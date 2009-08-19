@@ -3,12 +3,14 @@ package org.sonatype.nexus;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
+import org.sonatype.nexus.templates.repository.maven.Maven1GroupRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTemplate;
 
 public class GroupUpdateTest
     extends AbstractNexusTestCase
@@ -33,7 +35,7 @@ public class GroupUpdateTest
     {
         createM1HostedRepo( "m1h" );
         createM1ProxyRepo( "m1p" );
-        GroupRepository group = createM1Group( "m1g", Arrays.asList( "central-m1", "m1h", "m1p" ) );
+        MavenGroupRepository group = createM1Group( "m1g", Arrays.asList( "central-m1", "m1h", "m1p" ) );
         
         assertTrue( group.getMemberRepositoryIds().contains( "m1h" ) );
         assertTrue( group.getMemberRepositoryIds().contains( "m1p" ) );
@@ -48,65 +50,50 @@ public class GroupUpdateTest
         assertTrue( group.getMemberRepositoryIds().size() == 2 );
     }
     
-    private Repository createM1HostedRepo( String id )
+    private MavenRepository createM1HostedRepo( String id )
         throws Exception
-    {
-        Repository repo = repoRegistry.createNewRepository( id, Repository.class.getName(), "maven1" );
-        
-        repo.setBrowseable( true );
-        repo.setExposed( true );
-        repo.setId( id );
-        repo.setIndexable( false );
-        repo.setLocalStatus( LocalStatus.IN_SERVICE );
-        repo.setName( id );
-        repo.setNotFoundCacheActive( true );
-        
-        nexus.addRepository( repo );
-        
-        return repo;
+    {        
+        Maven1HostedRepositoryTemplate template = 
+            ( Maven1HostedRepositoryTemplate ) nexus.getRepositoryTemplates()
+                .getTemplates( Maven1HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+
+        template.getConfigurableRepository().setIndexable( false );
+        template.getConfigurableRepository().setId( id );
+        template.getConfigurableRepository().setName( id );
+
+        return template.create();
     }
     
-    private Repository createM1ProxyRepo( String id )
+    private MavenRepository createM1ProxyRepo( String id )
         throws Exception
     {
-        Repository repo = repoRegistry.createNewRepository( id, Repository.class.getName(), "maven1" );
-        
-        repo.setBrowseable( true );
-        repo.setExposed( true );
-        repo.setId( id );
-        repo.setIndexable( false );
-        repo.setLocalStatus( LocalStatus.IN_SERVICE );
-        repo.setName( id );
-        repo.setNotFoundCacheActive( true );
-        
-        ( ( ProxyRepository ) repo ).setRemoteStorage( remoteRepositoryStorage );
-        ( ( ProxyRepository ) repo ).setRemoteUrl( "http://someurl" );        
-        
-        nexus.addRepository( repo );
-        
-        return repo;
+        Maven1ProxyRepositoryTemplate template = 
+            ( Maven1ProxyRepositoryTemplate ) nexus.getRepositoryTemplates()
+                .getTemplates( Maven1ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+
+        template.getConfigurableRepository().setIndexable( false );
+        template.getConfigurableRepository().setId( id );
+        template.getConfigurableRepository().setName( id ); 
+
+        return template.create();
     }
     
-    private GroupRepository createM1Group( String id, List<String> members )
+    private MavenGroupRepository createM1Group( String id, List<String> members )
         throws Exception
     {
-        GroupRepository group = repoRegistry.createNewRepository( id, GroupRepository.class.getName(), "maven1" );
+        Maven1GroupRepositoryTemplate template = 
+            ( Maven1GroupRepositoryTemplate ) nexus.getRepositoryTemplates()
+                .getTemplates( Maven1GroupRepositoryTemplate.class ).pick();
 
-        group.setId( id );
-
-        group.setName( id );
-        
-        group.setExposed( true );
-
-        group.setLocalStatus( LocalStatus.IN_SERVICE );
+        template.getConfigurableRepository().setId( id );
+        template.getConfigurableRepository().setName( id );
+        template.getConfigurableRepository().setIndexable( false );        
         
         for ( String member : members )
         {
-            group.addMemberRepositoryId( member );
+            template.getExternalConfiguration( true ).addMemberRepositoryId( member );
         }
         
-        nexus.addRepository( group );
-        
-        return group;
+        return ( MavenGroupRepository ) template.create();
     }
 }

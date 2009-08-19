@@ -24,7 +24,7 @@ public class GroupUpdateIndexerManagerTest
 
         group.removeMemberRepositoryId( snapshots.getId() );
         super.nexusConfiguration.saveConfiguration();
-        Thread.sleep( 10000 );
+        waitForTasksToStop();
 
         group = (GroupRepository) repositoryRegistry.getRepository( "public" );
         assertFalse( group.getMemberRepositoryIds().contains( snapshots.getId() ) );
@@ -33,7 +33,7 @@ public class GroupUpdateIndexerManagerTest
 
         group.addMemberRepositoryId( apacheSnapshots.getId() );
         super.nexusConfiguration.saveConfiguration();
-        Thread.sleep( 10000 );
+        waitForTasksToStop();
 
         searchFor( "org.sonatype.test-evict", 1, "public" );
     }
