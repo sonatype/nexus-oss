@@ -45,6 +45,7 @@ public abstract class AbstractMavenRepositoryTemplate
     {
         MavenRepository mavenRepository = (MavenRepository) super.create();
 
+        // huh? see initConfig classes
         if ( getRepositoryPolicy() != null )
         {
             mavenRepository.setRepositoryPolicy( getRepositoryPolicy() );

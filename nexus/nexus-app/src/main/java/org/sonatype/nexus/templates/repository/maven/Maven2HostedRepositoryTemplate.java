@@ -43,7 +43,11 @@ public class Maven2HostedRepositoryTemplate
         repo.setExternalConfiguration( ex );
 
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( getRepositoryPolicy() );
+        // huh? see initConfig classes
+        if ( getRepositoryPolicy() != null )
+        {
+            exConf.setRepositoryPolicy( getRepositoryPolicy() );
+        }
 
         repo.externalConfigurationImple = exConf;
 

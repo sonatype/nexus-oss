@@ -5,26 +5,24 @@ import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
-import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven1.M1RepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
+import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
-public class Maven1HostedRepositoryTemplate
+public class Maven1GroupRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
-    public Maven1HostedRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
-                                           RepositoryPolicy repositoryPolicy )
+    public Maven1GroupRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description )
     {
-        super( provider, id, description, new Maven1ContentClass(), MavenHostedRepository.class, repositoryPolicy );
+        super( provider, id, description, new Maven1ContentClass(), MavenGroupRepository.class, null );
     }
 
-    public M1RepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    public M1GroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M1RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+        return (M1GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
             .getConfiguration( forWrite );
     }
 
@@ -36,34 +34,27 @@ public class Maven1HostedRepositoryTemplate
         repo.setId( "" );
         repo.setName( "" );
 
-        repo.setProviderRole( Repository.class.getName() );
+        repo.setProviderRole( GroupRepository.class.getName() );
         repo.setProviderHint( "maven1" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
-        M1RepositoryConfiguration exConf = new M1RepositoryConfiguration( ex );
-        // huh? see initConfig classes
-        if ( getRepositoryPolicy() != null )
-        {
-            exConf.setRepositoryPolicy( getRepositoryPolicy() );
-        }
-
+        M1GroupRepositoryConfiguration exConf = new M1GroupRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
-        repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
-        repo.setNotFoundCacheTTL( 1440 );
+        repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(
                                               getTemplateProvider().getApplicationConfiguration(),
                                               repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M1RepositoryConfiguration>()
+                                              new CRepositoryExternalConfigurationHolderFactory<M1GroupRepositoryConfiguration>()
                                               {
-                                                  public M1RepositoryConfiguration createExternalConfigurationHolder(
-                                                                                                                      CRepository config )
+                                                  public M1GroupRepositoryConfiguration createExternalConfigurationHolder(
+                                                                                                                           CRepository config )
                                                   {
-                                                      return new M1RepositoryConfiguration( (Xpp3Dom) config
+                                                      return new M1GroupRepositoryConfiguration( (Xpp3Dom) config
                                                           .getExternalConfiguration() );
                                                   }
                                               } );

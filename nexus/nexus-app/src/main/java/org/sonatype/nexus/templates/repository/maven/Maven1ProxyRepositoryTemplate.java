@@ -8,25 +8,25 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.maven.maven1.M1RepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
-public class Maven2ProxyRepositoryTemplate
+public class Maven1ProxyRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
-    public Maven2ProxyRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
+    public Maven1ProxyRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
                                           RepositoryPolicy repositoryPolicy )
     {
-        super( provider, id, description, new Maven2ContentClass(), MavenProxyRepository.class, repositoryPolicy );
+        super( provider, id, description, new Maven1ContentClass(), MavenProxyRepository.class, repositoryPolicy );
     }
 
-    public M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    public M1RepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+        return (M1RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
             .getConfiguration( forWrite );
     }
 
@@ -39,7 +39,7 @@ public class Maven2ProxyRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( Repository.class.getName() );
-        repo.setProviderHint( "maven2" );
+        repo.setProviderHint( "maven1" );
 
         repo.setRemoteStorage( new CRemoteStorage() );
         repo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
@@ -48,7 +48,7 @@ public class Maven2ProxyRepositoryTemplate
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+        M1RepositoryConfiguration exConf = new M1RepositoryConfiguration( ex );
         // huh? see initConfig classes
         if ( getRepositoryPolicy() != null )
         {
@@ -65,12 +65,12 @@ public class Maven2ProxyRepositoryTemplate
             new CRepositoryCoreConfiguration(
                                               getTemplateProvider().getApplicationConfiguration(),
                                               repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+                                              new CRepositoryExternalConfigurationHolderFactory<M1RepositoryConfiguration>()
                                               {
-                                                  public M2RepositoryConfiguration createExternalConfigurationHolder(
+                                                  public M1RepositoryConfiguration createExternalConfigurationHolder(
                                                                                                                       CRepository config )
                                                   {
-                                                      return new M2RepositoryConfiguration( (Xpp3Dom) config
+                                                      return new M1RepositoryConfiguration( (Xpp3Dom) config
                                                           .getExternalConfiguration() );
                                                   }
                                               } );
