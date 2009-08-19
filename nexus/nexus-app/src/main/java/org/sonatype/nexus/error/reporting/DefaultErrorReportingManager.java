@@ -209,23 +209,37 @@ public class DefaultErrorReportingManager
         if ( isEnabled() && shouldHandleReport( request ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
+            
+            File unencryptedFile = subRequest.getProblemReportBundle();
 
             encryptRequest( subRequest );
-
-            List<Issue> existingIssues = retrieveIssues( errorConfig, subRequest.getSummary() );
-
-            if ( existingIssues == null )
+            
+            File encryptedFile = subRequest.getProblemReportBundle();
+            
+            try
             {
-                IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
-                renameBundle( subRequest.getProblemReportBundle(), result.getKey() );
-                getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
+                List<Issue> existingIssues = retrieveIssues( errorConfig, subRequest.getSummary() );
+    
+                if ( existingIssues == null )
+                {
+                    IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
+                    renameBundle( unencryptedFile, result.getKey() );
+                    getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
+                }
+                else
+                {
+                    renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
+                    getLogger().info(
+                                      "Not reporting problem as it already exists in database: "
+                                          + existingIssues.iterator().next().getLink() );
+                }
             }
-            else
+            finally
             {
-                renameBundle( subRequest.getProblemReportBundle(), existingIssues.iterator().next().getKey() );
-                getLogger().info(
-                                  "Not reporting problem as it already exists in database: "
-                                      + existingIssues.iterator().next().getLink() );
+                if ( encryptedFile != null )
+                {
+                    encryptedFile.delete();
+                }
             }
         }
     }
