@@ -252,23 +252,29 @@ public class DefaultErrorReportingManager
 
     protected boolean shouldHandleReport( ErrorReportRequest request )
     {
-        getLogger().error( "Message: " + request.getThrowable().getMessage() );
-
-        String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
-
-        getLogger().error( "Hash: " + hash );
-
-        if ( errorHashSet.contains( hash ) )
+        if ( request.getThrowable() != null 
+            && request.getThrowable().getMessage() != null
+            && StringUtils.isNotEmpty( request.getThrowable().getMessage() ) )
         {
-            getLogger().error( "Contained!!!" );
-            return false;
+            String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
+    
+            if ( errorHashSet.contains( hash ) )
+            {
+                getLogger().debug( "Received an exception we already processed, ignoring." );
+                return false;
+            }
+            else
+            {
+                errorHashSet.add( hash );
+                return true;
+            }
         }
         else
         {
-            getLogger().error( "Not Contained!!!" );
-            errorHashSet.add( hash );
-            return true;
+            getLogger().debug( "Received an empty message in exception, will not handle" );
         }
+        
+        return false;
     }
 
     protected List<Issue> retrieveIssues( CErrorReporting errorConfig, String description )
