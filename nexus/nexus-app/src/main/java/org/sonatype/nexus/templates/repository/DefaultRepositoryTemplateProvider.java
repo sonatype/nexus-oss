@@ -11,8 +11,10 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.maven.Maven1GroupRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1Maven2ShadowRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven1ProxyRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
@@ -93,6 +95,16 @@ public class DefaultRepositoryTemplateProvider
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_snapshot",
                                                                "Maven1 Hosted Snapshot Repository",
                                                                RepositoryPolicy.SNAPSHOT ) );
+
+            templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_release",
+                                                              "Maven1 Proxy Release Repository",
+                                                              RepositoryPolicy.RELEASE ) );
+
+            templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_snapshot",
+                                                              "Maven1 Proxy Snapshot Repository",
+                                                              RepositoryPolicy.SNAPSHOT ) );
+
+            templates.add( new Maven1GroupRepositoryTemplate( this, "maven1_group", "Maven1 Group Repository" ) );
 
             templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
         }

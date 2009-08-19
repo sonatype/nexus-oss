@@ -64,7 +64,7 @@ public class DefaultNexusTest
         TemplateSet repoTemplates = getDefaultNexus().getRepositoryTemplates();
 
         assertNotNull( "template list is null", repoTemplates );
-        assertEquals( "there should be 9 templates", 9, repoTemplates.size() );
+        assertEquals( "there should be 12 templates", 12, repoTemplates.size() );
 
         RepositoryTemplate template =
             (AbstractRepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );
