@@ -32,7 +32,7 @@ public class DefaultErrorReportingManagerTest
     private DefaultErrorReportingManager manager;
 
     private NexusConfiguration nexusConfig;
-    
+
     private File unzipDir = new File( getBasedir(), "target/unzipdir" );
 
     @Override
@@ -43,7 +43,7 @@ public class DefaultErrorReportingManagerTest
 
         FileUtils.deleteDirectory( unzipDir );
 
-        nexusConfig = (NexusConfiguration) lookup( NexusConfiguration.class );
+        nexusConfig = lookup( NexusConfiguration.class );
 
         manager = (DefaultErrorReportingManager) lookup( ErrorReportingManager.class );
     }
@@ -53,9 +53,9 @@ public class DefaultErrorReportingManagerTest
     {
         manager.setEnabled( true );
         manager.setJIRAUrl( "https://issues.sonatype.org" );
-        manager.setJIRAProject( "*****" );
-        manager.setJIRAUsername( "*****" );
-        manager.setJIRAPassword( "*****" );
+        manager.setJIRAProject( "SBOX" );
+        // manager.setJIRAUsername( "********" );
+        // manager.setJIRAPassword( "********" );
         manager.setUseGlobalProxy( useProxy );
 
         nexusConfig.saveConfiguration();
@@ -72,16 +72,17 @@ public class DefaultErrorReportingManagerTest
         nexusConfig.saveConfiguration();
     }
 
-    public void donttestJiraAccess()
+    public void testJiraAccess()
         throws Exception
     {
-        enableProxy();
+        // enableProxy();
+        enableErrorReports( false );
 
         ErrorReportRequest request = new ErrorReportRequest();
 
         try
         {
-            throw new Exception( "Test exception" );
+            throw new Exception( "Test exception " + Long.toHexString( System.currentTimeMillis() ) );
         }
         catch ( Exception e )
         {
@@ -90,19 +91,24 @@ public class DefaultErrorReportingManagerTest
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: " + request.getThrowable().getMessage() );
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + request.getThrowable().getMessage() );
 
         Assert.assertNull( issues );
 
         manager.handleError( request );
 
-        issues = manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: " + request.getThrowable().getMessage() );
+        issues =
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + request.getThrowable().getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
 
         manager.handleError( request );
 
-        issues = manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: " + request.getThrowable().getMessage() );
+        issues =
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + request.getThrowable().getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
     }
@@ -203,33 +209,35 @@ public class DefaultErrorReportingManagerTest
         }
     }
 
-    public void donttestTaskFailure()
+    public void testTaskFailure()
         throws Exception
     {
         enableErrorReports( false );
 
-        NexusTask<?> task = (NexusTask<?>) lookup( SchedulerTask.class, "ExceptionTask" );
+        String msg = "Runtime exception " + Long.toHexString( System.currentTimeMillis() );
+        ExceptionTask task = (ExceptionTask) lookup( SchedulerTask.class, "ExceptionTask" );
+        task.setMessage(msg);
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: "
-                + new RuntimeException( "Runtime exception" ).getMessage() );
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + new RuntimeException( msg ).getMessage() );
 
         Assert.assertNull( issues );
 
         doCall( task );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: "
-                + new RuntimeException( "Runtime exception" ).getMessage() );
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + new RuntimeException( msg ).getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
 
         doCall( task );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "Automated Problem Report: "
-                + new RuntimeException( "Runtime exception" ).getMessage() );
+            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+                + new RuntimeException( msg ).getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
     }

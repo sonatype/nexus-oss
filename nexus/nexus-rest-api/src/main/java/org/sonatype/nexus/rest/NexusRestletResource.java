@@ -1,6 +1,7 @@
 package org.sonatype.nexus.rest;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
@@ -23,7 +24,7 @@ public class NexusRestletResource
     {
         super( context, request, response, delegate );
     }
-    
+
     @Override
     public Representation represent( Variant variant )
         throws ResourceException
@@ -38,17 +39,17 @@ public class NexusRestletResource
             {
                 handleError( e );
             }
-            
+
             throw e;
         }
         catch ( RuntimeException e )
         {
             handleError( e );
-            
+
             throw e;
         }
     }
-    
+
     @Override
     public void acceptRepresentation( Representation representation )
         throws ResourceException
@@ -63,17 +64,17 @@ public class NexusRestletResource
             {
                 handleError( e );
             }
-            
+
             throw e;
         }
         catch ( RuntimeException e )
         {
             handleError( e );
-            
+
             throw e;
         }
     }
-    
+
     @Override
     public void storeRepresentation( Representation representation )
         throws ResourceException
@@ -88,17 +89,17 @@ public class NexusRestletResource
             {
                 handleError( e );
             }
-            
+
             throw e;
         }
         catch ( RuntimeException e )
         {
             handleError( e );
-            
+
             throw e;
         }
     }
-    
+
     @Override
     public void removeRepresentations()
         throws ResourceException
@@ -113,29 +114,30 @@ public class NexusRestletResource
             {
                 handleError( e );
             }
-            
+
             throw e;
         }
         catch ( RuntimeException e )
         {
             handleError( e );
-            
+
             throw e;
         }
     }
-    
+
     protected void handleError( Throwable throwable )
     {
-        ErrorReportingManager manager = ( ErrorReportingManager ) getContext().getAttributes().get( ErrorReportingManager.class.getName() );
-        
+        ErrorReportingManager manager =
+            (ErrorReportingManager) getContext().getAttributes().get( ErrorReportingManager.class.getName() );
+
         if ( manager != null )
         {
             ErrorReportRequest request = new ErrorReportRequest();
-            
+
             request.getContext().putAll( getContext().getAttributes() );
-            
+
             request.setThrowable( throwable );
-            
+
             try
             {
                 manager.handleError( request );
@@ -145,6 +147,10 @@ public class NexusRestletResource
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
             }
             catch ( IOException e )
+            {
+                getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
+            }
+            catch ( GeneralSecurityException e )
             {
                 getLogger().log( Level.SEVERE, "Unable to submit error report to jira", e );
             }

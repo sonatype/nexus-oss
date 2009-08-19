@@ -2,6 +2,7 @@ package org.sonatype.nexus.error.reporting;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.sonatype.nexus.configuration.Configurable;
@@ -36,7 +37,7 @@ public interface ErrorReportingManager
     // ==
 
     void handleError( ErrorReportRequest request )
-        throws IssueSubmissionException, IOException;
+        throws IssueSubmissionException, IOException, GeneralSecurityException;
 
     File assembleBundle( ErrorReportRequest request )
         throws IOException;

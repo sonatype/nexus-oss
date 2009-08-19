@@ -8,22 +8,29 @@ import org.sonatype.scheduling.SchedulerTask;
 public class ExceptionTask
     extends AbstractNexusTask<Object>
 {
+    private String msg;
+
     @Override
     protected Object doRun()
         throws Exception
     {
-        throw new RuntimeException( "Runtime exception" );
+        throw new RuntimeException( msg );
     }
-    
+
     @Override
     protected String getAction()
     {
         return "Exception Task";
     }
-    
+
     @Override
     protected String getMessage()
     {
-        return "Exception Task";
+        return msg;
+    }
+
+    public void setMessage( String msg )
+    {
+        this.msg = msg;
     }
 }
