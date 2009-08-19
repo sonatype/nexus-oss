@@ -65,7 +65,7 @@ Ext.override( Sonatype.repoServer.ServerEditPanel, {
             {
               xtype: 'checkbox',
               fieldLabel: 'Enable',
-              helpText: 'Nexus will check for new releases, and will notify you in the Welcome tab when available.  Nexus will also use the "Default HTTP Proxy Settings" if available.',
+              helpText: 'Nexus will check for new releases, and will notify you in the Welcome tab when available.',
               name: 'enableVersionUpdates',
               anchor: Sonatype.view.FIELD_OFFSET,
               allowBlank: true,
