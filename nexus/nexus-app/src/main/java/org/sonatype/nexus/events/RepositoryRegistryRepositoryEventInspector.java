@@ -21,6 +21,8 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -31,6 +33,9 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -45,9 +50,14 @@ public class RepositoryRegistryRepositoryEventInspector
 
     @Requirement
     private IndexerManager indexerManager;
-    
+
     @Requirement
     private RepositoryRegistry repoRegistry;
+
+    @Requirement
+    private NexusScheduler nexusScheduler;
+
+    private boolean nexusStarted = false;
 
     protected Logger getLogger()
     {
@@ -59,14 +69,28 @@ public class RepositoryRegistryRepositoryEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event evt )
+    public boolean accepts( Event<?> evt )
     {
         return ( evt instanceof RepositoryRegistryRepositoryEvent )
-            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
+            || ( evt instanceof RepositoryConfigurationUpdatedEvent ) || ( evt instanceof NexusStartedEvent )
+            || ( evt instanceof NexusStoppedEvent );
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
+        if ( evt instanceof NexusStartedEvent )
+        {
+            nexusStarted = true;
+
+            return;
+        }
+        else if ( evt instanceof NexusStoppedEvent )
+        {
+            nexusStarted = false;
+
+            return;
+        }
+
         Repository repository = null;
 
         if ( evt instanceof RepositoryRegistryRepositoryEvent )
@@ -77,13 +101,13 @@ public class RepositoryRegistryRepositoryEventInspector
         {
             repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
         }
-        
+
         try
         {
-            //check registry for existance, wont be able to do much
-            //if doesn't exist yet
+            // check registry for existance, wont be able to do much
+            // if doesn't exist yet
             repoRegistry.getRepository( repository.getId() );
-            
+
             inspectForNexus( evt, repository );
 
             inspectForIndexerManager( evt, repository );
@@ -94,74 +118,77 @@ public class RepositoryRegistryRepositoryEventInspector
         }
     }
 
-    private void inspectForNexus( Event evt, Repository repository )
+    private void inspectForNexus( Event<?> evt, Repository repository )
     {
-        StringBuffer sb = new StringBuffer();
-
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        // we do not want RSS entries about boot and repo additions during boot
+        if ( nexusStarted )
         {
-            sb.append( " repository group " );
-        }
-        else
-        {
-            sb.append( " repository " );
-        }
+            StringBuffer sb = new StringBuffer();
 
-        sb.append( repository.getName() );
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                sb.append( " repository group " );
+            }
+            else
+            {
+                sb.append( " repository " );
+            }
 
-        sb.append( " (ID=" );
-
-        sb.append( repository.getId() );
-
-        sb.append( ") " );
-
-        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            sb.append( " as proxy repository for URL " );
-
-            sb.append( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
-        {
-            sb.append( " as hosted repository" );
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
-        {
-            sb.append( " as " );
-
-            sb.append( repository.getClass().getName() );
-
-            sb.append( " virtual repository for " );
-
-            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
+            sb.append( repository.getName() );
 
             sb.append( " (ID=" );
 
-            sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
+            sb.append( repository.getId() );
 
             sb.append( ") " );
-        }
 
-        sb.append( "." );
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            {
+                sb.append( " as proxy repository for URL " );
 
-        if ( evt instanceof RepositoryRegistryEventAdd )
-        {
-            sb.insert( 0, "Registered" );
-        }
-        else if ( evt instanceof RepositoryRegistryEventRemove )
-        {
-            sb.insert( 0, "Unregistered" );
-        }
-        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
-        {
-            sb.insert( 0, "Updated" );
-        }
+                sb.append( repository.adaptToFacet( ProxyRepository.class ).getRemoteUrl() );
+            }
+            else if ( repository.getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
+            {
+                sb.append( " as hosted repository" );
+            }
+            else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+            {
+                sb.append( " as " );
 
-        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
+                sb.append( repository.getClass().getName() );
 
+                sb.append( " virtual repository for " );
+
+                sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getName() );
+
+                sb.append( " (ID=" );
+
+                sb.append( repository.adaptToFacet( ShadowRepository.class ).getMasterRepository().getId() );
+
+                sb.append( ") " );
+            }
+
+            sb.append( "." );
+
+            if ( evt instanceof RepositoryRegistryEventAdd )
+            {
+                sb.insert( 0, "Registered" );
+            }
+            else if ( evt instanceof RepositoryRegistryEventRemove )
+            {
+                sb.insert( 0, "Unregistered" );
+            }
+            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
+            {
+                sb.insert( 0, "Updated" );
+            }
+
+            getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
+        }
     }
 
-    private void inspectForIndexerManager( Event evt, Repository repository )
+    private void inspectForIndexerManager( Event<?> evt, Repository repository )
     {
         try
         {
@@ -169,10 +196,29 @@ public class RepositoryRegistryRepositoryEventInspector
             if ( evt instanceof RepositoryRegistryEventAdd )
             {
                 getIndexerManager().addRepositoryIndexContext( repository.getId() );
+
+                getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isIndexable() );
+
+                // create the initial index
+                if ( nexusStarted && repository.isIndexable() )
+                {
+                    // Create the initial index for the repository
+                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    rt.setRepositoryId( repository.getId() );
+                    nexusScheduler.submit( "Create initial index.", rt );
+                }
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
             {
                 getIndexerManager().removeRepositoryIndexContext( repository.getId(), false );
+
+                // remove the storage folders for the repository
+                DeleteRepositoryFoldersTask task =
+                    nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
+
+                task.setRepository( repository );
+
+                nexusScheduler.submit( "Remove repository folder", task );
             }
             else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {

@@ -41,20 +41,15 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 public class DownloadRemoteIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
-
     private Server server;
 
     private File fakeCentral;
-
-    private NexusIndexer nexusIndexer;
 
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        nexusIndexer = lookup( NexusIndexer.class );
 
         fakeCentral = new File( getBasedir(), "target/repos/fake-central" );
         fakeCentral.mkdirs();

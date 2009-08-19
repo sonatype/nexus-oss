@@ -24,9 +24,10 @@ public class Maven2ProxyRepositoryTemplate
         super( provider, id, description, new Maven2ContentClass(), MavenProxyRepository.class, repositoryPolicy );
     }
 
-    public M2RepositoryConfiguration getExternalConfiguration()
+    public M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
+        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+            .getConfiguration( forWrite );
     }
 
     @Override

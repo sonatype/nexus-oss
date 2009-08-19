@@ -37,7 +37,6 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventRetrieve;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
@@ -68,7 +67,7 @@ public class RepositoryItemEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event evt )
+    public boolean accepts( Event<?> evt )
     {
         if ( evt instanceof RepositoryItemEvent )
         {
@@ -77,14 +76,14 @@ public class RepositoryItemEventInspector
         return false;
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
         inspectForNexus( evt );
 
         inspectForIndexerManager( evt );
     }
 
-    private void inspectForNexus( Event evt )
+    private void inspectForNexus( Event<?> evt )
     {
         RepositoryItemEvent ievt = (RepositoryItemEvent) evt;
 
@@ -134,7 +133,7 @@ public class RepositoryItemEventInspector
         }
     }
 
-    private void inspectForIndexerManager( Event evt )
+    private void inspectForIndexerManager( Event<?> evt )
     {
         try
         {

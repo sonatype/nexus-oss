@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.repositories;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.Context;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -44,19 +46,25 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.util.EnumUtil;
+import org.sonatype.nexus.templates.TemplateProvider;
+import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
+import org.sonatype.nexus.templates.repository.ManuallyConfiguredRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 /**
  * A resource list for Repository list.
- *
+ * 
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryListPlexusResource" )
 public class RepositoryListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    // UGLY HACK, SEE BELOW
+    @Requirement( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
+    private DefaultRepositoryTemplateProvider repositoryTemplateProvider;
 
     public RepositoryListPlexusResource()
     {
@@ -102,9 +110,21 @@ public class RepositoryListPlexusResource
 
             try
             {
-                CRepository normal = getRepositoryAppModel( resource, null );
+                CRepository config = getRepositoryAppModel( resource, null );
 
-                getNexus().createRepository( normal );
+                // UGLY HACK
+                // This is all broken here, the conversions that happens (Repo REST DTO -> CRepo DTO -> Repo creation)
+                // is simply damn too stupid.
+                // All this should be removed, and do not use C* config classes anymore in REST API (see NEXUS-2505).
+                // For now, this is a "backdoor", using manual template when we have a CRepo object.
+                ManuallyConfiguredRepositoryTemplate template =
+                    repositoryTemplateProvider
+                        .createManuallyTemplate( new CRepositoryCoreConfiguration( repositoryTemplateProvider
+                            .getApplicationConfiguration(), config, null ) );
+
+                template.create();
+
+                getNexusConfiguration().saveConfiguration();
             }
             catch ( ConfigurationException e )
             {
@@ -126,7 +146,7 @@ public class RepositoryListPlexusResource
     /**
      * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
      * target is null, "create".
-     *
+     * 
      * @param model
      * @param target
      * @return app model, merged or created
@@ -163,7 +183,7 @@ public class RepositoryListPlexusResource
 
             appModel.setExternalConfiguration( ex );
 
-            //indexer is unaware of the m2 layout conversion
+            // indexer is unaware of the m2 layout conversion
             appModel.setIndexable( false );
 
             RepositoryShadowResource repoResource = (RepositoryShadowResource) resource;
@@ -187,7 +207,7 @@ public class RepositoryListPlexusResource
             RepositoryResource repoResource = (RepositoryResource) resource;
 
             // we can use the default if the value is empty
-            if( StringUtils.isNotEmpty( repoResource.getWritePolicy() ))
+            if ( StringUtils.isNotEmpty( repoResource.getWritePolicy() ) )
             {
                 appModel.setWritePolicy( repoResource.getWritePolicy() );
             }
@@ -241,7 +261,7 @@ public class RepositoryListPlexusResource
     /**
      * Converting REST DTO + possible App model to App model. If app model is given, "update" happens, otherwise if
      * target is null, "create".
-     *
+     * 
      * @param model
      * @param target
      * @return app model, merged or created
@@ -271,13 +291,19 @@ public class RepositoryListPlexusResource
             target.getRemoteStorage().setUrl( model.getRemoteStorage().getRemoteStorageUrl() );
 
             // remote auth
-            target.getRemoteStorage().setAuthentication( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), null ) );
+            target.getRemoteStorage().setAuthentication(
+                                                         this.convertAuthentication( model.getRemoteStorage()
+                                                             .getAuthentication(), null ) );
 
             // connection settings
-            target.getRemoteStorage().setConnectionSettings( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
+            target.getRemoteStorage().setConnectionSettings(
+                                                             this.convertRemoteConnectionSettings( model
+                                                                 .getRemoteStorage().getConnectionSettings() ) );
 
             // http proxy settings
-            target.getRemoteStorage().setHttpProxySettings( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), null ) );
+            target.getRemoteStorage().setHttpProxySettings(
+                                                            this.convertHttpProxySettings( model.getRemoteStorage()
+                                                                .getHttpProxySettings(), null ) );
         }
 
         return target;

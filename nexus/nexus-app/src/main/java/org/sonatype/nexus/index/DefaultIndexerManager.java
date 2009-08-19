@@ -40,7 +40,6 @@ import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
@@ -59,7 +58,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -73,12 +71,6 @@ import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.ResetGroupIndexTask;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * Indexer Manager. This is a thin layer above Nexus Indexer and simply manages indexingContext additions, updates and
@@ -88,13 +80,13 @@ import org.sonatype.plexus.appevents.EventListener;
  * remote peer is publishing index). In case of group reposes, the things are little different: their local context
  * contains the index of GroupRepository local storage, and remote context contains the merged indexes of it's member
  * repositories.
- *
+ * 
  * @author Tamas Cservenak
  */
 @Component( role = ComposableIndexerManager.class, hint = "lucene" )
 public class DefaultIndexerManager
     extends AbstractLogEnabled
-    implements ComposableIndexerManager, EventListener, Initializable
+    implements ComposableIndexerManager
 
 {
     /** Context id local suffix */
@@ -120,17 +112,11 @@ public class DefaultIndexerManager
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
-
     @Requirement( role = IndexCreator.class, hints = { "min", "jarContent" } )
     private List<IndexCreator> indexCreators;
 
     @Requirement( hint = "maven2" )
     private ContentClass maven2;
-
-    @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
 
     @Requirement
     private IndexArtifactFilter indexArtifactFilter;
@@ -407,16 +393,6 @@ public class DefaultIndexerManager
 
         IndexingContext rctx = getRepositoryRemoteIndexContext( repository );
 
-        if ( !ctx.isSearchable() && searchable )
-        {
-            // we have a !searchable -> searchable transition, reindex it
-            ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-
-            rt.setRepositoryId( repositoryId );
-
-            nexusScheduler.submit( "Searchable re-enabled", rt );
-        }
-
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
@@ -431,7 +407,7 @@ public class DefaultIndexerManager
 
     /**
      * Extracts the repo root on local FS as File. It may return null!
-     *
+     * 
      * @param repository
      * @return
      * @throws MalformedURLException
@@ -499,11 +475,11 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
-        
+
         if ( repository.isIndexable() )
         {
             reindexRepository( repository, fullReindex );
-    
+
             publishRepositoryIndex( repositoryId );
         }
     }
@@ -511,17 +487,18 @@ public class DefaultIndexerManager
     public void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        GroupRepository groupRepo = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-        
+        GroupRepository groupRepo =
+            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
+
         if ( groupRepo.isIndexable() )
-        {    
+        {
             List<Repository> group = groupRepo.getMemberRepositories();
-    
+
             for ( Repository repository : group )
             {
                 reindexRepository( repository, fullReindex );
             }
-    
+
             publishRepositoryGroupIndex( repositoryGroupId );
         }
     }
@@ -530,24 +507,24 @@ public class DefaultIndexerManager
         throws NoSuchRepositoryException, IOException
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
-        
+
         if ( group.isIndexable() )
         {
             getLogger().info( "Remerging group '" + groupId + "'" );
-            
+
             List<Repository> repositoriesList = group.getMemberRepositories();
-    
+
             purgeCurrentIndex( group );
-    
+
             // purge it, and below will be repopulated
             purgeRepositoryGroupIndex( group );
-    
+
             for ( Repository repository : repositoriesList )
             {
                 getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
                 mergeRepositoryGroupIndexWithMember( repository );
             }
-    
+
             publishRepositoryGroupIndex( groupId );
         }
     }
@@ -555,8 +532,7 @@ public class DefaultIndexerManager
     protected void reindexRepository( Repository repository, boolean fullReindex )
         throws IOException
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) 
-            || !repository.isIndexable() )
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) || !repository.isIndexable() )
         {
             return;
         }
@@ -654,7 +630,8 @@ public class DefaultIndexerManager
         {
             if ( repository.isIndexable() )
             {
-                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) && downloadRepositoryIndex( repository ) )
+                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() )
+                    && downloadRepositoryIndex( repository ) )
                 {
                     mergeRepositoryGroupIndexWithMember( repository );
                 }
@@ -667,8 +644,7 @@ public class DefaultIndexerManager
     {
         ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
 
-        if ( repository.isIndexable() 
-            && downloadRepositoryIndex( repository ) )
+        if ( repository.isIndexable() && downloadRepositoryIndex( repository ) )
         {
             mergeRepositoryGroupIndexWithMember( repository );
         }
@@ -683,8 +659,7 @@ public class DefaultIndexerManager
 
         for ( Repository repository : group )
         {
-            if ( repository.isIndexable() 
-                && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            if ( repository.isIndexable() && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
                 if ( downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
                 {
@@ -955,14 +930,14 @@ public class DefaultIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-        
+
         if ( group.isIndexable() )
         {
             for ( Repository repository : group.getMemberRepositories() )
             {
                 publishRepositoryIndex( repository );
             }
-    
+
             publishRepositoryGroupIndex( group );
         }
     }
@@ -971,8 +946,7 @@ public class DefaultIndexerManager
         throws IOException
     {
         // shadows are not capable to publish indexes
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) 
-            || !repository.isIndexable())
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) || !repository.isIndexable() )
         {
             return;
         }
@@ -1055,42 +1029,42 @@ public class DefaultIndexerManager
             {
                 getLogger().debug( "Publishing merged index for repository group " + repoId );
             }
-    
+
             // groups contains the merged context in -remote idx context
             IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
-    
+
             File targetDir = null;
-    
+
             Lock lock = getLock( repoId ).writeLock();
             lock.lock();
             try
             {
                 targetDir = new File( getTempDirectory(), "nx-index" + System.currentTimeMillis() );
-    
+
                 if ( !targetDir.mkdirs() )
                 {
                     throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
                 }
-    
+
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "Packing the merged index context." );
                 }
-    
+
                 // copy the current properties file to the temp directory, this is what the indexer uses to decide
                 // if chunks are necessary, and what to label it as
                 copyIndexPropertiesToTempDir( groupRepository, targetDir );
-    
+
                 IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
-    
+
                 packReq.setCreateIncrementalChunks( true );
-    
+
                 packReq.setUseTargetProperties( true );
-    
+
                 indexPacker.packIndex( packReq );
-    
+
                 File[] files = targetDir.listFiles();
-    
+
                 if ( files != null )
                 {
                     for ( File file : files )
@@ -1102,14 +1076,14 @@ public class DefaultIndexerManager
             finally
             {
                 lock.unlock();
-    
+
                 if ( targetDir != null )
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug( "Cleanup of temp files..." );
                     }
-    
+
                     FileUtils.deleteDirectory( targetDir );
                 }
             }
@@ -1617,26 +1591,4 @@ public class DefaultIndexerManager
 
         return tmpContext;
     }
-
-    public void onEvent( Event<?> evt )
-    {
-        if ( evt instanceof RepositoryGroupMembersChangedEvent )
-        {
-            GroupRepository repo = ( (RepositoryGroupMembersChangedEvent) evt ).getGroupRepository();
-            
-            if ( repo.isIndexable() )
-            {
-                // Update the repo
-                ResetGroupIndexTask rt = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
-                rt.setRepositoryGroupId( repo.getId() );
-                nexusScheduler.submit( "Update group index.", rt );
-            }
-        }
-    }
-
-    public void initialize()
-    {
-        applicationEventMulticaster.addEventListener( this );
-    }
-
 }

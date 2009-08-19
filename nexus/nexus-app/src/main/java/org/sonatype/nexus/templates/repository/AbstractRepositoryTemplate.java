@@ -19,10 +19,12 @@ public abstract class AbstractRepositoryTemplate
 
     private final Class<?> mainFacet;
 
+    private ConfigurableRepository configurableRepository;
+
     public AbstractRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
                                        ContentClass contentClass, Class<?> mainFacet )
     {
-        super( id, description );
+        super( provider, id, description );
 
         this.provider = provider;
 
@@ -38,7 +40,15 @@ public abstract class AbstractRepositoryTemplate
         }
     }
 
-    protected DefaultRepositoryTemplateProvider getTemplateProvider()
+    @Override
+    public boolean targetFits( Object clazz )
+    {
+        return super.targetFits( clazz ) || targetIsClassAndFitsClass( clazz, getMainFacet() )
+            || clazz.equals( getContentClass() );
+    }
+
+    @Override
+    public DefaultRepositoryTemplateProvider getTemplateProvider()
     {
         return provider;
     }
@@ -55,18 +65,20 @@ public abstract class AbstractRepositoryTemplate
 
     public ConfigurableRepository getConfigurableRepository()
     {
-        ConfigurableRepository configurableRepository = new ConfigurableRepository();
-
-        try
+        if ( configurableRepository == null )
         {
-            configurableRepository.configure( getCoreConfiguration() );
-        }
-        catch ( ConfigurationException e )
-        {
-            // will not happen, since ConfigurableRepository will not validate!
-            // TODO: get rid of this exception from here
-        }
+            configurableRepository = new ConfigurableRepository();
 
+            try
+            {
+                configurableRepository.configure( getCoreConfiguration() );
+            }
+            catch ( ConfigurationException e )
+            {
+                // will not happen, since ConfigurableRepository will not validate!
+                // TODO: get rid of this exception from here
+            }
+        }
         return configurableRepository;
     }
 
@@ -79,16 +91,15 @@ public abstract class AbstractRepositoryTemplate
         getCoreConfiguration().commitChanges();
 
         // create a repository
-        Repository result =
-            getTemplateProvider().getNexus().createRepository(
-                                                               ( (CRepositoryCoreConfiguration) getCoreConfiguration() )
-                                                                   .getConfiguration( false ) );
+        Repository repository =
+            getTemplateProvider().getNexus().getNexusConfiguration()
+                .createRepository( ( (CRepositoryCoreConfiguration) getCoreConfiguration() ).getConfiguration( false ) );
 
         // reset the template
         setCoreConfiguration( null );
 
         // return the result
-        return result;
+        return repository;
     }
 
     @Override

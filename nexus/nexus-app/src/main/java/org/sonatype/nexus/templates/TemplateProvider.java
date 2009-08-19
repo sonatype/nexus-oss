@@ -1,7 +1,5 @@
 package org.sonatype.nexus.templates;
 
-import java.util.List;
-
 import javax.inject.Singleton;
 
 import org.sonatype.plugin.ExtensionPoint;
@@ -13,21 +11,28 @@ import org.sonatype.plugin.ExtensionPoint;
  */
 @ExtensionPoint
 @Singleton
-public interface TemplateProvider<T extends Template>
+public interface TemplateProvider
 {
     /**
-     * Returns the template class for which this provider provides templates.
+     * Lists all templates.
      * 
      * @return
      */
-    Class<T> getTemplateClass();
+    TemplateSet getTemplates();
 
     /**
-     * Lists the templates.
+     * Lists all templates that fits supplied filter.
      * 
      * @return
      */
-    List<T> getTemplates();
+    TemplateSet getTemplates( Object filter );
+
+    /**
+     * Lists all templates that fits supplied filters.
+     * @param clazz
+     * @return
+     */
+    TemplateSet getTemplates( Object... filters );
 
     /**
      * Search a template by it's ID.
@@ -36,6 +41,6 @@ public interface TemplateProvider<T extends Template>
      * @return
      * @throws NoSuchTemplateIdException
      */
-    T getTemplateById( String id )
+    Template getTemplateById( String id )
         throws NoSuchTemplateIdException;
 }

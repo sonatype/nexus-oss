@@ -7,13 +7,9 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.hamcrest.CoreMatchers;
 import org.restlet.data.Status;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -26,13 +22,12 @@ import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -215,56 +210,41 @@ public class Nexus2145RepositoryTest
     public void createRepo()
         throws Exception
     {
-        CRepository cRepo = new CRepository();
-        cRepo.setId( "nexus2145" );
-        cRepo.setName( "nexus2145" );
-        cRepo.setProviderRole( Repository.class.getName() );
-        cRepo.setProviderHint( "maven2" );
+        Maven2ProxyRepositoryTemplate template =
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
-        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        template.getConfigurableRepository().setId( "nexus2145" );
+        template.getConfigurableRepository().setName( "nexus2145" );
 
-        Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-        cRepo.setExternalConfiguration( ex );
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
 
-        cRepo.setLocalStorage( new CLocalStorage() );
-        cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
-        cRepo.getLocalStorage().setProvider( "file" );
+        template.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
-        cRepo.setRemoteStorage( new CRemoteStorage() );
-        cRepo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
-        cRepo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
-        cRepo.setExposed( true );
-        cRepo.setUserManaged( true );
-        cRepo.setIndexable( true );
-        cRepo.setBrowseable( true );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setUserManaged( true );
+        template.getConfigurableRepository().setIndexable( true );
+        template.getConfigurableRepository().setBrowseable( true );
 
-        proxyRepo = (M2Repository) nexus.createRepository( cRepo );
+        proxyRepo = (M2Repository) template.create();
 
-        cRepo = new CRepository();
-        cRepo.setId( "hosted-nexus2145" );
-        cRepo.setName( "hosted-nexus2145" );
-        cRepo.setProviderRole( Repository.class.getName() );
-        cRepo.setProviderHint( "maven2" );
+        Maven2HostedRepositoryTemplate hostedTemplate =
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
-        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        hostedTemplate.getConfigurableRepository().setId( "hosted-nexus2145" );
+        hostedTemplate.getConfigurableRepository().setName( "hosted-nexus2145" );
 
-        ex = new Xpp3Dom( "externalConfiguration" );
-        cRepo.setExternalConfiguration( ex );
-        exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        hostedTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
 
-        cRepo.setLocalStorage( new CLocalStorage() );
-        cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
-        cRepo.getLocalStorage().setProvider( "file" );
+        hostedTemplate.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
-        cRepo.setExposed( true );
-        cRepo.setUserManaged( true );
-        cRepo.setIndexable( true );
-        cRepo.setBrowseable( true );
+        hostedTemplate.getConfigurableRepository().setExposed( true );
+        hostedTemplate.getConfigurableRepository().setUserManaged( true );
+        hostedTemplate.getConfigurableRepository().setIndexable( true );
+        hostedTemplate.getConfigurableRepository().setBrowseable( true );
 
-        hostedRepo = (M2Repository) nexus.createRepository( cRepo );
+        hostedRepo = (M2Repository) hostedTemplate.create();
     }
 
     @AfterClass
@@ -379,7 +359,8 @@ public class Nexus2145RepositoryTest
         RepositoriesTab repositories = startContextMenuTest();
 
         // put out of service
-        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper
+            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuPutOutOfService( hostedRepo.getId() );
         new MessageBox( selenium ).clickOk();
 
@@ -427,7 +408,8 @@ public class Nexus2145RepositoryTest
         RepositoriesTab repositories = startContextMenuTest();
 
         // block proxy
-        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper
+            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuBlockProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
 
@@ -448,7 +430,8 @@ public class Nexus2145RepositoryTest
                            equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
 
         // allow proxy
-        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper
+            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuAllowProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
 

@@ -29,7 +29,7 @@ public class RepositoryEventLocalStatusChangedInspector
     extends AbstractFeedRecorderEventInspector
 {
 
-    public boolean accepts( Event evt )
+    public boolean accepts( Event<?> evt )
     {
         if ( evt instanceof RepositoryEventLocalStatusChanged )
         {
@@ -38,7 +38,7 @@ public class RepositoryEventLocalStatusChangedInspector
         return false;
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
         RepositoryEventLocalStatusChanged revt = (RepositoryEventLocalStatusChanged) evt;
 

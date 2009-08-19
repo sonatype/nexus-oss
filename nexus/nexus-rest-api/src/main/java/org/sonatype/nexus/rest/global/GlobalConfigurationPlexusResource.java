@@ -31,6 +31,10 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.rest.RestApiConfiguration;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
@@ -44,6 +48,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
+import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
@@ -71,6 +76,60 @@ public class GlobalConfigurationPlexusResource
 
     @Requirement
     private RestApiConfiguration restApiConfiguration;
+
+    // DEFAULT CONFIG
+    // ==
+    @Requirement( hint = "static" )
+    private SecurityConfigurationSource defaultSecurityConfigurationSource;
+
+    @Requirement( hint = "static" )
+    private ApplicationConfigurationSource configurationSource;
+
+    // ----------------------------------------------------------------------------
+    // Default Configuration
+    // ----------------------------------------------------------------------------
+
+    public boolean isDefaultSecurityEnabled()
+    {
+        return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
+    }
+
+    public boolean isDefaultAnonymousAccessEnabled()
+    {
+        return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
+    }
+
+    public String getDefaultAnonymousUsername()
+    {
+        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousUsername();
+    }
+
+    public String getDefaultAnonymousPassword()
+    {
+        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousPassword();
+    }
+
+    public List<String> getDefaultRealms()
+    {
+        return this.defaultSecurityConfigurationSource.getConfiguration().getRealms();
+    }
+
+    public CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings()
+    {
+        return configurationSource.getConfiguration().getGlobalConnectionSettings();
+    }
+
+    public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
+    {
+        return configurationSource.getConfiguration().getGlobalHttpProxySettings();
+    }
+
+    public CSmtpConfiguration readDefaultSmtpConfiguration()
+    {
+        return configurationSource.getConfiguration().getSmtpConfiguration();
+    }
+
+    // ==
 
     public GlobalConfigurationPlexusResource()
     {
@@ -292,31 +351,30 @@ public class GlobalConfigurationPlexusResource
 
                                 getLogger()
                                     .warn(
-                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                        e );
+                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                           e );
 
                                 String msg = "User '" + resource.getSecurityAnonymousUsername() + "' does not exist.";
 
-                                throw new PlexusResourceException(
-                                    Status.CLIENT_ERROR_BAD_REQUEST,
-                                    msg,
-                                    getNexusErrorResponse( "securityAnonymousUsername", msg ) );
+                                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, msg,
+                                                                   getNexusErrorResponse( "securityAnonymousUsername",
+                                                                                          msg ) );
                             }
                             catch ( AuthenticationException e )
                             {
                                 // the supplied anon auth info is wrong
                                 getLogger()
                                     .warn(
-                                        "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                        e );
+                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                           e );
 
-                                String msg = "The password of user '" + resource.getSecurityAnonymousUsername()
-                                    + "' is incorrect.";
+                                String msg =
+                                    "The password of user '" + resource.getSecurityAnonymousUsername()
+                                        + "' is incorrect.";
 
-                                throw new PlexusResourceException(
-                                    Status.CLIENT_ERROR_BAD_REQUEST,
-                                    msg,
-                                    getNexusErrorResponse( "securityAnonymousPassword", msg ) );
+                                throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, msg,
+                                                                   getNexusErrorResponse( "securityAnonymousPassword",
+                                                                                          msg ) );
                             }
                         }
 
@@ -390,25 +448,25 @@ public class GlobalConfigurationPlexusResource
      */
     protected void fillDefaultConfiguration( Request request, GlobalConfigurationResource resource )
     {
-        resource.setSecurityEnabled( getNexus().isDefaultSecurityEnabled() );
+        resource.setSecurityEnabled( isDefaultSecurityEnabled() );
 
-        resource.setSecurityAnonymousAccessEnabled( getNexus().isDefaultAnonymousAccessEnabled() );
+        resource.setSecurityAnonymousAccessEnabled( isDefaultAnonymousAccessEnabled() );
 
-        resource.setSecurityRealms( getNexus().getDefaultRealms() );
+        resource.setSecurityRealms( getDefaultRealms() );
 
-        resource.setSecurityAnonymousUsername( getNexus().getDefaultAnonymousUsername() );
+        resource.setSecurityAnonymousUsername( getDefaultAnonymousUsername() );
 
         resource.setSecurityAnonymousPassword( PASSWORD_PLACE_HOLDER );
 
-        resource.setGlobalConnectionSettings( convert( getNexus().readDefaultGlobalRemoteConnectionSettings() ) );
+        resource.setGlobalConnectionSettings( convert( readDefaultGlobalRemoteConnectionSettings() ) );
 
-        resource.setGlobalHttpProxySettings( convert( getNexus().readDefaultGlobalRemoteHttpProxySettings() ) );
+        resource.setGlobalHttpProxySettings( convert( readDefaultGlobalRemoteHttpProxySettings() ) );
 
         resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
 
         resource.setForceBaseUrl( restApiConfiguration.isForceBaseUrl() );
 
-        resource.setSmtpSettings( convert( getNexus().readDefaultSmtpConfiguration() ) );
+        resource.setSmtpSettings( convert( readDefaultSmtpConfiguration() ) );
     }
 
     /**

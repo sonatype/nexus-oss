@@ -1,13 +1,11 @@
 package org.sonatype.nexus.templates;
 
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public abstract class AbstractTemplateProvider<T extends Template>
-    implements TemplateProvider<T>
+    implements TemplateProvider
 {
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -22,13 +20,12 @@ public abstract class AbstractTemplateProvider<T extends Template>
         this.applicationConfiguration = conf;
     }
 
-    public T getTemplateById( String id )
+    public Template getTemplateById( String id )
         throws NoSuchTemplateIdException
     {
-        // TODO: some other selection that simple iteration?
-        List<T> templates = getTemplates();
+        TemplateSet templates = getTemplates();
 
-        for ( T template : templates )
+        for ( Template template : templates )
         {
             if ( StringUtils.equals( id, template.getId() ) )
             {
@@ -36,7 +33,6 @@ public abstract class AbstractTemplateProvider<T extends Template>
             }
         }
 
-        throw new NoSuchTemplateIdException( "Template for class='" + getTemplateClass().getName() + "' with Id='" + id
-            + "' not found!" );
+        throw new NoSuchTemplateIdException( "Template for Id='" + id + "' not found!" );
     }
 }

@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.rest.templates.repositories;
 
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -30,6 +28,8 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.templates.Template;
+import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -67,10 +67,12 @@ public class RepositoryTemplateListPlexusResource
 
         RepositoryListResource repoRes;
 
-        List<RepositoryTemplate> repoTemplates = getNexus().getRepositoryTemplates();
+        TemplateSet repoTemplates = getNexus().getRepositoryTemplates();
 
-        for ( RepositoryTemplate template : repoTemplates )
+        for ( Template tmp : repoTemplates )
         {
+            RepositoryTemplate template = (RepositoryTemplate) tmp;
+
             repoRes = new RepositoryListResource();
 
             repoRes.setResourceURI( createChildReference( request, this, template.getId() ).toString() );
@@ -105,9 +107,8 @@ public class RepositoryTemplateListPlexusResource
             // another hack
             if ( template.getCoreConfiguration().getExternalConfiguration().getConfiguration( false ) instanceof AbstractMavenRepositoryConfiguration )
             {
-                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template
-                    .getCoreConfiguration().getExternalConfiguration().getConfiguration( false ) )
-                    .getRepositoryPolicy().toString() );
+                repoRes.setRepoPolicy( ( (AbstractMavenRepositoryConfiguration) template.getCoreConfiguration()
+                    .getExternalConfiguration().getConfiguration( false ) ).getRepositoryPolicy().toString() );
             }
 
             // format

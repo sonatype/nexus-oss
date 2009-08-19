@@ -37,13 +37,14 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 public abstract class AbstractRepositoryGroupPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
-    
+
     @Requirement
     private PlexusContainer container;
 
@@ -72,10 +73,11 @@ public abstract class AbstractRepositoryGroupPlexusResource
             group.setName( model.getName() );
 
             group.setExposed( model.isExposed() );
-            
+
             ArrayList<String> members = new ArrayList<String>();
 
-            for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model.getRepositories() )
+            for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model
+                .getRepositories() )
             {
                 members.add( member.getId() );
             }
@@ -84,18 +86,18 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             getNexusConfiguration().saveConfiguration();
         }
-        catch ( NoSuchRepositoryAccessException e)
+        catch ( NoSuchRepositoryAccessException e )
         {
             // access denied 403
             getLogger().warn( "Repository referenced by Repository Group Access Eenied, ID=" + model.getId(), e );
-            
+
             throw new PlexusResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Repository referenced by Repository Group Access Denied, GroupId="
-                    + model.getId(),
-                e,
-                getNexusErrorResponse( "repositories",
-                                       "Repository referenced by Repository Group Access Denied" ) );
+                                               Status.CLIENT_ERROR_BAD_REQUEST,
+                                               "Repository referenced by Repository Group Access Denied, GroupId="
+                                                   + model.getId(),
+                                               e,
+                                               getNexusErrorResponse( "repositories",
+                                                                      "Repository referenced by Repository Group Access Denied" ) );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -133,50 +135,41 @@ public abstract class AbstractRepositoryGroupPlexusResource
     {
         try
         {
-            GroupRepository group = this.getRepositoryRegistry().createNewRepository( model.getId(), GroupRepository.class.getName(), model.getProvider() );
+            Maven2GroupRepositoryTemplate template =
+                (Maven2GroupRepositoryTemplate) getNexus().getRepositoryTemplates()
+                    .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
 
-            group.setId( model.getId() );
+            template.getConfigurableRepository().setId( model.getId() );
 
-            group.setName( model.getName() );
-            
-            group.setExposed( model.isExposed() );
+            template.getConfigurableRepository().setName( model.getName() );
 
-            group.setLocalStatus( LocalStatus.IN_SERVICE );
-        
-            for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model.getRepositories() )
+            template.getConfigurableRepository().setExposed( model.isExposed() );
+
+            template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+
+            for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model
+                .getRepositories() )
             {
-                group.addMemberRepositoryId( member.getId() );
+                template.getExternalConfiguration( true ).addMemberRepositoryId( member.getId() );
             }
-            
-            this.getNexus().addRepository( group );
-            
+
+            template.create();
         }
-        catch ( NoSuchRepositoryAccessException e)
+        // FIXME: cstamas or toby?
+/*        catch ( NoSuchRepositoryAccessException e )
         {
             // access denied 403
             getLogger().warn( "Repository referenced by Repository Group Access Denied, ID=" + model.getId(), e );
-            
-            throw new PlexusResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Repository referenced by Repository Group Access Denied, GroupId="
-                    + model.getId(),
-                e,
-                getNexusErrorResponse( "repositories",
-                                       "Repository referenced by Repository Group Access Denied" ) );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "Repository referenced by Repository Group Not Found, ID=" + model.getId(), e );
 
             throw new PlexusResourceException(
                                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                               "Repository referenced by Repository Group Not Found, GroupId="
+                                               "Repository referenced by Repository Group Access Denied, GroupId="
                                                    + model.getId(),
                                                e,
                                                getNexusErrorResponse( "repositories",
-                                                                      "Repository referenced by Repository Group Not Found" ) );
+                                                                      "Repository referenced by Repository Group Access Denied" ) );
         }
-        catch ( InvalidGroupingException e )
+*/        catch ( InvalidGroupingException e )
         {
             getLogger().warn( "Invalid grouping detected!, GroupId=" + model.getId(), e );
 

@@ -1,12 +1,8 @@
 package org.sonatype.nexus.selenium.nexus2262;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.data.Status;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RepositoryMirror;
@@ -14,14 +10,13 @@ import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -43,56 +38,42 @@ public class Nexus2261RepositoryMirrorTest
         throws Exception
     {
         nexus = lookup( Nexus.class );
-        CRepository cRepo = new CRepository();
-        cRepo.setId( "nexus2261" );
-        cRepo.setName( "nexus2261" );
-        cRepo.setProviderRole( Repository.class.getName() );
-        cRepo.setProviderHint( "maven2" );
 
-        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        Maven2ProxyRepositoryTemplate template =
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
-        Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
-        cRepo.setExternalConfiguration( ex );
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        template.getConfigurableRepository().setId( "nexus2261" );
+        template.getConfigurableRepository().setName( "nexus2261" );
 
-        cRepo.setLocalStorage( new CLocalStorage() );
-        cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
-        cRepo.getLocalStorage().setProvider( "file" );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
 
-        cRepo.setRemoteStorage( new CRemoteStorage() );
-        cRepo.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
-        cRepo.getRemoteStorage().setUrl( "http://some-remote-repository/repo-root" );
-        cRepo.setExposed( true );
-        cRepo.setUserManaged( true );
-        cRepo.setIndexable( true );
-        cRepo.setBrowseable( true );
+        template.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
-        proxyRepo = (M2Repository) nexus.createRepository( cRepo );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setUserManaged( true );
+        template.getConfigurableRepository().setIndexable( true );
+        template.getConfigurableRepository().setBrowseable( true );
 
-        cRepo = new CRepository();
-        cRepo.setId( "hosted-nexus2261" );
-        cRepo.setName( "hosted-nexus2261" );
-        cRepo.setProviderRole( Repository.class.getName() );
-        cRepo.setProviderHint( "maven2" );
+        proxyRepo = (M2Repository) template.create();
 
-        cRepo.setLocalStatus( LocalStatus.IN_SERVICE.name() );
+        Maven2HostedRepositoryTemplate hostedTemplate =
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
-        ex = new Xpp3Dom( "externalConfiguration" );
-        cRepo.setExternalConfiguration( ex );
-        exConf = new M2RepositoryConfiguration( ex );
-        exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        hostedTemplate.getConfigurableRepository().setId( "hosted-nexus2261" );
+        hostedTemplate.getConfigurableRepository().setName( "hosted-nexus2261" );
 
-        cRepo.setLocalStorage( new CLocalStorage() );
-        cRepo.getLocalStorage().setUrl( cRepo.defaultLocalStorageUrl );
-        cRepo.getLocalStorage().setProvider( "file" );
+        hostedTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
 
-        cRepo.setExposed( true );
-        cRepo.setUserManaged( true );
-        cRepo.setIndexable( true );
-        cRepo.setBrowseable( true );
+        hostedTemplate.setRepositoryPolicy( RepositoryPolicy.RELEASE );
 
-        hostedRepo = (M2Repository) nexus.createRepository( cRepo );
+        hostedTemplate.getConfigurableRepository().setExposed( true );
+        hostedTemplate.getConfigurableRepository().setUserManaged( true );
+        hostedTemplate.getConfigurableRepository().setIndexable( true );
+        hostedTemplate.getConfigurableRepository().setBrowseable( true );
+
+        hostedRepo = (M2Repository) hostedTemplate.create();
     }
 
     @AfterClass
@@ -129,7 +110,7 @@ public class Nexus2261RepositoryMirrorTest
 
     @Test
     public void fieldValidationHosted()
-    throws Exception
+        throws Exception
     {
         LoginTest.doLogin( main );
 

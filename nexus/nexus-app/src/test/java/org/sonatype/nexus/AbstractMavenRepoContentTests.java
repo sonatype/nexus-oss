@@ -83,6 +83,11 @@ public abstract class AbstractMavenRepoContentTests
         super.tearDown();
     }
 
+    protected boolean loadConfigurationAtSetUp()
+    {
+        return false;
+    }
+
     public Nexus getNexus()
     {
         return defaultNexus;

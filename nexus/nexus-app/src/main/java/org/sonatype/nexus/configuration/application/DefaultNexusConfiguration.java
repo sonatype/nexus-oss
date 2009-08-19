@@ -49,7 +49,6 @@ import org.sonatype.nexus.configuration.validator.ValidationRequest;
 import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -157,11 +156,11 @@ public class DefaultNexusConfiguration
             // create global remote ctx
             // this one has no parent
             globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
-            
+
             globalRemoteConnectionSettings.configure( this );
 
             globalRemoteStorageContext.setRemoteConnectionSettings( globalRemoteConnectionSettings );
-            
+
             globalHttpProxySettings.configure( this );
 
             globalRemoteStorageContext.setRemoteProxySettings( globalHttpProxySettings );
@@ -184,7 +183,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public void applyConfiguration()
+    public boolean applyConfiguration()
     {
         getLogger().info( "Applying Nexus Configuration..." );
 
@@ -204,34 +203,41 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster
                 .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges() ) );
+
+            return true;
         }
         else
         {
             getLogger().info( "... applying was vetoed by: " + prepare.getVetos() );
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationRollbackEvent( this ) );
+
+            return false;
         }
     }
 
     public void saveConfiguration()
         throws IOException
     {
-        applyConfiguration();
-        // TODO: when NEXUS-2215 is fixed, this should be remove/moved/cleaned
-
-        // validate before we do anything
-        ValidationRequest request = new ValidationRequest( configurationSource.getConfiguration() );
-        ValidationResponse response = configurationValidator.validateModel( request );
-        if ( !response.isValid() )
+        if ( applyConfiguration() )
         {
-            this.getLogger().error( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
-            throw new IOException( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
+            // TODO: when NEXUS-2215 is fixed, this should be remove/moved/cleaned
+            // START <<<
+            // validate before we do anything
+            ValidationRequest request = new ValidationRequest( configurationSource.getConfiguration() );
+            ValidationResponse response = configurationValidator.validateModel( request );
+            if ( !response.isValid() )
+            {
+                this.getLogger().error( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
+                throw new IOException( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
+            }
+            // END   <<<
+
+            configurationSource.storeConfiguration();
+
+            // we succesfully saved config
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
         }
-
-        configurationSource.storeConfiguration();
-
-        // we succesfully saved config
-        applicationEventMulticaster.notifyEventListeners( new ConfigurationSaveEvent( this ) );
     }
 
     @Deprecated
@@ -437,25 +443,11 @@ public class DefaultNexusConfiguration
     {
         List<CRepository> reposes = getConfigurationModel().getRepositories();
 
-        // we first create non-group repositories because groups have refs to non-group
         for ( CRepository repo : reposes )
         {
-            if ( !repo.getProviderRole().equals( GroupRepository.class.getName() ) )
-            {
-                Repository repository = createRepositoryFromModel( repo );
+            Repository repository = createRepositoryFromModel( repo );
 
-                repositoryRegistry.addRepository( repository );
-            }
-        }
-
-        for ( CRepository repo : reposes )
-        {
-            if ( repo.getProviderRole().equals( GroupRepository.class.getName() ) )
-            {
-                Repository repository = createRepositoryFromModel( repo );
-
-                repositoryRegistry.addRepository( repository );
-            }
+            repositoryRegistry.addRepository( repository );
         }
     }
 

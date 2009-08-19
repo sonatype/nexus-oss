@@ -16,6 +16,10 @@ public class TestEvictUnusedProxiedItemsTask
         throws Exception
     {
         super.setUp();
+
+        nexusConfiguration.setSecurityEnabled( false );
+        
+        nexusConfiguration.saveConfiguration();
         
         scheduler = ( NexusScheduler ) lookup( NexusScheduler.class );
     }

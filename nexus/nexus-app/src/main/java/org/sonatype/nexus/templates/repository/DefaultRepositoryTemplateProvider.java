@@ -1,25 +1,29 @@
 package org.sonatype.nexus.templates.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateProvider;
+import org.sonatype.nexus.templates.TemplateSet;
+import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven1Maven2ShadowRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
-@Component( role = TemplateProvider.class, hint = "default-repository" )
+@Component( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
 public class DefaultRepositoryTemplateProvider
     extends AbstractTemplateProvider<RepositoryTemplate>
 {
+    public static final String PROVIDER_ID = "default-repository";
+
     private static final String DEFAULT_HOSTED_RELEASE = "default_hosted_release";
 
     private static final String DEFAULT_HOSTED_SNAPSHOT = "default_hosted_snapshot";
@@ -34,6 +38,9 @@ public class DefaultRepositoryTemplateProvider
 
     @Requirement
     private Nexus nexus;
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     protected Nexus getNexus()
     {
@@ -51,9 +58,9 @@ public class DefaultRepositoryTemplateProvider
         return RepositoryTemplate.class;
     }
 
-    public List<RepositoryTemplate> getTemplates()
+    public TemplateSet getTemplates()
     {
-        ArrayList<RepositoryTemplate> templates = new ArrayList<RepositoryTemplate>( 6 );
+        TemplateSet templates = new TemplateSet( null );
 
         try
         {
@@ -76,6 +83,17 @@ public class DefaultRepositoryTemplateProvider
             templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
                                                                      "Maven1-to-Maven2 Virtual Repository" ) );
 
+            templates.add( new Maven2Maven1ShadowRepositoryTemplate( this, "maven2_maven1_virtual",
+                                                                     "Maven2-to-Maven1 Virtual Repository" ) );
+
+            templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_release",
+                                                               "Maven1 Hosted Release Repository",
+                                                               RepositoryPolicy.RELEASE ) );
+
+            templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_snapshot",
+                                                               "Maven1 Hosted Snapshot Repository",
+                                                               RepositoryPolicy.SNAPSHOT ) );
+
             templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
         }
         catch ( Exception e )
@@ -83,6 +101,27 @@ public class DefaultRepositoryTemplateProvider
             // will not happen
         }
 
-        return Collections.unmodifiableList( templates );
+        return templates;
+    }
+
+    public TemplateSet getTemplates( Object filter )
+    {
+        return getTemplates().getTemplates( filter );
+    }
+
+    public TemplateSet getTemplates( Object... filters )
+    {
+        return getTemplates().getTemplates( filters );
+    }
+
+    public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
+    {
+        ContentClass contentClass =
+            repositoryTypeRegistry
+                .getRepositoryContentClass( configuration.getConfiguration( false ).getProviderRole(), configuration
+                    .getConfiguration( false ).getProviderHint() );
+
+        return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
+                                                         null, configuration );
     }
 }

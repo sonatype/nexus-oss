@@ -35,7 +35,7 @@ public class DefaultEventInspectorHost
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
-    public void processEvent( Event evt )
+    public void processEvent( Event<?> evt )
     {
         for ( Map.Entry<String, EventInspector> entry : eventInspectors.entrySet() )
         {
@@ -57,7 +57,7 @@ public class DefaultEventInspectorHost
         }
     }
 
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         processEvent( evt );
     }

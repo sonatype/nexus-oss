@@ -6,24 +6,24 @@ import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenShadowRepository;
-import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
-public class Maven1Maven2ShadowRepositoryTemplate
+public class Maven2Maven1ShadowRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
-    public Maven1Maven2ShadowRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
+    public Maven2Maven1ShadowRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
                                                  String description )
     {
         super( provider, id, description, new Maven2ContentClass(), MavenShadowRepository.class, null );
     }
 
-    public M2LayoutedM1ShadowRepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    public M1LayoutedM2ShadowRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2LayoutedM1ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+        return (M1LayoutedM2ShadowRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
             .getConfiguration( forWrite );
     }
 
@@ -36,12 +36,12 @@ public class Maven1Maven2ShadowRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( ShadowRepository.class.getName() );
-        repo.setProviderHint( "m1-m2-shadow" );
+        repo.setProviderHint( "m2-m1-shadow" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
-        M2LayoutedM1ShadowRepositoryConfiguration exConf = new M2LayoutedM1ShadowRepositoryConfiguration( ex );
+        M1LayoutedM2ShadowRepositoryConfiguration exConf = new M1LayoutedM2ShadowRepositoryConfiguration( ex );
         repo.externalConfigurationImple = exConf;
 
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
@@ -50,12 +50,12 @@ public class Maven1Maven2ShadowRepositoryTemplate
             new CRepositoryCoreConfiguration(
                                               getTemplateProvider().getApplicationConfiguration(),
                                               repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M2LayoutedM1ShadowRepositoryConfiguration>()
+                                              new CRepositoryExternalConfigurationHolderFactory<M1LayoutedM2ShadowRepositoryConfiguration>()
                                               {
-                                                  public M2LayoutedM1ShadowRepositoryConfiguration createExternalConfigurationHolder(
+                                                  public M1LayoutedM2ShadowRepositoryConfiguration createExternalConfigurationHolder(
                                                                                                                                       CRepository config )
                                                   {
-                                                      return new M2LayoutedM1ShadowRepositoryConfiguration(
+                                                      return new M1LayoutedM2ShadowRepositoryConfiguration(
                                                                                                             (Xpp3Dom) config
                                                                                                                 .getExternalConfiguration() );
                                                   }

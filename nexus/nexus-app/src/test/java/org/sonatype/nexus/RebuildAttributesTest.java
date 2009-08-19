@@ -16,13 +16,14 @@ package org.sonatype.nexus;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
 public class RebuildAttributesTest
     extends AbstractNexusTestCase
@@ -67,18 +68,19 @@ public class RebuildAttributesTest
     {
         try
         {
-            CRepository newRepo = new CRepository();
-            newRepo.setId( "test" );
-            newRepo.setName( "Test" );
-            newRepo.setProviderRole( Repository.class.getName() );
-            newRepo.setProviderHint( "maven2" );
-            newRepo.setLocalStatus( LocalStatus.IN_SERVICE.toString() );
-            getDefaultNexus().createRepository( newRepo );
+            RepositoryTemplate hostedRepoTemplate =
+                (RepositoryTemplate) getDefaultNexus().getRepositoryTemplates()
+                    .getTemplates( Maven2HostedRepositoryTemplate.class ).getTemplates( RepositoryPolicy.RELEASE )
+                    .pick();
 
-            repositoryRegistry.getRepository( "test" ).recreateAttributes(
-                                                                           new ResourceStoreRequest(
-                                                                                                     RepositoryItemUid.PATH_ROOT ),
-                                                                           null );
+            hostedRepoTemplate.getConfigurableRepository().setId( "test" );
+            hostedRepoTemplate.getConfigurableRepository().setName( "Test" );
+            hostedRepoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+
+            hostedRepoTemplate.create();
+
+            repositoryRegistry.getRepository( "test" )
+                .recreateAttributes( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), null );
         }
         catch ( ConfigurationException e )
         {

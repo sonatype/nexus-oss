@@ -12,23 +12,22 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
+import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
@@ -39,7 +38,7 @@ public class ProtectedRepositoryRegistryTest
     private RepositoryRegistry repositoryRegistry = null;
 
     private SecuritySystem securitySystem = null;
-    
+
     private Nexus nexus;
 
     @Override
@@ -48,7 +47,7 @@ public class ProtectedRepositoryRegistryTest
         super.customizeContext( ctx );
         ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
     }
-    
+
     @Override
     protected boolean loadConfigurationAtSetUp()
     {
@@ -60,8 +59,8 @@ public class ProtectedRepositoryRegistryTest
         throws Exception
     {
         super.setUp();
-     
-     // copy the security-configuration
+
+        // copy the security-configuration
         String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
         URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
         try
@@ -74,12 +73,12 @@ public class ProtectedRepositoryRegistryTest
         {
             throw new IllegalStateException( e );
         }
-        
+
         // this will trigger config load!
         this.nexus = lookup( Nexus.class );
 
         this.repositoryRegistry = this.lookup( RepositoryRegistry.class, "protected" );
-        
+
         this.buildRepository( "repo1" );
         this.buildRepository( "repo2" );
 
@@ -91,22 +90,22 @@ public class ProtectedRepositoryRegistryTest
 
         // create a target
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
-        Target t1 = new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays
-            .asList( new String[] { ".*" } ) );
+        Target t1 =
+            new Target( "maven2-all", "All (Maven2)", new Maven2ContentClass(), Arrays.asList( new String[] { ".*" } ) );
         targetRegistry.addRepositoryTarget( t1 );
         nexus.getNexusConfiguration().saveConfiguration();
 
         // setup security
         this.securitySystem = this.lookup( SecuritySystem.class );
-//        this.securitySystem.setSecurityEnabled( true );
+        // this.securitySystem.setSecurityEnabled( true );
 
         // copy the security-configuration
-        //String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
-        //URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-        //FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
+        // String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
+        // URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
+        // FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
 
-//         this.securitySystem.start();
-        
+        // this.securitySystem.start();
+
         waitForTasksToStop();
     }
 
@@ -277,82 +276,83 @@ public class ProtectedRepositoryRegistryTest
         // logout user
         this.securitySystem.logout( subject.getPrincipals() );
     }
-    
+
     public void testGetGroupsWithAccess()
-    throws Exception
+        throws Exception
     {
         Subject subject = this.loginUser( "repoall" );
-        
+
         Collection<GroupRepository> groups = this.repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
-        
-//        list should have 2 group repos
+
+        // list should have 2 group repos
         List<String> groupIds = new ArrayList<String>();
-        
+
         for ( GroupRepository groupRepo : groups )
         {
             groupIds.add( groupRepo.getId() );
         }
-        
+
         Assert.assertTrue( groupIds.contains( "group1" ) );
         Assert.assertTrue( groupIds.contains( "group2" ) );
         Assert.assertTrue( groupIds.contains( "public" ) );
         Assert.assertTrue( groupIds.contains( "public-snapshots" ) );
         Assert.assertEquals( 4, groups.size() );
-        
-        
+
         // logout user
         this.securitySystem.logout( subject.getPrincipals() );
-        
+
     }
 
     private Repository buildRepository( String repoId )
         throws Exception
     {
-        CRepository repoConfig = new DefaultCRepository();
-        repoConfig.setProviderRole( Repository.class.getName() );
-        repoConfig.setProviderHint( "maven2" );
-        repoConfig.setIndexable( false );
-        repoConfig.setId( repoId );
+        Maven2HostedRepositoryTemplate template =
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
-        return nexus.createRepository( repoConfig );
+        template.getConfigurableRepository().setIndexable( false );
+        template.getConfigurableRepository().setId( repoId );
+
+        return template.create();
     }
 
     private Repository buildGroupRepository( String repoId )
         throws Exception
     {
-        CRepository repoConfig = new DefaultCRepository();
-        repoConfig.setProviderRole( GroupRepository.class.getName() );
-        repoConfig.setProviderHint( "maven2" );
-        repoConfig.setIndexable( false );
-        repoConfig.setId( repoId );
-        
-        return nexus.createRepository( repoConfig );
+        Maven2GroupRepositoryTemplate template =
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
+
+        template.getConfigurableRepository().setIndexable( false );
+        template.getConfigurableRepository().setId( repoId );
+
+        return template.create();
     }
 
     private Repository buildShadowRepository( String repoId )
         throws Exception
     {
-        CRepository repoConfig = new DefaultCRepository();
-        repoConfig.setProviderRole( Repository.class.getName() );
-        repoConfig.setProviderHint( "maven2" );
-        repoConfig.setIndexable( false );
-        repoConfig.setId( repoId );
-        
-        nexus.createRepository( repoConfig );
+        Maven2HostedRepositoryTemplate template =
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+
+        template.getConfigurableRepository().setIndexable( false );
+        template.getConfigurableRepository().setId( repoId );
+
+        // just create
+        template.create();
 
         // now for the shadow
-        CRepository shadowConfig = new DefaultCRepository();
-        shadowConfig.setProviderRole( ShadowRepository.class.getName() );
-        shadowConfig.setProviderHint( "m2-m1-shadow" );
-        shadowConfig.setIndexable( false );
-        shadowConfig.setId( repoId + "-shadow" );
+        Maven2Maven1ShadowRepositoryTemplate shadowTemplate =
+            (Maven2Maven1ShadowRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2Maven1ShadowRepositoryTemplate.class ).pick();
 
-        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
-        shadowConfig.setExternalConfiguration( exRepo );
-        M1LayoutedM2ShadowRepositoryConfiguration exRepoConf = new M1LayoutedM2ShadowRepositoryConfiguration( exRepo );
-        exRepoConf.setMasterRepositoryId( repoConfig.getId() );
-        
-        return nexus.createRepository( shadowConfig );
+        shadowTemplate.getConfigurableRepository().setIndexable( false );
+        shadowTemplate.getConfigurableRepository().setId( repoId + "-shadow" );
+
+        shadowTemplate.getExternalConfiguration( true ).setMasterRepositoryId( repoId );
+
+        return shadowTemplate.create();
     }
 
     private Subject loginUser( String username )

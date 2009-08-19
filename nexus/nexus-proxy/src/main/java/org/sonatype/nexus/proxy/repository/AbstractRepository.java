@@ -128,9 +128,12 @@ public abstract class AbstractRepository
 
     /** Request processors list */
     private Map<String, RequestProcessor> requestProcessors;
-    
+
     /** if local url changed, need special handling after save */
     private boolean localUrlChanged = false;
+
+    /** if non-indexable -> indexable change occured, need special handling after save */
+    private boolean madeSearchable = false;
 
     // --
 
@@ -155,24 +158,28 @@ public abstract class AbstractRepository
     @Override
     public boolean commitChanges()
         throws ConfigurationException
-    {        
+    {
         boolean wasDirty = super.commitChanges();
 
         if ( wasDirty )
-        {            
+        {
             getApplicationEventMulticaster().notifyEventListeners( getRepositoryConfigurationUpdatedEvent() );
         }
-        
+
         this.localUrlChanged = false;
+
+        this.madeSearchable = false;
 
         return wasDirty;
     }
-    
+
     @Override
     public boolean rollbackChanges()
     {
         this.localUrlChanged = false;
-        
+
+        this.madeSearchable = false;
+
         return super.rollbackChanges();
     }
 
@@ -181,12 +188,14 @@ public abstract class AbstractRepository
     {
         return applicationConfiguration;
     }
-    
+
     protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent()
     {
         RepositoryConfigurationUpdatedEvent event = new RepositoryConfigurationUpdatedEvent( this );
+
         event.setLocalUrlChanged( this.localUrlChanged );
-        
+        event.setMadeSearchable( this.madeSearchable );
+
         return event;
     }
 
@@ -274,6 +283,18 @@ public abstract class AbstractRepository
     }
 
     @Override
+    public void setIndexable( boolean indexable )
+    {
+        if ( !isIndexable() && indexable )
+        {
+            // we have a non-indexable -> indexable transition
+            madeSearchable = true;
+        }
+
+        super.setIndexable( indexable );
+    }
+
+    @Override
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
@@ -285,7 +306,7 @@ public abstract class AbstractRepository
         }
 
         getLocalStorage().validateStorageUrl( newLocalUrl );
-        
+
         if ( !StringUtils.equals( newLocalUrl, getLocalUrl() ) )
         {
             this.localUrlChanged = true;
@@ -1102,10 +1123,10 @@ public abstract class AbstractRepository
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is not available (localStatus=" + getLocalStatus().toString() + ")!" );
         }
-        
+
         // check for writing to read only repo
         // Readonly is ALWAYS read only
-        if( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && action.isWritingAction()  )
+        if ( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && action.isWritingAction() )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is Read Only, but action was '" + action.toString() + "'!" );
@@ -1131,11 +1152,12 @@ public abstract class AbstractRepository
 
         return shouldProcess;
     }
-    
-    protected void enforceWritePolicy( ResourceStoreRequest request, Action action ) throws IllegalRequestException
-    {   
+
+    protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
+        throws IllegalRequestException
+    {
         // check for write once (no redeploy)
-        if( Action.update.equals( action ) && !RepositoryWritePolicy.ALLOW_WRITE.equals( this.getWritePolicy() ) )
+        if ( Action.update.equals( action ) && !RepositoryWritePolicy.ALLOW_WRITE.equals( this.getWritePolicy() ) )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' has does not allow updating artifacts." );
@@ -1204,5 +1226,5 @@ public abstract class AbstractRepository
         }
 
         return localItem;
-    }    
+    }
 }

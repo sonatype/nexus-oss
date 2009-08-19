@@ -37,32 +37,27 @@ public class ConfigurationChangeEventInspector
         return indexerManager;
     }
 
-    public boolean accepts( Event evt )
+    public boolean accepts( Event<?> evt )
     {
-        if ( evt instanceof ConfigurationChangeEvent )
-        {
-            return true;
-        }
-        return false;
+        return ( evt instanceof ConfigurationChangeEvent );
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
         inspectForNexus( evt );
 
         inspectForIndexerManager( evt );
     }
 
-    private void inspectForNexus( Event evt )
+    private void inspectForNexus( Event<?> evt )
     {
         // TODO: This causes cycle!
         // getNexus().getSystemStatus().setLastConfigChange( new Date() );
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
-
     }
 
-    private void inspectForIndexerManager( Event evt )
+    private void inspectForIndexerManager( Event<?> evt )
     {
         getIndexerManager().resetConfiguration();
     }

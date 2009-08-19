@@ -7,24 +7,24 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.maven.MavenHostedRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
+import org.sonatype.nexus.proxy.maven.maven1.M1RepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
 
-public class Maven2HostedRepositoryTemplate
+public class Maven1HostedRepositoryTemplate
     extends AbstractMavenRepositoryTemplate
 {
-    public Maven2HostedRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
+    public Maven1HostedRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id, String description,
                                            RepositoryPolicy repositoryPolicy )
     {
-        super( provider, id, description, new Maven2ContentClass(), MavenHostedRepository.class, repositoryPolicy );
+        super( provider, id, description, new Maven1ContentClass(), MavenHostedRepository.class, repositoryPolicy );
     }
 
-    public M2RepositoryConfiguration getExternalConfiguration( boolean forWrite )
+    public M1RepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+        return (M1RepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
             .getConfiguration( forWrite );
     }
 
@@ -37,12 +37,12 @@ public class Maven2HostedRepositoryTemplate
         repo.setName( "" );
 
         repo.setProviderRole( Repository.class.getName() );
-        repo.setProviderHint( "maven2" );
+        repo.setProviderHint( "maven1" );
 
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
-        M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
+        M1RepositoryConfiguration exConf = new M1RepositoryConfiguration( ex );
         exConf.setRepositoryPolicy( getRepositoryPolicy() );
 
         repo.externalConfigurationImple = exConf;
@@ -54,12 +54,12 @@ public class Maven2HostedRepositoryTemplate
             new CRepositoryCoreConfiguration(
                                               getTemplateProvider().getApplicationConfiguration(),
                                               repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M2RepositoryConfiguration>()
+                                              new CRepositoryExternalConfigurationHolderFactory<M1RepositoryConfiguration>()
                                               {
-                                                  public M2RepositoryConfiguration createExternalConfigurationHolder(
+                                                  public M1RepositoryConfiguration createExternalConfigurationHolder(
                                                                                                                       CRepository config )
                                                   {
-                                                      return new M2RepositoryConfiguration( (Xpp3Dom) config
+                                                      return new M1RepositoryConfiguration( (Xpp3Dom) config
                                                           .getExternalConfiguration() );
                                                   }
                                               } );

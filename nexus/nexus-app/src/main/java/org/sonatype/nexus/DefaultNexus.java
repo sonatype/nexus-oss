@@ -35,12 +35,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
@@ -76,16 +70,14 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
-import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateManager;
+import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.nexus.timeline.RepositoryIdTimelineFilter;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.timeline.TimelineFilter;
 
 /**
@@ -110,9 +102,6 @@ public class DefaultNexus
      */
     @Requirement
     private NexusConfiguration nexusConfiguration;
-
-    @Requirement( hint = "static" )
-    private SecurityConfigurationSource defaultSecurityConfigurationSource;
 
     /**
      * The NexusIndexer.
@@ -269,80 +258,14 @@ public class DefaultNexus
     // Repo maintenance
     // ----------------------------------------------------------------------------
 
-    public Repository createRepository( CRepository settings )
-        throws ConfigurationException, IOException
-    {
-        Repository repository = nexusConfiguration.createRepository( settings );
-
-        try
-        {
-            indexerManager.setRepositoryIndexContextSearchable( settings.getId(), repository.isIndexable() );
-
-            // create the initial index
-            if ( repository.isIndexable() )
-            {
-                // Create the initial index for the repository
-                ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                rt.setRepositoryId( settings.getId() );
-                nexusScheduler.submit( "Create initial index.", rt );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // will not happen, just added it
-        }
-
-        return repository;
-    }
-    
-    public void addRepository( Repository repository )
-    throws ConfigurationException, IOException
-    {
-        try
-        {
-            indexerManager.setRepositoryIndexContextSearchable( repository.getId(), repository.isIndexable() );
-    
-            // create the initial index
-            if ( repository.isIndexable() )
-            {
-                // Create the initial index for the repository
-                ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                rt.setRepositoryId( repository.getId() );
-                nexusScheduler.submit( "Create initial index.", rt );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // will not happen, just added it
-        }
-        
-        //commit the changes in the repo
-        repository.commitChanges();
-        // now add it to config, since it is validated and succesfully created
-        CRepositoryCoreConfiguration coreConfig = (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration();
-        this.getNexusConfiguration().getConfigurationModel().addRepository( coreConfig.getConfiguration( false ) );
-
-        this.getNexusConfiguration().saveConfiguration();
-        
-        // register with repoRegistry
-        repositoryRegistry.addRepository( repository );
-    }
-
-
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException,
-            AccessDeniedException
+        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
     {
         deleteRepository( id, false );
     }
 
     public void deleteRepository( String id, boolean force )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException,
-            AccessDeniedException
+        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException
     {
         Repository repository = repositoryRegistry.getRepository( id );
 
@@ -353,13 +276,6 @@ public class DefaultNexus
 
         // delete the configuration
         nexusConfiguration.deleteRepository( id );
-        
-        // remove the storage folders for the repository
-        DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
-
-        task.setRepository( repository );
-
-        nexusScheduler.submit( "Remove repository folder", task );
     }
 
     // Maintenance
@@ -558,77 +474,6 @@ public class DefaultNexus
     // ----------------------------------------------------------------------------
     // Repo templates, CRUD
     // ----------------------------------------------------------------------------
-
-    // ----------------------------------------------------------------------------
-    // Default Configuration
-    // ----------------------------------------------------------------------------
-
-    public boolean isDefaultSecurityEnabled()
-    {
-        return this.defaultSecurityConfigurationSource.getConfiguration().isEnabled();
-    }
-
-    public boolean isDefaultAnonymousAccessEnabled()
-    {
-        return this.defaultSecurityConfigurationSource.getConfiguration().isAnonymousAccessEnabled();
-    }
-
-    public String getDefaultAnonymousUsername()
-    {
-        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousUsername();
-    }
-
-    public String getDefaultAnonymousPassword()
-    {
-        return this.defaultSecurityConfigurationSource.getConfiguration().getAnonymousPassword();
-    }
-
-    public List<String> getDefaultRealms()
-    {
-        return this.defaultSecurityConfigurationSource.getConfiguration().getRealms();
-    }
-
-    public NexusStreamResponse getDefaultConfigurationAsStream()
-        throws IOException
-    {
-        NexusStreamResponse response = new NexusStreamResponse();
-
-        response.setName( "default" );
-
-        response.setMimeType( "text/xml" );
-
-        // TODO:
-        response.setSize( 0 );
-
-        response.setInputStream( nexusConfiguration.getConfigurationSource().getDefaultsSource()
-            .getConfigurationAsStream() );
-
-        return response;
-    }
-
-    public CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings()
-    {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
-            .getGlobalConnectionSettings();
-    }
-
-    public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
-    {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
-            .getGlobalHttpProxySettings();
-    }
-
-    public CRouting readDefaultRouting()
-    {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration().getRouting();
-    }
-
-    public CSmtpConfiguration readDefaultSmtpConfiguration()
-    {
-        return nexusConfiguration.getConfigurationSource().getDefaultsSource().getConfiguration()
-            .getSmtpConfiguration();
-    }
-
     // ----------------------------------------------------------------------------
     // Feeds
     // ----------------------------------------------------------------------------
@@ -957,14 +802,14 @@ public class DefaultNexus
     // Repo templates
     // ----------------------------------------------------------------------------
 
-    public List<RepositoryTemplate> getRepositoryTemplates()
+    public TemplateSet getRepositoryTemplates()
     {
-        return templateManager.getTemplateProviderForTarget( RepositoryTemplate.class ).getTemplates();
+        return templateManager.getTemplates().getTemplates( RepositoryTemplate.class );
     }
 
     public RepositoryTemplate getRepositoryTemplateById( String id )
         throws NoSuchTemplateIdException
     {
-        return templateManager.getTemplate( RepositoryTemplate.class, id );
+        return (RepositoryTemplate) templateManager.getTemplate( RepositoryTemplate.class, id );
     }
 }

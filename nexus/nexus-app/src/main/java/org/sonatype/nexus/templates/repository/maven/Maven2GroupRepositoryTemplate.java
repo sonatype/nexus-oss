@@ -20,9 +20,10 @@ public class Maven2GroupRepositoryTemplate
         super( provider, id, description, new Maven2ContentClass(), MavenGroupRepository.class, null );
     }
 
-    public M2GroupRepositoryConfiguration getExternalConfiguration()
+    public M2GroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration();
+        return (M2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
+            .getConfiguration( forWrite );
     }
 
     @Override

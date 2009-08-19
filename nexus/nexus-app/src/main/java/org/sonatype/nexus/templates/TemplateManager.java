@@ -1,7 +1,5 @@
 package org.sonatype.nexus.templates;
 
-import java.util.List;
-
 /**
  * Template manager aggregates various TemplateProviders, and adds means to select between them.
  * 
@@ -10,23 +8,16 @@ import java.util.List;
 public interface TemplateManager
 {
     /**
-     * Get all templates known to manager,
-     * 
-     * @return
-     */
-    <T extends Template> List<T> getTemplates();
-
-    /**
-     * Get templates that are able to create instances of suplied class.
+     * Get templates.
      * 
      * @param <I>
      * @param clazz
      * @return
      */
-    <I extends Template> TemplateProvider<I> getTemplateProviderForTarget( Class<I> clazz );
+    TemplateSet getTemplates();
 
     /**
-     * Get one specific template that is ablt to create instance of supplied class with given id.
+     * Get one specific template that fits of supplied class with given id.
      * 
      * @param <I>
      * @param clazz
@@ -34,6 +25,6 @@ public interface TemplateManager
      * @return
      * @throws NoSuchTemplateIdException
      */
-    <I extends Template> I getTemplate( Class<I> clazz, String id )
+    Template getTemplate( Object clazz, String id )
         throws NoSuchTemplateIdException;
 }

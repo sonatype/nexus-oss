@@ -15,7 +15,6 @@ package org.sonatype.nexus.proxy.registry;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -27,18 +26,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
  */
 public interface RepositoryRegistry
 {
-    /**
-     * Factory method to creates an empty repository based on the type and provider, and updates the id.
-     * 
-     * @param repoId the id of the repository to be created.
-     * @param type a fully qualified class name of a type of repository.
-     * @param provider the implementation hint.
-     * @return a Repository.
-     * @throws ConfigurationException
-     */
-    public <R extends Repository> R createNewRepository( String repoId, String type, String provider ) 
-        throws ConfigurationException;
-    
     /**
      * Adds single repository.
      *

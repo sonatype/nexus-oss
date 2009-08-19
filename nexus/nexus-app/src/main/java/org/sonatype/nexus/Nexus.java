@@ -21,11 +21,6 @@ import java.util.Set;
 
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.feeds.AuthcAuthzEvent;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
@@ -46,6 +41,7 @@ import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
+import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
 /**
@@ -76,13 +72,6 @@ public interface Nexus
     // Repo maintenance
     // ----------------------------------------------------------------------------
 
-    @Deprecated
-    public Repository createRepository( CRepository settings )
-        throws ConfigurationException, IOException;
-    
-    public void addRepository( Repository repository )
-        throws ConfigurationException, IOException;
-
     /**
      * Delete a user managed repository
      * 
@@ -94,10 +83,7 @@ public interface Nexus
      * @see #deleteRepository(String, boolean)
      */
     public void deleteRepository( String id )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException,
-            AccessDeniedException;
+        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
 
     /**
      * Delete a repository, can only delete user managed repository unless force == true
@@ -110,11 +96,8 @@ public interface Nexus
      * @throws AccessDeniedException when try to delete a non-user-managed repository and without force enabled
      */
     public void deleteRepository( String id, boolean force )
-        throws NoSuchRepositoryException,
-            IOException,
-            ConfigurationException,
-            AccessDeniedException;
-    
+        throws NoSuchRepositoryException, IOException, ConfigurationException, AccessDeniedException;
+
     // ----------------------------------------------------------------------------
     // Maintenance
     // ----------------------------------------------------------------------------
@@ -210,39 +193,14 @@ public interface Nexus
     List<SystemEvent> getSystemEvents( Integer from, Integer count );
 
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Integer from, Integer count );
-    
-    List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count);
 
-    // ----------------------------------------------------------------------------
-    // Default Configuration
-    // ----------------------------------------------------------------------------
-
-    boolean isDefaultSecurityEnabled();
-
-    boolean isDefaultAnonymousAccessEnabled();
-
-    String getDefaultAnonymousUsername();
-
-    String getDefaultAnonymousPassword();
-
-    List<String> getDefaultRealms();
-
-    NexusStreamResponse getDefaultConfigurationAsStream()
-        throws IOException;
-
-    CRemoteConnectionSettings readDefaultGlobalRemoteConnectionSettings();
-
-    CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings();
-
-    CSmtpConfiguration readDefaultSmtpConfiguration();
-
-    CRouting readDefaultRouting();
+    List<ErrorWarningEvent> getErrorWarningEvents( Integer from, Integer count );
 
     // ----------------------------------------------------------------------------
     // Repo templates
     // ----------------------------------------------------------------------------
 
-    List<RepositoryTemplate> getRepositoryTemplates();
+    TemplateSet getRepositoryTemplates();
 
     RepositoryTemplate getRepositoryTemplateById( String id )
         throws NoSuchTemplateIdException;;

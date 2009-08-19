@@ -11,41 +11,55 @@ public class RepositoryConfigurationUpdatedEvent
     extends RepositoryEvent
 {
     private boolean localUrlChanged = false;
+
     private boolean remoteUrlChanged = false;
+
     private boolean downloadRemoteIndexEnabled = false;
-    
+
+    private boolean madeSearchable = false;
+
     public RepositoryConfigurationUpdatedEvent( Repository repository )
     {
         super( repository );
     }
-    
+
     public boolean isLocalUrlChanged()
     {
         return localUrlChanged;
     }
-    
+
     public boolean isRemoteUrlChanged()
     {
         return remoteUrlChanged;
     }
-    
+
     public boolean isDownloadRemoteIndexEnabled()
     {
         return downloadRemoteIndexEnabled;
     }
-    
+
     public void setLocalUrlChanged( boolean localUrlChanged )
     {
         this.localUrlChanged = localUrlChanged;
     }
-    
+
     public void setRemoteUrlChanged( boolean remoteUrlChanged )
     {
         this.remoteUrlChanged = remoteUrlChanged;
     }
-    
+
     public void setDownloadRemoteIndexEnabled( boolean downloadRemoteIndexEnabled )
     {
         this.downloadRemoteIndexEnabled = downloadRemoteIndexEnabled;
+    }
+
+    public boolean isMadeSearchable()
+    {
+        return madeSearchable;
+    }
+
+    public void setMadeSearchable( boolean madeSearchable )
+    {
+        this.madeSearchable = madeSearchable;
     }
 }

@@ -8,9 +8,9 @@ public abstract class AbstractConfigurableTemplate
 {
     private CoreConfiguration coreConfiguration;
 
-    public AbstractConfigurableTemplate( String id, String description )
+    public AbstractConfigurableTemplate( TemplateProvider provider, String id, String description )
     {
-        super( id, description );
+        super( provider, id, description );
     }
 
     public CoreConfiguration getCoreConfiguration()

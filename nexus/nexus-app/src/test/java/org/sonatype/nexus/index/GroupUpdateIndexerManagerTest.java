@@ -12,9 +12,12 @@ public class GroupUpdateIndexerManagerTest
         fillInRepo();
 
         GroupRepository group = (GroupRepository) repositoryRegistry.getRepository( "public" );
+        group.setIndexable( true );
+        
+        nexusConfiguration.saveConfiguration();
 
         indexerManager.reindexAllRepositories( null, true );
-
+        
         searchFor( "org.sonatype.plexus", 1, "public" );
         searchFor( "org.sonatype.test-evict", 1, "apache-snapshots" );
         searchFor( "org.sonatype.test-evict", 0, "public" );

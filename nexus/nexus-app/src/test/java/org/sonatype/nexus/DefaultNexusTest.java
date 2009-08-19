@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus;
 
-import java.util.List;
 import java.util.Map;
 
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -22,6 +21,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 
@@ -61,10 +61,10 @@ public class DefaultNexusTest
     public void testRepositoryTemplates()
         throws Exception
     {
-        List<RepositoryTemplate> repoTemplates = getDefaultNexus().getRepositoryTemplates();
+        TemplateSet repoTemplates = getDefaultNexus().getRepositoryTemplates();
 
         assertNotNull( "template list is null", repoTemplates );
-        assertEquals( "there should be 6 templates", 6, repoTemplates.size() );
+        assertEquals( "there should be 9 templates", 9, repoTemplates.size() );
 
         RepositoryTemplate template =
             (AbstractRepositoryTemplate) getDefaultNexus().getRepositoryTemplateById( "default_hosted_release" );

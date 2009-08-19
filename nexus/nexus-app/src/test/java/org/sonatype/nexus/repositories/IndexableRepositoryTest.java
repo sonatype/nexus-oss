@@ -6,17 +6,17 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven1HostedRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 
 public class IndexableRepositoryTest
     extends AbstractNexusTestCase
 {
 
     private Nexus nexus;
-
-    private RepositoryRegistry repositoryRegistry;
 
     @Override
     protected void setUp()
@@ -25,7 +25,6 @@ public class IndexableRepositoryTest
         super.setUp();
 
         this.nexus = this.lookup( Nexus.class );
-        this.repositoryRegistry = this.lookup( RepositoryRegistry.class );
     }
 
     @Override
@@ -33,9 +32,14 @@ public class IndexableRepositoryTest
         throws Exception
     {
         this.nexus = null;
-        this.repositoryRegistry = null;
 
         super.tearDown();
+    }
+
+    @Override
+    protected boolean loadConfigurationAtSetUp()
+    {
+        return false;
     }
 
     public void testCreateIndexableM1()
@@ -43,17 +47,21 @@ public class IndexableRepositoryTest
     {
         String repoId = "indexableM1";
 
-        Repository repo = repositoryRegistry.createNewRepository( repoId, Repository.class.getName(), "maven1" );
+        RepositoryTemplate repoTemplate =
+            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven1HostedRepositoryTemplate.class,
+                                                                              RepositoryPolicy.RELEASE ).pick();
 
-        repo.setName( repoId + "-name" );
+        repoTemplate.getConfigurableRepository().setId( repoId );
+        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
         // Assert.assertEquals( "group-name", group.getName() );
-        repo.setExposed( true );
-        repo.setLocalStatus( LocalStatus.IN_SERVICE );
-        repo.setIndexable( true );
+        repoTemplate.getConfigurableRepository().setExposed( true );
+        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+
+        repoTemplate.getConfigurableRepository().setIndexable( true );
 
         try
         {
-            this.nexus.addRepository( repo );
+            repoTemplate.create();
             fail( "Should not be able to create a M1 indexable repo" );
         }
         catch ( InvalidConfigurationException e )
@@ -67,8 +75,10 @@ public class IndexableRepositoryTest
             assertEquals( "indexable", error.getKey() );
         }
 
-        repo.setIndexable( false );
-        this.nexus.addRepository( repo );
+        repoTemplate.getConfigurableRepository().setIndexable( false );
+
+        // should succeed
+        repoTemplate.create();
     }
 
     public void testCreateIndexableM2()
@@ -76,15 +86,18 @@ public class IndexableRepositoryTest
     {
         String repoId = "indexableM2";
 
-        Repository repo = repositoryRegistry.createNewRepository( repoId, Repository.class.getName(), "maven2" );
+        RepositoryTemplate repoTemplate =
+            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven2HostedRepositoryTemplate.class )
+                .getTemplates( RepositoryPolicy.RELEASE ).pick();
 
-        repo.setName( repoId + "-name" );
+        repoTemplate.getConfigurableRepository().setId( repoId );
+        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
         // Assert.assertEquals( "group-name", group.getName() );
-        repo.setExposed( true );
-        repo.setLocalStatus( LocalStatus.IN_SERVICE );
-        repo.setIndexable( true );
+        repoTemplate.getConfigurableRepository().setExposed( true );
+        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        repoTemplate.getConfigurableRepository().setIndexable( true );
 
-        this.nexus.addRepository( repo );
+        repoTemplate.create();
     }
 
     public void testCreateNonIndexableM2()
@@ -92,15 +105,18 @@ public class IndexableRepositoryTest
     {
         String repoId = "nonIndexableM2";
 
-        Repository repo = repositoryRegistry.createNewRepository( repoId, Repository.class.getName(), "maven2" );
+        RepositoryTemplate repoTemplate =
+            (RepositoryTemplate) nexus.getRepositoryTemplates().getTemplates( Maven2HostedRepositoryTemplate.class )
+                .getTemplates( RepositoryPolicy.RELEASE ).pick();
 
-        repo.setName( repoId + "-name" );
+        repoTemplate.getConfigurableRepository().setId( repoId );
+        repoTemplate.getConfigurableRepository().setName( repoId + "-name" );
         // Assert.assertEquals( "group-name", group.getName() );
-        repo.setExposed( true );
-        repo.setLocalStatus( LocalStatus.IN_SERVICE );
-        repo.setIndexable( false );
+        repoTemplate.getConfigurableRepository().setExposed( true );
+        repoTemplate.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        repoTemplate.getConfigurableRepository().setIndexable( false );
 
-        this.nexus.addRepository( repo );
+        repoTemplate.create();
     }
 
 }

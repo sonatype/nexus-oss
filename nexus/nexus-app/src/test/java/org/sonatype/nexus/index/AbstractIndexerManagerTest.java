@@ -29,6 +29,10 @@ public abstract class AbstractIndexerManagerTest
         throws Exception
     {
         super.setUp();
+        
+        nexusConfiguration.setSecurityEnabled( false );
+        
+        nexusConfiguration.saveConfiguration();
 
         indexerManager = lookup( IndexerManager.class );
 
@@ -39,8 +43,6 @@ public abstract class AbstractIndexerManagerTest
     protected void tearDown()
         throws Exception
     {
-        indexerManager.shutdown( false );
-
         super.tearDown();
     }
 

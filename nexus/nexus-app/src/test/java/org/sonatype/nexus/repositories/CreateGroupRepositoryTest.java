@@ -8,11 +8,8 @@ import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-
+import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
 
 public class CreateGroupRepositoryTest
     extends AbstractNexusTestCase
@@ -21,6 +18,12 @@ public class CreateGroupRepositoryTest
     private Nexus nexus;
 
     private NexusConfiguration nexusConfiguration;
+
+    @Override
+    protected boolean loadConfigurationAtSetUp()
+    {
+        return false;
+    }
 
     @Override
     protected void setUp()
@@ -38,20 +41,18 @@ public class CreateGroupRepositoryTest
 
         String groupId = "group-id";
 
-        RepositoryRegistry repositoryRegistry = this.lookup( RepositoryRegistry.class );
+        Maven2GroupRepositoryTemplate template =
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
 
-        GroupRepository group = repositoryRegistry.createNewRepository(
-            groupId,
-            GroupRepository.class.getName(),
-            "maven2" );
-
-        group.setName( "group-name" );
+        template.getConfigurableRepository().setId( groupId );
+        template.getConfigurableRepository().setName( "group-name" );
         // Assert.assertEquals( "group-name", group.getName() );
-        group.setExposed( true );
-        group.setLocalStatus( LocalStatus.IN_SERVICE );
-        group.addMemberRepositoryId( "central" );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        template.getExternalConfiguration( true ).addMemberRepositoryId( "central" );
 
-        this.nexus.addRepository( group );
+        template.create();
 
         boolean found = false;
         // verify nexus config in memory
@@ -64,7 +65,7 @@ public class CreateGroupRepositoryTest
                 // make sure something is there, there are already UT, to validate the rest
                 Assert.assertEquals( "group-name", cRepo.getName() );
                 // check the members (they are in the external config)
-                Xpp3Dom dom =  (Xpp3Dom) cRepo.getExternalConfiguration();
+                Xpp3Dom dom = (Xpp3Dom) cRepo.getExternalConfiguration();
                 Xpp3Dom memberDom = dom.getChild( "memberRepositories" );
                 Assert.assertEquals( 1, memberDom.getChildCount() );
                 Assert.assertEquals( "central", memberDom.getChild( 0 ).getValue() );
@@ -83,7 +84,7 @@ public class CreateGroupRepositoryTest
             {
                 found = true;
                 // make sure something is there, there are already UT, to validate the rest
-                Assert.assertEquals( "group-name", group.getName() );
+                Assert.assertEquals( "group-name", template.getConfigurableRepository().getName() );
             }
         }
         Assert.assertTrue( "Group Repo is not in file.", found );
@@ -94,23 +95,24 @@ public class CreateGroupRepositoryTest
     {
         String groupId = "group-id";
 
-        RepositoryRegistry repositoryRegistry = this.lookup( RepositoryRegistry.class );
+        Maven2GroupRepositoryTemplate template =
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
 
-        GroupRepository group = repositoryRegistry.createNewRepository(
-            groupId,
-            GroupRepository.class.getName(),
-            "maven2" );
-
-        group.setName( "group-name" );
-        group.setExposed( true );
-        group.setLocalStatus( LocalStatus.IN_SERVICE );
+        template.getConfigurableRepository().setId( groupId );
+        template.getConfigurableRepository().setName( "group-name" );
+        // Assert.assertEquals( "group-name", group.getName() );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        // validation does NOT happen on the fly!
+        template.getExternalConfiguration( true ).addMemberRepositoryId( "INVALID-REPO-ID" );
 
         try
         {
-            group.addMemberRepositoryId( "INVALID-REPO-ID" );
+            template.create();
             Assert.fail( "Expected NoSuchRepositoryException" );
         }
-        catch ( NoSuchRepositoryException e )
+        catch ( ConfigurationException e )
         {
             // expected
         }
@@ -121,7 +123,6 @@ public class CreateGroupRepositoryTest
             if ( groupId.equals( cRepo.getId() ) )
             {
                 Assert.fail( "found Group Repo in memory." );
-
             }
         }
         // reload the config and see if the repo is still there
@@ -143,11 +144,20 @@ public class CreateGroupRepositoryTest
     {
         String groupId = null;
 
-        RepositoryRegistry repositoryRegistry = this.lookup( RepositoryRegistry.class );
+        Maven2GroupRepositoryTemplate template =
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
+
+        template.getConfigurableRepository().setId( groupId );
+        template.getConfigurableRepository().setName( "group-name" );
+        // Assert.assertEquals( "group-name", group.getName() );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        template.getExternalConfiguration( true ).addMemberRepositoryId( "central" );
 
         try
         {
-            repositoryRegistry.createNewRepository( groupId, GroupRepository.class.getName(), "maven2" );
+            template.create();
             Assert.fail( "expected ConfigurationException" );
         }
         catch ( ConfigurationException e )
@@ -161,11 +171,20 @@ public class CreateGroupRepositoryTest
     {
         String groupId = "";
 
-        RepositoryRegistry repositoryRegistry = this.lookup( RepositoryRegistry.class );
+        Maven2GroupRepositoryTemplate template =
+            (Maven2GroupRepositoryTemplate) nexus.getRepositoryTemplates()
+                .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
+
+        template.getConfigurableRepository().setId( groupId );
+        template.getConfigurableRepository().setName( "group-name" );
+        // Assert.assertEquals( "group-name", group.getName() );
+        template.getConfigurableRepository().setExposed( true );
+        template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
+        template.getExternalConfiguration( true ).addMemberRepositoryId( "central" );
 
         try
         {
-            repositoryRegistry.createNewRepository( groupId, GroupRepository.class.getName(), "maven2" );
+            template.create();
             Assert.fail( "expected ConfigurationException" );
         }
         catch ( ConfigurationException e )

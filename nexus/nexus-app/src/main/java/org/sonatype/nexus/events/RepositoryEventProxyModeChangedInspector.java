@@ -29,7 +29,7 @@ public class RepositoryEventProxyModeChangedInspector
     extends AbstractFeedRecorderEventInspector
 {
 
-    public boolean accepts( Event evt )
+    public boolean accepts( Event<?> evt )
     {
         if ( evt instanceof RepositoryEventProxyModeChanged )
         {
@@ -38,7 +38,7 @@ public class RepositoryEventProxyModeChangedInspector
         return false;
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
         RepositoryEventProxyModeChanged revt = (RepositoryEventProxyModeChanged) evt;
 

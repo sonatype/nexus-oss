@@ -12,6 +12,13 @@ import org.sonatype.nexus.configuration.ConfigurationException;
 public interface Template
 {
     /**
+     * Returns the originating template provider of this template.
+     * 
+     * @return
+     */
+    TemplateProvider getTemplateProvider();
+
+    /**
      * The ID of this template.
      * 
      * @return
@@ -24,6 +31,16 @@ public interface Template
      * @return
      */
     String getDescription();
+
+    /**
+     * Returns true if the supplied object does "fit" the target that this template creates (a la
+     * class.isAssignableFrom(target)). The actual meaning of "fit" is left to given template and it's implementation,
+     * how to "narrow" the selection.
+     * 
+     * @param target
+     * @return
+     */
+    boolean targetFits( Object target );
 
     /**
      * Instantianates this template.
