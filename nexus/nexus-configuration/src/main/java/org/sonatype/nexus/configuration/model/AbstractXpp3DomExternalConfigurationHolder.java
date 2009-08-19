@@ -265,26 +265,32 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
         if ( node == null )
         {
-            // do NOT create nodes for inspection, only explicitly with setNodeValue()
             return false;
+        }        
+        
+        // Unfortunately simply removing the child node from the Xpp3Dom object is causing
+        // merge issues at a later point (seems some remnants are left in the Xpp3Dom object
+        // and is causing a child to get duplicated).
+        // So we simply build new child list and call setCollection()
+        
+        List<String> children = new ArrayList<String>();
+        
+        boolean removed = false;
 
-            // node = new Xpp3Dom( name );
-
-            // parent.addChild( node );
-        }
-
-        for ( int i = 0; i < node.getChildCount(); i++ )
+        for ( Xpp3Dom child : node.getChildren() )
         {
-            Xpp3Dom child = node.getChild( i );
-
-            if ( StringUtils.equals( value, child.getValue() ) )
+            if ( !StringUtils.equals( value, child.getValue() ) )
             {
-                node.removeChild( i );
-
-                return true;
+                children.add( child.getValue() );
+            }
+            else
+            {
+                removed = true;
             }
         }
+        
+        setCollection( parent, name, children );
 
-        return false;
+        return removed;
     }
 }
