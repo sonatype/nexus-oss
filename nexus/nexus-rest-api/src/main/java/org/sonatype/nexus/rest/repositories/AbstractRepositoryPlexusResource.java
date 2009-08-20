@@ -18,7 +18,6 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -43,7 +42,6 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NexusCompat;
@@ -90,7 +88,7 @@ public abstract class AbstractRepositoryPlexusResource
 
     @Requirement
     private GlobalHttpProxySettings globalHttpProxySettings;
-    
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
@@ -108,7 +106,7 @@ public abstract class AbstractRepositoryPlexusResource
     {
         return globalHttpProxySettings;
     }
-    
+
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
@@ -116,7 +114,7 @@ public abstract class AbstractRepositoryPlexusResource
 
     /**
      * Pull the repository Id out of the Request.
-     * 
+     *
      * @param request
      * @return
      */
@@ -133,9 +131,8 @@ public abstract class AbstractRepositoryPlexusResource
 
         boolean forceCheck = form.getFirst( "forceCheck" ) != null;
 
-        RemoteStatus rs = repository.getRemoteStatus(
-            new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ),
-            forceCheck );
+        RemoteStatus rs =
+            repository.getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), forceCheck );
 
         if ( RemoteStatus.UNKNOWN.equals( rs ) )
         {
@@ -230,8 +227,7 @@ public abstract class AbstractRepositoryPlexusResource
 
                 if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                 {
-                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy()
-                        .toString() );
+                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
                 }
 
                 if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -257,6 +253,12 @@ public abstract class AbstractRepositoryPlexusResource
             RepositoryBaseResource resource = null;
 
             Repository repository = getRepositoryRegistry().getRepository( repoId );
+
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                // it is a group, not a repo
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
+            }
 
             resource = getRepositoryRestModel( repository );
 
@@ -308,7 +310,7 @@ public abstract class AbstractRepositoryPlexusResource
         resource.setName( repository.getName() );
 
         resource.setWritePolicy( repository.getWritePolicy().name() );
-        
+
         resource.setBrowseable( repository.isBrowseable() );
 
         resource.setIndexable( repository.isIndexable() );
@@ -320,29 +322,31 @@ public abstract class AbstractRepositoryPlexusResource
         // TODO: remove the default local storage, this is a work around for NEXUS-1994
         // the new 1.4 API doesn't store the default URL, well, it is part of the CRepo, but it is not exposed.
         // so we can figure it out again, I think the default local Storage should be removed from the REST message
-        // which is part of the reason for not exposing it. The other part is it is not used anywhere except to set 
+        // which is part of the reason for not exposing it. The other part is it is not used anywhere except to set
         // the localUrl if not already set.
-        
-        File defaultStorageFile = new File( new File( this.applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
-        //      make sure both URLs either end with '/' or do not end with '/'
+
+        File defaultStorageFile =
+            new File( new File( this.applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
+        // make sure both URLs either end with '/' or do not end with '/'
         String defaultLocalStorage = "";
         try
         {
             defaultLocalStorage = defaultStorageFile.toURL().toString();
-            defaultLocalStorage = (defaultLocalStorage.endsWith( "/" )) ? defaultLocalStorage : defaultLocalStorage + "/";
+            defaultLocalStorage =
+                ( defaultLocalStorage.endsWith( "/" ) ) ? defaultLocalStorage : defaultLocalStorage + "/";
         }
         catch ( MalformedURLException e )
         {
-           this.getLogger().warn( "Could not figure out the default storage URL for repository: "+ repository.getId() );
+            this.getLogger().warn( "Could not figure out the default storage URL for repository: " + repository.getId() );
         }
-        
+
         String currentLocalStorage = repository.getLocalUrl();
-        currentLocalStorage = (currentLocalStorage.endsWith( "/" )) ? currentLocalStorage : currentLocalStorage + "/";
-        
+        currentLocalStorage = ( currentLocalStorage.endsWith( "/" ) ) ? currentLocalStorage : currentLocalStorage + "/";
+
         resource.setDefaultLocalStorageUrl( defaultLocalStorage );
-        
+
         // now if the currentLocalStorage is different from the override local storage set it.
-        if( !defaultLocalStorage.equals( currentLocalStorage ) )
+        if ( !defaultLocalStorage.equals( currentLocalStorage ) )
         {
             resource.setOverrideLocalStorageUrl( currentLocalStorage );
         }
@@ -353,11 +357,9 @@ public abstract class AbstractRepositoryPlexusResource
 
             if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
             {
-                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy()
-                    .toString() );
+                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy().toString() );
 
-                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class )
-                    .isDownloadRemoteIndexes() );
+                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() );
             }
         }
 
@@ -377,21 +379,16 @@ public abstract class AbstractRepositoryPlexusResource
         resource.getRemoteStorage().setRemoteStorageUrl( repository.getRemoteUrl() );
 
         resource.getRemoteStorage().setAuthentication(
-                                                       AbstractGlobalConfigurationPlexusResource.convert( NexusCompat
-                                                           .getRepositoryRawConfiguration( repository )
-                                                           .getRemoteStorage().getAuthentication() ) );
+                                                       AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                     repository ).getRemoteStorage().getAuthentication() ) );
 
         resource.getRemoteStorage().setConnectionSettings(
-                                                           AbstractGlobalConfigurationPlexusResource
-                                                               .convert( NexusCompat
-                                                                   .getRepositoryRawConfiguration( repository )
-                                                                   .getRemoteStorage().getConnectionSettings() ) );
+                                                           AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                         repository ).getRemoteStorage().getConnectionSettings() ) );
 
         resource.getRemoteStorage().setHttpProxySettings(
-                                                          AbstractGlobalConfigurationPlexusResource
-                                                              .convert( NexusCompat
-                                                                  .getRepositoryRawConfiguration( repository )
-                                                                  .getRemoteStorage().getHttpProxySettings() ) );
+                                                          AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
+                                                                                                                                                        repository ).getRemoteStorage().getHttpProxySettings() ) );
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
