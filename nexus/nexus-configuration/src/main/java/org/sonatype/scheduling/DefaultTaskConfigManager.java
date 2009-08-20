@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -38,6 +37,7 @@ import org.sonatype.nexus.configuration.model.CProps;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CScheduledTaskCoreConfiguration;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.scheduling.schedules.CronSchedule;
 import org.sonatype.scheduling.schedules.DailySchedule;
@@ -53,11 +53,12 @@ import org.sonatype.scheduling.schedules.WeeklySchedule;
  * The default implementation of the Task Configuration manager. Will handle writing to and loading from the tasks
  * within nexus.xml file.
  */
-@Component( role = TaskConfigManager.class )
+@Component ( role = TaskConfigManager.class )
 public class DefaultTaskConfigManager
     extends AbstractConfigurable
     implements TaskConfigManager
 {
+
     @Requirement
     private Logger logger;
 
@@ -125,8 +126,9 @@ public class DefaultTaskConfigManager
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
+                                              + configuration.getClass().getName() + "\" and not the required \""
+                                              + ApplicationConfiguration.class.getName() + "\"!"
+            );
         }
     }
 
@@ -160,7 +162,8 @@ public class DefaultTaskConfigManager
                     TaskUtils.setName( nexusTask, task.getName() );
 
                     scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
-                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) )
+                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) )
+                    )
                         .setEnabled( task.isEnabled() );
                 }
                 catch ( IllegalArgumentException e )
@@ -168,8 +171,9 @@ public class DefaultTaskConfigManager
                     // this is bad, Plexus did not find the component, possibly the task.getType() contains bad class
                     // name
                     getLogger().warn(
-                                      "Unable to initialize task " + task.getName() + ", couldn't load service class "
-                                          + task.getId(), e );
+                        "Unable to initialize task " + task.getName() + ", couldn't load service class "
+                        + task.getId(), e
+                    );
                 }
             }
         }
@@ -246,9 +250,16 @@ public class DefaultTaskConfigManager
         {
             return (SchedulerTask<?>) getPlexusContainer().lookup( SchedulerTask.class, taskType );
         }
-        catch ( ComponentLookupException e )
+        catch ( ComponentLookupException ignore )
         {
-            throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
+            try
+            {
+                return (SchedulerTask<?>) getPlexusContainer().lookup( NexusTask.class, taskType );
+            }
+            catch ( ComponentLookupException e )
+            {
+                throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
+            }
         }
     }
 
@@ -328,7 +339,8 @@ public class DefaultTaskConfigManager
 
             schedule =
                 new MonthlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
-                                     daysToRun );
+                                     daysToRun
+                );
         }
         else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
         {
@@ -350,7 +362,8 @@ public class DefaultTaskConfigManager
 
             schedule =
                 new WeeklySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
-                                    daysToRun );
+                                    daysToRun
+                );
         }
         else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
         {
