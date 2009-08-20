@@ -73,6 +73,12 @@ public class Gav
 
     private SignatureType signatureType;
 
+    public Gav( String groupId, String artifactId, String version )
+        throws IllegalArtifactCoordinateException
+    {
+        this( groupId, artifactId, version, null, null, null, null, null, false, false, null, false, null );
+    }
+
     public Gav( String groupId, String artifactId, String version, String classifier, String extension,
         Integer snapshotBuildNumber, Long snapshotTimeStamp, String name, boolean snapshot, boolean hash,
         HashType hashType, boolean signature, SignatureType signatureType )
@@ -219,7 +225,7 @@ public class Gav
     }
 
     @Override
-    public int hashCode() 
+    public int hashCode()
     {
         int result = 1;
         result = 31 * result + ( groupId == null ? 0 : groupId.hashCode() );
@@ -254,9 +260,9 @@ public class Gav
         {
             return false;
         }
-        
+
         Gav other = (Gav) obj;
-        
+
         if ( groupId == null )
         {
             if ( other.groupId != null )
@@ -280,7 +286,7 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( version == null )
         {
             if ( other.version != null )
@@ -304,7 +310,7 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( classifier == null )
         {
             if ( other.classifier != null )
@@ -316,7 +322,7 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( extension == null )
         {
             if ( other.extension != null )
@@ -328,7 +334,7 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( name == null )
         {
             if ( other.name != null )
@@ -340,12 +346,12 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( snapshot != other.snapshot )
         {
             return false;
         }
-        
+
         if ( snapshotBuildNumber == null )
         {
             if ( other.snapshotBuildNumber != null )
@@ -357,7 +363,7 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( snapshotTimeStamp == null )
         {
             if ( other.snapshotTimeStamp != null )
@@ -369,12 +375,12 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( hash != other.hash )
         {
             return false;
         }
-        
+
         if ( hashType == null )
         {
             if ( other.hashType != null )
@@ -386,12 +392,12 @@ public class Gav
         {
             return false;
         }
-        
+
         if ( signature != other.signature )
         {
             return false;
         }
-        
+
         if ( signatureType == null )
         {
             if ( other.signatureType != null )
@@ -403,7 +409,7 @@ public class Gav
         {
             return false;
         }
-        
+
         return true;
     }
 
