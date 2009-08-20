@@ -108,6 +108,11 @@ public abstract class AbstractRepositoryPlexusResource
     {
         return globalHttpProxySettings;
     }
+    
+    protected ApplicationConfiguration getApplicationConfiguration()
+    {
+        return applicationConfiguration;
+    }
 
     /**
      * Pull the repository Id out of the Request.

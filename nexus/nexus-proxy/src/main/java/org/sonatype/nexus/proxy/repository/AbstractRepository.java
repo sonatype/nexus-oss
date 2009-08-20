@@ -298,7 +298,12 @@ public abstract class AbstractRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String newLocalUrl = localUrl.trim();
+        String newLocalUrl = "";
+        
+        if ( localUrl != null )
+        {
+            newLocalUrl = localUrl.trim();
+        }
 
         if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {

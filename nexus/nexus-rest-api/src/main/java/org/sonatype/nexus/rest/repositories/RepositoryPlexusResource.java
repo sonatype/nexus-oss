@@ -13,9 +13,11 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -234,7 +236,16 @@ public class RepositoryPlexusResource
                             }
                         }
 
-                        if ( model.getOverrideLocalStorageUrl() != null )
+                        if ( StringUtils.isEmpty( model.getOverrideLocalStorageUrl() ) )
+                        {
+                            //TODO: NEXUS-1994
+                            //This is a little hack to allow user to clear the override storage.
+                            //See specific change in AbstractRepositoryPlexusResource as well (NEXUS-1994 in there)
+                            File defaultStorageFile = new File( new File( this.getApplicationConfiguration().getWorkingDirectory(), "storage" ), repository.getId() );
+                            
+                            repository.setLocalUrl( defaultStorageFile.toURL().toString() );
+                        }
+                        else
                         {
                             repository.setLocalUrl( model.getOverrideLocalStorageUrl() );
                         }
