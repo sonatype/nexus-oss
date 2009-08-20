@@ -235,28 +235,8 @@ public class RepositoryPlexusResource
                                 }
                             }
                         }
-
-                        if ( StringUtils.isEmpty( model.getOverrideLocalStorageUrl() ) )
-                        {
-                            //TODO: NEXUS-1994
-                            //This is a little hack to allow user to clear the override storage.
-                            //See specific change in AbstractRepositoryPlexusResource as well (NEXUS-1994 in there)
-                            File defaultStorageFile = new File( new File( this.getApplicationConfiguration().getWorkingDirectory(), "storage" ), repository.getId() );
-                            
-                            repository.setLocalUrl( defaultStorageFile.toURL().toString() );
-                        }
-                        else
-                        {
-                            repository.setLocalUrl( model.getOverrideLocalStorageUrl() );
-                        }
-
-                        if ( RepositoryProxyResource.class.isAssignableFrom( model.getClass() ) )
-                        {
-                            
-                            
-                            // XXX cstamas!
-                            // appModel = getRepositoryProxyAppModel( (RepositoryProxyResource) model, appModel );
-                        }
+                        
+                        repository.setLocalUrl( model.getOverrideLocalStorageUrl() );
 
                         getNexusConfiguration().saveConfiguration();
                     }

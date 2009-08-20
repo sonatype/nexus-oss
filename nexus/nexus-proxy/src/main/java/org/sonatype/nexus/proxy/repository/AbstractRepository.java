@@ -298,21 +298,25 @@ public abstract class AbstractRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String newLocalUrl = "";
+        String newLocalUrl = null;
         
         if ( localUrl != null )
         {
             newLocalUrl = localUrl.trim();
         }
-
-        if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        
+        if ( newLocalUrl != null )
         {
-            newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
+            if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            {
+                newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
+            }
+             
+            getLocalStorage().validateStorageUrl( newLocalUrl );
         }
 
-        getLocalStorage().validateStorageUrl( newLocalUrl );
-
-        if ( !StringUtils.equals( newLocalUrl, getLocalUrl() ) )
+        // Dont use getLocalUrl since that applies default
+        if ( !StringUtils.equals( newLocalUrl, getCurrentConfiguration( false ).getLocalStorage().getUrl() ) )
         {
             this.localUrlChanged = true;
         }

@@ -126,9 +126,15 @@ public class ConfigurableRepository
     public void setLocalUrl( String localUrl )
         throws StorageException
     {
-        String newLocalUrl = localUrl.trim();
-
-        if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        String newLocalUrl = null;
+        
+        if ( !StringUtils.isEmpty( localUrl ) )
+        {
+            newLocalUrl = localUrl.trim();
+        }
+        
+        if ( newLocalUrl != null 
+            && newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
             newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
         }
