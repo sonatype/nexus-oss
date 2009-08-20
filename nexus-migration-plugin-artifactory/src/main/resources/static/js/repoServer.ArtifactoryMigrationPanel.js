@@ -496,11 +496,16 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
   showMigrationLog: function() {
 
+    var visible = Ext.get('view-logs');
+
 //    FIXME, tabe title is duplicated here
     var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-              'st-nexus-search-panel', Sonatype.repoServer.LogsViewPanel, { title: 'Logs and Config Files' } );
+              'view-logs', Sonatype.repoServer.LogsViewPanel, { title: 'Logs and Config Files' } )
+
+    if(visible) {
+      panel.reloadAllFiles();
+    }
     
-    // FIXME: Add check to see if log exists
     panel.showLog('migration.log');
 
   },

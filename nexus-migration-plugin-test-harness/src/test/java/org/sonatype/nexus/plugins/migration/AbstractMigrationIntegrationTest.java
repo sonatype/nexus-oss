@@ -38,8 +38,10 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 public abstract class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -50,6 +52,10 @@ public abstract class AbstractMigrationIntegrationTest
     protected GroupMessageUtil groupUtil;
 
     protected SearchMessageUtil searchUtil;
+
+    protected UserMessageUtil userUtil;
+
+    protected RoleMessageUtil roleUtil;
 
     public AbstractMigrationIntegrationTest()
     {
@@ -64,6 +70,8 @@ public abstract class AbstractMigrationIntegrationTest
         }
         this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil();
+        this.userUtil = new UserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @BeforeClass

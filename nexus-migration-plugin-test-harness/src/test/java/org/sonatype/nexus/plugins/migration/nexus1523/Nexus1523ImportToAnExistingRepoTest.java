@@ -26,7 +26,8 @@ public class Nexus1523ImportToAnExistingRepoTest
         String log = IOUtil.toString( new FileReader( logFile ) );
         Assert.assertFalse( "Error during migration \n" + log, log.toLowerCase().contains( "error" ) );
 
-        File importedArtifact = new File(nexusWorkDir, "/storage/main-local/nexus1523/import-artifact/1.0/import-artifact-1.0.jar");
+        File importedArtifact =
+            new File( nexusWorkDir, "/storage/main-local/nexus1523/import-artifact/1.0/import-artifact-1.0.jar" );
         Assert.assertTrue( "Imported artifact do not exists!", importedArtifact.isFile() );
     }
 }

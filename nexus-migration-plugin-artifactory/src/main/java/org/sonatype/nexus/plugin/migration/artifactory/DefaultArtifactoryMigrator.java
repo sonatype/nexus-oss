@@ -26,11 +26,13 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
@@ -69,6 +71,9 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.RebuildAttributesTask;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.templates.TemplateProvider;
+import org.sonatype.nexus.templates.repository.DefaultRepositoryTemplateProvider;
+import org.sonatype.nexus.templates.repository.ManuallyConfiguredRepositoryTemplate;
 import org.sonatype.nexus.tools.repository.RepositoryConvertor;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -112,6 +117,12 @@ public class DefaultArtifactoryMigrator
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
+
+    @Requirement
+    private NexusConfiguration nexusConfiguration;
+
+    @Requirement( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
+    private DefaultRepositoryTemplateProvider repositoryTemplateProvider;
 
     /**
      * Map of processed migrations.
@@ -248,8 +259,20 @@ public class DefaultArtifactoryMigrator
                 result.addErrorMessage( "Error importing security.", e );
             }
 
+            try
+            {
+                this.nexusConfiguration.saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                result.addErrorMessage( "Error saving configuration changes.", e );
+            }
+
             // finally, recreate metadata for all migrated reposes
-            spawnAllMetadatas( result );
+            if ( result.getErrorMessages().isEmpty() )
+            {
+                spawnAllMetadatas( result );
+            }
 
             // if we have errors already, just return
             if ( !result.getErrorMessages().isEmpty() )
@@ -309,10 +332,11 @@ public class DefaultArtifactoryMigrator
         {
             result.addInfoMessage( "Importing user: " + userResolution.getUserId() );
 
-            ArtifactoryUser user =
-                new ArtifactoryUser( userResolution.getUserId(), userResolution.getPassword(),
-                                     userResolution.getEmail() );
+            ArtifactoryUser user = cfg.getUserByUsername( userResolution.getUserId() );
 
+            user.setUsername( userResolution.getUserId() );
+            user.setPassword( userResolution.getPassword() );
+            user.setEmail( userResolution.getEmail() );
             user.setAdmin( userResolution.isAdmin() );
 
             userList.add( user );
@@ -460,9 +484,14 @@ public class DefaultArtifactoryMigrator
         }
         exConf.setMemberRepositoryIds( members );
 
+        ManuallyConfiguredRepositoryTemplate template =
+            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
+                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
+                                                                                                 group, null ) );
+
         try
         {
-            this.nexus.createRepository( group );
+            template.create();
         }
         catch ( Exception e )
         {
@@ -519,6 +548,12 @@ public class DefaultArtifactoryMigrator
 
         String repoId = repo.getKey();
         String repoName = repo.getDescription();
+
+        if ( repoName == null )
+        {
+            repoName = repoId;
+        }
+
         if ( suffix != null )
         {
             repoId += "-" + suffix;
@@ -613,13 +648,18 @@ public class DefaultArtifactoryMigrator
 
         }
 
+        ManuallyConfiguredRepositoryTemplate template =
+            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
+                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
+                                                                                                 nexusRepo, null ) );
+
         try
         {
-            this.nexus.createRepository( nexusRepo );
+            template.create();
         }
         catch ( Exception e )
         {
-            throw new MigrationException( "Unable to create new repository: " + repoId, e );
+            throw new MigrationException( "Unable to create repository group: " + repoId, e );
         }
 
         try
@@ -807,13 +847,18 @@ public class DefaultArtifactoryMigrator
         exConf.setMasterRepositoryId( shadowOfRepoId );
         exConf.setSynchronizeAtStartup( true );
 
+        ManuallyConfiguredRepositoryTemplate template =
+            repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
+                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
+                                                                                                 shadowRepo, null ) );
+
         try
         {
-            this.nexus.createRepository( shadowRepo );
+            template.create();
         }
         catch ( Exception e )
         {
-            throw new MigrationException( "Error creating shadow repo: " + shadowOfRepoId, e );
+            throw new MigrationException( "Unable to create repository group: " + shadowId, e );
         }
 
         return shadowRepo;

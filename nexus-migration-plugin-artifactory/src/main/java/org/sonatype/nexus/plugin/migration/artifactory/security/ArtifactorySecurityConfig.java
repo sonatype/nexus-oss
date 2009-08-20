@@ -74,9 +74,22 @@ public class ArtifactorySecurityConfig
                 return user;
             }
         }
+
+        if ( username.endsWith( "-artifactory" ) )
+        {
+            username = username.replace( "-artifactory", "" );
+            for ( ArtifactoryUser user : users )
+            {
+                if ( user.getUsername().equals( username ) )
+                {
+                    return user;
+                }
+            }
+        }
+
         return null;
     }
-    
+
     public ArtifactoryGroup getGroupByName( String name )
     {
         for ( ArtifactoryGroup group : groups )
@@ -102,8 +115,7 @@ public class ArtifactorySecurityConfig
         }
         return null;
     }
-    
-    
+
     public ArtifactoryPermissionTarget getPermissionTarget( String name )
     {
         for ( ArtifactoryPermissionTarget target : permissionTargets )
