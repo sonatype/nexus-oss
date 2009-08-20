@@ -19,7 +19,6 @@ import org.codehaus.swizzle.jira.Issue;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.scheduling.NexusTask;
@@ -91,7 +90,7 @@ public class DefaultErrorReportingManagerTest
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + request.getThrowable().getMessage() );
 
         Assert.assertNull( issues );
@@ -99,7 +98,7 @@ public class DefaultErrorReportingManagerTest
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + request.getThrowable().getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
@@ -107,7 +106,7 @@ public class DefaultErrorReportingManagerTest
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + request.getThrowable().getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
@@ -128,15 +127,16 @@ public class DefaultErrorReportingManagerTest
         {
             exception = e;
         }
-
-        CErrorReporting config = new CErrorReporting();
-        config.setEnabled( true );
-        config.setJiraProject( "NEXUS" );
+        
+        manager.setEnabled( true );
+        manager.setJIRAProject( "NEXUS" );
+        
+        nexusConfiguration.saveConfiguration();
 
         ErrorReportRequest request = new ErrorReportRequest();
         request.setThrowable( exception );
 
-        IssueSubmissionRequest subRequest = manager.buildRequest( config, request );
+        IssueSubmissionRequest subRequest = manager.buildRequest( request );
 
         assertEquals( "NEXUS", subRequest.getProjectId() );
         assertEquals( "APR: Test exception", subRequest.getSummary() );
@@ -220,7 +220,7 @@ public class DefaultErrorReportingManagerTest
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + new RuntimeException( msg ).getMessage() );
 
         Assert.assertNull( issues );
@@ -228,7 +228,7 @@ public class DefaultErrorReportingManagerTest
         doCall( task );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + new RuntimeException( msg ).getMessage() );
 
         Assert.assertEquals( 1, issues.size() );
@@ -236,7 +236,7 @@ public class DefaultErrorReportingManagerTest
         doCall( task );
 
         issues =
-            manager.retrieveIssues( manager.getCurrentConfiguration( false ), "APR: "
+            manager.retrieveIssues( "APR: "
                 + new RuntimeException( msg ).getMessage() );
 
         Assert.assertEquals( 1, issues.size() );

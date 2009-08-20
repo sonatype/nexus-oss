@@ -161,6 +161,18 @@ public class DefaultErrorReportingManager
     {
         return getCurrentConfiguration( false ).getJiraUsername();
     }
+    
+    protected String getValidJIRAUsername()
+    {
+        String username = getJIRAUsername();
+
+        if ( StringUtils.isEmpty( username ) )
+        {
+            username = DEFAULT_USERNAME;
+        }
+
+        return username;        
+    }
 
     public void setJIRAUsername( String username )
     {
@@ -170,6 +182,18 @@ public class DefaultErrorReportingManager
     public String getJIRAPassword()
     {
         return getCurrentConfiguration( false ).getJiraPassword();
+    }
+    
+    protected String getValidJIRAPassword()
+    {
+        String password = getJIRAPassword();
+        
+        if ( StringUtils.isEmpty( password ) )
+        {
+            password = DEFAULT_USERNAME;
+        }
+
+        return password;
     }
 
     public void setJIRAPassword( String password )
@@ -199,16 +223,14 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    // FIXME: get rid of CErrorReporirting direct usages in general, use setter/getters!
-
     public void handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
-        CErrorReporting errorConfig = getCurrentConfiguration( false );
-
+        getLogger().error( "Detected Error in Nexus", request.getThrowable() );
+        
         if ( isEnabled() && shouldHandleReport( request ) )
         {
-            IssueSubmissionRequest subRequest = buildRequest( errorConfig, request );
+            IssueSubmissionRequest subRequest = buildRequest( request );
             
             File unencryptedFile = subRequest.getProblemReportBundle();
 
@@ -218,11 +240,11 @@ public class DefaultErrorReportingManager
             
             try
             {
-                List<Issue> existingIssues = retrieveIssues( errorConfig, subRequest.getSummary() );
+                List<Issue> existingIssues = retrieveIssues( subRequest.getSummary() );
     
                 if ( existingIssues == null )
                 {
-                    IssueSubmissionResult result = getIssueSubmitter( errorConfig ).submitIssue( subRequest );
+                    IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
                     renameBundle( unencryptedFile, result.getKey() );
                     getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
                 }
@@ -291,17 +313,18 @@ public class DefaultErrorReportingManager
         return false;
     }
 
-    protected List<Issue> retrieveIssues( CErrorReporting errorConfig, String description )
+    @SuppressWarnings( "unchecked" )
+    protected List<Issue> retrieveIssues( String description )
     {
         Jira jira = null;
 
         try
         {
-            jira = new Jira( errorConfig.getJiraUrl() + "/rpc/xmlrpc" );
-            jira.login( getJiraUsername( errorConfig ), getJiraPassword( errorConfig ) );
+            jira = new Jira( getJIRAUrl() + "/rpc/xmlrpc" );
+            jira.login( getValidJIRAUsername(), getValidJIRAPassword() );
 
             List<Issue> issues =
-                jira.getIssuesFromTextSearchWithProject( Arrays.asList( errorConfig.getJiraProject() ), "\""
+                jira.getIssuesFromTextSearchWithProject( Arrays.asList( getJIRAProject() ), "\""
                     + description + "\"", 20 );
 
             if ( !issues.isEmpty() )
@@ -343,7 +366,7 @@ public class DefaultErrorReportingManager
         }
     }
 
-    protected IssueSubmissionRequest buildRequest( CErrorReporting errorConfig, ErrorReportRequest request )
+    protected IssueSubmissionRequest buildRequest( ErrorReportRequest request )
         throws IOException
     {
         String summary = "APR: " + request.getThrowable().getMessage();
@@ -355,17 +378,16 @@ public class DefaultErrorReportingManager
 
         IssueSubmissionRequest subRequest = new IssueSubmissionRequest();
 
-        subRequest.setProjectId( errorConfig.getJiraProject() );
+        subRequest.setProjectId( getJIRAProject() );
         subRequest.setSummary( summary );
         subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
             + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setReporter( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) ? errorConfig.getJiraUsername()
-                        : DEFAULT_USERNAME );
+        subRequest.setReporter( getValidJIRAUsername() );
         subRequest.setComponent( COMPONENT );
         subRequest.setEnvironment( assembleEnvironment( request ) );
 
-        if ( errorConfig.isUseGlobalProxy() )
+        if ( isUseGlobalProxy() )
         {
             subRequest.setProxyConfigurator( new NexusProxyServerConfigurator(
                                                                                nexusConfig.getGlobalRemoteStorageContext(),
@@ -373,30 +395,6 @@ public class DefaultErrorReportingManager
         }
 
         return subRequest;
-    }
-
-    private String getJiraUsername( CErrorReporting errorConfig )
-    {
-        String username = DEFAULT_USERNAME;
-
-        if ( StringUtils.isNotEmpty( errorConfig.getJiraUsername() ) )
-        {
-            username = errorConfig.getJiraUsername();
-        }
-
-        return username;
-    }
-
-    private String getJiraPassword( CErrorReporting errorConfig )
-    {
-        String password = DEFAULT_USERNAME;
-
-        if ( StringUtils.isNotEmpty( errorConfig.getJiraPassword() ) )
-        {
-            password = errorConfig.getJiraPassword();
-        }
-
-        return password;
     }
 
     private String assembleEnvironment( ErrorReportRequest request )
@@ -432,14 +430,14 @@ public class DefaultErrorReportingManager
         return sb.toString();
     }
 
-    private IssueSubmitter getIssueSubmitter( CErrorReporting errorConfig )
+    private IssueSubmitter getIssueSubmitter()
         throws IssueSubmissionException
     {
         try
         {
-            return new JiraIssueSubmitter( errorConfig.getJiraUrl(),
-                                           new DefaultAuthenticationSource( getJiraUsername( errorConfig ),
-                                                                            getJiraPassword( errorConfig ) ) );
+            return new JiraIssueSubmitter( getJIRAUrl(),
+                                           new DefaultAuthenticationSource( getValidJIRAUsername(),
+                                                                            getValidJIRAPassword() ) );
         }
         catch ( InitializationException e )
         {
