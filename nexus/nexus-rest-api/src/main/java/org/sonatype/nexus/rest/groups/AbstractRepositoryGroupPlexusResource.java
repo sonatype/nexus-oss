@@ -17,27 +17,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
+import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
+import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.InvalidGroupingException;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
-import org.sonatype.nexus.templates.repository.maven.Maven2GroupRepositoryTemplate;
+import org.sonatype.nexus.templates.repository.RepositoryTemplate;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
 public abstract class AbstractRepositoryGroupPlexusResource
@@ -46,7 +41,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
     public static final String GROUP_ID_KEY = "groupId";
 
     @Requirement
-    private PlexusContainer container;
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     protected void createOrUpdateRepositoryGroup( RepositoryGroupResource model, boolean create )
         throws ResourceException
@@ -61,7 +56,6 @@ public abstract class AbstractRepositoryGroupPlexusResource
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     protected void updateRepositoryGroup( RepositoryGroupResource model )
         throws ResourceException
     {
@@ -135,9 +129,12 @@ public abstract class AbstractRepositoryGroupPlexusResource
     {
         try
         {
-            Maven2GroupRepositoryTemplate template =
-                (Maven2GroupRepositoryTemplate) getNexus().getRepositoryTemplates()
-                    .getTemplates( Maven2GroupRepositoryTemplate.class ).pick();
+            ContentClass contentClass =
+                repositoryTypeRegistry.getRepositoryContentClass( GroupRepository.class.getName(), model.getProvider() );
+
+            RepositoryTemplate template =
+                (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates( MavenGroupRepository.class,
+                                                                                       contentClass ).pick();
 
             template.getConfigurableRepository().setId( model.getId() );
 
@@ -147,29 +144,40 @@ public abstract class AbstractRepositoryGroupPlexusResource
 
             template.getConfigurableRepository().setLocalStatus( LocalStatus.IN_SERVICE );
 
+            // we create an empty group
+            GroupRepository groupRepository = (GroupRepository) template.create();
+
+            ArrayList<String> memberIds = new ArrayList<String>( model.getRepositories().size() );
+
             for ( RepositoryGroupMemberRepository member : (List<RepositoryGroupMemberRepository>) model
                 .getRepositories() )
             {
-                template.getExternalConfiguration( true ).addMemberRepositoryId( member.getId() );
+                memberIds.add( member.getId() );
             }
 
-            template.create();
+            groupRepository.setMemberRepositoryIds( memberIds );
         }
         // FIXME: cstamas or toby?
-/*        catch ( NoSuchRepositoryAccessException e )
+        /*
+         * catch ( NoSuchRepositoryAccessException e ) { // access denied 403 getLogger().warn(
+         * "Repository referenced by Repository Group Access Denied, ID=" + model.getId(), e ); throw new
+         * PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+         * "Repository referenced by Repository Group Access Denied, GroupId=" + model.getId(), e,
+         * getNexusErrorResponse( "repositories", "Repository referenced by Repository Group Access Denied" ) ); }
+         */
+        catch ( NoSuchRepositoryException e )
         {
-            // access denied 403
-            getLogger().warn( "Repository referenced by Repository Group Access Denied, ID=" + model.getId(), e );
+            getLogger().warn( "Repository referenced by group does not exists!, GroupId=" + model.getId(), e );
 
             throw new PlexusResourceException(
                                                Status.CLIENT_ERROR_BAD_REQUEST,
-                                               "Repository referenced by Repository Group Access Denied, GroupId="
+                                               "Repository referenced by group does not exists, GroupId="
                                                    + model.getId(),
                                                e,
                                                getNexusErrorResponse( "repositories",
-                                                                      "Repository referenced by Repository Group Access Denied" ) );
+                                                                      "Repository referenced by Repository Group does not exists!" ) );
         }
-*/        catch ( InvalidGroupingException e )
+        catch ( InvalidGroupingException e )
         {
             getLogger().warn( "Invalid grouping detected!, GroupId=" + model.getId(), e );
 
