@@ -20,7 +20,7 @@
   </scm>
 
   <properties>
-    <jetty.version>6.1.17</jetty.version>
+    <jetty.version>6.1.19</jetty.version>
     <plexus-utils.version>1.5.5</plexus-utils.version>
     <plexus-container.version>1.0.1-SNAPSHOT</plexus-container.version>
     <!-- The plugin 1.0-beta-3.0.8-SNAPSHOT has a bug! -->
