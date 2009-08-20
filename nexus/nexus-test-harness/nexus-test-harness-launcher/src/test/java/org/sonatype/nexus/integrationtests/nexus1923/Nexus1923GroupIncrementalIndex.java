@@ -54,8 +54,6 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertFalse( getThirdHostedRepositoryIndexIncrement( "1" ).exists() );
         validateCurrentThirdHostedIncrementalCounter( 0 );
 
-        // Group doesnt create index on creation, so reindex is first pass at creating, thus no
-        // incremental piece
         Assert.assertTrue( getGroupIndex().exists() );
         Assert.assertFalse( getGroupIndexIncrement( "1" ).exists() );
         validateCurrentGroupIncrementalCounter( 0 );

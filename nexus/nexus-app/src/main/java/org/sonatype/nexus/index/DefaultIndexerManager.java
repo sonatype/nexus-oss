@@ -490,17 +490,14 @@ public class DefaultIndexerManager
         GroupRepository groupRepo =
             repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
-        if ( groupRepo.isIndexable() )
+        List<Repository> group = groupRepo.getMemberRepositories();
+
+        for ( Repository repository : group )
         {
-            List<Repository> group = groupRepo.getMemberRepositories();
-
-            for ( Repository repository : group )
-            {
-                reindexRepository( repository, fullReindex );
-            }
-
-            publishRepositoryGroupIndex( repositoryGroupId );
+            reindexRepository( repository, fullReindex );
         }
+
+        publishRepositoryGroupIndex( repositoryGroupId );
     }
 
     public void resetGroupIndex( String groupId )
@@ -508,31 +505,33 @@ public class DefaultIndexerManager
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
 
-        if ( group.isIndexable() )
+        getLogger().info( "Remerging group '" + groupId + "'" );
+
+        List<Repository> repositoriesList = group.getMemberRepositories();
+
+        purgeCurrentIndex( group );
+
+        // purge it, and below will be repopulated
+        purgeRepositoryGroupIndex( group );
+
+        for ( Repository repository : repositoriesList )
         {
-            getLogger().info( "Remerging group '" + groupId + "'" );
-
-            List<Repository> repositoriesList = group.getMemberRepositories();
-
-            purgeCurrentIndex( group );
-
-            // purge it, and below will be repopulated
-            purgeRepositoryGroupIndex( group );
-
-            for ( Repository repository : repositoriesList )
+            if ( repository.isIndexable() )
             {
                 getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
                 mergeRepositoryGroupIndexWithMember( repository );
             }
-
-            publishRepositoryGroupIndex( groupId );
         }
+
+        publishRepositoryGroupIndex( groupId );
     }
 
     protected void reindexRepository( Repository repository, boolean fullReindex )
         throws IOException
     {
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) || !repository.isIndexable() )
+        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class )
+            || repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+            || !repository.isIndexable() )
         {
             return;
         }
@@ -579,21 +578,24 @@ public class DefaultIndexerManager
         throws IOException
     {
         IndexingContext context = getRepositoryLocalIndexContext( repository );
-
-        Lock lock = getLock( repository.getId() ).writeLock();
-        lock.lock();
-        try
+        
+        if ( context != null )
         {
-            File repoDir = context.getRepository();
-            if ( repoDir != null && repoDir.isDirectory() )
+            Lock lock = getLock( repository.getId() ).writeLock();
+            lock.lock();
+            try
             {
-                File indexDir = new File( repoDir, ".index" );
-                FileUtils.forceDelete( indexDir );
+                File repoDir = context.getRepository();
+                if ( repoDir != null && repoDir.isDirectory() )
+                {
+                    File indexDir = new File( repoDir, ".index" );
+                    FileUtils.forceDelete( indexDir );
+                }
             }
-        }
-        finally
-        {
-            lock.unlock();
+            finally
+            {
+                lock.unlock();
+            }
         }
     }
 
@@ -608,8 +610,15 @@ public class DefaultIndexerManager
 
         try
         {
-            context.purge();
-            localContext.purge();
+            if ( context != null )
+            {
+                context.purge();
+            }
+            
+            if ( localContext != null )
+            {
+                localContext.purge();
+            }
         }
         finally
         {
@@ -906,7 +915,9 @@ public class DefaultIndexerManager
 
         for ( Repository repository : reposes )
         {
-            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) 
+                && !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
+                && repository.isIndexable() )
             {
                 publishRepositoryIndex( repository );
             }
@@ -931,15 +942,12 @@ public class DefaultIndexerManager
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
-        if ( group.isIndexable() )
+        for ( Repository repository : group.getMemberRepositories() )
         {
-            for ( Repository repository : group.getMemberRepositories() )
-            {
-                publishRepositoryIndex( repository );
-            }
-
-            publishRepositoryGroupIndex( group );
+            publishRepositoryIndex( repository );
         }
+
+        publishRepositoryGroupIndex( group );
     }
 
     protected void publishRepositoryIndex( Repository repository )
@@ -1022,17 +1030,17 @@ public class DefaultIndexerManager
     protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
         throws IOException
     {
-        if ( groupRepository.isIndexable() )
+        // groups contains the merged context in -remote idx context
+        IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
+        
+        if ( context != null )
         {
             String repoId = groupRepository.getId();
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug( "Publishing merged index for repository group " + repoId );
             }
-
-            // groups contains the merged context in -remote idx context
-            IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
-
+            
             File targetDir = null;
 
             Lock lock = getLock( repoId ).writeLock();

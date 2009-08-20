@@ -15,7 +15,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -24,7 +23,6 @@ import junit.framework.Assert;
 
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -35,14 +33,7 @@ import com.sun.syndication.io.XmlReader;
 
 public class FeedUtil
 {
-
     private static final String FEED_URL_PART = "service/local/feeds/";
-    
-    private static URL getFeedUrl( String feedId )
-        throws MalformedURLException
-    {
-        return new URL( AbstractNexusIntegrationTest.baseNexusUrl + FEED_URL_PART + feedId );
-    }
 
     public static SyndFeed getFeed( String feedId )
         throws IllegalArgumentException,
@@ -52,7 +43,7 @@ public class FeedUtil
     {
         SyndFeedInput input = new SyndFeedInput();
         
-        Response response = RequestFacade.sendMessage( FEED_URL_PART + feedId, Method.GET );
+        Response response = RequestFacade.sendMessage( FEED_URL_PART + feedId + "?_dc=" + System.currentTimeMillis(), Method.GET );
         Assert.assertTrue( "Expected content", response.getEntity().isAvailable());
         
         SyndFeed feed = input.build( new XmlReader( response.getEntity().getStream() ) );
