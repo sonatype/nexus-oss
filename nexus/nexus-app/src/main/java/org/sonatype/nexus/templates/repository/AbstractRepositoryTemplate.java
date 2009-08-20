@@ -44,7 +44,7 @@ public abstract class AbstractRepositoryTemplate
     public boolean targetFits( Object clazz )
     {
         return super.targetFits( clazz ) || targetIsClassAndFitsClass( clazz, getMainFacet() )
-            || targetIsClassAndFitsClass( clazz, getContentClass().getClass() );
+            || ( targetIsClassAndFitsClass( clazz, getContentClass().getClass() ) || getContentClass().equals( clazz ) );
     }
 
     @Override

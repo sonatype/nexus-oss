@@ -44,7 +44,7 @@ public abstract class AbstractTemplate
     {
         if ( filter instanceof Class<?> )
         {
-            return ( (Class<?>) filter ).isAssignableFrom( getClass() );
+            return ( (Class<?>) filter ).isAssignableFrom( clazz );
         }
         else
         {

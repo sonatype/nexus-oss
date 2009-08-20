@@ -168,7 +168,7 @@ public class RepositoryListPlexusResource
         }
         else
         {
-            ex = new Xpp3Dom( "externalConfiguration" );
+            ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         }
 
         appModel.setId( resource.getId() );

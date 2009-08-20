@@ -156,6 +156,8 @@ public abstract class AbstractRepositoryGroupPlexusResource
             }
 
             groupRepository.setMemberRepositoryIds( memberIds );
+            
+            getNexusConfiguration().saveConfiguration();
         }
         // FIXME: cstamas or toby?
         /*
