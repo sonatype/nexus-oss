@@ -363,6 +363,20 @@ public interface Repository
      */
     void setIndexable( boolean val );
 
+    /**
+     * Is Repository searchable?.
+     * 
+     * @return true if is searchable, otherwise false.
+     */
+    boolean isSearchable();
+
+    /**
+     * Sets the searchable property of repository. If true, its content will be searched by Indexer (when doing "global", non targeted searches), otherwise not.
+     * 
+     * @param val the val
+     */
+    void setSearchable( boolean val );
+
     // ==================================================
     // Maintenance
 

@@ -348,6 +348,7 @@ public class Upgrade108to140
         newrepo.setLocalStatus( this.localStatus.get( oldrepos.getLocalStatus() ) );
         newrepo.setBrowseable( oldrepos.isBrowseable() );
         newrepo.setIndexable( oldrepos.isIndexable() );
+        newrepo.setSearchable( oldrepos.isIndexable() );
         newrepo.setNotFoundCacheTTL( oldrepos.getNotFoundCacheTTL() );
         newrepo.setExposed( oldrepos.isExposed() );
         newrepo.setMirrors( copyCMirrors1_0_8( oldrepos.getMirrors() ) );
@@ -638,7 +639,8 @@ public class Upgrade108to140
             groupRepo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
             groupRepo.setBrowseable( true );
             groupRepo.setExposed( true );
-            groupRepo.setIndexable( false );
+            groupRepo.setIndexable( true );
+            groupRepo.setSearchable( false );
             groupRepo.setLocalStatus( LocalStatus.IN_SERVICE.toString() );
 
             if ( oldgroup.getLocalStorage() != null )

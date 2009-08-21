@@ -197,7 +197,7 @@ public class RepositoryRegistryRepositoryEventInspector
             {
                 getIndexerManager().addRepositoryIndexContext( repository.getId() );
 
-                getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isIndexable() );
+                getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isSearchable() );
 
                 // create the initial index
                 if ( nexusStarted && repository.isIndexable() )

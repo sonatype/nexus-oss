@@ -16,8 +16,5 @@ public abstract class AbstractGroupRepositoryConfigurator
         
         // Groups are read only
         repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
-        
-        // Groups are non indexable by default
-        repository.setIndexable( false );
     }
 }

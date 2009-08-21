@@ -25,9 +25,6 @@ public class GroupReindexIndexerManagerTest
         assertFalse( indexFile.exists() );
         assertFalse( incrementalIndexFile.exists() );
 
-        group.setIndexable( true );
-        nexusConfiguration.saveConfiguration();
-        
         indexerManager.reindexRepositoryGroup( null, group.getId(), true );
 
         assertTrue( indexFile.exists() );

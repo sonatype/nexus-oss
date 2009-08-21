@@ -14,7 +14,7 @@ public class DisableIndexerManagerTest
 
         searchFor( "org.sonatype.plexus", 1 );
 
-        snapshots.setIndexable( false );
+        snapshots.setSearchable( false );
 
         nexusConfiguration.saveConfiguration();
 

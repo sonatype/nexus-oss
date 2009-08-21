@@ -29,6 +29,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
@@ -56,6 +57,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots</url>
@@ -83,6 +85,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.repository.codehaus.org/</url>
@@ -110,6 +113,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>-1</artifactMaxAge>
@@ -133,6 +137,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>1440</artifactMaxAge>
@@ -156,6 +161,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>-1</artifactMaxAge>
@@ -194,6 +200,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -216,6 +223,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>

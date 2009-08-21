@@ -525,8 +525,17 @@
           <type>boolean</type>
           <description>
             If true, repository will get indexed. If false, the files and artifacts from repository will NOT
-            appear on Nexus index, thus will be not searcheable (and browseable on views that relies on
-            index), altough it will serve Maven clients properly.
+            be indexed (no index will be maintained for this repository).
+          </description>
+          <required>true</required>
+        </field>
+        <field>
+          <name>searchable</name>
+          <version>1.4.0+</version>
+          <type>boolean</type>
+          <description>
+            If true, repository will be searchable. If false, the files and artifacts from repository will NOT
+            appear on Nexus index, thus will be not searcheable.
           </description>
           <required>true</required>
         </field>

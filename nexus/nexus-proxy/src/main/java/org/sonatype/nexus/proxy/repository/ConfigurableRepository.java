@@ -115,6 +115,16 @@ public class ConfigurableRepository
         getCurrentConfiguration( true ).setIndexable( indexable );
     }
 
+    public boolean isSearchable()
+    {
+        return getCurrentConfiguration( false ).isSearchable();
+    }
+
+    public void setSearchable( boolean searchable )
+    {
+        getCurrentConfiguration( true ).setSearchable( searchable );
+    }
+
     public String getLocalUrl()
     {
         // see NEXUS-2482

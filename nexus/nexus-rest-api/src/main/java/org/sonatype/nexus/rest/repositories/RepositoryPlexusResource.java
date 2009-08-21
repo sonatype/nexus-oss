@@ -13,11 +13,9 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -156,7 +154,7 @@ public class RepositoryPlexusResource
 
                         repository.setBrowseable( model.isBrowseable() );
 
-                        repository.setIndexable( model.isIndexable() );
+                        repository.setSearchable( model.isIndexable() );
 
                         repository.setNotFoundCacheTimeToLive( model.getNotFoundCacheTTL() );
 

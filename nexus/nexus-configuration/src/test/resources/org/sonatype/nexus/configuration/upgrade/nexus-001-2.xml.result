@@ -38,6 +38,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
@@ -65,6 +66,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://hehe.sonatype.com/repos/customer</url>
@@ -92,6 +94,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://java.freehep.org/maven2/</url>
@@ -119,6 +122,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://people.apache.org/repo/m2-incubating-repository/</url>
@@ -146,6 +150,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>https://maven.atlassian.com/public/</url>
@@ -173,6 +178,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://www.openfast.org/maven/release/</url>
@@ -200,6 +206,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://snapshots.repository.codehaus.org/</url>
@@ -227,6 +234,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
@@ -254,6 +262,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://java.freehep.org/maven2/</url>
@@ -281,6 +290,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>https://maven.atlassian.com/public-snapshot/</url>
@@ -308,6 +318,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://www.openfast.org/maven/snapshot/</url>
@@ -333,6 +344,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -356,6 +368,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>

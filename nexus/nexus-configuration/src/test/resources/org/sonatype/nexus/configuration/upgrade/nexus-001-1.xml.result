@@ -34,6 +34,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/public</url>
@@ -61,6 +62,7 @@
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://192.168.1.1:8080/nexus/groups/snapshot</url>
@@ -88,6 +90,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>86400</artifactMaxAge>
@@ -111,6 +114,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>86400</artifactMaxAge>
@@ -134,6 +138,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>86400</artifactMaxAge>
@@ -157,6 +162,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>86400</artifactMaxAge>
@@ -180,6 +186,7 @@
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
+      <searchable>true</searchable>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>86400</artifactMaxAge>
@@ -201,6 +208,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
@@ -224,6 +232,7 @@
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
         <memberRepositories>
