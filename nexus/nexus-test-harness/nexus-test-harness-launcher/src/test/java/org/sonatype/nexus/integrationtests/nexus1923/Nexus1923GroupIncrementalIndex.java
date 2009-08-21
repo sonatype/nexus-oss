@@ -49,7 +49,7 @@ public class Nexus1923GroupIncrementalIndex
         validateCurrentThirdHostedIncrementalCounter( 0 );
 
         Assert.assertTrue( getGroupIndex().exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "1" ).exists() );
+        Assert.assertFalse( "Should not exists!", getGroupIndexIncrement( "1" ).exists() );
         validateCurrentGroupIncrementalCounter( 0 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
