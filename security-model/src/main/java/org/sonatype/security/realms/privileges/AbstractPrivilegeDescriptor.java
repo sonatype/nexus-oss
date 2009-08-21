@@ -28,30 +28,30 @@ public abstract class AbstractPrivilegeDescriptor
 {
     @Requirement
     private ConfigurationIdGenerator idGenerator;
-    
+
     protected String getProperty( CPrivilege privilege, String key )
     {
-        for ( CProperty property : ( List<CProperty> ) privilege.getProperties() )
+        for ( CProperty property : (List<CProperty>) privilege.getProperties() )
         {
             if ( property.getKey().equals( key ) )
             {
                 return property.getValue();
             }
         }
-        
+
         return null;
     }
-    
-    public ValidationResponse<SecurityValidationContext> validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
+
+    public ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
-        SecurityValidationContext context = response.getContext();
+
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
         List<String> existingIds = context.getExistingPrivilegeIds();
 
@@ -68,8 +68,9 @@ public abstract class AbstractPrivilegeDescriptor
         {
             String newId = idGenerator.generateId();
 
-            ValidationMessage message = new ValidationMessage( "id", "Fixed wrong privilege ID from '"
-                + privilege.getId() + "' to '" + newId + "'" );
+            ValidationMessage message =
+                new ValidationMessage( "id", "Fixed wrong privilege ID from '" + privilege.getId() + "' to '" + newId
+                    + "'" );
             response.addValidationWarning( message );
 
             privilege.setId( newId );
@@ -79,23 +80,22 @@ public abstract class AbstractPrivilegeDescriptor
 
         if ( StringUtils.isEmpty( privilege.getType() ) )
         {
-            ValidationMessage message = new ValidationMessage(
-                "type",
-                "Cannot have an empty type",
-                "Privilege cannot have an invalid type" );
+            ValidationMessage message =
+                new ValidationMessage( "type", "Cannot have an empty type", "Privilege cannot have an invalid type" );
 
             response.addValidationError( message );
         }
-        
+
         if ( StringUtils.isEmpty( privilege.getName() ) )
         {
-            ValidationMessage message = new ValidationMessage( "name", "Privilege ID '" + privilege.getId()
-                + "' requires a name.", "Name is required." );
+            ValidationMessage message =
+                new ValidationMessage( "name", "Privilege ID '" + privilege.getId() + "' requires a name.",
+                                       "Name is required." );
             response.addValidationError( message );
         }
-        
+
         existingIds.add( privilege.getId() );
-        
+
         return response;
     }
 }

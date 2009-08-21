@@ -51,7 +51,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad1()
         throws Exception
     {
-        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad1.xml" ) ) ) );
 
@@ -68,7 +68,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad2()
         throws Exception
     {
-        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad2.xml" ) ) ) );
 
@@ -84,7 +84,7 @@ public class DefaultConfigurationValidatorTest
     public void testBad3()
         throws Exception
     {
-        ValidationResponse<SecurityValidationContext> response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
+        ValidationResponse response = configurationValidator.validateModel( new ValidationRequest<Configuration>(
             getConfigurationFromStream( getClass().getResourceAsStream(
                 "/org/sonatype/security/configuration/validator/security-bad3.xml" ) ) ) );
     

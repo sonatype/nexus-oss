@@ -39,20 +39,20 @@ public class DefaultConfigurationValidator
 {
     @Requirement
     private ConfigurationIdGenerator idGenerator;
-    
-    @Requirement(role=PrivilegeDescriptor.class)
+
+    @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
 
     private static String DEFAULT_SOURCE = "default";
-    
-    public ValidationResponse<SecurityValidationContext> validateModel( ValidationRequest<Configuration> request )
+
+    public ValidationResponse validateModel( ValidationRequest<Configuration> request )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
         response.setContext( new SecurityValidationContext() );
 
         Configuration model = (Configuration) request.getConfiguration();
 
-        SecurityValidationContext context = response.getContext();
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
         List<CPrivilege> privs = model.getPrivileges();
 
@@ -86,7 +86,7 @@ public class DefaultConfigurationValidator
                 for ( CUserRoleMapping userRoleMapping : (List<CUserRoleMapping>) model.getUserRoleMappings() )
                 {
                     if ( userRoleMapping.getUserId() != null && userRoleMapping.getUserId().equals( user.getId() )
-                        && ( DEFAULT_SOURCE.equals(userRoleMapping.getSource() ) ) )
+                        && ( DEFAULT_SOURCE.equals( userRoleMapping.getSource() ) ) )
                     {
                         roleIds.addAll( userRoleMapping.getRoles() );
                     }
@@ -144,19 +144,19 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse<SecurityValidationContext> validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update )
+    public ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
-        
+
         for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
         {
-            ValidationResponse<SecurityValidationContext> resp = descriptor.validatePrivilege( privilege, ctx, update );
-            
+            ValidationResponse resp = descriptor.validatePrivilege( privilege, ctx, update );
+
             if ( resp != null )
             {
                 response.append( resp );
@@ -166,16 +166,16 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateRoleContainment( SecurityValidationContext ctx )
+    public ValidationResponse validateRoleContainment( SecurityValidationContext ctx )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
 
-        SecurityValidationContext context = response.getContext();
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
         if ( context.getExistingRoleIds() != null )
         {
@@ -203,22 +203,22 @@ public class DefaultConfigurationValidator
         }
         return false;
     }
-    
+
     private String getRoleTextForDisplay( String roleId, SecurityValidationContext ctx )
     {
         String name = ctx.getExistingRoleNameMap().get( roleId );
-        
+
         if ( StringUtils.isEmpty( name ) )
         {
             return roleId;
         }
-        
+
         return name;
     }
 
-    private ValidationResponse<SecurityValidationContext> isRecursive( String baseRoleId, String roleId, SecurityValidationContext ctx )
+    private ValidationResponse isRecursive( String baseRoleId, String roleId, SecurityValidationContext ctx )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         List<String> containedRoles = ctx.getRoleContainmentMap().get( roleId );
 
@@ -228,9 +228,11 @@ public class DefaultConfigurationValidator
             if ( baseRoleId.equals( roleId ) )
             {
                 if ( !ctx.getExistingRoleIds().contains( roleId ) )
-                {                    
-                    ValidationMessage message = new ValidationMessage( "roles", "Role '" + getRoleTextForDisplay( baseRoleId, ctx )
-                        + "' contains an invalid role", "Role cannot contain invalid role '" + getRoleTextForDisplay( roleId, ctx ) + "'." );
+                {
+                    ValidationMessage message =
+                        new ValidationMessage( "roles", "Role '" + getRoleTextForDisplay( baseRoleId, ctx )
+                            + "' contains an invalid role", "Role cannot contain invalid role '"
+                            + getRoleTextForDisplay( roleId, ctx ) + "'." );
 
                     response.addValidationError( message );
                 }
@@ -238,11 +240,11 @@ public class DefaultConfigurationValidator
 
             if ( containedRoleId.equals( baseRoleId ) )
             {
-                ValidationMessage message = new ValidationMessage(
-                    "roles",
-                    "Role '" + getRoleTextForDisplay( baseRoleId, ctx ) + "' contains itself through Role '" + getRoleTextForDisplay( roleId, ctx )
-                        + "'.  This is not valid.",
-                    "Role cannot contain itself recursively (via role '" + getRoleTextForDisplay( roleId, ctx ) + "')." );
+                ValidationMessage message =
+                    new ValidationMessage( "roles", "Role '" + getRoleTextForDisplay( baseRoleId, ctx )
+                        + "' contains itself through Role '" + getRoleTextForDisplay( roleId, ctx )
+                        + "'.  This is not valid.", "Role cannot contain itself recursively (via role '"
+                        + getRoleTextForDisplay( roleId, ctx ) + "')." );
 
                 response.addValidationError( message );
 
@@ -256,10 +258,11 @@ public class DefaultConfigurationValidator
             // Only need to do this on the first level
             else if ( baseRoleId.equals( roleId ) )
             {
-                ValidationMessage message = new ValidationMessage(
-                    "roles",
-                    "Role '" + getRoleTextForDisplay( roleId, ctx ) + "' contains an invalid role '" + getRoleTextForDisplay( containedRoleId, ctx ) + "'.",
-                    "Role cannot contain invalid role '" + getRoleTextForDisplay( containedRoleId, ctx ) + "'." );
+                ValidationMessage message =
+                    new ValidationMessage( "roles", "Role '" + getRoleTextForDisplay( roleId, ctx )
+                        + "' contains an invalid role '" + getRoleTextForDisplay( containedRoleId, ctx ) + "'.",
+                                           "Role cannot contain invalid role '"
+                                               + getRoleTextForDisplay( containedRoleId, ctx ) + "'." );
 
                 response.addValidationError( message );
             }
@@ -268,16 +271,16 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateRole( SecurityValidationContext ctx, CRole role, boolean update )
+    public ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
 
-        SecurityValidationContext context = response.getContext();
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
         List<String> existingIds = context.getExistingRoleIds();
 
@@ -315,27 +318,28 @@ public class DefaultConfigurationValidator
 
         if ( StringUtils.isEmpty( role.getName() ) )
         {
-            ValidationMessage message = new ValidationMessage( "name", "Role ID '" + role.getId()
-                + "' requires a name.", "Name is required." );
+            ValidationMessage message =
+                new ValidationMessage( "name", "Role ID '" + role.getId() + "' requires a name.", "Name is required." );
             response.addValidationError( message );
         }
         else if ( isRoleNameAlreadyInUse( existingRoleNameMap, role ) )
         {
-            ValidationMessage message = new ValidationMessage( "name", "Role ID '" + role.getId()
-                + "' can't use the name '" + role.getName() + "'.", "Name is already in use." );
+            ValidationMessage message =
+                new ValidationMessage( "name", "Role ID '" + role.getId() + "' can't use the name '" + role.getName()
+                    + "'.", "Name is already in use." );
             response.addValidationError( message );
         }
         else
         {
             existingRoleNameMap.put( role.getId(), role.getName() );
         }
-        
+
         if ( 1 > role.getSessionTimeout() )
         {
-            ValidationMessage message = new ValidationMessage(
-                "sessionTimeout",
-                "Role ID '" + role.getId() + "' requires a Session Timeout greater than 0 minutes.",
-                "Enter a session timeout greater than 0 minutes." );
+            ValidationMessage message =
+                new ValidationMessage( "sessionTimeout", "Role ID '" + role.getId()
+                    + "' requires a Session Timeout greater than 0 minutes.",
+                                       "Enter a session timeout greater than 0 minutes." );
             response.addValidationError( message );
         }
 
@@ -347,10 +351,9 @@ public class DefaultConfigurationValidator
             {
                 if ( !context.getExistingPrivilegeIds().contains( privId ) )
                 {
-                    ValidationMessage message = new ValidationMessage(
-                        "privileges",
-                        "Role ID '" + role.getId() + "' Invalid privilege id '" + privId + "' found.",
-                        "Role cannot contain invalid privilege ID '" + privId + "'." );
+                    ValidationMessage message =
+                        new ValidationMessage( "privileges", "Role ID '" + role.getId() + "' Invalid privilege id '"
+                            + privId + "' found.", "Role cannot contain invalid privilege ID '" + privId + "'." );
                     response.addValidationError( message );
                 }
             }
@@ -370,8 +373,9 @@ public class DefaultConfigurationValidator
         {
             if ( roleId.equals( role.getId() ) )
             {
-                ValidationMessage message = new ValidationMessage( "roles", "Role ID '" + role.getId()
-                    + "' cannot contain itself.", "Role cannot contain itself." );
+                ValidationMessage message =
+                    new ValidationMessage( "roles", "Role ID '" + role.getId() + "' cannot contain itself.",
+                                           "Role cannot contain itself." );
                 response.addValidationError( message );
             }
             else if ( context.getRoleContainmentMap() != null )
@@ -391,16 +395,16 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateUser( SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update )
+    public ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         if ( ctx != null )
         {
             response.setContext( ctx );
         }
 
-        SecurityValidationContext context = response.getContext();
+        SecurityValidationContext context = (SecurityValidationContext) response.getContext();
 
         List<String> existingIds = context.getExistingUserIds();
 
@@ -415,29 +419,34 @@ public class DefaultConfigurationValidator
 
         if ( !update && ( StringUtils.isEmpty( user.getId() ) || existingIds.contains( user.getId() ) ) )
         {
-            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getId()
-                + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
+            ValidationMessage message =
+                new ValidationMessage( "userId", "User ID '" + user.getId()
+                    + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
             response.addValidationError( message );
         }
 
         if ( StringUtils.isEmpty( user.getName() ) )
         {
-            ValidationMessage message = new ValidationMessage( "name", "User ID '" + user.getId()
-                + "' has no Name.  This is a required field.", "Name is required." );
+            ValidationMessage message =
+                new ValidationMessage( "name",
+                                       "User ID '" + user.getId() + "' has no Name.  This is a required field.",
+                                       "Name is required." );
             response.addValidationError( message );
         }
 
         if ( StringUtils.isEmpty( user.getPassword() ) )
         {
-            ValidationMessage message = new ValidationMessage( "password", "User ID '" + user.getId()
-                + "' has no password.  This is a required field.", "Password is required." );
+            ValidationMessage message =
+                new ValidationMessage( "password", "User ID '" + user.getId()
+                    + "' has no password.  This is a required field.", "Password is required." );
             response.addValidationError( message );
         }
 
         if ( StringUtils.isEmpty( user.getEmail() ) )
         {
-            ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getId()
-                + "' has no email address", "Email address is required." );
+            ValidationMessage message =
+                new ValidationMessage( "email", "User ID '" + user.getId() + "' has no email address",
+                                       "Email address is required." );
             response.addValidationError( message );
         }
         else
@@ -447,9 +456,10 @@ public class DefaultConfigurationValidator
 
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) && !CUser.STATUS_DISABLED.equals( user.getStatus() ) )
         {
-            ValidationMessage message = new ValidationMessage( "status", "User ID '" + user.getId()
-                + "' has invalid status '" + user.getStatus() + "'.  (Allowed values are: " + CUser.STATUS_ACTIVE
-                + " and " + CUser.STATUS_DISABLED + ")", "Invalid Status selected." );
+            ValidationMessage message =
+                new ValidationMessage( "status", "User ID '" + user.getId() + "' has invalid status '"
+                    + user.getStatus() + "'.  (Allowed values are: " + CUser.STATUS_ACTIVE + " and "
+                    + CUser.STATUS_DISABLED + ")", "Invalid Status selected." );
             response.addValidationError( message );
         }
 
@@ -462,9 +472,9 @@ public class DefaultConfigurationValidator
                 {
                     if ( !context.getExistingRoleIds().contains( roleId ) )
                     {
-                        ValidationMessage message = new ValidationMessage( "roles", "User ID '" + user.getId()
-                            + "' Invalid role id '" + roleId + "' found.", "User cannot contain invalid role ID '"
-                            + roleId + "'." );
+                        ValidationMessage message =
+                            new ValidationMessage( "roles", "User ID '" + user.getId() + "' Invalid role id '" + roleId
+                                + "' found.", "User cannot contain invalid role ID '" + roleId + "'." );
                         response.addValidationError( message );
                     }
                 }
@@ -479,24 +489,26 @@ public class DefaultConfigurationValidator
         return response;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateUserRoleMapping( SecurityValidationContext context, CUserRoleMapping userRoleMapping,
-        boolean update )
+    public ValidationResponse validateUserRoleMapping( SecurityValidationContext context,
+                                                       CUserRoleMapping userRoleMapping, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse response = new ValidationResponse();
 
         // ID must be not empty
         if ( StringUtils.isEmpty( userRoleMapping.getUserId() ) )
         {
-            ValidationMessage message = new ValidationMessage( "userId", "UserRoleMapping has no userId."
-                + "  This is a required field.", "UserId is required." );
+            ValidationMessage message =
+                new ValidationMessage( "userId", "UserRoleMapping has no userId." + "  This is a required field.",
+                                       "UserId is required." );
             response.addValidationError( message );
         }
 
         // source must be not empty
         if ( StringUtils.isEmpty( userRoleMapping.getSource() ) )
         {
-            ValidationMessage message = new ValidationMessage( "source", "User Role Mapping for user '"
-                + userRoleMapping.getUserId() + "' has no source.  This is a required field.", "UserId is required." );
+            ValidationMessage message =
+                new ValidationMessage( "source", "User Role Mapping for user '" + userRoleMapping.getUserId()
+                    + "' has no source.  This is a required field.", "UserId is required." );
             response.addValidationError( message );
         }
 
@@ -511,11 +523,10 @@ public class DefaultConfigurationValidator
                 {
                     if ( !context.getExistingRoleIds().contains( roleId ) )
                     {
-                        ValidationMessage message = new ValidationMessage(
-                            "roles",
-                            "User Role Mapping for user '" + userRoleMapping.getUserId() + "' Invalid role id '"
-                                + roleId + "' found.",
-                            "User cannot contain invalid role ID '" + roleId + "'." );
+                        ValidationMessage message =
+                            new ValidationMessage( "roles", "User Role Mapping for user '"
+                                + userRoleMapping.getUserId() + "' Invalid role id '" + roleId + "' found.",
+                                                   "User cannot contain invalid role ID '" + roleId + "'." );
                         response.addValidationError( message );
                     }
                 }

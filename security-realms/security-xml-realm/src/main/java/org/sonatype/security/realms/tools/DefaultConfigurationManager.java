@@ -144,7 +144,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validatePrivilege( context, privilege, false );
+        ValidationResponse vr = validator.validatePrivilege( context, privilege, false );
 
         if ( vr.isValid() )
         {
@@ -170,7 +170,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateRole( context, role, false );
+        ValidationResponse vr = validator.validateRole( context, role, false );
 
         if ( vr.isValid() )
         {
@@ -214,7 +214,7 @@ public class DefaultConfigurationManager
             user.setPassword( StringDigester.getSha1Digest( password ) );
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateUser( context, user, user.getRoles(), false );
+        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), false );
 
         if ( vr.isValid() )
         {
@@ -432,7 +432,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validatePrivilege( context, privilege, true );
+        ValidationResponse vr = validator.validatePrivilege( context, privilege, true );
 
         if ( vr.isValid() )
         {
@@ -461,7 +461,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateRole( context, role, true );
+        ValidationResponse vr = validator.validateRole( context, role, true );
 
         if ( vr.isValid() )
         {
@@ -490,7 +490,7 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateUser( context, user, user.getRoles(), true );
+        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), true );
 
         if ( vr.isValid() )
         {
@@ -542,7 +542,7 @@ public class DefaultConfigurationManager
             // this will throw a NoSuchRoleMappingException, if there isn't one
             this.readUserRoleMapping( userRoleMapping.getUserId(), userRoleMapping.getSource() );
 
-            ValidationResponse<SecurityValidationContext> vr = new ValidationResponse<SecurityValidationContext>();
+            ValidationResponse vr = new ValidationResponse();
             vr.addValidationError( new ValidationMessage( "*", "User Role Mapping for user '"
                 + userRoleMapping.getUserId() + "' already exists." ) );
 
@@ -553,7 +553,7 @@ public class DefaultConfigurationManager
             // expected
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateUserRoleMapping( context, userRoleMapping, false );
+        ValidationResponse vr = validator.validateUserRoleMapping( context, userRoleMapping, false );
 
         if ( vr.getValidationErrors().size() > 0 )
         {
@@ -601,14 +601,14 @@ public class DefaultConfigurationManager
 
         if ( this.readUserRoleMapping( userRoleMapping.getUserId(), userRoleMapping.getSource() ) == null )
         {
-            ValidationResponse<SecurityValidationContext> vr = new ValidationResponse<SecurityValidationContext>();
+            ValidationResponse vr = new ValidationResponse();
             vr.addValidationError( new ValidationMessage( "*", "No User Role Mapping found for user '" + userRoleMapping.getUserId()
                 + "'." ) );
 
             throw new InvalidConfigurationException( vr );
         }
 
-        ValidationResponse<SecurityValidationContext> vr = validator.validateUserRoleMapping( context, userRoleMapping, true );
+        ValidationResponse vr = validator.validateUserRoleMapping( context, userRoleMapping, true );
 
         if ( vr.getValidationErrors().size() > 0 )
         {

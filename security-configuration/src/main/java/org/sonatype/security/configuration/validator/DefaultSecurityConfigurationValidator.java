@@ -12,10 +12,10 @@ public class DefaultSecurityConfigurationValidator
     implements SecurityConfigurationValidator
 {
 
-    public ValidationResponse<SecurityValidationContext> validateModel( SecurityValidationContext context,
+    public ValidationResponse validateModel( SecurityValidationContext context,
         ValidationRequest<SecurityConfiguration> request )
     {
-        ValidationResponse<SecurityValidationContext> validationResponse = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
 
         SecurityConfiguration configuration = request.getConfiguration();
@@ -27,28 +27,28 @@ public class DefaultSecurityConfigurationValidator
         return validationResponse;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateAnonymousPassword( SecurityValidationContext context,
+    public ValidationResponse validateAnonymousPassword( SecurityValidationContext context,
         String anonymousPassword )
     {
         // we are not currently doing anything here
-        ValidationResponse<SecurityValidationContext> validationResponse = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
         return validationResponse;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateAnonymousUsername( SecurityValidationContext context,
+    public ValidationResponse validateAnonymousUsername( SecurityValidationContext context,
         String anonymousUsername )
     {
         // we are not currently doing anything here
-        ValidationResponse<SecurityValidationContext> validationResponse = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
         return validationResponse;
     }
 
-    public ValidationResponse<SecurityValidationContext> validateRealms( SecurityValidationContext context,
+    public ValidationResponse validateRealms( SecurityValidationContext context,
         List<String> realms )
     {
-        ValidationResponse<SecurityValidationContext> validationResponse = new ValidationResponse<SecurityValidationContext>();
+        ValidationResponse validationResponse = new ValidationResponse();
         validationResponse.setContext( context );
 
         if ( ( context.getSecurityConfiguration() != null && context.getSecurityConfiguration().isEnabled() )

@@ -75,7 +75,7 @@ public abstract class AbstractSecurityPlexusResource
 
         ErrorResponse errorResponse;
 
-        ValidationResponse<?> vr = e.getValidationResponse();
+        ValidationResponse vr = e.getValidationResponse();
 
         if ( vr != null && vr.getValidationErrors().size() > 0 )
         {
@@ -184,20 +184,24 @@ public abstract class AbstractSecurityPlexusResource
 
         // if this blows up we don't need to stop, we already have the ID, and really this should never happen because
         // we just looked up this info
-        
+
         try
         {
             roleName = securitySystem.getAuthorizationManager( role.getSource() ).getRole( role.getRoleId() ).getName();
         }
         catch ( NoSuchRoleException e )
         {
-            this.getLogger().error( "Failed to lookup the users Role: "+ role.getRoleId() +" source: "+ role.getSource() +" but the user has this role.", e);
+            this.getLogger().error(
+                                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                                        + role.getSource() + " but the user has this role.", e );
         }
         catch ( NoSuchAuthorizationManager e )
         {
-            this.getLogger().error( "Failed to lookup the users Role: "+ role.getRoleId() +" source: "+ role.getSource() +" but the user has this role.", e);
+            this.getLogger().error(
+                                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                                        + role.getSource() + " but the user has this role.", e );
         }
-        
+
         PlexusRoleResource roleResource = new PlexusRoleResource();
         roleResource.setRoleId( role.getRoleId() );
         roleResource.setName( roleName );
@@ -230,7 +234,7 @@ public abstract class AbstractSecurityPlexusResource
 
         if ( !found )
         {
-            ValidationResponse<ValidationContext> response = new ValidationResponse<ValidationContext>();
+            ValidationResponse response = new ValidationResponse();
             response.addValidationError( new ValidationMessage( "status", "Users status is not valid." ) );
             throw new InvalidConfigurationException( response );
         }

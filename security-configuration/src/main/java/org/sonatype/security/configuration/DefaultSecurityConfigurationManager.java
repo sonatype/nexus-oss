@@ -65,7 +65,7 @@ public class DefaultSecurityConfigurationManager
     public void setAnonymousPassword( String anonymousPassword )
         throws InvalidConfigurationException
     {
-        ValidationResponse<SecurityValidationContext> vr = validator.validateAnonymousPassword( this
+        ValidationResponse vr = validator.validateAnonymousPassword( this
             .initializeContext(), anonymousPassword );
 
         if ( vr.isValid() )
@@ -86,7 +86,7 @@ public class DefaultSecurityConfigurationManager
     public void setAnonymousUsername( String anonymousUsername )
         throws InvalidConfigurationException
     {
-        ValidationResponse<SecurityValidationContext> vr = validator.validateAnonymousUsername( this
+        ValidationResponse vr = validator.validateAnonymousUsername( this
             .initializeContext(), anonymousUsername );
 
         if ( vr.isValid() )
@@ -107,7 +107,7 @@ public class DefaultSecurityConfigurationManager
     public void setRealms( List<String> realms )
         throws InvalidConfigurationException
     {
-        ValidationResponse<SecurityValidationContext> vr = validator.validateRealms( this.initializeContext(), realms );
+        ValidationResponse vr = validator.validateRealms( this.initializeContext(), realms );
 
         if ( vr.isValid() )
         {

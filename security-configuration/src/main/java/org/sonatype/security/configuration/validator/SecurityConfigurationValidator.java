@@ -8,14 +8,12 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
 
 public interface SecurityConfigurationValidator
 {
-    ValidationResponse<SecurityValidationContext> validateModel( SecurityValidationContext context,
-        ValidationRequest<SecurityConfiguration> request );
+    ValidationResponse validateModel( SecurityValidationContext context,
+                                      ValidationRequest<SecurityConfiguration> request );
 
-    ValidationResponse<SecurityValidationContext> validateAnonymousUsername( SecurityValidationContext context,
-        String anonymousUsername );
+    ValidationResponse validateAnonymousUsername( SecurityValidationContext context, String anonymousUsername );
 
-    ValidationResponse<SecurityValidationContext> validateAnonymousPassword( SecurityValidationContext context,
-        String anonymousPassword );
+    ValidationResponse validateAnonymousPassword( SecurityValidationContext context, String anonymousPassword );
 
-    ValidationResponse<SecurityValidationContext> validateRealms( SecurityValidationContext context, List<String> realms );
+    ValidationResponse validateRealms( SecurityValidationContext context, List<String> realms );
 }

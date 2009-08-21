@@ -24,15 +24,15 @@ import org.sonatype.security.model.Configuration;
 
 public interface SecurityConfigurationValidator
 {
-    ValidationResponse<SecurityValidationContext> validateModel( ValidationRequest<Configuration> request );
+    ValidationResponse validateModel( ValidationRequest<Configuration> request );
     
-    ValidationResponse<SecurityValidationContext> validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update );
+    ValidationResponse validatePrivilege( SecurityValidationContext ctx, CPrivilege privilege, boolean update );
     
-    ValidationResponse<SecurityValidationContext> validateRoleContainment( SecurityValidationContext ctx );
+    ValidationResponse validateRoleContainment( SecurityValidationContext ctx );
     
-    ValidationResponse<SecurityValidationContext> validateRole( SecurityValidationContext ctx, CRole role, boolean update );
+    ValidationResponse validateRole( SecurityValidationContext ctx, CRole role, boolean update );
     
-    ValidationResponse<SecurityValidationContext> validateUser( SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update );
+    ValidationResponse validateUser( SecurityValidationContext ctx, CUser user, Set<String> roles, boolean update );
     
-    ValidationResponse<SecurityValidationContext> validateUserRoleMapping( SecurityValidationContext ctx, CUserRoleMapping userRoleMapping, boolean update );
+    ValidationResponse validateUserRoleMapping( SecurityValidationContext ctx, CUserRoleMapping userRoleMapping, boolean update );
 }
