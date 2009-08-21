@@ -8,7 +8,6 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus1923GroupIncrementalIndex
     extends AbstractNexus1923
@@ -26,12 +25,7 @@ public class Nexus1923GroupIncrementalIndex
         createHostedRepository();
         createSecondHostedRepository();
         createThirdHostedRepository();
-        
-        TaskScheduleUtil.waitForAllTasksToStop();
-
         createGroup( GROUP_ID, HOSTED_REPO_ID, SECOND_HOSTED_REPO_ID, THIRD_HOSTED_REPO_ID );
-        
-        TaskScheduleUtil.waitForAllTasksToStop();
 
         String reindexId = createReindexTask( GROUP_ID, GROUP_REINDEX_TASK_NAME );
 

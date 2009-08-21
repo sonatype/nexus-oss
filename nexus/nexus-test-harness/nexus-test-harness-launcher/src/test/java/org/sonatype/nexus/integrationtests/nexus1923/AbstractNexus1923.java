@@ -103,12 +103,15 @@ public abstract class AbstractNexus1923
         resource.setId( HOSTED_REPO_ID );
         resource.setName( HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
+        resource.setIndexable( true );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setNotFoundCacheTTL( 1440 );
         resource.setDownloadRemoteIndexes( false );
         
         repoUtils.createRepository( resource );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void createProxyRepository()
@@ -118,6 +121,7 @@ public abstract class AbstractNexus1923
         resource.setId( PROXY_REPO_ID );
         resource.setName( PROXY_REPO_ID );
         resource.setRepoType( "proxy" );
+        resource.setIndexable( true );
         resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
@@ -126,6 +130,8 @@ public abstract class AbstractNexus1923
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         repoUtils.createRepository( resource );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void createSecondHostedRepository()
@@ -137,7 +143,10 @@ public abstract class AbstractNexus1923
         resource.setRepoType( "hosted" );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
+        resource.setIndexable( true );
         repoUtils.createRepository( resource );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void createThirdHostedRepository()
@@ -148,11 +157,14 @@ public abstract class AbstractNexus1923
         resource.setName( THIRD_HOSTED_REPO_ID );
         resource.setRepoType( "hosted" );
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
+        resource.setIndexable( true );
         repoUtils.createRepository( resource );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void createGroup( String groupId, String... repoIds )
-        throws IOException
+        throws Exception
     {
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( groupId );
@@ -167,7 +179,10 @@ public abstract class AbstractNexus1923
             repo.setId( repoId );
             group.addRepository( repo );
         }
+        
         groupUtils.createGroup( group );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected String createReindexTask( String repositoryId, String taskName )
@@ -222,7 +237,7 @@ public abstract class AbstractNexus1923
     {
         TaskScheduleUtil.run( taskId );
 
-        TaskScheduleUtil.waitForTask( taskName, 300 );
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void reindexHostedRepository( String taskId )

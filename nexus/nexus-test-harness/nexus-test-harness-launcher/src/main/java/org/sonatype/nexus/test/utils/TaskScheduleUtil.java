@@ -132,8 +132,6 @@ public class TaskScheduleUtil
 
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
         {
-            Thread.sleep( sleep );
-
             List<ScheduledServiceListResource> tasks = getTasks();
 
             boolean running = false;
@@ -159,6 +157,8 @@ public class TaskScheduleUtil
             {
                 LOG.debug( "Still running " + runninTaskId );
             }
+            
+            Thread.sleep( sleep );
         }
     }
 
