@@ -18,29 +18,27 @@ import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.configuration.Configuration;
-import org.sonatype.configuration.validation.ValidationContext;
 import org.sonatype.configuration.validation.ValidationResponse;
-
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
  * 
  * @author cstamas
  */
-public abstract class AbstractStreamConfigurationSource <E extends Configuration>
+public abstract class AbstractStreamConfigurationSource<E extends Configuration>
     implements ConfigurationSource<E>
 {
     /** The configuration. */
     private E configuration;
-    
+
     /** Flag to mark update. */
     private boolean configurationUpgraded;
-    
+
     /** The validation response */
-    private ValidationResponse<ValidationContext> validationResponse;
+    private ValidationResponse validationResponse;
 
     private Logger logger = LoggerFactory.getLogger( this.getClass() );
-    
+
     public E getConfiguration()
     {
         return configuration;
@@ -50,7 +48,7 @@ public abstract class AbstractStreamConfigurationSource <E extends Configuration
     {
         this.configuration = configuration;
     }
-    
+
     /**
      * Called by subclasses when loaded configuration is rejected for some reason.
      */
@@ -63,7 +61,7 @@ public abstract class AbstractStreamConfigurationSource <E extends Configuration
             getLogger().warn( message );
         }
     }
-    
+
     /**
      * Load configuration.
      * 
@@ -73,19 +71,17 @@ public abstract class AbstractStreamConfigurationSource <E extends Configuration
      */
     protected abstract void loadConfiguration( InputStream is )
         throws IOException;
-    
-    
-    
-    public ValidationResponse<ValidationContext> getValidationResponse()
+
+    public ValidationResponse getValidationResponse()
     {
         return validationResponse;
     }
 
-    protected void setValidationResponse( ValidationResponse<ValidationContext> validationResponse )
+    protected void setValidationResponse( ValidationResponse validationResponse )
     {
         this.validationResponse = validationResponse;
     }
-    
+
     /**
      * Is configuration updated?
      */
@@ -111,7 +107,7 @@ public abstract class AbstractStreamConfigurationSource <E extends Configuration
     {
         return null;
     }
-    
+
     public Logger getLogger()
     {
         return this.logger;

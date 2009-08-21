@@ -35,7 +35,5 @@ public interface ConfigurationUpgrader<E extends Configuration>
      * @throws UnsupportedConfigurationVersionException
      */
     public E loadOldConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException,
-            UnsupportedConfigurationVersionException;
+        throws IOException, ConfigurationIsCorruptedException, UnsupportedConfigurationVersionException;
 }

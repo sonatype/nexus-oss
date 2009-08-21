@@ -21,7 +21,7 @@ import java.util.List;
  * 
  * @author cstamas
  */
-public class ValidationResponse<V extends ValidationContext>
+public class ValidationResponse
 {
     /**
      * A simple counter to enumerate messages.
@@ -51,7 +51,7 @@ public class ValidationResponse<V extends ValidationContext>
     /**
      * Context for validators to communicate.
      */
-    private V context;
+    private ValidationContext context;
 
     public boolean isValid()
     {
@@ -174,7 +174,7 @@ public class ValidationResponse<V extends ValidationContext>
      * 
      * @param validationResponse
      */
-    public void append( ValidationResponse<V> validationResponse )
+    public void append( ValidationResponse validationResponse )
     {
         for ( ValidationMessage msg : validationResponse.getValidationErrors() )
         {
@@ -201,12 +201,12 @@ public class ValidationResponse<V extends ValidationContext>
         setModified( isModified() || validationResponse.isModified() );
     }
 
-    public void setContext( V context )
+    public void setContext( ValidationContext context )
     {
         this.context = context;
     }
 
-    public V getContext()
+    public ValidationContext getContext()
     {
         return context;
     }

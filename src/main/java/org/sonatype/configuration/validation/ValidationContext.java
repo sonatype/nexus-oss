@@ -12,9 +12,7 @@
  */
 package org.sonatype.configuration.validation;
 
-
 public interface ValidationContext
 {
 
 }
-

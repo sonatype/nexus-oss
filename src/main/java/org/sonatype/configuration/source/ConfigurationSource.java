@@ -13,10 +13,10 @@
 package org.sonatype.configuration.source;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.sonatype.configuration.Configuration;
 import org.sonatype.configuration.ConfigurationException;
-import org.sonatype.configuration.validation.ValidationContext;
 import org.sonatype.configuration.validation.ValidationResponse;
 
 /**
@@ -24,14 +24,14 @@ import org.sonatype.configuration.validation.ValidationResponse;
  * 
  * @author cstamas
  */
-public interface ConfigurationSource <E extends Configuration>
+public interface ConfigurationSource<E extends Configuration>
 {
     /**
      * Returns the validation response, if any. It is created on the loading of the user configuration.
      * 
      * @return the response or null if not applicable or config was still not loaded.
      */
-    ValidationResponse<ValidationContext> getValidationResponse();
+    ValidationResponse getValidationResponse();
 
     /**
      * Persists the current configuration.
@@ -60,17 +60,16 @@ public interface ConfigurationSource <E extends Configuration>
      * @throws IOException
      */
     E loadConfiguration()
-        throws ConfigurationException,
-            IOException;
-    
-//    /**
-//     * Returns the actual content of configuration as stream.
-//     * 
-//     * @return
-//     * @throws IOException
-//     */
-//    InputStream getConfigurationAsStream()
-//        throws IOException;
+        throws ConfigurationException, IOException;
+
+    /**
+     * Returns the actual content of configuration as stream.
+     * 
+     * @return
+     * @throws IOException
+     */
+    InputStream getConfigurationAsStream()
+        throws IOException;
 
     /**
      * Returns whether the configuration was upgraded.
