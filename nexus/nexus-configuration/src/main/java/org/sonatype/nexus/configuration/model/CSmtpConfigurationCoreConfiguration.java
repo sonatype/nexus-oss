@@ -1,6 +1,6 @@
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public class CSmtpConfigurationCoreConfiguration
@@ -24,9 +24,8 @@ public class CSmtpConfigurationCoreConfiguration
     }
 
     @Override
-    protected void doValidateChanges( Object changedConfiguration )
-        throws ConfigurationException
+    public ValidationResponse doValidateChanges( Object changedConfiguration )
     {
-        // TODO Auto-generated method stub
+        return new ValidationResponse();
     }
 }

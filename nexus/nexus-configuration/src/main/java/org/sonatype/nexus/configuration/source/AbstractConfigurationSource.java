@@ -14,7 +14,9 @@
 package org.sonatype.nexus.configuration.source;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
+import org.sonatype.configuration.source.ConfigurationSource;
+import org.sonatype.configuration.validation.ValidationResponse;
+import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
  * Abstract class that encapsulates Modello model loading and saving with interpolation.
@@ -23,14 +25,14 @@ import org.sonatype.nexus.configuration.validator.ValidationResponse;
  */
 public abstract class AbstractConfigurationSource
     extends AbstractLogEnabled
-    implements ConfigurationSource
+    implements ConfigurationSource<Configuration>
 {
     /** Flag to mark update. */
     private boolean configurationUpgraded;
 
     /** The validation response */
     private ValidationResponse validationResponse;
-    
+
     public ValidationResponse getValidationResponse()
     {
         return validationResponse;
@@ -62,7 +64,7 @@ public abstract class AbstractConfigurationSource
     /**
      * Returns the default source of ConfigurationSource. May be null.
      */
-    public ConfigurationSource getDefaultsSource()
+    public ConfigurationSource<Configuration> getDefaultsSource()
     {
         return null;
     }

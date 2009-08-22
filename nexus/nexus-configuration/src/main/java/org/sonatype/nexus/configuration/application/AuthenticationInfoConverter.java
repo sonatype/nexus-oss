@@ -1,6 +1,6 @@
 package org.sonatype.nexus.configuration.application;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 

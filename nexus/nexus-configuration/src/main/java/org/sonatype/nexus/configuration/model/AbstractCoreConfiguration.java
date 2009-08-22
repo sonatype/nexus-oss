@@ -1,6 +1,6 @@
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;

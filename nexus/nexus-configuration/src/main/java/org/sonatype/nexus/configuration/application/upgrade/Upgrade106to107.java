@@ -24,6 +24,11 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.v1_0_6.Configuration;
+import org.sonatype.nexus.configuration.model.v1_0_6.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.v1_0_7.CGroupsSetting;
 import org.sonatype.nexus.configuration.model.v1_0_7.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_7.CHttpProxySettings;
@@ -44,21 +49,16 @@ import org.sonatype.nexus.configuration.model.v1_0_7.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_7.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_7.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_7.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.v1_0_6.Configuration;
-import org.sonatype.nexus.configuration.model.v1_0_6.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 /**
  * Upgrades configuration model from version 1.0.6 to 1.0.7.
  * 
  * @author cstamas
  */
-@Component( role = Upgrader.class, hint = "1.0.6" )
+@Component( role = SingleVersionUpgrader.class, hint = "1.0.6" )
 public class Upgrade106to107
     extends AbstractLogEnabled
-    implements Upgrader
+    implements SingleVersionUpgrader
 {
     public Object loadConfiguration( File file )
         throws IOException,

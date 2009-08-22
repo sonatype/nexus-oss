@@ -1,7 +1,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.AbstractXpp3DomExternalConfigurationHolder;
@@ -20,8 +20,9 @@ public abstract class AbstractRepositoryConfiguration
     }
 
     @Override
-    public void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
-        throws ConfigurationException
+    public ValidationResponse doValidateChanges( ApplicationConfiguration applicationConfiguration,
+                                                 CoreConfiguration owner, Xpp3Dom configuration )
     {
+        return new ValidationResponse();
     }
 }

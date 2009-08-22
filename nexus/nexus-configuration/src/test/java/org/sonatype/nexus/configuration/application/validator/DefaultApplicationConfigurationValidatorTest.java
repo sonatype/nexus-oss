@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.configuration.validation.ValidationRequest;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.application.upgrade.ApplicationConfigurationUpgrader;
 import org.sonatype.nexus.configuration.model.CRepository;
@@ -33,8 +35,6 @@ import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
-import org.sonatype.nexus.configuration.validator.ValidationRequest;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.ExternalConfigUtil;
 

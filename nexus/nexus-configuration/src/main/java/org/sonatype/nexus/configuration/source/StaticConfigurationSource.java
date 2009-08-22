@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**

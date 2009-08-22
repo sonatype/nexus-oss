@@ -22,6 +22,9 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v1_0_8.CProps;
 import org.sonatype.nexus.configuration.model.v1_0_8.CRepository;
 import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup;
@@ -29,14 +32,11 @@ import org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_8.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_8.upgrade.BasicVersionUpgrade;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
-@Component( role = Upgrader.class, hint = "1.0.7" )
+@Component( role = SingleVersionUpgrader.class, hint = "1.0.7" )
 public class Upgrade107to108
     extends AbstractLogEnabled
-    implements Upgrader
+    implements SingleVersionUpgrader
 {
     private BasicVersionUpgrade converter = new BasicVersionUpgrade()
     {
@@ -152,7 +152,6 @@ public class Upgrade107to108
         
     }
     
-    @SuppressWarnings( "unchecked" )
     private void upgradeGroupRefsInTask( org.sonatype.nexus.configuration.model.v1_0_8.Configuration conf, String groupId )
     {
         for ( CScheduledTask task : (List<CScheduledTask>) conf.getTasks() )

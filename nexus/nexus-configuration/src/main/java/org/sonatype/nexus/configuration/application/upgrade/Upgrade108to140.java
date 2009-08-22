@@ -26,6 +26,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CLocalStorage;
@@ -46,9 +49,6 @@ import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_8.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationXpp3Reader;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -63,10 +63,10 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
  * 
  * @author cstamas
  */
-@Component( role = Upgrader.class, hint = "1.0.8" )
+@Component( role = SingleVersionUpgrader.class, hint = "1.0.8" )
 public class Upgrade108to140
     extends AbstractLogEnabled
-    implements Upgrader
+    implements SingleVersionUpgrader
 {
     @Requirement( hint = "file" )
     private SecurityConfigurationSource securityConfigurationSource;
@@ -137,7 +137,6 @@ public class Upgrade108to140
         return conf;
     }
 
-    @SuppressWarnings( "unchecked" )
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
@@ -339,7 +338,6 @@ public class Upgrade108to140
         return cs;
     }
 
-    @SuppressWarnings( "unchecked" )
     protected CRepository copyCRepository1_0_8( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldrepos )
     {
         CRepository newrepo = new CRepository();

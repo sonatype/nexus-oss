@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;

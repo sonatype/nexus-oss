@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.configuration.validator;
 
+import org.sonatype.configuration.validation.ValidationRequest;
+import org.sonatype.configuration.validation.ValidationResponse;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.

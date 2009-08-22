@@ -21,6 +21,9 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v1_0_1.CGroupsSettingPathMappingItem;
 import org.sonatype.nexus.configuration.model.v1_0_1.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_1.io.xpp3.NexusConfigurationXpp3Reader;
@@ -41,18 +44,15 @@ import org.sonatype.nexus.configuration.model.v1_0_2.CRepositoryShadow;
 import org.sonatype.nexus.configuration.model.v1_0_2.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.v1_0_2.CRouting;
 import org.sonatype.nexus.configuration.model.v1_0_2.CSecurity;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 /**
  * Upgrades configuration model from version 1.0.1 to 1.0.2.
  * 
  * @author cstamas
  */
-@Component( role = Upgrader.class, hint = "1.0.1" )
+@Component( role = SingleVersionUpgrader.class, hint = "1.0.1" )
 public class Upgrade101to102
-    implements Upgrader
+    implements SingleVersionUpgrader
 {
     public Object loadConfiguration( File file )
         throws IOException,

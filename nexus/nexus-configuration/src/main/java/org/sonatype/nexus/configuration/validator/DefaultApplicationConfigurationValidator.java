@@ -26,6 +26,9 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationRequest;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
@@ -72,10 +75,14 @@ public class DefaultApplicationConfigurationValidator
     public ValidationResponse validateModel( ValidationRequest request )
     {
         ValidationResponse response = new ApplicationValidationResponse();
+        
+        response.setContext( new ApplicationValidationContext() );
 
         Configuration model = (Configuration) request.getConfiguration();
 
         ApplicationValidationContext context = (ApplicationValidationContext) response.getContext();
+        
+        response.setContext( context );
 
         // global conn settings
         if ( model.getGlobalConnectionSettings() != null )

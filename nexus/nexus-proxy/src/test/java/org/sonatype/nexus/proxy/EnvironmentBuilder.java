@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 
 /**
  * The Interface Environment.

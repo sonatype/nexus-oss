@@ -25,6 +25,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.v1_0_3.CAdvancedSchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CDailySchedule;
 import org.sonatype.nexus.configuration.model.v1_0_3.CGroupsSettingPathMappingItem;
@@ -55,9 +58,6 @@ import org.sonatype.nexus.configuration.model.v1_0_4.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.v1_0_4.CScheduledTask;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSecurity;
 import org.sonatype.nexus.configuration.model.v1_0_4.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
@@ -68,10 +68,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * 
  * @author cstamas
  */
-@Component( role = Upgrader.class, hint = "1.0.3" )
+@Component( role = SingleVersionUpgrader.class, hint = "1.0.3" )
 public class Upgrade103to104
     extends AbstractLogEnabled
-    implements Upgrader
+    implements SingleVersionUpgrader
 {
     private File tasksFile;
 

@@ -27,9 +27,9 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.micromailer.Address;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
@@ -414,13 +414,6 @@ public class GlobalConfigurationPlexusResource
 
                     getNexusConfiguration().saveConfiguration();
                 }
-                catch ( ConfigurationException e )
-                {
-                    getLogger().warn( "Nexus refused to apply configuration.", e );
-
-                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
-                                                       getNexusErrorResponse( "*", e.getMessage() ) );
-                }
                 catch ( IOException e )
                 {
                     getLogger().warn( "Got IO Exception during update of Nexus configuration.", e );
@@ -433,7 +426,13 @@ public class GlobalConfigurationPlexusResource
                     getLogger().debug( "Configuraiton Exception while setting security values", e );
                     this.handleInvalidConfigurationException( e );
                 }
+                catch ( ConfigurationException e )
+                {
+                    getLogger().warn( "Nexus refused to apply configuration.", e );
 
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(),
+                                                       getNexusErrorResponse( "*", e.getMessage() ) );
+                }
             }
         }
         // TODO: this method needs some serious cleaning up...

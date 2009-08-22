@@ -25,11 +25,11 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
+import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
+import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
-import org.sonatype.nexus.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 
 /**
  * Default configuration updater, using versioned Modello models. It tried to detect version signature from existing
@@ -42,8 +42,8 @@ public class DefaultApplicationConfigurationUpgrader
     extends AbstractLogEnabled
     implements ApplicationConfigurationUpgrader
 {
-    @Requirement( role = Upgrader.class )
-    private Map<String, Upgrader> upgraders;
+    @Requirement( role = SingleVersionUpgrader.class )
+    private Map<String, SingleVersionUpgrader> upgraders;
 
     /**
      * This implementation relies to plexus registered upgraders. It will cycle through them until the configuration is
@@ -86,7 +86,7 @@ public class DefaultApplicationConfigurationUpgrader
             msg.setModelVersion( "1.0.0" );
         }
 
-        Upgrader upgrader = upgraders.get( msg.getModelVersion() );
+        SingleVersionUpgrader upgrader = upgraders.get( msg.getModelVersion() );
 
         if ( upgrader != null )
         {

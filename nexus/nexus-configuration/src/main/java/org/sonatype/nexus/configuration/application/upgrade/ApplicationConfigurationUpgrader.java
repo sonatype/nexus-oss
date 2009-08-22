@@ -16,9 +16,9 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.IOException;
 
+import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
+import org.sonatype.configuration.upgrade.UnsupportedConfigurationVersionException;
 import org.sonatype.nexus.configuration.model.Configuration;
-import org.sonatype.nexus.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.nexus.configuration.upgrade.UnsupportedConfigurationVersionException;
 
 /**
  * A component involved only if old Nexus configuration is found. It will fetch the old configuration, transform it to

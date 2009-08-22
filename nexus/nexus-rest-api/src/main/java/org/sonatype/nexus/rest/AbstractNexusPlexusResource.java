@@ -25,15 +25,15 @@ import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -230,30 +230,6 @@ public abstract class AbstractNexusPlexusResource
         ErrorResponse nexusErrorResponse;
 
         ValidationResponse vr = e.getValidationResponse();
-
-        if ( vr != null && vr.getValidationErrors().size() > 0 )
-        {
-            ValidationMessage vm = vr.getValidationErrors().get( 0 );
-            nexusErrorResponse = getNexusErrorResponse( vm.getKey(), vm.getShortMessage() );
-        }
-        else
-        {
-            nexusErrorResponse = getNexusErrorResponse( "*", e.getMessage() );
-        }
-
-        throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
-    }
-    
-    // Generic InvalidConfigurationException from base-configuration
-    protected void handleInvalidConfigurationException(
-        org.sonatype.configuration.validation.InvalidConfigurationException e )
-        throws PlexusResourceException
-    {
-        getLogger().warn( "Configuration error!", e );
-
-        ErrorResponse nexusErrorResponse;
-
-        org.sonatype.configuration.validation.ValidationResponse<?> vr = e.getValidationResponse();
 
         if ( vr != null && vr.getValidationErrors().size() > 0 )
         {

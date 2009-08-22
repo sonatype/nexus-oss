@@ -16,8 +16,6 @@ package org.sonatype.nexus.rest.routes;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -27,8 +25,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.ConfigurationException;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping;
 import org.sonatype.nexus.proxy.repository.GroupRepository;

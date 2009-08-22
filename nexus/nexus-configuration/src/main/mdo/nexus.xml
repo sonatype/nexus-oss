@@ -31,6 +31,9 @@
     <class rootElement="true" xml.tagName="nexusConfiguration">
       <name>Configuration</name>
       <version>1.4.0+</version>
+      <interfaces>
+        <interface>org.sonatype.configuration.Configuration</interface>
+      </interfaces>
       <description>The root element of Nexus configuration.</description>
       <fields>
         <field>

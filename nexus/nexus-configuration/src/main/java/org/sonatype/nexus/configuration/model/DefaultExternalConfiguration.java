@@ -1,6 +1,8 @@
 package org.sonatype.nexus.configuration.model;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -85,6 +87,12 @@ public class DefaultExternalConfiguration<T extends AbstractXpp3DomExternalConfi
     }
 
     // ==
+
+    public ValidationResponse doValidateChanges( Xpp3Dom configuration )
+    {
+        return changedConfiguration.doValidateChanges( getApplicationConfiguration(), coreConfiguration, configuration );
+
+    }
 
     protected ApplicationConfiguration getApplicationConfiguration()
     {

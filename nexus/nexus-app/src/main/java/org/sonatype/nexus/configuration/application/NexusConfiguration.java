@@ -16,8 +16,8 @@ package org.sonatype.nexus.configuration.application;
 import java.io.IOException;
 import java.util.Map;
 
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.NexusStreamResponse;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.proxy.repository.Repository;

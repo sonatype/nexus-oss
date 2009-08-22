@@ -13,7 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**

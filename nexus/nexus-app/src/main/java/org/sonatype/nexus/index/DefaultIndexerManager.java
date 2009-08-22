@@ -212,16 +212,14 @@ public class DefaultIndexerManager
             // the member reposes only, so it would duplicate results
             ctxLocal =
                 nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, new File( getWorkingDirectory(),
-                                                                           getLocalContextId( repository.getId() ) ),
-                                                       null, null, indexCreators );
+                    repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null, null,
+                    indexCreators );
             ctxLocal.setSearchable( repository.isSearchable() );
 
             ctxRemote =
                 nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, new File( getWorkingDirectory(),
-                                                                           getRemoteContextId( repository.getId() ) ),
-                                                       null, null, indexCreators );
+                    repoRoot, new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ), null, null,
+                    indexCreators );
             ctxRemote.setSearchable( repository.isSearchable() );
         }
         else
@@ -233,16 +231,14 @@ public class DefaultIndexerManager
             // add context for repository
             ctxLocal =
                 nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, new File( getWorkingDirectory(),
-                                                                           getLocalContextId( repository.getId() ) ),
-                                                       null, null, indexCreators );
+                    repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null, null,
+                    indexCreators );
             ctxLocal.setSearchable( repository.isSearchable() );
 
             ctxRemote =
                 nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
-                                                       repoRoot, new File( getWorkingDirectory(),
-                                                                           getRemoteContextId( repository.getId() ) ),
-                                                       null, null, indexCreators );
+                    repoRoot, new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ), null, null,
+                    indexCreators );
             ctxRemote.setSearchable( repository.isSearchable() );
         }
     }
@@ -287,11 +283,19 @@ public class DefaultIndexerManager
         // get context for repository, check is change needed
         IndexingContext ctx = getRepositoryLocalIndexContext( repository );
 
-        if ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() )
+        // handle the isIndexed false->true transition, but also do this only if some specified properties changed
+        if ( ctx != null && !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
+            || ctx.isSearchable() != repository.isSearchable() )
         {
             // recreate the context
             removeRepositoryIndexContext( repositoryId, false );
+        }
 
+        if ( ctx == null
+            || ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository
+                .isSearchable() ) )
+        {
+            // recreate the context
             addRepositoryIndexContext( repositoryId );
         }
 
@@ -396,8 +400,7 @@ public class DefaultIndexerManager
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Searching on repository ID='" + repositoryId + "' is set to: "
-                                   + String.valueOf( searchable ) );
+                "Searching on repository ID='" + repositoryId + "' is set to: " + String.valueOf( searchable ) );
         }
 
         ctx.setSearchable( searchable );
@@ -713,8 +716,7 @@ public class DefaultIndexerManager
                     else
                     {
                         getLogger().info(
-                                          "Remote indexes unchanged (no update needed) for repository "
-                                              + repository.getId() );
+                            "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
                     }
                 }
                 catch ( Exception e )
@@ -853,8 +855,8 @@ public class DefaultIndexerManager
             {
                 String groupId = group.getId();
                 getLogger().info(
-                                  "Cascading merge of group indexes for group '" + groupId + "', where repository '"
-                                      + repoId + "' is member." );
+                    "Cascading merge of group indexes for group '" + groupId + "', where repository '" + repoId
+                        + "' is member." );
 
                 // get the groups target ctx
                 IndexingContext groupContext = getRepositoryRemoteIndexContext( group );
@@ -1112,8 +1114,7 @@ public class DefaultIndexerManager
                 is = item.getInputStream();
 
                 FileUtils.copyStreamToFile( new RawInputStreamFacade( is ), new File( tempDir,
-                                                                                      IndexingContext.INDEX_FILE
-                                                                                          + ".properties" ) );
+                    IndexingContext.INDEX_FILE + ".properties" ) );
             }
         }
         catch ( Exception e )
@@ -1578,13 +1579,13 @@ public class DefaultIndexerManager
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                                                     baseContext.getRepositoryId(), //
-                                                     baseContext.getRepository(), //
-                                                     directory, //
-                                                     baseContext.getRepositoryUrl(), //
-                                                     baseContext.getIndexUpdateUrl(), //
-                                                     baseContext.getIndexCreators(), //
-                                                     true );
+                baseContext.getRepositoryId(), //
+                baseContext.getRepository(), //
+                directory, //
+                baseContext.getRepositoryUrl(), //
+                baseContext.getIndexUpdateUrl(), //
+                baseContext.getIndexCreators(), //
+                true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {

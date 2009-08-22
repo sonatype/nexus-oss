@@ -9,7 +9,9 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.reflection.Reflector;
 import org.codehaus.plexus.util.reflection.ReflectorException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.util.Inflector;
@@ -63,8 +65,25 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
         }
     }
 
-    public abstract void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
-        throws ConfigurationException;
+    public final void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
+        throws ConfigurationException
+    {
+        checkValidationResponse( doValidateChanges( applicationConfiguration, owner, configuration ) );
+    }
+
+    public abstract ValidationResponse doValidateChanges( ApplicationConfiguration applicationConfiguration,
+                                                          CoreConfiguration owner, Xpp3Dom configuration );
+
+    // ==
+
+    protected void checkValidationResponse( ValidationResponse response )
+        throws ConfigurationException
+    {
+        if ( !response.isValid() )
+        {
+            throw new InvalidConfigurationException( response );
+        }
+    }
 
     // ==
 
@@ -266,15 +285,15 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
         if ( node == null )
         {
             return false;
-        }        
-        
+        }
+
         // Unfortunately simply removing the child node from the Xpp3Dom object is causing
         // merge issues at a later point (seems some remnants are left in the Xpp3Dom object
         // and is causing a child to get duplicated).
         // So we simply build new child list and call setCollection()
-        
+
         List<String> children = new ArrayList<String>();
-        
+
         boolean removed = false;
 
         for ( Xpp3Dom child : node.getChildren() )
@@ -288,7 +307,7 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
                 removed = true;
             }
         }
-        
+
         setCollection( parent, name, children );
 
         return removed;

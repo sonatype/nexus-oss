@@ -61,10 +61,10 @@ public class RepositoryViewPrivilegeDescriptor
     }
 
     @Override
-    public ValidationResponse<SecurityValidationContext> validatePrivilege( CPrivilege privilege,
+    public ValidationResponse validatePrivilege( CPrivilege privilege,
         SecurityValidationContext ctx, boolean update )
     {
-        ValidationResponse<SecurityValidationContext> response = super.validatePrivilege( privilege, ctx, update );
+        ValidationResponse response = super.validatePrivilege( privilege, ctx, update );
 
         if ( !TYPE.equals( privilege.getType() ) )
         {

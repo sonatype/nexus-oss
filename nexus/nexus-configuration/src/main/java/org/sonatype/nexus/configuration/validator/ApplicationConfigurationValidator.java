@@ -15,6 +15,7 @@ package org.sonatype.nexus.configuration.validator;
 
 import java.util.List;
 
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CMirror;
@@ -31,7 +32,6 @@ import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.CScheduleConfig;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
-import org.sonatype.nexus.configuration.model.v1_0_0.CRepositoryGroup;
 
 /**
  * The validator used to validate current configuration in boot-up sequence.

@@ -21,10 +21,10 @@ import java.util.TimeZone;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
-import org.sonatype.nexus.configuration.upgrade.Upgrader;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.configuration.source.FileSecurityConfigurationSource;
@@ -289,7 +289,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         // this has slf4f deps and plexus might skip it
-        this.lookup( Upgrader.class, "1.0.8" );
+        this.lookup( SingleVersionUpgrader.class, "1.0.8" );
     }
 
     // public void testUpgradeStaticConfig()

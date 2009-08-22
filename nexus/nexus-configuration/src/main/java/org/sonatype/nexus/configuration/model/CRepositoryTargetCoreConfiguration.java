@@ -2,7 +2,7 @@ package org.sonatype.nexus.configuration.model;
 
 import java.util.List;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 public class CRepositoryTargetCoreConfiguration
@@ -27,10 +27,8 @@ public class CRepositoryTargetCoreConfiguration
     }
 
     @Override
-    protected void doValidateChanges( Object changedConfiguration )
-        throws ConfigurationException
+    public ValidationResponse doValidateChanges( Object changedConfiguration )
     {
-        // TODO Auto-generated method stub
-        
+        return new ValidationResponse();
     }
 }

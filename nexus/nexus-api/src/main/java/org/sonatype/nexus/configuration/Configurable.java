@@ -1,5 +1,7 @@
 package org.sonatype.nexus.configuration;
 
+import org.sonatype.configuration.ConfigurationException;
+
 
 /**
  * A Configurable component.

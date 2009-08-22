@@ -20,7 +20,7 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;

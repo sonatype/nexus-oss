@@ -6,7 +6,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.configuration.validation.ValidationContext;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.model.CPrivilege;
@@ -110,7 +109,7 @@ public class TargetPrivilegeDescriptor
     }
     
     @Override
-    public ValidationResponse<SecurityValidationContext> validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
+    public ValidationResponse validatePrivilege( CPrivilege privilege, SecurityValidationContext ctx, boolean update )
     {
         ValidationResponse response = super.validatePrivilege( privilege, ctx, update );
         

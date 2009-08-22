@@ -13,15 +13,15 @@
  */
 package org.sonatype.nexus.configuration.validator;
 
-import org.sonatype.nexus.configuration.validator.AbstractValidationResponse;
-import org.sonatype.nexus.configuration.validator.ValidationContext;
+import org.sonatype.configuration.validation.ValidationResponse;
 
 public class ApplicationValidationResponse
-    extends AbstractValidationResponse
+    extends ValidationResponse
 {
-    @Override
-    protected ValidationContext doGetContext()
+    public ApplicationValidationResponse()
     {
-        return new ApplicationValidationContext();
+        super();
+        
+        setContext( new ApplicationValidationContext() );
     }
 }

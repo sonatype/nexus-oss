@@ -1,5 +1,7 @@
 package org.sonatype.nexus.configuration;
 
+import org.sonatype.configuration.ConfigurationException;
+
 /**
  * Revertable configuration is a configuration that is changeable, but may be be reverted (rollback the changes). The
  * changes are "visible" only after applyChanges() call.

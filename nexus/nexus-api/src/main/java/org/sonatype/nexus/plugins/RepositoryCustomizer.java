@@ -15,7 +15,7 @@ package org.sonatype.nexus.plugins;
 
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.plugin.ExtensionPoint;
 

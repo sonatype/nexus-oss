@@ -24,13 +24,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;

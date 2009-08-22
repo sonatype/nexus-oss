@@ -2,7 +2,7 @@ package org.sonatype.nexus.plugins.lvo.config;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.plugins.lvo.NoSuchKeyException;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 

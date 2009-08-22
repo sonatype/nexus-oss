@@ -6,14 +6,13 @@ import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationMessage;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.configuration.validator.InvalidConfigurationException;
-import org.sonatype.nexus.configuration.validator.ValidationMessage;
-import org.sonatype.nexus.configuration.validator.ValidationResponse;
 
 public class AbstractGroupRepositoryConfiguration
     extends AbstractRepositoryConfiguration
@@ -62,10 +61,9 @@ public class AbstractGroupRepositoryConfiguration
     }
 
     @Override
-    public void validate( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner )
-        throws ConfigurationException
+    public ValidationResponse doValidateChanges( ApplicationConfiguration applicationConfiguration, CoreConfiguration owner, Xpp3Dom config )
     {
-        super.validate( applicationConfiguration, owner );
+        ValidationResponse response = super.doValidateChanges( applicationConfiguration, owner, config );
 
         // validate members existence
 
@@ -84,11 +82,9 @@ public class AbstractGroupRepositoryConfiguration
                 new ValidationMessage( MEMBER_REPOSITORIES, "Group repository points to nonexistent members!",
                                        "The source nexus repository is not existing." );
 
-            ValidationResponse response = new ApplicationValidationResponse();
-
             response.addValidationError( message );
-
-            throw new InvalidConfigurationException( response );
         }
+        
+        return response;
     }
 }

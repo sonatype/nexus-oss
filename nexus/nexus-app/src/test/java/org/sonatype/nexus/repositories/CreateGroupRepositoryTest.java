@@ -3,9 +3,9 @@ package org.sonatype.nexus.repositories;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;

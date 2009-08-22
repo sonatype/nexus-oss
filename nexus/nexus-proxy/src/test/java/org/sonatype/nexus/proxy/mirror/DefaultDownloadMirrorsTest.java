@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.mirror;
 import java.util.Arrays;
 import java.util.List;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -54,6 +54,7 @@ public class DefaultDownloadMirrorsTest
     private DefaultDownloadMirrors newDefaultDownloadMirrors( Mirror[] mirrors )
     {
         DefaultCRepository conf = new DefaultCRepository();
+        conf.setId( "kuku" );
         conf.setRemoteStorage( new CRemoteStorage() );
         conf.getRemoteStorage().setProvider( CommonsHttpClientRemoteStorage.PROVIDER_STRING );
         conf.getRemoteStorage().setUrl( "http://repo1.maven.org/maven2/" );

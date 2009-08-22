@@ -2,7 +2,9 @@ package org.sonatype.nexus.configuration.model;
 
 import java.util.Collection;
 
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.RevertableConfiguration;
 
 import com.thoughtworks.xstream.XStream;
@@ -109,7 +111,7 @@ public abstract class AbstractRevertableConfiguration
     {
         if ( isThisDirty() )
         {
-            doValidateChanges( getChangedConfiguration() );
+            checkValidationResponse( doValidateChanges( getChangedConfiguration() ) );
         }
     }
 
@@ -120,7 +122,7 @@ public abstract class AbstractRevertableConfiguration
         {
             try
             {
-                doValidateChanges( getChangedConfiguration() );
+                checkValidationResponse( doValidateChanges( getChangedConfiguration() ) );
             }
             catch ( ConfigurationException e )
             {
@@ -148,6 +150,14 @@ public abstract class AbstractRevertableConfiguration
 
     // ==
 
-    protected abstract void doValidateChanges( Object changedConfiguration )
-        throws ConfigurationException;
+    protected void checkValidationResponse( ValidationResponse response )
+        throws ConfigurationException
+    {
+        if ( response != null && !response.isValid() )
+        {
+            throw new InvalidConfigurationException( response );
+        }
+    }
+
+    public abstract ValidationResponse doValidateChanges( Object changedConfiguration );
 }

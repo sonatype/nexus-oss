@@ -13,9 +13,7 @@
  */
 package org.sonatype.nexus.configuration.source;
 
-import java.io.IOException;
-
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.source.ConfigurationSource;
 import org.sonatype.nexus.configuration.model.Configuration;
 
 /**
@@ -26,28 +24,8 @@ import org.sonatype.nexus.configuration.model.Configuration;
  * @author cstamas
  */
 public interface ApplicationConfigurationSource
-    extends ConfigurationSource
+    extends ConfigurationSource<Configuration>
 {
-    /**
-     * Gets the current configuration.
-     * 
-     * @return the configuration, null if not loaded
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration getConfiguration();
-
-    /**
-     * Forces reloading the user configuration.
-     * 
-     * @return the configuration
-     * @throws ConfigurationException
-     * @throws IOException
-     */
-    Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException;
-
     /**
      * Returns the configuration that this configuration uses for defaulting.
      * 

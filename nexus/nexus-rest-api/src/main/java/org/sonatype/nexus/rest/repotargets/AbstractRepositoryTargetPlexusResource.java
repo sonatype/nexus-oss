@@ -19,7 +19,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.nexus.configuration.ConfigurationException;
+import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.target.Target;

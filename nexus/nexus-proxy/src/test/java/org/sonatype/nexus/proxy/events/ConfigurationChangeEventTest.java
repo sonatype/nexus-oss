@@ -41,6 +41,8 @@ public class ConfigurationChangeEventTest
         // flush all potential changes
         getApplicationEventMulticaster()
             .notifyEventListeners( new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() ) );
+        getApplicationEventMulticaster()
+            .notifyEventListeners( new ConfigurationCommitEvent( getApplicationConfiguration() ) );
 
         // get hold on all registered reposes
         Repository repo1 = getRepositoryRegistry().getRepository( "repo1" );
@@ -63,6 +65,7 @@ public class ConfigurationChangeEventTest
         // fire prepareForSave event
         ConfigurationPrepareForSaveEvent pevt = new ConfigurationPrepareForSaveEvent( getApplicationConfiguration() );
         getApplicationEventMulticaster().notifyEventListeners( pevt );
+        assertFalse( pevt.isVetoed() );
 
         getApplicationEventMulticaster()
             .notifyEventListeners( new ConfigurationCommitEvent( getApplicationConfiguration() ) );

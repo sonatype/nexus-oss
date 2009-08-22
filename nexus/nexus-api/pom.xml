@@ -50,6 +50,10 @@
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-timeline</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.configuration</groupId>
+      <artifactId>base-configuration</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
