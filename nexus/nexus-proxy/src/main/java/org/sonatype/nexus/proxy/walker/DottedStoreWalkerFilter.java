@@ -19,12 +19,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 /**
  * A simple walkerFilter that filters out all items (directories and files) that starts with dot ('.'), aka "hidden"
  * files.
- * 
+ *
  * @author cstamas
+ * @author Alin Dreghiciu
  */
 public class DottedStoreWalkerFilter
     implements WalkerFilter
 {
+
     public boolean shouldProcess( WalkerContext ctx, StorageItem item )
     {
         return shouldProcessItem( item );
@@ -39,4 +41,15 @@ public class DottedStoreWalkerFilter
     {
         return !item.getName().startsWith( "." );
     }
+
+    /**
+     * Builder method.
+     *
+     * @return new DottedStoreWalkerFilter
+     */
+    public static DottedStoreWalkerFilter excludeItemsStartingWithDot()
+    {
+        return new DottedStoreWalkerFilter();
+    }
+
 }
