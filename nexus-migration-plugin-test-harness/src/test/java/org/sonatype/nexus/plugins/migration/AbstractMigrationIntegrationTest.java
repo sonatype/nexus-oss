@@ -107,7 +107,8 @@ public abstract class AbstractMigrationIntegrationTest
 
         File logFile = new File( "./target/logs/migration.log" );
         String log = FileUtils.readFileToString( logFile );
-        Assert.assertFalse( log, log.contains( "Exception" ) );
+        Assert.assertFalse( log, log.toLowerCase().contains( "Exception".toLowerCase() ) );
+        Assert.assertFalse( log, log.toLowerCase().contains( "Error".toLowerCase() ) );
     }
 
     protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version )

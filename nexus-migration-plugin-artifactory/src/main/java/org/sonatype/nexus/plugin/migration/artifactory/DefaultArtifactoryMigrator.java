@@ -646,6 +646,15 @@ public class DefaultArtifactoryMigrator
                 }
             }
 
+            if ( !StringUtils.isBlank( repo.getUsername() ) || !StringUtils.isBlank( repo.getPassword() ) )
+            {
+                CRemoteAuthentication authentication = new CRemoteAuthentication();
+                authentication.setUsername( repo.getUsername() );
+                authentication.setPassword( repo.getPassword() );
+
+                nexusRepo.getRemoteStorage().setAuthentication( authentication );
+            }
+
         }
 
         ManuallyConfiguredRepositoryTemplate template =

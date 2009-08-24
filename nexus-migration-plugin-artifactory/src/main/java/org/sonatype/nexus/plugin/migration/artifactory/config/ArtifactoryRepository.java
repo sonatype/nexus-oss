@@ -35,8 +35,7 @@ public class ArtifactoryRepository
 
     @SuppressWarnings( "deprecation" )
     public static ArtifactoryRepository read( File file )
-        throws IOException,
-            XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( file );
         try
@@ -51,8 +50,7 @@ public class ArtifactoryRepository
 
     @SuppressWarnings( "deprecation" )
     public static ArtifactoryRepository read( InputStream input )
-        throws IOException,
-            XmlPullParserException
+        throws IOException, XmlPullParserException
     {
         XmlStreamReader reader = ReaderFactory.newXmlReader( input );
         try
@@ -98,6 +96,16 @@ public class ArtifactoryRepository
     public String getProxy()
     {
         return getValue( dom, "proxyRef" );
+    }
+
+    public String getUsername()
+    {
+        return getValue( dom, "username" );
+    }
+
+    public String getPassword()
+    {
+        return getValue( dom, "password" );
     }
 
 }
