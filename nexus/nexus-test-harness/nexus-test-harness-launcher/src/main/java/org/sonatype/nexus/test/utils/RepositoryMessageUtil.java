@@ -19,7 +19,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -46,7 +45,7 @@ public class RepositoryMessageUtil
 {
 
     public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repositories";
-    
+
     private XStream xstream;
 
     private MediaType mediaType;
@@ -54,7 +53,7 @@ public class RepositoryMessageUtil
     private RepositoryTypeRegistry repositoryTypeRegistry;
 
     private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
-    
+
     public RepositoryMessageUtil( XStream xstream, MediaType mediaType, RepositoryTypeRegistry registry )
     {
         super();
@@ -153,8 +152,13 @@ public class RepositoryMessageUtil
         throws IOException
     {
 
-        String responseText =
-            RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId ).getEntity().getText();
+        Response response = RequestFacade.doGetRequest( SERVICE_PART + "/" + repoId );
+        String responseText = response.getEntity().getText();
+        if ( response.getStatus().isError() )
+        {
+            Assert.fail( "Error on request: " + response.getStatus() + "\n" + responseText );
+        }
+
         LOG.debug( "responseText: \n" + responseText );
 
         // this should use call to: getResourceFromResponse
@@ -293,15 +297,20 @@ public class RepositoryMessageUtil
             Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
-            
-            if( expected.getOverrideLocalStorageUrl() == null )
+
+            if ( expected.getOverrideLocalStorageUrl() == null )
             {
-                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.", cRepo.getLocalStorage().getUrl() );
+                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
+                                   cRepo.getLocalStorage().getUrl() );
             }
             else
             {
-                String actualLocalStorage = cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo.getLocalStorage().getUrl() +"/";
-                String overridLocalStorage = expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl() : expected.getOverrideLocalStorageUrl() + "/";
+                String actualLocalStorage =
+                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl()
+                                    : cRepo.getLocalStorage().getUrl() + "/";
+                String overridLocalStorage =
+                    expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
+                                    : expected.getOverrideLocalStorageUrl() + "/";
                 Assert.assertEquals( overridLocalStorage, actualLocalStorage );
             }
 
@@ -360,8 +369,7 @@ public class RepositoryMessageUtil
         throws IOException
     {
 
-        Response response =
-            RequestFacade.sendMessage( SERVICE_PART + "/" + repoId + "/status", Method.GET );
+        Response response = RequestFacade.sendMessage( SERVICE_PART + "/" + repoId + "/status", Method.GET );
         Status status = response.getStatus();
         Assert.assertTrue( "Fail to getStatus for '" + repoId + "' repository" + status, status.isSuccess() );
 
