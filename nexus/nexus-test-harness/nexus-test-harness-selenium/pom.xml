@@ -341,7 +341,7 @@
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>selenium-maven-plugin</artifactId>
-            <version>1.0-rc-1</version>
+            <version>1.0</version>
             <configuration>
               <port>${seleniumPort}</port>
               <background>true</background>

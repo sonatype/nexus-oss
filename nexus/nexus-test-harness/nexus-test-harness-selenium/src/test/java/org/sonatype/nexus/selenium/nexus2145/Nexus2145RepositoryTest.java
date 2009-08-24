@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
-import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -228,8 +227,8 @@ public class Nexus2145RepositoryTest
 
         proxyRepo = (M2Repository) template.create();
 
-        Maven2HostedRepositoryTemplate hostedTemplate =
-            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
+        Maven2ProxyRepositoryTemplate hostedTemplate =
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
                 .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
 
         hostedTemplate.getConfigurableRepository().setId( "hosted-nexus2145" );

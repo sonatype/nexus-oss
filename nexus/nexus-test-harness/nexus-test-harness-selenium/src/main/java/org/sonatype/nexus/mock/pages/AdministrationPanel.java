@@ -37,7 +37,7 @@ public class AdministrationPanel
 
     public boolean logAvailable()
     {
-        return isLinkAvailable( "Log" );
+        return isLinkAvailable( "Log Configuration" );
     }
 
     public void serverClick()
@@ -47,7 +47,7 @@ public class AdministrationPanel
 
     public void logClick()
     {
-        clickLink( "Log" );
+        clickLink( "Log Configuration" );
     }
 
     public void repositoryTargetsClick()

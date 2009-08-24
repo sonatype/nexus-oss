@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.MainPage;
@@ -150,6 +151,21 @@ public abstract class SeleniumTest
     public void loadUrl()
     {
         selenium.open( "/nexus" );
+
+        // sometimes the browser window just froze between tasks
+        try
+        {
+            selenium.getEval( "window.isRunning()" );
+        }
+        catch ( Exception e )
+        {
+            selenium.stop();
+            selenium.start();
+            selenium.open( "/nexus" );
+
+            selenium.getEval( "window.isRunning()" );
+        }
+
     }
 
     @AfterMethod( alwaysRun = true )
@@ -249,6 +265,9 @@ public abstract class SeleniumTest
     public void cleanInstance()
         throws Exception
     {
+
+        saveLogs();
+
         System.out.println( "Memory... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
             + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
 
@@ -259,6 +278,32 @@ public abstract class SeleniumTest
         System.out.println( "Memory gc... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
             + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
 
+    }
+
+    private void saveLogs()
+    {
+        File logsDir = new File( "./target/logs" );
+
+        if ( logsDir.exists() )
+        {
+            File testLogs = new File( logsDir, testId );
+            testLogs.mkdirs();
+
+            File[] logs = logsDir.listFiles();
+            for ( File log : logs )
+            {
+                try
+                {
+                    FileUtils.copyFile( log, new File( testLogs, log.getName() + testName ) );
+
+                    FileUtils.writeStringToFile( log, "" );
+                }
+                catch ( IOException e )
+                {
+                    NexusMockTestCase.log.error( e.getMessage(), e );
+                }
+            }
+        }
     }
 
     private void cleanFields()

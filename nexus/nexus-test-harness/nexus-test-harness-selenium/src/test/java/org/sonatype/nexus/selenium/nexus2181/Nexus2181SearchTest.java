@@ -2,7 +2,13 @@ package org.sonatype.nexus.selenium.nexus2181;
 
 import static org.testng.AssertJUnit.assertEquals;
 
+import java.util.Collections;
+
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.ArtifactInformationPanel;
 import org.sonatype.nexus.mock.pages.SearchTab;
@@ -13,9 +19,19 @@ public class Nexus2181SearchTest
     extends SeleniumTest
 {
 
+    @Requirement
+    private PlexusContainer plexus;
+
     @Test
     public void quickSearch()
+        throws Exception
     {
+        FlatSearchResponse result =
+            plexus.lookup( Searcher.class, "mavenCoordinates" ).flatSearch(
+                                                                            Collections.singletonMap( "g", "nexus2181" ),
+                                                                            "thirdparty", 0, Integer.MAX_VALUE );
+        assertEquals( 2, result.getTotalHits() );
+
         SearchTab search = main.searchPanel().search( "nexus2181" );
         assertEquals( 2, search.getGrid().getStoreDataLength() );
 
