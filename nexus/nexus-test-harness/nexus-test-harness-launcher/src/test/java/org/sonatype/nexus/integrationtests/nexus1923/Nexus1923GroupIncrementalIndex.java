@@ -27,6 +27,12 @@ public class Nexus1923GroupIncrementalIndex
         createThirdHostedRepository();
         createGroup( GROUP_ID, HOSTED_REPO_ID, SECOND_HOSTED_REPO_ID, THIRD_HOSTED_REPO_ID );
 
+        //all groups/repos should be indexed once on creation!
+        Assert.assertTrue( getHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getSecondHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getThirdHostedRepositoryIndex().exists() );
+        Assert.assertTrue( getGroupIndex().exists() );
+
         String reindexId = createReindexTask( GROUP_ID, GROUP_REINDEX_TASK_NAME );
 
         // deploy artifact 1 on repo 1
@@ -49,8 +55,9 @@ public class Nexus1923GroupIncrementalIndex
         validateCurrentThirdHostedIncrementalCounter( 0 );
 
         Assert.assertTrue( getGroupIndex().exists() );
-        Assert.assertFalse( "Should not exists!", getGroupIndexIncrement( "1" ).exists() );
-        validateCurrentGroupIncrementalCounter( 0 );
+        Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "2" ).exists() );
+        validateCurrentGroupIncrementalCounter( 1 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
 
@@ -70,7 +77,7 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getSecondHostedRepositoryIndexIncrement( "1" ).exists() );
         Assert.assertFalse( getSecondHostedRepositoryIndexIncrement( "2" ).exists() );
         validateCurrentSecondHostedIncrementalCounter( 1 );
-        
+
         // shouldn't change from first status
         Assert.assertTrue( getThirdHostedRepositoryIndex().exists() );
         Assert.assertFalse( getThirdHostedRepositoryIndexIncrement( "1" ).exists() );
@@ -79,8 +86,9 @@ public class Nexus1923GroupIncrementalIndex
         // group create index .1
         Assert.assertTrue( getGroupIndex().exists() );
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "2" ).exists() );
-        validateCurrentGroupIncrementalCounter( 1 );
+        Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "3" ).exists() );
+        validateCurrentGroupIncrementalCounter( 2 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );
@@ -111,8 +119,9 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getGroupIndex().exists() );
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "3" ).exists() );
-        validateCurrentGroupIncrementalCounter( 2 );
+        Assert.assertTrue( getGroupIndexIncrement( "3" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "4" ).exists() );
+        validateCurrentGroupIncrementalCounter( 3 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );
@@ -146,8 +155,9 @@ public class Nexus1923GroupIncrementalIndex
         Assert.assertTrue( getGroupIndexIncrement( "1" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "2" ).exists() );
         Assert.assertTrue( getGroupIndexIncrement( "3" ).exists() );
-        Assert.assertFalse( getGroupIndexIncrement( "4" ).exists() );
-        validateCurrentGroupIncrementalCounter( 3 );
+        Assert.assertTrue( getGroupIndexIncrement( "4" ).exists() );
+        Assert.assertFalse( getGroupIndexIncrement( "5" ).exists() );
+        validateCurrentGroupIncrementalCounter( 4 );
 
         searchFor( HOSTED_REPO_ID, FIRST_ARTIFACT, FOURTH_ARTIFACT );
         searchFor( SECOND_HOSTED_REPO_ID, SECOND_ARTIFACT );
@@ -162,9 +172,9 @@ public class Nexus1923GroupIncrementalIndex
             searchForArtifactInIndex( artifact, whereRepo, true );
             searchForArtifactInIndex( artifact, GROUP_ID, true );
         }
-        
+
         List<String> otherArtifacts = getArtifactBut( whatForArtifacts );
-        
+
         for ( String artifact : otherArtifacts )
         {
             searchForArtifactInIndex( artifact, whereRepo, false );
