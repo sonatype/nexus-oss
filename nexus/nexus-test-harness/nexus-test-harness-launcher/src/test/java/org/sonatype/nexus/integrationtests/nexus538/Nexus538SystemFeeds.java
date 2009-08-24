@@ -13,10 +13,12 @@
  */
 package org.sonatype.nexus.integrationtests.nexus538;
 
+import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -34,12 +36,20 @@ import com.sun.syndication.feed.synd.SyndFeed;
 public class Nexus538SystemFeeds
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void clean()
+        throws IOException
+    {
+        cleanWorkDir();
+    }
+
     @Test
     public void bootEventTest()
         throws Exception
     {
         TaskScheduleUtil.waitForAllTasksToStop();
-        
+
         SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
@@ -58,13 +68,13 @@ public class Nexus538SystemFeeds
         String newName = repo.getName() + "-new";
         repo.setName( newName );
         repoUtil.updateRepo( repo );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
-        Assert.assertTrue( "Update repo feed not found\r\n\r\n" + feed, findFeedEntry( feed, "Configuration change",
-                                                                               new String[] { newName, oldName } ) );
+        Assert.assertTrue( "Update repo feed not found\r\n\r\n" + feed,
+                           findFeedEntry( feed, "Configuration change", new String[] { newName, oldName } ) );
     }
 
     @Test
@@ -78,20 +88,20 @@ public class Nexus538SystemFeeds
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
         repoUtil.updateStatus( repo );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
 
         SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( systemFeed );
-        
+
         SyndFeed systemStatusFeed = FeedUtil.getFeed( "systemRepositoryStatusChanges" );
         this.validateLinksInFeeds( systemStatusFeed );
-        
+
         Assert.assertTrue( findFeedEntry( systemFeed, "Repository proxy mode change",
                                           new String[] { "release-proxy-repo-1" } ) );
-        
-        Assert.assertTrue( findFeedEntry( systemStatusFeed,
-                                          "Repository proxy mode change", new String[] { "release-proxy-repo-1" } ) );
+
+        Assert.assertTrue( findFeedEntry( systemStatusFeed, "Repository proxy mode change",
+                                          new String[] { "release-proxy-repo-1" } ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -134,14 +144,15 @@ public class Nexus538SystemFeeds
     @SuppressWarnings( "unchecked" )
     private void validateLinksInFeeds( SyndFeed feed )
     {
-        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ));
-        
+        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ) );
+
         List<SyndEntry> entries = feed.getEntries();
-        
+
         for ( SyndEntry syndEntry : entries )
         {
             Assert.assertNotNull( "Feed item link is empty.", syndEntry.getLink() );
-            Assert.assertTrue( "Feed item link is wrong, is: "+ syndEntry.getLink(), syndEntry.getLink().startsWith( this.getBaseNexusUrl() ));
+            Assert.assertTrue( "Feed item link is wrong, is: " + syndEntry.getLink(),
+                               syndEntry.getLink().startsWith( this.getBaseNexusUrl() ) );
         }
     }
 }

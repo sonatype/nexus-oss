@@ -8,6 +8,7 @@ import java.util.Date;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
@@ -17,6 +18,7 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -32,8 +34,9 @@ public class Nexus2351DisableRedeployUploadTest
     public Nexus2351DisableRedeployUploadTest()
         throws ComponentLookupException
     {
-        this.repoUtil = new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, this
-            .getRepositoryTypeRegistry() );
+        this.repoUtil =
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML,
+                                       this.getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -42,15 +45,17 @@ public class Nexus2351DisableRedeployUploadTest
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE );
 
-        Gav gav1 = new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date()
-            .getTime(), "release-deploy", false, false, null, false, null );
-        
-        Gav gav2 = new Gav( this.getTestId(), "release-deploy", "1.0.1", null, "jar", 0, new Date()
-        .getTime(), "release-deploy", false, false, null, false, null );
+        Gav gav1 =
+            new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "release-deploy", false, false, null, false, null );
+
+        Gav gav2 =
+            new Gav( this.getTestId(), "release-deploy", "1.0.1", null, "jar", 0, new Date().getTime(),
+                     "release-deploy", false, false, null, false, null );
 
         File mavenProject1 = getTestFile( "maven-project-1" );
         File mavenProject2 = getTestFile( "maven-project-2" );
-        
+
         this.deployWithMavenExpectSuccess( mavenProject1 );
         Metadata metadata = this.downloadMetadataFromRepository( gav1, this.getTestRepositoryId() );
         Date firstDeployDate = this.getLastDeployTimeStamp( metadata );
@@ -70,27 +75,27 @@ public class Nexus2351DisableRedeployUploadTest
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
         Assert.assertTrue( "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
             + secondDeployDate, secondDeployDate.before( thirdDeployDate ) );
-        
+
         this.deployWithMavenExpectSuccess( mavenProject2 );
         metadata = this.downloadMetadataFromRepository( gav2, this.getTestRepositoryId() );
-        
+
         // now check the metadata for both versions
-        Assert.assertTrue(  metadata.getVersioning().getVersions().contains( "1.0.0" ) );
-        Assert.assertTrue(  metadata.getVersioning().getVersions().contains( "1.0.1" ) );
-        
+        Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.0" ) );
+        Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.1" ) );
+
         Assert.assertEquals( 2, metadata.getVersioning().getVersions().size() );
-        
-        
+
     }
-    
-//    @Test FIXME: BROKEN NEXUS-2395
+
+    // @Test FIXME: BROKEN NEXUS-2395
     public void disableReleaseAllowRedeployWithUploadTest()
         throws Exception
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE );
 
-        Gav gav = new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date()
-            .getTime(), "release-deploy", false, false, null, false, null );
+        Gav gav =
+            new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "release-deploy", false, false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
@@ -121,63 +126,41 @@ public class Nexus2351DisableRedeployUploadTest
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.READ_ONLY );
 
-        Gav gav = new Gav(
-            this.getTestId(),
-            "disableReleaseReadOnlyWithUploadTest",
-            "1.0.0",
-            null,
-            "jar",
-            0,
-            new Date().getTime(),
-            "disableReleaseReadOnlyWithUploadTest",
-            false,
-            false,
-            null,
-            false,
-            null );
+        Gav gav =
+            new Gav( this.getTestId(), "disableReleaseReadOnlyWithUploadTest", "1.0.0", null, "jar", 0,
+                     new Date().getTime(), "disableReleaseReadOnlyWithUploadTest", false, false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
         Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy ) );
         Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy ) );
     }
-    
+
     @Test
     public void disableReleaseReadOnlyWithMavenTest()
         throws Exception
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.READ_ONLY );
 
-        Gav gav = new Gav(
-            this.getTestId(),
-            "release-deploy",
-            "1.0.0",
-            null,
-            "jar",
-        
-            0,
-            new Date().getTime(),
-            "release-deploy",
-            false,
-            false,
-            null,
-            false,
-            null );
+        Gav gav = new Gav( this.getTestId(), "release-deploy", "1.0.0", null, "jar",
+
+        0, new Date().getTime(), "release-deploy", false, false, null, false, null );
 
         File mavenProject = getTestFile( "maven-project-1" );
-        
-        this.deployWithMavenExpectFailure(  mavenProject );
-        this.deployWithMavenExpectFailure(  mavenProject );
+
+        this.deployWithMavenExpectFailure( mavenProject );
+        this.deployWithMavenExpectFailure( mavenProject );
     }
 
-//  @Test FIXME: BROKEN NEXUS-2351
+    // @Test FIXME: BROKEN NEXUS-2351
     public void disableReleaseNoRedeployWithUploadTest()
         throws Exception
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
-        Gav gav = new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date()
-            .getTime(), "disableReleaseNoRedeployTest", false, false, null, false, null );
+        Gav gav =
+            new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "disableReleaseNoRedeployTest", false, false, null, false, null );
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
@@ -185,43 +168,44 @@ public class Nexus2351DisableRedeployUploadTest
         Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy ) );
         Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy ) );
     }
-    
-//  @Test FIXME: BROKEN NEXUS-2351
+
+    // @Test FIXME: BROKEN NEXUS-2351
     public void disableReleaseNoRedeployWithMavenTest()
         throws Exception
     {
         setWritePolicy( this.getTestRepositoryId(), RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
-        Gav gav1 = new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date()
-            .getTime(), "disableReleaseNoRedeployTest", false, false, null, false, null );
-        
+        Gav gav1 =
+            new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.0", null, "jar", 0, new Date().getTime(),
+                     "disableReleaseNoRedeployTest", false, false, null, false, null );
 
-        Gav gav2 = new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.1", null, "jar", 0, new Date()
-            .getTime(), "disableReleaseNoRedeployTest", false, false, null, false, null );
+        Gav gav2 =
+            new Gav( this.getTestId(), "disableReleaseNoRedeployTest", "1.0.1", null, "jar", 0, new Date().getTime(),
+                     "disableReleaseNoRedeployTest", false, false, null, false, null );
 
         File mavenProject1 = getTestFile( "maven-project-1" );
         File mavenProject2 = getTestFile( "maven-project-2" );
-        
-//        (deploy whould work, once)
+
+        // (deploy whould work, once)
         this.deployWithMavenExpectSuccess( mavenProject1 );
         Metadata metadata = this.downloadMetadataFromRepository( gav1, this.getTestRepositoryId() );
         Date firstDeployDate = this.getLastDeployTimeStamp( metadata );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
-        
+
         // deploy again (should fail)
         this.deployWithMavenExpectFailure( mavenProject1 );
         metadata = this.downloadMetadataFromRepository( gav1, this.getTestRepositoryId() );
         Assert.assertEquals( firstDeployDate, this.getLastDeployTimeStamp( metadata ) );
-        
+
         // deploy a new version
         this.deployWithMavenExpectSuccess( mavenProject2 );
         metadata = this.downloadMetadataFromRepository( gav2, this.getTestRepositoryId() );
-        
+
         // now check the metadata for both versions
-        Assert.assertTrue(  metadata.getVersioning().getVersions().contains( "1.0.0" ) );
-        Assert.assertTrue(  metadata.getVersioning().getVersions().contains( "1.0.1" ) );
-        
+        Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.0" ) );
+        Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.1" ) );
+
         Assert.assertEquals( 2, metadata.getVersioning().getVersions().size() );
     }
 
@@ -235,8 +219,7 @@ public class Nexus2351DisableRedeployUploadTest
     }
 
     private void deployWithMavenExpectSuccess( File mavenProject )
-        throws VerificationException,
-            IOException
+        throws VerificationException, IOException
     {
         // deploy using maven
         Verifier verifier = this.createVerifier( mavenProject );
@@ -248,48 +231,58 @@ public class Nexus2351DisableRedeployUploadTest
 
         catch ( VerificationException e )
         {
+            File logs = new File( nexusLogDir );
+            File bkp = new File( "./target/logs/nexus2351-bkp" );
+            bkp.mkdirs();
+
+            FileUtils.copyDirectory( logs, bkp );
+
             failTest( verifier );
         }
 
     }
-    
+
     private void deployWithMavenExpectFailure( File mavenProject )
-    throws VerificationException,
-        IOException
+        throws VerificationException, IOException
     {
         // deploy using maven
         Verifier verifier = this.createVerifier( mavenProject );
         try
         {
             verifier.executeGoal( "deploy" );
-    
+
             verifier.verifyErrorFreeLog();
-    
+
             Assert.fail( "Should return 401 error" );
         }
         catch ( VerificationException e )
         {
             // expect error
         }
-    
+
     }
-    
+
     @BeforeClass
     public static void clean()
         throws IOException
     {
         cleanWorkDir();
+
+        FileUtils.writeStringToFile( new File( nexusLogDir, "nexus.log" ), "" );
+        FileUtils.writeStringToFile( new File( nexusLogDir, "tests.log" ), "" );
+
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
     }
-    
+
     private RepositoryResource setWritePolicy( String repoId, RepositoryWritePolicy policy )
         throws Exception
     {
         RepositoryResource repo = (RepositoryResource) this.repoUtil.getRepository( this.getTestRepositoryId() );
         repo.setWritePolicy( policy.name() );
         repo = (RepositoryResource) this.repoUtil.updateRepo( repo );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
-        
+
         return repo;
     }
 
