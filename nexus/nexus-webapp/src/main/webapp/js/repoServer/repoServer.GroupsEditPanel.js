@@ -49,7 +49,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function( config ) {
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
-    url: Sonatype.config.repos.urls.groupRepoTypes
+    url: Sonatype.config.repos.urls.repoTypes + '?repoType=group'
   } );
 
   this.repoStore = new Ext.data.JsonStore( {

@@ -235,13 +235,16 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
-    url: Sonatype.config.repos.urls.repoTypes,
+    url: Sonatype.config.repos.urls.repoTypes + '?repoType=hosted',
     autoLoad: true
   } );
 
   this.checkPayload();
 
   Sonatype.repoServer.HostedRepositoryEditor.superclass.constructor.call( this, {
+    dataStores: [
+      this.providerStore
+    ],
     items: [
       {
         xtype: 'textfield',
@@ -538,13 +541,16 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
-    url: Sonatype.config.repos.urls.repoTypes,
+    url: Sonatype.config.repos.urls.repoTypes + '?repoType=proxy',
     autoLoad: true
   } );
 
   this.checkPayload();
 
   Sonatype.repoServer.ProxyRepositoryEditor.superclass.constructor.call( this, {
+    dataStores: [
+      this.providerStore
+    ],
     items: [
       {
         xtype: 'textfield',
@@ -1128,13 +1134,17 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
-    url: Sonatype.config.repos.urls.shadowRepoTypes,
+    url: Sonatype.config.repos.urls.repoTypes + '?repoType=shadow',
     autoLoad: true
   } );
 
   this.checkPayload();
 
   Sonatype.repoServer.VirtualRepositoryEditor.superclass.constructor.call( this, {
+    dataStores: [
+      this.providerStore,
+      this.repoStore
+    ],
     items: [
       {
         xtype: 'textfield',

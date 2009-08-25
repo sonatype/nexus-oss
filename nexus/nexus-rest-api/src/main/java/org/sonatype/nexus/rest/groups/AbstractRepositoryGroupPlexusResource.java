@@ -22,7 +22,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -133,7 +132,7 @@ public abstract class AbstractRepositoryGroupPlexusResource
                 repositoryTypeRegistry.getRepositoryContentClass( GroupRepository.class.getName(), model.getProvider() );
 
             RepositoryTemplate template =
-                (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates( MavenGroupRepository.class,
+                (RepositoryTemplate) getNexus().getRepositoryTemplates().getTemplates( GroupRepository.class,
                                                                                        contentClass ).pick();
 
             template.getConfigurableRepository().setId( model.getId() );

@@ -143,8 +143,6 @@ Sonatype.config = function() {
         repoContentClasses: servicePath + '/components/repo_content_classes',
         realmComponents: servicePath + '/components/realm_types',
         repoTypes: servicePath + '/components/repo_types',
-        shadowRepoTypes: servicePath + '/components/shadow_repo_types',
-        groupRepoTypes: servicePath + '/components/group_repo_types',
         repoMirrors: servicePath + '/repository_mirrors',
         repoPredefinedMirrors: servicePath + '/repository_predefined_mirrors',
         repoMirrorStatus: servicePath + '/repository_mirrors_status',
