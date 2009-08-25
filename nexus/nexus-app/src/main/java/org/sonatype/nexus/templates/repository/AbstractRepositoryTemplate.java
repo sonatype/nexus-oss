@@ -92,8 +92,8 @@ public abstract class AbstractRepositoryTemplate
 
         // create a repository
         Repository repository =
-            getTemplateProvider().getNexus().getNexusConfiguration()
-                .createRepository( ( (CRepositoryCoreConfiguration) getCoreConfiguration() ).getConfiguration( false ) );
+            getTemplateProvider().getNexus().getNexusConfiguration().createRepository(
+                ( (CRepositoryCoreConfiguration) getCoreConfiguration() ).getConfiguration( false ) );
 
         // reset the template
         setCoreConfiguration( null );
@@ -101,6 +101,24 @@ public abstract class AbstractRepositoryTemplate
         // return the result
         return repository;
     }
+
+    public CRepositoryCoreConfiguration getCoreConfiguration()
+    {
+        // we may do this, since we predefined the initCoreConfiguration(), see below
+        return (CRepositoryCoreConfiguration) super.getCoreConfiguration();
+    }
+
+    public String getRepositoryProviderHint()
+    {
+        return getCoreConfiguration().getConfiguration( false ).getProviderRole();
+    }
+
+    public String getRepositoryProviderRole()
+    {
+        return getCoreConfiguration().getConfiguration( false ).getProviderHint();
+    }
+
+    // ==
 
     @Override
     protected abstract CRepositoryCoreConfiguration initCoreConfiguration();
