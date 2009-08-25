@@ -62,15 +62,15 @@
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START This are start/stop tests, shouldn't be runned -->
-            <exclude>Nexus758ServiceStabilityTest</exclude>
+            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
             <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>Nexus748MultipleStartTest</exclude>
+            <exclude>**/Nexus748MultipleStartTest.*</exclude>
             <!-- END This are start/stop tests, shouldn't be runned -->
 
             <!-- The following tests are executed on a forked process, check 'forked-ITs' profile  -->
-            <exclude>Nexus142UserPermissionTests</exclude>
-            <exclude>Nexus538SystemFeeds</exclude>
-            <exclude>Nexus2351DisableRedeployUploadTest</exclude>
+            <exclude>**/Nexus142UserPermissionTests.*</exclude>
+            <exclude>**/Nexus538SystemFeeds.*</exclude>
+            <exclude>**/Nexus2351DisableRedeployUploadTest.*</exclude>
           </excludes>
         </configuration>
       </plugin>
