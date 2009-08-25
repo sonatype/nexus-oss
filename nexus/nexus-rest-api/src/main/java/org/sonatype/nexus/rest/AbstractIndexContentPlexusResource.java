@@ -75,7 +75,7 @@ public abstract class AbstractIndexContentPlexusResource
 
         ContentListResourceResponse resourceResponse = createResponse( request, getIndexingContext( request ) );
 
-        if ( resourceResponse.getData().size() == 0 )
+        if ( resourceResponse.getData().isEmpty() )
         {
             response.setStatus( Status.CLIENT_ERROR_NOT_FOUND );
         }
@@ -86,7 +86,6 @@ public abstract class AbstractIndexContentPlexusResource
     protected ContentListResourceResponse createResponse( Request request, IndexingContext indexingContext )
         throws ResourceException
     {
-        NexusIndexer indexer = indexerManager.getNexusIndexer();
         String path = parsePathFromUri( request.getResourceRef().getRemainingPart() );
 
         ContentListResourceResponse response = new ContentListResourceResponse();

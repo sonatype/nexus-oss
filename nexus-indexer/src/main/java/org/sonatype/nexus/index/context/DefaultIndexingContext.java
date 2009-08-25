@@ -34,7 +34,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
  * The default {@link IndexingContext} implementation.
- * 
+ *
  * @author Jason van Zyl
  * @author Tamas Cservenak
  */
@@ -55,7 +55,7 @@ public class DefaultIndexingContext
     private static final String VERSION = "1.0";
 
     private static final Term DESCRIPTOR_TERM = new Term( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS );
-    
+
     private Object indexLock = new Object();
 
     private Directory indexDirectory;
@@ -93,8 +93,10 @@ public class DefaultIndexingContext
      */
     private GavCalculator gavCalculator;
 
-    private DefaultIndexingContext( String id, String repositoryId, File repository, //
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators )
+    private DefaultIndexingContext( String id, String repositoryId,
+                                    File repository, //
+                                    String repositoryUrl, String indexUpdateUrl,
+                                    List<? extends IndexCreator> indexCreators )
     {
         this.id = id;
 
@@ -120,9 +122,9 @@ public class DefaultIndexingContext
     }
 
     public DefaultIndexingContext( String id, String repositoryId, File repository, File indexDirectoryFile,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
-        throws IOException,
-            UnsupportedExistingLuceneIndexException
+                                   String repositoryUrl, String indexUpdateUrl,
+                                   List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
+        throws IOException, UnsupportedExistingLuceneIndexException
     {
         this( id, repositoryId, repository, repositoryUrl, indexUpdateUrl, indexCreators );
 
@@ -134,9 +136,9 @@ public class DefaultIndexingContext
     }
 
     public DefaultIndexingContext( String id, String repositoryId, File repository, Directory indexDirectory,
-        String repositoryUrl, String indexUpdateUrl, List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
-        throws IOException,
-            UnsupportedExistingLuceneIndexException
+                                   String repositoryUrl, String indexUpdateUrl,
+                                   List<? extends IndexCreator> indexCreators, boolean reclaimIndex )
+        throws IOException, UnsupportedExistingLuceneIndexException
     {
         this( id, repositoryId, repository, repositoryUrl, indexUpdateUrl, indexCreators );
 
@@ -161,8 +163,7 @@ public class DefaultIndexingContext
     }
 
     private void prepareIndex( boolean reclaimIndex )
-        throws IOException,
-            UnsupportedExistingLuceneIndexException
+        throws IOException, UnsupportedExistingLuceneIndexException
     {
         if ( IndexReader.indexExists( indexDirectory ) )
         {
@@ -173,7 +174,7 @@ public class DefaultIndexingContext
                 {
                     IndexReader.unlock( indexDirectory );
                 }
-    
+
                 checkAndUpdateIndexDescriptor( reclaimIndex );
             }
             catch ( IOException e )
@@ -195,8 +196,8 @@ public class DefaultIndexingContext
 
         timestamp = IndexUtils.getTimestamp( indexDirectory );
     }
-    
-    private void prepareCleanIndex( boolean deleteExisting ) 
+
+    private void prepareCleanIndex( boolean deleteExisting )
         throws IOException
     {
         if ( deleteExisting )
@@ -205,29 +206,29 @@ public class DefaultIndexingContext
             {
                 indexReader.close();
             }
-            
+
             indexReader = null;
-            
+
             if ( indexWriter != null && !indexWriter.isClosed() )
             {
                 indexWriter.close();
             }
-            
+
             indexWriter = null;
-            
+
             // unlock the dir forcibly
             if ( IndexReader.isLocked( indexDirectory ) )
             {
                 IndexReader.unlock( indexDirectory );
             }
-            
+
             indexDirectory.close();
             FileUtils.deleteDirectory( indexDirectoryFile );
             indexDirectoryFile.mkdirs();
-            
+
             indexDirectory = FSDirectory.getDirectory( indexDirectoryFile );
         }
-        
+
         if ( StringUtils.isEmpty( getRepositoryId() ) )
         {
             throw new IllegalArgumentException( "The repositoryId cannot be null when creating new repository!" );
@@ -240,8 +241,7 @@ public class DefaultIndexingContext
     }
 
     private void checkAndUpdateIndexDescriptor( boolean reclaimIndex )
-        throws IOException,
-            UnsupportedExistingLuceneIndexException
+        throws IOException, UnsupportedExistingLuceneIndexException
     {
         if ( reclaimIndex )
         {
@@ -294,12 +294,7 @@ public class DefaultIndexingContext
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
-        hdr
-            .add( new Field(
-                FLD_IDXINFO,
-                VERSION + ArtifactInfo.FS + getRepositoryId(),
-                Field.Store.YES,
-                Field.Index.NO ) );
+        hdr.add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES, Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
 
@@ -408,7 +403,7 @@ public class DefaultIndexingContext
             {
                 indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
 
-                indexWriter.setRAMBufferSizeMB(2);
+                indexWriter.setRAMBufferSizeMB( 2 );
             }
 
             return indexWriter;
@@ -457,8 +452,7 @@ public class DefaultIndexingContext
     }
 
     public void optimize()
-        throws CorruptIndexException,
-            IOException
+        throws CorruptIndexException, IOException
     {
         IndexWriter w = getIndexWriter();
 
@@ -518,7 +512,7 @@ public class DefaultIndexingContext
 
             rebuildGroups();
 
-            updateTimestamp( true );
+            updateTimestamp( true, null );
         }
     }
 
@@ -599,9 +593,9 @@ public class DefaultIndexingContext
 
                         if ( deleted != null )
                         {
-                            //Deleting the document loses history that it was delete, 
-                            //so incrementals wont work.  Therefore, put the delete 
-                            //document in as well
+                            // Deleting the document loses history that it was delete,
+                            // so incrementals wont work. Therefore, put the delete
+                            // document in as well
                             w.deleteDocuments( new Term( ArtifactInfo.UINFO, deleted ) );
                             w.addDocument( d );
                         }
@@ -634,8 +628,7 @@ public class DefaultIndexingContext
     }
 
     private void closeReaders()
-        throws CorruptIndexException,
-            IOException
+        throws CorruptIndexException, IOException
     {
         if ( indexWriter != null )
         {
