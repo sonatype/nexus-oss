@@ -27,11 +27,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -100,7 +100,6 @@ public class SearchMessageUtil
         return searchFor( queryArgs, null );
     }
 
-    @SuppressWarnings( "unchecked" )
     public static List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
         throws Exception
     {

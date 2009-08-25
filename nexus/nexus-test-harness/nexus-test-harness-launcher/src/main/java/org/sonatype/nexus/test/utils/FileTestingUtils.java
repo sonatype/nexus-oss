@@ -266,7 +266,7 @@ public class FileTestingUtils
             File destFile = new File( dest, fileName );
             destFile.getParentFile().mkdirs();
 
-            if ( Arrays.asList( "zip", "jar", "tar.gz", "jpg", "png" ).contains( extension ) )
+            if ( Arrays.asList( "zip", "jar", "gz", "jpg", "png" ).contains( extension ) )
             {
                 //just copy know binaries
                 FileUtils.copyFile( sourceFile, destFile );

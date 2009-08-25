@@ -29,6 +29,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
@@ -399,4 +400,21 @@ public class RepositoryMessageUtil
 
     }
 
+    public static ContentListResourceResponse downloadRepoIndexContent( String repoId )
+        throws IOException
+    {
+        String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
+
+        Response response = RequestFacade.doGetRequest( serviceURI );
+        String responseText = response.getEntity().getText();
+        Status status = response.getStatus();
+        Assert.assertTrue( responseText + status, status.isSuccess() );
+
+        XStreamRepresentation re =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        ContentListResourceResponse resourceResponse =
+            (ContentListResourceResponse) re.getPayload( new ContentListResourceResponse() );
+
+        return resourceResponse;
+    }
 }

@@ -63,7 +63,7 @@
             <exclude>**Suite*</exclude>
             <!-- START This are start/stop tests, shouldn't be runned -->
             <exclude>Nexus758ServiceStabilityTest</exclude>
-            <exclude>Nexus758StatusService</exclude>
+            <exclude>**/Nexus758StatusService.*</exclude>
             <exclude>Nexus748MultipleStartTest</exclude>
             <!-- END This are start/stop tests, shouldn't be runned -->
 
