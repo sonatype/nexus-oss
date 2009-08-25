@@ -68,7 +68,7 @@ Ext.override( Sonatype.repoServer.ServerEditPanel, {
               helpText: 'Nexus will check for new releases, and will notify you in the Welcome tab when available.',
               name: 'enableVersionUpdates',
               anchor: Sonatype.view.FIELD_OFFSET,
-              allowBlank: true,
+              allowBlank: true
             }
           ]
       });
