@@ -34,6 +34,7 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.Wagon;
 import org.apache.maven.wagon.WagonException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
@@ -57,14 +58,14 @@ import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
  * @author Jason van Zyl
  * @author Eugene Kuleshov
  */
-@Component(role = IndexUpdater.class)
+@Component( role = IndexUpdater.class )
 public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
     @Requirement( role = IncrementalHandler.class )
     IncrementalHandler incrementalHandler;
-    
+
     @Requirement
     private WagonManager wagonManager;
 
@@ -72,12 +73,15 @@ public class DefaultIndexUpdater
         throws IOException
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
-        
+
         // If no resource fetcher passed in, use the wagon fetcher by default
         // and put back in request for future use
         if ( fetcher == null )
         {
-            fetcher = new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest.getProxyInfo() );
+            fetcher =
+                new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest
+                    .getAuthenticationInfo(), updateRequest.getProxyInfo() );
+
             updateRequest.setResourceFetcher( fetcher );
         }
 
@@ -92,18 +96,19 @@ public class DefaultIndexUpdater
             if ( !updateRequest.isForceFullUpdate() )
             {
                 Properties localProperties = loadLocallyStoredRemoteProperties( context );
-                
+
                 // This will download the properties into context index directory so next run the
                 // loadLocallyStoredRemoteProperties() will retrieve it
                 Properties properties = downloadIndexProperties( context, fetcher );
 
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
-                
-                //If new timestamp is missing, dont bother checking incremental, we have an old file
+
+                // If new timestamp is missing, dont bother checking incremental, we have an old file
                 if ( updateTimestamp != null )
                 {
-                    List<String> filenames = incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
-                    
+                    List<String> filenames =
+                        incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
+
                     // if we have some incremental files, merge them in
                     if ( filenames != null )
                     {
@@ -111,7 +116,7 @@ public class DefaultIndexUpdater
                         {
                             loadIndexDirectory( updateRequest, true, filename );
                         }
-                        
+
                         return updateTimestamp;
                     }
                 }
@@ -119,12 +124,10 @@ public class DefaultIndexUpdater
                 {
                     updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_LEGACY_TIMESTAMP );
                 }
-                
-                // if incremental cant be done for whatever reason, simply use old logic of 
+
+                // if incremental cant be done for whatever reason, simply use old logic of
                 // checking the timestamp, if the same, nothing to do
-                if ( updateTimestamp != null 
-                    && contextTimestamp != null 
-                    && !updateTimestamp.after( contextTimestamp ) )
+                if ( updateTimestamp != null && contextTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
                 {
                     return null; // index is up to date
                 }
@@ -163,7 +166,7 @@ public class DefaultIndexUpdater
     {
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
-        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, proxyInfo ) );
+        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
 
         return fetchAndUpdateIndex( updateRequest );
     }
@@ -189,7 +192,7 @@ public class DefaultIndexUpdater
     public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return fetchIndexProperties( context, new WagonFetcher( wagonManager, listener, proxyInfo ) );
+        return fetchIndexProperties( context, new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
     }
 
     private Date loadIndexDirectory( IndexUpdateRequest updateRequest, boolean merge, String remoteIndexFile )
@@ -344,9 +347,7 @@ public class DefaultIndexUpdater
     }
 
     private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir, IndexingContext context )
-        throws CorruptIndexException,
-            LockObtainFailedException,
-            IOException
+        throws CorruptIndexException, LockObtainFailedException, IOException
     {
         IndexWriter w = null;
         IndexReader r = null;
@@ -372,7 +373,7 @@ public class DefaultIndexUpdater
             IndexUtils.close( r );
         }
     }
-    
+
     private static void filterDirectory( Directory directory, DocumentFilter filter )
         throws IOException
     {
@@ -380,18 +381,18 @@ public class DefaultIndexUpdater
         try
         {
             r = IndexReader.open( directory );
-    
+
             int numDocs = r.numDocs();
-    
+
             for ( int i = 0; i < numDocs; i++ )
             {
                 if ( r.isDeleted( i ) )
                 {
                     continue;
                 }
-    
+
                 Document d = r.document( i );
-    
+
                 if ( !filter.accept( d ) )
                 {
                     r.deleteDocument( i );
@@ -402,15 +403,15 @@ public class DefaultIndexUpdater
         {
             IndexUtils.close( r );
         }
-    
+
         IndexWriter w = null;
         try
         {
             // analyzer is unimportant, since we are not adding/searching to/on index, only reading/deleting
             w = new IndexWriter( directory, new NexusAnalyzer() );
-    
+
             w.optimize();
-    
+
             w.flush();
         }
         finally
@@ -418,9 +419,9 @@ public class DefaultIndexUpdater
             IndexUtils.close( w );
         }
     }
-    
+
     private Properties loadLocallyStoredRemoteProperties( IndexingContext context )
-    {        
+    {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
 
         File indexProperties = new File( context.getIndexDirectoryFile(), remoteIndexProperties );
@@ -445,10 +446,10 @@ public class DefaultIndexUpdater
         {
             IOUtil.close( fis );
         }
-        
+
         return null;
     }
-    
+
     private Properties downloadIndexProperties( IndexingContext context, ResourceFetcher fetcher )
         throws IOException
     {
@@ -475,7 +476,7 @@ public class DefaultIndexUpdater
             IOUtil.close( fis );
         }
     }
-    
+
     public Date getTimestamp( Properties properties, String key )
     {
         String indexTimestamp = properties.getProperty( key );
@@ -509,9 +510,9 @@ public class DefaultIndexUpdater
         try
         {
             IndexDataReader dr = new IndexDataReader( is );
-            
+
             IndexDataReadResult result = dr.readIndex( w, context );
-            
+
             return result.getTimestamp();
         }
         finally
@@ -530,14 +531,18 @@ public class DefaultIndexUpdater
 
         private final TransferListener listener;
 
+        private final AuthenticationInfo authenticationInfo;
+
         private final ProxyInfo proxyInfo;
 
         private Wagon wagon = null;
 
-        public WagonFetcher( WagonManager wagonManager, TransferListener listener, ProxyInfo proxyInfo )
+        public WagonFetcher( WagonManager wagonManager, TransferListener listener,
+                             AuthenticationInfo authenticationInfo, ProxyInfo proxyInfo )
         {
             this.wagonManager = wagonManager;
             this.listener = listener;
+            this.authenticationInfo = authenticationInfo;
             this.proxyInfo = proxyInfo;
         }
 
@@ -558,13 +563,27 @@ public class DefaultIndexUpdater
                 // when working in the context of Maven, the WagonManager is already
                 // populated with proxy information from the Maven environment
 
-                if ( proxyInfo != null )
+                if ( authenticationInfo != null )
                 {
-                    wagon.connect( repository, proxyInfo );
+                    if ( proxyInfo != null )
+                    {
+                        wagon.connect( repository, authenticationInfo, proxyInfo );
+                    }
+                    else
+                    {
+                        wagon.connect( repository, authenticationInfo );
+                    }
                 }
                 else
                 {
-                    wagon.connect( repository );
+                    if ( proxyInfo != null )
+                    {
+                        wagon.connect( repository, proxyInfo );
+                    }
+                    else
+                    {
+                        wagon.connect( repository );
+                    }
                 }
             }
             catch ( AuthenticationException ex )
@@ -597,8 +616,7 @@ public class DefaultIndexUpdater
         }
 
         public void retrieve( String name, File targetFile )
-            throws IOException,
-                FileNotFoundException
+            throws IOException, FileNotFoundException
         {
             try
             {

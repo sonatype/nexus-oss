@@ -6,6 +6,7 @@
  */
 package org.sonatype.nexus.index.updater;
 
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.DocumentFilter;
@@ -21,6 +22,8 @@ public class IndexUpdateRequest
     private ResourceFetcher resourceFetcher;
 
     private DocumentFilter documentFilter;
+    
+    private AuthenticationInfo authenticationInfo;
     
     private ProxyInfo proxyInfo;
     
@@ -105,5 +108,15 @@ public class IndexUpdateRequest
     public void setTransferListener( TransferListener transferListener )
     {
         this.transferListener = transferListener;
+    }
+
+    public AuthenticationInfo getAuthenticationInfo()
+    {
+        return authenticationInfo;
+    }
+
+    public void setAuthenticationInfo( AuthenticationInfo authenticationInfo )
+    {
+        this.authenticationInfo = authenticationInfo;
     }
 }
