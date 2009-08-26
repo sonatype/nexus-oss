@@ -44,10 +44,6 @@
 					<artifactId>nexus-configuration</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.sonatype.nexus</groupId>
-					<artifactId>nexus-indexer</artifactId>
-				</exclusion>
-				<exclusion>
 					<groupId>org.codehaus.plexus</groupId>
 					<artifactId>plexus-interpolation</artifactId>
 				</exclusion>

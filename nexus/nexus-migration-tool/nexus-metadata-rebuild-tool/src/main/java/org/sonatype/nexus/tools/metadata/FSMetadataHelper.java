@@ -20,14 +20,19 @@ import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Hex;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 
 @Component( role = FSMetadataHelper.class )
 public class FSMetadataHelper
     extends AbstractMetadataHelper
 {
+    @Requirement( role = GavCalculator.class, hint = "maven2" )
+    private GavCalculator gavCalculator;
+
     public FSMetadataHelper( Logger logger )
     {
         super( logger );
@@ -63,7 +68,7 @@ public class FSMetadataHelper
         }
 
     }
-    
+
     @Override
     public boolean exists( String path )
     {
@@ -80,13 +85,13 @@ public class FSMetadataHelper
         this.repo = repo;
     }
 
-    //copy from org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
+    // copy from org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
     @Override
     public String buildMd5( String path )
         throws Exception
     {
         InputStream fis = retrieveContent( path );
-        
+
         try
         {
             byte[] buffer = new byte[1024];
@@ -98,7 +103,7 @@ public class FSMetadataHelper
             do
             {
                 numRead = fis.read( buffer );
-                
+
                 if ( numRead > 0 )
                 {
                     md5.update( buffer, 0, numRead );
@@ -120,7 +125,7 @@ public class FSMetadataHelper
         throws Exception
     {
         InputStream fis = retrieveContent( path );
-        
+
         try
         {
             byte[] buffer = new byte[1024];
@@ -132,7 +137,7 @@ public class FSMetadataHelper
             do
             {
                 numRead = fis.read( buffer );
-                
+
                 if ( numRead > 0 )
                 {
                     sha1.update( buffer, 0, numRead );
@@ -156,7 +161,11 @@ public class FSMetadataHelper
     {
         FileUtils.forceDelete( repo + path );
     }
-    
+
+    @Override
+    protected GavCalculator getGavCalculator()
+    {
+        return gavCalculator;
+    }
+
 }
-
-

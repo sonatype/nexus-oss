@@ -26,6 +26,9 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.GavCalculator;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 /**
  * a Maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
@@ -173,10 +176,35 @@ abstract public class AbstractMetadataHelper
         v = model.getVersion() == null ? model.getParent().getVersion() : model.getVersion();
         n = path.substring( path.lastIndexOf( '/' ) + 1 );
 
-        // IF gav has potential problem, tell the user
-        warnIfNotAppropriate( g, path, "Group Id" );
-        warnIfNotAppropriate( a, path, "Artifact Id" );
-        warnIfNotAppropriate( v, path, "Version" );
+        // if the pom could not provide good values, parse GAV from path
+        if ( isInpropriateValue( g ) || isInpropriateValue( a ) || isInpropriateValue( v ) )
+        {
+            try
+            {
+                Gav gav = getGavCalculator().pathToGav( path );
+
+                if ( isInpropriateValue( g ) )
+                {
+                    g = gav.getGroupId();
+                }
+
+                if ( isInpropriateValue( a ) )
+                {
+                    a = gav.getArtifactId();
+                }
+
+                if ( isInpropriateValue( v ) )
+                {
+                    v = gav.getBaseVersion();
+                }
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                logger.warn( "Unable to parse good GAV values. Path: '" + path + "'. GAV: '" + g + ":" + a + ":" + v
+                    + "'" );
+            }
+        }
+        
 
         // GA
         String gaPath = "/" + g.replace( '.', '/' ) + "/" + a;
@@ -226,22 +254,18 @@ abstract public class AbstractMetadataHelper
         }
     }
 
-    /**
-     * @param idToValidate
-     * @param path
-     * @param logKey
-     */
-    private void warnIfNotAppropriate( String idToValidate, String path, String logKey )
+    private boolean isInpropriateValue( String value )
     {
-        if ( StringUtils.isEmpty( idToValidate ) )
+        if ( StringUtils.isEmpty( value ) )
         {
-            logger.warn( logKey + " parsed from '" + path + "' is empty." );
+            return true;
         }
-        else if ( !idToValidate.matches( APPROPRIATE_GAV_PATTERN ) )
+        if ( !value.matches( APPROPRIATE_GAV_PATTERN ) )
         {
-            logger.warn( logKey + "'" + idToValidate + "' parsed from '" + path
-                + "' is inappropriate, related maven-metadata.xml might not be recreated." );
+            return true;
         }
+
+        return false;
     }
 
     private String getPluginPrefix( String artifactId )
@@ -344,5 +368,7 @@ abstract public class AbstractMetadataHelper
      */
     abstract public boolean exists( String path )
         throws Exception;
+    
+    abstract protected GavCalculator getGavCalculator();
 
 }

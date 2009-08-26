@@ -1,5 +1,5 @@
 <project>
 	<groupId>${parent.groupId}</groupId>
-	<artifactId>proj5</artifactId>
+	<artifactId>proj6</artifactId>
 	<version>1.0</version>
 </project>

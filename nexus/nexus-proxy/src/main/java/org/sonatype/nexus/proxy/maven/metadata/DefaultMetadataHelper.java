@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 import java.io.InputStream;
 
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -27,7 +28,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
-import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
@@ -38,9 +39,9 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 public class DefaultMetadataHelper
     extends AbstractMetadataHelper
 {
-    private Repository repository;
+    private MavenRepository repository;
 
-    public DefaultMetadataHelper( Logger logger, Repository repository )
+    public DefaultMetadataHelper( Logger logger, MavenRepository repository )
     {
         super( logger );
 
@@ -147,6 +148,12 @@ public class DefaultMetadataHelper
         repository.storeItem( false, mdFile );
 
         repository.removeFromNotFoundCache( path );
+    }
+
+    @Override
+    protected GavCalculator getGavCalculator()
+    {
+        return repository.getGavCalculator();
     }
 
 }

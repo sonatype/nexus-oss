@@ -110,7 +110,10 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080923.191343-1.pom",
         "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080924.191343-2.jar",
         "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080924.191343-2.pom",
-        "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml" };
+        "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml",
+        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.pom",
+        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.jar"
+    };
 
     private String[] pluginArtifactFiles = {
         "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.jar",
@@ -637,30 +640,34 @@ public class RecreateMavenMetadataWalkerTest
         // should see warning log here
     }
     
-    public void testRecreatingOnInappropiatePOM()
+    public void testReleasePOMWithInterpolation()
         throws Exception
     {
         rebuildMavenMetadata( inhouseRelease );
-        
+
         Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
-        expected.put( "/com/mycom/proj1/maven-metadata.xml", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.md5", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar.sha1", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.md5", Boolean.TRUE );
-        expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.sha1", Boolean.TRUE );
-        expected.put( "/com/mycom/proj6/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/com/mycom/proj6/maven-metadata.xml", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.jar.sha1", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj6/1.0/proj6-1.0.pom.sha1", Boolean.TRUE );
-        
+
         validateResults( inhouseRelease, expected );
-        
-        // should see warning log here
+    }
+    
+    public void testSnapshotPOMWithInterpolation()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseSnapshot );
+
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+
+        expected.put( "/com/mycom/proj7/maven-metadata.xml", Boolean.TRUE );
+        expected.put( "/com/mycom/proj7/1.0-SNAPSHOT/maven-metadata.xml", Boolean.TRUE );
+
+        validateResults( inhouseSnapshot, expected );
     }
     
     public void testGroupPathIsArtifactPathAtTheSameTime()
