@@ -29,7 +29,9 @@ public class DummyWaitingNexusTask
     private long sleepTime = 10000;
 
     private Map<String, String> parameters;
-    
+
+    private Object result;
+
     public boolean isExposed()
     {
         return true;
@@ -69,7 +71,7 @@ public class DummyWaitingNexusTask
     {
         this.allowConcurrentSubmission = allowConcurrentSubmission;
     }
-    
+
     public void setAllowConcurrentExecution( boolean allowConcurrentExecution )
     {
         this.allowConcurrentExecution = allowConcurrentExecution;
@@ -85,6 +87,11 @@ public class DummyWaitingNexusTask
         this.sleepTime = sleepTime;
     }
 
+    public void setResult( Object resul )
+    {
+        this.result = resul;
+    }
+
     public Object call()
         throws Exception
     {
@@ -92,7 +99,7 @@ public class DummyWaitingNexusTask
         Thread.sleep( getSleepTime() );
         System.out.println( "AFTER SLEEP" );
 
-        return null;
+        return result;
     }
 
     protected String getAction()

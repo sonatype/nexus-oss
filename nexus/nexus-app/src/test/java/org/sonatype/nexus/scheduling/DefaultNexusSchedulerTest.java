@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.scheduling;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -24,12 +25,14 @@ public class DefaultNexusSchedulerTest
 {
     private NexusScheduler nexusScheduler;
 
+    @Override
     protected boolean loadConfigurationAtSetUp()
     {
         // IT IS NEEDED FROM NOW ON!
         return true;
     }
 
+    @Override
     protected void setUp()
         throws Exception
     {
@@ -38,6 +41,7 @@ public class DefaultNexusSchedulerTest
         nexusScheduler = lookup( NexusScheduler.class );
     }
 
+    @Override
     protected void tearDown()
         throws Exception
     {
@@ -47,20 +51,20 @@ public class DefaultNexusSchedulerTest
     public void testDoubleSubmission()
         throws Exception
     {
-        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
-            .getName() );
+        DummyWaitingNexusTask rt1 =
+            (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class.getName() );
 
         rt1.setAllowConcurrentSubmission( true );
 
         ScheduledTask<?> t1 = nexusScheduler.submit( "test1", rt1 );
 
-        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
-            .getName() );
+        DummyWaitingNexusTask rt2 =
+            (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class.getName() );
 
         rt2.setAllowConcurrentSubmission( false );
 
         ScheduledTask<?> t2 = null;
-        
+
         try
         {
             // the second submission should fail, since there is already a task of this type submitted
@@ -75,7 +79,7 @@ public class DefaultNexusSchedulerTest
         finally
         {
             t1.cancel();
-            
+
             if ( t2 != null )
             {
                 t2.cancel();
@@ -86,15 +90,15 @@ public class DefaultNexusSchedulerTest
     public void testDoubleSubmissionAllowed()
         throws Exception
     {
-        DummyWaitingNexusTask rt1 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
-            .getName() );
+        DummyWaitingNexusTask rt1 =
+            (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class.getName() );
 
         rt1.setAllowConcurrentSubmission( true );
 
         ScheduledTask<?> t1 = nexusScheduler.submit( "test1", rt1 );
 
-        DummyWaitingNexusTask rt2 = (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class
-            .getName() );
+        DummyWaitingNexusTask rt2 =
+            (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class.getName() );
 
         rt2.setAllowConcurrentSubmission( true );
 
@@ -111,11 +115,54 @@ public class DefaultNexusSchedulerTest
         finally
         {
             t1.cancel();
-            
+
             if ( t2 != null )
             {
                 t2.cancel();
             }
         }
+    }
+
+    public void testGetAsThreadJoinner()
+        throws Exception
+    {
+        DummyWaitingNexusTask rt =
+            (DummyWaitingNexusTask) lookup( SchedulerTask.class, DummyWaitingNexusTask.class.getName() );
+        rt.setResult( "result" );
+        rt.setSleepTime( 1000 );
+        rt.setAllowConcurrentExecution( true );
+        rt.setAllowConcurrentSubmission( true );
+        long start = System.currentTimeMillis();
+        ScheduledTask<Object> schedule = nexusScheduler.submit( "getTester", rt );
+        assertEquals( "Invalid return from schedule.get() after " + ( (double) System.currentTimeMillis() - start )
+            / 1000, "result", schedule.get() );
+
+        double took = ( (double) System.currentTimeMillis() - start ) / 1000;
+        assertTrue( took > 1 );
+    }
+
+    public void testGetAsThreadJoinnerException()
+        throws Exception
+    {
+        ExceptionerNexusTask rt = nexusScheduler.createTaskInstance( ExceptionerNexusTask.class );
+        rt.setSleepTime( 1000 );
+        rt.setAllowConcurrentExecution( true );
+        rt.setAllowConcurrentSubmission( true );
+        long start = System.currentTimeMillis();
+        ScheduledTask<Object> schedule = nexusScheduler.submit( "getException", rt );
+        try
+        {
+            assertEquals( "Invalid return from schedule.get() after " + ( (double) System.currentTimeMillis() - start )
+                / 1000, "result", schedule.get() );
+            fail("Should throw error");
+        }
+        catch ( ExecutionException e )
+        {
+            assertEquals( RuntimeException.class, e.getCause().getClass() );
+            assertEquals( "Error", e.getCause().getMessage() );
+        }
+
+        double took = ( (double) System.currentTimeMillis() - start ) / 1000;
+        assertTrue( took > 1 );
     }
 }

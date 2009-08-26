@@ -13,15 +13,39 @@
  */
 package org.sonatype.nexus.index;
 
+import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
 public class DefaultIndexerManagerTest
     extends AbstractIndexerManagerTest
 {
+
+    private Nexus nexus;
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        nexus = lookup( Nexus.class );
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        nexus = null;
+
+        super.tearDown();
+    }
+
     public void testRepoReindex()
         throws Exception
     {
         fillInRepo();
-        
+
         indexerManager.reindexAllRepositories( "/", false );
 
         searchFor( "org.sonatype.nexus", 9 );
@@ -29,4 +53,17 @@ public class DefaultIndexerManagerTest
         assertTemporatyContexts( releases );
     }
 
+    public void testInvalidRemoteUrl()
+        throws Exception
+    {
+        Maven2ProxyRepositoryTemplate t =
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplateById( "default_proxy_snapshot" );
+        t.getConfigurableRepository().setId( "invalidUrlRepo" );
+        ProxyRepository r = t.create().adaptToFacet( ProxyRepository.class );
+        r.setRemoteUrl( "http://repository.sonatyp.org/content/repositories/snapshots" );
+
+        nexusConfiguration.saveConfiguration();
+
+        indexerManager.reindexRepository( "/", r.getId(), true );
+    }
 }

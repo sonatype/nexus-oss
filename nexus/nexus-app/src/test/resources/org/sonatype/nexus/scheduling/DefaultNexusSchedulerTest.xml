@@ -12,5 +12,11 @@
 			<instantiation-strategy>per-lookup</instantiation-strategy>
 			<implementation>org.sonatype.nexus.scheduling.DummyWaitingNexusRepositoriesTask</implementation>
 		</component>
+		<component>
+			<role>org.sonatype.scheduling.SchedulerTask</role>
+			<role-hint>ExceptionerNexusTask</role-hint>
+			<instantiation-strategy>per-lookup</instantiation-strategy>
+			<implementation>org.sonatype.nexus.scheduling.ExceptionerNexusTask</implementation>
+		</component>
 	</components>
 </plexus>

@@ -105,7 +105,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         try
         {
-            Repository repo = getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class );
+            Repository repo = getRepositoryRegistry().getRepository( getRepositoryId() );
 
             return repo.getName();
         }
