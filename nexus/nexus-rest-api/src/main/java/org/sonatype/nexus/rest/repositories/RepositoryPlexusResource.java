@@ -113,7 +113,7 @@ public class RepositoryPlexusResource
                             getRepositoryRegistry().getRepositoryWithFacet( repoId, ShadowRepository.class );
 
                         shadow.setName( model.getName() );
-                        
+
                         shadow.setExposed( resource.isExposed() );
 
                         shadow.setMasterRepositoryId( model.getShadowOf() );
@@ -144,16 +144,17 @@ public class RepositoryPlexusResource
                         Repository repository = getRepositoryRegistry().getRepository( repoId );
 
                         repository.setName( model.getName() );
-                        
+
                         repository.setExposed( resource.isExposed() );
 
                         // set null to read only
                         RepositoryWritePolicy writePolicy = (model.getWritePolicy() != null) ? RepositoryWritePolicy.valueOf( model.getWritePolicy() ) : RepositoryWritePolicy.READ_ONLY;
-                        
+
                         repository.setWritePolicy( writePolicy );
 
                         repository.setBrowseable( model.isBrowseable() );
 
+                        repository.setIndexable( model.isIndexable() );
                         repository.setSearchable( model.isIndexable() );
 
                         repository.setNotFoundCacheTimeToLive( model.getNotFoundCacheTTL() );
@@ -168,31 +169,31 @@ public class RepositoryPlexusResource
                             {
                                 ChecksumPolicy checksum =
                                     EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class );
-                                
+
                                 MavenProxyRepository pRepository = repository.adaptToFacet( MavenProxyRepository.class );
                                 pRepository.setChecksumPolicy( checksum );
 
                                 pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
-                                
+
                                 pRepository.setRemoteUrl( model.getRemoteStorage().getRemoteStorageUrl() );
-                                
+
                                 pRepository.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
-                                
+
                                 pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
-                                
+
                                 RepositoryProxyResource proxyModel = ( RepositoryProxyResource ) model;
-                                
+
                                 pRepository.setArtifactMaxAge( proxyModel.getArtifactMaxAge() );
-                                
+
                                 pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
-                                
+
                                 String oldPasswordForRemoteStorage = null;
-                                if( pRepository.getRemoteAuthenticationSettings() != null && 
+                                if( pRepository.getRemoteAuthenticationSettings() != null &&
                                     UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
                                 {
                                     oldPasswordForRemoteStorage = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteAuthenticationSettings() ).getPassword();
                                 }
-                                
+
                                 String oldPasswordForProxy = null;
                                 if( pRepository.getRemoteProxySettings() != null && pRepository.getRemoteProxySettings().isEnabled() &&
                                     pRepository.getRemoteProxySettings().getProxyAuthentication() != null &&
@@ -200,11 +201,11 @@ public class RepositoryPlexusResource
                                 {
                                     oldPasswordForProxy = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteProxySettings().getProxyAuthentication() ).getPassword();
                                 }
-                                
+
                                 RemoteAuthenticationSettings remoteAuth = getAuthenticationInfoConverter().convertAndValidateFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
                                 RemoteConnectionSettings remoteConnSettings = getGlobalRemoteConnectionSettings().convertAndValidateFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
                                 RemoteProxySettings httpProxySettings = getGlobalHttpProxySettings().convertAndValidateFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
-                                
+
                                 if( remoteAuth != null )
                                 {
                                     pRepository.setRemoteAuthenticationSettings( remoteAuth );
@@ -213,7 +214,7 @@ public class RepositoryPlexusResource
                                 {
                                     pRepository.getRemoteStorageContext().removeRemoteAuthenticationSettings();
                                 }
-                                
+
                                 if( remoteConnSettings != null )
                                 {
                                     pRepository.setRemoteConnectionSettings( remoteConnSettings );
@@ -222,10 +223,10 @@ public class RepositoryPlexusResource
                                 {
                                     pRepository.getRemoteStorageContext().removeRemoteConnectionSettings();
                                 }
-                                
+
                                 if( httpProxySettings != null)
                                 {
-                                    pRepository.setRemoteProxySettings( httpProxySettings );   
+                                    pRepository.setRemoteProxySettings( httpProxySettings );
                                 }
                                 else
                                 {
@@ -233,7 +234,7 @@ public class RepositoryPlexusResource
                                 }
                             }
                         }
-                        
+
                         repository.setLocalUrl( model.getOverrideLocalStorageUrl() );
 
                         getNexusConfiguration().saveConfiguration();
