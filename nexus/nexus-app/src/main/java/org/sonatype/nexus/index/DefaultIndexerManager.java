@@ -288,8 +288,8 @@ public class DefaultIndexerManager
         IndexingContext ctx = getRepositoryLocalIndexContext( repository );
 
         // handle the isIndexed false->true transition, but also do this only if some specified properties changed
-        if ( ctx != null && !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() )
-            || ctx.isSearchable() != repository.isSearchable() )
+        if ( ctx != null
+            && ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository.isSearchable() ) )
         {
             // recreate the context
             removeRepositoryIndexContext( repositoryId, false );
