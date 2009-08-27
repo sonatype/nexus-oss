@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus;
 
+/**
+ * The source of common data from App.
+ * 
+ * @author cstamas
+ */
 public interface ApplicationStatusSource
 {
     SystemStatus getSystemStatus();
