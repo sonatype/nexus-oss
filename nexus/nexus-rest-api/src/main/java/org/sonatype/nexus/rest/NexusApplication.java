@@ -52,6 +52,8 @@ import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
+import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
+import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
@@ -294,6 +296,12 @@ public class NexusApplication
         xstream.registerLocalConverter( RepositoryListResourceResponse.class, "data",
                                         new AliasingListConverter( RepositoryListResource.class, "repositories-item" ) );
 
+        xstream.alias( "repositoryTypes", NexusRepositoryTypeListResourceResponse.class );
+        xstream.registerLocalConverter(
+            NexusRepositoryTypeListResourceResponse.class,
+            "data",
+            new AliasingListConverter( NexusRepositoryTypeListResource.class, "repositoryType" ) );
+        
         xstream.omitField( RepositoryStatusResourceResponse.class, "modelEncoding" );
         xstream.omitField( RepositoryStatusResource.class, "modelEncoding" );
         xstream.alias( "repository-status", RepositoryStatusResourceResponse.class );
