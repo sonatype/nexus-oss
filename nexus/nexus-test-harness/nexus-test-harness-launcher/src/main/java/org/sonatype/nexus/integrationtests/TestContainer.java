@@ -107,7 +107,6 @@ public class TestContainer
         };
         plexusAppBooter.setWorld( launcher.getWorld() );
 
-        plexusAppBooter.startContainer();
         this.plexusAppBooter = plexusAppBooter;
     }
 
