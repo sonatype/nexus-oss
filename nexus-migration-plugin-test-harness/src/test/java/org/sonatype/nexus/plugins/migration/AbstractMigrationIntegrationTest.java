@@ -33,6 +33,8 @@ import org.sonatype.nexus.plugin.migration.artifactory.task.ArtifactoryMigration
 import org.sonatype.nexus.plugins.migration.util.ImportMessageUtil;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
+import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
+import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -109,6 +111,8 @@ public abstract class AbstractMigrationIntegrationTest
         String log = FileUtils.readFileToString( logFile );
         Assert.assertFalse( log, log.toLowerCase().contains( "Exception".toLowerCase() ) );
         Assert.assertFalse( log, log.toLowerCase().contains( "Error".toLowerCase() ) );
+
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     protected void checkArtifact( String repositoryId, String groupId, String artifactId, String version )
@@ -187,6 +191,26 @@ public abstract class AbstractMigrationIntegrationTest
         }
         assertContains( groupsIds, groupId );
 
+    }
+
+    protected void checkSnapshotReleaseRepository( String repoId )
+        throws IOException
+    {
+        RepositoryGroupResource g = this.groupUtil.getGroup( repoId );
+        Assert.assertNotNull( g );
+
+        String releaseId = repoId + "-releases";
+        Assert.assertNotNull( this.repositoryUtil.getRepository( releaseId ) );
+        String snapshotId = repoId + "-snapshots";
+        Assert.assertNotNull( this.repositoryUtil.getRepository( snapshotId ) );
+
+        ArrayList<String> reposIds = new ArrayList<String>();
+        for ( RepositoryGroupMemberRepository repo : g.getRepositories() )
+        {
+            reposIds.add( repo.getId() );
+        }
+        assertContains( reposIds, releaseId );
+        assertContains( reposIds, snapshotId );
     }
 
     protected void checkRepository( String repoId )

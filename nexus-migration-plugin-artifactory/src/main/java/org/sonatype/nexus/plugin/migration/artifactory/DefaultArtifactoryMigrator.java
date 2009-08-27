@@ -398,7 +398,7 @@ public class DefaultArtifactoryMigrator
                         {
                             repoType = MAVEN2;
                         }
-                        CRepository nexusGroup =
+                        GroupRepository nexusGroup =
                             createGroup( repo.getKey(), repoType, result, nexusRepoReleases.getId(),
                                          nexusRepoSnapshots.getId() );
 
@@ -445,7 +445,8 @@ public class DefaultArtifactoryMigrator
         }
     }
 
-    private CRepository createGroup( String groupId, String repoType, MigrationResult result, String... repositoriesIds )
+    private GroupRepository createGroup( String groupId, String repoType, MigrationResult result,
+                                         String... repositoriesIds )
         throws MigrationException
     {
         result.addInfoMessage( "Creating group " + groupId );
@@ -491,14 +492,15 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            template.create();
+            Repository r = template.create();
+            this.nexusConfiguration.saveConfiguration();
+            return r.adaptToFacet( GroupRepository.class );
         }
         catch ( Exception e )
         {
             throw new MigrationException( "Unable to create repository group: " + groupId, e );
         }
 
-        return group;
     }
 
     private void importRepository( MigrationResult result, File repositoriesBackup,
@@ -615,6 +617,8 @@ public class DefaultArtifactoryMigrator
         String url = repo.getUrl();
         if ( !StringUtils.isBlank( url ) )
         {
+            exConf.setDownloadRemoteIndex( false );
+
             nexusRepo.setRemoteStorage( new CRemoteStorage() );
             nexusRepo.getRemoteStorage().setUrl( url );
             nexusRepo.getRemoteStorage().setProvider( "apacheHttpClient3x" );
@@ -664,21 +668,15 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            template.create();
+            Repository r = template.create();
+            this.nexusConfiguration.saveConfiguration();
+            return r;
         }
         catch ( Exception e )
         {
             throw new MigrationException( "Unable to create repository group: " + repoId, e );
         }
 
-        try
-        {
-            return repositoryRegistry.getRepository( repoId );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new MigrationException( "Should never happen, repo was created 3 lines before", e );
-        }
     }
 
     private void importGroups( MigrationResult result, ArtifactoryConfig cfg )
@@ -770,7 +768,7 @@ public class DefaultArtifactoryMigrator
                 }
             }
 
-            CRepository group =
+            GroupRepository group =
                 createGroup( virtualRepo.getKey(), repoType, result, repositoriesIds.toArray( new String[0] ) );
 
             CMapping map = new CMapping( virtualRepo.getKey(), group.getId(), null, null );
@@ -806,14 +804,14 @@ public class DefaultArtifactoryMigrator
 
         if ( map.getNexusGroupId() == null )
         {
-            CRepository shadowRepo = createShadowRepo( map.getNexusRepositoryId() );
+            ShadowRepository shadowRepo = createShadowRepo( map.getNexusRepositoryId() );
             repositoriesIds.add( shadowRepo.getId() );
         }
         else
         {
-            CRepository releasesRepo = createShadowRepo( map.getReleasesRepositoryId() );
+            ShadowRepository releasesRepo = createShadowRepo( map.getReleasesRepositoryId() );
             repositoriesIds.add( releasesRepo.getId() );
-            CRepository snapshotsRepo = createShadowRepo( map.getSnapshotsRepositoryId() );
+            ShadowRepository snapshotsRepo = createShadowRepo( map.getSnapshotsRepositoryId() );
             repositoriesIds.add( snapshotsRepo.getId() );
         }
     }
@@ -833,7 +831,7 @@ public class DefaultArtifactoryMigrator
         }
     }
 
-    private CRepository createShadowRepo( String shadowOfRepoId )
+    private ShadowRepository createShadowRepo( String shadowOfRepoId )
         throws MigrationException
     {
         String shadowId = shadowOfRepoId + "-virtual";
@@ -863,14 +861,14 @@ public class DefaultArtifactoryMigrator
 
         try
         {
-            template.create();
+            Repository r = template.create();
+            this.nexusConfiguration.saveConfiguration();
+            return r.adaptToFacet( ShadowRepository.class );
         }
         catch ( Exception e )
         {
             throw new MigrationException( "Unable to create repository group: " + shadowId, e );
         }
-
-        return shadowRepo;
     }
 
     private void copyArtifacts( MigrationResult result, Repository nexusRepoSnapshots, Repository nexusRepoReleases,
@@ -930,6 +928,19 @@ public class DefaultArtifactoryMigrator
     {
         for ( String repoId : result.getMigratedRepositoryIds() )
         {
+
+            try
+            {
+                repositoryRegistry.getRepository( repoId );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // this should never ever happen, repo should be created before this point
+                result.addErrorMessage( "The repository '" + repoId + "' does not exists! Unable to create metadatas!",
+                                        e );
+                continue;
+            }
+
             result.addInfoMessage( "Recreating repository metadatas " + repoId );
 
             RebuildAttributesTask at = nexusScheduler.createTaskInstance( RebuildAttributesTask.class );
