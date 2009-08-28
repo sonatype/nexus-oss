@@ -332,5 +332,18 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml", configuration );
     }
+    
+    public void testFrom108()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-108.xml", getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-108.xml", configuration );
+        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-108.xml" );
+    }
 
 }

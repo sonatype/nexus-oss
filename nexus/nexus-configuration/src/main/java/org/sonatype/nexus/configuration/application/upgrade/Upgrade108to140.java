@@ -55,7 +55,9 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.util.ExternalConfigUtil;
+import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
+import org.sonatype.security.configuration.source.PasswordHelper;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 
 /**
@@ -70,6 +72,9 @@ public class Upgrade108to140
 {
     @Requirement( hint = "file" )
     private SecurityConfigurationSource securityConfigurationSource;
+    
+    @Requirement
+    private PasswordHelper passwordHelper;    
 
     private static final String EXTERNAL_CONFIG = "externalConfiguration";
 
@@ -262,10 +267,18 @@ public class Upgrade108to140
             SecurityConfiguration securityConfig = new SecurityConfiguration();
             // set the version
             securityConfig.setVersion( SecurityConfiguration.MODEL_VERSION );
-
             securityConfig.setAnonymousAccessEnabled( oldsecurity.isAnonymousAccessEnabled() );
             securityConfig.setAnonymousUsername( oldsecurity.getAnonymousUsername() );
-            securityConfig.setAnonymousPassword( oldsecurity.getAnonymousPassword() );
+            try
+            {
+                securityConfig.setAnonymousPassword( passwordHelper.decrypt( oldsecurity.getAnonymousPassword() ) );
+            }
+            catch ( PlexusCipherException e )
+            {
+                getLogger().error(
+                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.",
+                    e );
+            }
             securityConfig.setEnabled( oldsecurity.isEnabled() );
             securityConfig.getRealms().addAll( oldsecurity.getRealms() );
 
