@@ -46,6 +46,14 @@
   </dependencyManagement>
 
   <build>
+    <extensions>
+      <extension>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </extension>
+    </extensions>
+
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
