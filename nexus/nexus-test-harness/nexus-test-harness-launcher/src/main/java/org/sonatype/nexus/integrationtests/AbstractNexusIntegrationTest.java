@@ -686,16 +686,28 @@ public class AbstractNexusIntegrationTest
         return basedir;
     }
 
-    protected Object lookup( String componentKey )
+    protected Object lookup( String role )
         throws Exception
     {
-        return container.lookup( componentKey );
+        return container.lookup( role );
     }
 
-    protected Object lookup( String role, String id )
+    protected Object lookup( String role, String hint )
         throws Exception
     {
-        return container.lookup( role, id );
+        return container.lookup( role, hint );
+    }
+
+    protected <E> E lookup( Class<E> role )
+        throws Exception
+    {
+        return container.lookup( role );
+    }
+
+    protected <E> E lookup( Class<E> role, String hint )
+        throws Exception
+    {
+        return container.lookup( role, hint );
     }
 
     protected String getRelitivePomPath( Gav gav )
