@@ -224,8 +224,8 @@ public class NexusHttpAuthenticationFilter
         catch ( AuthenticationException ae )
         {
             getLogger().info(
-                              "Unable to authenticate user [anonymous] from address/host [" + request.getRemoteAddr()
-                                  + "/" + request.getRemoteHost() + "]" );
+                              "Unable to authenticate user [anonymous] from IP Address "
+                              + RemoteIPFinder.findIP( ( HttpServletRequest ) request ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -243,8 +243,8 @@ public class NexusHttpAuthenticationFilter
                                       ServletResponse response )
     {
         String msg =
-            "Successfully authenticated user [" + token.getPrincipal() + "] from address/host ["
-                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+            "Successfully authenticated user [" + token.getPrincipal() + "] from IP Address "
+                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
 
         recordAuthcEvent( request, msg );
         
@@ -287,14 +287,11 @@ public class NexusHttpAuthenticationFilter
 
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
         
-        if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
+        String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
+        
+        if ( ip != null )
         {
-            String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
-            
-            if ( ip != null )
-            {
-                evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
-            }
+            evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
         }
 
         getNexus().addAuthcAuthzEvent( evt );
@@ -323,8 +320,8 @@ public class NexusHttpAuthenticationFilter
                                       ServletResponse response )
     {
         String msg =
-            "Unable to authenticate user [" + token.getPrincipal() + "] from address/host [" + request.getRemoteAddr()
-                + "/" + request.getRemoteHost() + "]";
+            "Unable to authenticate user [" + token.getPrincipal() + "] from IP Address "
+                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
 
         recordAuthcEvent( request, msg );
         

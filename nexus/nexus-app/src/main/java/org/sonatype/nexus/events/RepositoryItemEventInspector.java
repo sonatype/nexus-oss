@@ -108,7 +108,11 @@ public class RepositoryItemEventInspector
                 ai.setRemoteUrl( pomItem.getRemoteUrl() );
                 nae.setNexusItemInfo( ai );
                 nae.setEventDate( ievt.getEventDate() );
+                
+                //Make sure to add the item attributes as well
+                //that is where remote ip is contained (among other things)
                 nae.setEventContext( ievt.getContext() );
+                nae.getEventContext().putAll( ievt.getItem().getAttributes() );
 
                 if ( ievt instanceof RepositoryItemEventCache )
                 {

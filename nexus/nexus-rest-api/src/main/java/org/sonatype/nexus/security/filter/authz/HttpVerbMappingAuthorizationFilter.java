@@ -187,8 +187,8 @@ public class HttpVerbMappingAuthorizationFilter
 
         String msg =
             "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request ).name()
-                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from address/host ["
-                + request.getRemoteAddr() + "/" + request.getRemoteHost() + "]";
+                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from IP Address "
+                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
 
         if ( isSimilarEvent( msg ) )
         {
