@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.restlet.Context;
+import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
@@ -54,6 +55,10 @@ public class ProxyPlexusResource
         }
         else
         {
+            if ( mr.getMethod() != null && !mr.getMethod().equals( Method.GET ) )
+            {
+                return plexusResource.get( context, request, response, variant );
+            }
             mr.executed = true;
 
             response.setStatus( mr.getStatus() );
@@ -92,6 +97,11 @@ public class ProxyPlexusResource
         }
         else
         {
+            if ( mr.getMethod() != null && !mr.getMethod().equals( Method.DELETE ) )
+            {
+                plexusResource.delete( context, request, response );
+                return;
+            }
             mr.executed = true;
 
             response.setStatus( mr.getStatus() );
@@ -132,6 +142,10 @@ public class ProxyPlexusResource
         }
         else
         {
+            if ( mr.getMethod() != null && !mr.getMethod().equals( Method.POST ) )
+            {
+                return plexusResource.post( context, request, response, payload );
+            }
             mr.executed = true;
 
             try
@@ -182,6 +196,11 @@ public class ProxyPlexusResource
         }
         else
         {
+            if ( mr.getMethod() != null && !mr.getMethod().equals( Method.PUT ) )
+            {
+                return plexusResource.put( context, request, response, payload );
+            }
+
             mr.executed = true;
 
             try

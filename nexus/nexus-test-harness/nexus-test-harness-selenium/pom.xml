@@ -123,7 +123,6 @@
           </execution>
         </executions>
         <configuration>
-          <skipCoverage>${maven.test.skip}</skipCoverage>
           <source>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</source>
           <doNotInstrument>
             <js>ext-2.2</js>

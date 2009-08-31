@@ -1,5 +1,6 @@
 package org.sonatype.nexus.mock;
 
+import org.restlet.data.Method;
 import org.restlet.data.Status;
 
 public class MockResponse
@@ -14,11 +15,19 @@ public class MockResponse
 
     protected boolean executed = false;
 
+    private Method method;
+
     public MockResponse( Status status, Object payload )
     {
         this.status = status;
-
         this.response = payload;
+    }
+
+    public MockResponse( Status status, Object payload, Method method )
+    {
+        this.status = status;
+        this.response = payload;
+        this.method = method;
     }
 
     public Status getStatus()
@@ -66,4 +75,10 @@ public class MockResponse
     {
         return executed;
     }
+
+    public Method getMethod()
+    {
+        return method;
+    }
+
 }

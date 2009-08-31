@@ -687,7 +687,7 @@ Ext.extend( Sonatype.ext.FormPanel, Ext.FormPanel, {
           'Please change the missing or invalid fields.')
         .setIcon( Sonatype.MessageBox.WARNING );
     }
-    else if ( action.failureType == Ext.form.Action.CONNECT_FAILURE ) {
+    else if ( action.failureType == Ext.form.Action.CONNECT_FAILURE || action.response ) {
       Sonatype.utils.connectionError( action.response,
         'There is an error communicating with the server.' );
     }
