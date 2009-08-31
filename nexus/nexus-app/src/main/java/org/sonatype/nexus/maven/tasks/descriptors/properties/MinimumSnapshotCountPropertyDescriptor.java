@@ -16,19 +16,20 @@ package org.sonatype.nexus.maven.tasks.descriptors.properties;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.util.RegexUtil;
 
 @Component( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount", instantiationStrategy = "per-lookup" )
 public class MinimumSnapshotCountPropertyDescriptor
     extends AbstractNumberPropertyDescriptor
 {
     public static final String ID = "minSnapshotsToKeep";
-    
+
     public MinimumSnapshotCountPropertyDescriptor()
     {
         setHelpText( "Minimum number of snapshots to keep for one GAV." );
         setRequired( false );
     }
- 
+
     public String getId()
     {
         return ID;
@@ -38,4 +39,11 @@ public class MinimumSnapshotCountPropertyDescriptor
     {
         return "Minimum snapshot count";
     }
+
+    @Override
+    public String getRegexValidation()
+    {
+        return RegexUtil.BIGGER_THEN_MINUS_ONE;
+    }
+
 }

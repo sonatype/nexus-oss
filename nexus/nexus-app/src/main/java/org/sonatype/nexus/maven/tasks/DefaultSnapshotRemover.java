@@ -85,7 +85,7 @@ public class DefaultSnapshotRemover
         throws NoSuchRepositoryException, IllegalArgumentException
     {
         SnapshotRemovalResult result = new SnapshotRemovalResult();
-        
+
         logDetails( request );
 
         if ( request.getRepositoryId() != null )
@@ -189,8 +189,9 @@ public class DefaultSnapshotRemover
 
         repository.expireCaches( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
 
-        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor = new RecreateMavenMetadataWalkerProcessor( getLogger() );
-        
+        RecreateMavenMetadataWalkerProcessor metadataRebuildProcessor =
+            new RecreateMavenMetadataWalkerProcessor( getLogger() );
+
         for ( String path : request.getMetadataRebuildPaths() )
         {
             DefaultWalkerContext ctxMd =
@@ -214,7 +215,7 @@ public class DefaultSnapshotRemover
 
         return result;
     }
-    
+
     private void logDetails( SnapshotRemovalRequest request )
     {
         if ( request.getRepositoryId() != null )
@@ -224,15 +225,14 @@ public class DefaultSnapshotRemover
         else if ( request.getRepositoryGroupId() != null )
         {
             getLogger().info(
-                "Removing old SNAPSHOT deployments from " 
-                + request.getRepositoryGroupId()
-                + " repository group." );
+                              "Removing old SNAPSHOT deployments from " + request.getRepositoryGroupId()
+                                  + " repository group." );
         }
         else
         {
             getLogger().info( "Removing old SNAPSHOT deployments from all repositories." );
         }
-        
+
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "With parameters: " );
@@ -301,7 +301,7 @@ public class DefaultSnapshotRemover
             throws Exception
         {
         }
-        
+
         @Override
         public void onCollectionExit( WalkerContext context, StorageCollectionItem coll )
         {
@@ -341,9 +341,7 @@ public class DefaultSnapshotRemover
 
             Collection<StorageItem> items;
 
-
             items = repository.list( false, coll );
-
 
             HashSet<Long> versionsToRemove = new HashSet<Long>();
 
@@ -352,8 +350,9 @@ public class DefaultSnapshotRemover
             {
                 if ( !item.isVirtual() && !StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
                 {
-                    gav = ( (MavenRepository) coll.getRepositoryItemUid().getRepository() )
-                        .getGavCalculator().pathToGav( item.getPath() );
+                    gav =
+                        ( (MavenRepository) coll.getRepositoryItemUid().getRepository() ).getGavCalculator().pathToGav(
+                                                                                                                        item.getPath() );
 
                     if ( gav != null )
                     {
@@ -379,9 +378,9 @@ public class DefaultSnapshotRemover
                             getLogger().debug( "Using GAV snapshot timestamp" );
 
                             long itemTimestamp = gav.getSnapshotTimeStamp().longValue();
-                            
+
                             getLogger().debug( "NOW is " + itemTimestamp );
-                            
+
                             // If this timestamp is already marked to be removed, junk it
                             if ( versionsToRemove.contains( new Long( itemTimestamp ) ) )
                             {
@@ -390,7 +389,7 @@ public class DefaultSnapshotRemover
                             else
                             {
                                 getLogger().debug( "itemTimestamp=" + itemTimestamp + ", dateTreshold=" + dateThreshold );
-    
+
                                 // if dateTreshold is not used (zero days) OR
                                 // if itemTimestamp is less then dateTreshold (NB: both are positive!)
                                 // below will the retentionCount overrule if needed this
@@ -410,7 +409,7 @@ public class DefaultSnapshotRemover
                             // If no timestamp on gav, then it is a non-unique snapshot
                             // and should _not_ be removed
                             getLogger().debug( "GAV Snapshot timestamp not available, skipping non-unique snapshot" );
-                            
+
                             addStorageFileItemToMap( remainingSnapshotsAndFiles, gav, (StorageFileItem) item );
                         }
                     }
@@ -437,8 +436,8 @@ public class DefaultSnapshotRemover
                             if ( getLogger().isDebugEnabled() )
                             {
                                 getLogger().debug(
-                                    "Could not delete whole GAV " + coll.getRepositoryItemUid().toString(),
-                                    e );
+                                                   "Could not delete whole GAV "
+                                                       + coll.getRepositoryItemUid().toString(), e );
                             }
                         }
                     }
@@ -450,20 +449,23 @@ public class DefaultSnapshotRemover
             }
             else
             {
-                // and now check some things
-                if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                if ( request.getMinCountOfSnapshotsToKeep() == -1 || request.getRemoveSnapshotsOlderThanDays() == -1 )
+                {
+                    // delete nothing, there is one keep for ever rule
+                    deletableSnapshotsAndFiles.clear();
+                }
+                else if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                 {
                     // do something
-                    if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request
-                        .getMinCountOfSnapshotsToKeep() )
+                    if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                     {
                         // delete nothing, since there is less snapshots in total as allowed
                         deletableSnapshotsAndFiles.clear();
                     }
                     else
                     {
-                        TreeSet<ArtifactVersion> keys = new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles
-                            .keySet() );
+                        TreeSet<ArtifactVersion> keys =
+                            new TreeSet<ArtifactVersion>( deletableSnapshotsAndFiles.keySet() );
 
                         while ( !keys.isEmpty()
                             && remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
@@ -473,7 +475,7 @@ public class DefaultSnapshotRemover
                             if ( remainingSnapshotsAndFiles.containsKey( keyToMove ) )
                             {
                                 remainingSnapshotsAndFiles.get( keyToMove ).addAll(
-                                    deletableSnapshotsAndFiles.get( keyToMove ) );
+                                                                                    deletableSnapshotsAndFiles.get( keyToMove ) );
                             }
                             else
                             {
@@ -532,7 +534,6 @@ public class DefaultSnapshotRemover
             removeDirectoryIfEmpty( coll );
 
             updateMetadataIfNecessary( context, coll );
- 
 
         }
 

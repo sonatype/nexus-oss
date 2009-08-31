@@ -25,6 +25,5 @@ public interface SnapshotRemover
     String MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV = "moreTsSnapshotsExistsForGav";
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
-        throws NoSuchRepositoryException,
-            IllegalArgumentException;
+        throws NoSuchRepositoryException, IllegalArgumentException;
 }

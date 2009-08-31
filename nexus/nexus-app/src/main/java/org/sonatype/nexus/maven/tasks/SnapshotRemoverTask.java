@@ -32,20 +32,20 @@ public class SnapshotRemoverTask
     extends AbstractNexusRepositoriesTask<SnapshotRemovalResult>
 {
     public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
-    
+
     public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
-    
+
     public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
     public int getMinSnapshotsToKeep()
-    {        
+    {
         String param = getParameters().get( MinimumSnapshotCountPropertyDescriptor.ID );
-        
+
         if ( StringUtils.isEmpty( param ) )
         {
             return DEFAULT_MIN_SNAPSHOTS_TO_KEEP;
         }
-        
+
         return Integer.parseInt( param );
     }
 
@@ -57,12 +57,12 @@ public class SnapshotRemoverTask
     public int getRemoveOlderThanDays()
     {
         String param = getParameters().get( SnapshotRetentionDaysPropertyDescriptor.ID );
-        
+
         if ( StringUtils.isEmpty( param ) )
         {
             return DEFAULT_OLDER_THAN_DAYS;
         }
-        
+
         return Integer.parseInt( param );
     }
 
@@ -81,24 +81,35 @@ public class SnapshotRemoverTask
         getParameters().put( RemoveIfReleasedPropertyDescriptor.ID, Boolean.toString( removeIfReleaseExists ) );
     }
 
+    @Override
     public SnapshotRemovalResult doRun()
         throws Exception
     {
-        SnapshotRemovalRequest req = new SnapshotRemovalRequest(
-            getRepositoryId(),
-            getRepositoryGroupId(),
-            getMinSnapshotsToKeep(),
-            getRemoveOlderThanDays(),
-            isRemoveIfReleaseExists() );
+
+        if ( getMinSnapshotsToKeep() < -1 )
+        {
+            throw new IllegalArgumentException( "Invalid number of snapshots to be kept.  Must be positive, 0 or -1!" );
+        }
+
+        if ( getRemoveOlderThanDays() < -1 )
+        {
+            throw new IllegalArgumentException( "Invalid number of days to be kept.  Must be positive, 0 or -1!" );
+        }
+
+        SnapshotRemovalRequest req =
+            new SnapshotRemovalRequest( getRepositoryId(), getRepositoryGroupId(), getMinSnapshotsToKeep(),
+                                        getRemoveOlderThanDays(), isRemoveIfReleaseExists() );
 
         return getNexus().removeSnapshots( req );
     }
 
+    @Override
     protected String getAction()
     {
         return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
     }
 
+    @Override
     protected String getMessage()
     {
         if ( getRepositoryGroupId() != null )
