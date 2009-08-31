@@ -316,7 +316,8 @@ public abstract class AbstractRepository
         }
 
         // Dont use getLocalUrl since that applies default
-        if ( !StringUtils.equals( newLocalUrl, getCurrentConfiguration( false ).getLocalStorage().getUrl() ) )
+        if ( getCurrentConfiguration( false ).getLocalStorage() != null 
+            && !StringUtils.equals( newLocalUrl, getCurrentConfiguration( false ).getLocalStorage().getUrl() ) )
         {
             this.localUrlChanged = true;
         }

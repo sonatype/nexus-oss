@@ -128,9 +128,13 @@ public class ConfigurableRepository
     public String getLocalUrl()
     {
         // see NEXUS-2482
-        String localUrl = getCurrentConfiguration( false ).getLocalStorage().getUrl();
+        if ( getCurrentConfiguration( false ).getLocalStorage() == null 
+            || StringUtils.isEmpty( getCurrentConfiguration( false ).getLocalStorage().getUrl() ) )
+        {
+            return getCurrentConfiguration( false ).defaultLocalStorageUrl; 
+        }
         
-        return ( StringUtils.isEmpty( localUrl ) ) ? getCurrentConfiguration( false ).defaultLocalStorageUrl : localUrl;
+        return getCurrentConfiguration( false ).getLocalStorage().getUrl();
     }
 
     public void setLocalUrl( String localUrl )
