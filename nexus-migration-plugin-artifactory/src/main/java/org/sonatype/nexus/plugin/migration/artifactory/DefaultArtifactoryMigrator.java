@@ -34,8 +34,6 @@ import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
-import org.sonatype.nexus.log.LogManager;
-import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.config.ArtifactoryProxy;
@@ -56,7 +54,6 @@ import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigCo
 import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigConvertorRequest;
 import org.sonatype.nexus.plugin.migration.artifactory.security.SecurityConfigReceiver;
 import org.sonatype.nexus.plugin.migration.artifactory.security.builder.ArtifactorySecurityConfigBuilder;
-import org.sonatype.nexus.plugin.migration.artifactory.util.MigrationLog4jConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.util.VirtualRepositoryUtil;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -86,8 +83,6 @@ public class DefaultArtifactoryMigrator
 
     private static final String MAVEN1 = "maven1";
 
-    private static final String MIGRATION_LOG = "migration.log";
-
     private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
         new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
 
@@ -113,7 +108,7 @@ public class DefaultArtifactoryMigrator
     private Nexus nexus;
 
     @Requirement
-    private LogManager logManager;
+    private MigrationLogInitializer logInitializer;
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
@@ -1030,24 +1025,7 @@ public class DefaultArtifactoryMigrator
     public void initialize()
         throws InitializationException
     {
-        if ( this.logManager.getLogFile( MIGRATION_LOG ) != null )
-        {
-            return;
-        }
-
-        File nexusLog = this.logManager.getLogFile( "nexus.log" );
-        File migrationLog = new File( nexusLog.getParentFile(), MIGRATION_LOG );
-
-        try
-        {
-            SimpleLog4jConfig logConfig =
-                new MigrationLog4jConfig( (SimpleLog4jConfig) nexus.getLogConfig(), migrationLog );
-            logManager.setLogConfig( logConfig );
-        }
-        catch ( IOException e )
-        {
-            throw new InitializationException( "Unable to configure migration log", e );
-        }
+        logInitializer.initialize();
     }
 
 }

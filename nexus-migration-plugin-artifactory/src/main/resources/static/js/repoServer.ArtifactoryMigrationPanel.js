@@ -500,14 +500,14 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
 //    FIXME, tabe title is duplicated here
     var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-              'view-logs', Sonatype.repoServer.LogsViewPanel, { title: 'Logs and Config Files' } )
+              'view-logs', Sonatype.repoServer.LogsViewPanel, { title: 'System Files' } )
+
+    panel.showLog('migration.log');
 
     if(visible) {
       panel.reloadAllFiles();
     }
     
-    panel.showLog('migration.log');
-
   },
   
 

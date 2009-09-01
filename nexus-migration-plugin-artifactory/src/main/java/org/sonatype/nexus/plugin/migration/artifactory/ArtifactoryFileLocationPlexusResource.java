@@ -25,6 +25,8 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -60,6 +62,7 @@ import org.sonatype.security.usermanagement.User;
 @Component( role = PlexusResource.class, hint = "artifactoryFileLocation" )
 public class ArtifactoryFileLocationPlexusResource
     extends AbstractArtifactoryMigrationPlexusResource
+    implements Initializable
 {
 
     @Requirement
@@ -67,6 +70,9 @@ public class ArtifactoryFileLocationPlexusResource
 
     @Requirement
     private RepositoryRegistry repositoryRegistry;
+
+    @Requirement
+    private MigrationLogInitializer logInitializer;
 
     public ArtifactoryFileLocationPlexusResource()
     {
@@ -355,6 +361,12 @@ public class ArtifactoryFileLocationPlexusResource
 
         }
         return null;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        logInitializer.initialize();
     }
 
 }

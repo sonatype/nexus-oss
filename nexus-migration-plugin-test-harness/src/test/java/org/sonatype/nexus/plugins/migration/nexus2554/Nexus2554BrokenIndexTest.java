@@ -52,6 +52,7 @@ public class Nexus2554BrokenIndexTest
                             logs,
                             logs.contains( "Error message is: java.lang.NullPointerException Strack trace: java.lang.NullPointerException" ) );
         Assert.assertFalse( logs, logs.contains( "RepositoryNotAvailableException" ) );
+        Assert.assertFalse( logs, logs.contains( "java.lang.NullPointerException" ) );
     }
 
 }

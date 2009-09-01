@@ -9,6 +9,9 @@ import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
  */
 public interface ArtifactoryMigrator
 {
+
+    String MIGRATION_LOG = "migration.log";
+
     /**
      * Will return the migration result for the given ID. Returns null if such request was never proccessed.
      * 
