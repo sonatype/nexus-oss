@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -361,6 +362,11 @@ public abstract class AbstractRepositoryPlexusResource
 
                 resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() );
             }
+        }
+        //as this is a required field on ui, we need this to be set for non-maven type repos
+        else
+        {
+            resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
         }
 
         return resource;
