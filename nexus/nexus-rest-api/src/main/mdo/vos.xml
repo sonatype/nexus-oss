@@ -2036,6 +2036,18 @@
           <type>String</type>
           <required>true</required>
         </field>
+        <field>
+          <name>pomLink</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
+        <field>
+          <name>artifactLink</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+        </field>
       </fields>
     </class>
 

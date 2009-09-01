@@ -17,6 +17,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
   Ext.apply( this, config, defaultConfig );
   
   this.linkDivId = Ext.id();
+  this.linkLabelId = Ext.id();
   
   this.formPanel = new Ext.form.FormPanel( {
     autoScroll: true,
@@ -63,7 +64,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
               {
                 xtype: 'panel',
                 html: '<div class="x-form-item" tabindex="-1">' + 
-                  '<label class="x-form-item-label" style="width: 70px;">Download:</label>' +
+                  '<label id="' + this.linkLabelId + '" class="x-form-item-label" style="width: 70px;"></label>' +
                   '<div id="' + this.linkDivId + '" class="x-form-element" style="padding-left: 75px; padding-top: 3px">' +
                   '</div><div class="x-form-clear-left"/></div>'
               }
@@ -120,40 +121,22 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
-  formatJarLink: function( data ) {
-    var r = data.repoId;
-    var g = data.groupId;
-    var a = data.artifactId;
-    var v = data.version;
-    var c = data.classifier;
-    var p = data.packaging;
+  formatDownloadLink: function( data ) {
+  	var pomLink = data.pomLink;
+  	var artifactLink = data.artifactLink;
   
-    if ( c ) {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' );
-    }
-    // no packaging, only shows a pom link
-    else if ( ! p ) {
-      return this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' )
-    }
-    else if ( p == 'pom') {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'pom' );
-    }
-    else {
-      return this.makeArtifactLink( r, g, a, v, c, p, 'artifact' ) + ', ' +
-      this.makeArtifactLink( r, g, a, v, null, 'pom', 'pom' );
-    }
+  	var links = [];
+  	if ( pomLink ) {
+  		links.push( this.makeDownloadLink( pomLink, 'pom' ) );
+  	}
+  	if ( artifactLink ) {
+  		links.push( this.makeDownloadLink( artifactLink, 'artifact' ) );
+  	}
+  	return links.join(', ');
   },
   
-  makeArtifactLink: function( r, g, a, v, c, p, title ) {
-    var url = Sonatype.config.repos.urls.redirect +
-      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;
-    if ( c ) {
-      url += '&c=' + c;
-    }
-    if ( p ) {
-      url += '&p=' + p;
-    }
-    return String.format( '<a target="_blank" href="{0}">{1}</a>', Sonatype.utils.appendAuth( url ), title );
+  makeDownloadLink: function( url, title ) {
+    return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
   },
 
   showArtifact: function( data, collapse ) {
@@ -169,8 +152,17 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
         '</dependency>\n';
     }
     this.formPanel.form.setValues( data );
+    
+    var linkLabel = document.getElementById( this.linkLabelId );
     var linkDiv = document.getElementById( this.linkDivId );
-    linkDiv.innerHTML = empty ? '' : this.formatJarLink( data );
+    var linkHtml = this.formatDownloadLink( data );
+    if ( empty || linkHtml.length == 0 ) {
+    	linkLabel.innerHTML = '';
+    } else {
+    	linkLabel.innerHTML = 'Download: ';
+    	linkDiv.innerHTML =  linkHtml;
+    }
+
     if ( collapse ) {
       this.collapse();
     }

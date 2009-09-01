@@ -29,7 +29,9 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       {name:'resourceURI'},
       {name:'contextId'},
       {name:'classifier'},
-      {name:'packaging'}
+      {name:'packaging'},
+      {name:'pomLink'},
+      {name:'artifactLink'}
   ]);
 
   var resultReader = new Ext.data.JsonReader({
@@ -292,18 +294,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.clearWarningLabel();
   },
   
-  makeArtifactUrl: function(r, g, a, v, c, p) {
-    var url = Sonatype.config.repos.urls.redirect +
-      '?r=' + r + '&g=' + g + '&a=' + a + '&v=' + v;	
-    if ( c ) {
-        url += '&c=' + c;
-    }
-    if ( p ) {
-        url += '&p=' + p;
-    }
-    return url;
-  },
-  
   makeDownloadItem: function(text, url, event){
 	var item = {   
       text: text,
@@ -340,31 +330,14 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     	menu.add( '-' );
     }
     
-    var r = rec.get( 'repoId' );
-    var g = rec.get( 'groupId' );
-    var a = rec.get( 'artifactId' );
-    var v = rec.get( 'version' );
-    var c = rec.get( 'classifier' );
-    var p = rec.get( 'packaging' );
+    var pomLink = rec.get('pomLink');
+    var artifactLink = rec.get('artifactLink');
     
-    if ( c ) {
-      var url = this.makeArtifactUrl( r, g, a, v, c, p);
-      menu.add( this.makeDownloadItem('Download Artifact', url, e) );
+    if ( pomLink ) {
+    	menu.add( this.makeDownloadItem( 'Open POM', pomLink, e) );
     }
-    // no packaging, only shows a pom link
-    else if ( !p ){
-      var url = this.makeArtifactUrl( r, g, a, v, null, 'pom');
-      menu.add( this.makeDownloadItem('Open POM', url, e) );
-    }
-    else if ( p == 'pom') {
-      var url = this.makeArtifactUrl( r, g, a, v, c, p);
-      menu.add( this.makeDownloadItem('Open POM', url, e) );
-    }
-    else {
-      var url = this.makeArtifactUrl( r, g, a, v, c, p);
-      menu.add( this.makeDownloadItem('Download Artifact', url, e) );
-      url = this.makeArtifactUrl( r, g, a, v, null, 'pom');
-      menu.add( this.makeDownloadItem('Open POM', url, e) );
+    if ( artifactLink ) {
+    	menu.add( this.makeDownloadItem( 'Download Artifact', artifactLink, e) );
     }
 
     e.stopEvent();

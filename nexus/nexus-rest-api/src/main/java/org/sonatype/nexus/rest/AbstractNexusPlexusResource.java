@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -312,6 +313,20 @@ public abstract class AbstractNexusPlexusResource
         }
 
         NexusArtifact a = new NexusArtifact();
+        
+        a.setGroupId( ai.groupId );
+
+        a.setArtifactId( ai.artifactId );
+
+        a.setVersion( ai.version );
+
+        a.setClassifier( ai.classifier );
+
+        a.setPackaging( ai.packaging );
+
+        a.setRepoId( ai.repository );
+
+        a.setContextId( ai.context );
 
         try
         {
@@ -337,12 +352,19 @@ public abstract class AbstractNexusPlexusResource
                     null );
 
                 ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
+               
                 a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
+                
+                a.setPomLink( createPomLink( request, ai ) );
+
+                a.setArtifactLink( createArtifactLink( request, ai ) );
             }
         }
         catch ( NoSuchRepositoryAccessException e )
         {
-            this.getLogger().debug( "Ignoring NoSuchRepositoryAccessException, but hiding the urls for the artifact: "+ a.getGroupId() + ":"+ a.getArtifactId() +":"+ a.getVersion() +" - in repository: "+ ai.repository );
+            this.getLogger().debug(
+                "Ignoring NoSuchRepositoryAccessException, but hiding the links for the artifact: " + ai.groupId + ":"
+                    + ai.artifactId + ":" + ai.version + " - in repository: " + ai.repository );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -355,21 +377,43 @@ public abstract class AbstractNexusPlexusResource
             return null;
         }
 
-        a.setGroupId( ai.groupId );
-
-        a.setArtifactId( ai.artifactId );
-
-        a.setVersion( ai.version );
-
-        a.setClassifier( ai.classifier );
-
-        a.setPackaging( ai.packaging );
-
-        a.setRepoId( ai.repository );
-
-        a.setContextId( ai.context );
-
         return a;
+    }
+    
+    protected String createPomLink( Request request, ArtifactInfo ai )
+    {
+        if ( StringUtils.isNotEmpty( ai.classifier ) )
+        {
+            return "";
+        }
+
+        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version
+            + "&p=pom";
+
+        return createRedirectBaseRef( request ).toString() + suffix;
+    }
+
+    protected String createArtifactLink( Request request, ArtifactInfo ai )
+    {
+        if ( StringUtils.isEmpty( ai.packaging ) || "pom".equals( ai.packaging ) )
+        {
+            return "";
+        }
+
+        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&p="
+            + ai.packaging;
+
+        if ( StringUtils.isNotBlank( ai.classifier ) )
+        {
+            suffix = suffix + "&c=" + ai.classifier;
+        }
+
+        return createRedirectBaseRef( request ).toString() + suffix;
+    }
+    
+    protected Reference createRedirectBaseRef( Request request )
+    {
+        return createReference( getContextRoot( request ), "service/local/artifact/maven/redirect" ).getTargetRef();
     }
 
     protected String getValidRemoteIPAddress( Request request )
