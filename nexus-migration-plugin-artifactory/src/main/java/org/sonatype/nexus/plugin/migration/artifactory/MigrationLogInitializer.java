@@ -8,6 +8,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.Nexus;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.plugin.migration.artifactory.util.MigrationLog4jConfig;
@@ -23,6 +24,9 @@ public class MigrationLogInitializer
     @Requirement
     private Nexus nexus;
 
+    @Requirement
+    private ApplicationConfiguration applicationConfiguration;
+
     public void initialize()
         throws InitializationException
     {
@@ -31,8 +35,8 @@ public class MigrationLogInitializer
             return;
         }
 
-        File nexusLog = this.logManager.getLogFile( "nexus.log" );
-        File migrationLog = new File( nexusLog.getParentFile(), ArtifactoryMigrator.MIGRATION_LOG );
+        File logsDir = applicationConfiguration.getWorkingDirectory( "logs" );
+        File migrationLog = new File( logsDir, ArtifactoryMigrator.MIGRATION_LOG );
 
         try
         {
