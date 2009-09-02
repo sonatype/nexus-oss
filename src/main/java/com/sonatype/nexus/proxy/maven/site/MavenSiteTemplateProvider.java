@@ -1,31 +1,17 @@
 package com.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
-import org.sonatype.nexus.templates.repository.RepositoryTemplate;
+import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
 
 @Component( role = TemplateProvider.class, hint = MavenSiteTemplateProvider.PROVIDER_ID )
 public class MavenSiteTemplateProvider
-    extends AbstractTemplateProvider<RepositoryTemplate>
+    extends AbstractRepositoryTemplateProvider
 {
-
     public static final String PROVIDER_ID = "site-repository";
 
     private static final String MAVEN_SITE_ID = "maven-site";
-
-    @Override
-    public ApplicationConfiguration getApplicationConfiguration()
-    {
-        return super.getApplicationConfiguration();
-    }
-
-    public Class<RepositoryTemplate> getTemplateClass()
-    {
-        return RepositoryTemplate.class;
-    }
 
     public TemplateSet getTemplates()
     {
@@ -42,15 +28,4 @@ public class MavenSiteTemplateProvider
 
         return templates;
     }
-
-    public TemplateSet getTemplates( Object filter )
-    {
-        return getTemplates().getTemplates( filter );
-    }
-
-    public TemplateSet getTemplates( Object... filters )
-    {
-        return getTemplates().getTemplates( filters );
-    }
-
 }

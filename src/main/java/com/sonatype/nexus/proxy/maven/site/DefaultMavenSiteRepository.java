@@ -68,7 +68,7 @@ public class DefaultMavenSiteRepository
     }
 
     @Override
-    protected CRepositoryExternalConfigurationHolderFactory getExternalConfigurationHolderFactory()
+    protected CRepositoryExternalConfigurationHolderFactory<DefaultMavenSiteRepositoryConfiguration> getExternalConfigurationHolderFactory()
     {
         return new CRepositoryExternalConfigurationHolderFactory<DefaultMavenSiteRepositoryConfiguration>()
         {
