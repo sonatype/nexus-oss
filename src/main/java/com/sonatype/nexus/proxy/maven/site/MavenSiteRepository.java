@@ -1,4 +1,4 @@
-package org.sonatype.nexus.proxy.maven.site;
+package com.sonatype.nexus.proxy.maven.site;
 
 import java.io.IOException;
 import java.io.InputStream;

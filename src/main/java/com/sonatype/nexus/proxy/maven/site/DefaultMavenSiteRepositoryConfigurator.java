@@ -11,34 +11,13 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.maven.site;
+package com.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.registry.ContentClass;
+import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepositoryConfigurator;
 
-/**
- * The Maven Site content class. It is not compatible with anything, hence it is not groupable.
- * 
- * @author cstamas
- */
-@Component( role = ContentClass.class, hint = "maven-site" )
-public class MavenSiteContentClass
-    implements ContentClass
+@Component( role = DefaultMavenSiteRepositoryConfigurator.class )
+public class DefaultMavenSiteRepositoryConfigurator
+    extends AbstractWebSiteRepositoryConfigurator
 {
-    private static final String ID = "maven-site";
-
-    public String getId()
-    {
-        return ID;
-    }
-
-    public boolean isCompatible( ContentClass contentClass )
-    {
-        return false;
-    }
-    
-    public boolean isGroupable()
-    {
-        return false;
-    }
 }

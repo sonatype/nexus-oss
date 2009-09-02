@@ -9,7 +9,9 @@
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
+  
   <packaging>nexus-plugin</packaging>
+    
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   <description>Nexus Maven Site Plugin (Extras).</description>
 
@@ -56,6 +58,79 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.0.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin> 
     </plugins>
   </build>
+  
+   <profiles>
+    <profile>
+      <id>obfuscation</id>
+      <activation>
+        <property>
+          <name>!skip-obfuscation</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.pyx4me</groupId>
+            <artifactId>proguard-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>proguard</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <injar>classes</injar>
+              <options>
+                <option>-keep public interface * { public *; }</option>
+                <option>
+                  <![CDATA[
+                    -keep 
+                    public class * extends java.lang.Exception 
+                    {
+                      public <methods>;
+                      public <fields>;                                  
+                    }
+                  ]]>
+                </option>
+                <option>-keep public class * implements org.sonatype.nexus.scheduling.NexusTask { }</option>
+                <option>-keep public class * implements org.sonatype.nexus.plugins.rest.NexusResourceBundle { }</option>
+                <option>-dontusemixedcaseclassnames</option>
+                <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature</option>
+                <option>-dontoptimize</option>
+                <option>-dontshrink</option>
+                <option>-repackageclasses 'codeguard.nexusmsiteplugin'</option>
+                <option>-allowaccessmodification</option>
+                <option>-useuniqueclassmembernames</option>
+                <option>-obfuscationdictionary ${project.build.directory}/dictionary.txt</option>
+                <option>-classobfuscationdictionary ${project.build.directory}/dictionary.txt</option>
+              </options>
+              <libs>
+                <lib>${java-runtime}</lib>
+              </libs>
+        <exclusions>
+                <exclusion>
+                  <groupId>org.springframework</groupId>
+                </exclusion>
+              </exclusions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
 </project>
