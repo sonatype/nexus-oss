@@ -326,18 +326,19 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.rebuildMetadata );
     }
     
-    if ( menu.items.first() ){
-    	menu.add( '-' );
-    }
-    
-    var pomLink = rec.get('pomLink');
-    var artifactLink = rec.get('artifactLink');
-    
-    if ( pomLink ) {
-    	menu.add( this.makeDownloadItem( 'Open POM', pomLink, e) );
-    }
-    if ( artifactLink ) {
-    	menu.add( this.makeDownloadItem( 'Download Artifact', artifactLink, e) );
+    if ( this.sp.checkPermission( 'nexus:artifact', this.sp.READ) ) {
+	    if ( menu.items.first() ){
+	    	menu.add( '-' );
+	    }
+	    var pomLink = rec.get('pomLink');
+	    var artifactLink = rec.get('artifactLink');
+	    
+	    if ( pomLink ) {
+	    	menu.add( this.makeDownloadItem( 'Open POM', pomLink, e) );
+	    }
+	    if ( artifactLink ) {
+	    	menu.add( this.makeDownloadItem( 'Download Artifact', artifactLink, e) );
+	    }
     }
 
     e.stopEvent();

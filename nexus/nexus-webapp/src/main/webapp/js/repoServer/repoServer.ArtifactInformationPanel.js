@@ -16,6 +16,8 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
   var defaultConfig = {};
   Ext.apply( this, config, defaultConfig );
   
+  this.sp = Sonatype.lib.Permissions;
+  
   this.linkDivId = Ext.id();
   this.linkLabelId = Ext.id();
   
@@ -153,14 +155,16 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
     }
     this.formPanel.form.setValues( data );
     
-    var linkLabel = document.getElementById( this.linkLabelId );
-    var linkDiv = document.getElementById( this.linkDivId );
-    var linkHtml = this.formatDownloadLink( data );
-    if ( empty || linkHtml.length == 0 ) {
-    	linkLabel.innerHTML = '';
-    } else {
-    	linkLabel.innerHTML = 'Download: ';
-    	linkDiv.innerHTML =  linkHtml;
+    if ( this.sp.checkPermission( 'nexus:artifact', this.sp.READ) ) {
+	    var linkLabel = document.getElementById( this.linkLabelId );
+	    var linkDiv = document.getElementById( this.linkDivId );
+	    var linkHtml = this.formatDownloadLink( data );
+	    if ( empty || linkHtml.length == 0 ) {
+	    	linkLabel.innerHTML = '';
+	    } else {
+	    	linkLabel.innerHTML = 'Download: ';
+	    	linkDiv.innerHTML =  linkHtml;
+	    }
     }
 
     if ( collapse ) {
