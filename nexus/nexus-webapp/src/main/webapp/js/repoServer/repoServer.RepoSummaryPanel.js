@@ -91,13 +91,13 @@ Ext.extend( Sonatype.repoServer.AbstractRepositorySummaryPanel, Sonatype.ext.For
       return bytes + ' Bytes';
     }
     else if ( bytes < 1048576 ) {
-      return bytes / 1024 + ' KB';
+      return (bytes/1024).toFixed(2) + ' KB';
     }
     else if ( bytes < 1073741824 ) {
-      return bytes / 1048576 + ' MB'; 
+      return (bytes/1048576).toFixed(2) + ' MB'; 
     }
     else {
-      return bytes / 1073741824 + ' GB';
+      return (bytes/1073741824).toFixed(2) + ' GB';
     }
   }
 } );
