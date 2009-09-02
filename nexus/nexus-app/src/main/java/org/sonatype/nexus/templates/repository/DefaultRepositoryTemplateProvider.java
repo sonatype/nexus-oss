@@ -1,14 +1,7 @@
 package org.sonatype.nexus.templates.repository;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.Nexus;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
-import org.sonatype.nexus.proxy.registry.ContentClass;
-import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
-import org.sonatype.nexus.templates.AbstractTemplateProvider;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.maven.Maven1GroupRepositoryTemplate;
@@ -20,9 +13,14 @@ import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTempl
 import org.sonatype.nexus.templates.repository.maven.Maven2Maven1ShadowRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
 
+/**
+ * A template provider implementation that covers core-supported repositories.
+ * 
+ * @author cstamas
+ */
 @Component( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
 public class DefaultRepositoryTemplateProvider
-    extends AbstractTemplateProvider<RepositoryTemplate>
+    extends AbstractRepositoryTemplateProvider
 {
     public static final String PROVIDER_ID = "default-repository";
 
@@ -35,24 +33,10 @@ public class DefaultRepositoryTemplateProvider
     private static final String DEFAULT_PROXY_SNAPSHOT = "default_proxy_snapshot";
 
     private static final String M1_M2_VIRTUAL = "maven1_maven2_virtual";
-    
+
     private static final String M2_M1_VIRTUAL = "maven2_maven1_virtual";
 
     private static final String DEFAULT_GROUP = "default_group";
-
-    @Requirement
-    private RepositoryTypeRegistry repositoryTypeRegistry;
-
-    @Override
-    public ApplicationConfiguration getApplicationConfiguration()
-    {
-        return super.getApplicationConfiguration();
-    }
-
-    public Class<RepositoryTemplate> getTemplateClass()
-    {
-        return RepositoryTemplate.class;
-    }
 
     public TemplateSet getTemplates()
     {
@@ -61,42 +45,34 @@ public class DefaultRepositoryTemplateProvider
         try
         {
             templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_RELEASE,
-                                                               "Maven2 Hosted Release Repository",
-                                                               RepositoryPolicy.RELEASE ) );
+                "Maven2 Hosted Release Repository", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_SNAPSHOT,
-                                                               "Maven2 Hosted Snapshot Repository",
-                                                               RepositoryPolicy.SNAPSHOT ) );
+                "Maven2 Hosted Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_RELEASE,
-                                                              "Maven2 Proxy Release Repository",
-                                                              RepositoryPolicy.RELEASE ) );
+                "Maven2 Proxy Release Repository", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_SNAPSHOT,
-                                                              "Maven2 Proxy Snapshot Repository",
-                                                              RepositoryPolicy.SNAPSHOT ) );
+                "Maven2 Proxy Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, M1_M2_VIRTUAL,
-                                                                     "Maven1-to-Maven2 Virtual Repository" ) );
+                "Maven1-to-Maven2 Virtual Repository" ) );
 
             templates.add( new Maven2Maven1ShadowRepositoryTemplate( this, M2_M1_VIRTUAL,
-                                                                     "Maven2-to-Maven1 Virtual Repository" ) );
+                "Maven2-to-Maven1 Virtual Repository" ) );
 
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_release",
-                                                               "Maven1 Hosted Release Repository",
-                                                               RepositoryPolicy.RELEASE ) );
+                "Maven1 Hosted Release Repository", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_snapshot",
-                                                               "Maven1 Hosted Snapshot Repository",
-                                                               RepositoryPolicy.SNAPSHOT ) );
+                "Maven1 Hosted Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_release",
-                                                              "Maven1 Proxy Release Repository",
-                                                              RepositoryPolicy.RELEASE ) );
+                "Maven1 Proxy Release Repository", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_snapshot",
-                                                              "Maven1 Proxy Snapshot Repository",
-                                                              RepositoryPolicy.SNAPSHOT ) );
+                "Maven1 Proxy Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven1GroupRepositoryTemplate( this, "maven1_group", "Maven1 Group Repository" ) );
 
@@ -108,27 +84,5 @@ public class DefaultRepositoryTemplateProvider
         }
 
         return templates;
-    }
-
-    public TemplateSet getTemplates( Object filter )
-    {
-        return getTemplates().getTemplates( filter );
-    }
-
-    public TemplateSet getTemplates( Object... filters )
-    {
-        return getTemplates().getTemplates( filters );
-    }
-    
-
-    public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
-    {
-        ContentClass contentClass =
-            repositoryTypeRegistry
-                .getRepositoryContentClass( configuration.getConfiguration( false ).getProviderRole(), configuration
-                    .getConfiguration( false ).getProviderHint() );
-
-        return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
-                                                         null, configuration );
     }
 }

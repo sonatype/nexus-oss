@@ -8,7 +8,7 @@ public class ManuallyConfiguredRepositoryTemplate
 {
     private final CRepositoryCoreConfiguration repoConfig;
 
-    public ManuallyConfiguredRepositoryTemplate( DefaultRepositoryTemplateProvider provider, String id,
+    public ManuallyConfiguredRepositoryTemplate( AbstractRepositoryTemplateProvider provider, String id,
                                                  String description, ContentClass contentClass, Class<?> mainFacet,
                                                  CRepositoryCoreConfiguration repoConfig )
     {

@@ -8,13 +8,12 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.templates.AbstractConfigurableTemplate;
-import org.sonatype.nexus.templates.AbstractTemplateProvider;
 
 public abstract class AbstractRepositoryTemplate
     extends AbstractConfigurableTemplate
     implements RepositoryTemplate
 {
-    private final AbstractTemplateProvider<RepositoryTemplate> provider;
+    private final AbstractRepositoryTemplateProvider provider;
 
     private final ContentClass contentClass;
 
@@ -22,7 +21,7 @@ public abstract class AbstractRepositoryTemplate
 
     private ConfigurableRepository configurableRepository;
 
-    public AbstractRepositoryTemplate( AbstractTemplateProvider<RepositoryTemplate> provider, String id, String description,
+    public AbstractRepositoryTemplate( AbstractRepositoryTemplateProvider provider, String id, String description,
                                        ContentClass contentClass, Class<?> mainFacet )
     {
         super( provider, id, description );
@@ -49,7 +48,7 @@ public abstract class AbstractRepositoryTemplate
     }
 
     @Override
-    public AbstractTemplateProvider<RepositoryTemplate> getTemplateProvider()
+    public AbstractRepositoryTemplateProvider getTemplateProvider()
     {
         return provider;
     }
