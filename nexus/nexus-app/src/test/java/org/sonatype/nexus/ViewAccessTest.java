@@ -28,14 +28,10 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
-import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.security.WebSecurityUtil;
@@ -97,46 +93,6 @@ public class ViewAccessTest
         this.feedRecorder = this.lookup( FeedRecorder.class );
 
         this.indexerManager = this.lookup( IndexerManager.class );
-    }
-
-    public void testAccessWithNoViewAccess()
-        throws Exception
-    {
-        try
-        {
-            this.getItem( "test-noview", "test", "/spoof/simple.txt" );
-            Assert.fail( "expected AuthenticationException" );
-        }
-        catch ( AccessDeniedException e )
-        {
-            // expected
-        }
-    }
-
-    public void testAccessWithViewAccess()
-        throws AuthenticationException, Exception
-    {
-        this.getItem( "alltest", "test", "/spoof/simple.txt" );
-    }
-
-    private StorageItem getItem( String username, String repositoryId, String path )
-        throws AccessDeniedException, Exception
-    {
-        WebSecurityUtil.setupWebContext( username + "-" + repositoryId + "-" + path );
-
-        Subject subject = securitySystem.login( new UsernamePasswordToken( username, "" ) );
-
-        Repository repo = this.getRepositoryRegistry().getRepository( repositoryId );
-
-        ResourceStoreRequest request = new ResourceStoreRequest( path, false );
-
-        StorageItem item = repo.retrieveItem( request );
-
-        // not sure if we really need to log the user out, we are not using a remember me,
-        // but what can it hurt?
-        securitySystem.logout( subject.getPrincipals() );
-
-        return item;
     }
 
     // feeds test!

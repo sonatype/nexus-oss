@@ -65,7 +65,7 @@ public abstract class AbstractNexusPlexusResource
     private NexusConfiguration nexusConfiguration;
 
     @Requirement( hint = "protected" )
-    private RepositoryRegistry protectedRepositoryRegistry;
+    private RepositoryRegistry repositoryRegistry;
 
     @Requirement( hint = "default" )
     private RepositoryRegistry defaultRepositoryRegistry;
@@ -85,7 +85,7 @@ public abstract class AbstractNexusPlexusResource
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
-        return protectedRepositoryRegistry;
+        return repositoryRegistry;
     }
     
     protected RepositoryRegistry getUnprotectedRepositoryRegistry()
