@@ -103,7 +103,10 @@ public class SearchMessageUtil
     public static List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
         throws Exception
     {
-        String responseText = doSearchFor( queryArgs, repositoryId ).getEntity().getText();
+        Response response = doSearchFor( queryArgs, repositoryId );
+        String responseText = response.getEntity().getText();
+        
+        Assert.assertTrue( "Search failure:\n"+ responseText, response.getStatus().isSuccess() );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );

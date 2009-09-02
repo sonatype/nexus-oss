@@ -29,6 +29,8 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
@@ -66,6 +68,17 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
         throws IOException
     {
+        if ( repo.getProviderRole() == null )
+        {
+            if ( "virtual".equals( repo.getRepoType() ) )
+            {
+                repo.setProviderRole( ShadowRepository.class.getName() );
+            }
+            else
+            {
+                repo.setProviderRole( Repository.class.getName() );
+            }
+        }
 
         Response response = this.sendMessage( Method.POST, repo );
 
@@ -96,7 +109,8 @@ public class RepositoryMessageUtil
         // Assert.assertEquals( repo.getDefaultLocalStorageUrl(), responseResource.getDefaultLocalStorageUrl() ); //
         // TODO: add check for this
 
-        Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
+        // format is not used anymore, removing the check
+//        Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
         Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
 
         if ( repo.getRepoType().equals( "virtual" ) )

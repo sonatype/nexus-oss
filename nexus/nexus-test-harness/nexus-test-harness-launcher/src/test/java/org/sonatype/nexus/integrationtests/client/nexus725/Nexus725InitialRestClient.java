@@ -28,6 +28,7 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -122,6 +123,7 @@ public class Nexus725InitialRestClient
         repoResoruce.setName( "Create Test Repo" );
         // repoResoruce.setRepoType( ? )
         repoResoruce.setProvider( "maven2" );
+        repoResoruce.setProviderRole( Repository.class.getName() );
         // format is neglected by server from now on, provider is the new guy in the town
         repoResoruce.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
         repoResoruce.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );

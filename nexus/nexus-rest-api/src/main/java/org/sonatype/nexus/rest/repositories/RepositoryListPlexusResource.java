@@ -35,10 +35,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
@@ -176,11 +173,11 @@ public class RepositoryListPlexusResource
         appModel.setName( resource.getName() );
 
         appModel.setExposed( resource.isExposed() );
+        
+        appModel.setProviderRole( resource.getProviderRole() );
 
         if ( REPO_TYPE_VIRTUAL.equals( resource.getRepoType() ) )
         {
-            appModel.setProviderRole( ShadowRepository.class.getName() );
-
             appModel.setExternalConfiguration( ex );
 
             // indexer is unaware of the m2 layout conversion
@@ -195,15 +192,8 @@ public class RepositoryListPlexusResource
             exConf.setSynchronizeAtStartup( repoResource.isSyncAtStartup() );
 
         }
-        else if ( REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
+        else if ( !REPO_TYPE_GROUP.equals( resource.getRepoType() ) )
         {
-            appModel.setProviderRole( GroupRepository.class.getName() );
-        }
-        else
-        {
-
-            appModel.setProviderRole( Repository.class.getName() );
-
             RepositoryResource repoResource = (RepositoryResource) resource;
 
             // we can use the default if the value is empty

@@ -68,6 +68,7 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   
   providerSelectHandler: function( combo, rec, index ) {
     this.form.findField( 'format' ).setValue( rec.data.format );
+    this.form.findField( 'providerRole' ).setValue( rec.data.providerRole );
     this.afterProviderSelectHandler( combo, rec, index);
   },
   
@@ -232,6 +233,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
     fields: [
       { name: 'description', sortType:Ext.data.SortTypes.asUCString },
       { name: 'format' },
+      { name: 'providerRole' },
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
@@ -298,6 +300,10 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
           select: this.providerSelectHandler,
           scope: this
         }
+      },
+      {
+        xtype: 'hidden',
+        name: 'providerRole'
       },
       {
         xtype: 'textfield',
@@ -538,6 +544,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
     fields: [
       { name: 'description', sortType:Ext.data.SortTypes.asUCString },
       { name: 'format' },
+      { name: 'providerRole' },
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
@@ -604,6 +611,10 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
           select: this.providerSelectHandler,
           scope: this
         }
+      },
+      {
+        xtype: 'hidden',
+        name: 'providerRole'
       },
       {
         xtype: 'textfield',
@@ -1131,6 +1142,7 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
     fields: [
       { name: 'description', sortType:Ext.data.SortTypes.asUCString },
       { name: 'format' },
+      { name: 'providerRole' },
       { name: 'provider' }
     ],
     sortInfo: { field: 'description', direction: 'asc' },
@@ -1198,6 +1210,10 @@ Sonatype.repoServer.VirtualRepositoryEditor = function( config ) {
           select: this.providerSelectHandler,
           scope: this
         }
+      },
+      {
+        xtype: 'hidden',
+        name: 'providerRole'
       },
       {
         xtype: 'textfield',

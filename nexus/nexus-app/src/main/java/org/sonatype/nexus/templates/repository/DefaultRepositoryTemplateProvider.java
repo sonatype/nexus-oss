@@ -34,20 +34,14 @@ public class DefaultRepositoryTemplateProvider
 
     private static final String DEFAULT_PROXY_SNAPSHOT = "default_proxy_snapshot";
 
-    private static final String DEFAULT_VIRTUAL = "default_virtual";
+    private static final String M1_M2_VIRTUAL = "maven1_maven2_virtual";
+    
+    private static final String M2_M1_VIRTUAL = "maven2_maven1_virtual";
 
     private static final String DEFAULT_GROUP = "default_group";
 
     @Requirement
-    private Nexus nexus;
-
-    @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
-
-    protected Nexus getNexus()
-    {
-        return nexus;
-    }
 
     @Override
     public ApplicationConfiguration getApplicationConfiguration()
@@ -82,10 +76,10 @@ public class DefaultRepositoryTemplateProvider
                                                               "Maven2 Proxy Snapshot Repository",
                                                               RepositoryPolicy.SNAPSHOT ) );
 
-            templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
+            templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, M1_M2_VIRTUAL,
                                                                      "Maven1-to-Maven2 Virtual Repository" ) );
 
-            templates.add( new Maven2Maven1ShadowRepositoryTemplate( this, "maven2_maven1_virtual",
+            templates.add( new Maven2Maven1ShadowRepositoryTemplate( this, M2_M1_VIRTUAL,
                                                                      "Maven2-to-Maven1 Virtual Repository" ) );
 
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_release",
@@ -125,6 +119,7 @@ public class DefaultRepositoryTemplateProvider
     {
         return getTemplates().getTemplates( filters );
     }
+    
 
     public ManuallyConfiguredRepositoryTemplate createManuallyTemplate( CRepositoryCoreConfiguration configuration )
     {

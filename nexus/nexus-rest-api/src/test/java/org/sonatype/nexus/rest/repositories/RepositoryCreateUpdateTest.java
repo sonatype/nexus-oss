@@ -9,6 +9,7 @@ import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
@@ -224,6 +225,7 @@ public class RepositoryCreateUpdateTest
         repositoryResource.setName( "test-name" );
         repositoryResource.setNotFoundCacheTTL( 11 );
         repositoryResource.setProvider( "maven2" );
+        repositoryResource.setProviderRole( Repository.class.getName() );
         repositoryResource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repositoryResource.setRepoType( "proxy" );
 
@@ -293,6 +295,7 @@ public class RepositoryCreateUpdateTest
         repositoryResource.setName( "test-name" );
         repositoryResource.setNotFoundCacheTTL( 11 );
         repositoryResource.setProvider( "maven2" );
+        repositoryResource.setProviderRole( Repository.class.getName() );
         repositoryResource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repositoryResource.setRepoType( "proxy" );
 
