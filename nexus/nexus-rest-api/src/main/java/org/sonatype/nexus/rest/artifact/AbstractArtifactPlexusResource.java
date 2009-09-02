@@ -52,7 +52,6 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
 
 public abstract class AbstractArtifactPlexusResource
@@ -77,7 +76,7 @@ public abstract class AbstractArtifactPlexusResource
                 "Deployment tried with both 'packaging' and/or 'extension' being empty! One of these values is mandatory!" );
         }
 
-        MavenRepository mavenRepository = getMavenRepository( null, repositoryId );
+        MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
         // if extension is not given, fall-back to packaging and apply mapper
         if ( StringUtils.isBlank( e ) )
@@ -171,7 +170,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            MavenRepository mavenRepository = getMavenRepository( gavRequest, repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
             ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
@@ -259,7 +258,7 @@ public abstract class AbstractArtifactPlexusResource
 
         try
         {
-            MavenRepository mavenRepository = getMavenRepository( gavRequest, repositoryId );
+            MavenRepository mavenRepository = getMavenRepository( repositoryId );
 
             ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
@@ -451,7 +450,7 @@ public abstract class AbstractArtifactPlexusResource
 
                         try
                         {
-                            MavenRepository mr = getMavenRepository( gavRequest,  repositoryId );
+                            MavenRepository mr = getMavenRepository( repositoryId );
 
                             ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
 
@@ -588,12 +587,12 @@ public abstract class AbstractArtifactPlexusResource
         }
     }
 
-    protected MavenRepository getMavenRepository( ArtifactStoreRequest gavRequest,  String id )
+    protected MavenRepository getMavenRepository( String id )
         throws ResourceException
     {
         try
         {
-            Repository repository = getRepositoryRegistry().getRepository( id );
+            Repository repository = getUnprotectedRepositoryRegistry().getRepository( id );
 
             if ( !repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
@@ -601,10 +600,6 @@ public abstract class AbstractArtifactPlexusResource
             }
 
             return repository.adaptToFacet( MavenRepository.class );
-        }
-        catch ( NoSuchRepositoryAccessException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to repository: "+ id );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -624,4 +619,5 @@ public abstract class AbstractArtifactPlexusResource
 
         return result;
     }
+    
 }

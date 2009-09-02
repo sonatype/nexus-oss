@@ -65,7 +65,10 @@ public abstract class AbstractNexusPlexusResource
     private NexusConfiguration nexusConfiguration;
 
     @Requirement( hint = "protected" )
-    private RepositoryRegistry repositoryRegistry;
+    private RepositoryRegistry protectedRepositoryRegistry;
+
+    @Requirement( hint = "default" )
+    private RepositoryRegistry defaultRepositoryRegistry;
     
     @Requirement
     private ReferenceFactory referenceFactory;
@@ -82,7 +85,12 @@ public abstract class AbstractNexusPlexusResource
 
     protected RepositoryRegistry getRepositoryRegistry()
     {
-        return repositoryRegistry;
+        return protectedRepositoryRegistry;
+    }
+    
+    protected RepositoryRegistry getUnprotectedRepositoryRegistry()
+    {
+        return defaultRepositoryRegistry;
     }
 
     /**
@@ -301,7 +309,7 @@ public abstract class AbstractNexusPlexusResource
 
     /**
      * Convert from ArtifactInfo to a NexusArtifact
-     *
+     * 
      * @param ai
      * @return
      */
@@ -313,7 +321,7 @@ public abstract class AbstractNexusPlexusResource
         }
 
         NexusArtifact a = new NexusArtifact();
-        
+
         a.setGroupId( ai.groupId );
 
         a.setArtifactId( ai.artifactId );
@@ -328,20 +336,24 @@ public abstract class AbstractNexusPlexusResource
 
         a.setContextId( ai.context );
 
+        a.setPomLink( createPomLink( request, ai ) );
+
+        a.setArtifactLink( createArtifactLink( request, ai ) );
+
         try
         {
-            Repository repository = getRepositoryRegistry().getRepository( ai.repository );
+            Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
 
             if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
             {
-                MavenRepository mr = (MavenRepository) repository;
+                MavenRepository mavenRepository = (MavenRepository) repository;
 
                 Gav gav = new Gav(
                     ai.groupId,
                     ai.artifactId,
                     ai.version,
                     ai.classifier,
-                    mr.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
+                    mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
                     null,
                     null,
                     null,
@@ -351,23 +363,15 @@ public abstract class AbstractNexusPlexusResource
                     false,
                     null );
 
-                ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
-               
-                a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
-                
-                a.setPomLink( createPomLink( request, ai ) );
+                ResourceStoreRequest req = new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
 
-                a.setArtifactLink( createArtifactLink( request, ai ) );
+                a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
             }
-        }
-        catch ( NoSuchRepositoryAccessException e )
-        {
-            this.getLogger().debug(
-                "Ignoring NoSuchRepositoryAccessException, but hiding the links for the artifact: " + ai.groupId + ":"
-                    + ai.artifactId + ":" + ai.version + " - in repository: " + ai.repository );
         }
         catch ( NoSuchRepositoryException e )
         {
+            getLogger().warn( "No such repository: '" + ai.repository + "'.", e );
+
             return null;
         }
         catch ( IllegalArtifactCoordinateException e )
