@@ -56,6 +56,9 @@ import org.sonatype.nexus.index.updater.IndexUpdater;
  *        
  *    void publishIndex( File targetDirectory )
  *        throws IOException;
+ *        
+ *    void updateRemoteIndex()
+ *        throws IOException;
  * }
  * 
  * @author Damian
