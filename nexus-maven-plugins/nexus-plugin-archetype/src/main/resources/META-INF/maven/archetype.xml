@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype>
+  <id>nexus-archetype-plugin</id>
+  <sources>
+    <source>src/main/java/events/InfectedItemFoundEvent.java</source>
+    <source>src/main/java/XYVirusScanner.java</source>
+    <source>src/main/java/VirusScanner.java</source>
+    <source>src/main/java/VirusScannerRepositoryCustomizer.java</source>
+    <source>src/main/java/VirusScannerRequestProcessor.java</source>
+  </sources>
+</archetype>
