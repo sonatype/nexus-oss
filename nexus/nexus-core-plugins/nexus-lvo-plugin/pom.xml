@@ -115,6 +115,13 @@
 						</aggregation>
 					</aggregations>
 				</configuration>
+                <dependencies>
+                  <dependency>
+                    <groupId>org.codehaus.plexus</groupId>
+                    <artifactId>plexus-utils</artifactId>
+                    <version>1.1</version>
+                 </dependency>
+               </dependencies>
 			</plugin>
 		</plugins>
 	</build>
