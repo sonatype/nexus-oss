@@ -553,8 +553,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.addProperty( "created=" + item.getCreated() );
         result.addProperty( "modified=" + item.getModified() );
         result.addProperty( "lastRequested=" + item.getLastRequested() );
-        result.addProperty( "remoteChecked" + item.getRemoteChecked() );
-        result.addProperty( "remoteUrl" + item.getRemoteUrl() );
+        result.addProperty( "remoteChecked=" + item.getRemoteChecked() );
+        result.addProperty( "remoteUrl=" + item.getRemoteUrl() );
         result.addProperty( "storedLocally=" + item.getStoredLocally() );
         result.addProperty( "isExpired=" + item.isExpired() );
         result.addProperty( "readable=" + item.isReadable() );
