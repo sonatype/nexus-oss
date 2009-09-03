@@ -177,6 +177,22 @@
       <artifactId>com.noelios.restlet</artifactId>
       <scope>test</scope>
     </dependency>
+	<dependency>
+		<groupId>org.codehaus.plexus</groupId>
+		<artifactId>plexus-slf4j-logging</artifactId>
+		<scope>test</scope>
+		<exclusions>
+			<exclusion>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-api</artifactId>
+			</exclusion>
+			<exclusion>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+			</exclusion>
+		</exclusions>
+	</dependency>
+
   </dependencies>
 
   <build>

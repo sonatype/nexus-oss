@@ -28,6 +28,8 @@ public class LogManagerTest
     extends AbstractNexusTestCase
 {
     private LogManager manager;
+    
+    private org.codehaus.plexus.logging.Logger logger;
 
     @Override
     public void setUp()
@@ -42,6 +44,8 @@ public class LogManagerTest
         System.getProperties().put( "plexus.log4j-prop-file", logFile.getAbsolutePath() );
 
         manager = lookup( LogManager.class );
+        
+        logger = this.getLoggerManager().getLoggerForComponent( LogManagerTest.class.getName() );
     }
 
     public void testLogConfig()
@@ -94,5 +98,19 @@ public class LogManagerTest
         // test getLogFile() method
         assertEquals( appenderFileA, manager.getLogFile( "appenderA.log" ) );
         assertEquals( appenderFileB, manager.getLogFile( "appenderB.log" ) );
+    }
+    
+    public void testLogFileLock()
+        throws Exception
+    {
+        Logger rootLogger = Logger.getRootLogger();
+
+        File logFile = new File( getBasedir(), "target/logs/appender.log" );
+        rootLogger.addAppender( new FileAppender( new PatternLayout(), logFile.getAbsolutePath() ) );
+        logger.info( "Test log file lock." );
+
+        this.getContainer().dispose();
+
+        assertTrue( logFile.delete() );
     }
 }
