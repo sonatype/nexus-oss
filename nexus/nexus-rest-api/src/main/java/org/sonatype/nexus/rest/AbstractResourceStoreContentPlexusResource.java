@@ -532,7 +532,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             result.setOriginatingRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
 
-            result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind().getMainFacet().getName() );
+            result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind()
+                .getMainFacet().getName() );
         }
         else
         {
@@ -542,8 +543,23 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.getProcessedRepositoriesList().addAll( item.getResourceStoreRequest().getProcessedRepositories() );
 
         // applied mappings
+        for ( Map.Entry<String, List<String>> mappingEntry : item.getResourceStoreRequest().getAppliedMappings()
+            .entrySet() )
+        {
+            result.addAppliedMapping( mappingEntry.getKey() + " repository applied " + mappingEntry.getValue() );
+        }
 
         // properties
+        result.addProperty( "created=" + item.getCreated() );
+        result.addProperty( "modified=" + item.getModified() );
+        result.addProperty( "lastRequested=" + item.getLastRequested() );
+        result.addProperty( "remoteChecked" + item.getRemoteChecked() );
+        result.addProperty( "remoteUrl" + item.getRemoteUrl() );
+        result.addProperty( "storedLocally=" + item.getStoredLocally() );
+        result.addProperty( "isExpired=" + item.isExpired() );
+        result.addProperty( "readable=" + item.isReadable() );
+        result.addProperty( "writable=" + item.isWritable() );
+        result.addProperty( "virtual=" + item.isVirtual() );
 
         // attributes
         for ( Map.Entry<String, String> entry : item.getAttributes().entrySet() )
@@ -620,8 +636,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Got exception during processing " + req.getMethod() + " "
-                                   + req.getResourceRef().toString(), t );
+                "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString(), t );
         }
 
         if ( t instanceof ResourceException )

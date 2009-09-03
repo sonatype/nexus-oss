@@ -105,7 +105,6 @@ public class DefaultRequestRepositoryMapper
         }
     }
 
-
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
@@ -177,8 +176,7 @@ public class DefaultRequestRepositoryMapper
                 reposList.clear();
 
                 getLogger().info(
-                                  "The request path [" + request.toString() + "] is blocked by rule "
-                                      + mapping.toString() );
+                    "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString() );
 
                 return reposList;
             }
@@ -249,6 +247,17 @@ public class DefaultRequestRepositoryMapper
             }
         }
 
+        // store the applied mappings to request context
+        ArrayList<String> appliedMappingsList = new ArrayList<String>( appliedMappings.size() );
+        
+        for ( RepositoryPathMapping mapping : appliedMappings )
+        {
+            appliedMappingsList.add( mapping.toString() );
+        }
+        
+        request.addAppliedMappingsList( repository, appliedMappingsList );
+
+        // log it if needed
         if ( getLogger().isDebugEnabled() )
         {
             if ( appliedMappings.isEmpty() )
@@ -273,14 +282,14 @@ public class DefaultRequestRepositoryMapper
                 if ( reposList.size() == 0 )
                 {
                     getLogger().debug(
-                                       "Mapping for path [" + request.toString()
-                                           + "] excluded all storages from servicing the request." );
+                        "Mapping for path [" + request.toString()
+                            + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
                     getLogger().debug(
-                                       "Request path for [" + request.toString() + "] is MAPPED to reposes: "
-                                           + ResourceStoreUtils.getResourceStoreListAsString( reposList ) );
+                        "Request path for [" + request.toString() + "] is MAPPED to reposes: "
+                            + ResourceStoreUtils.getResourceStoreListAsString( reposList ) );
                 }
             }
         }
@@ -402,12 +411,13 @@ public class DefaultRequestRepositoryMapper
 
     // ==
 
-    public boolean addMapping( RepositoryPathMapping mapping ) throws ConfigurationException
+    public boolean addMapping( RepositoryPathMapping mapping )
+        throws ConfigurationException
     {
         removeMapping( mapping.getId() );
-        
-        CPathMappingItem pathItem =  convert( mapping );
-        
+
+        CPathMappingItem pathItem = convert( mapping );
+
         // validate
         this.validate( pathItem );
 
@@ -415,13 +425,14 @@ public class DefaultRequestRepositoryMapper
 
         return true;
     }
-    
-    protected void validate( CPathMappingItem pathItem ) throws InvalidConfigurationException
+
+    protected void validate( CPathMappingItem pathItem )
+        throws InvalidConfigurationException
     {
-        ValidationResponse response =  this.validator.validateGroupsSettingPathMappingItem( null, pathItem );
-        if( !response.isValid() )
+        ValidationResponse response = this.validator.validateGroupsSettingPathMappingItem( null, pathItem );
+        if ( !response.isValid() )
         {
-            throw new InvalidConfigurationException( response ); 
+            throw new InvalidConfigurationException( response );
         }
     }
 

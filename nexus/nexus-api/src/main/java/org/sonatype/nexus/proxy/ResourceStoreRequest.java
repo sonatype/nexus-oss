@@ -14,7 +14,9 @@
 package org.sonatype.nexus.proxy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -36,9 +38,12 @@ public class ResourceStoreRequest
 
     /** Used internally by Routers. */
     private Stack<String> pathStack;
-    
+
     /** Used internally to track reposes where this request was */
     private List<String> processedRepositories;
+
+    /** Used internally to track applied mappins */
+    private Map<String, List<String>> appliedMappings;
 
     public ResourceStoreRequest( String requestPath, boolean localOnly, boolean remoteOnly )
     {
@@ -46,6 +51,7 @@ public class ResourceStoreRequest
         this.requestPath = requestPath;
         this.pathStack = new Stack<String>();
         this.processedRepositories = new ArrayList<String>();
+        this.appliedMappings = new HashMap<String, List<String>>();
         this.requestContext = new RequestContext();
         this.requestContext.setRequestLocalOnly( localOnly );
         this.requestContext.setRequestRemoteOnly( remoteOnly );
@@ -198,7 +204,6 @@ public class ResourceStoreRequest
         getRequestContext().setRequestGroupLocalOnly( requestGroupLocal );
     }
 
-
     /**
      * Returns the list of processed repositories.
      * 
@@ -307,6 +312,26 @@ public class ResourceStoreRequest
     public void setRequestAppRootUrl( String url )
     {
         getRequestContext().setRequestAppRootUrl( url );
+    }
+
+    /**
+     * Adds a list of applied mappings that happened in given repository.
+     * 
+     * @param repository
+     */
+    public void addAppliedMappingsList( Repository repository, List<String> mappingList )
+    {
+        appliedMappings.put( repository.getId(), mappingList );
+    }
+
+    /**
+     * Returns the applied mappings.
+     * 
+     * @return
+     */
+    public Map<String, List<String>> getAppliedMappings()
+    {
+        return appliedMappings;
     }
 
     public String toString()
