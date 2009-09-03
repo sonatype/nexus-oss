@@ -43,6 +43,15 @@ public interface SecuritySystem //extends Startable
 
     public AuthenticationInfo authenticate( AuthenticationToken token )
         throws AuthenticationException;
+    
+    /**
+     * This method sets the current thread to use the <code>principal</code> passed in.
+     * You must log the user out subject.logout() when your done.
+     * 
+     * @param principal The account to login in as.
+     * @return The subject that was created as a result of the principal.
+     */
+    public Subject runAs( PrincipalCollection principal );
 
     /**
      * Finds the current logged in user.

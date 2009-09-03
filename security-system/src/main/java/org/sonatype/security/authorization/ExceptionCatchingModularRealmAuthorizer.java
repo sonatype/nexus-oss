@@ -161,7 +161,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             {
                 if ( realm.isPermitted( subjectPrincipal, permission ) )
                 {
-                    this.logger.debug( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" is has permisison: "+ permission );
+                    this.logger.debug( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" has permisison: "+ permission );
                     return true;
                 }
                 else

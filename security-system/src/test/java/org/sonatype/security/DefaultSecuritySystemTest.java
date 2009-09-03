@@ -70,7 +70,7 @@ public class DefaultSecuritySystemTest
         securitySystem.logout( new SimplePrincipalCollection( "jcoder", "ANYTHING" ) );
 
         // the current user should be null
-        Assert.assertNull( securitySystem.getSubject().getPrincipal() );
+        Assert.assertNull( securitySystem.getSubject() );
     }
 
     public void testAuthorization()

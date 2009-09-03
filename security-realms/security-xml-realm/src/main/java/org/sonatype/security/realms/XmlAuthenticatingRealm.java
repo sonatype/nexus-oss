@@ -32,18 +32,20 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.Sha1ThenMd5CredentialsMatcher;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-@Component( role = Realm.class, hint = "XmlAuthenticatingRealm", description = "Xml Authenticating Realm" )
+@Component( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE, description = "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Initializable, Realm
 {
+    public static final String ROLE = "XmlAuthenticatingRealm";
+    
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 
     @Override
     public String getName()
     {
-        return XmlAuthenticatingRealm.class.getName();
+        return ROLE;
     }
 
     public void initialize()

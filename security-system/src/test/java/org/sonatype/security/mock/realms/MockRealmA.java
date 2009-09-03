@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.authc.AuthenticationException;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
@@ -14,12 +15,19 @@ import org.jsecurity.authz.Permission;
 import org.jsecurity.realm.AuthenticatingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
+import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.usermanagement.UserManager;
+import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = Realm.class, hint = "MockRealmA" )
 public class MockRealmA
     extends AuthenticatingRealm
 {
 
+    @Requirement( hint = "MockUserManagerA" )
+    private UserManager userManager;
+    
     public MockRealmA()
     {
         this.setAuthenticationTokenClass( UsernamePasswordToken.class );
@@ -98,7 +106,25 @@ public class MockRealmA
 
     public boolean hasRole( PrincipalCollection subjectPrincipal, String roleIdentifier )
     {
-        // TODO Auto-generated method stub
+        // mock this one out using the user manager
+
+        try
+        {
+            User user = this.userManager.getUser( subjectPrincipal.oneByType( String.class ) );
+            for ( RoleIdentifier eachRoleIdentifier : user.getRoles() )
+            {
+                if( eachRoleIdentifier.getRoleId().equals( roleIdentifier ) )
+                {
+                    return true;
+                }
+            }
+        }
+        catch ( UserNotFoundException e )
+        {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
         return false;
     }
 

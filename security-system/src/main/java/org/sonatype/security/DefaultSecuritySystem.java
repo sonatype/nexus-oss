@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -17,6 +18,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.jsecurity.SecurityUtils;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
@@ -24,8 +26,11 @@ import org.jsecurity.cache.Cache;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
+import org.jsecurity.subject.DelegatingSubject;
 import org.jsecurity.subject.PrincipalCollection;
+import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
+import org.jsecurity.util.ThreadContext;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -61,12 +66,15 @@ public class DefaultSecuritySystem
     @Requirement
     private SecurityConfigurationManager securityConfiguration;
 
-    /**
-     * This is the jsecurity Security Manager. IDEA: we could lazy load this so the config could be in the
-     * security-configuration.xml file. or of course you could just change the plexus.xml
-     */
-    @Requirement( hint = "web" )
-    private RealmSecurityManager securityManager;
+    // TODO: we should get this value from the config, (not plexus)
+    @Configuration( value = "web" )
+    private String applicationSecurityManagerHint;
+    
+    @Configuration( value = "default" )
+    private String runAsSecurityManagerHint;
+    
+    @Requirement( role = RealmSecurityManager.class )
+    private Map<String, RealmSecurityManager> securityManagerMap;
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
@@ -95,45 +103,62 @@ public class DefaultSecuritySystem
     {
         try
         {
-            return this.securityManager.login( token );
+            return this.getApplicationSecurityManager().login( token );
         }
         catch ( org.jsecurity.authc.AuthenticationException e )
         {
             throw new AuthenticationException( e.getMessage(), e );
         }
     }
-
+    
     public AuthenticationInfo authenticate( AuthenticationToken token )
         throws AuthenticationException
     {
         try
         {
-            return this.securityManager.authenticate( token );
+            return this.getApplicationSecurityManager().authenticate( token );
         }
         catch ( org.jsecurity.authc.AuthenticationException e )
         {
             throw new AuthenticationException( e.getMessage(), e );
         }
     }
+    
+    public Subject runAs( PrincipalCollection principal )
+    {
+        RealmSecurityManager securityManager = this.getRunAsSecurityManager();
+        // TODO: we might need to bind this to the ThreadContext for this thread
+        // however if we do this we would need to unbind it so it doesn't leak
+//        ThreadContext.bind( securityManager );
+        
+        DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null, securityManager );
+        
+        // fake the login
+        ThreadContext.bind( fakeLoggedInSubject );
+        // this is un-bind when the user logs out.
+        
+        return fakeLoggedInSubject;
+    }
 
     public Subject getSubject()
-    {
-        return this.securityManager.getSubject();
+    {   
+        // this gets the currently bound Subject to the thread
+        return SecurityUtils.getSubject();
     }
 
     public void logout( PrincipalCollection principal )
     {
-        this.securityManager.logout( principal );
+        this.getApplicationSecurityManager().logout( principal );
     }
 
     public boolean isPermitted( PrincipalCollection principal, String permission )
     {
-        return this.securityManager.isPermitted( principal, permission );
+        return this.getApplicationSecurityManager().isPermitted( principal, permission );
     }
 
     public boolean[] isPermitted( PrincipalCollection principal, List<String> permissions )
     {
-        return this.securityManager.isPermitted( principal, permissions.toArray( new String[permissions.size()] ) );
+        return this.getApplicationSecurityManager().isPermitted( principal, permissions.toArray( new String[permissions.size()] ) );
     }
 
     public void checkPermission( PrincipalCollection principal, String permission )
@@ -141,7 +166,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.securityManager.checkPermission( principal, permission );
+            this.getApplicationSecurityManager().checkPermission( principal, permission );
         }
         catch ( org.jsecurity.authz.AuthorizationException e )
         {
@@ -155,7 +180,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.securityManager.checkPermissions( principal, permissions.toArray( new String[permissions.size()] ) );
+            this.getApplicationSecurityManager().checkPermissions( principal, permissions.toArray( new String[permissions.size()] ) );
         }
         catch ( org.jsecurity.authz.AuthorizationException e )
         {
@@ -165,7 +190,7 @@ public class DefaultSecuritySystem
 
     public boolean hasRole( PrincipalCollection principals, String string )
     {
-        return this.securityManager.hasRole( principals, string );
+        return this.getApplicationSecurityManager().hasRole( principals, string );
     }
 
     private Collection<Realm> getRealmsFromConfigSource()
@@ -537,7 +562,7 @@ public class DefaultSecuritySystem
         }
 
         // get the sorted order of realms from the realm locator
-        Collection<Realm> realms = this.securityManager.getRealms();
+        Collection<Realm> realms = this.getApplicationSecurityManager().getRealms();
 
         for ( Realm realm : realms )
         {
@@ -623,7 +648,7 @@ public class DefaultSecuritySystem
         try
         {
             UsernamePasswordToken authenticationToken = new UsernamePasswordToken( userId, oldPassword );
-            if ( this.securityManager.authenticate( authenticationToken ) == null )
+            if ( this.getApplicationSecurityManager().authenticate( authenticationToken ) == null )
             {
                 throw new InvalidCredentialsException();
             }
@@ -768,7 +793,10 @@ public class DefaultSecuritySystem
         this.securityConfiguration.save();
 
         // update the realms in the security manager
-        this.securityManager.setRealms( this.getRealmsFromConfigSource() );
+        for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+        {
+            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );   
+        }
     }
 
     public void setAnonymousAccessEnabled( boolean enabled )
@@ -808,7 +836,11 @@ public class DefaultSecuritySystem
         // reload the config
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
-        this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+        
+        for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+        {
+            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );   
+        }
     }
 
     public void stop()
@@ -819,9 +851,10 @@ public class DefaultSecuritySystem
 
     private void clearRealmCaches()
     {
-        if( this.securityManager.getRealms() != null)
+        // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
+        if( this.getApplicationSecurityManager().getRealms() != null)
         {
-            for ( Realm realm : this.securityManager.getRealms() )
+            for ( Realm realm : this.getApplicationSecurityManager().getRealms() )
             {
                 // check if its a AuthorizingRealm, if so clear the cache
                 if ( AuthorizingRealm.class.isInstance( realm ) )
@@ -850,7 +883,11 @@ public class DefaultSecuritySystem
         {
             this.clearRealmCaches();
             this.securityConfiguration.clearCache();
-            this.securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+            
+            for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+            {
+                securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+            }
         }
     }
     
@@ -860,5 +897,15 @@ public class DefaultSecuritySystem
         // add event handler
         this.eventMulticaster.addEventListener( this );
     
+    }
+    
+    private RealmSecurityManager getApplicationSecurityManager()
+    {
+        return this.securityManagerMap.get( this.applicationSecurityManagerHint );
+    }
+    
+    private RealmSecurityManager getRunAsSecurityManager()
+    {
+        return this.securityManagerMap.get( this.runAsSecurityManagerHint );
     }
 }
