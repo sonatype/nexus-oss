@@ -20,7 +20,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.maven.AbstractMavenRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
@@ -116,7 +115,9 @@ public class RepositoryTemplatePlexusResource
 
             repoRes.setName( template.getDescription() );
 
-            repoRes.setProvider( ( ((CRepositoryCoreConfiguration) template.getCoreConfiguration()).getConfiguration( false ) ).getProviderHint() );
+            repoRes.setProvider( template.getRepositoryProviderHint() );
+            
+            repoRes.setProviderRole( template.getRepositoryProviderRole() );
 
             repoRes.setFormat( template.getContentClass().getId() );
 
