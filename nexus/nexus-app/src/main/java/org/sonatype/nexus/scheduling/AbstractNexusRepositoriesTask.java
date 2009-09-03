@@ -87,9 +87,8 @@ public abstract class AbstractNexusRepositoriesTask<T>
     {
         try
         {
-            GroupRepository repo = getRepositoryRegistry().getRepositoryWithFacet(
-                getRepositoryGroupId(),
-                GroupRepository.class );
+            GroupRepository repo =
+                getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class );
 
             return repo.getName() + " (group)";
         }
@@ -128,45 +127,40 @@ public abstract class AbstractNexusRepositoriesTask<T>
         // get all activeTasks that runs and are descendants of AbstractNexusRepositoriesTask
         for ( String taskType : activeTasks.keySet() )
         {
-            try
-            {
-                ComponentDescriptor<?> cd = getPlexusContainer().getComponentDescriptor(
-                    SchedulerTask.class,
-                    SchedulerTask.class.getName(),
+            ComponentDescriptor<?> cd =
+                getPlexusContainer().getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
                     taskType );
 
-                if ( cd != null )
+            if ( cd != null )
+            {
+                Class<?> taskClazz = cd.getImplementationClass();
+
+                if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
                 {
-                    Class<?> taskClazz = Class.forName( cd.getImplementation() );
+                    List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
 
-                    if ( AbstractNexusRepositoriesTask.class.isAssignableFrom( taskClazz ) )
+                    for ( ScheduledTask<?> task : tasks )
                     {
-                        List<ScheduledTask<?>> tasks = activeTasks.get( taskType );
-
-                        for ( ScheduledTask<?> task : tasks )
+                        // check against RUNNING intersection
+                        if ( TaskState.RUNNING.equals( task.getTaskState() )
+                            && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
+                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
+                                RepositoryOrGroupPropertyDescriptor.ID ) ) )
                         {
-                            // check against RUNNING intersection
-                            if ( TaskState.RUNNING.equals( task.getTaskState() )
-                                && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                                && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
-                                    RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                            if ( getLogger().isDebugEnabled() )
                             {
-                                if ( getLogger().isDebugEnabled() )
-                                {
-                                    getLogger().debug(
-                                        "Task " + task.getName() + " is already running and is conflicting with task "
-                                            + this.getClass().getName() );
-                                }
-
-                                return true;
+                                getLogger().debug(
+                                    "Task " + task.getName() + " is already running and is conflicting with task "
+                                        + this.getClass().getName() );
                             }
+
+                            return true;
                         }
                     }
                 }
             }
-            catch ( ClassNotFoundException e )
+            else
             {
-                // ignore, cannot happen
                 getLogger().warn( "Could not find component that implements SchedulerTask of type='" + taskType + "'!" );
             }
         }
@@ -211,8 +205,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             }
             else
             {
-                thisReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet(
-                    getRepositoryGroupId(),
+                thisReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(),
                     GroupRepository.class ).getMemberRepositories() );
             }
 
@@ -224,8 +217,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             }
             else
             {
-                otherReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet(
-                    otherRepositoryGroupId,
+                otherReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( otherRepositoryGroupId,
                     GroupRepository.class ).getMemberRepositories() );
             }
 
