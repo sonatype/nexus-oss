@@ -24,7 +24,11 @@ import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.packer.IndexPacker;
+import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.search.grouping.GAVGrouping;
+import org.sonatype.nexus.index.updater.IndexUpdateRequest;
+import org.sonatype.nexus.index.updater.IndexUpdater;
 
 /**
  * Sample app to show how to integrate with the nexus indexer.  Note that this is a simple plexus
@@ -49,6 +53,9 @@ import org.sonatype.nexus.index.search.grouping.GAVGrouping;
  *    
  *    Map<String, ArtifactInfoGroup> searchIndexGrouped( Query q, Grouping grouping )
  *        throws IOException;
+ *        
+ *    void publishIndex( File targetDirectory )
+ *        throws IOException;
  * }
  * 
  * @author Damian
@@ -63,6 +70,14 @@ public class DefaultSampleApp
     // The nexus indexer
     @Requirement
     private NexusIndexer indexer;
+    
+    // The nexus index packer
+    @Requirement
+    private IndexPacker indexPacker;
+    
+    // The nexus index updater
+    @Requirement
+    private IndexUpdater indexUpdater;
     
     // The list of index creators we will be using (all of them)
     @Requirement( role = IndexCreator.class )
@@ -196,5 +211,37 @@ public class DefaultSampleApp
         GroupedSearchResponse response = indexer.searchGrouped( request );
         
         return response.getResults();
+    }
+    
+    public void publishIndex( File targetDirectory )
+        throws IOException
+    {
+        IndexPackingRequest packReq = new IndexPackingRequest( context, targetDirectory );
+        packReq.setCreateChecksumFiles( true );
+        packReq.setCreateIncrementalChunks( true );
+        
+        //NOTE: There are numerous other options you can set in the index pack request
+        
+        indexPacker.packIndex( packReq );
+    }
+    
+    public void updateRemoteIndex()
+        throws IOException
+    {
+        IndexUpdateRequest updRequest = new IndexUpdateRequest( context );
+        
+        //not too much to configure with the IndexUpdateRequest, but you can
+        //supply your own ResourceFetcher if you would like to use some other
+        //means to retrieve the index file than the default.  You can also
+        //add auth and proxy info to default ResourceFetcher, and you can set
+        //a transfer listener to be notified of transfer events.
+        
+        //But by default, will simply use the remote index url assigned to the index
+        //context to retrieve new index file, and merge locally
+        
+        //also you can force full update, which will wipe out what is local, and replace
+        //with the latest remote content.
+        
+        indexUpdater.fetchAndUpdateIndex( updRequest );
     }
 }

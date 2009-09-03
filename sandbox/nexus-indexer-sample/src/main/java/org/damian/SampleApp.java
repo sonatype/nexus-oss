@@ -1,5 +1,6 @@
 package org.damian;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
@@ -27,5 +28,11 @@ public interface SampleApp
         throws IOException;
     
     Map<String, ArtifactInfoGroup> searchIndexGrouped( Query q, Grouping grouping )
+        throws IOException;
+    
+    void publishIndex( File targetDirectory )
+        throws IOException;
+    
+    void updateRemoteIndex()
         throws IOException;
 }

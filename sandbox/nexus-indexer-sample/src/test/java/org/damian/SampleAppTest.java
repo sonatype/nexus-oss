@@ -1,5 +1,6 @@
 package org.damian;
 
+import java.io.File;
 import java.util.Map;
 import java.util.Set;
 
@@ -280,5 +281,32 @@ public class SampleAppTest
         assertNotNull( "returned groupedArtifacts is null", groupedArtifacts );
         assertEquals( "returned groupedArtifacts should have 1 entry", 1, groupedArtifacts.size() );
         assertEquals( "group key should be value", "value", groupedArtifacts.values().iterator().next().getGroupKey() );
+    }
+    
+    public void testIndexPacking()
+        throws Exception
+    {
+        app.index();
+        
+        File publishDir = new File( getBasedir(), "target/publish/");
+        
+        app.publishIndex( publishDir );
+        
+        assertTrue( publishDir.exists() );
+        
+        // Legacy index format
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.zip" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.zip.sha1" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.zip.md5" ).exists() );
+        
+        // Current index format
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.gz" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.gz.sha1" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.gz.md5" ).exists() );
+        
+        // properties file
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.properties" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.properties.sha1" ).exists() );
+        assertTrue( new File( publishDir, "nexus-maven-repository-index.properties.md5" ).exists() );
     }
 }
