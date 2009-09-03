@@ -139,7 +139,7 @@ public class DefaultNexusItemAuthorizer
     protected boolean isPermitted( List<String> perms )
     {
         // Get the current user
-        Subject subject = SecurityUtils.getSubject();
+        Subject subject = this.securitySystem.getSubject();
 
         if ( this.securitySystem.isSecurityEnabled() )
         {

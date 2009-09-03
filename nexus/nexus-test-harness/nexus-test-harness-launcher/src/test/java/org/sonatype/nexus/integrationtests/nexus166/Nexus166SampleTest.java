@@ -27,7 +27,7 @@ import org.sonatype.nexus.integrationtests.runner.ConsoleLoggingRunner;
 /**
  * A sample test and a good starting point: <a href='https://docs.sonatype.com/display/NX/Nexus+Test-Harness'>Nexus Test-Harness</a>
  */
-@RunWith( ConsoleLoggingRunner.class )
+//@RunWith( ConsoleLoggingRunner.class )
 public class Nexus166SampleTest extends AbstractNexusIntegrationTest
 {
 

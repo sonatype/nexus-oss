@@ -68,8 +68,8 @@ public class TestContainer
         File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
         System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
 
-        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
-            + ITAppBooterCustomizer.class.getName() );
+//        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
+//            + ITAppBooterCustomizer.class.getName() );
 
         File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
 
@@ -90,7 +90,7 @@ public class TestContainer
 
         // Launcher trick -- begin
         Launcher launcher = new Launcher();
-        launcher.setSystemClassLoader( Thread.currentThread().getContextClassLoader() );
+//        launcher.setSystemClassLoader( Thread.currentThread().getContextClassLoader() );
         launcher.configure( new FileInputStream( classworldsConf ) ); // launcher closes stream upon configuration
         // Launcher trick -- end
 

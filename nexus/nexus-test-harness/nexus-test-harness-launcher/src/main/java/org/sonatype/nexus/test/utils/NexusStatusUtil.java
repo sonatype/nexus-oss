@@ -13,17 +13,19 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
 import org.apache.log4j.Logger;
-import org.codehaus.plexus.PlexusContainerException;
 import org.restlet.data.Response;
 import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
+import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -38,6 +40,8 @@ public class NexusStatusUtil
     private static final String STATUS_STOPPED = "STOPPED";
 
     private static final String STATUS_STARTED = "STARTED";
+
+    private static ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
     public static StatusResourceResponse getNexusStatus()
         throws NexusIllegalStateException
@@ -66,8 +70,9 @@ public class NexusStatusUtil
         }
         catch ( IOException e )
         {
-            throw new NexusIllegalStateException( "Unable to retrieve nexus status " + new XStream().toXML( response ),
-                                                  e );
+            throw new NexusIllegalStateException(
+                "Unable to retrieve nexus status " + new XStream().toXML( response ),
+                e );
         }
 
         StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML( entityText );
@@ -76,7 +81,7 @@ public class NexusStatusUtil
 
     @Deprecated
     public static void doSoftStart()
-        throws NexusIllegalStateException, PlexusContainerException
+        throws Exception
     {
         start();
     }
@@ -90,21 +95,15 @@ public class NexusStatusUtil
 
     @Deprecated
     public static void doHardStart()
-        throws NexusIllegalStateException, PlexusContainerException
+        throws Exception
     {
         start();
     }
 
     public static void start()
-        throws NexusIllegalStateException, PlexusContainerException
+        throws Exception
     {
-        PlexusAppBooter appBooter = TestContainer.getInstance().getPlexusAppBooter();
-        if ( appBooter.isStarted() )
-        {
-            appBooter.stopContainer();
-        }
-
-        appBooter.startContainer();
+        getAppBooterService().start();
 
         if ( !waitForStart() )
         {
@@ -131,6 +130,23 @@ public class NexusStatusUtil
     public static void stop()
         throws NexusIllegalStateException
     {
+        try
+        {
+            if( !getAppBooterService().isStopped() )
+            {
+                getAppBooterService().stop();
+            }
+        }
+        catch ( Exception e )
+        {
+            System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "+ e.getMessage() );
+            e.printStackTrace();
+        }
+//        finally
+//        {
+//            APP_BOOTER_SERVICE = null;
+//        }
+
         PlexusAppBooter appBooter = TestContainer.getInstance().getPlexusAppBooter();
         if ( appBooter.isStarted() )
         {
@@ -146,7 +162,8 @@ public class NexusStatusUtil
 
     public static boolean isNexusAlive()
     {
-        return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort,
+        return isNexusAlive( new int[] {
+            AbstractNexusIntegrationTest.nexusControlPort,
             AbstractNexusIntegrationTest.nexusApplicationPort } );
     }
 
@@ -204,8 +221,11 @@ public class NexusStatusUtil
     public static boolean waitForStart()
         throws NexusIllegalStateException
     {
+        int totalWaitTime = 40 * 1000; // 20 sec
+        int pollingFreq = 200; // 200 ms
+        
         log.info( "wait for Nexus start" );
-        for ( int i = 0; i < 20; i++ )
+        for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
         {
             log.debug( "wait for Nexus start, attempt: " + i );
             try
@@ -223,7 +243,7 @@ public class NexusStatusUtil
 
             try
             {
-                Thread.sleep( 1000 );
+                Thread.sleep( pollingFreq );
             }
             catch ( InterruptedException e )
             {
@@ -239,8 +259,11 @@ public class NexusStatusUtil
         throws NexusIllegalStateException
     {
         log.info( "wait for Nexus stop" );
+        
+        int totalWaitTime = 40 * 1000; // 20 sec
+        int pollingFreq = 200; // 200 ms
 
-        for ( int i = 0; i < 20; i++ )
+        for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
         {
             log.debug( "wait for Nexus stop, attempt: " + i );
             if ( !isNexusAlive() )
@@ -251,7 +274,7 @@ public class NexusStatusUtil
 
             try
             {
-                Thread.sleep( 1000 );
+                Thread.sleep( pollingFreq );
             }
             catch ( InterruptedException e )
             {
@@ -266,6 +289,51 @@ public class NexusStatusUtil
 
         // didn't stopped!
         return false;
+    }
+
+    private static ThreadedPlexusAppBooterService getAppBooterService() throws Exception
+    {
+
+        if ( APP_BOOTER_SERVICE == null )
+        {
+
+            final File f = new File( "target/plexus-home" );
+
+            if ( !f.isDirectory() )
+            {
+                f.mkdirs();
+            }
+
+            File bundleRoot = new File( TestProperties.getAll().get( "nexus.base.dir" ) );
+            System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
+
+            // System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
+            // + ITAppBooterCustomizer.class.getName() );
+
+            File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
+
+            if ( !classworldsConf.isFile() )
+            {
+                throw new IllegalStateException( "The bundle classworlds.conf file is not found (\""
+                    + classworldsConf.getAbsolutePath() + "\")!" );
+            }
+
+            System.setProperty( "classworlds.conf", classworldsConf.getAbsolutePath() );
+
+            // this is non trivial here, since we are running Nexus in _same_ JVM as tests
+            // and the PlexusAppBooterJSWListener (actually theused WrapperManager in it) enforces then Nexus may be
+            // started only once in same JVM!
+            // So, we are _overrriding_ the in-bundle plexus app booter with the simplest one
+            // since we dont need all the bells-and-whistles in Service and JSW
+            // but we are still _reusing_ the whole bundle environment by tricking Classworlds Launcher
+
+            ServerSocket socket = new ServerSocket(0);
+            int controlPort = socket.getLocalPort();
+            socket.close();
+            
+            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort );
+        }
+        return APP_BOOTER_SERVICE;
     }
 
 }
