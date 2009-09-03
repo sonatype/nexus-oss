@@ -20,7 +20,7 @@ public class ArtifactoryFileLocationPRTest
         throws Exception
     {
         System.setProperty( "plexus.log4j-prop-file",
-                            new File( getBasedir(), "src/test/resources/log4j.properties" ).getAbsolutePath() );
+                            new File( getBasedir(), "target/test-classes/log4j.properties" ).getAbsolutePath() );
 
         PlexusResource resource = this.lookup( PlexusResource.class, "artifactoryFileLocation" );
 
