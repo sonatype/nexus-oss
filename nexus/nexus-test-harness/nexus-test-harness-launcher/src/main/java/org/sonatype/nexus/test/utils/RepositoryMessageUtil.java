@@ -68,18 +68,6 @@ public class RepositoryMessageUtil
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
         throws IOException
     {
-        if ( repo.getProviderRole() == null )
-        {
-            if ( "virtual".equals( repo.getRepoType() ) )
-            {
-                repo.setProviderRole( ShadowRepository.class.getName() );
-            }
-            else
-            {
-                repo.setProviderRole( Repository.class.getName() );
-            }
-        }
-
         Response response = this.sendMessage( Method.POST, repo );
 
         if ( !response.getStatus().isSuccess() )
@@ -212,6 +200,19 @@ public class RepositoryMessageUtil
     public Response sendMessage( Method method, RepositoryBaseResource resource, String id )
         throws IOException
     {
+        if ( resource != null 
+            && resource.getProviderRole() == null )
+        {
+            if ( "virtual".equals( resource.getRepoType() ) )
+            {
+                resource.setProviderRole( ShadowRepository.class.getName() );
+            }
+            else
+            {
+                resource.setProviderRole( Repository.class.getName() );
+            }
+        }
+        
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String idPart = ( method == Method.POST ) ? "" : "/" + id;
@@ -241,7 +242,6 @@ public class RepositoryMessageUtil
      * @return
      * @throws IOException
      */
-    @SuppressWarnings( "unchecked" )
     public List<RepositoryListResource> getList()
         throws IOException
     {
