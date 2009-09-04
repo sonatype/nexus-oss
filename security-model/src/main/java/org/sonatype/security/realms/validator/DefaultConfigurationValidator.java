@@ -417,11 +417,18 @@ public class DefaultConfigurationValidator
 
         Map<String, String> existingEmailMap = context.getExistingEmailMap();
 
-        if ( !update && ( StringUtils.isEmpty( user.getId() ) || existingIds.contains( user.getId() ) ) )
+        if ( !update && StringUtils.isEmpty( user.getId() ) )
         {
-            ValidationMessage message =
-                new ValidationMessage( "userId", "User ID '" + user.getId()
-                    + "' is invalid.  It is either empty or already in use.", "User Id is required and must be unique." );
+            ValidationMessage message = new ValidationMessage( "userId", "User ID is required.", "User ID is required." );
+            
+            response.addValidationError( message );
+        }
+        
+        if ( !update && StringUtils.isNotEmpty( user.getId() ) && existingIds.contains( user.getId() ) )
+        {
+            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getId()
+                + "' is already in use.", "User ID '" + user.getId() + "' is already in use." );
+
             response.addValidationError( message );
         }
 
