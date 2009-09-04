@@ -33,6 +33,7 @@ import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -371,6 +372,8 @@ public abstract class AbstractRepositoryPlexusResource
         else
         {
             resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
+            resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
+            resource.setDownloadRemoteIndexes( false );
         }
 
         return resource;
