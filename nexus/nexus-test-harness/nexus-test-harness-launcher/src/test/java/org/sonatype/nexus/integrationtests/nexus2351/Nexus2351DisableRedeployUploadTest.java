@@ -264,7 +264,7 @@ public class Nexus2351DisableRedeployUploadTest
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
 

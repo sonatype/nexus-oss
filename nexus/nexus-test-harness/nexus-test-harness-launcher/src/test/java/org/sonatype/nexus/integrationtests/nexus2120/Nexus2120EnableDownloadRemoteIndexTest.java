@@ -1,7 +1,6 @@
 package org.sonatype.nexus.integrationtests.nexus2120;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 import org.junit.After;
@@ -36,7 +35,7 @@ public class Nexus2120EnableDownloadRemoteIndexTest
 
     @BeforeClass
     public static void init()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

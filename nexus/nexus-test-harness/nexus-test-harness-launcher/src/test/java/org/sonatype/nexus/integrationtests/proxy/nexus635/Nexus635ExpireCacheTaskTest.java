@@ -16,7 +16,6 @@ package org.sonatype.nexus.integrationtests.proxy.nexus635;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -37,24 +36,12 @@ public class Nexus635ExpireCacheTaskTest
     extends AbstractNexusProxyIntegrationTest
 {
 
-    private Gav GAV = new Gav(
-        "nexus635",
-        "artifact",
-        "1.0-SNAPSHOT",
-        null,
-        "jar",
-        0,
-        0L,
-        null,
-        true,
-        false,
-        null,
-        false,
-        null );
+    private Gav GAV =
+        new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
 
     @BeforeClass
     public static void cleanEnv()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus639;
 
-import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -39,20 +38,21 @@ public class Nexus639PurgeTaskTest
 
     @BeforeClass
     public static void cleanEnv()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }
 
     @Test
-    public void doPurgeTaskTest() throws Exception
+    public void doPurgeTaskTest()
+        throws Exception
     {
         // an artifact was deployed already, so test the deploy feed has something.
 
         SyndFeed feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue("Expected artifacts in the recentlyDeployed feed.", entries.size() > 0 );
+        Assert.assertTrue( "Expected artifacts in the recentlyDeployed feed.", entries.size() > 0 );
 
         // run the purge task for everything
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
@@ -68,13 +68,13 @@ public class Nexus639PurgeTaskTest
         feed = FeedUtil.getFeed( "recentlyDeployedArtifacts" );
         entries = feed.getEntries();
 
-//        for ( SyndEntry syndEntry : entries )
-//        {
+        // for ( SyndEntry syndEntry : entries )
+        // {
         // ! should use logger
-//            System.out.println( "entry: "+ syndEntry.getTitle() );
-//        }
-//
-        Assert.assertTrue("Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0 );
+        // System.out.println( "entry: "+ syndEntry.getTitle() );
+        // }
+        //
+        Assert.assertTrue( "Expected ZERO artifacts in the recentlyDeployed feed.", entries.size() == 0 );
     }
 
 }

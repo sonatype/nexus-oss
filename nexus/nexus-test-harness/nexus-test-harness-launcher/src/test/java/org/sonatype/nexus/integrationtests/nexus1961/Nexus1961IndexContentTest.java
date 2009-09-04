@@ -1,6 +1,5 @@
 package org.sonatype.nexus.integrationtests.nexus1961;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.junit.Assert;
@@ -23,7 +22,7 @@ public class Nexus1961IndexContentTest
 
     @BeforeClass
     public static void init()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

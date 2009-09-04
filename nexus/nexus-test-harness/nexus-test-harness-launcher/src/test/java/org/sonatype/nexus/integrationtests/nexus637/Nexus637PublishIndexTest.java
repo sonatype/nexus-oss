@@ -14,7 +14,6 @@
 package org.sonatype.nexus.integrationtests.nexus637;
 
 import java.io.File;
-import java.io.IOException;
 
 import junit.framework.Assert;
 
@@ -27,7 +26,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
  * Test task Publish Indexes is working.
- *
+ * 
  * @author marvin
  */
 public class Nexus637PublishIndexTest
@@ -36,7 +35,7 @@ public class Nexus637PublishIndexTest
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

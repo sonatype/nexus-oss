@@ -1,7 +1,5 @@
 package org.sonatype.nexus.integrationtests.nexus1329;
 
-import java.io.IOException;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -26,7 +24,7 @@ public abstract class AbstractMirrorTest
 
     @BeforeClass
     public static void init()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

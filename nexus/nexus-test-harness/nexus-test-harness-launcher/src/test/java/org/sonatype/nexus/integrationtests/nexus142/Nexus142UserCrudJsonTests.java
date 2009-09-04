@@ -41,15 +41,9 @@ public class Nexus142UserCrudJsonTests
 
     @BeforeClass
     public static void clean()
+        throws Exception
     {
-        try
-        {
-            cleanWorkDir();
-        }
-        catch ( IOException e )
-        {
-            // NVM
-        }
+        cleanWorkDir();
     }
 
     protected UserMessageUtil messageUtil;

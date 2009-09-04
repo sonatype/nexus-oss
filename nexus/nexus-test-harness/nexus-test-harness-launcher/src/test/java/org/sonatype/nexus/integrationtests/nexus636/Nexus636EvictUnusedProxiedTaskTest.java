@@ -48,7 +48,7 @@ public class Nexus636EvictUnusedProxiedTaskTest
 
     @BeforeClass
     public static void cleanEnv()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

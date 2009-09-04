@@ -14,7 +14,6 @@
 package org.sonatype.nexus.integrationtests.nexus634;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 
 import junit.framework.Assert;
@@ -35,7 +34,7 @@ public abstract class AbstractSnapshotRemoverTest
 
     @BeforeClass
     public static void cleanEnv()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }
@@ -68,15 +67,15 @@ public abstract class AbstractSnapshotRemoverTest
 
         RepositoryMessageUtil.updateIndexes( "nexus-test-harness-snapshot-repo" );
 
-//        Gav gav =
-//            new Gav( "nexus634", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
-//        File fileToDeploy = getTestFile( "artifact-1.jar" );
-//
-//        // Deploying a fresh timestamp artifact
-//        MavenDeployer.deployAndGetVerifier( gav, getNexusTestRepoUrl(), fileToDeploy, null );
-//
-//        // Artifacts should be deployed here
-//        Assert.assertTrue( "nexus643:artifact:1.0-SNAPSHOT folder doesn't exists!", artifactFolder.isDirectory() );
+        // Gav gav =
+        // new Gav( "nexus634", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
+        // File fileToDeploy = getTestFile( "artifact-1.jar" );
+        //
+        // // Deploying a fresh timestamp artifact
+        // MavenDeployer.deployAndGetVerifier( gav, getNexusTestRepoUrl(), fileToDeploy, null );
+        //
+        // // Artifacts should be deployed here
+        // Assert.assertTrue( "nexus643:artifact:1.0-SNAPSHOT folder doesn't exists!", artifactFolder.isDirectory() );
     }
 
     public void initFolders()
@@ -106,8 +105,9 @@ public abstract class AbstractSnapshotRemoverTest
         removeReleasedProp.setId( "removeIfReleaseExists" );
         removeReleasedProp.setValue( String.valueOf( removeIfReleaseExists ) );
 
-        ScheduledServiceListResource task =TaskScheduleUtil.runTask( SnapshotRemovalTaskDescriptor.ID,
-                                  repositoryProp, keepSnapshotsProp, ageProp, removeReleasedProp );
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( SnapshotRemovalTaskDescriptor.ID, repositoryProp, keepSnapshotsProp, ageProp,
+                                      removeReleasedProp );
 
         Assert.assertNotNull( task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );

@@ -14,6 +14,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -77,12 +78,18 @@ public class TaskScheduleUtil
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     public static List<ScheduledServiceListResource> getTasks()
         throws IOException
     {
         String serviceURI = "service/local/schedules";
         Response response = RequestFacade.doGetRequest( serviceURI );
+
+        if ( response.getStatus().isError() )
+        {
+            LOG.error( response.getStatus().toString() );
+            return Collections.emptyList();
+        }
+
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
 
@@ -157,7 +164,7 @@ public class TaskScheduleUtil
             {
                 LOG.debug( "Still running " + runninTaskId );
             }
-            
+
             Thread.sleep( sleep );
         }
     }
@@ -194,7 +201,7 @@ public class TaskScheduleUtil
 
     /**
      * Blocks while waiting for a task to finish.
-     *
+     * 
      * @param name
      * @return
      * @throws Exception

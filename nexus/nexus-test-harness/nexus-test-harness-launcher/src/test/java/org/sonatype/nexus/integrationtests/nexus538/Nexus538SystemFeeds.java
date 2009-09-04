@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus538;
 
-import java.io.IOException;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -39,7 +38,7 @@ public class Nexus538SystemFeeds
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

@@ -332,7 +332,7 @@ public class Nexus2351DisableRedeployMaven1Test
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }

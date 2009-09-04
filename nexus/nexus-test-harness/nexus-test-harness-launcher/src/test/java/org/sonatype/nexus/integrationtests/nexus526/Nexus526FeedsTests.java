@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus526;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Nexus526FeedsTests
 
     @BeforeClass
     public static void cleanEnv()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }
@@ -59,7 +58,7 @@ public class Nexus526FeedsTests
     public void recentCachedOrDeployedFileFeedTest()
         throws Exception
     {
-        SyndFeed feed = FeedUtil.getFeed( "recentlyCachedOrDeployedFiles" );        
+        SyndFeed feed = FeedUtil.getFeed( "recentlyCachedOrDeployedFiles" );
         this.validateLinksInFeeds( feed );
 
         List<SyndEntry> entries = feed.getEntries();
@@ -220,16 +219,17 @@ public class Nexus526FeedsTests
             Assert.assertTrue( title.contains( pomName ) || title.contains( contentName ) );
         }
     }
-    
+
     private void validateLinksInFeeds( SyndFeed feed )
     {
-        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ));
-        
+        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ) );
+
         List<SyndEntry> entries = feed.getEntries();
-        
+
         for ( SyndEntry syndEntry : entries )
         {
-            Assert.assertTrue( "Feed item link is wrong, is: "+ syndEntry.getLink(), syndEntry.getLink().startsWith( this.getBaseNexusUrl() ));
+            Assert.assertTrue( "Feed item link is wrong, is: " + syndEntry.getLink(),
+                               syndEntry.getLink().startsWith( this.getBaseNexusUrl() ) );
         }
     }
 }

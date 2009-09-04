@@ -61,6 +61,7 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 
@@ -160,7 +161,7 @@ public class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     *
+     * 
      * @throws Exception
      */
     @Before
@@ -248,8 +249,11 @@ public class AbstractNexusIntegrationTest
     }
 
     protected static void cleanWorkDir()
-        throws IOException
+        throws Exception
     {
+        // must wait for all tasks, some do file locking
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         final File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.
@@ -488,7 +492,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -507,7 +511,7 @@ public class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -536,7 +540,7 @@ public class AbstractNexusIntegrationTest
 
     /**
      * See oncePerClassSetUp.
-     *
+     * 
      * @throws Exception
      */
     @BeforeClass

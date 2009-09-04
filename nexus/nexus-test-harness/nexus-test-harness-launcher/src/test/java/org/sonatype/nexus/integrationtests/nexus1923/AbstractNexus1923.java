@@ -2,7 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus1923;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
@@ -25,7 +25,6 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -108,9 +107,9 @@ public abstract class AbstractNexus1923
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setNotFoundCacheTTL( 1440 );
         resource.setDownloadRemoteIndexes( false );
-        
+
         repoUtils.createRepository( resource );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -130,7 +129,7 @@ public abstract class AbstractNexus1923
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
         repoUtils.createRepository( resource );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -145,7 +144,7 @@ public abstract class AbstractNexus1923
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setIndexable( true );
         repoUtils.createRepository( resource );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -159,7 +158,7 @@ public abstract class AbstractNexus1923
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         resource.setIndexable( true );
         repoUtils.createRepository( resource );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -179,9 +178,9 @@ public abstract class AbstractNexus1923
             repo.setId( repoId );
             group.addRepository( repo );
         }
-        
+
         groupUtils.createGroup( group );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
     }
 
@@ -560,7 +559,7 @@ public abstract class AbstractNexus1923
             args.put( "a", "commons-io" );
         }
 
-        List<NexusArtifact> artifacts = searchUtils.searchFor( args, repositoryId );
+        List<NexusArtifact> artifacts = SearchMessageUtil.searchFor( args, repositoryId );
 
         Assert.assertEquals( artifacts.size() > 0, shouldFind );
     }
@@ -612,7 +611,7 @@ public abstract class AbstractNexus1923
 
     @BeforeClass
     public static void clean()
-        throws IOException
+        throws Exception
     {
         cleanWorkDir();
     }
