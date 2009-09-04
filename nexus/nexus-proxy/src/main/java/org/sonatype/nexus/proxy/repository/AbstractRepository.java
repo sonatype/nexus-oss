@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -211,9 +212,9 @@ public abstract class AbstractRepository
     {
         // we are allowing all, and subclasses will filter as they want
         return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true )
-            .setAllowsUserInitiatedTasks( true )
-            .setContentOperators( DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS )
-            .setAttributeOperators( DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
+            .setAllowsUserInitiatedTasks( true ).setContentOperators(
+                DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS ).setAttributeOperators(
+                DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
     public Map<String, RequestProcessor> getRequestProcessors()
@@ -299,19 +300,19 @@ public abstract class AbstractRepository
         throws StorageException
     {
         String newLocalUrl = null;
-        
+
         if ( localUrl != null )
         {
             newLocalUrl = localUrl.trim();
         }
-        
+
         if ( newLocalUrl != null )
         {
             if ( newLocalUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
             {
                 newLocalUrl = newLocalUrl.substring( 0, newLocalUrl.length() - 1 );
             }
-             
+
             getLocalStorage().validateStorageUrl( newLocalUrl );
         }
 
@@ -334,8 +335,8 @@ public abstract class AbstractRepository
 
             super.setLocalStatus( localStatus );
 
-            getApplicationEventMulticaster()
-                .notifyEventListeners( new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
+            getApplicationEventMulticaster().notifyEventListeners(
+                new RepositoryEventLocalStatusChanged( this, oldLocalStatus, localStatus ) );
         }
     }
 
@@ -385,8 +386,7 @@ public abstract class AbstractRepository
         request.setRequestLocalOnly( true );
 
         getLogger().info(
-                          "Expiring local cache in repository ID='" + getId() + "' from path='"
-                              + request.getRequestPath() + "'" );
+            "Expiring local cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
         // 1st, expire all the files below path
         DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
@@ -419,8 +419,7 @@ public abstract class AbstractRepository
         }
 
         getLogger().info(
-                          "Clearing NFC cache in repository ID='" + getId() + "' from path='"
-                              + request.getRequestPath() + "'" );
+            "Clearing NFC cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
         // remove the items from NFC
         if ( RepositoryItemUid.PATH_ROOT.equals( request.getRequestPath() ) )
@@ -443,8 +442,7 @@ public abstract class AbstractRepository
         }
 
         getApplicationEventMulticaster().notifyEventListeners(
-                                                               new RepositoryEventExpireCaches( this, request
-                                                                   .getRequestPath() ) );
+            new RepositoryEventExpireCaches( this, request.getRequestPath() ) );
     }
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
@@ -488,8 +486,7 @@ public abstract class AbstractRepository
         }
 
         getLogger().info(
-                          "Rebuilding attributes in repository ID='" + getId() + "' from path='"
-                              + request.getRequestPath() + "'" );
+            "Rebuilding attributes in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
         RecreateAttributesWalker walkerProcessor = new RecreateAttributesWalker( this, initialData );
 
@@ -545,8 +542,8 @@ public abstract class AbstractRepository
         if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) && !isBrowseable() )
         {
             getLogger().debug(
-                               getId() + " retrieveItem() :: FOUND a collection on " + request.toString()
-                                   + " but repository is not Browseable." );
+                getId() + " retrieveItem() :: FOUND a collection on " + request.toString()
+                    + " but repository is not Browseable." );
 
             throw new ItemNotFoundException( request, this );
         }
@@ -683,8 +680,13 @@ public abstract class AbstractRepository
 
     public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
     {
+        boolean originalLocalOnly = rsr.isRequestLocalOnly();
+
         try
         {
+            // enforce localOnly check
+            rsr.setRequestLocalOnly( true );
+
             retrieveItem( false, rsr );
 
             return Action.update;
@@ -704,6 +706,10 @@ public abstract class AbstractRepository
             getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
 
             return null;
+        }
+        finally
+        {
+            rsr.setRequestLocalOnly( originalLocalOnly );
         }
     }
 
@@ -728,6 +734,8 @@ public abstract class AbstractRepository
         maintainNotFoundCache( request.getRequestPath() );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
+        
+        uid.lock( Action.read );
 
         try
         {
@@ -757,9 +765,8 @@ public abstract class AbstractRepository
                 else
                 {
                     getLogger().info(
-                                      "The file in repository ID='" + this.getId() + "' on path='" + uid.getPath()
-                                          + "' should be generated by ContentGeneratorId='" + key
-                                          + "', but it does not exists!" );
+                        "The file in repository ID='" + this.getId() + "' on path='" + uid.getPath()
+                            + "' should be generated by ContentGeneratorId='" + key + "', but it does not exists!" );
 
                     throw new ItemNotFoundException( request, this );
                 }
@@ -789,6 +796,10 @@ public abstract class AbstractRepository
 
             throw ex;
         }
+        finally
+        {
+            uid.unlock();
+        }
     }
 
     public void copyItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
@@ -809,10 +820,10 @@ public abstract class AbstractRepository
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
         RepositoryItemUid toUid = createUid( to.getRequestPath() );
-
-        getRepositoryItemUidFactory().lock( fromUid );
-
-        getRepositoryItemUidFactory().lock( toUid );
+        
+        fromUid.lock( Action.read );
+        
+        toUid.lock( getResultingActionOnWrite( to ) );
 
         try
         {
@@ -823,9 +834,8 @@ public abstract class AbstractRepository
                 try
                 {
                     DefaultStorageFileItem target =
-                        new DefaultStorageFileItem( this, to, true, true,
-                                                    new PreparedContentLocator( ( (StorageFileItem) item )
-                                                        .getInputStream() ) );
+                        new DefaultStorageFileItem( this, to, true, true, new PreparedContentLocator(
+                            ( (StorageFileItem) item ).getInputStream() ) );
 
                     target.getItemContext().putAll( item.getItemContext() );
 
@@ -842,9 +852,9 @@ public abstract class AbstractRepository
         }
         finally
         {
-            getRepositoryItemUidFactory().unlock( fromUid );
-
-            getRepositoryItemUidFactory().unlock( toUid );
+            toUid.unlock();
+            
+            fromUid.unlock();
         }
     }
 
@@ -861,26 +871,9 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        RepositoryItemUid uidFrom = createUid( from.getRequestPath() );
+        copyItem( fromTask, from, to );
 
-        RepositoryItemUid uidTo = createUid( to.getRequestPath() );
-
-        getRepositoryItemUidFactory().lock( uidFrom );
-
-        getRepositoryItemUidFactory().lock( uidTo );
-
-        try
-        {
-            copyItem( fromTask, from, to );
-
-            deleteItem( fromTask, from );
-        }
-        finally
-        {
-            getRepositoryItemUidFactory().unlock( uidFrom );
-
-            getRepositoryItemUidFactory().unlock( uidTo );
-        }
+        deleteItem( fromTask, from );
     }
 
     public void deleteItem( boolean fromTask, ResourceStoreRequest request )
@@ -900,7 +893,7 @@ public abstract class AbstractRepository
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        getRepositoryItemUidFactory().lock( uid );
+        uid.lock( Action.delete );
 
         try
         {
@@ -914,9 +907,8 @@ public abstract class AbstractRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                                "We are deleting a collection, starting a walker to send delete notifications per-file." );
+                    getLogger().debug(
+                        "We are deleting a collection, starting a walker to send delete notifications per-file." );
                 }
 
                 // it is collection, walk it and below and fire events for all files
@@ -945,7 +937,7 @@ public abstract class AbstractRepository
         }
         finally
         {
-            getRepositoryItemUidFactory().unlock( uid );
+            uid.unlock();
         }
     }
 
@@ -967,7 +959,7 @@ public abstract class AbstractRepository
         // replace UID to own one
         item.setRepositoryItemUid( uid );
 
-        getRepositoryItemUidFactory().lock( uid );
+        uid.lock( getResultingActionOnWrite( new ResourceStoreRequest( item ) ) );
 
         try
         {
@@ -976,7 +968,7 @@ public abstract class AbstractRepository
         }
         finally
         {
-            getRepositoryItemUidFactory().unlock( uid );
+            uid.unlock();
         }
 
         // remove the "request" item from n-cache if there
@@ -1070,8 +1062,7 @@ public abstract class AbstractRepository
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug(
-                                           "The path " + path
-                                               + " is in NFC and still active, throwing ItemNotFoundException." );
+                            "The path " + path + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
                     throw new ItemNotFoundException( path );
                 }

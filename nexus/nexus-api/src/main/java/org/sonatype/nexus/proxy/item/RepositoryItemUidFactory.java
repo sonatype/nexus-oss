@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import java.util.concurrent.locks.ReadWriteLock;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -37,28 +39,37 @@ public interface RepositoryItemUidFactory
      * @throws NoSuchRepositoryException
      */
     public RepositoryItemUid createUid( String uidStr )
-        throws IllegalArgumentException,
-            NoSuchRepositoryException;
-
+        throws IllegalArgumentException, NoSuchRepositoryException;
 
     /**
-     * Performs a lock on this UID, and by that, potentionally locks all other threads if needed, that are working on
-     * the same UID as this one.
+     * Gets a lock on this UID. Should not be used directly, see {@link RepositoryItemUid}
      */
-    void lock( RepositoryItemUid uid );
+    ReadWriteLock acquireLock( RepositoryItemUid uid );
 
     /**
-     * Unlocks this UID.
+     * Release a lock on this UID. Should not be used directly, see {@link RepositoryItemUid}
      */
-    void unlock( RepositoryItemUid uid );
-    
+    void releaseLock( RepositoryItemUid uid );
+
+    /**
+     * Gets a lock on this UID for item's attributes repesented by this UID. Should not be used directly, see
+     * {@link RepositoryItemUid}
+     */
+    ReadWriteLock acquireAttributesLock( RepositoryItemUid uid );
+
+    /**
+     * Release a lock on this UID for item's attributes represented by this UID. Should not be used directly, see
+     * {@link RepositoryItemUid}
+     */
+    void releaseAttributesLock( RepositoryItemUid uid );
+
     /**
      * For testing/debugging purposes.
      * 
      * @return
      */
     public int getLockCount();
-    
+
     /**
      * For testing/debugging purposes.
      * 

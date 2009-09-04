@@ -16,7 +16,9 @@ package org.sonatype.nexus.proxy.item;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -30,7 +32,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
-@Component(role=RepositoryItemUidFactory.class)
+@Component( role = RepositoryItemUidFactory.class )
 public class DefaultRepositoryItemUidFactory
     implements RepositoryItemUidFactory
 {
@@ -40,9 +42,12 @@ public class DefaultRepositoryItemUidFactory
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    private final ConcurrentHashMap<String, List<RepositoryItemUid>> uidMap = new ConcurrentHashMap<String, List<RepositoryItemUid>>();
+    private final ConcurrentHashMap<String, List<RepositoryItemUid>> itemUidMap =
+        new ConcurrentHashMap<String, List<RepositoryItemUid>>();
 
-    private final ConcurrentHashMap<String, ReentrantLock> lockMap = new ConcurrentHashMap<String, ReentrantLock>();
+    private final ConcurrentHashMap<String, ReadWriteLock> itemLockMap = new ConcurrentHashMap<String, ReadWriteLock>();
+
+    private final ConcurrentHashMap<String, ReadWriteLock> attrLockMap = new ConcurrentHashMap<String, ReadWriteLock>();
 
     public RepositoryItemUid createUid( Repository repository, String path )
     {
@@ -59,12 +64,11 @@ public class DefaultRepositoryItemUidFactory
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        return new DefaultRepositoryItemUid( repository, path );
+        return new DefaultRepositoryItemUid( this, repository, path );
     }
 
     public RepositoryItemUid createUid( String uidStr )
-        throws IllegalArgumentException,
-            NoSuchRepositoryException
+        throws IllegalArgumentException, NoSuchRepositoryException
     {
         if ( uidStr.indexOf( ":" ) > -1 )
         {
@@ -89,38 +93,46 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
-    public void lock( RepositoryItemUid uid )
+    public ReadWriteLock acquireLock( RepositoryItemUid uid )
     {
-        register( uid );
-        
-        lockMap.get( uid.toString() ).lock();
+        return register( uid, itemUidMap, itemLockMap );
     }
 
-    public void unlock( RepositoryItemUid uid )
+    public void releaseLock( RepositoryItemUid uid )
     {
-        lockMap.get( uid.toString() ).unlock();
-        
-        deregister( uid );
+        deregister( uid, itemUidMap, itemLockMap );
+    }
+
+    public ReadWriteLock acquireAttributesLock( RepositoryItemUid uid )
+    {
+        return register( uid, itemUidMap, attrLockMap );
+    }
+
+    public void releaseAttributesLock( RepositoryItemUid uid )
+    {
+        deregister( uid, itemUidMap, attrLockMap );
     }
 
     public int getLockCount()
     {
-        return lockMap.size();
+        return itemLockMap.size();
     }
-    
+
     public int getUidCount()
     {
-        return uidMap.size();
+        return itemUidMap.size();
     }
 
     // =====
 
-    private synchronized void register( RepositoryItemUid uid )
+    private synchronized ReadWriteLock register( RepositoryItemUid uid,
+                                                 ConcurrentMap<String, List<RepositoryItemUid>> uidMap,
+                                                 ConcurrentMap<String, ReadWriteLock> lockMap )
     {
         String key = uid.toString();
 
         // maintain locks
-        ReentrantLock lock = new ReentrantLock();
+        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
         lockMap.putIfAbsent( key, lock );
 
@@ -130,20 +142,26 @@ public class DefaultRepositoryItemUidFactory
         uidMap.putIfAbsent( key, uidList );
 
         uidMap.get( key ).add( uid );
+
+        return lockMap.get( key );
     }
 
-    private synchronized void deregister( RepositoryItemUid uid )
+    private synchronized void deregister( RepositoryItemUid uid, ConcurrentMap<String, List<RepositoryItemUid>> uidMap,
+                                          ConcurrentMap<String, ReadWriteLock> lockMap )
     {
         String key = uid.toString();
 
         // maintain uidlists
-        if ( uidMap.get( key ).remove( uid ) )
+        if ( uidMap.containsKey( key ) )
         {
-            if ( uidMap.get( key ).size() == 0 )
+            if ( uidMap.get( key ).remove( uid ) )
             {
-                uidMap.remove( key );
+                if ( uidMap.get( key ).size() == 0 )
+                {
+                    uidMap.remove( key );
 
-                lockMap.remove( key );
+                    lockMap.remove( key );
+                }
             }
         }
     }

@@ -20,9 +20,9 @@ import static org.easymock.EasyMock.replay;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.item.DefaultRepositoryItemUid;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -37,6 +37,8 @@ public class DefaultAttributeStorageTest
 
     protected DefaultAttributeStorage attributeStorage;
 
+    protected RepositoryItemUidFactory repositoryItemUidFactory;
+
     protected Repository repository;
 
     public void setUp()
@@ -45,6 +47,8 @@ public class DefaultAttributeStorageTest
         super.setUp();
 
         attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.class );
+
+        repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
 
         FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
 
@@ -57,8 +61,10 @@ public class DefaultAttributeStorageTest
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        expect( repository.createUid( "/a.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/a.txt" ) );
-        expect( repository.createUid( "/b.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/b.txt" ) );
+        expect( repository.createUid( "/a.txt" ) )
+            .andReturn( repositoryItemUidFactory.createUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/b.txt" ) )
+            .andReturn( repositoryItemUidFactory.createUid( repository, "/b.txt" ) );
 
         replay( repository );
 
@@ -71,12 +77,9 @@ public class DefaultAttributeStorageTest
     public void testSimplePutGet()
         throws Exception
     {
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            new ResourceStoreRequest( "/a.txt" ),
-            true,
-            true,
-            new StringContentLocator( "CONTENT" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/a.txt" ), true, true,
+                new StringContentLocator( "CONTENT" ) );
 
         file.getAttributes().put( "kuku", "kuku" );
 
@@ -92,12 +95,9 @@ public class DefaultAttributeStorageTest
     public void testSimplePutDelete()
         throws Exception
     {
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            new ResourceStoreRequest( "/b.txt" ),
-            true,
-            true,
-            new StringContentLocator( "CONTENT" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/b.txt" ), true, true,
+                new StringContentLocator( "CONTENT" ) );
 
         file.getAttributes().put( "kuku", "kuku" );
 

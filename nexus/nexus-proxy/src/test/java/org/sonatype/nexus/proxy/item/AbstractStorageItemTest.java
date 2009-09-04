@@ -25,6 +25,8 @@ public abstract class AbstractStorageItemTest
 {
     protected Repository repository;
 
+    protected RepositoryItemUidFactory uidFactory;
+
     protected RepositoryRouter router;
 
     public void setUp()
@@ -32,13 +34,15 @@ public abstract class AbstractStorageItemTest
     {
         super.setUp();
 
+        uidFactory = lookup( RepositoryItemUidFactory.class );
+
         repository = createMock( Repository.class );
 
         router = createMock( RepositoryRouter.class );
     }
 
     public void checkAbstractStorageItem( ResourceStore store, AbstractStorageItem item, boolean isVirtual,
-        String shouldBeName, String shouldBePath, String shouldBeParentPath )
+                                          String shouldBeName, String shouldBePath, String shouldBeParentPath )
     {
         // it is backed by repo
         assertEquals( isVirtual, item.isVirtual() );

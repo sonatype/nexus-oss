@@ -28,7 +28,7 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn( uidFactory.createUid( repository, "/a.txt" ) );
 
         replay( repository );
 
@@ -36,25 +36,21 @@ public class DefaultStorageFileItemTest
 
         //
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            "/a.txt",
-            true,
-            true,
-            new StringContentLocator( "/a.txt" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, "/a.txt", true, true, new StringContentLocator( "/a.txt" ) );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/a.txt", "/" );
 
         // content
         InputStream is = file.getInputStream();
-        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file
-            .getRepositoryItemUid().getPath().getBytes() ) ) );
+        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath()
+            .getBytes() ) ) );
     }
 
     public void testNonVirtualFileWithContentSimple()
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andReturn( new DefaultRepositoryItemUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn( uidFactory.createUid( repository, "/a.txt" ) );
 
         replay( repository );
 
@@ -62,12 +58,8 @@ public class DefaultStorageFileItemTest
 
         //
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            "/a.txt",
-            true,
-            true,
-            new StringContentLocator( "THIS IS CONTENT" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, "/a.txt", true, true, new StringContentLocator( "THIS IS CONTENT" ) );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/a.txt", "/" );
 
         // content
@@ -80,7 +72,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( repository, "/some/dir/hierarchy/a.txt" ) );
+            uidFactory.createUid( repository, "/some/dir/hierarchy/a.txt" ) );
 
         replay( repository );
 
@@ -88,18 +80,15 @@ public class DefaultStorageFileItemTest
 
         //
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            "/some/dir/hierarchy/a.txt",
-            true,
-            true,
-            new StringContentLocator( "/some/dir/hierarchy/a.txt" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true, new StringContentLocator(
+                "/some/dir/hierarchy/a.txt" ) );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy" );
 
         // content
         InputStream is = file.getInputStream();
-        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file
-            .getRepositoryItemUid().getPath().getBytes() ) ) );
+        assertEquals( true, IOUtil.contentEquals( is, new ByteArrayInputStream( file.getRepositoryItemUid().getPath()
+            .getBytes() ) ) );
     }
 
     public void testNonVirtualFileWithContentDeep()
@@ -107,7 +96,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            new DefaultRepositoryItemUid( repository, "/some/dir/hierarchy/a.txt" ) );
+            uidFactory.createUid( repository, "/some/dir/hierarchy/a.txt" ) );
 
         replay( repository );
 
@@ -115,12 +104,9 @@ public class DefaultStorageFileItemTest
 
         //
 
-        DefaultStorageFileItem file = new DefaultStorageFileItem(
-            repository,
-            "/some/dir/hierarchy/a.txt",
-            true,
-            true,
-            new StringContentLocator( "THIS IS CONTENT" ) );
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, "/some/dir/hierarchy/a.txt", true, true, new StringContentLocator(
+                "THIS IS CONTENT" ) );
         checkAbstractStorageItem( repository, file, false, "a.txt", "/some/dir/hierarchy/a.txt", "/some/dir/hierarchy" );
 
         // content

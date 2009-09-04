@@ -48,5 +48,4 @@ public interface AttributeStorage
      * @return true, if successful
      */
     boolean deleteAttributes( RepositoryItemUid uid );
-
 }

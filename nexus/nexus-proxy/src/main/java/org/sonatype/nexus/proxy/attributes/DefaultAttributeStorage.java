@@ -26,12 +26,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -56,9 +56,6 @@ public class DefaultAttributeStorage
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
-
-    @Requirement
-    private RepositoryItemUidFactory repositoryItemUidFactory;
 
     /**
      * The base dir.
@@ -85,7 +82,7 @@ public class DefaultAttributeStorage
         applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
         {
@@ -135,7 +132,7 @@ public class DefaultAttributeStorage
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        repositoryItemUidFactory.lock( uid );
+        uid.lockAttributes( Action.delete );
 
         try
         {
@@ -161,13 +158,13 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            repositoryItemUidFactory.unlock( uid );
+            uid.unlockAttributes();
         }
     }
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        repositoryItemUidFactory.lock( uid );
+        uid.lockAttributes( Action.read );
 
         try
         {
@@ -192,7 +189,7 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            repositoryItemUidFactory.unlock( uid );
+            uid.unlockAttributes();
         }
     }
 
@@ -200,7 +197,7 @@ public class DefaultAttributeStorage
     {
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 
-        repositoryItemUidFactory.lock( origUid );
+        origUid.lockAttributes( Action.create );
 
         try
         {
@@ -218,12 +215,12 @@ public class DefaultAttributeStorage
             try
             {
                 AbstractStorageItem onDisk = doGetAttributes( item.getRepositoryItemUid() );
-                
+
                 if ( onDisk != null && ( onDisk.getGeneration() > item.getGeneration() ) )
                 {
                     // change detected, overlay the to be saved onto the newer one and swap
                     onDisk.setResourceStoreRequest( item.getResourceStoreRequest() );
-                    
+
                     onDisk.overlay( item );
 
                     // and overlay other things too
@@ -271,9 +268,11 @@ public class DefaultAttributeStorage
         }
         finally
         {
-            repositoryItemUidFactory.unlock( origUid );
+            origUid.unlockAttributes();
         }
     }
+
+    // ==
 
     /**
      * Gets the attributes.

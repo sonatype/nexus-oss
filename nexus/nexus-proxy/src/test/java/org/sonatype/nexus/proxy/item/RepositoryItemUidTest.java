@@ -13,78 +13,83 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import static org.easymock.EasyMock.*;
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.makeThreadSafe;
+import static org.easymock.EasyMock.replay;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class RepositoryItemUidTest
     extends AbstractNexusTestEnvironment
 {
     protected Repository repository;
-    
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
-        repository = createMock(Repository.class);
+
+        repository = createMock( Repository.class );
 
         makeThreadSafe( repository, true );
-        
-        expect(repository.getId()).andReturn( "dummy" ).anyTimes();
-        
-        replay(repository);
+
+        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+
+        replay( repository );
     }
-    
+
     public void testReleaseFromMemory()
         throws Exception
     {
         RepositoryItemUidFactory factory = getRepositoryItemUidFactory();
-        
+
         RepositoryItemUid uid = factory.createUid( repository, "/a.txt" );
         RepositoryItemUid uid2 = factory.createUid( repository, "/a.txt" );
         RepositoryItemUid uid3 = factory.createUid( repository, "/b.txt" );
-        
+
         // Proof that create isn't putting anything in the internal maps
         assertEquals( 0, factory.getUidCount() );
         assertEquals( 0, factory.getLockCount() );
-        
-        factory.lock( uid );
-        
+
+        uid.lock( Action.create );
+
         // Proof that locking a uid adds it to internal maps
         assertEquals( 1, factory.getUidCount() );
         assertEquals( 1, factory.getLockCount() );
-        
-        factory.lock( uid2 );
-        
+
+        uid2.lock( Action.create );
+
         // Proof that locking 2 uids w/ the same item does not increase the internal map count
         assertEquals( 1, factory.getUidCount() );
         assertEquals( 1, factory.getLockCount() );
-        
-        factory.lock( uid3 );
-        
+
+        uid3.lock( Action.create );
+
         // Proof that using a different uid creates a new item in internal map
         assertEquals( 2, factory.getUidCount() );
         assertEquals( 2, factory.getLockCount() );
-        
-        factory.unlock( uid3 );
-        
+
+        uid3.unlock();
+
         // Proof that removing an item updates internal maps
         assertEquals( 1, factory.getUidCount() );
         assertEquals( 1, factory.getLockCount() );
-        
-        factory.unlock( uid2 );
-        
+
+        uid2.unlock();
+
         // Proof that removing an item that was added twice, doesn't remove the whole list
         assertEquals( 1, factory.getUidCount() );
         assertEquals( 1, factory.getLockCount() );
-        
-        factory.unlock( uid );
-        
+
+        uid.unlock();
+
         // Proof that removing the final item (if added more than once) removes whole list
         assertEquals( 0, factory.getUidCount() );
         assertEquals( 0, factory.getLockCount() );
@@ -92,15 +97,13 @@ public class RepositoryItemUidTest
 
     public void testConcurrentLocksOfSameUid()
         throws Exception
-    {   
+    {
         RepositoryItemUidFactory factory = getRepositoryItemUidFactory();
-        
+
         RepositoryItemUid uidA = factory.createUid( repository, "/a.txt" );
 
-        Thread thread1 = new Thread(
-            new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
-        Thread thread2 = new Thread(
-            new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
+        Thread thread1 = new Thread( new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
+        Thread thread2 = new Thread( new RepositoryItemUidLockProcessLauncher( factory, uidA, 100, 100 ) );
 
         thread1.start();
         thread2.start();
@@ -127,7 +130,7 @@ public class RepositoryItemUidTest
         private long timeout;
 
         public RepositoryItemUidLockProcessLauncher( RepositoryItemUidFactory repositoryItemUidFactory,
-            RepositoryItemUid uid, int threadCount, long timeout )
+                                                     RepositoryItemUid uid, int threadCount, long timeout )
         {
             this.uid = uid;
             this.threadCount = threadCount;
@@ -141,7 +144,7 @@ public class RepositoryItemUidTest
 
             for ( int i = 0; i < threadCount; i++ )
             {
-                threads.add( new Thread( new RepositoryItemUidLockProcess( repositoryItemUidFactory, uid, timeout ) ) );
+                threads.add( new Thread( new RepositoryItemUidLockProcess( uid, timeout ) ) );
             }
 
             for ( Iterator<Thread> iter = threads.iterator(); iter.hasNext(); )
@@ -167,23 +170,19 @@ public class RepositoryItemUidTest
     private static final class RepositoryItemUidLockProcess
         implements Runnable
     {
-        private RepositoryItemUidFactory repositoryItemUidFactory;
-
         private RepositoryItemUid uid;
 
         private long timeout;
 
-        public RepositoryItemUidLockProcess( RepositoryItemUidFactory repositoryItemUidFactory, RepositoryItemUid uid,
-            long timeout )
+        public RepositoryItemUidLockProcess( RepositoryItemUid uid, long timeout )
         {
-            this.repositoryItemUidFactory = repositoryItemUidFactory;
             this.uid = uid;
             this.timeout = timeout;
         }
 
         public void run()
         {
-            repositoryItemUidFactory.lock( uid );
+            uid.lock( Action.create );
 
             try
             {
@@ -195,7 +194,7 @@ public class RepositoryItemUidTest
             }
             finally
             {
-                repositoryItemUidFactory.unlock( uid );
+                uid.unlock();
             }
         }
     }
