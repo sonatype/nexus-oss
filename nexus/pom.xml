@@ -769,7 +769,7 @@
       <dependency>
         <groupId>org.sonatype.spice</groupId>
         <artifactId>plexus-encryptor</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
