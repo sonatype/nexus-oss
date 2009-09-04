@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -9,9 +8,9 @@
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
-  
+
   <packaging>nexus-plugin</packaging>
-    
+
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   <description>Nexus Maven Site Plugin (Extras).</description>
 
@@ -32,6 +31,18 @@
     </developer>
   </developers>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -50,6 +61,10 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.sonatype.nexus.plugin</groupId>
+      <artifactId>nexus-licensing-plugin</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -67,11 +82,11 @@
           <target>1.5</target>
           <encoding>UTF-8</encoding>
         </configuration>
-      </plugin> 
+      </plugin>
     </plugins>
   </build>
-  
-   <profiles>
+
+  <profiles>
     <profile>
       <id>obfuscation</id>
       <activation>
@@ -121,7 +136,7 @@
               <libs>
                 <lib>${java-runtime}</lib>
               </libs>
-        <exclusions>
+              <exclusions>
                 <exclusion>
                   <groupId>org.springframework</groupId>
                 </exclusion>
@@ -132,5 +147,5 @@
       </build>
     </profile>
   </profiles>
-  
+
 </project>
