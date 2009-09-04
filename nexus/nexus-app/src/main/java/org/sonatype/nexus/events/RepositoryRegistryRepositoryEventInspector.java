@@ -204,7 +204,15 @@ public class RepositoryRegistryRepositoryEventInspector
                 {
                     // Create the initial index for the repository
                     ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                    rt.setRepositoryId( repository.getId() );
+                    
+                    if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class  ) )
+                    {
+                        rt.setRepositoryGroupId( repository.getId() );
+                    }
+                    else
+                    {
+                        rt.setRepositoryId( repository.getId() );
+                    }
                     nexusScheduler.submit( "Create initial index.", rt );
                 }
             }
