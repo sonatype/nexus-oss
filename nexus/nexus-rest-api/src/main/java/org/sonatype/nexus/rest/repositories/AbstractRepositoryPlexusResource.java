@@ -213,6 +213,10 @@ public abstract class AbstractRepositoryPlexusResource
                 repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
 
                 repoRes.setRepoType( getRestRepoType( repository ) );
+                
+                repoRes.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
+                
+                repoRes.setProviderRole( NexusCompat.getRepositoryProviderRole( repository ) );
 
                 repoRes.setFormat( repository.getRepositoryContentClass().getId() );
 

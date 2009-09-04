@@ -473,6 +473,18 @@
           <required>true</required>
         </field>
         <field>
+          <name>provider</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>providerRole</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
