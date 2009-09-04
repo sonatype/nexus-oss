@@ -28,7 +28,6 @@ import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.DelegatingSubject;
 import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.util.ThreadContext;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -55,6 +54,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.security.usermanagement.UserStatus;
 
 /**
  * This implementation wraps a jsecurity/Ki SecurityManager, and adds user management.
@@ -69,10 +69,10 @@ public class DefaultSecuritySystem
     // TODO: we should get this value from the config, (not plexus)
     @Configuration( value = "web" )
     private String applicationSecurityManagerHint;
-    
+
     @Configuration( value = "default" )
     private String runAsSecurityManagerHint;
-    
+
     @Requirement( role = RealmSecurityManager.class )
     private Map<String, RealmSecurityManager> securityManagerMap;
 
@@ -110,7 +110,7 @@ public class DefaultSecuritySystem
             throw new AuthenticationException( e.getMessage(), e );
         }
     }
-    
+
     public AuthenticationInfo authenticate( AuthenticationToken token )
         throws AuthenticationException
     {
@@ -123,25 +123,25 @@ public class DefaultSecuritySystem
             throw new AuthenticationException( e.getMessage(), e );
         }
     }
-    
+
     public Subject runAs( PrincipalCollection principal )
     {
         RealmSecurityManager securityManager = this.getRunAsSecurityManager();
         // TODO: we might need to bind this to the ThreadContext for this thread
         // however if we do this we would need to unbind it so it doesn't leak
-//        ThreadContext.bind( securityManager );
-        
+        // ThreadContext.bind( securityManager );
+
         DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null, securityManager );
-        
+
         // fake the login
         ThreadContext.bind( fakeLoggedInSubject );
         // this is un-bind when the user logs out.
-        
+
         return fakeLoggedInSubject;
     }
 
     public Subject getSubject()
-    {   
+    {
         // this gets the currently bound Subject to the thread
         return SecurityUtils.getSubject();
     }
@@ -158,7 +158,8 @@ public class DefaultSecuritySystem
 
     public boolean[] isPermitted( PrincipalCollection principal, List<String> permissions )
     {
-        return this.getApplicationSecurityManager().isPermitted( principal, permissions.toArray( new String[permissions.size()] ) );
+        return this.getApplicationSecurityManager().isPermitted( principal,
+            permissions.toArray( new String[permissions.size()] ) );
     }
 
     public void checkPermission( PrincipalCollection principal, String permission )
@@ -180,7 +181,8 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.getApplicationSecurityManager().checkPermissions( principal, permissions.toArray( new String[permissions.size()] ) );
+            this.getApplicationSecurityManager().checkPermissions( principal,
+                permissions.toArray( new String[permissions.size()] ) );
         }
         catch ( org.jsecurity.authz.AuthorizationException e )
         {
@@ -284,15 +286,13 @@ public class DefaultSecuritySystem
     }
 
     public User addUser( User user )
-        throws NoSuchUserManager,
-            InvalidConfigurationException
+        throws NoSuchUserManager, InvalidConfigurationException
     {
         return this.addUser( user, this.generatePassword() );
     }
 
     public User addUser( User user, String password )
-        throws NoSuchUserManager,
-            InvalidConfigurationException
+        throws NoSuchUserManager, InvalidConfigurationException
     {
         // if the password is null, generate one
         if ( password == null )
@@ -334,16 +334,17 @@ public class DefaultSecuritySystem
             }
         }
 
-        // don't forget to email the user!
-        this.getSecurityEmailer().sendNewUserCreated( user.getEmailAddress(), user.getUserId(), password );
+        if ( UserStatus.active.equals( user.getStatus() ) )
+        {
+            // don't forget to email the user (if the user being added is active)!
+            getSecurityEmailer().sendNewUserCreated( user.getEmailAddress(), user.getUserId(), password );
+        }
 
         return user;
     }
 
     public User updateUser( User user )
-        throws UserNotFoundException,
-            NoSuchUserManager,
-            InvalidConfigurationException
+        throws UserNotFoundException, NoSuchUserManager, InvalidConfigurationException
     {
         // first update the user
         // this is the UserManager that owns the user
@@ -401,24 +402,21 @@ public class DefaultSecuritySystem
     }
 
     public void deleteUser( String userId, String source )
-        throws UserNotFoundException,
-            NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManager
     {
         UserManager userManager = this.getUserManager( source );
         userManager.deleteUser( userId );
     }
 
     public Set<RoleIdentifier> getUsersRoles( String userId, String source )
-        throws UserNotFoundException,
-            NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManager
     {
         User user = this.getUser( userId, source );
         return user.getRoles();
     }
 
     public void setUsersRoles( String userId, String source, Set<RoleIdentifier> roleIdentifiers )
-        throws InvalidConfigurationException,
-            UserNotFoundException
+        throws InvalidConfigurationException, UserNotFoundException
     {
         // TODO: this is a bit sticky, what we really want to do is just expose the RoleMappingUserManagers this way (i
         // think), maybe this is too generic
@@ -433,8 +431,8 @@ public class DefaultSecuritySystem
                 try
                 {
                     foundUser = true;
-                    roleMappingUserManager.setUsersRoles( userId, source, RoleIdentifier
-                        .getRoleIdentifiersForSource( tmpUserManager.getSource(), roleIdentifiers ) );
+                    roleMappingUserManager.setUsersRoles( userId, source, RoleIdentifier.getRoleIdentifiersForSource(
+                        tmpUserManager.getSource(), roleIdentifiers ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -475,8 +473,7 @@ public class DefaultSecuritySystem
     }
 
     public User getUser( String userId, String source )
-        throws UserNotFoundException,
-            NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManager
     {
         // first get the user
         // this is the UserManager that owns the user
@@ -544,7 +541,6 @@ public class DefaultSecuritySystem
      * 
      * @return the list of UserManagers in the order (as close as possible) to the list of realms.
      */
-    @SuppressWarnings( "unchecked" )
     private List<UserManager> orderUserManagers()
     {
         List<UserManager> orderedLocators = new ArrayList<UserManager>();
@@ -596,8 +592,8 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    Set<RoleIdentifier> roleIdentifiers = roleMappingUserManager.getUsersRoles( user.getUserId(), user
-                        .getSource() );
+                    Set<RoleIdentifier> roleIdentifiers =
+                        roleMappingUserManager.getUsersRoles( user.getUserId(), user.getSource() );
                     if ( roleIdentifiers != null )
                     {
                         user.addAllRoles( roleIdentifiers );
@@ -640,9 +636,7 @@ public class DefaultSecuritySystem
     }
 
     public void changePassword( String userId, String oldPassword, String newPassword )
-        throws UserNotFoundException,
-            InvalidCredentialsException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidCredentialsException, InvalidConfigurationException
     {
         // first authenticate the user
         try
@@ -664,8 +658,7 @@ public class DefaultSecuritySystem
     }
 
     public void changePassword( String userId, String newPassword )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         User user = this.getUser( userId );
 
@@ -684,8 +677,7 @@ public class DefaultSecuritySystem
     }
 
     public void forgotPassword( String userId, String email )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         UserSearchCriteria criteria = new UserSearchCriteria();
         criteria.setEmail( email );
@@ -745,8 +737,7 @@ public class DefaultSecuritySystem
     }
 
     public void resetPassword( String userId )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         String newClearTextPassword = this.generatePassword();
 
@@ -795,7 +786,7 @@ public class DefaultSecuritySystem
         // update the realms in the security manager
         for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
         {
-            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );   
+            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
     }
 
@@ -836,10 +827,10 @@ public class DefaultSecuritySystem
         // reload the config
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
-        
+
         for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
         {
-            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );   
+            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
     }
 
@@ -852,7 +843,7 @@ public class DefaultSecuritySystem
     private void clearRealmCaches()
     {
         // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
-        if( this.getApplicationSecurityManager().getRealms() != null)
+        if ( this.getApplicationSecurityManager().getRealms() != null )
         {
             for ( Realm realm : this.getApplicationSecurityManager().getRealms() )
             {
@@ -861,7 +852,7 @@ public class DefaultSecuritySystem
                 {
                     // clear the cache
                     AuthorizingRealm aRealm = (AuthorizingRealm) realm;
-    
+
                     Cache cache = aRealm.getAuthorizationCache();
                     if ( cache != null )
                     {
@@ -883,27 +874,27 @@ public class DefaultSecuritySystem
         {
             this.clearRealmCaches();
             this.securityConfiguration.clearCache();
-            
+
             for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
             {
                 securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
             }
         }
     }
-    
+
     public void initialize()
-    throws InitializationException
+        throws InitializationException
     {
         // add event handler
         this.eventMulticaster.addEventListener( this );
-    
+
     }
-    
+
     private RealmSecurityManager getApplicationSecurityManager()
     {
         return this.securityManagerMap.get( this.applicationSecurityManagerHint );
     }
-    
+
     private RealmSecurityManager getRunAsSecurityManager()
     {
         return this.securityManagerMap.get( this.runAsSecurityManagerHint );
