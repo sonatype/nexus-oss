@@ -12,7 +12,7 @@ import org.sonatype.configuration.ConfigurationException;
 public interface Template
 {
     /**
-     * Returns the originating template provider of this template.
+     * Returns the originating template provider for this template.
      * 
      * @return
      */
@@ -43,7 +43,7 @@ public interface Template
     boolean targetFits( Object target );
 
     /**
-     * Instantianates this template.
+     * Instantianates this template, creates resulting object (needs cast).
      * 
      * @return
      * @throws ConfigurationException
