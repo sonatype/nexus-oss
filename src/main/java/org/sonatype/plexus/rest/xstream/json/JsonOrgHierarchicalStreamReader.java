@@ -258,7 +258,7 @@ public class JsonOrgHierarchicalStreamReader
 
         public String toString()
         {
-            return name + " :: " + jsonObject != null ? jsonObject.toString() : "";
+            return name + " :: " + ( jsonObject != null ? jsonObject.toString() : "" );
         }
     }
 
