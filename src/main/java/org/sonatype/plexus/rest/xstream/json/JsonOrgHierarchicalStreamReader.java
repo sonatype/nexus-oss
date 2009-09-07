@@ -16,28 +16,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
+import com.thoughtworks.xstream.converters.ErrorWriter;
+import com.thoughtworks.xstream.core.util.FastStack;
+import com.thoughtworks.xstream.io.HierarchicalStreamReader;
+import com.thoughtworks.xstream.io.StreamException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.sonatype.plexus.rest.xstream.LookAheadStreamReader;
 
-import com.thoughtworks.xstream.converters.ErrorWriter;
-import com.thoughtworks.xstream.core.util.FastStack;
-import com.thoughtworks.xstream.io.HierarchicalStreamReader;
-import com.thoughtworks.xstream.io.StreamException;
-
 /**
  * HierarchicalStreamReader for JSON that uses json.org/java stuff for reading.
- * 
+ *
  * @author cstamas
  */
 public class JsonOrgHierarchicalStreamReader
     implements HierarchicalStreamReader, LookAheadStreamReader
 {
+
     private ClassHintProvider classHintProvider;
 
     private FastStack objects = new FastStack( 16 );
@@ -49,6 +49,7 @@ public class JsonOrgHierarchicalStreamReader
     public class EmptyIterator
         implements Iterator
     {
+
         public boolean hasNext()
         {
             return false;
@@ -68,6 +69,7 @@ public class JsonOrgHierarchicalStreamReader
     public class IntegerIterator
         implements Iterator
     {
+
         private int max;
 
         private int ptr;
@@ -97,6 +99,7 @@ public class JsonOrgHierarchicalStreamReader
     public class ArrayValuesIterator
         implements Iterator
     {
+
         private JSONArray array;
 
         private int ptr;
@@ -133,14 +136,15 @@ public class JsonOrgHierarchicalStreamReader
     public class ObjectValuesIterator
         implements Iterator
     {
+
         private JSONObject object;
 
         private Iterator keys;
 
-        public ObjectValuesIterator( JSONObject object )
+        public ObjectValuesIterator( JSONObject object, Iterator keys )
         {
             this.object = object;
-            this.keys = object.keys();
+            this.keys = keys;
         }
 
         public boolean hasNext()
@@ -168,6 +172,7 @@ public class JsonOrgHierarchicalStreamReader
 
     public class Node
     {
+
         public final String name;
 
         public final NodeType nodeType;
@@ -187,7 +192,7 @@ public class JsonOrgHierarchicalStreamReader
             this.name = name;
             this.jsonObject = object;
             if ( object.toString().equals( Boolean.TRUE.toString() )
-                || object.toString().equals( Boolean.FALSE.toString() ) )
+                 || object.toString().equals( Boolean.FALSE.toString() ) )
             {
                 nodeType = NodeType.BOOLEAN;
                 valueNull = false;
@@ -219,7 +224,7 @@ public class JsonOrgHierarchicalStreamReader
                 values = new ArrayValuesIterator( (JSONArray) object );
                 attributes = null;
             }
-            else if (object.getClass().isAssignableFrom( Date.class ))
+            else if ( object.getClass().isAssignableFrom( Date.class ) )
             {
                 nodeType = NodeType.DATE;
                 valueNull = false;
@@ -241,8 +246,7 @@ public class JsonOrgHierarchicalStreamReader
                 else
                 {
                     attributes = new ArrayList<String>();
-                    keys = ( (JSONObject) object ).keys();
-                    values = new ObjectValuesIterator( (JSONObject) object );
+                    final Collection<String> filteredKeys = new ArrayList<String>();
                     for ( Iterator keys = ( (JSONObject) object ).keys(); keys.hasNext(); )
                     {
                         String key = (String) keys.next();
@@ -250,8 +254,13 @@ public class JsonOrgHierarchicalStreamReader
                         {
                             attributes.add( key.substring( 1 ) );
                         }
+                        else
+                        {
+                            filteredKeys.add( key );
+                        }
                     }
-
+                    keys = filteredKeys.iterator();
+                    values = new ObjectValuesIterator( (JSONObject) object, filteredKeys.iterator() );
                 }
             }
         }
@@ -270,7 +279,7 @@ public class JsonOrgHierarchicalStreamReader
     }
 
     public JsonOrgHierarchicalStreamReader( Reader reader, boolean expectTopLevelEnvelope,
-        ClassHintProvider classHintProvider )
+                                            ClassHintProvider classHintProvider )
     {
         super();
 
@@ -302,7 +311,8 @@ public class JsonOrgHierarchicalStreamReader
                 {
                     // if using "envelopes", array cannot be root object
                     throw new StreamException(
-                        "JSON root element must be JSONObject with one member, and it must start with '{' (expectTopLevelEnvelope is TRUE)!" );
+                        "JSON root element must be JSONObject with one member, and it must start with '{' (expectTopLevelEnvelope is TRUE)!"
+                    );
                 }
                 else if ( jsonString.startsWith( "{" ) )
                 {
@@ -311,13 +321,14 @@ public class JsonOrgHierarchicalStreamReader
                     if ( keys.length == 1 )
                     {
                         // this is an "envelope"
-                        currentKey = keys[0];
+                        currentKey = keys[ 0 ];
                         currentNode = new Node( currentKey, jsonObject.get( currentKey ) );
                     }
                     else
                     {
                         throw new StreamException(
-                            "JSON root element must be JSONObject with one member, and it must start with '{' (expectTopLevelEnvelope is TRUE)!" );
+                            "JSON root element must be JSONObject with one member, and it must start with '{' (expectTopLevelEnvelope is TRUE)!"
+                        );
                     }
                 }
                 else
@@ -352,7 +363,8 @@ public class JsonOrgHierarchicalStreamReader
                 else
                 {
                     throw new StreamException(
-                        "JSON root element must be JSONObject or JSONArray, it must start with '{' or '['!" );
+                        "JSON root element must be JSONObject or JSONArray, it must start with '{' or '['!"
+                    );
                 }
             }
 
@@ -515,7 +527,7 @@ public class JsonOrgHierarchicalStreamReader
     public String getValue()
     {
         if ( currentNode.nodeType == NodeType.STRING || currentNode.nodeType == NodeType.BOOLEAN
-            || currentNode.nodeType == NodeType.NUMBER )
+             || currentNode.nodeType == NodeType.NUMBER )
         {
             if ( currentNode.valueNull )
             {
