@@ -99,18 +99,4 @@ public class LogManagerTest
         assertEquals( appenderFileA, manager.getLogFile( "appenderA.log" ) );
         assertEquals( appenderFileB, manager.getLogFile( "appenderB.log" ) );
     }
-    
-    public void testLogFileLock()
-        throws Exception
-    {
-        Logger rootLogger = Logger.getRootLogger();
-
-        File logFile = new File( getBasedir(), "target/logs/appender.log" );
-        rootLogger.addAppender( new FileAppender( new PatternLayout(), logFile.getAbsolutePath() ) );
-        logger.info( "Test log file lock." );
-
-        this.getContainer().dispose();
-
-        assertTrue( logFile.delete() );
-    }
 }

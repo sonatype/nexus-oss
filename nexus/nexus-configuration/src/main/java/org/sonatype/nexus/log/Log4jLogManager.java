@@ -28,18 +28,17 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.util.EnhancedProperties;
 
 /**
  * Log4J log manager.
- *
+ * 
  * @author cstamas
  * @author juven
  */
 @Component( role = LogManager.class )
 public class Log4jLogManager
-    implements LogManager, Disposable
+    implements LogManager
 {
     @Requirement
     private LogConfiguration<EnhancedProperties> logConfiguration;
@@ -67,55 +66,55 @@ public class Log4jLogManager
     public Set<File> getLogFiles()
     {
         HashSet<File> files = new HashSet<File>();
-        
+
         for ( Logger logger : getLoggers() )
         {
-        	files.addAll( getLogFiles( logger ) );
+            files.addAll( getLogFiles( logger ) );
         }
 
         return files;
     }
-    
+
     @SuppressWarnings( { "deprecation", "unchecked" } )
     private List<Logger> getLoggers()
     {
-    	List<Logger> result = new ArrayList<Logger>();
-    	
-    	result.add( Logger.getRootLogger() );
-    	
-    	Enumeration<Category> categories = Category.getCurrentCategories();
-    	
-    	while ( categories.hasMoreElements() )
-    	{
-    		Category category = categories.nextElement();
-    		
-    		if ( category instanceof Logger )
-    		{
-    			result.add( (Logger) category );
-    		}
-    	}
-    	
-    	return result;
+        List<Logger> result = new ArrayList<Logger>();
+
+        result.add( Logger.getRootLogger() );
+
+        Enumeration<Category> categories = Category.getCurrentCategories();
+
+        while ( categories.hasMoreElements() )
+        {
+            Category category = categories.nextElement();
+
+            if ( category instanceof Logger )
+            {
+                result.add( (Logger) category );
+            }
+        }
+
+        return result;
     }
-    
+
     @SuppressWarnings( "unchecked" )
     private List<FileAppender> getFileAppenders( Category logger )
     {
-    	List<FileAppender> result = new ArrayList<FileAppender>();
-    	
-    	Enumeration<Appender> appenders = logger.getAllAppenders();
-    	
+        List<FileAppender> result = new ArrayList<FileAppender>();
+
+        Enumeration<Appender> appenders = logger.getAllAppenders();
+
         while ( appenders.hasMoreElements() )
         {
             Appender appender = appenders.nextElement();
 
             if ( appender instanceof FileAppender )
             {
-            	result.add( (FileAppender)appender);
+                result.add( (FileAppender) appender );
             }
         }
-    	
-    	return result;
+
+        return result;
     }
 
     protected Set<File> getLogFiles( Category logger )
@@ -124,14 +123,14 @@ public class Log4jLogManager
 
         for ( FileAppender appender : getFileAppenders( logger ) )
         {
-        	String file = appender.getFile();
-        	
-        	if ( file == null )
-        	{
-        		continue;
-        	}
-        	
-        	files.add( new File( file ) );
+            String file = appender.getFile();
+
+            if ( file == null )
+            {
+                continue;
+            }
+
+            files.add( new File( file ) );
         }
 
         return files;
@@ -174,15 +173,4 @@ public class Log4jLogManager
 
         logConfiguration.save();
     }
-
-	public void dispose() 
-	{
-		for ( Logger logger : getLoggers() )
-		{
-			for ( FileAppender appender : getFileAppenders( logger) )
-			{
-				appender.close();
-			}
-		}
-	}
 }
