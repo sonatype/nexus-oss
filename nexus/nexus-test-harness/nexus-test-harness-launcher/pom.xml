@@ -99,7 +99,6 @@
             </goals>
             <configuration>
               <descriptors>
-                <descriptor>src/assemble/resources.xml</descriptor>
                 <descriptor>src/assemble/repo.xml</descriptor>
               </descriptors>
             </configuration>
