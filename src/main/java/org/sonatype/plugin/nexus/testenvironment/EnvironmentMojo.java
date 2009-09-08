@@ -24,6 +24,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactIdFilter;
 import org.apache.maven.shared.artifact.filter.collection.ClassifierFilter;
@@ -34,7 +35,10 @@ import org.apache.maven.shared.filtering.MavenFileFilter;
 import org.apache.maven.shared.filtering.MavenFilteringException;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.archiver.Archiver;
+import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.UnArchiver;
+import org.codehaus.plexus.archiver.zip.ZipArchiver;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.context.ContextException;
@@ -57,7 +61,6 @@ public class EnvironmentMojo
 {
 
     /** @component */
-    @SuppressWarnings( "unused" )
     private org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
     /** @component */
@@ -83,7 +86,7 @@ public class EnvironmentMojo
 
     /**
      * The maven project.
-     *
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -92,7 +95,7 @@ public class EnvironmentMojo
 
     /**
      * Where nexus instance should be extracted
-     *
+     * 
      * @parameter default-value="${project.build.directory}/nexus"
      * @required
      */
@@ -100,42 +103,42 @@ public class EnvironmentMojo
 
     /**
      * Artifact file containing nexus bundle
-     *
+     * 
      * @parameter
      */
     private MavenArtifact nexusBundleArtifact;
 
     /**
      * Emma used on ITs
-     *
+     * 
      * @parameter
      */
     private MavenArtifact emmaArtifact;
 
     /**
      * Artifact file containing nexus bundle
-     *
+     * 
      * @parameter
      */
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
      * Artifact file containing nexus bundle
-     *
+     * 
      * @parameter
      */
     private MavenArtifact[] extraResourcesArtifacts;
 
     /**
      * When true setup a maven instance
-     *
+     * 
      * @parameter default-value="true"
      */
     private boolean setupMaven;
 
     /**
      * Maven used on ITs
-     *
+     * 
      * @parameter
      * @see EnvironmentMojo#setupMaven
      */
@@ -143,7 +146,7 @@ public class EnvironmentMojo
 
     /**
      * Where maven instace should be created
-     *
+     * 
      * @parameter default-value="${project.build.directory}/maven"
      * @see EnvironmentMojo#setupMaven
      */
@@ -168,6 +171,11 @@ public class EnvironmentMojo
      * @parameter default-value="false"
      */
     private boolean extractNexusPluginsJavascript;
+
+    /**
+     * @component
+     */
+    private MavenProjectHelper projectHelper;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -266,6 +274,15 @@ public class EnvironmentMojo
         if ( resourcesSourceLocation.isDirectory() )
         {
             project.getProperties().put( "test-resources-source-folder", getPath( resourcesSourceLocation ) );
+
+            try
+            {
+                attachResources();
+            }
+            catch ( Exception e )
+            {
+                throw new MojoFailureException( "Unable to attach 'resources' bundle", e );
+            }
         }
 
         // start default configs
@@ -318,6 +335,19 @@ public class EnvironmentMojo
         {
             extractPluginJs();
         }
+    }
+
+    private void attachResources()
+        throws ArchiverException, IOException, ComponentLookupException
+    {
+        ZipArchiver za = (ZipArchiver) plexus.lookup( Archiver.ROLE, "zip" );
+        za.addDirectory( resourcesSourceLocation );
+        File destFile =
+            new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-resources.zip" );
+        za.setDestFile( destFile );
+        za.createArchive();
+
+        projectHelper.attachArtifact( project, "zip", "resources", destFile );
     }
 
     private void extractPluginJs()
