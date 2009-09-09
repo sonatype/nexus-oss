@@ -33,9 +33,9 @@ public class SnapshotRemoverTask
 {
     public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
 
-    public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
+    public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 20;
 
-    public static final int DEFAULT_OLDER_THAN_DAYS = -1;
+    public static final int DEFAULT_OLDER_THAN_DAYS = 0;
 
     public int getMinSnapshotsToKeep()
     {
@@ -85,6 +85,10 @@ public class SnapshotRemoverTask
     public SnapshotRemovalResult doRun()
         throws Exception
     {
+        
+        if(getMinSnapshotsToKeep() == 0 && getRemoveOlderThanDays() == 0) {
+            throw new IllegalArgumentException( "Number of snapshots and number of days to be kept can't be both zero." );
+        }
 
         if ( getMinSnapshotsToKeep() < -1 )
         {

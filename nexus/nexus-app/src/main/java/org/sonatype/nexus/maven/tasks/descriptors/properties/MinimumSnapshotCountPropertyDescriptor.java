@@ -43,7 +43,7 @@ public class MinimumSnapshotCountPropertyDescriptor
     @Override
     public String getRegexValidation()
     {
-        return RegexUtil.BIGGER_THEN_MINUS_ONE;
+        return RegexUtil.NUMBERS_POSITIVE_AND_MINUS_ONE;
     }
 
 }
