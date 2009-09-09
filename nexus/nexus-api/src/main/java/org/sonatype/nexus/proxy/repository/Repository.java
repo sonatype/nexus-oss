@@ -339,15 +339,13 @@ public interface Repository
     RepositoryWritePolicy getWritePolicy();
 
     /**
-     * Sets the write policy for the repo.
-     * See {@link RepositoryWritePolicy}.
-     * This does not affect the in-repository caching using LocalStorage. It just says, that from
-     * the "outer" perspective, this repo behaves like read-only repository, and deployment is disabled for example.
+     * Sets the write policy for the repo. See {@link RepositoryWritePolicy}. This does not affect the in-repository
+     * caching using LocalStorage. It just says, that from the "outer" perspective, this repo behaves like read-only
+     * repository, and deployment is disabled for example.
      * 
      * @param val the val
      */
     void setWritePolicy( RepositoryWritePolicy writePolicy );
-   
 
     /**
      * Is Repository indexable?.
@@ -371,7 +369,8 @@ public interface Repository
     boolean isSearchable();
 
     /**
-     * Sets the searchable property of repository. If true, its content will be searched by Indexer (when doing "global", non targeted searches), otherwise not.
+     * Sets the searchable property of repository. If true, its content will be searched by Indexer (when doing
+     * "global", non targeted searches), otherwise not.
      * 
      * @param val the val
      */
@@ -425,24 +424,33 @@ public interface Repository
 
     // ==================================================
     // Alternative (and unprotected) Content access
+    // THESE ARE DEPRECATED! They used as circumvention for tasks running without valid JSec subject
 
+    @Deprecated
     StorageItem retrieveItem( boolean fromTask, ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException;
 
+    @Deprecated
     void copyItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
+    @Deprecated
     void moveItem( boolean fromTask, ResourceStoreRequest from, ResourceStoreRequest to )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
+    @Deprecated
     void deleteItem( boolean fromTask, ResourceStoreRequest request )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
-    void storeItem( boolean fromTask, StorageItem item )
-        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
-
+    @Deprecated
     Collection<StorageItem> list( boolean fromTask, ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException;
+
+    // Alternative content access
+    // These will stay!
+    
+    void storeItem( boolean fromTask, StorageItem item )
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 
     Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
         throws IllegalOperationException, ItemNotFoundException, StorageException;
