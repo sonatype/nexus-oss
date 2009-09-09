@@ -336,38 +336,42 @@ public class DefaultNexus
     public NexusStreamResponse getApplicationLogAsStream( String logFile, long from, long count )
         throws IOException
     {
-        if ( !logFile.contains( File.pathSeparator ) )
+        if ( getLogger().isDebugEnabled() )
         {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Retrieving " + logFile + " log file." );
-            }
-
-            File log = logManager.getLogFile( logFile );
-
-            // "chroot"ing it to nexus log dir
-            if ( log.exists() )
-            {
-                NexusStreamResponse response = new NexusStreamResponse();
-
-                response.setName( logFile );
-
-                // TODO:
-                response.setMimeType( "text/plain" );
-
-                response.setSize( log.length() );
-
-                response.setFromByte( from );
-
-                response.setBytesCount( count );
-
-                response.setInputStream( new LimitedInputStream( new FileInputStream( log ), from, count ) );
-
-                return response;
-            }
+            getLogger().debug( "Retrieving " + logFile + " log file." );
         }
 
-        return null;
+        if ( logFile.contains( File.pathSeparator ) )
+        {
+            getLogger().warn( "Nexus refuses to retrive log files with path separators in its name." );
+
+            return null;
+        }
+
+        File log = logManager.getLogFile( logFile );
+
+        if ( log == null || !log.exists() )
+        {
+            getLogger().warn( "Log file does not exist: [" + logFile + "]" );
+            
+            return null;
+        }
+
+        NexusStreamResponse response = new NexusStreamResponse();
+
+        response.setName( logFile );
+
+        response.setMimeType( "text/plain" );
+
+        response.setSize( log.length() );
+
+        response.setFromByte( from );
+
+        response.setBytesCount( count );
+
+        response.setInputStream( new LimitedInputStream( new FileInputStream( log ), from, count ) );
+
+        return response;
     }
 
     public LogConfig getLogConfig()
