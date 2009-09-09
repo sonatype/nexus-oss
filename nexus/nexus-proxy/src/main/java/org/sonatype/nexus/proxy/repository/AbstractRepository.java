@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.Lock;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.LogEnabled;
@@ -54,6 +53,7 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.ReadLockingContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
@@ -317,7 +317,7 @@ public abstract class AbstractRepository
         }
 
         // Dont use getLocalUrl since that applies default
-        if ( getCurrentConfiguration( false ).getLocalStorage() != null 
+        if ( getCurrentConfiguration( false ).getLocalStorage() != null
             && !StringUtils.equals( newLocalUrl, getCurrentConfiguration( false ).getLocalStorage().getUrl() ) )
         {
             this.localUrlChanged = true;
@@ -734,14 +734,14 @@ public abstract class AbstractRepository
         maintainNotFoundCache( request.getRequestPath() );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
-        
+
         uid.lock( Action.read );
 
         try
         {
             StorageItem item = doRetrieveItem( request );
 
-            // Dyna content?
+            // file with generated content?
             if ( item instanceof StorageFileItem
                 && item.getAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID ) )
             {
@@ -770,6 +770,13 @@ public abstract class AbstractRepository
 
                     throw new ItemNotFoundException( request, this );
                 }
+            }
+            // plain file? wrap it
+            else if ( item instanceof StorageFileItem )
+            {
+                StorageFileItem file = (StorageFileItem) item;
+
+                file.setContentLocator( new ReadLockingContentLocator( uid, file.getContentLocator() ) );
             }
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventRetrieve( this, item ) );
@@ -820,9 +827,9 @@ public abstract class AbstractRepository
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
         RepositoryItemUid toUid = createUid( to.getRequestPath() );
-        
+
         fromUid.lock( Action.read );
-        
+
         toUid.lock( getResultingActionOnWrite( to ) );
 
         try
@@ -853,7 +860,7 @@ public abstract class AbstractRepository
         finally
         {
             toUid.unlock();
-            
+
             fromUid.unlock();
         }
     }

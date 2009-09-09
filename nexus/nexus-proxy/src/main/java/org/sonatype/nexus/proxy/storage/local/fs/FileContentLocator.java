@@ -11,12 +11,14 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.item;
+package org.sonatype.nexus.proxy.storage.local.fs;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.sonatype.nexus.proxy.item.ContentLocator;
 
 /**
  * A content locator that emits a InputStream using a File. Reusable.
