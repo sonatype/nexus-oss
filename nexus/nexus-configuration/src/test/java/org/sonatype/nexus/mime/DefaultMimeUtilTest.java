@@ -36,6 +36,13 @@ public class DefaultMimeUtilTest
         return MimeUtil2.getMostSpecificMimeType( mimeTypes ).toString();
     }
 
+    protected String getMimeType( String fileName )
+    {
+        Collection<MimeType> mimeTypes = medseaMimeUtil.getMimeTypes( fileName );
+
+        return MimeUtil2.getMostSpecificMimeType( mimeTypes ).toString();
+    }
+
     public void testSimple()
         throws Exception
     {
@@ -53,5 +60,23 @@ public class DefaultMimeUtilTest
         testFile = getTestFile( "target/test-classes/org/sonatype/nexus/mime/DefaultMimeUtilTest.class" );
 
         assertEquals( getMimeType( testFile ), mimeUtil.getMimeType( testFile ) );
+    }
+
+    public void testSimpleByName()
+        throws Exception
+    {
+        String testFileName = null;
+
+        testFileName = "pom.xml";
+        
+        assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );
+
+        testFileName = "DefaultMimeUtilTest.java";
+
+        assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );
+
+        testFileName = "DefaultMimeUtilTest.class";
+
+        assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );
     }
 }

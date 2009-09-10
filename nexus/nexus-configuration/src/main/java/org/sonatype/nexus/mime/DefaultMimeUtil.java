@@ -27,6 +27,11 @@ public class DefaultMimeUtil
         return mimeUtil;
     }
 
+    public String getMimeType( String fileName )
+    {
+        return MimeUtil2.getMostSpecificMimeType( getMimeUtil2().getMimeTypes( fileName ) ).toString();
+    }
+
     public String getMimeType( File file )
     {
         return MimeUtil2.getMostSpecificMimeType( getMimeUtil2().getMimeTypes( file ) ).toString();
