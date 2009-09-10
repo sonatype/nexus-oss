@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.Query;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.source.ArchetypeDataSource;
@@ -28,7 +27,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 /**
  * @author Eugene Kuleshov
  */
-@Component(role=ArchetypeDataSource.class, hint="nexus")
+@Component( role = ArchetypeDataSource.class, hint = "nexus" )
 public class NexusArchetypeDataSource
     extends AbstractLogEnabled
     implements ArchetypeDataSource
@@ -45,11 +44,16 @@ public class NexusArchetypeDataSource
         {
             Map<String, String> repositories = getRepositoryMap();
 
-            FlatSearchRequest searchRequest = new FlatSearchRequest( //
-                new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) ) );
-            
+            Query pq = indexer.constructQuery( ArtifactInfo.PACKAGING, "^maven-archetype$" );
+
+            FlatSearchRequest searchRequest = new FlatSearchRequest( pq );
+
+            // cstamas: old code was this
+            // FlatSearchRequest searchRequest = new FlatSearchRequest( //
+            // new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-archetype" ) ) );
+
             FlatSearchResponse searchResponse = indexer.searchFlat( searchRequest );
-            
+
             for ( ArtifactInfo info : searchResponse.getResults() )
             {
                 Archetype archetype = new Archetype();
@@ -91,11 +95,11 @@ public class NexusArchetypeDataSource
     {
         // TODO maybe update index
     }
-    
+
     // cstamas removed. is this needed? Settings is in maven-core and it brings a lot of deps to manage
-    //public void updateCatalog( Properties properties, Archetype archetype, Settings settings )
-    //{
-        // TODO maybe update index
-    //}
+    // public void updateCatalog( Properties properties, Archetype archetype, Settings settings )
+    // {
+    // TODO maybe update index
+    // }
 
 }
