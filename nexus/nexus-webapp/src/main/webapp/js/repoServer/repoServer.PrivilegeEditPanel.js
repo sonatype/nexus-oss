@@ -29,7 +29,9 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
     data: [['repository',this.convertRepositoryProperty.createDelegate( this )],
            ['repogroup',this.convertRepoGroupProperty.createDelegate( this )],
            ['repotarget',this.convertRepoTargetProperty.createDelegate( this )],
-           ['string',this.convertStringProperty.createDelegate( this )]] 
+           ['string',this.convertStringProperty.createDelegate( this )],
+           ['repoOrGroup', this.convertRepoOrGroupProperty.createDelegate( this )]
+           ] 
   });
   
   this.privilegeTypeStore = new Ext.data.JsonStore( {
@@ -224,6 +226,16 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
   
   convertRepoTargetProperty: function( value, parent ) {
     return this.convertDataValue( value, this.targetStore, 'id', 'name' );
+  },
+  
+  convertRepoOrGroupProperty: function( value, parent ) {
+  	var result = '';
+  	result = this.convertRepoGroupProperty( value, parent );
+  	if ( !Ext.isEmpty( result )) {
+  		return result;
+  	}
+  	result = this.convertRepositoryProperty( value, parent );
+  	return result;
   },
   
   onAddMenuInit: function( menu ) {
