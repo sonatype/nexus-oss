@@ -19,6 +19,7 @@ import java.net.URL;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -52,6 +53,17 @@ public abstract class AbstractLocalRepositoryStorage
      */
     @Requirement
     private Wastebasket wastebasket;
+
+    /**
+     * The MIME util.
+     */
+    @Requirement
+    private MimeUtil mimeUtil;
+
+    protected MimeUtil getMimeUtil()
+    {
+        return mimeUtil;
+    }
 
     /**
      * Gets the absolute url from base.
@@ -100,15 +112,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
     }
 
     public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -127,15 +137,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         touchItemLastRequested( System.currentTimeMillis(), repository, request );
     }
 
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -152,16 +160,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
-        throws ItemNotFoundException,
-            StorageException
+        throws ItemNotFoundException, StorageException
     {
         getAttributesHandler().getAttributeStorage().putAttribute( item );
     }
 
     public final void deleteItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException,
-            UnsupportedStorageOperationException,
-            StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, StorageException
     {
         wastebasket.delete( this, repository, request );
     }

@@ -15,6 +15,8 @@ package org.sonatype.nexus.proxy.item;
 
 import java.io.UnsupportedEncodingException;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * A simple content locator that emits a string actually.
  * 
@@ -29,7 +31,12 @@ public class StringContentLocator
 
     public StringContentLocator( String content )
     {
-        super( toByteArray( content ) );
+        this( content, null );
+    }
+
+    public StringContentLocator( String content, String mimeType )
+    {
+        super( toByteArray( content ), StringUtils.isBlank( mimeType ) ? "text/plain" : mimeType );
 
         this.content = content;
     }

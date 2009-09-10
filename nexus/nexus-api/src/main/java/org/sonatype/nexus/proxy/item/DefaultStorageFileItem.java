@@ -36,8 +36,6 @@ public class DefaultStorageFileItem
 
     private long length;
 
-    private String mimeType;
-
     /**
      * Instantiates a new default storage file item.
      * 
@@ -105,12 +103,7 @@ public class DefaultStorageFileItem
 
     public String getMimeType()
     {
-        return mimeType;
-    }
-
-    public void setMimeType( String mimeType )
-    {
-        this.mimeType = mimeType;
+        return getContentLocator().getMimeType();
     }
 
     public boolean isReusableStream()

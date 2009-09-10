@@ -226,7 +226,7 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     DefaultStorageLinkItem link =
                         new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
-                                                    getLinkTarget( target ) );
+                            getLinkTarget( target ) );
                     getAttributesHandler().fetchAttributes( link );
                     link.setModified( target.lastModified() );
                     link.setCreated( target.lastModified() );
@@ -245,7 +245,7 @@ public class DefaultFSLocalRepositoryStorage
             {
                 DefaultStorageFileItem file =
                     new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                                                new FileContentLocator( target ) );
+                        new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );

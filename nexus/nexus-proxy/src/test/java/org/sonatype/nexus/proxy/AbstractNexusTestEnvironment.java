@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.scheduling.Scheduler;
@@ -28,6 +29,8 @@ public abstract class AbstractNexusTestEnvironment
     private Scheduler scheduler;
 
     private RepositoryItemUidFactory repositoryItemUidFactory;
+
+    private MimeUtil mimeUtil;
 
     protected void setUp()
         throws Exception
@@ -45,7 +48,9 @@ public abstract class AbstractNexusTestEnvironment
         cacheManager = lookup( CacheManager.class );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
-        
+
+        mimeUtil = lookup( MimeUtil.class );
+
         this.lookup( SecuritySystem.class ).setSecurityEnabled( false );
     }
 
@@ -58,7 +63,7 @@ public abstract class AbstractNexusTestEnvironment
     {
         return cacheManager;
     }
-    
+
     protected Scheduler getScheduler()
     {
         return scheduler;
@@ -67,6 +72,11 @@ public abstract class AbstractNexusTestEnvironment
     protected RepositoryItemUidFactory getRepositoryItemUidFactory()
     {
         return repositoryItemUidFactory;
+    }
+
+    protected MimeUtil getMimeUtil()
+    {
+        return mimeUtil;
     }
 
 }

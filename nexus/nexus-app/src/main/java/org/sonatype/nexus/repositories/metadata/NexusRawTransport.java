@@ -89,7 +89,7 @@ public class NexusRawTransport
             new ResourceStoreRequest( path ),
             true,
             true,
-            new ByteArrayContentLocator( data ) );
+            new ByteArrayContentLocator( data, "text/xml" ) );
 
         repository.storeItem( false, file );
 

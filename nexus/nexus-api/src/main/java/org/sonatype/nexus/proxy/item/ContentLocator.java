@@ -33,6 +33,13 @@ public interface ContentLocator
         throws IOException;
 
     /**
+     * Returns the MIME type of the content.
+     * 
+     * @return
+     */
+    String getMimeType();
+
+    /**
      * Checks if is reusable.
      * 
      * @return true, if is reusable

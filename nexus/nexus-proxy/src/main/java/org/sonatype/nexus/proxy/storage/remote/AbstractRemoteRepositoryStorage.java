@@ -23,6 +23,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -43,6 +44,9 @@ public abstract class AbstractRemoteRepositoryStorage
 {
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
+    
+    @Requirement
+    private MimeUtil mimeUtil;
 
     /**
      * The edtion, that will tell us is there some change happened with installation.
@@ -58,6 +62,11 @@ public abstract class AbstractRemoteRepositoryStorage
      * Since storages are shared, we are tracking the last changes from each of them.
      */
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
+    
+    protected MimeUtil getMimeUtil()
+    {
+        return mimeUtil;
+    }
 
     /**
      * Gets the absolute url from base.

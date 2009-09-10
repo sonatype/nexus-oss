@@ -44,13 +44,6 @@ public interface StorageFileItem
     String getMimeType();
 
     /**
-     * Sets the mime type.
-     * 
-     * @param mimeType
-     */
-    void setMimeType( String mimeType );
-
-    /**
      * Shorthand method, goes to ContentLocator. Reusable stream. See {@link ContentLocator}
      * 
      * @return true, if successful

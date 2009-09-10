@@ -27,6 +27,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -118,6 +119,9 @@ public abstract class AbstractRepository
     @Requirement
     private Walker walker;
 
+    @Requirement
+    private MimeUtil mimeUtil;
+
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
 
@@ -146,6 +150,11 @@ public abstract class AbstractRepository
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    protected MimeUtil getMimeUtil()
+    {
+        return mimeUtil;
     }
 
     // ==
@@ -608,7 +617,8 @@ public abstract class AbstractRepository
         }
 
         DefaultStorageFileItem fItem =
-            new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is ) );
+            new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is, getMimeUtil()
+                .getMimeType( request.getRequestPath() ) ) );
 
         if ( userAttributes != null )
         {
@@ -842,7 +852,7 @@ public abstract class AbstractRepository
                 {
                     DefaultStorageFileItem target =
                         new DefaultStorageFileItem( this, to, true, true, new PreparedContentLocator(
-                            ( (StorageFileItem) item ).getInputStream() ) );
+                            ( (StorageFileItem) item ).getInputStream(), ( (StorageFileItem) item ).getMimeType() ) );
 
                     target.getItemContext().putAll( item.getItemContext() );
 
@@ -1179,11 +1189,11 @@ public abstract class AbstractRepository
 
     protected AbstractStorageItem createStorageItem( ResourceStoreRequest request, byte[] bytes )
     {
-        ContentLocator content = new ByteArrayContentLocator( bytes );
+        ContentLocator content =
+            new ByteArrayContentLocator( bytes, getMimeUtil().getMimeType( request.getRequestPath() ) );
 
         DefaultStorageFileItem result =
             new DefaultStorageFileItem( this, request, true /* isReadable */, false /* isWritable */, content );
-        result.setMimeType( "text/plain" );
         result.setLength( bytes.length );
 
         return result;

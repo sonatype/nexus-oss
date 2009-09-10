@@ -33,6 +33,11 @@ public class ReadLockingContentLocator
         return new ReadLockingInputStream( wrappedUid, wrappedLocator.getContent() );
     }
 
+    public String getMimeType()
+    {
+        return wrappedLocator.getMimeType();
+    }
+
     public boolean isReusable()
     {
         return wrappedLocator.isReusable();

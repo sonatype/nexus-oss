@@ -233,8 +233,8 @@ public class M2GroupRepository
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Item for path " + request.toString() + " merged from "
-                                       + Integer.toString( items.size() ) + " found items." );
+                    "Item for path " + request.toString() + " merged from " + Integer.toString( items.size() )
+                        + " found items." );
             }
 
             return item;
@@ -272,12 +272,10 @@ public class M2GroupRepository
     protected StorageCompositeFileItem createMergedMetadataItem( ResourceStoreRequest request, byte[] content,
                                                                  List<StorageItem> sources )
     {
-        ContentLocator contentLocator = new ByteArrayContentLocator( content );
+        ContentLocator contentLocator = new ByteArrayContentLocator( content, "text/xml" );
 
         DefaultStorageCompositeFileItem result =
             new DefaultStorageCompositeFileItem( this, request, true, false, contentLocator, sources );
-
-        result.setMimeType( "text/plain" );
 
         result.setLength( content.length );
 

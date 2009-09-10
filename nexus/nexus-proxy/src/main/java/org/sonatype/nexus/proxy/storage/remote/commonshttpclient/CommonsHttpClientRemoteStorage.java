@@ -163,19 +163,25 @@ public class CommonsHttpClientRemoteStorage
                     is = new GZIPInputStream( is );
                 }
 
+                String mimeType = null;
+
+                if ( method.getResponseHeader( "content-type" ) != null )
+                {
+                    mimeType = method.getResponseHeader( "content-type" ).getValue();
+                }
+                else
+                {
+                    mimeType = getMimeUtil().getMimeType( request.getRequestPath() );
+                }
+
                 DefaultStorageFileItem httpItem =
-                    new DefaultStorageFileItem( repository, request, true, true,
-                                                new PreparedContentLocator( new HttpClientInputStream( get, is ) ) );
+                    new DefaultStorageFileItem( repository, request, true, true, new PreparedContentLocator(
+                        new HttpClientInputStream( get, is ), mimeType ) );
 
                 if ( get.getResponseContentLength() != -1 )
                 {
                     // FILE
                     httpItem.setLength( get.getResponseContentLength() );
-                }
-
-                if ( method.getResponseHeader( "content-type" ) != null )
-                {
-                    httpItem.setMimeType( method.getResponseHeader( "content-type" ).getValue() );
                 }
 
                 httpItem.setRemoteUrl( remoteURL.toString() );
@@ -290,8 +296,8 @@ public class CommonsHttpClientRemoteStorage
         HttpClient httpClient = null;
 
         getLogger().info(
-                          "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId()
-                              + "\" (\"" + repository.getName() + "\"), updating HttpClient..." );
+            "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
+                + repository.getName() + "\"), updating HttpClient..." );
 
         int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
 
@@ -330,8 +336,7 @@ public class CommonsHttpClientRemoteStorage
             try
             {
                 getLogger().debug(
-                                   "Invoking HTTP " + method.getName() + " method against remote location "
-                                       + method.getURI() );
+                    "Invoking HTTP " + method.getName() + " method against remote location " + method.getURI() );
             }
             catch ( URIException e )
             {
@@ -423,8 +428,7 @@ public class CommonsHttpClientRemoteStorage
             catch ( DateParseException ex )
             {
                 getLogger().warn(
-                                  "Could not parse date '" + date
-                                      + "', using system current time as item creation time.", ex );
+                    "Could not parse date '" + date + "', using system current time as item creation time.", ex );
             }
             catch ( NullPointerException ex )
             {

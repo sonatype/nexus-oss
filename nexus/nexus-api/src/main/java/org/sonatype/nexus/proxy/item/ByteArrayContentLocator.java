@@ -22,15 +22,24 @@ public class ByteArrayContentLocator
 {
     private final byte[] content;
 
-    public ByteArrayContentLocator( byte[] content )
+    private final String mimeType;
+
+    public ByteArrayContentLocator( byte[] content, String mimeType )
     {
         this.content = content;
+
+        this.mimeType = mimeType;
     }
 
     public InputStream getContent()
         throws IOException
     {
         return new ByteArrayInputStream( content );
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
     }
 
     public boolean isReusable()

@@ -30,17 +30,26 @@ public class FileContentLocator
 {
     private final File file;
 
-    public FileContentLocator( File file )
+    private final String mimeType;
+
+    public FileContentLocator( File file, String mimeType )
     {
         super();
 
         this.file = file;
+
+        this.mimeType = mimeType;
     }
 
     public InputStream getContent()
         throws IOException
     {
         return new FileInputStream( file );
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
     }
 
     public boolean isReusable()
@@ -52,4 +61,5 @@ public class FileContentLocator
     {
         return file;
     }
+
 }

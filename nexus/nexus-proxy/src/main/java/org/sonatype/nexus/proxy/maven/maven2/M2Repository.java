@@ -191,7 +191,7 @@ public class M2Repository
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 OutputStreamWriter osw = new OutputStreamWriter( bos );
                 metadataWriter.write( osw, imd );
-                mdFile.setContentLocator( new ByteArrayContentLocator( bos.toByteArray() ) );
+                mdFile.setContentLocator( new ByteArrayContentLocator( bos.toByteArray(), mdFile.getMimeType() ) );
             }
             catch ( Exception e )
             {
@@ -201,7 +201,7 @@ public class M2Repository
                 {
                     // get backup and continue operation
                     backup.reset();
-                    mdFile.setContentLocator( new PreparedContentLocator( backup ) );
+                    mdFile.setContentLocator( new PreparedContentLocator( backup, mdFile.getMimeType() ) );
                 }
             }
         }

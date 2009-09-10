@@ -26,15 +26,24 @@ public class PreparedContentLocator
 {
     private final InputStream content;
 
-    public PreparedContentLocator( InputStream content )
+    private final String mimeType;
+
+    public PreparedContentLocator( InputStream content, String mimeType )
     {
         this.content = content;
+
+        this.mimeType = mimeType;
     }
 
     public InputStream getContent()
         throws IOException
     {
         return content;
+    }
+
+    public String getMimeType()
+    {
+        return mimeType;
     }
 
     public boolean isReusable()

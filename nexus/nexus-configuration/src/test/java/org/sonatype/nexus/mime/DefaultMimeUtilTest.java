@@ -71,6 +71,14 @@ public class DefaultMimeUtilTest
         
         assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );
 
+        testFileName = "/some/path/pom.xml";
+        
+        assertEquals( getMimeType( "pom.xml" ), mimeUtil.getMimeType( testFileName ) );
+
+        testFileName = "\\some\\path\\pom.xml";
+        
+        assertEquals( getMimeType( "pom.xml" ), mimeUtil.getMimeType( testFileName ) );
+
         testFileName = "DefaultMimeUtilTest.java";
 
         assertEquals( getMimeType( testFileName ), mimeUtil.getMimeType( testFileName ) );

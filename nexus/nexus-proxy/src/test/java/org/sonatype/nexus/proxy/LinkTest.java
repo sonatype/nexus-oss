@@ -51,7 +51,6 @@ public class LinkTest
             true,
             true,
             new StringContentLocator( contentString ) );
-        file.setMimeType( "plain/text" );
         file.getAttributes().put( "attr1", "ATTR1" );
         repo1.storeItem( false, file );
 

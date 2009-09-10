@@ -145,12 +145,12 @@ public class RepositoryMirrorDownloadTest
             .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
         // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
-            .andThrow( itemNotFount );
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
+            itemNotFount );
 
         // checksums are from canonical
-        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
-            .andThrow( itemNotFount );
+        expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
+            itemNotFount );
 
         replay( rs );
 
@@ -296,7 +296,8 @@ public class RepositoryMirrorDownloadTest
             if ( exception instanceof InvalidItemContentException )
             {
                 expect(
-                        rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                    rs
+                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
                             .getUrl() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
                 expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
@@ -305,7 +306,8 @@ public class RepositoryMirrorDownloadTest
             else
             {
                 expect(
-                        rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
+                    rs
+                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
                             .getUrl() ) ) ).andThrow( exception );
             }
         }
@@ -313,9 +315,8 @@ public class RepositoryMirrorDownloadTest
         if ( request.mirrorSuccess )
         {
             expect(
-                    rs
-                        .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
-                            .getUrl() ) ) ).andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
+                rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0].getUrl() ) ) )
+                .andReturn( newRemoteStorageFileItem( uid, ITEM_CONTENT ) );
 
             expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) )
                 .andReturn( newRemoteStorageFileItem( hashUid, ITEM_SHA1_HASH.getBytes() ) );
@@ -435,10 +436,10 @@ public class RepositoryMirrorDownloadTest
 
     private AbstractStorageItem newRemoteStorageFileItem( RepositoryItemUid uid, byte[] bytes )
     {
-        ContentLocator content = new ByteArrayContentLocator( bytes );
+        ContentLocator content = new ByteArrayContentLocator( bytes, getMimeUtil().getMimeType( uid.getPath() ) );
         DefaultStorageFileItem item =
             new DefaultStorageFileItem( uid.getRepository(), new ResourceStoreRequest( uid.getPath() ), true, false,
-                                        content );
+                content );
         if ( bytes.length == 0 )
         {
             item.getAttributes().put( "digest.sha1", ITEM_SHA1_HASH );
@@ -453,8 +454,8 @@ public class RepositoryMirrorDownloadTest
 
         expect( ls.getProviderId() ).andReturn( "dummy" );
 
-        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) )
-            .andThrow( itemNotFount ).anyTimes();
+        expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
+            itemNotFount ).anyTimes();
 
         ls.deleteItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() );
         expectLastCall().andThrow( itemNotFount ).anyTimes();
