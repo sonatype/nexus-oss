@@ -450,7 +450,7 @@ public abstract class AbstractArtifactPlexusResource
 
                         try
                         {
-                            MavenRepository mr = getMavenRepository( repositoryId );
+                            MavenRepository mr = gavRequest.getMavenRepository();
 
                             ArtifactStoreHelper helper = mr.getArtifactStoreHelper();
 
