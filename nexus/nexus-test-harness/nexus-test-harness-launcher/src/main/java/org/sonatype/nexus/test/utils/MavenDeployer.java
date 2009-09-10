@@ -37,32 +37,37 @@ public class MavenDeployer
         mavenProjectDir.mkdirs();
 
         Verifier verifier = new Verifier( mavenProjectDir.getAbsolutePath(), false );
+
+        String logname = "logs/maven-deploy/" + gav.getGroupId() + "/" + fileToDeploy.getName() + ".log";
+        new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
+        verifier.setLogFileName( logname );
+
         verifier.setAutoclean( false );
         verifier.resetStreams();
-        
+
         List<String> options = new ArrayList<String>();
         if ( settings != null )
         {
             options.add( "-s " + settings.getAbsolutePath() );
         }
-        
+
         options.add( "-Durl=\'" + repositoryUrl + "\'" );
         options.add( "-Dfile=\'" + fileToDeploy + "\'" );
         options.add( "-DgroupId=\'" + gav.getGroupId() + "\'" );
         options.add( "-DartifactId=\'" + gav.getArtifactId() + "\'" );
         options.add( "-Dversion=\'" + gav.getVersion() + "\'" );
         options.add( "-Dpackaging=\'" + gav.getExtension() + "\'" );
-        
-        
+
         verifier.setCliOptions( options );
         return verifier;
     }
 
-    public static Verifier deployAndGetVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings ) throws VerificationException, IOException
+    public static Verifier deployAndGetVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
+        throws VerificationException, IOException
     {
         Verifier verifier = createVerifier( gav, repositoryUrl, fileToDeploy, settings );
-//        verifier.executeGoal( "deploy:deploy-file" );
-        
+        // verifier.executeGoal( "deploy:deploy-file" );
+
         Map<String, String> args = new HashMap<String, String>();
         args.put( "url", repositoryUrl );
         args.put( "file", fileToDeploy.getAbsolutePath() );
@@ -70,18 +75,18 @@ public class MavenDeployer
         args.put( "artifactId", gav.getArtifactId() );
         args.put( "version", gav.getVersion() );
         args.put( "packaging", gav.getExtension() );
-        
+
         Properties props = new Properties();
         props.putAll( args );
-        
+
         verifier.setSystemProperties( props );
-        
+
         verifier.executeGoal( "deploy:deploy-file", args );
-        
+
         return verifier;
-        
+
     }
-    
+
     @Deprecated
     public static String deploy( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
         throws CommandLineException, InterruptedException
@@ -122,7 +127,7 @@ public class MavenDeployer
         if ( consoleOutput.contains( "FATAL ERROR" ) )
         {
             throw new CommandLineException( "Process failed: \n" + cli.toString() + "\nFATAL ERROR token found\n"
-                                            + "Process output:\n" + consoleOutput );
+                + "Process output:\n" + consoleOutput );
         }
 
         return consoleOutput;
