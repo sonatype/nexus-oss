@@ -449,6 +449,12 @@
           <required>true</required>
         </field>
         <field>
+          <name>contentResourceURI</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -538,6 +544,12 @@
       <name>RepositoryBaseResource</name>
       <version>1.0.0+</version>
       <fields>
+        <field>
+          <name>contentResourceURI</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
@@ -953,6 +965,12 @@
       <fields>
         <field>
           <name>resourceURI</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>contentResourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>

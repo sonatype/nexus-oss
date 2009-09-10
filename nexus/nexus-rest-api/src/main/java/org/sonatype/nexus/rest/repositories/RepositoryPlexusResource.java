@@ -86,7 +86,7 @@ public class RepositoryPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return this.getRepositoryResourceResponse( getRepositoryId( request ) );
+        return this.getRepositoryResourceResponse( request, getRepositoryId( request ) );
     }
 
     @Override
@@ -272,7 +272,7 @@ public class RepositoryPlexusResource
         }
 
         // return current repo
-        return this.getRepositoryResourceResponse( getRepositoryId( request ) );
+        return this.getRepositoryResourceResponse( request, getRepositoryId( request ) );
     }
 
     @Override

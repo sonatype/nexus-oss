@@ -205,17 +205,9 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
   submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
       if ( ! receivedData.resourceURI ) {
-        // DP: there's no response when submitting a new group, so we have to pretend we have all the data
-        receivedData.id = action.output.data.id;
-        receivedData.name = action.output.data.name;
-        receivedData.format = action.output.data.format;
-        receivedData.exposed = action.output.data.exposed;
         receivedData.displayStatus = Sonatype.utils.joinArrayObject( action.output.data.repositories, 'name' );
-        receivedData.repoType = 'group';
-        receivedData.userManaged = true;
         receivedData.resourceURI =
-          Sonatype.config.host + Sonatype.config.repos.urls.groups + '/' + action.output.data.id;
-        receivedData.displayURI = Sonatype.config.repos.restToContentUrl( receivedData.resourceURI );
+          Sonatype.config.host + Sonatype.config.repos.urls.groups + '/' + receivedData.id;
       }
       return;
     }

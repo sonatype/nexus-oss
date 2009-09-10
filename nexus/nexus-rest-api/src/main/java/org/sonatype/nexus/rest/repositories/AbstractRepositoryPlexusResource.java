@@ -212,7 +212,9 @@ public abstract class AbstractRepositoryPlexusResource
                 repoRes = new RepositoryListResource();
 
                 repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
-
+                
+                repoRes.setContentResourceURI( createRepositoryContentReference( request, repository.getId() ).toString() );
+                
                 repoRes.setRepoType( getRestRepoType( repository ) );
                 
                 repoRes.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
@@ -249,7 +251,7 @@ public abstract class AbstractRepositoryPlexusResource
     }
 
     // clean
-    protected RepositoryResourceResponse getRepositoryResourceResponse( String repoId )
+    protected RepositoryResourceResponse getRepositoryResourceResponse( Request request, String repoId )
         throws ResourceException
     {
         RepositoryResourceResponse result = new RepositoryResourceResponse();
@@ -266,7 +268,7 @@ public abstract class AbstractRepositoryPlexusResource
                 throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found" );
             }
 
-            resource = getRepositoryRestModel( repository );
+            resource = getRepositoryRestModel( request, repository );
 
             result.setData( resource );
         }
@@ -288,7 +290,7 @@ public abstract class AbstractRepositoryPlexusResource
     /**
      * Converting App model to REST DTO.
      */
-    public RepositoryBaseResource getRepositoryRestModel( Repository repository )
+    public RepositoryBaseResource getRepositoryRestModel( Request request, Repository repository )
     {
         RepositoryResource resource = null;
 
@@ -304,6 +306,8 @@ public abstract class AbstractRepositoryPlexusResource
         {
             resource = new RepositoryResource();
         }
+        
+        resource.setContentResourceURI( createRepositoryContentReference( request, repository.getId() ).toString() );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
 

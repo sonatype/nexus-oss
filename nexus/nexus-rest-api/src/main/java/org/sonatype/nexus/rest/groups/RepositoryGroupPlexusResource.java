@@ -27,12 +27,9 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.rest.NexusCompat;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
-import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -83,12 +80,10 @@ public class RepositoryGroupPlexusResource
 
         GroupRepository groupRepo = null;
 
-        RepositoryGroupResource resource = new RepositoryGroupResource();
-
         try
         {
             groupRepo = getRepositoryRegistry().getRepositoryWithFacet( getGroupId( request ), GroupRepository.class );
-
+            result.setData( buildGroupResource( request, groupRepo ) );
         }
         catch ( NoSuchRepositoryAccessException e)
         {
@@ -107,54 +102,7 @@ public class RepositoryGroupPlexusResource
             }
 
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Group Not Found" );
-        }
-        resource = new RepositoryGroupResource();
-
-        resource.setId( groupRepo.getId() );
-
-        resource.setName( groupRepo.getName() );
-
-        resource.setProvider( NexusCompat.getRepositoryProviderHint( groupRepo ) );
-
-        resource.setRepoType( AbstractRepositoryPlexusResource.REPO_TYPE_GROUP );
-
-        resource.setFormat( groupRepo.getRepositoryContentClass().getId() );
-        
-        resource.setExposed( groupRepo.isExposed() );
-
-        // just to trigger list creation, and not stay null coz of XStream serialization
-        resource.getRepositories();
-
-        for ( String repoId : groupRepo.getMemberRepositoryIds() )
-        {
-            RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-
-            member.setId( repoId );
-
-            try
-            {
-                // NOTE: we must hit the registry each time and NOT call groupRepo.getMemberRepositories, that doesn't block access
-                member.setName( getRepositoryRegistry().getRepository( repoId ).getName() );
-            }
-            catch ( NoSuchRepositoryAccessException e)
-            {
-                // access denied 403
-                getLogger().debug( "Blocking access to repository group, based on permissions." );
-                
-                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN );
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                getLogger().debug( "Found missing repo id: " + repoId + " contained in group" );
-            }            
-
-            member.setResourceURI( createChildReference( request, this, repoId ).toString() );
-
-            resource.addRepository( member );
-        }
-
-        result.setData( resource );
-        
+        }        
         
         return result;
     }
@@ -164,7 +112,7 @@ public class RepositoryGroupPlexusResource
         throws ResourceException
     {
         RepositoryGroupResourceResponse groupRequest = (RepositoryGroupResourceResponse) payload;
-        RepositoryGroupResourceResponse result = null;
+        RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
 
         if ( groupRequest != null )
         {
@@ -192,7 +140,20 @@ public class RepositoryGroupPlexusResource
             }
 
             createOrUpdateRepositoryGroup( resource, false );
+        
+            try
+            {
+                result.setData( buildGroupResource( request, groupRequest.getData().getId() ) );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new PlexusResourceException(
+                    Status.CLIENT_ERROR_NOT_FOUND,
+                    "Repository group id is somehow invalid! ",
+                    getNexusErrorResponse( "repositories", "Repository group id is invalid! " ) );
+            }
         }
+        
         return result;
     }
 

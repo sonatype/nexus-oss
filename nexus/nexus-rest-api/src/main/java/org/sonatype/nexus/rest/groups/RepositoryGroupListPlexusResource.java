@@ -80,6 +80,8 @@ public class RepositoryGroupListPlexusResource
             for ( GroupRepository group : groups )
             {
                 RepositoryGroupListResource resource = new RepositoryGroupListResource();
+                
+                resource.setContentResourceURI( createRepositoryContentReference( request, group.getId() ).toString() );
 
                 resource.setResourceURI( createRepositoryGroupReference( request, group.getId() ).toString() );
 
@@ -135,9 +137,23 @@ public class RepositoryGroupListPlexusResource
             }
 
             createOrUpdateRepositoryGroup( resource, true );
+            
+            try
+            {
+                RepositoryGroupResourceResponse result = new RepositoryGroupResourceResponse();
+                result.setData( buildGroupResource( request, resource.getId() ) );
+                
+                return result;
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new PlexusResourceException(
+                    Status.CLIENT_ERROR_BAD_REQUEST,
+                    "The group was somehow not found!",
+                    getNexusErrorResponse( "repositories", "Group id not found!" ) );
+            }
         }
 
-        // TODO: return the group
         return null;
     }
 

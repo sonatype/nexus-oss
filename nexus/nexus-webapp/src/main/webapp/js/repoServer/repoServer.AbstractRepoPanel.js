@@ -377,13 +377,17 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     Sonatype.Events.fireEvent( 'nexusRepositoryStatus', status );
   },
   
+  restToContentUrl: function( node, repoRecord ) {
+    return repoRecord.data.contentResourceURI + node.data.relativePath;
+  },
+  
   restToRemoteUrl: function( node, repoRecord ) {
     return repoRecord.data.remoteUri + node.data.relativePath;
   },
   
   downloadHandler: function( node, item, event ) {
     event.stopEvent();
-    window.open( Sonatype.config.repos.restToContentUrl( node.id ) );
+    window.open( this.restToContentUrl( node, node.attributes.repoRecord ) );
   },
   
   downloadFromRemoteHandler: function( node, item, event ) {
@@ -512,7 +516,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         text: 'Download',
         scope: this,
         handler: this.downloadHandler,
-        href: Sonatype.config.repos.restToContentUrl( contentRecord.id )
+        href: this.restToContentUrl( contentRecord, contentRecord.attributes.repoRecord )
       } );
     }
 

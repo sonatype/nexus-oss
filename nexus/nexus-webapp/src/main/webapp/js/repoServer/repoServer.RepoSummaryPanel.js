@@ -137,14 +137,14 @@ Ext.extend( Sonatype.repoServer.HostedRepositorySummaryPanel, Sonatype.repoServe
     this.populateDistributionManagementField( 
       this.payload.data.id,
       this.payload.data.repoPolicy,
-      this.payload.data.resourceURI );
+      this.payload.data.contentResourceURI );
   },
   populateDistributionManagementField : function( id, policy, uri ) {
     var distMgmtString = '<distributionManagement>\n  <${repositoryType}>\n    <id>${repositoryId}</id>\n    <url>${repositoryUrl}</url>\n  </${repositoryType}>\n</distributionManagement>';
     
     distMgmtString = distMgmtString.replaceAll('${repositoryType}', policy == 'Release' ? 'repository' : 'snapshotRepository' );
     distMgmtString = distMgmtString.replaceAll('${repositoryId}', id );
-    distMgmtString = distMgmtString.replaceAll('${repositoryUrl}', Sonatype.config.repos.restToContentUrl( uri ) );
+    distMgmtString = distMgmtString.replaceAll('${repositoryUrl}', uri );
     
     this.find( 'name', 'distMgmtField' )[0].setRawValue( distMgmtString );
   }

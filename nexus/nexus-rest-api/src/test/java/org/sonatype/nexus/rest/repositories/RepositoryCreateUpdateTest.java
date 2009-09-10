@@ -3,6 +3,7 @@ package org.sonatype.nexus.rest.repositories;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -136,7 +137,7 @@ public class RepositoryCreateUpdateTest
         RepositoryPlexusResource plexusResource =
             (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
 
-        Request request = new Request();
+        Request request = buildRequest();
         Response response = new Response( request );
 
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, originalResource.getId() );
@@ -263,7 +264,7 @@ public class RepositoryCreateUpdateTest
         RepositoryListPlexusResource plexusResource =
             (RepositoryListPlexusResource) this.lookup( PlexusResource.class, "RepositoryListPlexusResource" );
 
-        Request request = new Request();
+        Request request = buildRequest();
         Response response = new Response( request );
 
         RepositoryResourceResponse repoResponse =
@@ -314,7 +315,7 @@ public class RepositoryCreateUpdateTest
         RepositoryListPlexusResource plexusResource =
             (RepositoryListPlexusResource) this.lookup( PlexusResource.class, "RepositoryListPlexusResource" );
 
-        Request request = new Request();
+        Request request = buildRequest();
         Response response = new Response( request );
 
         RepositoryResourceResponse repoResponse =
@@ -358,7 +359,7 @@ public class RepositoryCreateUpdateTest
         RepositoryPlexusResource plexusResource =
             (RepositoryPlexusResource) this.lookup( PlexusResource.class, "RepositoryPlexusResource" );
 
-        Request request = new Request();
+        Request request = buildRequest();
         Response response = new Response( request );
 
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, originalResource.getId() );
@@ -372,6 +373,17 @@ public class RepositoryCreateUpdateTest
         
         Assert.assertEquals( newlocalStorage, result.getOverrideLocalStorageUrl() );
         
+    }
+    
+    private Request buildRequest()
+    {
+        Request request = new Request();
+        Reference ref = new Reference( "http://localhost:12345/" );
+
+        request.setRootRef( ref );
+        request.setResourceRef( new Reference( ref, "repositories" ) );
+        
+        return request;
     }
 
 }

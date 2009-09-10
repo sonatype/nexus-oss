@@ -135,7 +135,7 @@ public class RepositoryListPlexusResource
             }
         }
 
-        return getRepositoryResourceResponse( repoId );
+        return getRepositoryResourceResponse( request, repoId );
     }
 
     // --

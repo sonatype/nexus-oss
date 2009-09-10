@@ -65,11 +65,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
           return Sonatype.utils.joinArrayObject( v, 'name' );
         }
       },
-      { name: 'displayURI', mapping: 'resourceURI',         
-        convert: function( s ) {
-          return Sonatype.config.repos.restToContentUrl( s );
-        }
-      }
+      { name: 'contentResourceURI' }
     ],
     sortInfo: { field: 'name', direction: 'desc' },
     url: Sonatype.config.repos.urls.groups,
@@ -183,16 +179,12 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
         width: 200
       },
       { 
-        name: 'displayURI',
+        name: 'contentResourceURI',
         header: 'Repository Path',
         autoExpand: true,
         renderer: function( s ) {
           return '<a href="' + s + ((s != null && (s.charAt(s.length)) == '/') ? '' : '/') +
             '" target="_blank">' + s + '</a>';
-        },
-        mapping: 'resourceURI',
-        convert: function( s, parent ) {
-          return Sonatype.config.repos.restToContentUrl( s );
         }
       }
     ]

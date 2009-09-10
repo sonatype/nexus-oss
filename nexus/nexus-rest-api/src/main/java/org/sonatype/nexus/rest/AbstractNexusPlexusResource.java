@@ -41,6 +41,8 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.ReferenceFactory;
@@ -69,6 +71,9 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement( hint = "default" )
     private RepositoryRegistry defaultRepositoryRegistry;
+    
+    @Requirement
+    private RepositoryTypeRegistry repoTypeRegistry;
     
     @Requirement
     private ReferenceFactory referenceFactory;
@@ -156,7 +161,26 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createRepositoryContentReference( Request request, String repoId )
     {
-        return createReference( getContextRoot( request ), "content/repositories/" + repoId ).getTargetRef();
+        try
+        {
+            Repository repo = repositoryRegistry.getRepository( repoId );
+            
+            for ( RepositoryTypeDescriptor desc : repoTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
+            {
+                if ( NexusCompat.getRepositoryProviderRole( repo ).equals( desc.getRole() ) )
+                {
+                    return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId ).getTargetRef();        
+                }
+            }
+            
+            getLogger().error( "Cannot create reference for repository with role of " + NexusCompat.getRepositoryProviderRole( repo ) );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().error( "Cannot create reference for non-existant repository" );
+        }
+        
+        return null;
     }
 
     protected Reference createRepositoryReference( Request request, String repoId )

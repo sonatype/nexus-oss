@@ -138,8 +138,6 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
       if ( ! receivedData.resourceURI ) {
         receivedData.resourceURI =
           Sonatype.config.host + Sonatype.config.repos.urls.repositories + '/' + receivedData.id;
-        receivedData.displayURI =
-          Sonatype.config.host + Sonatype.config.content.repositories + '/' + receivedData.id;
         if ( receivedData.exposed == null ) {
           receivedData.exposed = true;
         }
