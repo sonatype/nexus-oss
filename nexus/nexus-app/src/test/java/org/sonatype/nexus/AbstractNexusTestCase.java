@@ -38,7 +38,7 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     private NexusScheduler nexusScheduler;
-    
+
     protected static final String PROXY_SERVER_PORT = "proxy.server.port";
 
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
@@ -50,7 +50,8 @@ public abstract class AbstractNexusTestCase
     public static final String APPS_CONFIGURATION_KEY = "apps";
 
     public static final String APPLICATION_CONF_KEY = "application-conf";
-    public static final String APPLICATION_CONFIG_KEY=APPLICATION_CONF_KEY;
+
+    public static final String APPLICATION_CONFIG_KEY = APPLICATION_CONF_KEY;
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
 
@@ -161,7 +162,7 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         nexusScheduler = lookup( NexusScheduler.class );
-        
+
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         PLEXUS_HOME.mkdirs();
@@ -206,39 +207,44 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         waitForTasksToStop();
-        
+
         super.tearDown();
 
         FileUtils.deleteDirectory( PLEXUS_HOME );
     }
-    
+
     protected void killActiveTasks()
         throws Exception
     {
-        Map<String,List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
-        
+        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
+
         for ( List<ScheduledTask<?>> taskList : taskMap.values() )
         {
             for ( ScheduledTask<?> task : taskList )
             {
                 task.cancel();
-            }   
+            }
         }
     }
-    
+
     protected void waitForTasksToStop()
         throws Exception
     {
+        if ( nexusScheduler == null )
+        {
+            return;
+        }
+
         // Give task a chance to start
         Thread.sleep( 50 );
-        
+
         int counter = 0;
-        
+
         while ( nexusScheduler.getActiveTasks().size() > 0 )
         {
             Thread.sleep( 100 );
             counter++;
-            
+
             if ( counter > 300 )
             {
                 System.out.println( "TIMEOUT WAITING FOR TASKS TO COMPLETE!!!  Will kill them." );
@@ -248,18 +254,19 @@ public abstract class AbstractNexusTestCase
             }
         }
     }
-    
+
     protected void printActiveTasks()
         throws Exception
     {
-        Map<String,List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
-        
+        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getActiveTasks();
+
         for ( List<ScheduledTask<?>> taskList : taskMap.values() )
         {
             for ( ScheduledTask<?> task : taskList )
             {
-                System.out.println( task.getName() + " with id " + task.getId() + " is in state " + task.getTaskState().toString() );
-            }   
+                System.out.println( task.getName() + " with id " + task.getId() + " is in state "
+                    + task.getTaskState().toString() );
+            }
         }
     }
 

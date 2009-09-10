@@ -141,13 +141,12 @@ public class SimpleRealmTest
     protected void setUp()
         throws Exception
     {
-        // call super
         FileUtils.deleteDirectory( PLEXUS_HOME );
 
         PLEXUS_HOME.mkdirs();
         WORK_HOME.mkdirs();
         CONF_HOME.mkdirs();
-
+        
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
         
@@ -172,6 +171,8 @@ public class SimpleRealmTest
     protected void tearDown()
         throws Exception
     {
+        super.tearDown();
+        
         FileUtils.deleteDirectory( PLEXUS_HOME );
     }
     
