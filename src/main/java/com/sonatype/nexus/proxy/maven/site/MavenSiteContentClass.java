@@ -14,6 +14,7 @@
 package com.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.proxy.registry.AbstractIdContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 
 /**
@@ -23,7 +24,7 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  */
 @Component( role = ContentClass.class, hint = MavenSiteContentClass.ID )
 public class MavenSiteContentClass
-    implements ContentClass
+    extends AbstractIdContentClass
 {
     public static final String ID = "maven-site";
 
