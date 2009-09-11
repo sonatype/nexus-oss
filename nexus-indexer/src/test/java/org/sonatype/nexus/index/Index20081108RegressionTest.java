@@ -140,7 +140,7 @@ public class Index20081108RegressionTest
     
         request.setStart( 0 );
     
-        request.setAiCount( 50 );
+        request.setCount( 50 );
     
         FlatSearchResponse response = nexusIndexer.searchFlat( request );
     
@@ -207,7 +207,7 @@ public class Index20081108RegressionTest
         FlatSearchRequest req = new FlatSearchRequest( q );
     
         // have page size of 4, that will make us 4 pages
-        req.setAiCount( pageSize );
+        req.setCount( pageSize );
         
         List<ArtifactInfo> constructedPageList = new ArrayList<ArtifactInfo>();
         

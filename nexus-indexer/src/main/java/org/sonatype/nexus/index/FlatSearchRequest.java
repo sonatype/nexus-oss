@@ -6,9 +6,8 @@
  */
 package org.sonatype.nexus.index;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -19,58 +18,30 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * @see NexusIndexer#searchFlat(FlatSearchRequest)
  */
 public class FlatSearchRequest
+    extends AbstractSearchRequest
 {
-    public static int UNDEFINED = -1;
-
-    private Query query;
-
     private Comparator<ArtifactInfo> artifactInfoComparator;
-
-    private List<IndexingContext> contexts;
-
-    private int start;
-
-    private int aiCount;
 
     public FlatSearchRequest( Query query )
     {
-        super();
-
-        this.query = query;
-
-        this.artifactInfoComparator = ArtifactInfo.VERSION_COMPARATOR;
-
-        this.contexts = null;
-
-        this.start = UNDEFINED;
-
-        this.aiCount = UNDEFINED;
+        this( query, ArtifactInfo.VERSION_COMPARATOR );
     }
 
     public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator )
     {
-        this( query );
-
-        this.artifactInfoComparator = artifactInfoComparator;
+        this( query, artifactInfoComparator, null );
     }
 
     public FlatSearchRequest( Query query, IndexingContext context )
     {
-        this( query );
-
-        getContexts().add( context );
+        this( query, ArtifactInfo.VERSION_COMPARATOR, context );
     }
 
     public FlatSearchRequest( Query query, Comparator<ArtifactInfo> artifactInfoComparator, IndexingContext context )
     {
-        this( query, artifactInfoComparator );
+        super( query, context != null ? Arrays.asList( new IndexingContext[] { context } ) : null );
 
-        getContexts().add( context );
-    }
-
-    public Query getQuery()
-    {
-        return query;
+        this.artifactInfoComparator = artifactInfoComparator;
     }
 
     public Comparator<ArtifactInfo> getArtifactInfoComparator()
@@ -78,34 +49,8 @@ public class FlatSearchRequest
         return artifactInfoComparator;
     }
 
-    public List<IndexingContext> getContexts()
+    public void setArtifactInfoComparator( Comparator<ArtifactInfo> artifactInfoComparator )
     {
-        if ( contexts == null )
-        {
-            contexts = new ArrayList<IndexingContext>();
-        }
-
-        return contexts;
+        this.artifactInfoComparator = artifactInfoComparator;
     }
-
-    public int getStart()
-    {
-        return start;
-    }
-
-    public int getAiCount()
-    {
-        return aiCount;
-    }
-
-    public void setStart( int start )
-    {
-        this.start = start;
-    }
-
-    public void setAiCount( int aiCount )
-    {
-        this.aiCount = aiCount;
-    }
-
 }

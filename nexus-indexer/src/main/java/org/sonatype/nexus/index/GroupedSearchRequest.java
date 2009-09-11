@@ -6,9 +6,8 @@
  */
 package org.sonatype.nexus.index;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -19,53 +18,35 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * @see NexusIndexer#searchGrouped(GroupedSearchRequest)
  */
 public class GroupedSearchRequest
+    extends AbstractSearchRequest
 {
-    private final Query query;
-
-    private final Grouping grouping;
+    private Grouping grouping;
 
     private Comparator<String> groupKeyComparator;
 
-    private List<IndexingContext> contexts;
-
     public GroupedSearchRequest( Query query, Grouping grouping )
     {
-        super();
-
-        this.query = query;
-
-        this.grouping = grouping;
-
-        this.groupKeyComparator = String.CASE_INSENSITIVE_ORDER;
-
-        this.contexts = null;
+        this( query, grouping, String.CASE_INSENSITIVE_ORDER );
     }
 
     public GroupedSearchRequest( Query query, Grouping grouping, Comparator<String> groupKeyComparator )
     {
-        this( query, grouping );
-
-        this.groupKeyComparator = groupKeyComparator;
+        this( query, grouping, groupKeyComparator, null );
     }
 
     public GroupedSearchRequest( Query query, Grouping grouping, IndexingContext context )
     {
-        this( query, grouping );
-        
-        getContexts().add( context );
+        this( query, grouping, String.CASE_INSENSITIVE_ORDER, context );
     }
 
     public GroupedSearchRequest( Query query, Grouping grouping, Comparator<String> groupKeyComparator,
                                  IndexingContext context )
     {
-        this( query, grouping, groupKeyComparator );
+        super( query, context != null ? Arrays.asList( new IndexingContext[] { context } ) : null );
 
-        getContexts().add( context );
-    }
+        this.grouping = grouping;
 
-    public Query getQuery()
-    {
-        return query;
+        this.groupKeyComparator = groupKeyComparator;
     }
 
     public Grouping getGrouping()
@@ -73,18 +54,18 @@ public class GroupedSearchRequest
         return grouping;
     }
 
+    public void setGrouping( Grouping grouping )
+    {
+        this.grouping = grouping;
+    }
+
     public Comparator<String> getGroupKeyComparator()
     {
         return groupKeyComparator;
     }
 
-    public List<IndexingContext> getContexts()
+    public void setGroupKeyComparator( Comparator<String> groupKeyComparator )
     {
-        if ( contexts == null )
-        {
-            contexts = new ArrayList<IndexingContext>();
-        }
-
-        return contexts;
+        this.groupKeyComparator = groupKeyComparator;
     }
 }

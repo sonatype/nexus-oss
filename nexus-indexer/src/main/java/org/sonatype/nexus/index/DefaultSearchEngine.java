@@ -26,7 +26,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
  * A default search engine implementation
- *
+ * 
  * @author Eugene Kuleshov
  * @author Tamas Cservenak
  */
@@ -35,7 +35,6 @@ public class DefaultSearchEngine
     extends AbstractLogEnabled
     implements SearchEngine
 {
-    private static final int MAX_HITS = 500;
     @Deprecated
     public Set<ArtifactInfo> searchFlat( Comparator<ArtifactInfo> artifactInfoComparator,
                                          IndexingContext indexingContext, Query query )
@@ -58,9 +57,11 @@ public class DefaultSearchEngine
         TreeSet<ArtifactInfo> result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
 
         int totalHits = 0;
+
         for ( IndexingContext context : request.getContexts() )
         {
-            totalHits += searchFlat( result, context, request.getQuery(), request.getStart(), request.getAiCount() );
+            totalHits +=
+                searchFlat( request, result, context, request.getQuery(), request.getStart(), request.getCount() );
         }
 
         return new FlatSearchResponse( request.getQuery(), totalHits, result );
@@ -91,12 +92,13 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                totalHits += searchFlat( result, ctx, request.getQuery(), request.getStart(), request.getAiCount() );
+                totalHits +=
+                    searchFlat( request, result, ctx, request.getQuery(), request.getStart(), request.getCount() );
             }
-            
-            if ( totalHits > MAX_HITS )
+
+            if ( request.isHitLimited() && totalHits > request.getResultHitLimit() )
             {
-                totalHits = -1;
+                totalHits = AbstractSearchResponse.LIMIT_EXCEEDED;
                 result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
                 break;
             }
@@ -132,33 +134,34 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                totalHits += searchGrouped( result, request.getGrouping(), ctx, request.getQuery() );
+                totalHits += searchGrouped( request, result, request.getGrouping(), ctx, request.getQuery() );
             }
         }
 
         return new GroupedSearchResponse( request.getQuery(), totalHits, result );
     }
 
-    protected int searchFlat( Collection<ArtifactInfo> result, IndexingContext context, Query query, int from,
-                              int aiCount )
+    protected int searchFlat( AbstractSearchRequest req, Collection<ArtifactInfo> result, IndexingContext context,
+                              Query query, int from, int aiCount )
         throws IOException
     {
         Hits hits =
-            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+            context.getIndexSearcher()
+                .search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
         if ( hits == null || hits.length() == 0 )
         {
             return 0;
         }
-        
-        if ( hits.length() > MAX_HITS )
+
+        if ( req.isHitLimited() && hits.length() > req.getResultHitLimit() )
         {
-            return -1;
+            return AbstractSearchResponse.LIMIT_EXCEEDED;
         }
 
         int hitCount = hits.length();
 
-        int start = 0; //from == FlatSearchRequest.UNDEFINED ? 0 : from;
+        int start = 0; // from == FlatSearchRequest.UNDEFINED ? 0 : from;
 
         int found = 0;
 
@@ -181,7 +184,7 @@ public class DefaultSearchEngine
                     found++;
                 }
 
-                if ( found >= MAX_HITS )
+                if ( req.isHitLimited() && found >= req.getResultHitLimit() )
                 {
                     // escape then
                     break;
@@ -192,12 +195,13 @@ public class DefaultSearchEngine
         return hitCount;
     }
 
-    protected int searchGrouped( Map<String, ArtifactInfoGroup> result, Grouping grouping, IndexingContext context,
-                                 Query query )
+    protected int searchGrouped( AbstractSearchRequest req, Map<String, ArtifactInfoGroup> result, Grouping grouping,
+                                 IndexingContext context, Query query )
         throws IOException
     {
         Hits hits =
-            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+            context.getIndexSearcher()
+                .search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
         if ( hits != null && hits.length() != 0 )
         {
