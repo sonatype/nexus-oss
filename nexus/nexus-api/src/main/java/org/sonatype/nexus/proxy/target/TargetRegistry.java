@@ -47,6 +47,15 @@ public interface TargetRegistry
      * @return
      */
     boolean removeRepositoryTarget( String id );
+    
+    /**
+     * This method will match all existing targets against a content class.  You will end up with a simple set
+     * of matched targets.  The cardinality of this set is equal to existing targets cardinality.
+     * 
+     * @param contentClass
+     * @return
+     */
+    Set<Target> getTargetsForContentClass( ContentClass contentClass );
 
     /**
      * This method will match all existing targets against a content class and a path. You will end up with simple set

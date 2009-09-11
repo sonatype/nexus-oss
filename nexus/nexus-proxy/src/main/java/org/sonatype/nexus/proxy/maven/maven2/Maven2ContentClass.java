@@ -22,11 +22,11 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * 
  * @author cstamas
  */
-@Component( role = ContentClass.class, hint = "maven2" )
+@Component( role = ContentClass.class, hint = Maven2ContentClass.ID )
 public class Maven2ContentClass
     extends AbstractIdContentClass
 {
-    private static final String ID = "maven2";
+    public static final String ID = "maven2";
 
     public String getId()
     {
