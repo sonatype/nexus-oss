@@ -18,7 +18,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.1-SNAPSHOT</version>
+        <version>1.1</version>
         <executions>
           <execution>
             <phase>initialize</phase>
@@ -106,7 +106,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>jscoverage-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         <executions>
           <execution>
             <id>instrument</id>
@@ -279,7 +279,7 @@
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>jscoverage-component</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>
