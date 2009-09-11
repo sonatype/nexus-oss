@@ -21,11 +21,11 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
  * 
  * @author cstamas
  */
-@Component( role = ContentClass.class, hint = "maven-site" )
+@Component( role = ContentClass.class, hint = MavenSiteContentClass.ID )
 public class MavenSiteContentClass
     implements ContentClass
 {
-    private static final String ID = "maven-site";
+    public static final String ID = "maven-site";
 
     public String getId()
     {
