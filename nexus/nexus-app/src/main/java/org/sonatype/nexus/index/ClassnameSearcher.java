@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
  * Searches Lucene index for artifacts containing classes with a specified name.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = Searcher.class, hint = "classname" )
@@ -39,31 +39,25 @@ public class ClassnameSearcher
     private IndexerManager m_lucene;
 
     /**
-     * Map should contain a term with key {@link #TERM_CLASSNAME} which has a non null value.
-     *
-     * {@inheritDoc}
+     * Map should contain a term with key {@link #TERM_CLASSNAME} which has a non null value. {@inheritDoc}
      */
     public boolean canHandle( final Map<String, String> terms )
     {
-        return terms.containsKey( TERM_CLASSNAME )
-               && !StringUtils.isEmpty( terms.get( TERM_CLASSNAME ) );
+        return terms.containsKey( TERM_CLASSNAME ) && !StringUtils.isEmpty( terms.get( TERM_CLASSNAME ) );
     }
 
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse flatSearch( final Map<String, String> terms,
-                                          final String repositoryId,
-                                          final Integer from,
-                                          final Integer count )
+    public FlatSearchResponse flatSearch( final Map<String, String> terms, final String repositoryId,
+                                          final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        if( !canHandle( terms ) )
+        if ( !canHandle( terms ) )
         {
-            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo>emptySet() );
+            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo> emptySet() );
         }
-        return m_lucene.searchArtifactClassFlat( terms.get( TERM_CLASSNAME ), repositoryId, from, count );
+        return m_lucene.searchArtifactClassFlat( terms.get( TERM_CLASSNAME ), repositoryId, from, count, hitLimit );
     }
-
 
 }

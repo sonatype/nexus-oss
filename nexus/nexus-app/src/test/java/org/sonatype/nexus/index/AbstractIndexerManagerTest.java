@@ -63,7 +63,7 @@ public abstract class AbstractIndexerManagerTest
         throws IOException, Exception
     {
         FlatSearchResponse response =
-            indexerManager.searchArtifactFlat( groupId, null, null, null, null, repoId, 0, 100 );
+            indexerManager.searchArtifactFlat( groupId, null, null, null, null, repoId, 0, 100, null );
 
         Collection<ArtifactInfo> result = response.getResults();
 

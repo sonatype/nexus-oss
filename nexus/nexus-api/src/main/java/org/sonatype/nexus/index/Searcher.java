@@ -17,10 +17,9 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
- * A searcher is able to perform artifact info searches based on key/value search terms.
- * Note thts this is an intermediate step towards future Nexus pluggable indexing and should not be considered public
- * api.
- *
+ * A searcher is able to perform artifact info searches based on key/value search terms. Note thts this is an
+ * intermediate step towards future Nexus pluggable indexing and should not be considered public api.
+ * 
  * @author Alin Dreghiciu
  */
 public interface Searcher
@@ -28,27 +27,25 @@ public interface Searcher
 
     /**
      * Ansers teh question: can this searcher be used to search for the available terms?
-     *
+     * 
      * @param terms available terms
-     *
      * @return true if searcher can be used to search for the available terms, false oterwise
      */
     boolean canHandle( Map<String, String> terms );
 
     /**
      * Searches for artifacts based on available terms.,
-     *
-     * @param terms        search terms
+     * 
+     * @param terms search terms
      * @param repositoryId repository id of the repository to be searched ir null if the search should be performed on
-     *                     all repositories that suports indexing
-     * @param from         offset of first search result
-     * @param count        number of search results to be retrieved
-     *
+     *            all repositories that suports indexing
+     * @param from offset of first search result
+     * @param count number of search results to be retrieved
      * @return search results
-     *
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
-    FlatSearchResponse flatSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count )
+    FlatSearchResponse flatSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
+                                   Integer hitLimit )
         throws NoSuchRepositoryException;
 
 }

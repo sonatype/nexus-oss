@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
  * Searches Lucene index wor artifacts that matches the provided keyword.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = Searcher.class, hint = "keyword" )
@@ -39,31 +39,25 @@ public class KeywordSearcher
     private IndexerManager m_lucene;
 
     /**
-     * Map should contain a term with key {@link #TERM_KEYWORD} which has a non null value.
-     *
-     * {@inheritDoc}
+     * Map should contain a term with key {@link #TERM_KEYWORD} which has a non null value. {@inheritDoc}
      */
     public boolean canHandle( final Map<String, String> terms )
     {
-        return terms.containsKey( TERM_KEYWORD )
-               && !StringUtils.isEmpty( terms.get( TERM_KEYWORD ) );
+        return terms.containsKey( TERM_KEYWORD ) && !StringUtils.isEmpty( terms.get( TERM_KEYWORD ) );
     }
 
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse flatSearch( final Map<String, String> terms,
-                                          final String repositoryId,
-                                          final Integer from,
-                                          final Integer count )
+    public FlatSearchResponse flatSearch( final Map<String, String> terms, final String repositoryId,
+                                          final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        if( !canHandle( terms ) )
+        if ( !canHandle( terms ) )
         {
-            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo>emptySet() );
+            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo> emptySet() );
         }
-        return m_lucene.searchArtifactFlat( terms.get( TERM_KEYWORD ), repositoryId, from, count );
+        return m_lucene.searchArtifactFlat( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit );
     }
-
 
 }

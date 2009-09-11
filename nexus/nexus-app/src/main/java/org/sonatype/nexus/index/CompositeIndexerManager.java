@@ -26,10 +26,10 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
  * An {@link IndexerManager} that will multiplex calls to all available {@link IndexerManager}s available. <br>
- * For non void methods will apply a strategy of first manager returning non null wins In case of search methods it
- * will acummulate teh results. If a manager does not implement a method it can throw
- * {@link UnsupportedOperationException}, case when the manager is ignored.
- *
+ * For non void methods will apply a strategy of first manager returning non null wins In case of search methods it will
+ * acummulate teh results. If a manager does not implement a method it can throw {@link UnsupportedOperationException},
+ * case when the manager is ignored.
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = IndexerManager.class, hint = "composite" )
@@ -47,13 +47,13 @@ public class CompositeIndexerManager
     public void addRepositoryIndexContext( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.addRepositoryIndexContext( repositoryId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -65,17 +65,17 @@ public class CompositeIndexerManager
      */
     public Query constructQuery( final String field, final String query )
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final Query result = manager.constructQuery( field, query );
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -89,13 +89,13 @@ public class CompositeIndexerManager
     public void downloadAllIndex()
         throws IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.downloadAllIndex();
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -108,13 +108,13 @@ public class CompositeIndexerManager
     public void downloadRepositoryGroupIndex( final String repositoryGroupId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.downloadRepositoryGroupIndex( repositoryGroupId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -127,13 +127,13 @@ public class CompositeIndexerManager
     public void downloadRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.downloadRepositoryIndex( repositoryId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -145,17 +145,17 @@ public class CompositeIndexerManager
      */
     public NexusIndexer getNexusIndexer()
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final NexusIndexer result = manager.getNexusIndexer();
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -169,17 +169,17 @@ public class CompositeIndexerManager
     public IndexingContext getRepositoryBestIndexContext( final String repositoryId )
         throws NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final IndexingContext result = manager.getRepositoryBestIndexContext( repositoryId );
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -193,17 +193,17 @@ public class CompositeIndexerManager
     public IndexingContext getRepositoryLocalIndexContext( final String repositoryId )
         throws NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final IndexingContext result = manager.getRepositoryLocalIndexContext( repositoryId );
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -217,17 +217,17 @@ public class CompositeIndexerManager
     public IndexingContext getRepositoryRemoteIndexContext( final String repositoryId )
         throws NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final IndexingContext result = manager.getRepositoryRemoteIndexContext( repositoryId );
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -241,17 +241,17 @@ public class CompositeIndexerManager
     public ArtifactInfo identifyArtifact( final String type, final String checksum )
         throws IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 final ArtifactInfo result = manager.identifyArtifact( type, checksum );
-                if( result != null )
+                if ( result != null )
                 {
                     return result;
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -265,13 +265,13 @@ public class CompositeIndexerManager
     public void publishAllIndex()
         throws IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.publishAllIndex();
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -284,13 +284,13 @@ public class CompositeIndexerManager
     public void publishRepositoryGroupIndex( final String repositoryGroupId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.publishRepositoryGroupIndex( repositoryGroupId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -303,13 +303,13 @@ public class CompositeIndexerManager
     public void publishRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.publishRepositoryIndex( repositoryId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -322,13 +322,13 @@ public class CompositeIndexerManager
     public void reindexAllRepositories( final String path, final boolean fullReindex )
         throws IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.reindexAllRepositories( path, fullReindex );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -341,13 +341,13 @@ public class CompositeIndexerManager
     public void reindexRepository( final String path, final String repositoryId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.reindexRepository( path, repositoryId, fullReindex );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -360,13 +360,13 @@ public class CompositeIndexerManager
     public void reindexRepositoryGroup( final String path, final String repositoryGroupId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.reindexRepositoryGroup( path, repositoryGroupId, fullReindex );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -379,13 +379,13 @@ public class CompositeIndexerManager
     public void removeRepositoryIndexContext( final String repositoryId, final boolean deleteFiles )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.removeRepositoryIndexContext( repositoryId, deleteFiles );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -397,13 +397,13 @@ public class CompositeIndexerManager
      */
     public void resetConfiguration()
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.resetConfiguration();
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -416,13 +416,13 @@ public class CompositeIndexerManager
     public void resetGroupIndex( String groupId )
         throws NoSuchRepositoryException, IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.resetGroupIndex( groupId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -432,31 +432,31 @@ public class CompositeIndexerManager
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse searchArtifactClassFlat( final String term,
-                                                       final String repositoryId,
-                                                       final Integer from, final Integer count )
+    public FlatSearchResponse searchArtifactClassFlat( final String term, final String repositoryId,
+                                                       final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
         int hits = 0;
         Set<ArtifactInfo> results = null;
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
-                final FlatSearchResponse result = manager.searchArtifactClassFlat( term, repositoryId, from, count );
-                if( result != null )
+                final FlatSearchResponse result =
+                    manager.searchArtifactClassFlat( term, repositoryId, from, count, hitLimit );
+                if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
                     results.addAll( results );
                     hits += result.getTotalHits();
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
         }
-        if( results != null )
+        if ( results != null )
         {
             return new FlatSearchResponse( null, hits, results );
         }
@@ -466,34 +466,32 @@ public class CompositeIndexerManager
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse searchArtifactFlat( final String gTerm, final String aTerm,
-                                                  final String vTerm, final String pTerm, final String cTerm,
-                                                  final String repositoryId,
-                                                  final Integer from, final Integer count )
+    public FlatSearchResponse searchArtifactFlat( final String gTerm, final String aTerm, final String vTerm,
+                                                  final String pTerm, final String cTerm, final String repositoryId,
+                                                  final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
         int hits = 0;
         Set<ArtifactInfo> results = null;
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
-                final FlatSearchResponse result = manager.searchArtifactFlat(
-                    gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count
-                );
-                if( result != null )
+                final FlatSearchResponse result =
+                    manager.searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count, hitLimit );
+                if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
                     results.addAll( results );
                     hits += result.getTotalHits();
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
         }
-        if( results != null )
+        if ( results != null )
         {
             return new FlatSearchResponse( null, hits, results );
         }
@@ -503,31 +501,31 @@ public class CompositeIndexerManager
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse searchArtifactFlat( final String term,
-                                                  final String repositoryId,
-                                                  final Integer from, final Integer count )
+    public FlatSearchResponse searchArtifactFlat( final String term, final String repositoryId, final Integer from,
+                                                  final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
         int hits = 0;
         Set<ArtifactInfo> results = null;
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
-                final FlatSearchResponse result = manager.searchArtifactFlat( term, repositoryId, from, count );
-                if( result != null )
+                final FlatSearchResponse result =
+                    manager.searchArtifactFlat( term, repositoryId, from, count, hitLimit );
+                if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
                     results.addAll( results );
                     hits += result.getTotalHits();
                 }
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
         }
-        if( results != null )
+        if ( results != null )
         {
             return new FlatSearchResponse( null, hits, results );
         }
@@ -540,13 +538,13 @@ public class CompositeIndexerManager
     public void setRepositoryIndexContextSearchable( final String repositoryId, final boolean searchable )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.setRepositoryIndexContextSearchable( repositoryId, searchable );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -559,13 +557,13 @@ public class CompositeIndexerManager
     public void shutdown( final boolean deleteFiles )
         throws IOException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.shutdown( deleteFiles );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }
@@ -578,13 +576,13 @@ public class CompositeIndexerManager
     public void updateRepositoryIndexContext( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        for( IndexerManager manager : m_managers.values() )
+        for ( IndexerManager manager : m_managers.values() )
         {
             try
             {
                 manager.updateRepositoryIndexContext( repositoryId );
             }
-            catch( UnsupportedOperationException ignore )
+            catch ( UnsupportedOperationException ignore )
             {
                 // ignore
             }

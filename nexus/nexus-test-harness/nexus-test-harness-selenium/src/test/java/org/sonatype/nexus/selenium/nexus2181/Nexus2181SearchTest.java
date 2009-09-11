@@ -29,7 +29,7 @@ public class Nexus2181SearchTest
         FlatSearchResponse result =
             plexus.lookup( Searcher.class, "mavenCoordinates" ).flatSearch(
                                                                             Collections.singletonMap( "g", "nexus2181" ),
-                                                                            "thirdparty", 0, Integer.MAX_VALUE );
+                                                                            "thirdparty", 0, Integer.MAX_VALUE, null );
         assertEquals( 2, result.getTotalHits() );
 
         SearchTab search = main.searchPanel().search( "nexus2181" );

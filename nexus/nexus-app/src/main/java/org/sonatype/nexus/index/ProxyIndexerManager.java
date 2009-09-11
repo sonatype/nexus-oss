@@ -26,7 +26,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
  * there are no other indexer managers or to a composite indexer manager {@link CompositeIndexerManager} in case that
  * more indexer managers are available. This indirection is for performnace reasons as in case that there are no more
  * indexer managers then lucene just a simple delegate call is performed.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = IndexerManager.class )
@@ -48,13 +48,11 @@ public class ProxyIndexerManager
 
     /**
      * On intitalization decide if it should proxy directly to lucene (aalready teh value of delegate) or use the
-     * composite as delegate.
-     *
-     * {@inheritDoc}
+     * composite as delegate. {@inheritDoc}
      */
     private IndexerManager indexer()
     {
-        if( m_indexers.size() > 1 )
+        if ( m_indexers.size() > 1 )
         {
             return m_composite;
         }
@@ -238,29 +236,31 @@ public class ProxyIndexerManager
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
+                                                       Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        return indexer().searchArtifactClassFlat( term, repositoryId, from, count );
+        return indexer().searchArtifactClassFlat( term, repositoryId, from, count, hitLimit );
     }
 
     /**
      * {@inheritDoc}
      */
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-                                                  String repositoryId, Integer from, Integer count )
+                                                  String repositoryId, Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        return indexer().searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count );
+        return indexer().searchArtifactFlat( gTerm, aTerm, vTerm, pTerm, cTerm, repositoryId, from, count, hitLimit );
     }
 
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
+                                                  Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        return indexer().searchArtifactFlat( term, repositoryId, from, count );
+        return indexer().searchArtifactFlat( term, repositoryId, from, count, hitLimit );
     }
 
     /**

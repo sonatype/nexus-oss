@@ -22,7 +22,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
  * Searches Lucene index for artifacts based on maven artifact coordinates.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = Searcher.class, hint = "mavenCoordinates" )
@@ -34,18 +34,22 @@ public class MavenCoordinatesSearcher
      * The key for group term.
      */
     public static final String TERM_GROUP = "g";
+
     /**
      * The key for artifact term.
      */
     public static final String TERM_ARTIFACT = "a";
+
     /**
      * The key for version term.
      */
     public static final String TERM_VERSION = "v";
+
     /**
      * The key for packaging term.
      */
     public static final String TERM_PACKAGING = "p";
+
     /**
      * The key for classifier term.
      */
@@ -56,38 +60,31 @@ public class MavenCoordinatesSearcher
 
     /**
      * Map should contain a term with key {@link #TERM_GROUP} or {@link #TERM_ARTIFACT} or {@link #TERM_VERSION} or
-     * {@link #TERM_PACKAGING} or {@link #TERM_CLASSIFIER} which has a non null value.
-     *
-     * {@inheritDoc}
+     * {@link #TERM_PACKAGING} or {@link #TERM_CLASSIFIER} which has a non null value. {@inheritDoc}
      */
     public boolean canHandle( final Map<String, String> terms )
     {
         return ( terms.containsKey( TERM_GROUP ) && !StringUtils.isEmpty( terms.get( TERM_GROUP ) ) )
-               || ( terms.containsKey( TERM_ARTIFACT ) && !StringUtils.isEmpty( terms.get( TERM_ARTIFACT ) ) )
-               || ( terms.containsKey( TERM_VERSION ) && !StringUtils.isEmpty( terms.get( TERM_VERSION ) ) )
-               || ( terms.containsKey( TERM_PACKAGING ) && !StringUtils.isEmpty( terms.get( TERM_PACKAGING ) ) )
-               || ( terms.containsKey( TERM_CLASSIFIER ) && !StringUtils.isEmpty( terms.get( TERM_CLASSIFIER ) ) );
+            || ( terms.containsKey( TERM_ARTIFACT ) && !StringUtils.isEmpty( terms.get( TERM_ARTIFACT ) ) )
+            || ( terms.containsKey( TERM_VERSION ) && !StringUtils.isEmpty( terms.get( TERM_VERSION ) ) )
+            || ( terms.containsKey( TERM_PACKAGING ) && !StringUtils.isEmpty( terms.get( TERM_PACKAGING ) ) )
+            || ( terms.containsKey( TERM_CLASSIFIER ) && !StringUtils.isEmpty( terms.get( TERM_CLASSIFIER ) ) );
     }
 
     /**
      * {@inheritDoc}
      */
-    public FlatSearchResponse flatSearch( final Map<String, String> terms,
-                                          final String repositoryId,
-                                          final Integer from,
-                                          final Integer count )
+    public FlatSearchResponse flatSearch( final Map<String, String> terms, final String repositoryId,
+                                          final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        if( !canHandle( terms ) )
+        if ( !canHandle( terms ) )
         {
-            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo>emptySet() );
+            return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo> emptySet() );
         }
-        return m_lucene.searchArtifactFlat(
-            terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ), terms.get( TERM_VERSION ),
-            terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ),
-            repositoryId, from, count
-        );
+        return m_lucene.searchArtifactFlat( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ), terms
+            .get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from, count,
+            hitLimit );
     }
-
 
 }

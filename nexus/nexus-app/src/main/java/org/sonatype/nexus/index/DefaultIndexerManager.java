@@ -1189,7 +1189,8 @@ public class DefaultIndexerManager
     // Combined searching
     // ----------------------------------------------------------------------------
 
-    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count )
+    public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
+                                                  Integer hitLimit )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -1242,6 +1243,11 @@ public class DefaultIndexerManager
                 req.setAiCount( count );
             }
 
+            if ( hitLimit != null )
+            {
+                req.setResultHitLimit( hitLimit );
+            }
+
             try
             {
                 FlatSearchResponse result = nexusIndexer.searchFlat( req );
@@ -1276,7 +1282,8 @@ public class DefaultIndexerManager
         }
     }
 
-    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count )
+    public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
+                                                       Integer hitLimit )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -1326,6 +1333,11 @@ public class DefaultIndexerManager
                 req.setAiCount( count );
             }
 
+            if ( hitLimit != null )
+            {
+                req.setResultHitLimit( hitLimit );
+            }
+
             try
             {
                 FlatSearchResponse result = nexusIndexer.searchFlat( req );
@@ -1361,7 +1373,7 @@ public class DefaultIndexerManager
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-                                                  String repositoryId, Integer from, Integer count )
+                                                  String repositoryId, Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException
     {
         if ( gTerm == null && aTerm == null && vTerm == null )
@@ -1433,6 +1445,11 @@ public class DefaultIndexerManager
             if ( count != null )
             {
                 req.setAiCount( count );
+            }
+
+            if ( hitLimit != null )
+            {
+                req.setResultHitLimit( hitLimit );
             }
 
             try
