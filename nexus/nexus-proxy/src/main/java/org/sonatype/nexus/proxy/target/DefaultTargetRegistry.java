@@ -1,13 +1,11 @@
 package org.sonatype.nexus.proxy.target;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -24,12 +22,9 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
-import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.appevents.Event;
 
 /**
  * The default implementation of target registry.
@@ -39,8 +34,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = TargetRegistry.class )
 public class DefaultTargetRegistry
     extends AbstractConfigurable
-    implements TargetRegistry,
-        EventInspector
+    implements TargetRegistry
 {
     @Requirement
     private Logger logger;
@@ -61,61 +55,6 @@ public class DefaultTargetRegistry
     protected Logger getLogger()
     {
         return logger;
-    }
-    
-    public boolean accepts( Event<?> evt )
-    {
-        if ( evt instanceof NexusStartedEvent )
-        {
-            return true;
-        }
-        
-        return false;
-    }
-    
-    public void inspect( Event<?> evt )
-    {
-        try
-        {
-            boolean changed = false;
-            
-            Map<String,ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
-            
-            for ( String key : contentClasses.keySet() )
-            {
-                for ( Target target : getTargetsForContentClass( contentClasses.get( key ) ) )
-                {
-                    // create default target for each content class that doesn't already exist
-                    if ( !( target.getContentClass().equals( contentClasses.get( key ) ) 
-                        && target.getPatternTexts().size() == 1
-                        && target.getPatternTexts().iterator().next().equals( ".*" ) ) )
-                    {
-                        Target newTarget = new Target(
-                            key,
-                            "All (" + key.toUpperCase() + ")",
-                            contentClasses.get( key ),
-                            Collections.singleton( ".*" ));
-                        
-                        addRepositoryTarget( newTarget );
-                        changed = true;
-                        getLogger().info( "Adding default target for " + key + " content class" );
-                    }
-                }
-            }
-            
-            if ( changed )
-            {
-                applicationConfiguration.saveConfiguration();
-            }
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Unable to properly add default Repository Targets", e );
-        }
-        catch ( ConfigurationException e )
-        {
-            getLogger().error( "Unable to properly add default Repository Targets", e );
-        }
     }
 
     // ==
