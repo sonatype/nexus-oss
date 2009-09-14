@@ -12,6 +12,8 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 
 public class Assertions
 {
+    public static final int INSTALLED_PLUGINS = 5;
+    
     private PlexusContainer plexusContainer;
 
     public Assertions( PlexusContainer plexusContainer )
@@ -42,7 +44,7 @@ public class Assertions
         // do discovery, both recorded value should be +1
         Collection<PluginManagerResponse> activationResponses = nexusPluginManager.activateInstalledPlugins();
 
-        Assert.assertEquals( "Three plugins should be discovered!", 4, activationResponses.size() );
+        Assert.assertEquals( "Wrong number of plugins discovered!", INSTALLED_PLUGINS, activationResponses.size() );
 
         for ( PluginManagerResponse response : activationResponses )
         {

@@ -92,8 +92,7 @@ public class DefaultNexusPluginManager
     private final Map<GAVCoordinate, PluginDescriptor> activatedPlugins =
         new HashMap<GAVCoordinate, PluginDescriptor>();
 
-    private final Map<GAVCoordinate, PluginResponse> pluginActions =
-        new HashMap<GAVCoordinate, PluginResponse>();
+    private final Map<GAVCoordinate, PluginResponse> pluginActions = new HashMap<GAVCoordinate, PluginResponse>();
 
     public void initialize()
         throws InitializationException
@@ -333,7 +332,7 @@ public class DefaultNexusPluginManager
                     // try to activate it in recursion
                     response.addPluginManagerResponse( activatePlugin( depCoord ) );
                 }
-                
+
                 dependencyPlugins.add( depCoord );
             }
 
@@ -374,7 +373,7 @@ public class DefaultNexusPluginManager
             {
                 GAVCoordinate dependencyCoordinates =
                     new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                                       dependency.getClassifier(), dependency.getType() );
+                        dependency.getClassifier(), dependency.getType() );
 
                 try
                 {
@@ -649,8 +648,8 @@ public class DefaultNexusPluginManager
                     if ( name.startsWith( "static/" ) )
                     {
                         PluginStaticResourceModel model =
-                            new PluginStaticResourceModel( name, "/" + name, mimeUtil
-                                .getMimeType( jarEntryToUrl( pluginJar, name ) ) );
+                            new PluginStaticResourceModel( name, "/" + name, mimeUtil.getMimeType( jarEntryToUrl(
+                                pluginJar, name ) ) );
 
                         result.add( model );
                     }
@@ -803,11 +802,17 @@ public class DefaultNexusPluginManager
                 request.getPluralComponentAnnotations().add( RepositoryType.class );
 
                 // listen for repository types
+                // RepositoryType: we have to register those with RepositoryTypeRegistry
                 request.getMarkerAnnotations().add( RepositoryType.class );
+
+                // TODO: can we detect these in some smarter war?
+                // ie. a class could be marked as @Component, but the build may not have been used plexus plugin!
+                // Component: we want to _avoid_ them, since they are most probably processed by plexus plugin!
+                request.getMarkerAnnotations().add( Component.class );
 
                 PlexusComponentGleanerResponse response = plexusComponentGleaner.glean( request );
 
-                if ( response != null )
+                if ( response != null && !response.getMarkerAnnotations().containsKey( Component.class ) )
                 {
                     if ( response.getMarkerAnnotations().containsKey( RepositoryType.class ) )
                     {
@@ -819,7 +824,7 @@ public class DefaultNexusPluginManager
                                 .pathPrefix() );
 
                         pd.getPluginRepositoryTypes().put( pluginRepositoryType.getComponentContract(),
-                                                           pluginRepositoryType );
+                            pluginRepositoryType );
                     }
 
                     pd.addComponentDescriptor( response.getComponentDescriptor() );

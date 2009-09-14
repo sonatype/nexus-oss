@@ -18,8 +18,6 @@ public abstract class AbstractNexusPluginManagerTest
 
     protected ClassRealm plexusCoreRealm;
 
-    protected DefaultNexusPluginManager nexusPluginManager;
-
     @Override
     protected void customizeContext( Context context )
     {
