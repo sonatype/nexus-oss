@@ -20,6 +20,7 @@ import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 
 public class RepoConversionTest
@@ -126,17 +127,23 @@ public class RepoConversionTest
         throws Exception
     {
         Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "inhouse", MavenHostedRepository.class );
+        
+        assertTrue( "This repo should not be READ only!", RepositoryWritePolicy.READ_ONLY != patient.getWritePolicy() );
 
         convertHosted2Proxy( (MavenHostedRepository) patient );
 
         assertTrue( "Partient should be proxy", patient.getRepositoryKind()
             .isFacetAvailable( MavenProxyRepository.class ) );
+
+        assertTrue( "This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy() );
     }
 
     public void testProxy2Hosted()
         throws Exception
     {
         Repository patient = getRepositoryRegistry().getRepositoryWithFacet( "repo1", MavenProxyRepository.class );
+
+        assertTrue( "This repo should be READ only!", RepositoryWritePolicy.READ_ONLY == patient.getWritePolicy() );
 
         convertProxy2Hosted( (MavenProxyRepository) patient );
 
