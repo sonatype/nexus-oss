@@ -248,23 +248,31 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   if ( rec.data.repoType == 'group' && sp.checkPermission( 'nexus:repogroups', sp.READ ) &&
       ( sp.checkPermission( 'nexus:repogroups', sp.CREATE ) ||
         sp.checkPermission( 'nexus:repogroups', sp.EDIT ) ) ) {
-    
-    // I have to say this is a poor solution, get the resource once, if ok, show the tab and get again.
-    // But I cannot think out a better, simpler solution. 
-    Ext.Ajax.request({
-    	url: Sonatype.config.repos.urls.groups + '/' + rec.get('id'),
-    	method: 'GET',
-    	scope: this,
-    	callback: function( options, isSuccess, response ){
-    		if ( isSuccess ) {
-    			cardPanel.add( new Sonatype.repoServer.RepositoryGroupEditor( {
-      				tabTitle: 'Configuration',
-      				payload: rec 
-    			} ) );
-    		}
-    	}
-    });
-        	
+    if ( rec.data.resourceURI ) {
+      // I have to say this is a poor solution, get the resource once, if ok, show the tab and get again.
+      // But I cannot think out a better, simpler solution. 
+      Ext.Ajax.request({
+      	url: Sonatype.config.repos.urls.groups + '/' + rec.get('id'),
+      	method: 'GET',
+      	scope: this,
+      	callback: function( options, isSuccess, response ){
+      		if ( isSuccess ) {
+      			cardPanel.add( new Sonatype.repoServer.RepositoryGroupEditor( {
+        				tabTitle: 'Configuration',
+        				payload: rec 
+      			} ) );
+      		}
+      	}
+      });
+    }
+    // Regardless of the change above to protect from 403 responses, we ALWAYS need 
+    // to show this tab when creating new group
+    else {
+      cardPanel.add( new Sonatype.repoServer.RepositoryGroupEditor( {
+        tabTitle: 'Configuration',
+        payload: rec 
+    } ) );
+    }        	
   }
 } );
 

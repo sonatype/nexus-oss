@@ -349,22 +349,24 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
     }
     var elp = tree.getEl();
     
-    if ( ! tree.errorEl ){
-      tree.errorEl = elp.createChild( { cls: 'x-form-invalid-msg' } );
-      tree.errorEl.setWidth( elp.getWidth( true ) ); //note removed -20 like on form fields
+    if ( elp ) {    
+      if ( ! tree.errorEl ){
+        tree.errorEl = elp.createChild( { cls: 'x-form-invalid-msg' } );
+        tree.errorEl.setWidth( elp.getWidth( true ) ); //note removed -20 like on form fields
+      }
+      tree.invalid = true;
+      var oldErrorText = tree.invalidText;
+      if ( errortext ) {
+        tree.invalidText = errortext;
+      }
+      tree.errorEl.update( tree.invalidText );
+      tree.invalidText = oldErrorText;
+      elp.child( '.x-panel-body' ).setStyle( {
+        'background-color': '#fee',
+        border: '1px solid #dd7870'
+      });
+      Ext.form.Field.msgFx['normal'].show( tree.errorEl, tree );
     }
-    tree.invalid = true;
-    var oldErrorText = tree.invalidText;
-    if ( errortext ) {
-      tree.invalidText = errortext;
-    }
-    tree.errorEl.update( tree.invalidText );
-    tree.invalidText = oldErrorText;
-    elp.child( '.x-panel-body' ).setStyle( {
-      'background-color': '#fee',
-      border: '1px solid #dd7870'
-    });
-    Ext.form.Field.msgFx['normal'].show( tree.errorEl, tree );
   },
 
   validate: function() {
@@ -466,6 +468,8 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
         this.createNode( leftRoot, rec );
       }
     }
+    
+    this.doLayout();
   }
 });
 
