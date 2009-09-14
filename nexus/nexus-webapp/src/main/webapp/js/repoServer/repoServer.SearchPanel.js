@@ -349,13 +349,52 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   
   applyBookmark: function( bookmark ) {
-    if ( bookmark && bookmark != this.searchField.getRawValue() ) {
-      this.startQuickSearch( bookmark );
+    if ( bookmark ) {
+      var parts = bookmark.split( '~' );
+      
+      if ( parts.length == 1 ) {
+        this.startQuickSearch( bookmark );
+      }
+      else if ( parts.length > 1 ) {
+        this.setSearchType( this, parts[0] );
+        
+        if ( parts[0] == 'quick' 
+          || parts[0] == 'classname' ) {
+          this.startQuickSearch( parts[1] );
+        }
+        else if ( parts[0] == 'gav' ) {
+          for ( var i = 1; i < parts.length; i++ ) {
+            this.gavFields[i - 1].setValue( parts[i]);
+          }
+          this.startGAVSearch();
+        }
+      }
     }
   },
   
   getBookmark: function() {
-    return this.searchField.getRawValue();
+    if ( this.searchTypeButton.value == 'quick' 
+      || this.searchTypeButton.value == 'classname' ){
+      return this.searchTypeButton.value
+        + '~'
+        + this.searchField.getRawValue();
+    }
+    else if ( this.searchTypeButton.value == 'gav' ){
+      var result = this.searchTypeButton.value + '~';
+      
+      for ( var i = 0; i < this.gavFields.length; i++ ) {
+        var v = this.gavFields[i].getRawValue();
+        if ( v ) {
+          result += v;
+        }
+        result += '~';
+      }
+      
+      return result;
+    }
+    else{
+      return this.searchField.getRawValue();
+    }
   },
 
   setWarningLabel: function( s ) {
@@ -451,6 +490,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       return;
     }
     this.clearWarningLabel();
+    
+    Sonatype.utils.updateHistory( this );
  
     this.fetchFirst50( this );
   },
