@@ -110,3 +110,25 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
                       new Ext.tree.AsyncTreeNode(attr));
   }
 });
+
+//create constructor for new class
+Ext.tree.SonatypeTreeSorter = function(el, config){
+    Ext.tree.SonatypeTreeSorter.superclass.constructor.call(this, el, config);
+};
+ 
+Ext.extend(Ext.tree.SonatypeTreeSorter, Ext.tree.TreeSorter, {
+    disableSort : function( tree ){
+      tree.un("beforechildrenrendered", this.doSort, this);    
+      tree.un("append", this.updateSort, this);    
+      tree.un("insert", this.updateSort, this);    
+      tree.un("textchange", this.updateSortParent, this);
+    },
+    enableSort : function( tree ){
+      tree.on("beforechildrenrendered", this.doSort, this);    
+      tree.on("append", this.updateSort, this);    
+      tree.on("insert", this.updateSort, this);    
+      tree.on("textchange", this.updateSortParent, this);
+      
+      this.doSort( tree.root );
+    }
+});

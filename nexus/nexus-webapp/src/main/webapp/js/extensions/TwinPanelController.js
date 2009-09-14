@@ -118,6 +118,12 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
     }
     
     if ( fromPanel && toPanel ) {
+      if ( toPanel.sorter && toPanel.sorter.disableSort ) {
+        toPanel.sorter.disableSort( toPanel );
+      }
+      if ( fromPanel.sorter && fromPanel.sorter.disableSort ) {
+        fromPanel.sorter.disableSort( fromPanel );
+      }
       var fromRoot = fromPanel.root;
       var toRoot = toPanel.root;
       if ( moveAll ) {
@@ -140,6 +146,12 @@ Ext.extend(Sonatype.ext.TwinPanelController, Ext.Panel, {
             }
           }
         }
+      }
+      if ( toPanel.sorter && toPanel.sorter.enableSort ) {
+        toPanel.sorter.enableSort( toPanel );
+      }
+      if ( fromPanel.sorter && fromPanel.sorter.enableSort) {
+        fromPanel.sorter.enableSort( fromPanel );
       }
     }
   }

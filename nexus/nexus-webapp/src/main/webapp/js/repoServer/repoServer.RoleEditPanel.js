@@ -745,7 +745,7 @@ Ext.extend( Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       return ( node.attributes.nodeType == 'role' ? '0' : '1' ) + node.text.toLowerCase();
     }
     
-    new Ext.tree.TreeSorter( tree, { sortType: sortTypeFunc } );
+    tree.sorter = new Ext.tree.SonatypeTreeSorter( tree, { sortType: sortTypeFunc } );
   },
   
   saveRolesTreeHelper : function(val, fpanel){
