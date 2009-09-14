@@ -436,6 +436,8 @@ public abstract class AbstractProxyRepository
             }
 
             getCurrentConfiguration( true ).getRemoteStorage().setProvider( remoteStorage.getProviderId() );
+            
+            setWritePolicy( RepositoryWritePolicy.READ_ONLY );
         }
     }
 

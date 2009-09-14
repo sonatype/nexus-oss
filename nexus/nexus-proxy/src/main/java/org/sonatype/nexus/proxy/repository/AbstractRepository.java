@@ -1178,7 +1178,7 @@ public abstract class AbstractRepository
         if ( Action.update.equals( action ) && !RepositoryWritePolicy.ALLOW_WRITE.equals( this.getWritePolicy() ) )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
-                + "' has does not allow updating artifacts." );
+                + "' does not allow updating artifacts." );
         }
     }
 
