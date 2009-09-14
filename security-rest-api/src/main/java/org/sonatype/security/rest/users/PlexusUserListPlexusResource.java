@@ -12,23 +12,27 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.Role;
+import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
+import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
 @Component( role = PlexusResource.class, hint = "PlexusUserListPlexusResource" )
 public class PlexusUserListPlexusResource
@@ -68,9 +72,29 @@ public class PlexusUserListPlexusResource
         // TODO: this logic should be removed from the this resource
         String source = getUserSource( request );
         Set<User> users = null;
-        if( "all".equalsIgnoreCase( source ))
+        if ( "all".equalsIgnoreCase( source ) )
         {
             users = this.getSecuritySystem().listUsers();
+        }
+        else if ( ConfiguredUsersUserManager.SOURCE.equalsIgnoreCase( source ) )
+        {
+            Set<Role> roles;
+            try
+            {
+                roles = this.getSecuritySystem().listRoles( SecurityXmlAuthorizationManager.SOURCE );
+                Set<String> roleIds = new HashSet<String>();
+                for ( Role role : roles )
+                {
+                    roleIds.add( role.getRoleId() );
+                }
+                users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, roleIds, null ) );
+            }
+            catch ( NoSuchAuthorizationManager e )
+            {
+               // This search is dependent on the xml auth info.
+                this.getLogger().error( "Could not find SecurityXmlAuthorizationManager", e );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Failed to get list of Roles from XML configuration: "+ e.getMessage(), e );
+            }
         }
         else
         {

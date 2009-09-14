@@ -18,6 +18,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
@@ -514,13 +515,28 @@ public class DefaultSecuritySystem
     {
         Set<User> users = new HashSet<User>();
 
+        // FIXME This doesn't seem right... why is this like this
         // NOTE: if we want to leave this very generic we need to search ALL UserManagers even if the source is set
         // the problem is that some users could be found by looking up role mappings in other realms
 
-        // search all user managers
-        for ( UserManager tmpUserManager : this.userManagerMap.values() )
+        if( StringUtils.isEmpty( criteria.getSource() ) )
         {
-            users.addAll( tmpUserManager.searchUsers( criteria ) );
+         // search all user managers
+            for ( UserManager tmpUserManager : this.userManagerMap.values() )
+            {
+                users.addAll( tmpUserManager.searchUsers( criteria ) );
+            }
+        }
+        else
+        {
+            try
+            {
+                users.addAll( this.getUserManager( criteria.getSource() ).searchUsers( criteria ) );
+            }
+            catch ( NoSuchUserManager e )
+            {
+                this.logger.warn( "UserManager: "+ criteria.getSource() +" was not found.", e );
+            }
         }
 
         // now add all the roles to the users

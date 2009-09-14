@@ -118,11 +118,11 @@ public class AdditinalRoleSecuritySystemTest
         criteria.setOneOfRoleIds( this.getXMLRoles() );
 
         criteria.setUserId( "pperalez" );
-        User user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
+        User user = searchForSingleUser( criteria, "pperalez", null );
         Assert.assertNull( user );
 
         criteria.setUserId( "jcoder" );
-        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "jcoder", null );
         Assert.assertNotNull( user );
         Assert.assertEquals( "Roles: " + this.toRoleIdSet( user.getRoles() ), 4, user.getRoles().size() );
         // A,B,C,1
@@ -133,7 +133,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "Role1" ) );
 
         criteria.setUserId( "dknudsen" );
-        user = searchForSingleUser( criteria, "dknudsen", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "dknudsen", null );
         Assert.assertNotNull( user );
         Assert.assertEquals( 1, user.getRoles().size() );
         // Role2
@@ -141,7 +141,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "Role2" ) );
 
         criteria.setUserId( "cdugas" );
-        user = searchForSingleUser( criteria, "cdugas", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "cdugas", null );
         Assert.assertNotNull( user );
         Assert.assertEquals( 3, user.getRoles().size() );
 
