@@ -318,7 +318,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     if ( v.search(/^[0-9a-f]{40}$/) == 0 ) {
       searchType = 'checksum';
     }
-    else if ( v.search(/^[A-Z]/) == 0 ) {
+    else if ( v.search(/^[a-z.]*[A-Z]/) == 0 ) {
       searchType = 'classname';
     }
     this.setSearchType( this, searchType );
