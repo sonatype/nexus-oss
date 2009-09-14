@@ -54,7 +54,7 @@ import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
 
 /**
  * A default index updater implementation
- * 
+ *
  * @author Jason van Zyl
  * @author Eugene Kuleshov
  */
@@ -69,6 +69,9 @@ public class DefaultIndexUpdater
     @Requirement
     private WagonManager wagonManager;
 
+    @Requirement( role = IndexUpdateSideEffect.class )
+    private List<IndexUpdateSideEffect> sideEffects;
+
     public Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
         throws IOException
     {
@@ -76,11 +79,12 @@ public class DefaultIndexUpdater
 
         // If no resource fetcher passed in, use the wagon fetcher by default
         // and put back in request for future use
-        if ( fetcher == null )
+        if( fetcher == null )
         {
             fetcher =
                 new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest
-                    .getAuthenticationInfo(), updateRequest.getProxyInfo() );
+                    .getAuthenticationInfo(), updateRequest.getProxyInfo()
+                );
 
             updateRequest.setResourceFetcher( fetcher );
         }
@@ -93,7 +97,7 @@ public class DefaultIndexUpdater
         {
             Date contextTimestamp = context.getTimestamp();
 
-            if ( !updateRequest.isForceFullUpdate() )
+            if( !updateRequest.isForceFullUpdate() )
             {
                 Properties localProperties = loadLocallyStoredRemoteProperties( context );
 
@@ -104,15 +108,15 @@ public class DefaultIndexUpdater
                 Date updateTimestamp = getTimestamp( properties, IndexingContext.INDEX_TIMESTAMP );
 
                 // If new timestamp is missing, dont bother checking incremental, we have an old file
-                if ( updateTimestamp != null )
+                if( updateTimestamp != null )
                 {
                     List<String> filenames =
                         incrementalHandler.loadRemoteIncrementalUpdates( updateRequest, localProperties, properties );
 
                     // if we have some incremental files, merge them in
-                    if ( filenames != null )
+                    if( filenames != null )
                     {
-                        for ( String filename : filenames )
+                        for( String filename : filenames )
                         {
                             loadIndexDirectory( updateRequest, true, filename );
                         }
@@ -127,7 +131,7 @@ public class DefaultIndexUpdater
 
                 // if incremental cant be done for whatever reason, simply use old logic of
                 // checking the timestamp, if the same, nothing to do
-                if ( updateTimestamp != null && contextTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
+                if( updateTimestamp != null && contextTimestamp != null && !updateTimestamp.after( contextTimestamp ) )
                 {
                     return null; // index is up to date
                 }
@@ -137,7 +141,7 @@ public class DefaultIndexUpdater
             {
                 return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".gz" );
             }
-            catch ( FileNotFoundException ex )
+            catch( FileNotFoundException ex )
             {
                 // try to look for legacy index transfer format
                 return loadIndexDirectory( updateRequest, false, IndexingContext.INDEX_FILE + ".zip" );
@@ -214,35 +218,45 @@ public class DefaultIndexUpdater
 
             Date timestamp = null;
 
-            if ( indexArchive.length() > 0 )
+            if( indexArchive.length() > 0 )
             {
                 is = new BufferedInputStream( new FileInputStream( indexArchive ) );
 
-                if ( remoteIndexFile.endsWith( ".gz" ) )
+                if( remoteIndexFile.endsWith( ".gz" ) )
                 {
                     timestamp = DefaultIndexUpdater.unpackIndexData( is, directory, //
-                        updateRequest.getIndexingContext() );
+                                                                     updateRequest.getIndexingContext()
+                    );
                 }
                 else
                 {
                     // legacy transfer format
                     timestamp = unpackIndexArchive( is, directory, //
-                        updateRequest.getIndexingContext() );
+                                                    updateRequest.getIndexingContext()
+                    );
                 }
             }
 
-            if ( updateRequest.getDocumentFilter() != null )
+            if( updateRequest.getDocumentFilter() != null )
             {
                 filterDirectory( directory, updateRequest.getDocumentFilter() );
             }
 
-            if ( merge )
+            if( merge )
             {
                 updateRequest.getIndexingContext().merge( directory );
             }
             else
             {
                 updateRequest.getIndexingContext().replace( directory );
+            }
+            if( sideEffects != null && sideEffects.size() > 0 )
+            {
+                getLogger().info( IndexUpdateSideEffect.class.getName() + " extensions found: " + sideEffects.size() );
+                for( IndexUpdateSideEffect sideeffect : sideEffects )
+                {
+                    sideeffect.updateIndex( directory, updateRequest.getIndexingContext(), merge );
+                }
             }
 
             return timestamp;
@@ -253,7 +267,7 @@ public class DefaultIndexUpdater
 
             indexArchive.delete();
 
-            if ( directory != null )
+            if( directory != null )
             {
                 directory.close();
             }
@@ -262,7 +276,7 @@ public class DefaultIndexUpdater
             {
                 FileUtils.deleteDirectory( indexDir );
             }
-            catch ( IOException ex )
+            catch( IOException ex )
             {
                 // ignore
             }
@@ -271,8 +285,8 @@ public class DefaultIndexUpdater
 
     /**
      * Unpack legacy index archive into a specified Lucene <code>Directory</code>
-     * 
-     * @param is a <code>ZipInputStream</code> with index data
+     *
+     * @param is        a <code>ZipInputStream</code> with index data
      * @param directory Lucene <code>Directory</code> to unpack index data to
      * @return {@link Date} of the index update or null if it can't be read
      */
@@ -317,9 +331,9 @@ public class DefaultIndexUpdater
         {
             zis = new ZipInputStream( is );
 
-            while ( ( entry = zis.getNextEntry() ) != null )
+            while( ( entry = zis.getNextEntry() ) != null )
             {
-                if ( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
+                if( entry.isDirectory() || entry.getName().indexOf( '/' ) > -1 )
                 {
                     continue;
                 }
@@ -329,7 +343,7 @@ public class DefaultIndexUpdater
                 {
                     int n = 0;
 
-                    while ( ( n = zis.read( buf ) ) != -1 )
+                    while( ( n = zis.read( buf ) ) != -1 )
                     {
                         io.writeBytes( buf, n );
                     }
@@ -356,9 +370,9 @@ public class DefaultIndexUpdater
             r = IndexReader.open( sourcedir );
             w = new IndexWriter( targetdir, false, new NexusAnalyzer(), true );
 
-            for ( int i = 0; i < r.maxDoc(); i++ )
+            for( int i = 0; i < r.maxDoc(); i++ )
             {
-                if ( !r.isDeleted( i ) )
+                if( !r.isDeleted( i ) )
                 {
                     w.addDocument( IndexUtils.updateDocument( r.document( i ), context ) );
                 }
@@ -384,16 +398,16 @@ public class DefaultIndexUpdater
 
             int numDocs = r.numDocs();
 
-            for ( int i = 0; i < numDocs; i++ )
+            for( int i = 0; i < numDocs; i++ )
             {
-                if ( r.isDeleted( i ) )
+                if( r.isDeleted( i ) )
                 {
                     continue;
                 }
 
                 Document d = r.document( i );
 
-                if ( !filter.accept( d ) )
+                if( !filter.accept( d ) )
                 {
                     r.deleteDocument( i );
                 }
@@ -438,7 +452,7 @@ public class DefaultIndexUpdater
 
             return properties;
         }
-        catch ( IOException e )
+        catch( IOException e )
         {
             getLogger().debug( "Unable to read remote properties stored locally", e );
         }
@@ -481,7 +495,7 @@ public class DefaultIndexUpdater
     {
         String indexTimestamp = properties.getProperty( key );
 
-        if ( indexTimestamp != null )
+        if( indexTimestamp != null )
         {
             try
             {
@@ -489,7 +503,7 @@ public class DefaultIndexUpdater
                 df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
                 return df.parse( indexTimestamp );
             }
-            catch ( ParseException ex )
+            catch( ParseException ex )
             {
             }
         }
@@ -498,8 +512,8 @@ public class DefaultIndexUpdater
 
     /**
      * Unpack index data using specified Lucene Index writer
-     * 
-     * @param is an input stream to unpack index data from
+     *
+     * @param is      an input stream to unpack index data from
      * @param w a writer to save index data
      * @param ics a collection of index creators for updating unpacked documents.
      */
@@ -555,7 +569,7 @@ public class DefaultIndexUpdater
             {
                 wagon = wagonManager.getWagon( repository );
 
-                if ( listener != null )
+                if( listener != null )
                 {
                     wagon.addTransferListener( listener );
                 }
@@ -563,9 +577,9 @@ public class DefaultIndexUpdater
                 // when working in the context of Maven, the WagonManager is already
                 // populated with proxy information from the Maven environment
 
-                if ( authenticationInfo != null )
+                if( authenticationInfo != null )
                 {
-                    if ( proxyInfo != null )
+                    if( proxyInfo != null )
                     {
                         wagon.connect( repository, authenticationInfo, proxyInfo );
                     }
@@ -576,7 +590,7 @@ public class DefaultIndexUpdater
                 }
                 else
                 {
-                    if ( proxyInfo != null )
+                    if( proxyInfo != null )
                     {
                         wagon.connect( repository, proxyInfo );
                     }
@@ -586,13 +600,13 @@ public class DefaultIndexUpdater
                     }
                 }
             }
-            catch ( AuthenticationException ex )
+            catch( AuthenticationException ex )
             {
                 String msg = "Authentication exception connecting to " + repository;
                 logError( msg, ex );
                 throw new IOException( msg );
             }
-            catch ( WagonException ex )
+            catch( WagonException ex )
             {
                 String msg = "Wagon exception connecting to " + repository;
                 logError( msg, ex );
@@ -602,13 +616,13 @@ public class DefaultIndexUpdater
 
         public void disconnect()
         {
-            if ( wagon != null )
+            if( wagon != null )
             {
                 try
                 {
                     wagon.disconnect();
                 }
-                catch ( ConnectionException ex )
+                catch( ConnectionException ex )
                 {
                     logError( "Failed to close connection", ex );
                 }
@@ -622,19 +636,19 @@ public class DefaultIndexUpdater
             {
                 wagon.get( name, targetFile );
             }
-            catch ( AuthorizationException e )
+            catch( AuthorizationException e )
             {
                 String msg = "Authorization exception retrieving " + name;
                 logError( msg, e );
                 throw new IOException( msg );
             }
-            catch ( ResourceDoesNotExistException e )
+            catch( ResourceDoesNotExistException e )
             {
                 String msg = "Resource " + name + " does not exist";
                 logError( msg, e );
                 throw new FileNotFoundException( msg );
             }
-            catch ( WagonException e )
+            catch( WagonException e )
             {
                 String msg = "Transfer for " + name + " failed";
                 logError( msg, e );
@@ -644,7 +658,7 @@ public class DefaultIndexUpdater
 
         private void logError( String msg, Exception ex )
         {
-            if ( listener != null )
+            if( listener != null )
             {
                 listener.debug( msg + "; " + ex.getMessage() );
             }

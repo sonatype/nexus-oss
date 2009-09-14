@@ -40,7 +40,11 @@
   </dependencyManagement>
 
   <dependencies>
-
+  <dependency>
+    <groupId>org.sonatype.plugin</groupId>
+    <artifactId>plugin-host-api</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+  </dependency>
     <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
