@@ -57,6 +57,9 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function( config ) {
     }
   } );
   
+  this.roleDataStore.load();
+  this.privDataStore.load();
+  
   Sonatype.repoServer.UserPrivilegeBrowsePanel.superclass.constructor.call( this, {
     region: 'center',
     width: '100%',
@@ -233,7 +236,7 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
   userHasPrivilege : function( privId ){
     if ( this.payload.data.roles ){
       for ( var i = 0 ; i < this.payload.data.roles.length ; i++ ){
-        if ( this.roleHasPrivilege( privId, this.payload.data.roles[i].roleId ) ){
+        if ( this.roleHasPrivilege( privId, this.getRoleIdFromPayload( this.payload.data.roles[i] ) ) ){
           return true;
         }
       }
@@ -275,7 +278,7 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
       for ( var i = 0 ; i < userRoles.length ; i++ ) {
         var role = this.roleDataStore.getAt( this.roleDataStore.findBy( 
             function( rec, recid ) {
-              return rec.id == userRoles[i].roleId;
+              return rec.id == this.getRoleIdFromPayload( userRoles[i] );
             }, this ) );
         var childRouteArray = this.getPrivilegeRoleRouteArray( privId, role.data );
         if ( childRouteArray ){
@@ -317,6 +320,13 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
     }
     
     return routeArray;
+  },
+  getRoleIdFromPayload : function( role ) {
+    if ( role.roleId ) {
+      return role.roleId;
+    }
+    
+    return role;
   }
 } );
 
