@@ -515,10 +515,8 @@ public class DefaultSecuritySystem
     {
         Set<User> users = new HashSet<User>();
 
-        // FIXME This doesn't seem right... why is this like this
-        // NOTE: if we want to leave this very generic we need to search ALL UserManagers even if the source is set
-        // the problem is that some users could be found by looking up role mappings in other realms
-
+        // if the source is not set search all realms.
+        
         if( StringUtils.isEmpty( criteria.getSource() ) )
         {
          // search all user managers

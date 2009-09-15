@@ -14,9 +14,7 @@ package org.sonatype.security.rest.users;
 
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Request;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
@@ -30,7 +28,12 @@ public abstract class AbstractUserSearchPlexusResource
 
     protected String getUserSource( Request request )
     {
-        return request.getAttributes().get( USER_SOURCE_KEY ).toString();
+        String source = request.getAttributes().get( USER_SOURCE_KEY ).toString();
+        if ( "all".equalsIgnoreCase( source ) )
+        {
+            return null;
+        }
+        return source;
     }
 
     protected PlexusUserListResourceResponse search( UserSearchCriteria criteria )
