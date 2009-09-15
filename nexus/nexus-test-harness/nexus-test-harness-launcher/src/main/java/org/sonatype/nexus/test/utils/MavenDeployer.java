@@ -81,7 +81,7 @@ public class MavenDeployer
 
         verifier.setSystemProperties( props );
 
-        verifier.executeGoal( "deploy:deploy-file", args );
+        verifier.executeGoal( "org.apache.maven.plugins:maven-deploy-plugin:2.4:deploy-file", args );
 
         return verifier;
 
