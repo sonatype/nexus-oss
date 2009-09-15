@@ -76,26 +76,6 @@ public class PlexusUserListPlexusResource
         {
             users = this.getSecuritySystem().listUsers();
         }
-        else if ( ConfiguredUsersUserManager.SOURCE.equalsIgnoreCase( source ) )
-        {
-            Set<Role> roles;
-            try
-            {
-                roles = this.getSecuritySystem().listRoles( SecurityXmlAuthorizationManager.SOURCE );
-                Set<String> roleIds = new HashSet<String>();
-                for ( Role role : roles )
-                {
-                    roleIds.add( role.getRoleId() );
-                }
-                users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, roleIds, source ) );
-            }
-            catch ( NoSuchAuthorizationManager e )
-            {
-               // This search is dependent on the xml auth info.
-                this.getLogger().error( "Could not find SecurityXmlAuthorizationManager", e );
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Failed to get list of Roles from XML configuration: "+ e.getMessage(), e );
-            }
-        }
         else
         {
             users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, source ) );
