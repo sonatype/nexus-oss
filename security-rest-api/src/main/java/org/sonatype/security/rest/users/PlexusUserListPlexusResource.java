@@ -87,7 +87,7 @@ public class PlexusUserListPlexusResource
                 {
                     roleIds.add( role.getRoleId() );
                 }
-                users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, roleIds, null ) );
+                users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, roleIds, source ) );
             }
             catch ( NoSuchAuthorizationManager e )
             {
