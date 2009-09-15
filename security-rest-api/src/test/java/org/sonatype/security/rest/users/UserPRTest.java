@@ -30,21 +30,53 @@ public class UserPRTest
         userResource.setUserId( "testAddUser" );
         userResource.addRole( "admin" );
 
+        // try
+        // {
+
+        resource.post( null, this.buildRequest(), null, resourceRequest );
+        // }
+        // catch ( PlexusResourceException e )
+        // {
+        // ErrorResponse errorResponse = (ErrorResponse) e.getResultObject();
+        // ErrorMessage errorMessage = (ErrorMessage) errorResponse.getErrors().get( 0 );
+        // Assert.fail( e.getMessage() + ": " + errorMessage.getMsg() );
+        // }
+
+        // now list
+        resource.get( null, this.buildRequest(), null, null );
+
+    }
+
+    public void testInvalidEmailAddUser()
+        throws Exception
+    {
+
+        PlexusResource resource = this.lookup( PlexusResource.class, "UserListPlexusResource" );
+
+        UserResourceRequest resourceRequest = new UserResourceRequest();
+        UserResource userResource = new UserResource();
+        resourceRequest.setData( userResource );
+        userResource.setEmail( "testInvalidEmailAddUser" );
+        userResource.setName( "testInvalidEmailAddUser" );
+        userResource.setStatus( "active" );
+        userResource.setUserId( "testInvalidEmailAddUser" );
+        userResource.addRole( "admin" );
+
         try
         {
 
             resource.post( null, this.buildRequest(), null, resourceRequest );
+            Assert.fail( "expected PlexusResourceException" );
         }
         catch ( PlexusResourceException e )
         {
             ErrorResponse errorResponse = (ErrorResponse) e.getResultObject();
             ErrorMessage errorMessage = (ErrorMessage) errorResponse.getErrors().get( 0 );
-            Assert.fail( e.getMessage() + ": " + errorMessage.getMsg() );
+            Assert.assertTrue( errorMessage.getId().contains( "email" ) );
         }
 
         // now list
         resource.get( null, this.buildRequest(), null, null );
-
     }
 
     public void testUpdateUserValidation()
@@ -78,6 +110,43 @@ public class UserPRTest
         catch ( PlexusResourceException e )
         {
             // expected
+        }
+
+    }
+
+    public void testInvalidEmailUpdateUserValidation()
+        throws Exception
+    {
+        // test user creation with NO status
+
+        // add a user
+        PlexusResource resource = this.lookup( PlexusResource.class, "UserListPlexusResource" );
+
+        UserResourceRequest resourceRequest = new UserResourceRequest();
+        UserResource userResource = new UserResource();
+        resourceRequest.setData( userResource );
+        userResource.setEmail( "testInvalidEmailUpdateUserValidation@test.com" );
+        userResource.setName( "testInvalidEmailUpdateUserValidation" );
+        userResource.setStatus( "active" );
+        userResource.setUserId( "testInvalidEmailUpdateUserValidation" );
+        userResource.addRole( "admin" );
+
+        resource.post( null, this.buildRequest(), null, resourceRequest );
+
+        // remove the status
+        userResource.setEmail( "invalidEmailAddress" );
+
+        resource = this.lookup( PlexusResource.class, "UserPlexusResource" );
+        try
+        {
+            resource.put( null, this.buildRequest(), null, resourceRequest );
+            Assert.fail( "expected PlexusResourceException" );
+        }
+        catch ( PlexusResourceException e )
+        {
+            ErrorResponse errorResponse = (ErrorResponse) e.getResultObject();
+            ErrorMessage errorMessage = (ErrorMessage) errorResponse.getErrors().get( 0 );
+            Assert.assertTrue( errorMessage.getId().contains( "email" ) );
         }
 
     }
