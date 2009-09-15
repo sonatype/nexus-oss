@@ -198,6 +198,23 @@ public abstract class AbstractPrivilegeTest
         // add it
         this.giveUserRole( userId, role.getId() );
     }
+    
+    protected void giveUserRoleByName( String userId, String roleName )
+        throws IOException
+    {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        
+        for ( RoleResource roleResource : roleUtil.getList() )
+        {
+            if ( roleResource.getName().equals( roleName ) )
+            {
+                UserResource testUser = this.userUtil.getUser( userId );
+                testUser.addRole( roleResource.getId() );
+                this.userUtil.updateUser( testUser );
+                break;
+            }
+        }
+    }
 
     protected void giveUserRole( String userId, String roleId )
         throws IOException
