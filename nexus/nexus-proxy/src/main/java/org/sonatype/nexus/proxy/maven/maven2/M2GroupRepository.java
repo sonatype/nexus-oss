@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
@@ -33,9 +34,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
+import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -189,7 +192,32 @@ public class M2GroupRepository
 
                 StorageFileItem fileItem = (StorageFileItem) item;
 
-                existingMetadatas.add( parseMetadata( fileItem ) );
+                try
+                {
+                    existingMetadatas.add( parseMetadata( fileItem ) );
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn(
+                        "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
+                            + "\", will be skipped from aggregation!", e );
+
+                    getFeedRecorder()
+                        .addNexusArtifactEvent(
+                            newMetadataFailureEvent( fileItem,
+                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                }
+                catch ( MetadataException e )
+                {
+                    getLogger().warn(
+                        "Metadata exception during parse of metadata from UID=\""
+                            + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
+
+                    getFeedRecorder()
+                        .addNexusArtifactEvent(
+                            newMetadataFailureEvent( fileItem,
+                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                }
             }
 
             if ( existingMetadatas.isEmpty() )
@@ -282,5 +310,32 @@ public class M2GroupRepository
         result.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
 
         return result;
+    }
+
+    // TODO: clean up this! This is a copy+paste from org.sonatype.nexus.proxy.maven.ChecksumContentValidator
+    // centralize this!
+    private NexusArtifactEvent newMetadataFailureEvent( StorageFileItem item, String msg )
+    {
+        NexusArtifactEvent nae = new NexusArtifactEvent();
+
+        nae.setAction( NexusArtifactEvent.ACTION_BROKEN );
+
+        nae.setEventDate( new Date() );
+
+        nae.setEventContext( item.getItemContext() );
+
+        nae.setMessage( msg );
+
+        NexusItemInfo ai = new NexusItemInfo();
+
+        ai.setPath( item.getPath() );
+
+        ai.setRepositoryId( item.getRepositoryId() );
+
+        ai.setRemoteUrl( item.getRemoteUrl() );
+
+        nae.setNexusItemInfo( ai );
+
+        return nae;
     }
 }

@@ -144,7 +144,10 @@ public abstract class AbstractConfigurable
     {
         this.coreConfiguration = wrapConfiguration( config );
 
-        doConfigure();
+        // "pull" the config to make it dirty
+        getCurrentConfiguration( true );
+
+        commitChanges();
     }
 
     public boolean isDirty()
@@ -152,19 +155,18 @@ public abstract class AbstractConfigurable
         return getCurrentCoreConfiguration().isDirty();
     }
 
-    // FIXME: who will call prepareForSave() if Configurable used directly?
-    public void prepareForSave()
+    protected void prepareForSave()
         throws ConfigurationException
     {
         if ( isDirty() )
         {
+            getCurrentCoreConfiguration().validateChanges();
+            
             if ( getConfigurator() != null )
             {
                 // prepare for save: transfer what we have in memory (if any) to model
                 getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
             }
-
-            getCurrentCoreConfiguration().validateChanges();
         }
     }
 
@@ -173,8 +175,21 @@ public abstract class AbstractConfigurable
     {
         if ( isDirty() )
         {
-            prepareForSave();
+            // 1st, validate
+            getCurrentCoreConfiguration().validateChanges();
+            
+            // 2nd, we apply configurator (it will map things that are not 1:1 from config object)
+            if ( getConfigurator() != null )
+            {
+                // apply config, transfer what is not mappable (if any) from model
+                getConfigurator().applyConfiguration( this, getApplicationConfiguration(),
+                    getCurrentCoreConfiguration() );
 
+                // prepare for save: transfer what we have in memory (if any) to model
+                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
+            }
+
+            // 3rd, commit
             getCurrentCoreConfiguration().commitChanges();
 
             return true;
@@ -197,22 +212,6 @@ public abstract class AbstractConfigurable
         {
             return false;
         }
-    }
-
-    // ==
-
-    protected void doConfigure()
-        throws ConfigurationException
-    {
-        // "pull" the config to make it dirty
-        getCurrentConfiguration( true );
-
-        if ( getConfigurator() != null )
-        {
-            getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
-        }
-
-        getCurrentCoreConfiguration().commitChanges();
     }
 
     // ==

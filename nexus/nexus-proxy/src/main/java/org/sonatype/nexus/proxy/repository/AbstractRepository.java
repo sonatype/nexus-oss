@@ -27,6 +27,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -122,6 +123,9 @@ public abstract class AbstractRepository
     @Requirement
     private MimeUtil mimeUtil;
 
+    @Requirement
+    private FeedRecorder feedRecorder;
+
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
 
@@ -155,6 +159,11 @@ public abstract class AbstractRepository
     protected MimeUtil getMimeUtil()
     {
         return mimeUtil;
+    }
+
+    protected FeedRecorder getFeedRecorder()
+    {
+        return feedRecorder;
     }
 
     // ==

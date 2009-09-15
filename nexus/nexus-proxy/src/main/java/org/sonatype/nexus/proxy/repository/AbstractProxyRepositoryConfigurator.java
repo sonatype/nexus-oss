@@ -52,15 +52,25 @@ public abstract class AbstractProxyRepositoryConfigurator
             {
                 if ( repo.getRemoteStorage() != null )
                 {
-                    RemoteRepositoryStorage rs =
+                    RemoteRepositoryStorage oldRemoteStorage = prepository.getRemoteStorage();
+
+                    RemoteRepositoryStorage configRemoteStorage =
                         getRemoteRepositoryStorage( repo.getId(), repo.getRemoteStorage().getProvider() );
 
-                    rs.validateStorageUrl( repo.getRemoteStorage().getUrl() );
+                    // detect do we really need to set remote storage
+                    if ( oldRemoteStorage == null || oldRemoteStorage != configRemoteStorage )
+                    {
+                        // validate the remoteUrl with new remote storage
+                        configRemoteStorage.validateStorageUrl( repo.getRemoteStorage().getUrl() );
 
-                    prepository.setRemoteStorage( rs );
-                    
-                    // the write policy on a proxy repo is read only
-                    prepository.setWritePolicy( RepositoryWritePolicy.READ_ONLY );
+                        // set the chosen remote storage
+                        prepository.setRemoteStorage( configRemoteStorage );
+                    }
+                    else
+                    {
+                        // just validate
+                        oldRemoteStorage.validateStorageUrl( repo.getRemoteStorage().getUrl() );
+                    }
 
                     if ( repo.getRemoteStorage().getAuthentication() != null )
                     {
@@ -126,8 +136,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                 if ( rsc.hasRemoteAuthenticationSettings() )
                 {
                     repoConfig.getRemoteStorage().setAuthentication(
-                                                                     authenticationInfoConverter.convertToModel( rsc
-                                                                         .getRemoteAuthenticationSettings() ) );
+                        authenticationInfoConverter.convertToModel( rsc.getRemoteAuthenticationSettings() ) );
                 }
                 else
                 {
@@ -137,9 +146,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                 if ( rsc.hasRemoteConnectionSettings() )
                 {
                     repoConfig.getRemoteStorage().setConnectionSettings(
-                                                                         globalRemoteConnectionSettings
-                                                                             .convertToModel( rsc
-                                                                                 .getRemoteConnectionSettings() ) );
+                        globalRemoteConnectionSettings.convertToModel( rsc.getRemoteConnectionSettings() ) );
                 }
                 else
                 {
@@ -151,8 +158,7 @@ public abstract class AbstractProxyRepositoryConfigurator
                     if ( rsc.getRemoteProxySettings() != null )
                     {
                         repoConfig.getRemoteStorage().setHttpProxySettings(
-                                                                            globalHttpProxySettings.convertToModel( rsc
-                                                                                .getRemoteProxySettings() ) );
+                            globalHttpProxySettings.convertToModel( rsc.getRemoteProxySettings() ) );
                     }
                     else
                     {

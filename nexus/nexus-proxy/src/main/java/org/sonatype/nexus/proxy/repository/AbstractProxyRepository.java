@@ -22,12 +22,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
-import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
@@ -70,12 +68,6 @@ public abstract class AbstractProxyRepository
 
     /** if remote url changed, need special handling after save */
     private boolean remoteUrlChanged = false;
-
-    /**
-     * Feed recorder.
-     */
-    @Requirement
-    private FeedRecorder feedRecorder;
 
     /** The proxy remote status */
     private volatile RemoteStatus remoteStatus = RemoteStatus.UNKNOWN;
@@ -804,7 +796,7 @@ public abstract class AbstractProxyRepository
 
         for ( NexusArtifactEvent event : events )
         {
-            feedRecorder.addNexusArtifactEvent( event );
+            getFeedRecorder().addNexusArtifactEvent( event );
         }
     }
 

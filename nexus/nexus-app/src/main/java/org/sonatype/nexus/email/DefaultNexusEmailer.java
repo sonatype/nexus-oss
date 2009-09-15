@@ -139,16 +139,6 @@ public class DefaultNexusEmailer
         return wasDirty;
     }
     
-
-    @Override
-    protected void doConfigure()
-        throws ConfigurationException
-    {
-        super.doConfigure();
-        
-        this.configureEmailer();
-    }
-    
     private synchronized void configureEmailer()
     {
         EmailerConfiguration config = new EmailerConfiguration();
