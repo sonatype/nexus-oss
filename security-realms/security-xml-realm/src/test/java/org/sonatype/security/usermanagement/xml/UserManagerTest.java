@@ -1,7 +1,10 @@
 package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,6 +22,7 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
@@ -306,6 +310,47 @@ public class UserManagerTest
 
         Assert.assertTrue( "did not find anon user in role mapping", found );
     }
+    
+    public void testLoadConfigWithInvalidEmail() throws Exception
+    {   
+        File securityXML = new File( CONFIG_DIR, "security.xml" );
+        FileInputStream fis = null;
+        FileWriter fileWriter = null;
+        Configuration config = null;
+        
+        String userId = null;
+        
+        try
+        {
+            fis = new FileInputStream( securityXML );
+            SecurityConfigurationXpp3Reader reader = new SecurityConfigurationXpp3Reader();
+            config = reader.read( fis );
+            
+            IOUtil.close( fis );
+            
+            fileWriter = new FileWriter( securityXML );
+            
+            config.getUsers().get( 0 ).setEmail( "testLoadConfigWithInvalidEmail" );
+            userId = config.getUsers().get( 0 ).getId();
+            
+            SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
+            writer.write( fileWriter, config );
+            
+        }
+        finally
+        {
+            IOUtil.close( fis );
+            IOUtil.close( fileWriter );
+        }
+        
+        // now restart the security
+        this.getSecuritySystem().start();
+        
+        // that should have went well,
+        User user = this.getSecuritySystem().getUser( userId, "default" );
+        Assert.assertEquals( "testLoadConfigWithInvalidEmail", user.getEmailAddress() );
+        
+    }
 
     private List<String> getRoleIds( User user )
     {
@@ -335,7 +380,8 @@ public class UserManagerTest
         {
             IOUtil.close( fileReader );
         }
-
     }
+    
+    
 
 }

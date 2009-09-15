@@ -89,7 +89,7 @@ public class XmlAuthenticatingRealmTest
         String clearPassword = "default-password";
         
         SecurityUser user = new SecurityUser();
-        user.setEmail( "testCreateWithPassowrdEmail" );
+        user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
         user.setName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setId( "testCreateWithPassowrdEmailUserId" );
@@ -173,7 +173,7 @@ public class XmlAuthenticatingRealmTest
         configurationManager.createRole( role );
         
         SecurityUser user = new SecurityUser();
-        user.setEmail( "dummyemail" );
+        user.setEmail( "dummyemail@somewhere" );
         user.setName( "dummyname" );
         user.setStatus( status );
         user.setId( "username" );

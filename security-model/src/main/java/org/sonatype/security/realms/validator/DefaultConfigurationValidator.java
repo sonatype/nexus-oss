@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.PatternSyntaxException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -415,8 +416,6 @@ public class DefaultConfigurationValidator
             existingIds = context.getExistingUserIds();
         }
 
-        Map<String, String> existingEmailMap = context.getExistingEmailMap();
-
         if ( !update && StringUtils.isEmpty( user.getId() ) )
         {
             ValidationMessage message = new ValidationMessage( "userId", "User ID is required.", "User ID is required." );
@@ -458,7 +457,20 @@ public class DefaultConfigurationValidator
         }
         else
         {
-            existingEmailMap.put( user.getId(), user.getEmail() );
+            try
+            {
+                if ( !user.getEmail().matches( ".+@.+" ) )
+                {
+                    ValidationMessage message = new ValidationMessage( "email", "User ID '" + user.getId()
+                        + "' has an invalid email address.", "Email address is invalid." );
+                    response.addValidationError( message );
+                }
+            }
+            catch ( PatternSyntaxException e )
+            {
+                throw new IllegalStateException( "Regex did not compile: " + e.getMessage(), e );
+            }
+
         }
 
         if ( !CUser.STATUS_ACTIVE.equals( user.getStatus() ) && !CUser.STATUS_DISABLED.equals( user.getStatus() ) )
