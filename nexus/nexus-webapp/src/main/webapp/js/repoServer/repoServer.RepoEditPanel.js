@@ -132,6 +132,10 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
       this.lastPolicy = repoPolicy;
     }
   },
+  
+  repoPolicySubmitDataModifier: function() {
+  	
+  },
 
   submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
@@ -157,7 +161,7 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
     rec.set( 'name', receivedData.name );
     rec.set( 'repoType', receivedData.repoType );
     rec.set( 'format', receivedData.format );
-    rec.set( 'repoPolicy', Sonatype.utils.upperFirstCharLowerRest( receivedData.repoPolicy ) );
+    rec.set( 'repoPolicy', Sonatype.utils.upperFirstCharLowerRest( receivedData.repoPolicy ) );	
     rec.commit();
     rec.endEdit();
     
@@ -165,6 +169,7 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   
     //@override
   addSorted : function(store, rec) {
+  // make sure listing group first, then the repositories sorted
   var insertIndex = store.getCount();
   for (var i=0 ; i < store.getCount() ; i++) {
     var tempRec = store.getAt(i);
@@ -176,6 +181,14 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
       break;
     }
   }
+  // hack the policy
+  if ( rec.get('repoPolicy') && rec.get('repoPolicy') == 'MIXED'  ) {
+  	rec.beginEdit();
+  	rec.set('repoPolicy', '');
+  	rec.commit();
+  	rec.endEdit();
+  }
+  
   store.insert( insertIndex, [rec] );
   }
   
