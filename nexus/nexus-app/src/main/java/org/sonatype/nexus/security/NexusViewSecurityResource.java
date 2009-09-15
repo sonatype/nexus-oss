@@ -36,14 +36,14 @@ public class NexusViewSecurityResource extends AbstractStaticSecurityResource im
         Configuration configuration = new Configuration();
 
         configuration.addPrivilege( buildPrivilege(
-            "Repository (All) - (view)",
+            "All Repositories - (view)",
             "Privilege that gives view access to all repositories.",
             "*" ) );
 
         for ( Repository repo : repoRegistry.getRepositories() )
         {
             configuration.addPrivilege( buildPrivilege(
-                "Repository (" + repo.getName() + ") - (view)",
+                repo.getName() + " - (view)",
                 "Privilege that gives view access to the " + repo.getName() + " repository.",
                 repo.getId() ) );
         }
