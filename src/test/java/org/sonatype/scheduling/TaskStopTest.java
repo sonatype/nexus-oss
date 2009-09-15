@@ -57,6 +57,8 @@ public class TaskStopTest
             {
                 while ( true )
                 {
+                    //Replace with Thread.yield() to see the problem.  The sleep state will
+                    //cause the thread to stop
                     Thread.sleep( 1 );
                     started = true;
                 }
