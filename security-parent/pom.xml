@@ -18,7 +18,7 @@
     <plexus-component-annotations.version>1.0-alpha-17</plexus-component-annotations.version>
     <plexus-ehcache.version>1.0.1</plexus-ehcache.version>
     <plexus-events.version>1.0.0-SNAPSHOT</plexus-events.version>
-    <base-configuration.version>0.0.1-SNAPSHOT</base-configuration.version>
+    <base-configuration.version>1.0</base-configuration.version>
     <plexus-cipher.version>1.5-SNAPSHOT</plexus-cipher.version>
     <plugin-host-api.version>0.0.1-SNAPSHOT</plugin-host-api.version>
   </properties>
