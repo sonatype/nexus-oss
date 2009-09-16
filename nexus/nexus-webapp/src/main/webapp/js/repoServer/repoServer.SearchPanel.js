@@ -358,28 +358,22 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       else if ( parts.length > 1 ) {
         this.setSearchType( this, parts[0] );
         
-        if ( parts[0] == 'quick' 
-          || parts[0] == 'classname' ) {
-          this.startQuickSearch( parts[1] );
-        }
-        else if ( parts[0] == 'gav' ) {
+        if ( parts[0] == 'gav' ) {
           for ( var i = 1; i < parts.length; i++ ) {
             this.gavFields[i - 1].setValue( parts[i]);
           }
           this.startGAVSearch();
+        }
+        else {
+          this.searchField.setRawValue( parts[1] );
+          this.startSearch( this );
         }
       }
     }
   },
   
   getBookmark: function() {
-    if ( this.searchTypeButton.value == 'quick' 
-      || this.searchTypeButton.value == 'classname' ){
-      return this.searchTypeButton.value
-        + '~'
-        + this.searchField.getRawValue();
-    }
-    else if ( this.searchTypeButton.value == 'gav' ){
+    if ( this.searchTypeButton.value == 'gav' ){
       var result = this.searchTypeButton.value;
       
       for ( var i = 0; i < this.gavFields.length; i++ ) {
@@ -392,8 +386,10 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       
       return result;
     }
-    else{
-      return this.searchField.getRawValue();
+    else {
+      return this.searchTypeButton.value
+        + '~'
+        + this.searchField.getRawValue();
     }
   },
 
