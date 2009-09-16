@@ -480,15 +480,16 @@ public abstract class AbstractProxyRepository
             try
             {
                 getLocalStorage().storeItem( this, item );
+
+                removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+
+                result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
+
             }
             finally
             {
                 item.getRepositoryItemUid().unlock();
             }
-
-            removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
-
-            result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventCache( this, result ) );
 
