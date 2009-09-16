@@ -173,7 +173,7 @@
         <!-- TODO remove when upgrade generator is marged into modello -->
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>modello-plugin-upgrade</artifactId>
-        <version>0.0.2-SNAPSHOT</version>
+        <version>1.0</version>
         <executions>
           <execution>
             <id>nexus-upgrade</id>
@@ -187,8 +187,7 @@
                 <packagedVersion>1.0.7</packagedVersion>
               </packagedVersions>
               <models>
-                <model>src/main/mdo/nexus-old.xml
-								</model>
+                <model>src/main/mdo/nexus-old.xml</model>
               </models>
             </configuration>
           </execution>
