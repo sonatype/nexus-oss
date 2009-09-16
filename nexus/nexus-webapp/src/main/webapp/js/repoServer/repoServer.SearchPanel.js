@@ -380,14 +380,14 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         + this.searchField.getRawValue();
     }
     else if ( this.searchTypeButton.value == 'gav' ){
-      var result = this.searchTypeButton.value + '~';
+      var result = this.searchTypeButton.value;
       
       for ( var i = 0; i < this.gavFields.length; i++ ) {
+        result += '~';
         var v = this.gavFields[i].getRawValue();
         if ( v ) {
           result += v;
         }
-        result += '~';
       }
       
       return result;
