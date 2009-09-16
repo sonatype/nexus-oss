@@ -327,14 +327,17 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   
   startSearch: function( p ) {
+    
     p.searchField.triggers[0].show();
     Sonatype.utils.updateHistory( p );
 
     var value = p.searchField.getRawValue();
     
-    p.grid.store.baseParams = {};
-    p.grid.store.baseParams[p.searchField.paramName] = value;
-    p.fetchFirst50( p );
+    if ( value ) {
+      p.grid.store.baseParams = {};
+      p.grid.store.baseParams[p.searchField.paramName] = value;
+      p.fetchFirst50( p );
+    }
   },
   
   fetchFirst50: function( p ) {
