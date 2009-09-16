@@ -179,6 +179,7 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
         this.response = response;
         if (response.status == 400){ //validation error
           this.success(response);
+          Sonatype.MessageBox.hide();
           return;
         }
         
