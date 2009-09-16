@@ -126,17 +126,13 @@ public class DefaultNexusEmailer
         }
     }
 
-    public boolean commitChanges()
+    @Override
+    public void doConfigure()
         throws ConfigurationException
     {
-        boolean wasDirty = super.commitChanges();
-
-        if ( wasDirty )
-        {
-            this.configureEmailer();
-        }
-
-        return wasDirty;
+        super.doConfigure();
+        
+        configureEmailer();
     }
     
     private synchronized void configureEmailer()

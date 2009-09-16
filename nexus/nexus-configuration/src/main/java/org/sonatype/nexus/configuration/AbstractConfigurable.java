@@ -148,7 +148,7 @@ public abstract class AbstractConfigurable
         getCurrentConfiguration( true );
 
         // do commit
-        doCommitChanges();
+        doConfigure();
     }
 
     public boolean isDirty()
@@ -174,7 +174,16 @@ public abstract class AbstractConfigurable
     public boolean commitChanges()
         throws ConfigurationException
     {
-        return doCommitChanges();
+        if ( isDirty() )
+        {
+            doConfigure();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean rollbackChanges()
@@ -193,34 +202,24 @@ public abstract class AbstractConfigurable
 
     // ==
 
-    protected boolean doCommitChanges()
+    protected void doConfigure()
         throws ConfigurationException
     {
-        if ( isDirty() )
+        // 1st, validate
+        getCurrentCoreConfiguration().validateChanges();
+
+        // 2nd, we apply configurator (it will map things that are not 1:1 from config object)
+        if ( getConfigurator() != null )
         {
-            // 1st, validate
-            getCurrentCoreConfiguration().validateChanges();
+            // apply config, transfer what is not mappable (if any) from model
+            getConfigurator().applyConfiguration( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
 
-            // 2nd, we apply configurator (it will map things that are not 1:1 from config object)
-            if ( getConfigurator() != null )
-            {
-                // apply config, transfer what is not mappable (if any) from model
-                getConfigurator().applyConfiguration( this, getApplicationConfiguration(),
-                    getCurrentCoreConfiguration() );
-
-                // prepare for save: transfer what we have in memory (if any) to model
-                getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
-            }
-
-            // 3rd, commit
-            getCurrentCoreConfiguration().commitChanges();
-
-            return true;
+            // prepare for save: transfer what we have in memory (if any) to model
+            getConfigurator().prepareForSave( this, getApplicationConfiguration(), getCurrentCoreConfiguration() );
         }
-        else
-        {
-            return false;
-        }
+
+        // 3rd, commit
+        getCurrentCoreConfiguration().commitChanges();
     }
 
     protected abstract Configurator getConfigurator();
