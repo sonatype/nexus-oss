@@ -84,10 +84,12 @@ Sonatype.repoServer.PrivilegeEditPanel = function( config ) {
 
   Sonatype.Events.on( 'privilegeAddMenuInit', this.onAddMenuInit, this );
   Sonatype.Events.on( 'privilegeViewInit', this.onViewInit, this );
+  Sonatype.Events.on( 'privilegeClickedEvent', this.onPrivilegeClicked, this );
   
   Sonatype.repoServer.PrivilegeEditPanel.superclass.constructor.call( this, {
     addMenuInitEvent: 'privilegeAddMenuInit',
     rowClickEvent: 'privilegeViewInit',
+	rowFocusChangedEvent: 'privilegeClickedEvent',
     deleteButton: this.sp.checkPermission( 'security:privileges', this.sp.DELETE ),
     url: Sonatype.config.repos.urls.privileges,
     dataStores: [this.privilegeTypeStore, this.groupStore, this.repoStore, this.targetStore],
@@ -268,10 +270,14 @@ Ext.extend( Sonatype.repoServer.PrivilegeEditPanel, Sonatype.panels.GridViewer, 
       propertyTypeStore: this.propertyTypeStore
     } );
     editor.on( 'submit', this.submitHandler, this );
-
+    
     Sonatype.Events.fireEvent( 'privilegeEditorInit', editor );
     
     cardPanel.add( editor );
+  },
+  
+  onPrivilegeClicked: function( cardPanel, rec ) {
+  	this.toolbarDeleteButton.setVisible( rec.data.userManaged );
   },
   
   submitHandler: function( form, action, receivedData ) {
