@@ -89,6 +89,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
+import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
@@ -369,6 +370,7 @@ public class NexusApplication
         xstream.omitField( GlobalConfigurationResource.class, "modelEncoding" );
         xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
         xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
+        xstream.omitField( RestApiSettings.class, "modelEncoding" );
         xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
         xstream.omitField( SmtpSettings.class, "modelEncoding" );
         xstream.omitField( ErrorReportingSettings.class, "modelEncoding" );

@@ -83,6 +83,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
+import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
@@ -552,12 +553,16 @@ public class TestMarshalUnmarchal
         GlobalConfigurationResourceResponse resourceResponse = new GlobalConfigurationResourceResponse();
 
         GlobalConfigurationResource resource = new GlobalConfigurationResource();
-        resource.setBaseUrl( "baseUrl" );
         resource.setSecurityAnonymousAccessEnabled( true );
         resource.setSecurityAnonymousPassword( "anonPass" );
         resource.setSecurityAnonymousUsername( "anonUser" );
         resource.setSecurityEnabled( true );
 
+        RestApiSettings restSet = new RestApiSettings();
+        restSet.setBaseUrl( "baseUrl" );
+        restSet.setForceBaseUrl( false);
+        resource.setGlobalRestApiSettings( restSet );
+        
         RemoteConnectionSettings connSet = new RemoteConnectionSettings();
         connSet.setConnectionTimeout( 2 );
         connSet.setQueryString( "queryString" );

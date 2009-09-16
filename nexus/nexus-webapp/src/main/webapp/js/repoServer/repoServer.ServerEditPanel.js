@@ -307,8 +307,8 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         xtype: 'fieldset',
         checkboxToggle:true,
         collapsed: true,
-        id: formId + '_' + 'applicationServerSettings',
-        name: 'applicationServerSettings',
+        id: formId + '_' + 'globalRestApiSettings',
+        name: 'globalRestApiSettings',
         title: 'Application Server Settings (optional)',
         anchor: Sonatype.view.FIELDSET_OFFSET,
         autoHeight:true,
@@ -333,7 +333,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             itemCls: 'required-field',
             fieldLabel: 'Base URL',
             helpText: ht.baseUrl,
-            name: 'baseUrl',
+            name: 'globalRestApiSettings.baseUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank: true,
             validator: function( v ) {
@@ -341,7 +341,7 @@ Sonatype.repoServer.ServerEditPanel = function(config){
                 return 'Protocol must be http:// or https://'; 
               }
 
-              var forceCheckbox = this.ownerCt.find( 'name', 'forceBaseUrl' )[0];
+              var forceCheckbox = this.ownerCt.find( 'name', 'globalRestApiSettings.forceBaseUrl' )[0];
               if ( this.allowBlank == false 
                   && forceCheckbox.checked 
                   && !Ext.isEmpty( v )
@@ -370,11 +370,11 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             xtype: 'checkbox',
             fieldLabel: 'Force Base URL',
             helpText: ht.forceBaseUrl,
-            name: 'forceBaseUrl',
+            name: 'globalRestApiSettings.forceBaseUrl',
             anchor: Sonatype.view.FIELD_OFFSET,
             allowBlank: true,
             handler: function( checkbox, checked ) {
-              var baseUrlField = checkbox.ownerCt.find( 'name', 'baseUrl' )[0];
+              var baseUrlField = checkbox.ownerCt.find( 'name', 'globalRestApiSettings.baseUrl' )[0];
               baseUrlField.validate();
             }
           }
@@ -630,12 +630,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   save : function(config) {
     var form = this.form;
 
-    var appSettingsPanel = this.findById( this.id + '_applicationServerSettings' );
-    if ( appSettingsPanel.collapsed ) {
-      var baseUrlField = this.find( 'name', 'baseUrl' )[0];
-      baseUrlField.setValue( '' );
-    }
-
     form.doAction('sonatypeSubmit', {
       method: 'PUT',
       url: Sonatype.config.repos.urls.globalSettingsState,
@@ -648,8 +642,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
         "securityRealms" : function(val, fpanel){
           return fpanel.find( 'name', 'securityRealms' )[0].getValue();
-        },
-        "baseUrl" : Sonatype.utils.returnValidStr
+        }
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
     });
@@ -691,7 +684,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   loadServerConfig: function() {
     
     var fpanel = this.formPanel;
-    var appSettingsPanel = fpanel.findById( fpanel.id + '_applicationServerSettings' );
 
     this.formPanel.getForm().doAction('sonatypeLoad', {
       url:Sonatype.config.repos.urls.globalSettingsState,
@@ -704,26 +696,13 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "securityRealms" : function(arr, srcObj, fpanel){
           fpanel.find( 'name', 'securityRealms' )[0].setValue( arr );
           return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
-        },
-        "baseUrl" : function(str) {
-            if (!Ext.isEmpty(str)){
-              appSettingsPanel.expand();
-            }
-            return str;
-          }
+        }
       }
     });
   },
   
   testSmtpBtnHandler: function() {
     var fpanel = this.formPanel;
-    var appSettingsPanel = fpanel.findById( fpanel.id + '_applicationServerSettings' );
-
-    if ( appSettingsPanel.collapsed ) {
-      var baseUrlField = this.find( 'name', 'baseUrl' )[0];
-      baseUrlField.setValue( '' );
-    }
-
     
     var data = {
       testEmail: '',
@@ -840,9 +819,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       //        default behavior sets the original value to whatever is specified in the config.
       if (action.options.fpanel.find('name', 'securityAnonymousAccessEnabled')[0].getValue() == "true") {
         action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'anonymousAccessSettings'))[0].expand();
-      }
-      if (!Ext.isEmpty(action.options.fpanel.find('name', 'baseUrl')[0].getValue())) {
-        action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'applicationServerSettings'))[0].expand();
       }
     }
     

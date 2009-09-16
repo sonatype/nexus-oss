@@ -9,7 +9,6 @@
   </globalConnectionSettings>
   <restApi>
     <baseUrl>http://repository.sonatype.org</baseUrl>
-    <sessionExpiration>-1</sessionExpiration>
   </restApi>
   <httpProxy>
     <port>8082</port>

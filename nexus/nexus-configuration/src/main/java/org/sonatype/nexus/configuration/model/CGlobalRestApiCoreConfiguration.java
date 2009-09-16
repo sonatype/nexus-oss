@@ -4,35 +4,32 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
-public class CGlobalHttpProxySettingsCoreConfiguration
+public class CGlobalRestApiCoreConfiguration
     extends AbstractCoreConfiguration
 {
     private boolean nullified;
 
-    public CGlobalHttpProxySettingsCoreConfiguration( ApplicationConfiguration applicationConfiguration )
+    public CGlobalRestApiCoreConfiguration( ApplicationConfiguration applicationConfiguration )
     {
         super( applicationConfiguration );
     }
 
     @Override
-    public CRemoteHttpProxySettings getConfiguration( boolean forWrite )
+    protected Object extractConfiguration( Configuration configuration )
     {
-        return (CRemoteHttpProxySettings) super.getConfiguration( forWrite );
+        return configuration.getRestApi();
     }
 
     @Override
-    protected CRemoteHttpProxySettings extractConfiguration( Configuration configuration )
+    public CRestApiSettings getConfiguration( boolean forWrite )
     {
-        return configuration.getGlobalHttpProxySettings();
+        return (CRestApiSettings) super.getConfiguration( forWrite );
     }
 
-    public void initConfig()
+    @Override
+    public ValidationResponse doValidateChanges( Object changedConfiguration )
     {
-        CRemoteHttpProxySettings newProxy = new CRemoteHttpProxySettings();
-
-        getApplicationConfiguration().getConfigurationModel().setGlobalHttpProxySettings( newProxy );
-
-        setOriginalConfiguration( newProxy );
+        return new ValidationResponse();
     }
 
     public void nullifyConfig()
@@ -40,14 +37,8 @@ public class CGlobalHttpProxySettingsCoreConfiguration
         setChangedConfiguration( null );
 
         setOriginalConfiguration( null );
-        
-        nullified = true;
-    }
 
-    @Override
-    public ValidationResponse doValidateChanges( Object changedConfiguration )
-    {
-        return new ValidationResponse();
+        nullified = true;
     }
 
     @Override
@@ -63,7 +54,7 @@ public class CGlobalHttpProxySettingsCoreConfiguration
         if ( nullified )
         {
             // nullified, nothing to validate and the super.commitChanges() will not work
-            getApplicationConfiguration().getConfigurationModel().setGlobalHttpProxySettings( null );
+            getApplicationConfiguration().getConfigurationModel().setRestApi( null );
         }
         else
         {
@@ -79,5 +70,14 @@ public class CGlobalHttpProxySettingsCoreConfiguration
         super.rollbackChanges();
 
         nullified = false;
+    }
+
+    public void initConfig()
+    {
+        CRestApiSettings restApiSettings = new CRestApiSettings();
+
+        getApplicationConfiguration().getConfigurationModel().setRestApi( restApiSettings );
+
+        setOriginalConfiguration( restApiSettings );
     }
 }

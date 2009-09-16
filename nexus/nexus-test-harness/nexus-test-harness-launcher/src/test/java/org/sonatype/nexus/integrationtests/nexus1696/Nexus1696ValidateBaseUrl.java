@@ -20,6 +20,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -49,11 +50,13 @@ public class Nexus1696ValidateBaseUrl
     public void init()
         throws Exception
     {
-        baseUrl = baseNexusUrl.replace( "nexus", "nexus1696" ).replace( "http", "https" );
+        baseUrl = nexusBaseUrl.replace( "nexus", "nexus1696" ).replace( "http", "https" );
 
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-        settings.setForceBaseUrl( true );
-        settings.setBaseUrl( baseUrl );
+        RestApiSettings restApiSettings = new RestApiSettings();
+        restApiSettings.setForceBaseUrl( true );
+        restApiSettings.setBaseUrl( baseUrl );
+        settings.setGlobalRestApiSettings( restApiSettings );
 
         SettingsMessageUtil.save( settings );
     }
@@ -244,11 +247,13 @@ public class Nexus1696ValidateBaseUrl
     public void resetBaseUrl()
         throws Exception
     {
-        baseUrl = baseNexusUrl;
+        baseUrl = nexusBaseUrl;
 
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
-        settings.setForceBaseUrl( true );
-        settings.setBaseUrl( baseUrl );
+        RestApiSettings restApiSettings = new RestApiSettings();
+        restApiSettings.setForceBaseUrl( true );
+        restApiSettings.setBaseUrl( baseUrl );
+        settings.setGlobalRestApiSettings( restApiSettings );
 
         SettingsMessageUtil.save( settings );
     }

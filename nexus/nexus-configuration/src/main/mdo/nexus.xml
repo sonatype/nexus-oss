@@ -77,7 +77,7 @@
           <association>
             <type>CRestApiSettings</type>
           </association>
-          <required>true</required>
+          <required>false</required>
         </field>
         <field>
           <name>httpProxy</name>
@@ -347,13 +347,6 @@
             Should the base URL be used always in case of response or try to build response against incoming
             request.
           </description>
-          <required>true</required>
-        </field>
-        <field>
-          <name>sessionExpiration</name>
-          <version>1.4.0+</version>
-          <type>int</type>
-          <description>The auth token expiration in minutes. Default is one week.</description>
           <required>true</required>
         </field>
       </fields>

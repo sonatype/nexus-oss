@@ -484,14 +484,14 @@ public class Upgrade108to140
     protected CRestApiSettings copyCRestApi1_0_8(
         org.sonatype.nexus.configuration.model.v1_0_8.CRestApiSettings oldrestapi )
     {
-        CRestApiSettings restapi = new CRestApiSettings();
-
-        if ( oldrestapi != null )
+        if ( oldrestapi == null )
         {
-            restapi.setBaseUrl( oldrestapi.getBaseUrl() );
-            restapi.setForceBaseUrl( oldrestapi.isForceBaseUrl() );
-            restapi.setSessionExpiration( -1 );
+            return null;
         }
+
+        CRestApiSettings restapi = new CRestApiSettings();
+        restapi.setBaseUrl( oldrestapi.getBaseUrl() );
+        restapi.setForceBaseUrl( oldrestapi.isForceBaseUrl() );
 
         return restapi;
     }

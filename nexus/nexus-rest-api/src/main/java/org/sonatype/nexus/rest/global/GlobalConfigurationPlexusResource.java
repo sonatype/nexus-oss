@@ -33,15 +33,16 @@ import org.sonatype.micromailer.Address;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
-import org.sonatype.nexus.rest.RestApiConfiguration;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -73,9 +74,6 @@ public class GlobalConfigurationPlexusResource
 
     @Requirement
     private SecuritySystem securitySystem;
-
-    @Requirement
-    private RestApiConfiguration restApiConfiguration;
 
     // DEFAULT CONFIG
     // ==
@@ -122,6 +120,11 @@ public class GlobalConfigurationPlexusResource
     public CRemoteHttpProxySettings readDefaultGlobalRemoteHttpProxySettings()
     {
         return configurationSource.getConfiguration().getGlobalHttpProxySettings();
+    }
+    
+    public CRestApiSettings readDefaultRestApiSettings()
+    {
+        return configurationSource.getConfiguration().getRestApi();
     }
 
     public CSmtpConfiguration readDefaultSmtpConfiguration()
@@ -394,22 +397,26 @@ public class GlobalConfigurationPlexusResource
                                                            getNexusErrorResponse( "securityAnonymousUsername",
                                                                                   "Cannot be empty when Anonynous access is enabled" ) );
                     }
-
-                    if ( resource.getBaseUrl() != null )
+                    
+                    if ( resource.getGlobalRestApiSettings() != null )
                     {
-                        if ( StringUtils.isEmpty( resource.getBaseUrl() ) )
+                        RestApiSettings restApiSettings = resource.getGlobalRestApiSettings();
+
+                        getGlobalRestApiSettings().setForceBaseUrl( restApiSettings.isForceBaseUrl() );
+
+                        if ( StringUtils.isEmpty( resource.getGlobalRestApiSettings().getBaseUrl() ) )
                         {
-                            // resetting it
-                            restApiConfiguration.setBaseUrl( null );
+                            getGlobalRestApiSettings().setBaseUrl( null );
                         }
                         else
                         {
-                            // setting it using reference object to normalize the hostname (all lowercase)
-                            restApiConfiguration.setBaseUrl( new Reference( resource.getBaseUrl() ).getTargetRef()
-                                .toString() );
+                            getGlobalRestApiSettings().setBaseUrl(
+                                new Reference( restApiSettings.getBaseUrl() ).getTargetRef().toString() );
                         }
-
-                        restApiConfiguration.setForceBaseUrl( resource.isForceBaseUrl() );
+                    }
+                    else
+                    {
+                        getGlobalRestApiSettings().disable();
                     }
 
                     getNexusConfiguration().saveConfiguration();
@@ -461,9 +468,12 @@ public class GlobalConfigurationPlexusResource
 
         resource.setGlobalHttpProxySettings( convert( readDefaultGlobalRemoteHttpProxySettings() ) );
 
-        resource.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
-
-        resource.setForceBaseUrl( restApiConfiguration.isForceBaseUrl() );
+        RestApiSettings restApiSettings = convert( readDefaultRestApiSettings() );
+        if ( restApiSettings != null )
+        {
+            restApiSettings.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
+        }
+        resource.setGlobalRestApiSettings( restApiSettings );
 
         resource.setSmtpSettings( convert( readDefaultSmtpConfiguration() ) );
     }
@@ -489,10 +499,12 @@ public class GlobalConfigurationPlexusResource
 
         resource.setGlobalHttpProxySettings( convert( getGlobalHttpProxySettings() ) );
 
-        resource.setBaseUrl( StringUtils.isEmpty( restApiConfiguration.getBaseUrl() ) ? getContextRoot( request )
-            .getTargetRef().toString() : restApiConfiguration.getBaseUrl() );
-
-        resource.setForceBaseUrl( restApiConfiguration.isForceBaseUrl() );
+        RestApiSettings restApiSettings = convert( getGlobalRestApiSettings() );
+        if ( restApiSettings != null && StringUtils.isEmpty( restApiSettings.getBaseUrl() ) )
+        {
+            restApiSettings.setBaseUrl( getContextRoot( request ).getTargetRef().toString() );
+        }
+        resource.setGlobalRestApiSettings( restApiSettings );
 
         resource.setSmtpSettings( convert( getNexusEmailer() ) );
 

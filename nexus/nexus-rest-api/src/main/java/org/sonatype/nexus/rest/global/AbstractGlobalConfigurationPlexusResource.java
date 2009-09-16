@@ -17,9 +17,11 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.application.GlobalRestApiSettings;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
@@ -32,6 +34,7 @@ import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
+import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 
 /**
@@ -58,6 +61,9 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
     
     @Requirement
+    private GlobalRestApiSettings globalRestApiSettings;
+    
+    @Requirement
     private AuthenticationInfoConverter authenticationInfoConverter;
 
     @Requirement
@@ -76,6 +82,11 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     protected GlobalRemoteConnectionSettings getGlobalRemoteConnectionSettings()
     {
         return globalRemoteConnectionSettings;
+    }
+    
+    protected GlobalRestApiSettings getGlobalRestApiSettings()
+    {
+        return globalRestApiSettings;
     }
     
     protected AuthenticationInfoConverter getAuthenticationInfoConverter()
@@ -177,6 +188,22 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         return result;
     }
+    
+    public static RestApiSettings convert( GlobalRestApiSettings settings )
+    {
+        if ( settings == null || !settings.isEnabled() )
+        {
+            return null;
+        }
+
+        RestApiSettings result = new RestApiSettings();
+
+        result.setBaseUrl( settings.getBaseUrl() );
+
+        result.setForceBaseUrl( settings.isForceBaseUrl() );
+
+        return result;
+    }
 
     /**
      * Externalized Nexus object to DTO's conversion.
@@ -267,6 +294,22 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setProxyPort( settings.getProxyPort() );
 
         result.setAuthentication( convert( settings.getAuthentication() ) );
+
+        return result;
+    }
+    
+    public static RestApiSettings convert( CRestApiSettings settings )
+    {
+        if ( settings == null )
+        {
+            return null;
+        }
+
+        RestApiSettings result = new RestApiSettings();
+
+        result.setBaseUrl( settings.getBaseUrl() );
+
+        result.setForceBaseUrl( settings.isForceBaseUrl() );
 
         return result;
     }

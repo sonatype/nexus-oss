@@ -110,14 +110,6 @@ public class DefaultApplicationConfigurationValidator
         {
             response.append( validateRestApiSettings( context, model.getRestApi() ) );
         }
-        else
-        {
-            model.setRestApi( new CRestApiSettings() );
-
-            response.addValidationWarning( "The REST API section was missing from configuration, defaulted it." );
-
-            response.setModified( true );
-        }
 
         // nexus built-in http proxy
         if ( model.getHttpProxy() != null )

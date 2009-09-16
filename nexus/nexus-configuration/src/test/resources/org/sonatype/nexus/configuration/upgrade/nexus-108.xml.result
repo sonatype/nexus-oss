@@ -6,9 +6,7 @@
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <restApi>
-    <sessionExpiration>-1</sessionExpiration>
-  </restApi>
+  <restApi />
   <httpProxy>
     <enabled>true</enabled>
     <port>8082</port>

@@ -27,8 +27,6 @@ Sonatype.repoServer.referenceData = {
     securityEnabled: false,
     securityAnonymousAccessEnabled: false,
     securityRealms:[],
-    baseUrl: "",
-    forceBaseUrl: false,
     smtpSettings: {
       host: "",
       port: 25,
@@ -58,6 +56,10 @@ Sonatype.repoServer.referenceData = {
         ntlmHost: "",
         ntlmDomain: ""
       }
+    },
+    globalRestApiSettings: {
+      baseUrl: "",
+      forceBaseUrl: false
     }
   },
   

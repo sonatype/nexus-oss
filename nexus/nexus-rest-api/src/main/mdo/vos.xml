@@ -280,18 +280,6 @@
           <required>true</required>
         </field>
         <field>
-          <name>baseUrl</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>forceBaseUrl</name>
-          <version>1.0.0+</version>
-          <type>boolean</type>
-          <required>true</required>
-        </field>
-        <field>
           <name>globalConnectionSettings</name>
           <version>1.0.0+</version>
           <association>
@@ -312,6 +300,14 @@
           <version>1.0.0+</version>
           <association>
             <type>RemoteHttpProxySettings</type>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>globalRestApiSettings</name>
+          <version>1.0.0+</version>
+          <association>
+          	<type>RestApiSettings</type>
           </association>
           <required>false</required>
         </field>
@@ -2854,5 +2850,24 @@
       </fields>
     </class>
 
+	<class>
+		<name>RestApiSettings</name>
+		<version>1.0.0+</version>
+		<fields>
+			<field>
+				<name>forceBaseUrl</name>
+				<version>1.0.0+</version>
+				<type>boolean</type>
+				<required>false</required>
+			</field>
+			<field>
+				<name>baseUrl</name>
+				<version>1.0.0+</version>
+				<type>String</type>
+				<required>false</required>
+			</field>
+		</fields>
+	</class>
+	
   </classes>
 </model>
