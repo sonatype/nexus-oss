@@ -147,7 +147,8 @@ public abstract class AbstractConfigurable
         // "pull" the config to make it dirty
         getCurrentConfiguration( true );
 
-        commitChanges();
+        // do commit
+        doCommitChanges();
     }
 
     public boolean isDirty()
@@ -161,7 +162,7 @@ public abstract class AbstractConfigurable
         if ( isDirty() )
         {
             getCurrentCoreConfiguration().validateChanges();
-            
+
             if ( getConfigurator() != null )
             {
                 // prepare for save: transfer what we have in memory (if any) to model
@@ -173,11 +174,33 @@ public abstract class AbstractConfigurable
     public boolean commitChanges()
         throws ConfigurationException
     {
+        return doCommitChanges();
+    }
+
+    public boolean rollbackChanges()
+    {
+        if ( isDirty() )
+        {
+            getCurrentCoreConfiguration().rollbackChanges();
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    // ==
+
+    protected boolean doCommitChanges()
+        throws ConfigurationException
+    {
         if ( isDirty() )
         {
             // 1st, validate
             getCurrentCoreConfiguration().validateChanges();
-            
+
             // 2nd, we apply configurator (it will map things that are not 1:1 from config object)
             if ( getConfigurator() != null )
             {
@@ -199,22 +222,6 @@ public abstract class AbstractConfigurable
             return false;
         }
     }
-
-    public boolean rollbackChanges()
-    {
-        if ( isDirty() )
-        {
-            getCurrentCoreConfiguration().rollbackChanges();
-
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    // ==
 
     protected abstract Configurator getConfigurator();
 
