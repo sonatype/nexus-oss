@@ -20,7 +20,6 @@ import java.net.ServerSocket;
 import org.apache.log4j.Logger;
 import org.restlet.data.Response;
 import org.sonatype.appbooter.PlexusAppBooter;
-import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -88,7 +87,7 @@ public class NexusStatusUtil
 
     @Deprecated
     public static void doSoftStop()
-        throws NexusIllegalStateException
+        throws Exception
     {
         stop();
     }
@@ -115,21 +114,24 @@ public class NexusStatusUtil
 
     @Deprecated
     public static void doHardStop()
-        throws NexusIllegalStateException
+        throws Exception
     {
         stop();
     }
 
     @Deprecated
     public static void doHardStop( boolean checkStarted )
-        throws NexusIllegalStateException
+        throws Exception
     {
         stop();
     }
 
     public static void stop()
-        throws NexusIllegalStateException
+        throws Exception
     {
+        // NOTE: Until we can kill active tasks, we need to wait for them to stop
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         try
         {
             if( !getAppBooterService().isStopped() )

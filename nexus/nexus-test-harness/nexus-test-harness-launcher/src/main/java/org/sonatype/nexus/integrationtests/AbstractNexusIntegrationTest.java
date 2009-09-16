@@ -564,9 +564,6 @@ public class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
-        // NOTE: Until we can kill active tasks, we need to wait for them to stop
-        TaskScheduleUtil.waitForAllTasksToStop();
-        
         // stop nexus
         stopNexus();
 

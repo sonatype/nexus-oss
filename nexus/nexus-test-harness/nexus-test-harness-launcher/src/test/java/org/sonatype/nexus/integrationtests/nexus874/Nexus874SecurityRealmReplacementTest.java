@@ -169,48 +169,22 @@ public class Nexus874SecurityRealmReplacementTest
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
 
-        try
-        {
-            TargetMessageUtil.getList();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
-
-        try
-        {
-            TaskScheduleUtil.getTasks();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
+        String serviceURI = "service/local/schedules";
+        
+        Response response = RequestFacade.doGetRequest( "service/local/repo_targets" );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
+        
+        response = RequestFacade.doGetRequest( serviceURI );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
 
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
 
-        try
-        {
-            TargetMessageUtil.getList();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
+        response = RequestFacade.doGetRequest( "service/local/repo_targets" );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
 
-        try
-        {
-            TaskScheduleUtil.getTasks();
-            Assert.fail();
-        }
-        catch ( Exception e )
-        {
-            // OK
-        }
+        response = RequestFacade.doGetRequest( serviceURI );
+        Assert.assertEquals( 403, response.getStatus().getCode() );
 
     }
 }
