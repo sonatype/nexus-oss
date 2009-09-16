@@ -18,6 +18,7 @@ import org.codehaus.plexus.archiver.zip.ZipEntry;
 import org.codehaus.plexus.archiver.zip.ZipOutputStream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
@@ -73,6 +74,7 @@ public class Nexus2497ConcurrentRepoAccessTest
         return file;
     }
 
+    @Ignore
     @Test
     public void doConcurrence()
         throws Exception
