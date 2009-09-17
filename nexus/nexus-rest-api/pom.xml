@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -54,9 +55,8 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-    	<groupId>org.sonatype.security</groupId>
-    	<artifactId>security-rest-api</artifactId>
-    	<version>${plexus-security.version}</version>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
     </dependency>
     <!-- In the JSec filters -->
     <dependency>
@@ -120,8 +120,8 @@
       <version>${project.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
-    </dependency>    
-      <dependency>
+    </dependency>
+    <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
       <version>1.3</version>
