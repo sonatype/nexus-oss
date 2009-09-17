@@ -332,11 +332,18 @@ public abstract class AbstractProxyRepository
                 setProxyMode( ProxyMode.ALLOW, true, cause );
             }
         }
-        /*
-         * AUTO_BLOCK temporarily disabled else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) ) {
-         * this.remoteStatusUpdated = System.currentTimeMillis(); if ( getProxyMode() != null &&
-         * getProxyMode().shouldProxy() ) { setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause ); } }
-         */
+        else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
+        {
+            this.remoteStatusUpdated = System.currentTimeMillis();
+            
+            // TODO: To enable auto-block feature, uncomment this
+            // also take care that REMOTE_STATUS_RETAIN_TIME is a parameter, not
+            // constant, so user can tune how long should he keep repository autoblocked.
+            // if ( getProxyMode() != null && getProxyMode().shouldProxy() )
+            // {
+            //     setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
+            // }
+        }
     }
 
     public RemoteStorageContext getRemoteStorageContext()
@@ -428,7 +435,7 @@ public abstract class AbstractProxyRepository
             }
 
             getCurrentConfiguration( true ).getRemoteStorage().setProvider( remoteStorage.getProviderId() );
-            
+
             setWritePolicy( RepositoryWritePolicy.READ_ONLY );
         }
     }
@@ -531,7 +538,7 @@ public abstract class AbstractProxyRepository
 
         // here, we can get only by some other top level methods in AbstractProxy that does lock?
         // TODO: confirm or check!
-        
+
         // RepositoryItemUid uid = createUid( request.getRequestPath() );
 
         // Lock readLock = getRepositoryItemUidFactory().getLock( uid, Action.read );
