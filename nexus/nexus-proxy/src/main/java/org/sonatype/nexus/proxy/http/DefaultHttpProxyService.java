@@ -273,4 +273,9 @@ public class DefaultHttpProxyService
             }
         }
     }
+
+    public String getName()
+    {
+        return "Http Proxy Service Settings";
+    }
 }

@@ -736,4 +736,9 @@ public class DefaultRepositoryRouter
         return this.itemAuthorizer.authorizePath( matched, action );
     }
 
+    public String getName()
+    {
+        return "Repository Router Settings";
+    }
+
 }

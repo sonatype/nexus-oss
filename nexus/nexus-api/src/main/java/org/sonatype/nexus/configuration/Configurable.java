@@ -44,4 +44,9 @@ public interface Configurable
      * Rollbacks the changes. Resets the state of config "back to normal" (saved).
      */
     boolean rollbackChanges();
+    
+    /**
+     * A simple short name.
+     */
+    String getName();
 }

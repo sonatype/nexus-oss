@@ -201,8 +201,10 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            applicationEventMulticaster
-                .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges() ) );
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent(
+                this,
+                prepare.getChanges(),
+                securitySystem.getSubject() ) );
 
             return true;
         }

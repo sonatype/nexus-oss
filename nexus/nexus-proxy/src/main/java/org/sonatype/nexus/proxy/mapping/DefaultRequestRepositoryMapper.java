@@ -469,4 +469,9 @@ public class DefaultRequestRepositoryMapper
         return Collections.unmodifiableMap( result );
     }
 
+    public String getName()
+    {
+        return "Repository Grouping Configuration";
+    }
+
 }

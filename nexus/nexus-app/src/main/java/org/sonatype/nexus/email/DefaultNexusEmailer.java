@@ -276,4 +276,9 @@ public class DefaultNexusEmailer
 
         return userAgentPlatformInfo;
     }
+
+    public String getName()
+    {
+        return "SMTP Settings";
+    }
 }

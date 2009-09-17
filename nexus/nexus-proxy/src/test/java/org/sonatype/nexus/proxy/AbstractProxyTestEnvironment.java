@@ -222,7 +222,7 @@ public abstract class AbstractProxyTestEnvironment
         getEnvironmentBuilder().buildEnvironment( this );
 
         applicationEventMulticaster
-            .notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null ) );
+            .notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
 
         applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( null ) );
 

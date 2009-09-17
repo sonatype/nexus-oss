@@ -220,4 +220,9 @@ public class DefaultGlobalHttpProxySettings
     {
         ( (CGlobalHttpProxySettingsCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
     }
+
+    public String getName()
+    {
+        return "Global Http Proxy Settings";
+    }
 }

@@ -107,4 +107,9 @@ public class DefaultGlobalRestApiSettings
         ( (CGlobalRestApiCoreConfiguration) getCurrentCoreConfiguration() ).initConfig();
     }
 
+    public String getName()
+    {
+        return "Global Rest Api Settings";
+    }
+
 }

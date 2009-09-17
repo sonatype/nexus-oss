@@ -15,6 +15,7 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
@@ -54,7 +55,28 @@ public class ConfigurationChangeEventInspector
         // TODO: This causes cycle!
         // getNexus().getSystemStatus().setLastConfigChange( new Date() );
 
-        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, "Nexus configuration changed/updated." );
+        ConfigurationChangeEvent event = (ConfigurationChangeEvent) evt;
+
+        if ( event.getChanges().isEmpty() )
+        {
+            return;
+        }
+
+        StringBuffer msg = new StringBuffer();
+
+        msg.append( "The following configurations were changed: " );
+
+        for ( Configurable change : event.getChanges() )
+        {
+            msg.append( " '" ).append( change.getName() ).append( "', " );
+        }
+
+        if ( event.getSubject() != null && event.getSubject().getPrincipal() != null )
+        {
+            msg.append( "change was made by [" + event.getSubject().getPrincipal().toString() + "]" );
+        }
+
+        getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, msg.toString() );
     }
 
     private void inspectForIndexerManager( Event<?> evt )

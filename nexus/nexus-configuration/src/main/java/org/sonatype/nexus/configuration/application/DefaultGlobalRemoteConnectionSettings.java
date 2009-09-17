@@ -141,4 +141,9 @@ public class DefaultGlobalRemoteConnectionSettings
         }
     }
 
+    public String getName()
+    {
+        return "Global Remote Connection Settings";
+    }
+
 }

@@ -534,4 +534,9 @@ public class DefaultTaskConfigManager
         return storeableTask;
     }
 
+    public String getName()
+    {
+        return "Scheduled Task Configuration";
+    }
+
 }

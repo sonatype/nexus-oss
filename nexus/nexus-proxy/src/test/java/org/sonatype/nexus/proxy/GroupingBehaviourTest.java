@@ -70,7 +70,7 @@ public class GroupingBehaviourTest
         mgr.setMergeMetadata( false );
         mgr.getCurrentCoreConfiguration().commitChanges();
         getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null, null ) );
 
         StorageItem item = getRootRouter()
             .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
@@ -91,7 +91,7 @@ public class GroupingBehaviourTest
 
         // get metadata from a gidr router with merging on (default is on), merge should happen
         getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null, null ) );
 
         StorageItem item = getRootRouter()
             .retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
@@ -134,7 +134,7 @@ public class GroupingBehaviourTest
         mgr.setMergeMetadata( false );
         mgr.getCurrentCoreConfiguration().commitChanges();
         getApplicationEventMulticaster().notifyEventListeners(
-            new ConfigurationChangeEvent( getApplicationConfiguration(), null ) );
+            new ConfigurationChangeEvent( getApplicationConfiguration(), null, null ) );
 
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + spoofedPath, false ) );
         // it should be a file and unmodified

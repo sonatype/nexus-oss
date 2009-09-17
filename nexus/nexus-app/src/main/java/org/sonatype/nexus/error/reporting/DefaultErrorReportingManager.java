@@ -637,4 +637,9 @@ public class DefaultErrorReportingManager
             file.delete();
         }
     }
+
+    public String getName()
+    {
+        return "Error Report Settings";
+    }
 }

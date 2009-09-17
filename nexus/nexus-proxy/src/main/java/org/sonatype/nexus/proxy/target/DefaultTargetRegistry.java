@@ -298,4 +298,9 @@ public class DefaultTargetRegistry
 
         return false;
     }
+
+    public String getName()
+    {
+        return "Repository Target Configuration";
+    }
 }
