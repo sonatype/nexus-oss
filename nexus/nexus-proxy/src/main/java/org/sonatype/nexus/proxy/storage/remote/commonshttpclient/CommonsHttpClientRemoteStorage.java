@@ -496,7 +496,9 @@ public class CommonsHttpClientRemoteStorage
             // HEAD returned error, but not exception, try GET before failing
             if ( doGet == false && response != HttpStatus.SC_OK )
             {
-                doGet = true;
+                // try with GET unless some known to fail responses are in
+                doGet = ( response != HttpStatus.SC_UNAUTHORIZED ) && ( response != HttpStatus.SC_FORBIDDEN );
+
                 getLogger().debug( "HEAD method failed, will attempt GET.  Status: " + response );
             }
         }
