@@ -42,7 +42,9 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator implements LegacyDocumentUpdater
 {
-    private Locator jl = new JavadocLocator();
+    private static final String MAVEN_ARCHETYPE = "maven-archetype";
+    private static final String[] ARCHETYPE_XML_LOCATIONS = {"META-INF/maven/archetype.xml","META-INF/archetype.xml", "META-INF/maven/archetype-metadata.xml"};
+	private Locator jl = new JavadocLocator();
 
     private Locator sl = new SourcesLocator();
 
@@ -145,8 +147,43 @@ public class MinimalArtifactInfoIndexCreator
         }
 
         checkMavenPlugin( ai, artifact );
+        checkMavenArchetype(ai, artifact);
     }
+    /**
+     * Archetypes that are added will have their packaging types set correctly (to maven-archetype)
+     * @param ai
+     * @param artifact
+     */
+    private void checkMavenArchetype(ArtifactInfo ai, File artifact) {
+		if (MAVEN_ARCHETYPE.equals(ai.packaging) || artifact == null) {
+			return;
+		}
+		ZipFile jf = null;
+		try {
+			jf = new ZipFile(artifact);
+			for(String location : ARCHETYPE_XML_LOCATIONS){
+				if(checkEntry(ai, jf, location)){
+					return;
+				}
+			}
+		} catch (Exception e) {
+			getLogger().info(
+					"Failed to parse Maven artifact "
+							+ artifact.getAbsolutePath(), e);
+		} finally {
+			close(jf);
+		}
+	}
 
+	private boolean checkEntry(ArtifactInfo ai, ZipFile jf, String entryName) {
+		ZipEntry entry = jf.getEntry(entryName);
+		if (entry != null) {
+			ai.packaging = MAVEN_ARCHETYPE;
+			return true;
+		}
+		return false;
+	}
+	
     private String getExtension( File artifact, Gav gav )
     {
         if ( gav != null )
