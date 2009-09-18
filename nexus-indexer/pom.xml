@@ -25,7 +25,6 @@
   <properties>
     <maven.version>2.2.1</maven.version>
     <archetype.version>2.0-alpha-4</archetype.version>
-    <wagon.version>1.0-beta-6</wagon.version>
   </properties>
 
   <!-- override the snapshot included in Maven -->
@@ -61,12 +60,6 @@
       <artifactId>maven-model</artifactId>
       <version>${maven.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-provider-api</artifactId>
-      <version>${wagon.version}</version>
-    </dependency>
-
     <dependency>
       <groupId>org.apache.maven.archetype</groupId>
       <artifactId>archetype-common</artifactId>
@@ -140,10 +133,9 @@
       <version>1.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.wagon</groupId>
-      <artifactId>wagon-http</artifactId>
-      <version>${wagon.version}</version>
-      <scope>test</scope>
+    	<groupId>org.eclipse.jetty</groupId>
+    	<artifactId>jetty-client</artifactId>
+    	<version>7.0.0.RC6-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
