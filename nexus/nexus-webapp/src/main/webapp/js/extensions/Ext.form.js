@@ -140,6 +140,9 @@ Ext.override(Ext.form.Field, {
      that was serialized and sent to the server.
  */
 Ext.form.Action.sonatypeSubmit = function(form, options){
+    if ( options.autoValidation == undefined ) {
+      options.autoValidation = true;
+    }
     Ext.form.Action.sonatypeSubmit.superclass.constructor.call(this, form, options);
 };
 
@@ -177,7 +180,8 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     // override connection failure because server validation errors come back with 400 code
     failure : function(response){
         this.response = response;
-        if (response.status == 400){ //validation error
+        if (response.status == 400
+            && this.options.autoValidation){ //validation error
           this.success(response);
           Sonatype.MessageBox.hide();
           return;
