@@ -5,25 +5,15 @@
  */
 package org.sonatype.nexus.index.creator;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
@@ -38,15 +28,12 @@ import org.sonatype.nexus.index.locator.SourcesLocator;
 /**
  * A minimal index creator used to provide basic information about Maven artifact.
  */
-@Component( role = IndexCreator.class, hint = "min" )
+@Component( role = IndexCreator.class, hint = MinimalArtifactInfoIndexCreator.ID )
 public class MinimalArtifactInfoIndexCreator
     extends AbstractIndexCreator
     implements LegacyDocumentUpdater
 {
-    private static final String MAVEN_ARCHETYPE = "maven-archetype";
-
-    private static final String[] ARCHETYPE_XML_LOCATIONS =
-        { "META-INF/maven/archetype.xml", "META-INF/archetype.xml", "META-INF/maven/archetype-metadata.xml" };
+    public static final String ID = "min";
 
     private Locator jl = new JavadocLocator();
 
@@ -107,6 +94,7 @@ public class MinimalArtifactInfoIndexCreator
         if ( artifact != null )
         {
             File signature = sigl.locate( artifact );
+            
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
             File sha1 = sha1l.locate( artifact );
@@ -149,67 +137,6 @@ public class MinimalArtifactInfoIndexCreator
                 ai.packaging = model.getPackaging();
             }
         }
-
-        // we need the file to perform these checks, and those may be only JARs
-        if ( artifact != null && StringUtils.equals( ai.fextension, "jar" ) )
-        {
-            // TODO: recheck, is the following true? "Maven plugins and Maven Archetypes can be only JARs?"
-
-            // 1st, check for maven plugin
-            checkMavenPlugin( ai, artifact );
-
-            // 2nd (last!), check for maven archetype, since Archetypes seems to not have consistent packaging,
-            // and depending on the contents of the JAR, this call will override the packaging to "maven-archetype"!
-            checkMavenArchetype( ai, artifact );
-        }
-    }
-
-    /**
-     * Archetypes that are added will have their packaging types set correctly (to maven-archetype)
-     * 
-     * @param ai
-     * @param artifact
-     */
-    private void checkMavenArchetype( ArtifactInfo ai, File artifact )
-    {
-        if ( MAVEN_ARCHETYPE.equals( ai.packaging ) || artifact == null )
-        {
-            return;
-        }
-
-        ZipFile jf = null;
-
-        try
-        {
-            jf = new ZipFile( artifact );
-
-            for ( String location : ARCHETYPE_XML_LOCATIONS )
-            {
-                if ( checkEntry( ai, jf, location ) )
-                {
-                    return;
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().info( "Failed to parse Maven artifact " + artifact.getAbsolutePath(), e );
-        }
-        finally
-        {
-            close( jf );
-        }
-    }
-
-    private boolean checkEntry( ArtifactInfo ai, ZipFile jf, String entryName )
-    {
-        ZipEntry entry = jf.getEntry( entryName );
-        if ( entry != null )
-        {
-            ai.packaging = MAVEN_ARCHETYPE;
-            return true;
-        }
-        return false;
     }
 
     private String getExtension( File artifact, Gav gav )
@@ -234,56 +161,6 @@ public class MinimalArtifactInfoIndexCreator
 
         // get the part after the last dot
         return FileUtils.getExtension( artifactFileName );
-    }
-
-    private void checkMavenPlugin( ArtifactInfo ai, File artifact )
-    {
-        if ( !"maven-plugin".equals( ai.packaging ) || artifact == null )
-        {
-            return;
-        }
-
-        ZipFile jf = null;
-
-        InputStream is = null;
-
-        try
-        {
-            jf = new ZipFile( artifact );
-
-            ZipEntry entry = jf.getEntry( "META-INF/maven/plugin.xml" );
-
-            if ( entry == null )
-            {
-                return;
-            }
-
-            is = new BufferedInputStream( jf.getInputStream( entry ) );
-
-            PlexusConfiguration plexusConfig =
-                new XmlPlexusConfiguration( Xpp3DomBuilder.build( new InputStreamReader( is ) ) );
-
-            ai.prefix = plexusConfig.getChild( "goalPrefix" ).getValue();
-
-            ai.goals = new ArrayList<String>();
-
-            PlexusConfiguration[] mojoConfigs = plexusConfig.getChild( "mojos" ).getChildren( "mojo" );
-
-            for ( PlexusConfiguration mojoConfig : mojoConfigs )
-            {
-                ai.goals.add( mojoConfig.getChild( "goal" ).getValue() );
-            }
-        }
-        catch ( Exception e )
-        {
-            getLogger().info( "Failed to parsing Maven plugin " + artifact.getAbsolutePath(), e );
-        }
-        finally
-        {
-            close( jf );
-
-            IOUtil.close( is );
-        }
     }
 
     public void updateDocument( ArtifactInfo ai, Document doc )
@@ -323,6 +200,17 @@ public class MinimalArtifactInfoIndexCreator
             doc.add( new Field( ArtifactInfo.CLASSIFIER, ai.classifier, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
         }
 
+        if ( ai.sha1 != null )
+        {
+            doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+        }
+    }
+
+    public void updateLegacyDocument( ArtifactInfo ai, Document doc )
+    {
+        updateDocument( ai, doc );
+
+        // legacy!
         if ( ai.prefix != null )
         {
             doc.add( new Field( ArtifactInfo.PLUGIN_PREFIX, ai.prefix, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
@@ -333,16 +221,6 @@ public class MinimalArtifactInfoIndexCreator
             doc.add( new Field( ArtifactInfo.PLUGIN_GOALS, ArtifactInfo.lst2str( ai.goals ), Field.Store.YES,
                 Field.Index.NO ) );
         }
-
-        if ( ai.sha1 != null )
-        {
-            doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
-        }
-    }
-
-    public void updateLegacyDocument( ArtifactInfo ai, Document doc )
-    {
-        updateDocument( ai, doc );
 
         doc.removeField( ArtifactInfo.GROUP_ID );
         doc.add( new Field( ArtifactInfo.GROUP_ID, ai.groupId, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
@@ -409,18 +287,6 @@ public class MinimalArtifactInfoIndexCreator
                 }
             }
 
-            if ( "maven-plugin".equals( ai.packaging ) )
-            {
-                ai.prefix = doc.get( ArtifactInfo.PLUGIN_PREFIX );
-
-                String goals = doc.get( ArtifactInfo.PLUGIN_GOALS );
-
-                if ( goals != null )
-                {
-                    ai.goals = ArtifactInfo.str2lst( goals );
-                }
-            }
-
             res = true;
         }
 
@@ -461,24 +327,11 @@ public class MinimalArtifactInfoIndexCreator
         // artifactInfo.fname = ???
     }
 
-    private void close( ZipFile zf )
-    {
-        if ( zf != null )
-        {
-            try
-            {
-                zf.close();
-            }
-            catch ( IOException ex )
-            {
-            }
-        }
-    }
+    // ==
 
     @Override
     public String toString()
     {
-        return "min";
+        return ID;
     }
-
 }

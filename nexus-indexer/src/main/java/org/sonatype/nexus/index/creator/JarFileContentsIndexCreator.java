@@ -21,11 +21,12 @@ import org.sonatype.nexus.index.context.IndexCreator;
 /**
  * An index creator used to index Java class names from a Maven artifact.
  */
-@Component( role = IndexCreator.class, hint = "jarContent" )
+@Component( role = IndexCreator.class, hint = JarFileContentsIndexCreator.ID )
 public class JarFileContentsIndexCreator
     extends AbstractIndexCreator
     implements LegacyDocumentUpdater
 {
+    public static final String ID = "jarContent";
 
     public void populateArtifactInfo( ArtifactContext artifactContext )
         throws IOException
@@ -137,15 +138,9 @@ public class JarFileContentsIndexCreator
                         sb.append( name.substring( 0, name.length() - 6 ) ).append( '\n' );
                     }
                 }
-                else if ( "META-INF/archetype.xml".equals( name ) //
-                    || "META-INF/maven/archetype.xml".equals( name ) //
-                    || "META-INF/maven/archetype-metadata.xml".equals( name ) )
-                {
-                    ai.packaging = "maven-archetype";
-                }
             }
 
-            if( sb.toString().trim().length() != 0 )
+            if ( sb.toString().trim().length() != 0 )
             {
                 ai.classNames = sb.toString();
             }
@@ -173,7 +168,7 @@ public class JarFileContentsIndexCreator
     @Override
     public String toString()
     {
-        return "jarContent";
+        return ID;
     }
 
 }

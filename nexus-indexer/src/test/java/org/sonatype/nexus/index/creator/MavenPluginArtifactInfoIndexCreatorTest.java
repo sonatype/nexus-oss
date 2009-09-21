@@ -18,7 +18,7 @@ import org.sonatype.nexus.index.context.IndexCreator;
 /**
  * @author juven
  */
-public class MinimalArtifactInfoIndexCreatorTest
+public class MavenPluginArtifactInfoIndexCreatorTest
     extends PlexusTestCase
 {
     protected IndexCreator indexCreator;
@@ -29,7 +29,7 @@ public class MinimalArtifactInfoIndexCreatorTest
     {
         super.setUp();
 
-        indexCreator = this.lookup( IndexCreator.class, "min" );
+        indexCreator = this.lookup( IndexCreator.class, MavenPluginArtifactInfoIndexCreator.ID );
     }
 
     public void testMavenPluginInfo()
@@ -49,6 +49,9 @@ public class MinimalArtifactInfoIndexCreatorTest
             "maven-dependency-plugin",
             "2.0",
             null );
+        
+        artifactInfo.packaging = "maven-plugin";
+        artifactInfo.fextension = "jar";
 
         ArtifactContext artifactContext = new ArtifactContext( pom, artifact, null, artifactInfo, null );
 

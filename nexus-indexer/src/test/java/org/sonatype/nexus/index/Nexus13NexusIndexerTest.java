@@ -42,7 +42,7 @@ public class Nexus13NexusIndexerTest
             indexDir,
             null,
             null,
-            DEFAULT_CREATORS );
+            FULL_CREATORS );
         nexusIndexer.scan( context );
     }
 

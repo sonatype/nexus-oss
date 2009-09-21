@@ -7,8 +7,6 @@
 package org.sonatype.nexus.index.creator;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.nexus.index.ArtifactContext;
