@@ -154,10 +154,11 @@ public class NexusStatusUtil
         {
             appBooter.stopContainer();
 
-            if ( !waitForStop() )
-            {
-                throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
-            }
+        }
+
+        if ( !waitForStop() )
+        {
+            throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
         }
 
     }
@@ -222,7 +223,7 @@ public class NexusStatusUtil
     public static boolean waitForStart()
         throws NexusIllegalStateException
     {
-        int totalWaitTime = 100 * 1000; // 100 sec
+        int totalWaitTime = 40 * 1000; // 20 sec
         int pollingFreq = 200; // 200 ms
 
         log.info( "wait for Nexus start" );
@@ -261,7 +262,7 @@ public class NexusStatusUtil
     {
         log.info( "wait for Nexus stop" );
 
-        int totalWaitTime = 50 * 1000; // 50 sec
+        int totalWaitTime = 40 * 1000; // 20 sec
         int pollingFreq = 200; // 200 ms
 
         for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
