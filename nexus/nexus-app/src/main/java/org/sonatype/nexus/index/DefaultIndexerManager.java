@@ -48,6 +48,10 @@ import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MavenArchetypeArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
@@ -113,7 +117,9 @@ public class DefaultIndexerManager
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    @Requirement( role = IndexCreator.class, hints = { "min", "jarContent" } )
+    @Requirement( role = IndexCreator.class, hints = { MinimalArtifactInfoIndexCreator.ID,
+        MavenPluginArtifactInfoIndexCreator.ID, MavenArchetypeArtifactInfoIndexCreator.ID,
+        JarFileContentsIndexCreator.ID } )
     private List<IndexCreator> indexCreators;
 
     @Requirement( hint = "maven2" )
