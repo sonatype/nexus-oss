@@ -135,6 +135,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-client</artifactId>
       <version>7.0.0.RC6-SNAPSHOT</version>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 
