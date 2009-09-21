@@ -26,7 +26,9 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
- * A Maven Plugin index creator used to provide information about Maven Plugins.
+ * A Maven Plugin index creator used to provide information about Maven Plugins. It will collect the plugin prefix and
+ * the goals the plugin provides. Also, the Lucene document and the returned ArtifactInfo will be correctly filled with
+ * these information.
  * 
  * @author cstamas
  */

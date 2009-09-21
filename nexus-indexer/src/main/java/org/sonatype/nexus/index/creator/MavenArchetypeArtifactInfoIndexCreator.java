@@ -17,7 +17,10 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
- * A Maven Archetype index creator used to detect and correct the artifact packaging to "maven-archetype".
+ * A Maven Archetype index creator used to detect and correct the artifact packaging to "maven-archetype" if the
+ * inspected JAR is an Archetype. Since packaging is already handled by Minimal creator, this Creator only alters the
+ * supplied ArtifactInfo packaging field during processing, but does not interferes with Lucene document fill-up or the
+ * ArtifactInfo fill-up (the update* methods are empty).
  * 
  * @author cstamas
  */

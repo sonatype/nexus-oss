@@ -26,7 +26,12 @@ import org.sonatype.nexus.index.locator.SignatureLocator;
 import org.sonatype.nexus.index.locator.SourcesLocator;
 
 /**
- * A minimal index creator used to provide basic information about Maven artifact.
+ * A minimal index creator used to provide basic information about Maven artifact. This creator will create the index
+ * fast, will not open any file to be fastest as possible but it has some drawbacks: The information gathered by this
+ * creator are sometimes based on "best-effort" only, and does not reflect the reality (ie. maven archetype packaging @see
+ * {@link MavenArchetypeArtifactInfoIndexCreator}).
+ * 
+ * @author cstamas
  */
 @Component( role = IndexCreator.class, hint = MinimalArtifactInfoIndexCreator.ID )
 public class MinimalArtifactInfoIndexCreator
@@ -94,7 +99,7 @@ public class MinimalArtifactInfoIndexCreator
         if ( artifact != null )
         {
             File signature = sigl.locate( artifact );
-            
+
             ai.signatureExists = signature.exists() ? ArtifactAvailablility.PRESENT : ArtifactAvailablility.NOT_PRESENT;
 
             File sha1 = sha1l.locate( artifact );

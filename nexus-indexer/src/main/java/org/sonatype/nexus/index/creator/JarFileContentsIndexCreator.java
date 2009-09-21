@@ -19,7 +19,8 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
- * An index creator used to index Java class names from a Maven artifact.
+ * An index creator used to index Java class names from a Maven artifact. Will open up the JAR and collect all the class
+ * names from it.
  */
 @Component( role = IndexCreator.class, hint = JarFileContentsIndexCreator.ID )
 public class JarFileContentsIndexCreator
