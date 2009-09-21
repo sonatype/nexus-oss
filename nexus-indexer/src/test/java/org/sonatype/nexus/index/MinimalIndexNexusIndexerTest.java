@@ -87,7 +87,8 @@ public class MinimalIndexNexusIndexerTest
     {
         Query query = new TermQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         FlatSearchResponse response = nexusIndexer.searchFlat(new FlatSearchRequest(query));
-        assertEquals(response.getResults().toString(), 3, response.getTotalHits());
+        // repo contains 3 artifacts with packaging "maven-plugin", but one of the is actually an archetype!
+        assertEquals(response.getResults().toString(), 2, response.getTotalHits());
     }
     
 }
