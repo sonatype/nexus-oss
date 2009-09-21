@@ -300,7 +300,11 @@ public class M2GroupRepository
     protected StorageCompositeFileItem createMergedMetadataItem( ResourceStoreRequest request, byte[] content,
                                                                  List<StorageItem> sources )
     {
-        ContentLocator contentLocator = new ByteArrayContentLocator( content, "text/xml" );
+        // we are creating file maven-metadata.xml, and ask the MimeUtil for it's exact MIME type to honor potential
+        // user configuration
+        String mimeType = getMimeUtil().getMimeType( "maven-metadata.xml" );
+
+        ContentLocator contentLocator = new ByteArrayContentLocator( content, mimeType );
 
         DefaultStorageCompositeFileItem result =
             new DefaultStorageCompositeFileItem( this, request, true, false, contentLocator, sources );
