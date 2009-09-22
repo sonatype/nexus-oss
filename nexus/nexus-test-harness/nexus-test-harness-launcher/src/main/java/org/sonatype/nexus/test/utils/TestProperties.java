@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.test.utils;
 
+import java.io.File;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,6 +51,11 @@ public class TestProperties
             properties.put( key, bundle.getString( key ) );
         }
         return properties;
+    }
+
+    public static File getFile( String key )
+    {
+        return new File( getString( key ) );
     }
 
 }

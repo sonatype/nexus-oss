@@ -42,6 +42,8 @@ public class MavenDeployer
         new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
         verifier.setLogFileName( logname );
 
+        verifier.setLocalRepo( TestProperties.getFile( "maven-repository" ).getAbsolutePath() );
+
         verifier.setAutoclean( false );
         verifier.resetStreams();
 
