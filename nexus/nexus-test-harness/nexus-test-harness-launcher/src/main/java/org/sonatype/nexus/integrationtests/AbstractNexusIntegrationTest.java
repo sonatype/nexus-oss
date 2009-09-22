@@ -432,9 +432,12 @@ public class AbstractNexusIntegrationTest
         catch ( Exception e )
         {
             log.fatal( e.getMessage(), e );
-            File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
-            testNexusLog.getParentFile().mkdirs();
-            FileUtils.copyFile( nexusLog, testNexusLog );
+            if ( nexusLog.exists() )
+            {
+                File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
+                testNexusLog.getParentFile().mkdirs();
+                FileUtils.copyFile( nexusLog, testNexusLog );
+            }
             throw e;
         }
     }
