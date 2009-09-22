@@ -20,6 +20,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.TermQuery;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
@@ -29,46 +30,52 @@ import org.sonatype.nexus.index.context.IndexingContext;
  */
 class DefaultScannerListener
     extends AbstractLogEnabled
-    implements ArtifactScanningListener 
+    implements ArtifactScanningListener
 {
     private final IndexingContext context;
+
     private final IndexerEngine indexerEngine;
+
     private final boolean update;
+
     private final ArtifactScanningListener listener;
 
     private final Set<String> uinfos = new HashSet<String>();
+
     private final Set<String> processedUinfos = new HashSet<String>();
+
     private final Set<String> allGroups = new HashSet<String>();
+
     private final Set<String> groups = new HashSet<String>();
-    
+
     private final List<Exception> exceptions = new ArrayList<Exception>();
-    
+
     private int count = 0;
-    
+
     DefaultScannerListener( IndexingContext context, //
-        IndexerEngine indexerEngine, boolean update, // 
-        ArtifactScanningListener listener ) 
+                            IndexerEngine indexerEngine, boolean update, // 
+                            ArtifactScanningListener listener )
     {
         this.context = context;
         this.indexerEngine = indexerEngine;
         this.update = update;
         this.listener = listener;
     }
-  
+
     public void scanningStarted( IndexingContext ctx )
     {
-        try 
+        try
         {
             if ( update )
             {
                 initialize( ctx );
             }
-        } 
-        catch ( IOException ex ) 
-        {
-            exceptions.add( ex );              
         }
-      
+        catch ( IOException ex )
+        {
+            exceptions.add( ex );
+        }
+
         if ( listener != null )
         {
             listener.scanningStarted( ctx );
@@ -78,21 +85,25 @@ class DefaultScannerListener
     public void artifactDiscovered( ArtifactContext ac )
     {
         String uinfo = ac.getArtifactInfo().getUinfo();
-        
+
+        // TODO: scattered across commented out changes while I was fixing NEXUS-2712, cstamas
+        // These changes should be applied by borks too much the fragile indexer
+
+        // if ( VersionUtils.isSnapshot( ac.getArtifactInfo().version ) && processedUinfos.contains( uinfo ) )
         if ( processedUinfos.contains( uinfo ) )
         {
-            return;  // skip individual snapshots
+            return; // skip individual snapshots
         }
-        
-        processedUinfos.add( uinfo );
-        
+
+        boolean adding = processedUinfos.add( uinfo );
+
         if ( uinfos.contains( uinfo ) )
         {
             // already indexed
             uinfos.remove( uinfo );
             return;
         }
-      
+
         try
         {
             if ( listener != null )
@@ -100,16 +111,23 @@ class DefaultScannerListener
                 listener.artifactDiscovered( ac );
             }
 
+            // if ( adding )
+            // {
             indexerEngine.index( context, ac );
-            
+            // }
+            // else
+            // {
+            // indexerEngine.update( context, ac );
+            // }
+
             for ( Exception e : ac.getErrors() )
             {
                 artifactError( ac, e );
             }
-            
+
             groups.add( ac.getArtifactInfo().getRootGroup() );
             allGroups.add( ac.getArtifactInfo().groupId );
-            
+
             count++;
         }
         catch ( IOException ex )
@@ -117,58 +135,58 @@ class DefaultScannerListener
             artifactError( ac, ex );
         }
     }
-    
+
     public void scanningFinished( IndexingContext ctx, ScanningResult result )
     {
         result.setTotalFiles( count );
-        
-        for ( Exception ex : exceptions ) 
+
+        for ( Exception ex : exceptions )
         {
             result.addException( ex );
         }
-        
-        try 
+
+        try
         {
             context.optimize();
-            
+
             context.setRootGroups( groups );
-            
+
             context.setAllGroups( allGroups );
-            
+
             if ( update )
             {
                 removeDeletedArtifacts( context, result );
             }
-        } 
-        catch ( IOException ex ) 
+        }
+        catch ( IOException ex )
         {
             result.addException( ex );
         }
-        
+
         if ( listener != null )
         {
             listener.scanningFinished( ctx, result );
         }
-        
-        if ( result.getDeletedFiles() >0 || result.getTotalFiles() > 0 ) 
+
+        if ( result.getDeletedFiles() > 0 || result.getTotalFiles() > 0 )
         {
-            try 
+            try
             {
                 context.updateTimestamp( true );
- 
+
                 context.optimize();
-            } 
-            catch (Exception ex) 
+            }
+            catch ( Exception ex )
             {
-                result.addException(ex);
+                result.addException( ex );
             }
         }
     }
-  
+
     public void artifactError( ArtifactContext ac, Exception e )
     {
         exceptions.add( e );
-        
+
         if ( listener != null )
         {
             listener.artifactError( ac, e );
@@ -176,23 +194,22 @@ class DefaultScannerListener
     }
 
     private void initialize( IndexingContext ctx )
-        throws IOException,
-            CorruptIndexException
+        throws IOException, CorruptIndexException
     {
         IndexReader r = ctx.getIndexReader();
-        
+
         for ( int i = 0; i < r.numDocs(); i++ )
         {
             if ( !r.isDeleted( i ) )
             {
                 Document d = r.document( i );
-  
+
                 String uinfo = d.get( ArtifactInfo.UINFO );
-  
+
                 if ( uinfo != null )
                 {
                     uinfos.add( uinfo );
-                    
+
                     // add all existing groupIds to the lists, as they will
                     // not be "discovered" and would be missing from the new list..
                     String groupId = uinfo.substring( 0, uinfo.indexOf( '|' ) );
@@ -203,42 +220,42 @@ class DefaultScannerListener
             }
         }
     }
-    
-    private void removeDeletedArtifacts( IndexingContext context, ScanningResult result ) 
-        throws IOException 
+
+    private void removeDeletedArtifacts( IndexingContext context, ScanningResult result )
+        throws IOException
     {
         int deleted = 0;
-      
-        for ( String uinfo : uinfos ) 
+
+        for ( String uinfo : uinfos )
         {
             Term term = new Term( ArtifactInfo.UINFO, uinfo );
-            
+
             Hits hits = context.getIndexSearcher().search( new TermQuery( term ) );
 
-            if( hits.length() > 0 )
+            if ( hits.length() > 0 )
             {
                 String[] ra = ArtifactInfo.FS_PATTERN.split( uinfo );
 
                 ArtifactInfo ai = new ArtifactInfo();
-                
+
                 ai.repository = context.getRepositoryId();
-       
+
                 ai.groupId = ra[0];
-       
+
                 ai.artifactId = ra[1];
-       
+
                 ai.version = ra[2];
-       
+
                 if ( ra.length > 3 )
                 {
                     ai.classifier = ArtifactInfo.renvl( ra[3] );
                 }
-      
+
                 if ( ra.length > 4 )
                 {
                     ai.packaging = ArtifactInfo.renvl( ra[4] );
                 }
-            
+
                 // minimal ArtifactContext for removal
                 try
                 {
@@ -257,8 +274,8 @@ class DefaultScannerListener
                 }
             }
         }
-        
+
         result.setDeletedFiles( deleted );
     }
-    
+
 }
