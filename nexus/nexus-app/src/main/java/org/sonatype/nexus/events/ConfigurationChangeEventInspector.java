@@ -64,16 +64,17 @@ public class ConfigurationChangeEventInspector
 
         StringBuffer msg = new StringBuffer();
 
-        msg.append( "The following configurations were changed: " );
+        msg.append( "Nexus server configuration was changed" );
 
-        for ( Configurable change : event.getChanges() )
+        //TODO: refine _what_ is changed
+/*        for ( Configurable change : event.getChanges() )
         {
             msg.append( " '" ).append( change.getName() ).append( "', " );
-        }
+        }*/
 
         if ( event.getSubject() != null && event.getSubject().getPrincipal() != null )
         {
-            msg.append( "change was made by [" + event.getSubject().getPrincipal().toString() + "]" );
+            msg.append( ", change was made by [" + event.getSubject().getPrincipal().toString() + "]" );
         }
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, msg.toString() );
