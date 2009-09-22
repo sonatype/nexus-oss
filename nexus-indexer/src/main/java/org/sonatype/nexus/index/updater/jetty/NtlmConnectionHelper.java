@@ -24,8 +24,10 @@ import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jetty.http.HttpFields;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
@@ -33,6 +35,7 @@ import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.zip.GZIPInputStream;
 
 public class NtlmConnectionHelper
 {
@@ -112,24 +115,21 @@ public class NtlmConnectionHelper
         if ( doGet )
         {
             InputStream is = urlConnection.getInputStream();
-
             String contentEncoding = urlConnection.getHeaderField( "Content-Encoding" );
-            if ( contentEncoding != null )
+            boolean isGZipped = contentEncoding == null ? false : "gzip".equalsIgnoreCase( contentEncoding );
+            if ( isGZipped )
             {
-                exchange.setContentEncoding( contentEncoding );
+                is = new GZIPInputStream( is );
             }
 
-            exchange.setContentLength( urlConnection.getContentLength() );
-            exchange.setLastModified( urlConnection.getLastModified() );
-            exchange.setResponseContentStream( is );
-        }
-        else
-        {
-            exchange.setLastModified( urlConnection.getLastModified() );
+            ByteArrayOutputStream content = new ByteArrayOutputStream();
+            IOUtil.copy( is, content );
+            exchange.setResponseContentBytes( content.toByteArray() );
         }
 
+        exchange.setLastModified( urlConnection.getLastModified() );
+        exchange.setContentLength( urlConnection.getContentLength() );
         exchange.setResponseStatus( responseCode );
-        exchange.onResponseComplete();
     }
 
     private void addHeaders( final URLConnection urlConnection )

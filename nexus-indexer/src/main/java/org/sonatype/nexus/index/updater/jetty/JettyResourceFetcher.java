@@ -1,5 +1,8 @@
 package org.sonatype.nexus.index.updater.jetty;
 
+import static org.codehaus.plexus.util.IOUtil.close;
+
+import org.apache.maven.wagon.LazyFileOutputStream;
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
@@ -17,7 +20,10 @@ import org.sonatype.nexus.index.updater.ResourceFetcher;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
+import java.util.zip.GZIPInputStream;
 
 public class JettyResourceFetcher
     implements ResourceFetcher
@@ -36,8 +42,6 @@ public class JettyResourceFetcher
 
     private HttpFields headers;
 
-    private int maxRedirects = 4;
-
     // END: configuration fields.
 
     // transient fields.
@@ -53,29 +57,10 @@ public class JettyResourceFetcher
         throws IOException, FileNotFoundException
     {
         HttpFields exchangeHeaders = buildHeaders();
-        ResourceExchange exchange = new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, listenerSupport );
-
+        ResourceExchange exchange = new ResourceExchange( exchangeHeaders );
+        exchange.setURL( url );
         exchange.setMethod( HttpMethods.GET );
 
-        StringBuilder getUrl = new StringBuilder( url );
-        if ( getUrl.charAt( getUrl.length() - 1 ) != '/' && !name.startsWith( "/" ) )
-        {
-            getUrl.append( '/' );
-        }
-        getUrl.append( name );
-
-        exchange.setURL( getUrl.toString() );
-
-        exchange = get( exchange );
-        while ( exchange.prepareForRedirect() )
-        {
-            exchange = get( exchange );
-        }
-    }
-
-    private ResourceExchange get( final ResourceExchange exchange )
-        throws IOException
-    {
         httpClient.send( exchange );
         try
         {
@@ -94,8 +79,6 @@ public class JettyResourceFetcher
         {
             case ServerResponse.SC_OK:
             case ServerResponse.SC_NOT_MODIFIED:
-            case ServerResponse.SC_MOVED_PERMANENTLY:
-            case ServerResponse.SC_MOVED_TEMPORARILY:
                 break;
 
             case ServerResponse.SC_FORBIDDEN:
@@ -119,7 +102,9 @@ public class JettyResourceFetcher
             }
         }
 
-        return exchange;
+        getTransfer( targetFile, exchange );
+        targetFile.setLastModified( exchange.getLastModified() );
+        listenerSupport.fireGetCompleted( url, targetFile );
     }
 
     public void connect( final String id, final String url )
@@ -278,17 +263,6 @@ public class JettyResourceFetcher
         }
     }
 
-    public int getMaxRedirects()
-    {
-        return maxRedirects;
-    }
-
-    public JettyResourceFetcher setMaxRedirects( final int maxRedirects )
-    {
-        this.maxRedirects = maxRedirects;
-        return this;
-    }
-
     public int getMaxConnections()
     {
         return maxConnections;
@@ -344,6 +318,78 @@ public class JettyResourceFetcher
     {
         listenerSupport.addTransferListener( listener );
         return this;
+    }
+
+    private void getTransfer( final File targetFile, final ResourceExchange exchange )
+        throws IOException
+    {
+        listenerSupport.fireGetStarted( url, targetFile );
+
+        File destinationDirectory = targetFile.getParentFile();
+        if ( destinationDirectory != null && !destinationDirectory.exists() )
+        {
+            destinationDirectory.mkdirs();
+            if ( !destinationDirectory.exists() )
+            {
+                throw new IOException( "Specified destination directory cannot be created: " + destinationDirectory );
+            }
+        }
+
+        InputStream input = null;
+        OutputStream output = null;
+        try
+        {
+            input = getResponseContentSource( exchange );
+            output = new LazyFileOutputStream( targetFile );
+
+            byte[] buffer = new byte[4096];
+
+            TransferEvent transferEvent =
+                new TransferEvent( null, listenerSupport.resourceFor( url ), TransferEvent.TRANSFER_PROGRESS,
+                                   TransferEvent.REQUEST_GET );
+
+            transferEvent.setTimestamp( System.currentTimeMillis() );
+
+            int remaining = exchange.getContentLength();
+            while ( remaining > 0 )
+            {
+                int n = input.read( buffer, 0, Math.min( buffer.length, remaining ) );
+
+                if ( n == -1 )
+                {
+                    break;
+                }
+
+                listenerSupport.fireTransferProgress( transferEvent, buffer, n );
+
+                output.write( buffer, 0, n );
+
+                remaining -= n;
+            }
+            output.flush();
+        }
+        finally
+        {
+            close( input );
+            close( output );
+        }
+    }
+
+    private InputStream getResponseContentSource( final ResourceExchange exchange )
+        throws IOException
+    {
+        InputStream source = exchange.getResponseContentSource();
+
+        if ( source != null )
+        {
+            String contentEncoding = exchange.getContentEncoding();
+            if ( contentEncoding != null && "gzip".equalsIgnoreCase( contentEncoding ) )
+            {
+                source = new GZIPInputStream( source );
+            }
+        }
+
+        return source;
     }
 
     private HttpFields buildHeaders()
