@@ -51,26 +51,26 @@ public class HttpClientProxyUtil
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
-                logger.info( "... authentication setup for NTLM domain {}" + nras.getNtlmDomain() );
+                logger.info( "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"" );
 
                 httpConfiguration.setHost( nras.getNtlmHost() );
 
-                httpClient.getState().setCredentials(
-                                                      AuthScope.ANY,
-                                                      new NTCredentials( nras.getUsername(), nras.getPassword(), nras
-                                                          .getNtlmHost(), nras.getNtlmDomain() ) );
+                httpClient.getState()
+                    .setCredentials(
+                        AuthScope.ANY,
+                        new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras
+                            .getNtlmDomain() ) );
             }
             else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
             {
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                logger.info( "... authentication setup for remote storage with username " + uras.getUsername() );
+                logger
+                    .info( "... authentication setup for remote storage with username \"" + uras.getUsername() + "\"" );
 
-                httpClient.getState().setCredentials(
-                                                      AuthScope.ANY,
-                                                      new UsernamePasswordCredentials( uras.getUsername(), uras
-                                                          .getPassword() ) );
+                httpClient.getState().setCredentials( AuthScope.ANY,
+                    new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
             }
 
             httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
@@ -80,14 +80,14 @@ public class HttpClientProxyUtil
 
         if ( rps.isEnabled() )
         {
-            logger.info( "... proxy setup with host " + rps.getHostname() );
+            logger.info( "... proxy setup with host \"" + rps.getHostname() + "\"" );
 
             httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
 
             if ( rps.getProxyAuthentication() != null )
             {
                 ras = rps.getProxyAuthentication();
-                
+
                 List<String> authPrefs = new ArrayList<String>( 2 );
                 authPrefs.add( AuthPolicy.DIGEST );
                 authPrefs.add( AuthPolicy.BASIC );
@@ -108,23 +108,21 @@ public class HttpClientProxyUtil
                     if ( ctx.getRemoteAuthenticationSettings() != null
                         && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
                     {
-                        logger.warn(
-                                          "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
-                                              + " for BOTH server side and proxy side authentication!\n"
-                                              + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
-                                              + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                                              + " *** SERVER SIDE AUTH OVERRIDDEN" );
+                        logger.warn( "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                            + " for BOTH server side and proxy side authentication!\n"
+                            + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
+                            + " if you have to use NTLM proxy, otherwise it will not work!\n"
+                            + " *** SERVER SIDE AUTH OVERRIDDEN" );
                     }
 
-                    logger.info( "... proxy authentication setup for NTLM domain " + nras.getNtlmDomain() );
+                    logger.info( "... proxy authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"" );
 
                     httpConfiguration.setHost( nras.getNtlmHost() );
 
                     httpClient.getState().setProxyCredentials(
-                                                               AuthScope.ANY,
-                                                               new NTCredentials( nras.getUsername(), nras
-                                                                   .getPassword(), nras.getNtlmHost(), nras
-                                                                   .getNtlmDomain() ) );
+                        AuthScope.ANY,
+                        new NTCredentials( nras.getUsername(), nras.getPassword(), nras.getNtlmHost(), nras
+                            .getNtlmDomain() ) );
                 }
                 else if ( ras instanceof UsernamePasswordRemoteAuthenticationSettings )
                 {
@@ -132,14 +130,11 @@ public class HttpClientProxyUtil
                         (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                     // Using Username/Pwd auth, will not add NTLM
-                    logger.info(
-                                      "... proxy authentication setup for remote storage with username "
-                                          + uras.getUsername() );
+                    logger.info( "... proxy authentication setup for remote storage with username \""
+                        + uras.getUsername() + "\"" );
 
-                    httpClient.getState().setProxyCredentials(
-                                                               AuthScope.ANY,
-                                                               new UsernamePasswordCredentials( uras.getUsername(),
-                                                                                                uras.getPassword() ) );
+                    httpClient.getState().setProxyCredentials( AuthScope.ANY,
+                        new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
                 }
 
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
