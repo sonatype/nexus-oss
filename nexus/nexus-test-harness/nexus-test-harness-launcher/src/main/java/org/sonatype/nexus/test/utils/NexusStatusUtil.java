@@ -231,7 +231,7 @@ public class NexusStatusUtil
     public static boolean waitForStart()
         throws NexusIllegalStateException
     {
-        int totalWaitTime = 40 * 1000; // 20 sec
+        int totalWaitTime = 200 * 1000; // 20 sec
         int pollingFreq = 200; // 200 ms
 
         log.info( "wait for Nexus start" );
