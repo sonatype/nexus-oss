@@ -105,7 +105,15 @@ public class NexusStatusUtil
 
         if ( !waitForStart() )
         {
-            throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped" );
+            try
+            {
+                getAppBooterService().shutdown();
+            }
+            catch ( Throwable t )
+            {
+                t.printStackTrace();
+            }
+            throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
         }
 
         isNexusRunning();
