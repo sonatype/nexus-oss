@@ -5,30 +5,6 @@
  */
 package org.sonatype.nexus.index.updater;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.IndexOutput;
-import org.apache.lucene.store.LockObtainFailedException;
-import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.index.context.DocumentFilter;
-import org.sonatype.nexus.index.context.IndexUtils;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.context.NexusAnalyzer;
-import org.sonatype.nexus.index.context.NexusIndexWriter;
-import org.sonatype.nexus.index.incremental.IncrementalHandler;
-import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
-import org.sonatype.nexus.index.updater.jetty.JettyResourceFetcher;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +20,38 @@ import java.util.TimeZone;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.IndexOutput;
+import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.maven.artifact.manager.WagonManager;
+import org.apache.maven.wagon.ConnectionException;
+import org.apache.maven.wagon.ResourceDoesNotExistException;
+import org.apache.maven.wagon.Wagon;
+import org.apache.maven.wagon.WagonException;
+import org.apache.maven.wagon.authentication.AuthenticationException;
+import org.apache.maven.wagon.authentication.AuthenticationInfo;
+import org.apache.maven.wagon.authorization.AuthorizationException;
+import org.apache.maven.wagon.events.TransferListener;
+import org.apache.maven.wagon.proxy.ProxyInfo;
+import org.apache.maven.wagon.repository.Repository;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.index.context.DocumentFilter;
+import org.sonatype.nexus.index.context.IndexUtils;
+import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.context.NexusAnalyzer;
+import org.sonatype.nexus.index.context.NexusIndexWriter;
+import org.sonatype.nexus.index.incremental.IncrementalHandler;
+import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
+
 /**
  * A default index updater implementation
  *
@@ -58,10 +66,13 @@ public class DefaultIndexUpdater
     @Requirement( role = IncrementalHandler.class )
     IncrementalHandler incrementalHandler;
 
+    @Requirement
+    private WagonManager wagonManager;
+
     @Requirement( role = IndexUpdateSideEffect.class )
     private List<IndexUpdateSideEffect> sideEffects;
 
-    public Date fetchAndUpdateIndex( final IndexUpdateRequest updateRequest )
+    public Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
         throws IOException
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
@@ -71,9 +82,9 @@ public class DefaultIndexUpdater
         if( fetcher == null )
         {
             fetcher =
-                new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() )
-                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                                          .setProxyInfo( updateRequest.getProxyInfo() );
+                new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest
+                    .getAuthenticationInfo(), updateRequest.getProxyInfo()
+                );
 
             updateRequest.setResourceFetcher( fetcher );
         }
@@ -145,8 +156,7 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
      */
-    @Deprecated
-    public Date fetchAndUpdateIndex( final IndexingContext context, final TransferListener listener )
+    public Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener )
         throws IOException
     {
         return fetchAndUpdateIndex( context, listener, null );
@@ -155,19 +165,17 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
      */
-    @Deprecated
-    public Date fetchAndUpdateIndex( final IndexingContext context, final TransferListener listener, final ProxyInfo proxyInfo )
+    public Date fetchAndUpdateIndex( final IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
-        updateRequest.setResourceFetcher( new JettyResourceFetcher().addTransferListener( listener )
-                                                                    .setProxyInfo( proxyInfo ) );
+        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
 
         return fetchAndUpdateIndex( updateRequest );
     }
 
-    public Properties fetchIndexProperties( final IndexingContext context, final ResourceFetcher fetcher )
+    public Properties fetchIndexProperties( IndexingContext context, ResourceFetcher fetcher )
         throws IOException
     {
         fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
@@ -185,15 +193,13 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchIndexProperties(IndexingContext, ResourceFetcher)}
      */
-    @Deprecated
-    public Properties fetchIndexProperties( final IndexingContext context, final TransferListener listener, final ProxyInfo proxyInfo )
+    public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
         throws IOException
     {
-        return fetchIndexProperties( context, new JettyResourceFetcher().addTransferListener( listener )
-                                                                        .setProxyInfo( proxyInfo ) );
+        return fetchIndexProperties( context, new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
     }
 
-    private Date loadIndexDirectory( final IndexUpdateRequest updateRequest, final boolean merge, final String remoteIndexFile )
+    private Date loadIndexDirectory( IndexUpdateRequest updateRequest, boolean merge, String remoteIndexFile )
         throws IOException
     {
         File indexArchive = File.createTempFile( remoteIndexFile, "" );
@@ -284,7 +290,7 @@ public class DefaultIndexUpdater
      * @param directory Lucene <code>Directory</code> to unpack index data to
      * @return {@link Date} of the index update or null if it can't be read
      */
-    public static Date unpackIndexArchive( final InputStream is, final Directory directory, final IndexingContext context )
+    public static Date unpackIndexArchive( InputStream is, Directory directory, IndexingContext context )
         throws IOException
     {
         File indexArchive = File.createTempFile( "nexus-index", "" );
@@ -312,7 +318,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void unpackDirectory( final Directory directory, final InputStream is )
+    private static void unpackDirectory( Directory directory, InputStream is )
         throws IOException
     {
         byte[] buf = new byte[4096];
@@ -354,7 +360,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void copyUpdatedDocuments( final Directory sourcedir, final Directory targetdir, final IndexingContext context )
+    private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir, IndexingContext context )
         throws CorruptIndexException, LockObtainFailedException, IOException
     {
         IndexWriter w = null;
@@ -382,7 +388,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void filterDirectory( final Directory directory, final DocumentFilter filter )
+    private static void filterDirectory( Directory directory, DocumentFilter filter )
         throws IOException
     {
         IndexReader r = null;
@@ -428,7 +434,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private Properties loadLocallyStoredRemoteProperties( final IndexingContext context )
+    private Properties loadLocallyStoredRemoteProperties( IndexingContext context )
     {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
 
@@ -458,7 +464,7 @@ public class DefaultIndexUpdater
         return null;
     }
 
-    private Properties downloadIndexProperties( final IndexingContext context, final ResourceFetcher fetcher )
+    private Properties downloadIndexProperties( IndexingContext context, ResourceFetcher fetcher )
         throws IOException
     {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
@@ -485,7 +491,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    public Date getTimestamp( final Properties properties, final String key )
+    public Date getTimestamp( Properties properties, String key )
     {
         String indexTimestamp = properties.getProperty( key );
 
@@ -511,7 +517,7 @@ public class DefaultIndexUpdater
      * @param w a writer to save index data
      * @param ics a collection of index creators for updating unpacked documents.
      */
-    public static Date unpackIndexData( final InputStream is, final Directory d, final IndexingContext context )
+    public static Date unpackIndexData( InputStream is, Directory d, IndexingContext context )
         throws IOException
     {
         NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
@@ -529,4 +535,134 @@ public class DefaultIndexUpdater
         }
     }
 
+    /**
+     * A ResourceFetcher implementation based on Wagon
+     */
+    public static class WagonFetcher
+        implements ResourceFetcher
+    {
+        private final WagonManager wagonManager;
+
+        private final TransferListener listener;
+
+        private final AuthenticationInfo authenticationInfo;
+
+        private final ProxyInfo proxyInfo;
+
+        private Wagon wagon = null;
+
+        public WagonFetcher( WagonManager wagonManager, TransferListener listener,
+                             AuthenticationInfo authenticationInfo, ProxyInfo proxyInfo )
+        {
+            this.wagonManager = wagonManager;
+            this.listener = listener;
+            this.authenticationInfo = authenticationInfo;
+            this.proxyInfo = proxyInfo;
+        }
+
+        public void connect( String id, String url )
+            throws IOException
+        {
+            Repository repository = new Repository( id, url );
+
+            try
+            {
+                wagon = wagonManager.getWagon( repository );
+
+                if( listener != null )
+                {
+                    wagon.addTransferListener( listener );
+                }
+
+                // when working in the context of Maven, the WagonManager is already
+                // populated with proxy information from the Maven environment
+
+                if( authenticationInfo != null )
+                {
+                    if( proxyInfo != null )
+                    {
+                        wagon.connect( repository, authenticationInfo, proxyInfo );
+                    }
+                    else
+                    {
+                        wagon.connect( repository, authenticationInfo );
+                    }
+                }
+                else
+                {
+                    if( proxyInfo != null )
+                    {
+                        wagon.connect( repository, proxyInfo );
+                    }
+                    else
+                    {
+                        wagon.connect( repository );
+                    }
+                }
+            }
+            catch( AuthenticationException ex )
+            {
+                String msg = "Authentication exception connecting to " + repository;
+                logError( msg, ex );
+                throw new IOException( msg );
+            }
+            catch( WagonException ex )
+            {
+                String msg = "Wagon exception connecting to " + repository;
+                logError( msg, ex );
+                throw new IOException( msg );
+            }
+        }
+
+        public void disconnect()
+        {
+            if( wagon != null )
+            {
+                try
+                {
+                    wagon.disconnect();
+                }
+                catch( ConnectionException ex )
+                {
+                    logError( "Failed to close connection", ex );
+                }
+            }
+        }
+
+        public void retrieve( String name, File targetFile )
+            throws IOException, FileNotFoundException
+        {
+            try
+            {
+                wagon.get( name, targetFile );
+            }
+            catch( AuthorizationException e )
+            {
+                String msg = "Authorization exception retrieving " + name;
+                logError( msg, e );
+                throw new IOException( msg );
+            }
+            catch( ResourceDoesNotExistException e )
+            {
+                String msg = "Resource " + name + " does not exist";
+                logError( msg, e );
+                throw new FileNotFoundException( msg );
+            }
+            catch( WagonException e )
+            {
+                String msg = "Transfer for " + name + " failed";
+                logError( msg, e );
+                throw new IOException( msg + "; " + e.getMessage() );
+            }
+        }
+
+        private void logError( String msg, Exception ex )
+        {
+            if( listener != null )
+            {
+                listener.debug( msg + "; " + ex.getMessage() );
+            }
+        }
+
+    }
 }
