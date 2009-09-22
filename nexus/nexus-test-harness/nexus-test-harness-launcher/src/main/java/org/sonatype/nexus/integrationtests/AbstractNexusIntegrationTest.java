@@ -17,7 +17,6 @@ package org.sonatype.nexus.integrationtests;
 import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -59,6 +58,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
+import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -117,6 +117,8 @@ public class AbstractNexusIntegrationTest
 
     protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
 
+    private static File nexusLog;
+
     public static final Integer nexusControlPort;
 
     public static final int nexusApplicationPort;
@@ -136,6 +138,7 @@ public class AbstractNexusIntegrationTest
         nexusLogDir = TestProperties.getString( "nexus.log.dir" );
         nexusBaseUrl = TestProperties.getString( "nexus.base.url" );
         baseNexusUrl = nexusBaseUrl;
+        nexusLog = new File( TestProperties.getFile( "nexus.log.dir" ), "nexus.log" );
     }
 
     protected AbstractNexusIntegrationTest()
@@ -243,11 +246,6 @@ public class AbstractNexusIntegrationTest
         // must override
     }
 
-    private boolean isSecurityTest()
-    {
-        return TestContainer.getInstance().getTestContext().isSecureTest();
-    }
-
     protected static void cleanWorkDir()
         throws Exception
     {
@@ -273,12 +271,16 @@ public class AbstractNexusIntegrationTest
             } );
 
             if ( filesToDelete != null )
+            {
                 for ( File fileToDelete : filesToDelete )
                 {
                     // delete work dir
                     if ( fileToDelete != null )
+                    {
                         FileUtils.deleteDirectory( fileToDelete );
+                    }
                 }
+            }
 
         }
     }
@@ -297,15 +299,7 @@ public class AbstractNexusIntegrationTest
             // we have the parent dir, for each child (one level) we need to grab the pom.xml out of it and parse it,
             // and then deploy the artifact, sounds like fun, right!
 
-            File[] projectFolders = projectsDir.listFiles( new FileFilter()
-            {
-
-                public boolean accept( File pathname )
-                {
-                    return ( !pathname.getName().endsWith( ".svn" ) && pathname.isDirectory() && new File( pathname,
-                                                                                                           "pom.xml" ).exists() );
-                }
-            } );
+            File[] projectFolders = projectsDir.listFiles( MavenProjectFileFilter.INSTANCE );
 
             for ( int ii = 0; ii < projectFolders.length; ii++ )
             {
@@ -418,6 +412,11 @@ public class AbstractNexusIntegrationTest
 
         log.info( "starting nexus" );
 
+        if ( nexusLog.exists() )
+        {
+            FileUtils.fileWrite( nexusLog.getAbsolutePath(), "" );
+        }
+
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         log.info( "***************************" );
@@ -426,7 +425,18 @@ public class AbstractNexusIntegrationTest
         log.info( "*\n*" );
         log.info( "***************************" );
 
-        NexusStatusUtil.doSoftStart();
+        try
+        {
+            NexusStatusUtil.doSoftStart();
+        }
+        catch ( Exception e )
+        {
+            log.fatal( e.getMessage(), e );
+            File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
+            testNexusLog.getParentFile().mkdirs();
+            FileUtils.copyFile( nexusLog, testNexusLog );
+            throw e;
+        }
     }
 
     private static void stopNexus()
