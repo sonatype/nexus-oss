@@ -30,6 +30,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       {name:'contextId'},
       {name:'classifier'},
       {name:'packaging'},
+      {name:'extension'},
       {name:'pomLink'},
       {name:'artifactLink'}
   ]);

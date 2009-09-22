@@ -355,6 +355,8 @@ public abstract class AbstractNexusPlexusResource
         a.setClassifier( ai.classifier );
 
         a.setPackaging( ai.packaging );
+        
+        a.setExtension( ai.fextension );
 
         a.setRepoId( ai.repository );
 

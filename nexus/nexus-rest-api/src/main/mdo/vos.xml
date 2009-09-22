@@ -2057,6 +2057,12 @@
           <required>true</required>
         </field>
         <field>
+          <name>extension</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
           <name>repoId</name>
           <version>1.0.0+</version>
           <type>String</type>

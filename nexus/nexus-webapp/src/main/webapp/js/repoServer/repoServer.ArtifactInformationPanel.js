@@ -151,6 +151,8 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
         '  <version>' + data.version + '</version>\n' +
         ( data.classifier ? 
           ( '  <classifier>' + data.classifier + '</classifier>\n' ) : '' ) +
+        ( ( data.extension && data.extension != 'jar' ) ?
+          ( '  <type>' + data.extension + '</type>\n' ) : '' ) +
         '</dependency>\n';
     }
     this.formPanel.form.setValues( data );
