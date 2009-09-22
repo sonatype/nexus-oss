@@ -230,7 +230,7 @@ public class DefaultSnapshotRemoverTest
         // and now setup the request
         // process the apacheSnapshots, leave min 2 snap, do not remove released ones
         SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, 2, 0, false );
+            new SnapshotRemovalRequest( snapshots.getId(), null, 2, -1, false );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
 
@@ -294,7 +294,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( apacheSnapshots.getId(), null, 2, -1, false );
 
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
@@ -325,7 +325,7 @@ public class DefaultSnapshotRemoverTest
         Metadata mdBefore =
             readMavenMetadata( retrieveFile( snapshots, "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -380,7 +380,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -406,7 +406,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 2, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 2, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -437,7 +437,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 1, -1, false );
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
@@ -550,7 +550,7 @@ public class DefaultSnapshotRemoverTest
     {
         fillInRepo();
 
-        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, 0, false );
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
 
         assertTrue( defaultNexus.removeSnapshots( request ).isSuccessful() );
 
@@ -598,67 +598,4 @@ public class DefaultSnapshotRemoverTest
         return md;
     }
 
-    public void testKeepAllBeforeReleased()
-        throws Exception
-    {
-        File source = new File( getBasedir(), "src/test/resources/reposes/keepall/snapshots" ).getAbsoluteFile();
-        File dest = new File( new URL( snapshots.getLocalUrl() ).toURI() ).getAbsoluteFile();
-        copyDirectory( source, dest );
-
-        // XXX: the test stuff is published on sonatype, so put the real central out of service for test
-        repositoryRegistry.getRepository( "central" ).setLocalStatus( LocalStatus.OUT_OF_SERVICE );
-
-        nexusConfiguration.saveConfiguration();
-
-        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
-
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-20010101.184024-1.jar", Boolean.TRUE );
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-SNAPSHOT.jar", Boolean.TRUE );
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-SNAPSHOT.pom", Boolean.TRUE );
-
-        validateResults( snapshots, expecting );
-
-        // minCountOfSnapshotsToKeep infinite
-        SnapshotRemovalRequest snapshotRemovalRequest =
-            new SnapshotRemovalRequest( snapshots.getId(), null, -1, 0, false );
-
-        SnapshotRemovalResult result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-        assertEquals( 1, result.getProcessedRepositories().size() );
-        assertTrue( result.isSuccessful() );
-        validateResults( snapshots, expecting );
-
-        // removeSnapshotsOlderThanDays infinite
-        snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
-
-        result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-        assertEquals( 1, result.getProcessedRepositories().size() );
-        assertTrue( result.isSuccessful() );
-        validateResults( snapshots, expecting );
-
-        // remove if release (not released yet)
-        snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, -1, -1, true );
-
-        result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-        assertEquals( 1, result.getProcessedRepositories().size() );
-        assertTrue( result.isSuccessful() );
-        validateResults( snapshots, expecting );
-
-        // release
-        File releaseSource = new File( getBasedir(), "src/test/resources/reposes/keepall/releases" ).getAbsoluteFile();
-        File releaseDest = new File( new URL( this.releases.getLocalUrl() ).toURI() ).getAbsoluteFile();
-        copyDirectory( releaseSource, releaseDest );
-
-        // remove if release (released now)
-        snapshotRemovalRequest = new SnapshotRemovalRequest( snapshots.getId(), null, -1, -1, true );
-
-        result = defaultNexus.removeSnapshots( snapshotRemovalRequest );
-        assertEquals( 1, result.getProcessedRepositories().size() );
-        assertTrue( result.isSuccessful() );
-
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-20010101.184024-1.jar", Boolean.FALSE );
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-SNAPSHOT.jar", Boolean.FALSE );
-        expecting.put( "/nexus634/artifact/1.0-SNAPSHOT/artifact-1.0-SNAPSHOT.pom", Boolean.FALSE );
-
-        validateResults( snapshots, expecting );
-    }
 }

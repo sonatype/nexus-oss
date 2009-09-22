@@ -16,7 +16,6 @@ package org.sonatype.nexus.maven.tasks.descriptors.properties;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.tasks.descriptors.properties.AbstractNumberPropertyDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
-import org.sonatype.nexus.util.RegexUtil;
 
 @Component( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays", instantiationStrategy = "per-lookup" )
 public class SnapshotRetentionDaysPropertyDescriptor
@@ -39,11 +38,4 @@ public class SnapshotRetentionDaysPropertyDescriptor
     {
         return "Snapshot retention (days)";
     }
-
-    @Override
-    public String getRegexValidation()
-    {
-        return RegexUtil.BIGGER_THEN_MINUS_ONE;
-    }
-
 }

@@ -33,9 +33,9 @@ public class SnapshotRemoverTask
 {
     public static final String SYSTEM_REMOVE_SNAPSHOTS_ACTION = "REMOVESNAPSHOTS";
 
-    public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 20;
+    public static final int DEFAULT_MIN_SNAPSHOTS_TO_KEEP = 0;
 
-    public static final int DEFAULT_OLDER_THAN_DAYS = 0;
+    public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
     public int getMinSnapshotsToKeep()
     {
@@ -81,25 +81,9 @@ public class SnapshotRemoverTask
         getParameters().put( RemoveIfReleasedPropertyDescriptor.ID, Boolean.toString( removeIfReleaseExists ) );
     }
 
-    @Override
     public SnapshotRemovalResult doRun()
         throws Exception
     {
-        
-        if(getMinSnapshotsToKeep() == 0 && getRemoveOlderThanDays() == 0) {
-            throw new IllegalArgumentException( "Number of snapshots and number of days to be kept can't be both zero." );
-        }
-
-        if ( getMinSnapshotsToKeep() < -1 )
-        {
-            throw new IllegalArgumentException( "Invalid number of snapshots to be kept.  Must be positive, 0 or -1!" );
-        }
-
-        if ( getRemoveOlderThanDays() < -1 )
-        {
-            throw new IllegalArgumentException( "Invalid number of days to be kept.  Must be positive, 0 or -1!" );
-        }
-
         SnapshotRemovalRequest req =
             new SnapshotRemovalRequest( getRepositoryId(), getRepositoryGroupId(), getMinSnapshotsToKeep(),
                                         getRemoveOlderThanDays(), isRemoveIfReleaseExists() );
@@ -107,13 +91,11 @@ public class SnapshotRemoverTask
         return getNexus().removeSnapshots( req );
     }
 
-    @Override
     protected String getAction()
     {
         return SYSTEM_REMOVE_SNAPSHOTS_ACTION;
     }
 
-    @Override
     protected String getMessage()
     {
         if ( getRepositoryGroupId() != null )

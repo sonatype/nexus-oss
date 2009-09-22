@@ -449,12 +449,8 @@ public class DefaultSnapshotRemover
             }
             else
             {
-                if ( request.getMinCountOfSnapshotsToKeep() == -1 || request.getRemoveSnapshotsOlderThanDays() == -1 )
-                {
-                    // delete nothing, there is one keep for ever rule
-                    deletableSnapshotsAndFiles.clear();
-                }
-                else if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
+                // and now check some things
+                if ( remainingSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
                 {
                     // do something
                     if ( remainingSnapshotsAndFiles.size() + deletableSnapshotsAndFiles.size() < request.getMinCountOfSnapshotsToKeep() )
