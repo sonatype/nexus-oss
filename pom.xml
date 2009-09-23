@@ -14,22 +14,10 @@
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   <description>Nexus Maven Site Plugin (Extras).</description>
 
-  <scm>
-    <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-maven-site-plugin</url>
-    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-maven-site-plugin</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-maven-site-plugin</developerConnection>
-  </scm>
-
-  <developers>
-    <developer>
-      <id>cstamas</id>
-      <name>Tamas Cservenak</name>
-      <email>cstamas@sonatype.com</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
+  <properties>
+    <nexus.version>1.4.0-SNAPSHOT</nexus.version>
+    <nexus-licensing-plugin.version>1.4.0-SNAPSHOT</nexus-licensing-plugin.version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -64,6 +52,7 @@
     <dependency>
       <groupId>com.sonatype.nexus.plugin</groupId>
       <artifactId>nexus-licensing-plugin</artifactId>
+      <version>${nexus-licensing-plugin.version}</version>
     </dependency>
   </dependencies>
 
