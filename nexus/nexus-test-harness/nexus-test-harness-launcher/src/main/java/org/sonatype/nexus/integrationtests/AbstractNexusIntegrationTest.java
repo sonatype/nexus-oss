@@ -412,11 +412,6 @@ public class AbstractNexusIntegrationTest
 
         log.info( "starting nexus" );
 
-        if ( nexusLog.exists() )
-        {
-            FileUtils.fileWrite( nexusLog.getAbsolutePath(), "" );
-        }
-
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
         log.info( "***************************" );
@@ -439,6 +434,28 @@ public class AbstractNexusIntegrationTest
                 FileUtils.copyFile( nexusLog, testNexusLog );
             }
             throw e;
+        }
+    }
+
+    @After
+    public void appendLogs()
+        throws Exception
+    {
+        if ( nexusLog.exists() )
+        {
+            File testNexusLog = new File( nexusLogDir, getTestId() + "/nexus.log" );
+            testNexusLog.getParentFile().mkdirs();
+            String data = FileUtils.fileRead( nexusLog );
+            FileUtils.fileAppend( testNexusLog.getAbsolutePath(), data );
+        }
+    }
+
+    private static void resetLog()
+        throws Exception
+    {
+        if ( nexusLog.exists() )
+        {
+            FileUtils.fileWrite( nexusLog.getAbsolutePath(), "" );
         }
     }
 
@@ -585,6 +602,8 @@ public class AbstractNexusIntegrationTest
             staticContainer.dispose();
         }
         staticContainer = null;
+
+        resetLog();
 
         takeSnapshot();
     }
