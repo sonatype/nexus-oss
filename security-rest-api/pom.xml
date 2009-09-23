@@ -13,7 +13,7 @@
   <version>1.0.8-SNAPSHOT</version>
 
   <properties>
-    <plexus-restlet-bridge.version>1.9-SNAPSHOT</plexus-restlet-bridge.version>
+    <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
   </properties>
 
   <dependencies>
