@@ -12,7 +12,7 @@
  */
 package org.sonatype.security.rest.users;
 
-import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -38,13 +38,16 @@ public class UserLocatorComponentListPlexusResource
 {
     @Requirement
     private PlexusContainer container;
-    
+
+    @Requirement( role = UserManager.class )
+    private Map<String, UserManager> userManagers;
+
     @Override
     public Object getPayloadInstance()
     {
         return null;
     }
-    
+
     @Override
     public String getResourceUri()
     {
@@ -56,11 +59,6 @@ public class UserLocatorComponentListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:componentsuserlocatortypes]" );
     }
 
-    protected String getRole( Request request )
-    {
-        return UserManager.class.getName();
-    }
-
     // TODO: this was copied from the Nexus AbstractComponentListPlexusResource
     @SuppressWarnings( "unchecked" )
     @Override
@@ -69,21 +67,18 @@ public class UserLocatorComponentListPlexusResource
     {
         PlexusComponentListResourceResponse result = new PlexusComponentListResourceResponse();
 
-        // get role from request
-        String role = getRole( request );
-
-        // get component descriptors
-        List<ComponentDescriptor<?>> componentMap = container.getComponentDescriptorList( role );
-
-        // check if valid role
-        if ( componentMap == null || componentMap.isEmpty() )
+        if ( userManagers == null || userManagers.isEmpty() )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
 
-        // loop and convert all objects of this role to a PlexusComponentListResource
-        for ( ComponentDescriptor componentDescriptor : componentMap )
+        for ( String hint : userManagers.keySet() )
         {
+            ComponentDescriptor componentDescriptor = container.getComponentDescriptor(
+                UserManager.class,
+                UserManager.class.getName(),
+                hint );
+
             PlexusComponentListResource resource = new PlexusComponentListResource();
 
             resource.setRoleHint( componentDescriptor.getRoleHint() );
