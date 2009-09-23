@@ -13,11 +13,12 @@
  */
 package org.sonatype.nexus.rest.component;
 
-import java.util.List;
+import java.util.Map;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -58,27 +59,34 @@ public abstract class AbstractComponentListPlexusResource
         // get role from request
         String role = getRole( request );
 
-        // get component descriptors
-        List<ComponentDescriptor<?>> componentMap = container.getComponentDescriptorList( role );
+        try
+        {
+            Map<String, Object> components = container.lookupMap( role );
 
-        // check if valid role
-        if ( componentMap == null || componentMap.isEmpty() )
+            if ( components == null || components.isEmpty() )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
+            }
+
+            for ( String hint : components.keySet() )
+            {
+                ComponentDescriptor componentDescriptor = container.getComponentDescriptor( role, hint );
+
+                PlexusComponentListResource resource = new PlexusComponentListResource();
+
+                resource.setRoleHint( componentDescriptor.getRoleHint() );
+                resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) )
+                    ? componentDescriptor.getDescription()
+                    : componentDescriptor.getRoleHint() );
+
+                // add it to the collection
+                result.addData( resource );
+            }
+
+        }
+        catch ( ComponentLookupException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
-        }
-
-        // loop and convert all objects of this role to a PlexusComponentListResource
-        for ( ComponentDescriptor componentDescriptor : componentMap )
-        {
-            PlexusComponentListResource resource = new PlexusComponentListResource();
-
-            resource.setRoleHint( componentDescriptor.getRoleHint() );
-            resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) )
-                ? componentDescriptor.getDescription()
-                : componentDescriptor.getRoleHint() );
-
-            // add it to the collection
-            result.addData( resource );
         }
 
         return result;
