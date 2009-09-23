@@ -212,6 +212,8 @@ Sonatype.repoServer.RepoServer = function(){
         //this.nexusPanel.enable();
       }
       
+      Sonatype.Events.fireEvent( 'nexusNavigationInitComplete', this.nexusPanel );
+      
     },
     
     nexusStatusEvent: function() {

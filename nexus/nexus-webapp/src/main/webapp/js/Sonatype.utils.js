@@ -738,30 +738,27 @@ Sonatype.utils = {
           
           Sonatype.utils.edition = respObj.data.editionLong;
           Sonatype.utils.editionShort = respObj.data.editionShort;
-          
-          var formattedAppName = Sonatype.utils.parseFormattedAppName( respObj.data.formattedAppName );
+          Sonatype.utils.formattedAppName = Sonatype.utils.parseFormattedAppName( respObj.data.formattedAppName );
           
           Ext.get('logo').update('<span>' 
-              + formattedAppName 
+              + Sonatype.utils.formattedAppName 
               + '</span>');
           Sonatype.view.viewport.doLayout();
 
-          if ( !versionOnly ){
-            Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
-            Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
-            Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
-            Sonatype.user.curr.loggedInUserSource = respObj.data.clientPermissions.loggedInUserSource;
-            
-            var availSvrs = Sonatype.config.installedServers;
-            for(var srv in availSvrs) {
-              if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
-                Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
-              }
+          Sonatype.user.curr.repoServer = respObj.data.clientPermissions.permissions;
+          Sonatype.user.curr.isLoggedIn = respObj.data.clientPermissions.loggedIn;
+          Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
+          Sonatype.user.curr.loggedInUserSource = respObj.data.clientPermissions.loggedInUserSource;
+          
+          var availSvrs = Sonatype.config.installedServers;
+          for(var srv in availSvrs) {
+            if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
+              Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
             }
-  
-            var baseUrl = respObj.data.baseUrl;
-            baseUrlMismatch = ( baseUrl.toLowerCase() != window.location.href.substring( 0, baseUrl.length ).toLowerCase() );
           }
+
+          var baseUrl = respObj.data.baseUrl;
+          baseUrlMismatch = ( baseUrl.toLowerCase() != window.location.href.substring( 0, baseUrl.length ).toLowerCase() );
         }
         else {
           Sonatype.utils.version = 'Version unavailable';
@@ -775,25 +772,22 @@ Sonatype.utils = {
         }
         
         Ext.get('version').update(Sonatype.utils.version);
-        if ( !versionOnly ){
 
-          Sonatype.Events.fireEvent('initHeadLinks');
-          
-          Sonatype.view.serverTabPanel.doLayout();
-  
-          if ( baseUrlMismatch && Sonatype.lib.Permissions.checkPermission(
-              'nexus:settings', Sonatype.lib.Permissions.READ ) ) {
-            Sonatype.utils.postWelcomePageAlert(
-              '<b>WARNING:</b> ' +
-              'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
-              'does not match your actual URL! ' +
-              'If you\'re running Apache mod_proxy, here\'s ' +
-              '<a href="http://nexus.sonatype.org/about/faq.html#' +
-              'QHowcanIintegrateNexuswithApacheHttpdandModProxy">' +
-              'more information</a> on configuring Nexus with it.'
-            );
-          }
+        Sonatype.Events.fireEvent('initHeadLinks');
+        
+        Sonatype.view.serverTabPanel.doLayout();
 
+        if ( baseUrlMismatch && Sonatype.lib.Permissions.checkPermission(
+            'nexus:settings', Sonatype.lib.Permissions.READ ) ) {
+          Sonatype.utils.postWelcomePageAlert(
+            '<b>WARNING:</b> ' +
+            'Base URL setting of <a href="' + baseUrl + '">' + baseUrl + '</a> ' +
+            'does not match your actual URL! ' +
+            'If you\'re running Apache mod_proxy, here\'s ' +
+            '<a href="http://nexus.sonatype.org/about/faq.html#' +
+            'QHowcanIintegrateNexuswithApacheHttpdandModProxy">' +
+            'more information</a> on configuring Nexus with it.'
+          );
         }
 
         Sonatype.Events.fireEvent( 'nexusStatus' );
