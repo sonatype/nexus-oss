@@ -296,13 +296,10 @@ public class RepositoryMessageUtil
         {
             RepositoryResource expected = (RepositoryResource) repo;
             CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
-            M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repo.getId() );
+            
 
             Assert.assertEquals( expected.getId(), cRepo.getId() );
-            if ( expected.getChecksumPolicy() != null )
-            {
-                Assert.assertEquals( expected.getChecksumPolicy(), cM2Repo.getChecksumPolicy().name() );
-            }
+            
             Assert.assertEquals( expected.getName(), cRepo.getName() );
 
             ContentClass expectedCc =
@@ -339,7 +336,18 @@ public class RepositoryMessageUtil
                                      cRepo.getRemoteStorage().getUrl() );
             }
 
-            Assert.assertEquals( expected.getRepoPolicy(), cM2Repo.getRepositoryPolicy().name() );
+            // check maven repo props (for not just check everything that is a Repository
+            if( expected.getProvider().matches( "maven[12]" ))
+            {
+                M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repo.getId() );
+                
+                if ( expected.getChecksumPolicy() != null )
+                {
+                    Assert.assertEquals( expected.getChecksumPolicy(), cM2Repo.getChecksumPolicy().name() );
+                }
+                
+                Assert.assertEquals( expected.getRepoPolicy(), cM2Repo.getRepositoryPolicy().name() );    
+            }
         }
 
     }
