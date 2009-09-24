@@ -32,6 +32,10 @@ public class ServerTestFixture
 
     private static final String SERVER_ROOT_RESOURCE_PATH = "index-updater/server-root";
 
+    private static final String SIXTY_TWO_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+    public static final String LONG_PASSWORD = SIXTY_TWO_CHARS + SIXTY_TWO_CHARS;
+
     private final Server server;
 
     public ServerTestFixture( final int port )
@@ -58,7 +62,9 @@ public class ServerTestFixture
 
         HashUserRealm realm = new HashUserRealm( "POC Server" );
         realm.put( "user", "password" );
+        realm.put( "longuser", LONG_PASSWORD );
         realm.addUserToRole( "user", "allowed" );
+        realm.addUserToRole( "longuser", "allowed" );
 
         sh.setUserRealm( realm );
         sh.setConstraintMappings( new ConstraintMapping[] { cm } );

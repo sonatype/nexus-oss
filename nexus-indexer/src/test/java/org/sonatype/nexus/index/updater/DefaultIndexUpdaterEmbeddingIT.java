@@ -99,6 +99,43 @@ public class DefaultIndexUpdaterEmbeddingIT
         }
     }
 
+    public void testAuthenticatedIndexRetrieval_LongAuthorizationHeader()
+        throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
+    {
+        File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
+        basedir.delete();
+        basedir.mkdirs();
+
+        try
+        {
+            IndexingContext ctx = newTestContext( basedir, baseUrl + "protected/" );
+
+            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
+            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
+            {
+                private static final long serialVersionUID = 1L;
+
+                {
+                    setUserName( "longuser" );
+                    setPassword( ServerTestFixture.LONG_PASSWORD );
+                }
+            } );
+            updateRequest.setTransferListener( new TransferListenerFixture() );
+
+            updater.fetchAndUpdateIndex( updateRequest );
+        }
+        finally
+        {
+            try
+            {
+                FileUtils.forceDelete( basedir );
+            }
+            catch ( IOException e )
+            {
+            }
+        }
+    }
+
     public void testBasicHighLatencyIndexRetrieval()
         throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
     {
