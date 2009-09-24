@@ -18,8 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 import junit.framework.TestCase;
 
@@ -358,17 +356,10 @@ public class DefaultIndexUpdaterEmbeddingIT
     {
         // FIXME: Try to detect the port from the system environment.
         int port = -1;
-        try
+        String portStr = System.getProperty( "index-server" );
+        if ( portStr != null )
         {
-            ResourceBundle bundle = ResourceBundle.getBundle( "baseTest" );
-            String portStr = bundle.getString( "index-server" );
-            if ( portStr != null )
-            {
-                port = Integer.parseInt( portStr );
-            }
-        }
-        catch ( MissingResourceException e )
-        {
+            port = Integer.parseInt( portStr );
         }
 
         if ( port < 1024 )

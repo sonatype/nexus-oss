@@ -259,6 +259,10 @@
                   <name>indexerJar</name>
                   <value>${project.build.directory}/${project.artifactId}-${project.version}-cli.jar</value>
                 </property>
+                <property>
+                  <name>index-server</name>
+                  <value>${index-server}</value>
+                </property>
               </systemProperties>
             </configuration>
           </execution>
