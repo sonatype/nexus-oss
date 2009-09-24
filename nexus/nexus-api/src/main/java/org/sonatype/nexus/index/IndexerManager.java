@@ -18,6 +18,8 @@ import java.io.IOException;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public interface IndexerManager
 {
@@ -86,7 +88,18 @@ public interface IndexerManager
     // Publish the used NexusIndexer
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     NexusIndexer getNexusIndexer();
+
+    // ----------------------------------------------------------------------------
+    // adding/removing on the fly
+    // ----------------------------------------------------------------------------
+
+    void addItemToIndex( Repository repository, StorageItem item )
+        throws IOException;
+
+    void removeItemFromIndex( Repository repository, StorageItem item )
+        throws IOException;
 
     // ----------------------------------------------------------------------------
     // Reindexing related (will do local-scan, remote-download, merge, publish)
