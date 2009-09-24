@@ -192,9 +192,11 @@ public class DefaultNexusPluginManager
 
     public PluginManagerResponse activatePlugin( GAVCoordinate pluginCoordinate )
     {
+        PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate, PluginActivationRequest.ACTIVATE );
+
         if ( getActivatedPlugins().containsKey( pluginCoordinate ) )
         {
-            PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate );
+            // already is active, let's play dumb
 
             return response;
         }
@@ -203,15 +205,15 @@ public class DefaultNexusPluginManager
         {
             PluginRepositoryArtifact pluginArtifact = pluginRepositoryManager.resolveArtifact( pluginCoordinate );
 
-            return doActivatePlugin( pluginArtifact );
+            doActivatePlugin( response, pluginArtifact );
+
+            return response;
         }
         catch ( NoSuchPluginRepositoryArtifactException e )
         {
-            PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationResult.ACTIVATED );
+            PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationResult.BROKEN );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
-
-            PluginManagerResponse response = new PluginManagerResponse( pluginCoordinate );
 
             response.addPluginResponse( result );
 
@@ -221,7 +223,8 @@ public class DefaultNexusPluginManager
 
     public PluginManagerResponse deactivatePlugin( GAVCoordinate pluginCoordinates )
     {
-        PluginManagerResponse response = new PluginManagerResponse( pluginCoordinates );
+        PluginManagerResponse response =
+            new PluginManagerResponse( pluginCoordinates, PluginActivationRequest.DEACTIVATE );
 
         PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.DEACTIVATED );
 
@@ -276,10 +279,8 @@ public class DefaultNexusPluginManager
 
     // ==
 
-    protected PluginManagerResponse doActivatePlugin( PluginRepositoryArtifact pluginArtifact )
+    protected void doActivatePlugin( PluginManagerResponse response, PluginRepositoryArtifact pluginArtifact )
     {
-        PluginManagerResponse response = new PluginManagerResponse( pluginArtifact.getCoordinate() );
-
         GAVCoordinate pluginCoordinates = pluginArtifact.getCoordinate();
 
         PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.ACTIVATED );
@@ -299,7 +300,7 @@ public class DefaultNexusPluginManager
 
                 response.addPluginResponse( result );
 
-                return response;
+                return;
             }
 
             // create validator
@@ -339,7 +340,7 @@ public class DefaultNexusPluginManager
             // before going further, we must ensure that we resolved all the dependencies
             if ( !response.isSuccessful() )
             {
-                return response;
+                return;
             }
 
             // add imports
@@ -364,7 +365,7 @@ public class DefaultNexusPluginManager
 
                 discoveryContext.getPluginDescriptor().getImportedPlugins().add( importPlugin );
             }
-            
+
             // glean the realm with plugin JAR only
             try
             {
@@ -459,8 +460,6 @@ public class DefaultNexusPluginManager
         }
 
         response.addPluginResponse( result );
-
-        return response;
     }
 
     /**
@@ -802,7 +801,7 @@ public class DefaultNexusPluginManager
             {
                 PlexusComponentGleanerRequest request =
                     new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
-                
+
                 // ignore implemented interfaces that are not (yet?) on classpath
                 request.setIgnoreNotFoundImplementedInterfaces( true );
 

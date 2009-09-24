@@ -10,11 +10,15 @@ public class PluginManagerResponse
 {
     private final GAVCoordinate originator;
 
+    private final PluginActivationRequest request;
+
     private List<PluginResponse> processedPlugins;
 
-    public PluginManagerResponse( GAVCoordinate originator )
+    public PluginManagerResponse( GAVCoordinate originator, PluginActivationRequest request )
     {
         this.originator = originator;
+
+        this.request = request;
     }
 
     public GAVCoordinate getOriginator()
@@ -33,6 +37,11 @@ public class PluginManagerResponse
         }
 
         return true;
+    }
+
+    public PluginActivationRequest getRequest()
+    {
+        return request;
     }
 
     public void addPluginResponse( PluginResponse response )
@@ -78,14 +87,18 @@ public class PluginManagerResponse
     {
         StringBuilder sb = new StringBuilder();
 
-        sb.append( "Plugin manager action against plugin \"" ).append( getOriginator().toCompositeForm() )
-            .append( "\" execution was: " ).append( isSuccessful() ? "SUCCESFUL" : "NOT SUCCESSFUL" ).append( "\n" );
+        sb.append( "Plugin manager request \"" + getRequest().toString() + "\" on plugin \"" ).append(
+            getOriginator().toCompositeForm() ).append( "\" was " ).append(
+            isSuccessful() ? "succesful." : "FAILED!" );
 
-        sb.append( "Following plugins were processed:\n" );
-
-        for ( PluginResponse response : getProcessedPluginResponses() )
+        if ( detailed || !isSuccessful() )
         {
-            sb.append( response.formatAsString( detailed ) );
+            sb.append( "\nFollowing plugins were processed:\n" );
+
+            for ( PluginResponse response : getProcessedPluginResponses() )
+            {
+                sb.append( response.formatAsString( detailed ) );
+            }
         }
 
         return sb.toString();
