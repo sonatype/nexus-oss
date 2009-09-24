@@ -1,6 +1,5 @@
 package org.sonatype.nexus.index.updater;
 
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -23,53 +22,10 @@ public class FullBootProofOfConcept
 {
 
     public static void main( final String[] args )
-        throws IOException
-    {
-        for ( int i = 0; i < 2; i++ )
-        {
-            File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
-
-            try
-            {
-                run( basedir );
-            }
-            catch ( IOException e )
-            {
-                e.printStackTrace();
-            }
-            catch ( ComponentLookupException e )
-            {
-                e.printStackTrace();
-            }
-            catch ( PlexusContainerException e )
-            {
-                e.printStackTrace();
-            }
-            catch ( ParseException e )
-            {
-                e.printStackTrace();
-            }
-            catch ( UnsupportedExistingLuceneIndexException e )
-            {
-                e.printStackTrace();
-            }
-            finally
-            {
-                try
-                {
-                    FileUtils.forceDelete( basedir );
-                }
-                catch ( IOException e )
-                {
-                }
-            }
-        }
-    }
-
-    public static void run( final File basedir )
         throws IOException, ComponentLookupException, PlexusContainerException, ParseException,
         UnsupportedExistingLuceneIndexException
     {
+        File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
         try
         {
             FileUtils.forceDelete( basedir );
@@ -91,8 +47,7 @@ public class FullBootProofOfConcept
         creators.add( jar );
 
         String repositoryId = "test";
-        String repositoryUrl = "http://repository.sonatype.org/content/groups/sonatype/";
-        // String repositoryUrl = "http://repo1.maven.org/maven2/";
+        String repositoryUrl = "http://repo1.maven.org/maven2/";
         String indexUrl = repositoryUrl + ".index";
 
         IndexingContext ctx =
@@ -100,16 +55,6 @@ public class FullBootProofOfConcept
                                         creators, true );
 
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-        updateRequest.setAuthenticationInfo( new AuthenticationInfo()
-        {
-            private static final long serialVersionUID = 1L;
-
-            {
-                setUserName( "deployment" );
-                setPassword( "mj21op1" );
-            }
-        } );
-
         updateRequest.setTransferListener( new TransferListener()
         {
 

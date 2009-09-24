@@ -5,7 +5,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jetty.client.ContentExchange;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeaders;
-import org.eclipse.jetty.http.HttpMethods;
 import org.eclipse.jetty.io.Buffer;
 import org.eclipse.jetty.io.BufferUtil;
 import org.eclipse.jetty.io.nio.NIOBuffer;
@@ -30,11 +29,13 @@ public class ResourceExchange
 
     private final File targetFile;
 
-    private final String originalUrl;
+    private final int maxRedirects;
 
     private final TransferListenerSupport listenerSupport;
 
     protected long lastModified;
+
+    private int redirectCount = 0;
 
     private boolean redirectionRequested;
 
@@ -44,6 +45,8 @@ public class ResourceExchange
 
     private File tmpFile;
 
+    private String originalUrl;
+
     private TransferEvent transferEvent;
 
     private String contentEncoding;
@@ -52,22 +55,12 @@ public class ResourceExchange
 
     private int contentLength;
 
-    public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final String targetUrl,
+    public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final int maxRedirects,
                              final TransferListenerSupport listenerSupport )
     {
-        this( targetFile, httpHeaders, targetUrl, targetUrl, listenerSupport );
-    }
-
-    public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final String originalUrl,
-                             final String targetUrl, final TransferListenerSupport listenerSupport )
-    {
         super( false );
-
-        setMethod( HttpMethods.GET );
-        setURL( targetUrl );
-
         this.targetFile = targetFile;
-        this.originalUrl = originalUrl;
+        this.maxRedirects = maxRedirects;
         this.listenerSupport = listenerSupport;
 
         addRequestHeaders( httpHeaders );
@@ -114,6 +107,10 @@ public class ResourceExchange
             case HttpHeaders.LOCATION_ORDINAL:
             {
                 redirectionUrl = value.toString();
+
+                System.out.println( redirectionUrl );
+                redirectCount++;
+
                 break;
             }
         }
@@ -128,6 +125,38 @@ public class ResourceExchange
         {
             redirectionRequested = true;
         }
+    }
+
+    public int getMaxRedirects()
+    {
+        return maxRedirects;
+    }
+
+    public int getRedirectCount()
+    {
+        return redirectCount;
+    }
+
+    public boolean prepareForRedirect()
+    {
+        if ( redirectionRequested && redirectCount < maxRedirects )
+        {
+            setURL( redirectionUrl );
+
+            reset();
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public void reset()
+    {
+        super.reset();
+
+        redirectionRequested = false;
+        redirectionUrl = null;
     }
 
     @Override
@@ -171,10 +200,6 @@ public class ResourceExchange
             transferEvent.setTimestamp( System.currentTimeMillis() );
             listenerSupport.fireTransferProgress( transferEvent, content.array(), contentLength );
         }
-        else
-        {
-            System.out.println( "Redirection requested for location: " + redirectionUrl + "\nSkipping response body." );
-        }
     }
 
     private void newTempFile()
@@ -192,8 +217,6 @@ public class ResourceExchange
 
             if ( "gzip".equals( contentEncoding ) )
             {
-                System.out.println( "Unpacking: " + tmpFile + "\nto: " + targetFile );
-
                 InputStream in = null;
                 OutputStream out = null;
                 try
@@ -212,14 +235,12 @@ public class ResourceExchange
             }
             else
             {
-                System.out.println( "Moving: " + tmpFile + "\nto: " + targetFile );
                 if ( targetFile.exists() )
                 {
                     targetFile.delete();
                 }
 
                 tmpFile.renameTo( targetFile );
-                System.out.println( "Move target exists? " + targetFile.exists() );
                 targetFile.setLastModified( lastModified );
             }
 
@@ -227,8 +248,18 @@ public class ResourceExchange
 
             listenerSupport.fireGetCompleted( originalUrl, targetFile );
             transferEvent = null;
-            redirectionRequested = false;
         }
+    }
+
+    @Override
+    public void setURL( final String url )
+    {
+        if ( originalUrl == null )
+        {
+            originalUrl = url;
+        }
+
+        super.setURL( url );
     }
 
     void setResponseContentStream( final InputStream in )
@@ -306,21 +337,6 @@ public class ResourceExchange
     void setContentLength( final int contentLength )
     {
         this.contentLength = contentLength;
-    }
-
-    public String getOriginalUrl()
-    {
-        return originalUrl;
-    }
-
-    public String getRedirectUrl()
-    {
-        return redirectionUrl;
-    }
-
-    public boolean isRedirectRequested()
-    {
-        return redirectionRequested;
     }
 
 }

@@ -11,6 +11,7 @@ import org.eclipse.jetty.client.security.ProxyAuthorization;
 import org.eclipse.jetty.client.security.Realm;
 import org.eclipse.jetty.client.security.RealmResolver;
 import org.eclipse.jetty.http.HttpFields;
+import org.eclipse.jetty.http.HttpMethods;
 import org.sonatype.nexus.index.updater.ResourceFetcher;
 
 import java.io.File;
@@ -23,7 +24,7 @@ public class JettyResourceFetcher
 {
 
     // configuration fields.
-    private int maxConnections = 1;
+    private int maxConnections;
 
     private int connectionTimeout;
 
@@ -52,6 +53,10 @@ public class JettyResourceFetcher
         throws IOException, FileNotFoundException
     {
         HttpFields exchangeHeaders = buildHeaders();
+        ResourceExchange exchange = new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, listenerSupport );
+
+        exchange.setMethod( HttpMethods.GET );
+
         StringBuilder getUrl = new StringBuilder( url );
         if ( getUrl.charAt( getUrl.length() - 1 ) != '/' && !name.startsWith( "/" ) )
         {
@@ -59,28 +64,16 @@ public class JettyResourceFetcher
         }
         getUrl.append( name );
 
-        ResourceExchange exchange =
-            new ResourceExchange( targetFile, exchangeHeaders, getUrl.toString(), listenerSupport );
+        exchange.setURL( getUrl.toString() );
 
-        get( exchange );
-
-        int redirCount = 0;
-        while ( exchange.isRedirectRequested() && redirCount < maxRedirects )
+        exchange = get( exchange );
+        while ( exchange.prepareForRedirect() )
         {
-            String url = exchange.getRedirectUrl();
-
-            exchange = new ResourceExchange( targetFile, exchangeHeaders, getUrl.toString(), url, listenerSupport );
-
-            get( exchange );
-        }
-
-        if ( redirCount == maxRedirects )
-        {
-            throw new IOException( "Maximum redirection count (" + maxRedirects + ") exceeded." );
+            exchange = get( exchange );
         }
     }
 
-    private void get( final ResourceExchange exchange )
+    private ResourceExchange get( final ResourceExchange exchange )
         throws IOException
     {
         httpClient.send( exchange );
@@ -96,15 +89,6 @@ public class JettyResourceFetcher
             throw err;
         }
 
-        try
-        {
-            Thread.sleep( 500 );
-        }
-        catch ( InterruptedException e )
-        {
-            e.printStackTrace();
-        }
-
         int responseStatus = exchange.getResponseStatus();
         switch ( responseStatus )
         {
@@ -115,7 +99,7 @@ public class JettyResourceFetcher
                 break;
 
             case ServerResponse.SC_FORBIDDEN:
-                throw new IOException( "Transfer failed: [" + responseStatus + "] " + exchange.getOriginalUrl() );
+                throw new IOException( "Transfer failed: [" + responseStatus + "] " + url );
 
             case ServerResponse.SC_UNAUTHORIZED:
                 throw new IOException( "Transfer failed: Not authorized" );
@@ -124,17 +108,18 @@ public class JettyResourceFetcher
                 throw new IOException( "Transfer failed: Not authorized by proxy" );
 
             case ServerResponse.SC_NOT_FOUND:
-                throw new IOException( "Transfer failed: " + exchange.getOriginalUrl() + " does not exist" );
+                throw new IOException( "Transfer failed: " + url + " does not exist" );
 
             default:
             {
-                IOException ex =
-                    new IOException( "Transfer failed: [" + responseStatus + "] " + exchange.getOriginalUrl() );
+                IOException ex = new IOException( "Transfer failed: [" + responseStatus + "] " + url );
                 listenerSupport.fireTransferError( url, ex, TransferEvent.REQUEST_GET );
 
                 throw ex;
             }
         }
+
+        return exchange;
     }
 
     public void connect( final String id, final String url )
