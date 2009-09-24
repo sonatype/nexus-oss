@@ -20,6 +20,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * An {@link IndexerManager} that will delegate to the legacy Lucene Indexer ({@link DefaultIndexerManager} in case that
@@ -288,6 +290,18 @@ public class ProxyIndexerManager
         throws IOException, NoSuchRepositoryException
     {
         indexer().updateRepositoryIndexContext( repositoryId );
+    }
+
+    public void addItemToIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        indexer().addItemToIndex( repository, item );
+    }
+
+    public void removeItemFromIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        indexer().removeItemFromIndex( repository, item );
     }
 
 }

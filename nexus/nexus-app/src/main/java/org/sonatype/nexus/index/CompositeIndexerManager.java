@@ -23,6 +23,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * An {@link IndexerManager} that will multiplex calls to all available {@link IndexerManager}s available. <br>
@@ -585,6 +587,38 @@ public class CompositeIndexerManager
             catch ( UnsupportedOperationException ignore )
             {
                 // ignore
+            }
+        }
+    }
+
+    public void addItemToIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        for ( IndexerManager manager : m_managers.values() )
+        {
+            try
+            {
+                manager.addItemToIndex( repository, item );
+            }
+            catch ( IOException e )
+            {
+                // ignore?
+            }
+        }
+    }
+
+    public void removeItemFromIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        for ( IndexerManager manager : m_managers.values() )
+        {
+            try
+            {
+                manager.removeItemFromIndex( repository, item );
+            }
+            catch ( IOException e )
+            {
+                // ignore?
             }
         }
     }

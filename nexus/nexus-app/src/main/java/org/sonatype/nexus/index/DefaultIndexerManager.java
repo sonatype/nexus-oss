@@ -42,7 +42,10 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexCreator;
@@ -57,15 +60,18 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 import org.sonatype.nexus.index.updater.IndexUpdater;
 import org.sonatype.nexus.index.updater.ResourceFetcher;
+import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -127,6 +133,9 @@ public class DefaultIndexerManager
 
     @Requirement
     private IndexArtifactFilter indexArtifactFilter;
+
+    @Requirement
+    private ArtifactContextProducer artifactContextProducer;
 
     @Requirement
     private MimeUtil mimeUtil;
@@ -455,9 +464,180 @@ public class DefaultIndexerManager
     // Publish the used NexusIndexer
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public NexusIndexer getNexusIndexer()
     {
         return nexusIndexer;
+    }
+
+    // ----------------------------------------------------------------------------
+    // adding/removing on the fly
+    // ----------------------------------------------------------------------------
+
+    public void addItemToIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        try
+        {
+            // sadly, the nexus-indexer is maven2 only, hence we check is the repo
+            // from where we get the event is a maven2 repo
+            if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "This is not a MavenRepository instance, will not process it." );
+                }
+
+                return;
+            }
+
+            // should we sync at all
+            IndexingContext context = getRepositoryLocalIndexContext( repository );
+
+            // by calculating GAV we check wether the request is against a repo artifact at all
+            Gav gav =
+                ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+
+            // signatures and hashes are not considered for processing
+            // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+            // emitted events about modifying them
+            if ( context != null && gav != null && !gav.isSignature() && !gav.isHash() )
+            {
+                // if we have a valid indexing context and have access to a File
+                if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
+                {
+                    File file =
+                        ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
+                            new ResourceStoreRequest( item ) );
+
+                    if ( file.exists() )
+                    {
+                        ArtifactContext ac = artifactContextProducer.getArtifactContext( context, file );
+
+                        if ( ac != null )
+                        {
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
+                            }
+
+                            ArtifactInfo ai = ac.getArtifactInfo();
+
+                            if ( ai.sha1 == null )
+                            {
+                                // if repo has no sha1 checksum, odd nexus one
+                                ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                            }
+
+                            getNexusIndexer().addArtifactToIndex( ac, context );
+                        }
+                    }
+                }
+            }
+
+            // finally, propagate to group contexts where this repository is member
+            for ( GroupRepository group : repositoryRegistry.getGroupsOfRepository( repository ) )
+            {
+                try
+                {
+                    addItemToIndex( group, item );
+                }
+                catch ( IOException e )
+                {
+                    // ignore it?
+                }
+            }
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // ignore it
+        }
+    }
+
+    public void removeItemFromIndex( Repository repository, StorageItem item )
+        throws IOException
+    {
+        try
+        {
+            // sadly, the nexus-indexer is maven2 only, hence we check is the repo
+            // from where we get the event is a maven2 repo
+            if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "This is not a MavenRepository instance, will not process it." );
+                }
+
+                return;
+            }
+
+            IndexingContext context = getRepositoryLocalIndexContext( repository );
+
+            // by calculating GAV we check wether the request is against a repo artifact at all
+            Gav gav =
+                ( (MavenRepository) repository ).getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+
+            // signatures and hashes are not considered for processing
+            // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+            // emitted events about modifying them
+            if ( context != null && gav != null && !gav.isSignature() && !gav.isHash() )
+            {
+
+                // NEXUS-814: we should not delete always
+                if ( !item.getItemContext().containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
+                {
+                    ArtifactInfo ai =
+                        new ArtifactInfo( context.getRepositoryId(), gav.getGroupId(), gav.getArtifactId(), gav
+                            .getBaseVersion(), gav.getClassifier() );
+
+                    // store extension if classifier is not empty
+                    if ( !StringUtils.isEmpty( ai.classifier ) )
+                    {
+                        ai.packaging = gav.getExtension();
+                    }
+
+                    ArtifactContext ac = new ArtifactContext( null, null, null, ai, gav );
+
+                    // remove file from index
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+                                + " from index (DELETE)." );
+                    }
+
+                    getNexusIndexer().deleteArtifactFromIndex( ac, context );
+                }
+                else
+                {
+                    // do NOT remove file from index
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "NOT deleting artifact " + gav.getGroupId() + ":" + gav.getArtifactId() + ":"
+                                + gav.getVersion()
+                                + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                    }
+                }
+            }
+
+            // finally, propagate to group contexts where this repository is member
+            for ( GroupRepository group : repositoryRegistry.getGroupsOfRepository( repository ) )
+            {
+                try
+                {
+                    removeItemFromIndex( group, item );
+                }
+                catch ( IOException e )
+                {
+                    // ignore it?
+                }
+            }
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // ignore it
+        }
     }
 
     // ----------------------------------------------------------------------------
@@ -1627,5 +1807,4 @@ public class DefaultIndexerManager
             }
         }
     }
-
 }

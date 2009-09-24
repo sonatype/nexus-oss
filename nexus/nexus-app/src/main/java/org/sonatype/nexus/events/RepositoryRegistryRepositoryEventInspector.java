@@ -15,7 +15,6 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -46,9 +45,6 @@ public class RepositoryRegistryRepositoryEventInspector
     extends AbstractFeedRecorderEventInspector
 {
     @Requirement
-    private Logger logger;
-
-    @Requirement
     private IndexerManager indexerManager;
 
     @Requirement
@@ -58,11 +54,6 @@ public class RepositoryRegistryRepositoryEventInspector
     private NexusScheduler nexusScheduler;
 
     private boolean nexusStarted = false;
-
-    protected Logger getLogger()
-    {
-        return logger;
-    }
 
     protected IndexerManager getIndexerManager()
     {
