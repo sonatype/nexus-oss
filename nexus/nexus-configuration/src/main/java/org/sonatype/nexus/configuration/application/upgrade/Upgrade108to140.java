@@ -596,6 +596,7 @@ public class Upgrade108to140
             newShadow.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
             newShadow.setBrowseable( true );
             newShadow.setIndexable( false );
+            newShadow.setSearchable( false );
             newShadow.setLocalStorage( null );
             newShadow.setMirrors( null );
             newShadow.setNotFoundCacheActive( false );
