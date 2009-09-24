@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -30,12 +31,18 @@ public class Nexus532GroupsCrudValidationTests
     extends AbstractNexusIntegrationTest
 {
 
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
+    }
+
     protected GroupMessageUtil messageUtil;
 
     public Nexus532GroupsCrudValidationTests()
     {
-        this.messageUtil =
-            new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test
@@ -160,7 +167,6 @@ public class Nexus532GroupsCrudValidationTests
         m1Repo.setId( "nexus-test-harness-shadow" );
         resource.addRepository( m1Repo );
 
-
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
         // should fail
@@ -239,8 +245,6 @@ public class Nexus532GroupsCrudValidationTests
         Response response = null;
         String responseText = null;
 
-
-
         // no groups
         resource.getRepositories().clear();
         response = this.messageUtil.sendMessage( Method.PUT, resource );
@@ -269,9 +273,9 @@ public class Nexus532GroupsCrudValidationTests
         responseText = response.getEntity().getText();
 
         Assert.assertTrue( "Group should have been udpated: " + response.getStatus() + "\n" + responseText,
-                            response.getStatus().isSuccess() );
+                           response.getStatus().isSuccess() );
         Assert.assertEquals( "Group Name did not default to the Id", resource.getId(),
-            this.messageUtil.getGroup( resource.getId() ).getName() );
+                             this.messageUtil.getGroup( resource.getId() ).getName() );
 
     }
 
