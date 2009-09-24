@@ -267,7 +267,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) )
+        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
         {
             return;
         }
@@ -282,7 +282,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) )
+        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
         {
             return;
         }
@@ -403,7 +403,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) )
+        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
         {
             return;
         }
@@ -486,6 +486,17 @@ public class DefaultIndexerManager
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "This is not a MavenRepository instance, will not process it." );
+                }
+
+                return;
+            }
+            
+            if ( !repository.isIndexable() )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug( "Repository '" + repository.getId() + "' is not indexable, will not process it." );
                 }
 
                 return;
