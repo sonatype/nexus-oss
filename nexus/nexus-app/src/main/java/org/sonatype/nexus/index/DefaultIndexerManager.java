@@ -282,7 +282,9 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
+        // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
+        // the repo might be already non-indexable, but the context would still exist!
+        if ( !isIndexingSupported( repository ) )
         {
             return;
         }
@@ -311,16 +313,20 @@ public class DefaultIndexerManager
             removeRepositoryIndexContext( repositoryId, false );
         }
 
-        if ( ctx == null
-            || ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository
-                .isSearchable() ) )
+        // we have to handle "transition" in configuration (indexable true->false)
+        if ( repository.isIndexable() )
         {
-            // recreate the context
-            addRepositoryIndexContext( repositoryId );
-        }
+            if ( ctx == null
+                || ( !ctx.getRepository().getAbsolutePath().equals( repoRoot.getAbsolutePath() ) || ctx.isSearchable() != repository
+                    .isSearchable() ) )
+            {
+                // recreate the context
+                addRepositoryIndexContext( repositoryId );
+            }
 
-        // set include in search/indexable
-        setRepositoryIndexContextSearchable( repositoryId, repository.isSearchable() );
+            // set include in search/indexable
+            setRepositoryIndexContextSearchable( repositoryId, repository.isSearchable() );
+        }
     }
 
     private IndexingContext mergeContexts( IndexingContext... contexts )
@@ -403,7 +409,9 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
+        // cannot do "!repository.isIndexable()" since we may be called to handle that config change (using events)!
+        // the repo might be already non-indexable, but the context would still exist!
+        if ( !isIndexingSupported( repository ) )
         {
             return;
         }
@@ -412,15 +420,19 @@ public class DefaultIndexerManager
 
         IndexingContext rctx = getRepositoryRemoteIndexContext( repository );
 
-        if ( getLogger().isDebugEnabled() )
+        // do this only if we have contexts, otherwise be muted
+        if ( ctx != null && rctx != null )
         {
-            getLogger().debug(
-                "Searching on repository ID='" + repositoryId + "' is set to: " + String.valueOf( searchable ) );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Searching on repository ID='" + repositoryId + "' is set to: " + String.valueOf( searchable ) );
+            }
+
+            ctx.setSearchable( searchable );
+
+            rctx.setSearchable( searchable );
         }
-
-        ctx.setSearchable( searchable );
-
-        rctx.setSearchable( searchable );
     }
 
     /**
@@ -479,6 +491,18 @@ public class DefaultIndexerManager
     {
         try
         {
+            // do the "cheaper" check 1st
+            if ( !repository.isIndexable() )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug( "Repository '" + repository.getId() + "' is not indexable, will not process it." );
+                }
+
+                return;
+            }
+
             // sadly, the nexus-indexer is maven2 only, hence we check is the repo
             // from where we get the event is a maven2 repo
             if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
@@ -486,17 +510,6 @@ public class DefaultIndexerManager
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug( "This is not a MavenRepository instance, will not process it." );
-                }
-
-                return;
-            }
-            
-            if ( !repository.isIndexable() )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger()
-                        .debug( "Repository '" + repository.getId() + "' is not indexable, will not process it." );
                 }
 
                 return;
@@ -570,6 +583,18 @@ public class DefaultIndexerManager
     {
         try
         {
+            // do the "cheaper" check 1st
+            if ( !repository.isIndexable() )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger()
+                        .debug( "Repository '" + repository.getId() + "' is not indexable, will not process it." );
+                }
+
+                return;
+            }
+
             // sadly, the nexus-indexer is maven2 only, hence we check is the repo
             // from where we get the event is a maven2 repo
             if ( !isIndexingSupported( repository ) || !MavenRepository.class.isAssignableFrom( repository.getClass() ) )
