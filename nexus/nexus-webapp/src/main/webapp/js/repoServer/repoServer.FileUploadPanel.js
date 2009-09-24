@@ -952,7 +952,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   
   if ( rec.data.exposed && rec.data.resourceURI && rec.data.userManaged &&
       sp.checkPermission( 'nexus:artifact', sp.CREATE ) &&
-      rec.data.repoType == 'hosted' && rec.data.repoPolicy.toUpperCase() == 'RELEASE' ) {
+      rec.data.repoType == 'hosted' && rec.data.repoPolicy && rec.data.repoPolicy.toUpperCase() == 'RELEASE' ) {
     
     Ext.Ajax.request({
       url: rec.data.resourceURI,

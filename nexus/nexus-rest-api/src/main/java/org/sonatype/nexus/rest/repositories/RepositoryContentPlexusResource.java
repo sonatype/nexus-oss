@@ -18,6 +18,7 @@ import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -31,6 +32,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 public class RepositoryContentPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
+    private static final String USE_WELCOME_FILES = "useWelcomeFiles";
 
     public RepositoryContentPlexusResource()
     {
@@ -67,6 +69,17 @@ public class RepositoryContentPlexusResource
     {
         return getUnprotectedRepositoryRegistry().getRepository(
             request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
+    }
+    
+    @Override
+    protected ResourceStoreRequest getResourceStoreRequest( Request request, String resourceStorePath )
+    {
+        ResourceStoreRequest resourceStoreRequest = super.getResourceStoreRequest( request, resourceStorePath );
+        
+        // welcome files should not be used with this resource.
+        resourceStoreRequest.getRequestContext().put( USE_WELCOME_FILES, Boolean.FALSE );
+        
+        return resourceStoreRequest;
     }
 
 }

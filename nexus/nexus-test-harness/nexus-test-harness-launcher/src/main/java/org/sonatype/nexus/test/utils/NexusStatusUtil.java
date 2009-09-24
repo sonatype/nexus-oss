@@ -237,7 +237,7 @@ public class NexusStatusUtil
         log.info( "wait for Nexus start" );
         for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
         {
-            log.debug( "wait for Nexus start, attempt: " + i );
+//            log.debug( "wait for Nexus start, attempt: " + i );
             try
             {
                 if ( isNexusRunning() )

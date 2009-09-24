@@ -35,6 +35,8 @@ public abstract class AbstractWebSiteRepository
     extends AbstractRepository
     implements WebSiteRepository
 {
+    private static final String USE_WELCOME_FILES = "useWelcomeFiles";
+    
     @Override
     protected AbstractWebSiteRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
@@ -54,12 +56,14 @@ public abstract class AbstractWebSiteRepository
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
-    {
+    {   
         StorageItem result = super.doRetrieveItem( request );
 
         List<String> wf = getWelcomeFiles();
-
-        if ( result instanceof StorageCollectionItem && wf.size() > 0 )
+        
+        boolean useWelcomeFiles = !request.getRequestContext().containsKey( USE_WELCOME_FILES ) || Boolean.TRUE.equals( request.getRequestContext().get( USE_WELCOME_FILES ) );
+        
+        if ( useWelcomeFiles && result instanceof StorageCollectionItem && wf.size() > 0 )
         {
             // it is a collection, check for one of the "welcome" files
             Collection<StorageItem> collItems = list( false, (StorageCollectionItem) result );
