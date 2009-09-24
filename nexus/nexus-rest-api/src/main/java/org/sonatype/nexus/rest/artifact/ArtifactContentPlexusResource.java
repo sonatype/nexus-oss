@@ -13,8 +13,12 @@
  */
 package org.sonatype.nexus.rest.artifact;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
+import org.restlet.data.MediaType;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
@@ -29,6 +33,12 @@ public class ArtifactContentPlexusResource
     public ArtifactContentPlexusResource()
     {
         this.setModifiable( true );
+    }
+    
+    @Override
+    public List<Variant> getVariants()
+    {
+        return Collections.singletonList( new Variant( MediaType.TEXT_HTML ) );
     }
 
     @Override

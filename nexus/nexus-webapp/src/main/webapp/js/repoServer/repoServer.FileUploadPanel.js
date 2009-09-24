@@ -901,7 +901,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
 
         //This is a hack to get around the fact that upload submit always returns
         //success = true
-        if ( response.responseXML.title == '' ) {
+        if ( response.responseText.toLowerCase().indexOf('<error>') == -1 ) {
           if ( lastItem ) {
             Sonatype.MessageBox.show({
               title: 'Upload Complete',
@@ -926,8 +926,8 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
         else {
           var s = 'Artifact upload failed.<br />';
           var r = response.responseText;
-          var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
-          var n2 = r.toLowerCase().indexOf( '</h3>' );
+          var n1 = r.toLowerCase().indexOf( '<error>' ) + 7;
+          var n2 = r.toLowerCase().indexOf( '</error>' );
           if ( n2 > n1 ) {
             s += r.substring( n1, n2 );
           }
