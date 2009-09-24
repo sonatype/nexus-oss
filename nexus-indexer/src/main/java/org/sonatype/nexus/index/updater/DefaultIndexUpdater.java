@@ -5,21 +5,6 @@
  */
 package org.sonatype.nexus.index.updater;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
@@ -51,6 +36,22 @@ import org.sonatype.nexus.index.context.NexusAnalyzer;
 import org.sonatype.nexus.index.context.NexusIndexWriter;
 import org.sonatype.nexus.index.incremental.IncrementalHandler;
 import org.sonatype.nexus.index.updater.IndexDataReader.IndexDataReadResult;
+import org.sonatype.nexus.index.updater.jetty.JettyResourceFetcher;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+import java.util.TimeZone;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * A default index updater implementation
@@ -66,13 +67,10 @@ public class DefaultIndexUpdater
     @Requirement( role = IncrementalHandler.class )
     IncrementalHandler incrementalHandler;
 
-    @Requirement
-    private WagonManager wagonManager;
-
     @Requirement( role = IndexUpdateSideEffect.class )
     private List<IndexUpdateSideEffect> sideEffects;
 
-    public Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
+    public Date fetchAndUpdateIndex( final IndexUpdateRequest updateRequest )
         throws IOException
     {
         ResourceFetcher fetcher = updateRequest.getResourceFetcher();
@@ -82,9 +80,9 @@ public class DefaultIndexUpdater
         if( fetcher == null )
         {
             fetcher =
-                new WagonFetcher( wagonManager, updateRequest.getTransferListener(), updateRequest
-                    .getAuthenticationInfo(), updateRequest.getProxyInfo()
-                );
+                new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() )
+                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
+                                          .setProxyInfo( updateRequest.getProxyInfo() );
 
             updateRequest.setResourceFetcher( fetcher );
         }
@@ -156,7 +154,8 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
      */
-    public Date fetchAndUpdateIndex( IndexingContext context, TransferListener listener )
+    @Deprecated
+    public Date fetchAndUpdateIndex( final IndexingContext context, final TransferListener listener )
         throws IOException
     {
         return fetchAndUpdateIndex( context, listener, null );
@@ -165,17 +164,19 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchAndUpdateIndex(IndexingContext, ResourceFetcher)}
      */
-    public Date fetchAndUpdateIndex( final IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
+    @Deprecated
+    public Date fetchAndUpdateIndex( final IndexingContext context, final TransferListener listener, final ProxyInfo proxyInfo )
         throws IOException
     {
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
-        updateRequest.setResourceFetcher( new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
+        updateRequest.setResourceFetcher( new JettyResourceFetcher().addTransferListener( listener )
+                                                                    .setProxyInfo( proxyInfo ) );
 
         return fetchAndUpdateIndex( updateRequest );
     }
 
-    public Properties fetchIndexProperties( IndexingContext context, ResourceFetcher fetcher )
+    public Properties fetchIndexProperties( final IndexingContext context, final ResourceFetcher fetcher )
         throws IOException
     {
         fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
@@ -193,13 +194,15 @@ public class DefaultIndexUpdater
     /**
      * @deprecated use {@link #fetchIndexProperties(IndexingContext, ResourceFetcher)}
      */
-    public Properties fetchIndexProperties( IndexingContext context, TransferListener listener, ProxyInfo proxyInfo )
+    @Deprecated
+    public Properties fetchIndexProperties( final IndexingContext context, final TransferListener listener, final ProxyInfo proxyInfo )
         throws IOException
     {
-        return fetchIndexProperties( context, new WagonFetcher( wagonManager, listener, null, proxyInfo ) );
+        return fetchIndexProperties( context, new JettyResourceFetcher().addTransferListener( listener )
+                                                                        .setProxyInfo( proxyInfo ) );
     }
 
-    private Date loadIndexDirectory( IndexUpdateRequest updateRequest, boolean merge, String remoteIndexFile )
+    private Date loadIndexDirectory( final IndexUpdateRequest updateRequest, final boolean merge, final String remoteIndexFile )
         throws IOException
     {
         File indexArchive = File.createTempFile( remoteIndexFile, "" );
@@ -290,7 +293,7 @@ public class DefaultIndexUpdater
      * @param directory Lucene <code>Directory</code> to unpack index data to
      * @return {@link Date} of the index update or null if it can't be read
      */
-    public static Date unpackIndexArchive( InputStream is, Directory directory, IndexingContext context )
+    public static Date unpackIndexArchive( final InputStream is, final Directory directory, final IndexingContext context )
         throws IOException
     {
         File indexArchive = File.createTempFile( "nexus-index", "" );
@@ -318,7 +321,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void unpackDirectory( Directory directory, InputStream is )
+    private static void unpackDirectory( final Directory directory, final InputStream is )
         throws IOException
     {
         byte[] buf = new byte[4096];
@@ -360,7 +363,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void copyUpdatedDocuments( Directory sourcedir, Directory targetdir, IndexingContext context )
+    private static void copyUpdatedDocuments( final Directory sourcedir, final Directory targetdir, final IndexingContext context )
         throws CorruptIndexException, LockObtainFailedException, IOException
     {
         IndexWriter w = null;
@@ -388,7 +391,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private static void filterDirectory( Directory directory, DocumentFilter filter )
+    private static void filterDirectory( final Directory directory, final DocumentFilter filter )
         throws IOException
     {
         IndexReader r = null;
@@ -434,7 +437,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    private Properties loadLocallyStoredRemoteProperties( IndexingContext context )
+    private Properties loadLocallyStoredRemoteProperties( final IndexingContext context )
     {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
 
@@ -464,7 +467,7 @@ public class DefaultIndexUpdater
         return null;
     }
 
-    private Properties downloadIndexProperties( IndexingContext context, ResourceFetcher fetcher )
+    private Properties downloadIndexProperties( final IndexingContext context, final ResourceFetcher fetcher )
         throws IOException
     {
         String remoteIndexProperties = IndexingContext.INDEX_FILE + ".properties";
@@ -491,7 +494,7 @@ public class DefaultIndexUpdater
         }
     }
 
-    public Date getTimestamp( Properties properties, String key )
+    public Date getTimestamp( final Properties properties, final String key )
     {
         String indexTimestamp = properties.getProperty( key );
 
@@ -517,7 +520,7 @@ public class DefaultIndexUpdater
      * @param w a writer to save index data
      * @param ics a collection of index creators for updating unpacked documents.
      */
-    public static Date unpackIndexData( InputStream is, Directory d, IndexingContext context )
+    public static Date unpackIndexData( final InputStream is, final Directory d, final IndexingContext context )
         throws IOException
     {
         NexusIndexWriter w = new NexusIndexWriter( d, new NexusAnalyzer(), true );
@@ -551,8 +554,8 @@ public class DefaultIndexUpdater
 
         private Wagon wagon = null;
 
-        public WagonFetcher( WagonManager wagonManager, TransferListener listener,
-                             AuthenticationInfo authenticationInfo, ProxyInfo proxyInfo )
+        public WagonFetcher( final WagonManager wagonManager, final TransferListener listener,
+                             final AuthenticationInfo authenticationInfo, final ProxyInfo proxyInfo )
         {
             this.wagonManager = wagonManager;
             this.listener = listener;
@@ -560,7 +563,7 @@ public class DefaultIndexUpdater
             this.proxyInfo = proxyInfo;
         }
 
-        public void connect( String id, String url )
+        public void connect( final String id, final String url )
             throws IOException
         {
             Repository repository = new Repository( id, url );
@@ -629,7 +632,7 @@ public class DefaultIndexUpdater
             }
         }
 
-        public void retrieve( String name, File targetFile )
+        public void retrieve( final String name, final File targetFile )
             throws IOException, FileNotFoundException
         {
             try
@@ -656,7 +659,7 @@ public class DefaultIndexUpdater
             }
         }
 
-        private void logError( String msg, Exception ex )
+        private void logError( final String msg, final Exception ex )
         {
             if( listener != null )
             {

@@ -11,7 +11,6 @@ import org.eclipse.jetty.client.security.ProxyAuthorization;
 import org.eclipse.jetty.client.security.Realm;
 import org.eclipse.jetty.client.security.RealmResolver;
 import org.eclipse.jetty.http.HttpFields;
-import org.eclipse.jetty.http.HttpMethods;
 import org.sonatype.nexus.index.updater.ResourceFetcher;
 
 import java.io.File;
@@ -26,7 +25,9 @@ public class JettyResourceFetcher
     // configuration fields.
     private int maxConnections;
 
-    private int connectionTimeout;
+    private int connectionTimeoutMs = 30000; // 30 seconds
+
+    private int transactionTimeoutMs = 60 * 30 * 1000; // 30 minutes.
 
     private boolean useCache;
 
@@ -53,9 +54,6 @@ public class JettyResourceFetcher
         throws IOException, FileNotFoundException
     {
         HttpFields exchangeHeaders = buildHeaders();
-        ResourceExchange exchange = new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, listenerSupport );
-
-        exchange.setMethod( HttpMethods.GET );
 
         StringBuilder getUrl = new StringBuilder( url );
         if ( getUrl.charAt( getUrl.length() - 1 ) != '/' && !name.startsWith( "/" ) )
@@ -64,7 +62,8 @@ public class JettyResourceFetcher
         }
         getUrl.append( name );
 
-        exchange.setURL( getUrl.toString() );
+        ResourceExchange exchange =
+            new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, getUrl.toString(), listenerSupport );
 
         exchange = get( exchange );
         while ( exchange.prepareForRedirect() )
@@ -76,21 +75,22 @@ public class JettyResourceFetcher
     private ResourceExchange get( final ResourceExchange exchange )
         throws IOException
     {
+        String url = exchange.getOriginalUrl();
         httpClient.send( exchange );
-        synchronized ( exchange.getLock() )
+        try
         {
-            try
+            if ( !exchange.waitFor( transactionTimeoutMs ) )
             {
-                exchange.getLock().wait();
-                // exchange.waitForDone();
+                listenerSupport.fireTransferError( url, new IOException( "Transaction timed out." ),
+                                                   TransferEvent.REQUEST_GET );
             }
-            catch ( InterruptedException e )
-            {
-                IOException err = new IOException( "Transfer interrupted: " + e.getMessage() );
-                err.initCause( e );
+        }
+        catch ( InterruptedException e )
+        {
+            IOException err = new IOException( "Transfer interrupted: " + e.getMessage() );
+            err.initCause( e );
 
-                throw err;
-            }
+            throw err;
         }
 
         int responseStatus = exchange.getResponseStatus();
@@ -140,9 +140,10 @@ public class JettyResourceFetcher
         {
             httpClient.setMaxConnectionsPerAddress( maxConnections );
         }
-        if ( connectionTimeout > 0 )
+
+        if ( connectionTimeoutMs > 0 )
         {
-            httpClient.setTimeout( connectionTimeout );
+            httpClient.setTimeout( connectionTimeoutMs );
         }
 
         httpClient.registerListener( NtlmListener.class.getName() );
@@ -304,14 +305,14 @@ public class JettyResourceFetcher
         return this;
     }
 
-    public int getConnectionTimeout()
+    public int getConnectionTimeoutMillis()
     {
-        return connectionTimeout;
+        return connectionTimeoutMs;
     }
 
-    public JettyResourceFetcher setConnectionTimeout( final int connectionTimeout )
+    public JettyResourceFetcher setConnectionTimeoutMillis( final int connectionTimeoutMs )
     {
-        this.connectionTimeout = connectionTimeout;
+        this.connectionTimeoutMs = connectionTimeoutMs;
         return this;
     }
 
@@ -368,6 +369,16 @@ public class JettyResourceFetcher
         }
 
         return result;
+    }
+
+    public int getTransactionTimeoutMillis()
+    {
+        return transactionTimeoutMs;
+    }
+
+    public void setTransactionTimeoutMillis( final int transactionTimeoutMs )
+    {
+        this.transactionTimeoutMs = transactionTimeoutMs;
     }
 
 }

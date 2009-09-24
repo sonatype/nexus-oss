@@ -5,6 +5,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.eclipse.jetty.client.ContentExchange;
 import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeaders;
+import org.eclipse.jetty.http.HttpMethods;
 import org.eclipse.jetty.io.Buffer;
 import org.eclipse.jetty.io.BufferUtil;
 import org.eclipse.jetty.io.nio.NIOBuffer;
@@ -45,7 +46,7 @@ public class ResourceExchange
 
     private File tmpFile;
 
-    private String originalUrl;
+    private final String originalUrl;
 
     private TransferEvent transferEvent;
 
@@ -57,10 +58,23 @@ public class ResourceExchange
 
     private final Object lock = new Object();
 
+    private boolean locked = true;
+
     public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final int maxRedirects,
+                             final String url, final TransferListenerSupport listenerSupport )
+    {
+        this( targetFile, httpHeaders, maxRedirects, url, url, listenerSupport );
+    }
+
+    public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final int maxRedirects,
+                             final String url, final String originalUrl,
                              final TransferListenerSupport listenerSupport )
     {
         super( false );
+        setMethod( HttpMethods.GET );
+        setURL( url );
+
+        this.originalUrl = originalUrl;
         this.targetFile = targetFile;
         this.maxRedirects = maxRedirects;
         this.listenerSupport = listenerSupport;
@@ -159,6 +173,7 @@ public class ResourceExchange
 
         redirectionRequested = false;
         redirectionUrl = null;
+        locked = true;
     }
 
     @Override
@@ -252,21 +267,8 @@ public class ResourceExchange
             transferEvent = null;
         }
 
-        synchronized ( lock )
-        {
-            lock.notify();
-        }
-    }
-
-    @Override
-    public void setURL( final String url )
-    {
-        if ( originalUrl == null )
-        {
-            originalUrl = url;
-        }
-
-        super.setURL( url );
+        locked = false;
+        releaseWait();
     }
 
     void setResponseContentStream( final InputStream in )
@@ -346,9 +348,68 @@ public class ResourceExchange
         this.contentLength = contentLength;
     }
 
-    public Object getLock()
+    public boolean waitFor( final int transactionTimeoutMs )
+        throws InterruptedException
     {
-        return lock;
+        if ( locked )
+        {
+            synchronized ( lock )
+            {
+                lock.wait( transactionTimeoutMs );
+            }
+
+            return !locked;
+        }
+
+        return true;
+    }
+
+    public String getOriginalUrl()
+    {
+        return originalUrl;
+    }
+
+    @Override
+    protected void onExpire()
+    {
+        super.onExpire();
+        listenerSupport.fireTransferError( originalUrl, new IOException( "Connection timed out." ),
+                                           TransferEvent.REQUEST_GET );
+        releaseWait();
+    }
+
+    private void releaseWait()
+    {
+        synchronized ( lock )
+        {
+            lock.notify();
+        }
+    }
+
+    @Override
+    protected void onConnectionFailed( final Throwable x )
+    {
+        super.onConnectionFailed( x );
+
+        IOException e = new IOException( x.getLocalizedMessage() );
+        e.initCause( x );
+
+        listenerSupport.fireTransferError( originalUrl, e, TransferEvent.REQUEST_GET );
+
+        releaseWait();
+    }
+
+    @Override
+    protected void onException( final Throwable x )
+    {
+        super.onException( x );
+
+        IOException e = new IOException( x.getLocalizedMessage() );
+        e.initCause( x );
+
+        listenerSupport.fireTransferError( originalUrl, e, TransferEvent.REQUEST_GET );
+
+        releaseWait();
     }
 
 }

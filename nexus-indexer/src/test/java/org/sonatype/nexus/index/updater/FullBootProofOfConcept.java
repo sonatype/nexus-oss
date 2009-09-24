@@ -26,7 +26,7 @@ public class FullBootProofOfConcept
     public static void main( final String[] args )
         throws IOException
     {
-        for ( int i = 0; i < 2; i++ )
+        for ( int i = 0; i < 1; i++ )
         {
             File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
 
@@ -92,7 +92,9 @@ public class FullBootProofOfConcept
         creators.add( jar );
 
         String repositoryId = "test";
-        String repositoryUrl = "http://repository.sonatype.org/content/groups/public/";
+        String repositoryUrl = "http://localhost:8081/nexus/content/groups/sonatype-public/";
+        // String repositoryUrl = "http://repository.sonatype.org/content/groups/public/";
+        // String repositoryUrl = "http://repository.sonatype.org/content/groups/sonatype/";
         String indexUrl = repositoryUrl + ".index";
 
         IndexingContext ctx =
