@@ -86,6 +86,11 @@ public abstract class AbstractComponentListPlexusResource
         }
         catch ( ComponentLookupException e )
         {
+            if ( this.getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Unable to look up plexus component with role '" + "1" + "'.", e );
+            }
+            
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
 

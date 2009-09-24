@@ -17,17 +17,16 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 public class ComponentPlexusResourceTest
-    extends PlexusTestCase
+    extends AbstractNexusTestCase
 {
-
     private AbstractComponentListPlexusResource getComponentPlexusResource()
         throws Exception
     {
