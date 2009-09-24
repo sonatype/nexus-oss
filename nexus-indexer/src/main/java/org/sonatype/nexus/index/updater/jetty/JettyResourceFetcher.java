@@ -70,6 +70,11 @@ public class JettyResourceFetcher
         {
             exchange = get( exchange );
         }
+
+        if ( exchange.isRedirectionPrevented() )
+        {
+            throw new IOException( "Too many redirects (" + exchange.getRedirectCount() + ")." );
+        }
     }
 
     private ResourceExchange get( final ResourceExchange exchange )
@@ -79,6 +84,7 @@ public class JettyResourceFetcher
         httpClient.send( exchange );
         try
         {
+            // TODO: This should happen outside of the whole get/redirect loop, to enforce overall transaction timeout.
             if ( !exchange.waitFor( transactionTimeoutMs ) )
             {
                 listenerSupport.fireTransferError( url, new IOException( "Transaction timed out." ),
@@ -91,6 +97,12 @@ public class JettyResourceFetcher
             err.initCause( e );
 
             throw err;
+        }
+
+        if ( !exchange.isFinished() )
+        {
+            exchange.cancel();
+            throw new IOException( "Transfer timed out." );
         }
 
         int responseStatus = exchange.getResponseStatus();
@@ -376,9 +388,10 @@ public class JettyResourceFetcher
         return transactionTimeoutMs;
     }
 
-    public void setTransactionTimeoutMillis( final int transactionTimeoutMs )
+    public JettyResourceFetcher setTransactionTimeoutMillis( final int transactionTimeoutMs )
     {
         this.transactionTimeoutMs = transactionTimeoutMs;
+        return this;
     }
 
 }

@@ -166,11 +166,17 @@ public class ResourceExchange
         return false;
     }
 
+    public boolean isRedirectionPrevented()
+    {
+        return redirectionRequested && redirectCount >= maxRedirects;
+    }
+
     @Override
     public void reset()
     {
         super.reset();
 
+        responseCode = -1;
         redirectionRequested = false;
         redirectionUrl = null;
         locked = true;
@@ -410,6 +416,11 @@ public class ResourceExchange
         listenerSupport.fireTransferError( originalUrl, e, TransferEvent.REQUEST_GET );
 
         releaseWait();
+    }
+
+    public boolean isFinished()
+    {
+        return !locked;
     }
 
 }
