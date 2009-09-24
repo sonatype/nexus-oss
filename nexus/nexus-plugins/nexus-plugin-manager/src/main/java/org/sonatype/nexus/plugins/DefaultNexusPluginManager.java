@@ -364,6 +364,16 @@ public class DefaultNexusPluginManager
 
                 discoveryContext.getPluginDescriptor().getImportedPlugins().add( importPlugin );
             }
+            
+            // glean the realm with plugin JAR only
+            try
+            {
+                findComponents( discoveryContext );
+            }
+            catch ( GleanerException e )
+            {
+                throw new InvalidPluginException( discoveryContext.getPluginDescriptor().getPluginCoordinates(), e );
+            }
 
             // get classpath dependecies (not inter-plugin but other libs, jars)
             List<File> dependencies =
@@ -401,7 +411,7 @@ public class DefaultNexusPluginManager
             // "real work" starts here
 
             // do all kind of discoveries needed
-            discoverPluginComponents( discoveryContext );
+            discoverPlexusPluginComponents( discoveryContext );
 
             // validate it
             validatePlugin( discoveryContext );
@@ -680,14 +690,14 @@ public class DefaultNexusPluginManager
     // Component Discovery
     // ==
 
-    public List<ComponentDescriptor<?>> discoverPluginComponents( PluginDiscoveryContext pluginDiscoveryContext )
+    public List<ComponentDescriptor<?>> discoverPlexusPluginComponents( PluginDiscoveryContext pluginDiscoveryContext )
         throws InvalidPluginException, IOException
     {
         try
         {
             List<ComponentDescriptor<?>> discoveredComponentDescriptors = new ArrayList<ComponentDescriptor<?>>();
 
-            PluginDescriptor pluginDescriptor = findComponents( pluginDiscoveryContext );
+            // findComponents( pluginDiscoveryContext );
 
             // HACK -- START
             // to enable "backward compatibility, nexus plugins that are written plexus-way", but circumvent the plexus
@@ -709,16 +719,13 @@ public class DefaultNexusPluginManager
             // HACK -- END
 
             // collecting
-            for ( ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents() )
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor()
+                .getComponents() )
             {
                 discoveredComponentDescriptors.add( componentDescriptor );
             }
 
             return discoveredComponentDescriptors;
-        }
-        catch ( GleanerException e )
-        {
-            throw new InvalidPluginException( pluginDiscoveryContext.getPluginDescriptor().getPluginCoordinates(), e );
         }
         catch ( CycleDetectedInComponentGraphException e )
         {
@@ -744,7 +751,7 @@ public class DefaultNexusPluginManager
     // Component discovery
     // ==
 
-    protected PluginDescriptor findComponents( PluginDiscoveryContext pluginDiscoveryContext )
+    protected void findComponents( PluginDiscoveryContext pluginDiscoveryContext )
         throws GleanerException, IOException
     {
         PluginDescriptor pluginDescriptor = pluginDiscoveryContext.getPluginDescriptor();
@@ -780,8 +787,6 @@ public class DefaultNexusPluginManager
                 cd.setRealm( pluginDescriptor.getPluginRealm() );
             }
         }
-
-        return pluginDescriptor;
     }
 
     protected void convertPluginMetadata( PluginDiscoveryContext pluginDiscoveryContext )
@@ -797,6 +802,9 @@ public class DefaultNexusPluginManager
             {
                 PlexusComponentGleanerRequest request =
                     new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
+                
+                // ignore implemented interfaces that are not (yet?) on classpath
+                request.setIgnoreNotFoundImplementedInterfaces( true );
 
                 // repository type is one more shot
                 request.getPluralComponentAnnotations().add( RepositoryType.class );
@@ -805,7 +813,7 @@ public class DefaultNexusPluginManager
                 // RepositoryType: we have to register those with RepositoryTypeRegistry
                 request.getMarkerAnnotations().add( RepositoryType.class );
 
-                // TODO: can we detect these in some smarter war?
+                // TODO: can we detect these in some smarter way?
                 // ie. a class could be marked as @Component, but the build may not have been used plexus plugin!
                 // Component: we want to _avoid_ them, since they are most probably processed by plexus plugin!
                 request.getMarkerAnnotations().add( Component.class );
