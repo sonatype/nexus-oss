@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.forge</groupId>
@@ -92,22 +91,26 @@
       </activation>
       <build>
         <plugins>
-	      <plugin>
-	        <groupId>org.maven.ide.eclipse</groupId>
-	        <artifactId>lifecycle-mapping</artifactId>
-	        <version>0.9.9-SNAPSHOT</version>
-	        <configuration>
-	          <mappingId>customizable</mappingId>
-	          <configurators>
-	            <configurator id='org.maven.ide.eclipse.jdt.javaConfigurator'/>
-	            <configurator id='org.maven.ide.eclipse.modello.modelloConfigurator'/>
-	            <configurator id='org.maven.ide.eclipse.plexus.annotations.plexusConfigurator'/>
-	          </configurators>
-	          <mojoExecutions>
-	            <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
-	          </mojoExecutions>
-	        </configuration>
-	      </plugin>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.9.9-SNAPSHOT</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator id='org.maven.ide.eclipse.jdt.javaConfigurator' />
+                <configurator id='org.maven.ide.eclipse.modello.modelloConfigurator' />
+                <configurator id='org.maven.ide.eclipse.plexus.annotations.plexusConfigurator' />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+              </mojoExecutions>
+            </configuration>
+          </plugin>
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.4</version>
+          </plugin>
         </plugins>
       </build>
     </profile>
@@ -141,7 +144,14 @@
         </plugin>
         <plugin>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>2.4</version>
+          <version>2.3</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.apache.maven.shared</groupId>
+              <artifactId>maven-filtering</artifactId>
+              <version>1.0-beta-3-SONATYPE-682132</version>
+            </dependency>
+          </dependencies>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
