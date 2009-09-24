@@ -16,6 +16,12 @@ public interface WebSiteRepository
     extends HostedRepository
 {
     /**
+     * Key to be used in a repository request to signal if we should use the welcome files (index.html, index.htm, etc)
+     * or if we should return the collection.
+     */
+    public static final String USE_WELCOME_FILES_KEY = "useWelcomeFiles";
+
+    /**
      * Gets the list of unmodifiable "welcome" file names. Example: "index.html", "index.htm".
      * 
      * @return
