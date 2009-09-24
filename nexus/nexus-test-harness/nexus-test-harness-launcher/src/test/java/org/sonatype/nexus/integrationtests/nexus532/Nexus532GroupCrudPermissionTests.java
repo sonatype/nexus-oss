@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -32,12 +33,19 @@ public class Nexus532GroupCrudPermissionTests
     extends AbstractPrivilegeTest
 {
 
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
+    }
+
     @Test
     public void testCreatePermission()
         throws IOException
     {
         this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
-        
+
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "testCreatePermission" );
         group.setName( "testCreatePermission" );
@@ -87,7 +95,7 @@ public class Nexus532GroupCrudPermissionTests
         throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
         this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
@@ -144,7 +152,7 @@ public class Nexus532GroupCrudPermissionTests
         throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
         this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
@@ -201,7 +209,7 @@ public class Nexus532GroupCrudPermissionTests
         throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
         this.giveUserPrivilege( TEST_USER_NAME, "repository-all" );
 
         RepositoryGroupResource group = new RepositoryGroupResource();
