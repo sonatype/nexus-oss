@@ -260,7 +260,6 @@ public class JettyResourceFetcher
                 public Realm getRealm( final String realmName, final HttpDestination destination, final String path )
                     throws IOException
                 {
-                    System.out.println( "Realm: " + realmName );
                     return new Realm()
                     {
                         public String getCredentials()

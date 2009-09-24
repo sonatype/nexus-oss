@@ -21,11 +21,56 @@ import java.util.List;
 public class FullBootProofOfConcept
 {
 
+    private static final int ONE_MEGABYTE = 1024 * 1024;
+
     public static void main( final String[] args )
+        throws IOException
+    {
+        for ( int i = 0; i < 2; i++ )
+        {
+            File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
+
+            try
+            {
+                run( basedir );
+            }
+            catch ( IOException e )
+            {
+                e.printStackTrace();
+            }
+            catch ( ComponentLookupException e )
+            {
+                e.printStackTrace();
+            }
+            catch ( PlexusContainerException e )
+            {
+                e.printStackTrace();
+            }
+            catch ( ParseException e )
+            {
+                e.printStackTrace();
+            }
+            catch ( UnsupportedExistingLuceneIndexException e )
+            {
+                e.printStackTrace();
+            }
+            finally
+            {
+                try
+                {
+                    FileUtils.forceDelete( basedir );
+                }
+                catch ( IOException e )
+                {
+                }
+            }
+        }
+    }
+
+    public static void run( final File basedir )
         throws IOException, ComponentLookupException, PlexusContainerException, ParseException,
         UnsupportedExistingLuceneIndexException
     {
-        File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
         try
         {
             FileUtils.forceDelete( basedir );
@@ -47,7 +92,7 @@ public class FullBootProofOfConcept
         creators.add( jar );
 
         String repositoryId = "test";
-        String repositoryUrl = "http://repo1.maven.org/maven2/";
+        String repositoryUrl = "http://repository.sonatype.org/content/groups/public/";
         String indexUrl = repositoryUrl + ".index";
 
         IndexingContext ctx =
@@ -55,12 +100,15 @@ public class FullBootProofOfConcept
                                         creators, true );
 
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
+
         updateRequest.setTransferListener( new TransferListener()
         {
 
             private int col = 0;
 
             private int count = 0;
+
+            private int mb = 0;
 
             public void transferStarted( final TransferEvent transferEvent )
             {
@@ -69,7 +117,14 @@ public class FullBootProofOfConcept
 
             public void transferProgress( final TransferEvent transferEvent, final byte[] buffer, final int length )
             {
-                if ( count > 16384 )
+                if ( buffer == null )
+                {
+                    return;
+                }
+
+                count += buffer.length;
+
+                if ( ( count / ONE_MEGABYTE ) > mb )
                 {
                     if ( col > 80 )
                     {
@@ -79,10 +134,8 @@ public class FullBootProofOfConcept
 
                     System.out.print( '.' );
                     col++;
-                    count = 0;
+                    mb++;
                 }
-
-                count += length;
             }
 
             public void transferInitiated( final TransferEvent transferEvent )
@@ -97,7 +150,8 @@ public class FullBootProofOfConcept
 
             public void transferCompleted( final TransferEvent transferEvent )
             {
-                System.out.println( "\nCompleted transfer: " + transferEvent.getResource().getName() );
+                System.out.println( "\nCompleted transfer: " + transferEvent.getResource().getName() + " ("
+                    + (double) ( count / ONE_MEGABYTE ) + " MB)" );
             }
 
             public void debug( final String message )

@@ -200,7 +200,7 @@ public class ResourceExchange
             }
 
             transferEvent.setTimestamp( System.currentTimeMillis() );
-            listenerSupport.fireTransferProgress( transferEvent, content.array(), contentLength );
+            listenerSupport.fireTransferProgress( transferEvent, content.asArray(), contentLength );
         }
     }
 
