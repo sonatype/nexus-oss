@@ -77,16 +77,20 @@ public class JettyResourceFetcher
         throws IOException
     {
         httpClient.send( exchange );
-        try
+        synchronized ( exchange.getLock() )
         {
-            exchange.waitForDone();
-        }
-        catch ( InterruptedException e )
-        {
-            IOException err = new IOException( "Transfer interrupted: " + e.getMessage() );
-            err.initCause( e );
+            try
+            {
+                exchange.getLock().wait();
+                // exchange.waitForDone();
+            }
+            catch ( InterruptedException e )
+            {
+                IOException err = new IOException( "Transfer interrupted: " + e.getMessage() );
+                err.initCause( e );
 
-            throw err;
+                throw err;
+            }
         }
 
         int responseStatus = exchange.getResponseStatus();
@@ -256,6 +260,7 @@ public class JettyResourceFetcher
                 public Realm getRealm( final String realmName, final HttpDestination destination, final String path )
                     throws IOException
                 {
+                    System.out.println( "Realm: " + realmName );
                     return new Realm()
                     {
                         public String getCredentials()

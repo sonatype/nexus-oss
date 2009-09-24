@@ -55,6 +55,8 @@ public class ResourceExchange
 
     private int contentLength;
 
+    private final Object lock = new Object();
+
     public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final int maxRedirects,
                              final TransferListenerSupport listenerSupport )
     {
@@ -249,6 +251,11 @@ public class ResourceExchange
             listenerSupport.fireGetCompleted( originalUrl, targetFile );
             transferEvent = null;
         }
+
+        synchronized ( lock )
+        {
+            lock.notify();
+        }
     }
 
     @Override
@@ -337,6 +344,11 @@ public class ResourceExchange
     void setContentLength( final int contentLength )
     {
         this.contentLength = contentLength;
+    }
+
+    public Object getLock()
+    {
+        return lock;
     }
 
 }
