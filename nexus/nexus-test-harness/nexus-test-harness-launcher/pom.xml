@@ -74,6 +74,7 @@
             <exclude>**/Nexus142UserPermissionTests.*</exclude>
             <exclude>**/Nexus538SystemFeeds.*</exclude>
             <exclude>**/Nexus2351DisableRedeployUploadTest.*</exclude>
+            <exclude>**/Nexus532*.*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -358,6 +359,32 @@
                   <forkMode>always</forkMode>
                   <includes>
                     <include>Nexus2351DisableRedeployUploadTest</include>
+                  </includes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>Nexus532GroupCrudPermissionTests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <forkMode>always</forkMode>
+                  <includes>
+                    <include>Nexus532GroupCrudPermissionTests</include>
+                  </includes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>Nexus532GroupsCrudXmlTests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <forkMode>always</forkMode>
+                  <includes>
+                    <include>Nexus532GroupsCrudXmlTests</include>
                   </includes>
                 </configuration>
               </execution>
