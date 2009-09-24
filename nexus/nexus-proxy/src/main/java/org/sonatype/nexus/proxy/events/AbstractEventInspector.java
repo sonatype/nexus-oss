@@ -13,15 +13,17 @@
  */
 package org.sonatype.nexus.proxy.events;
 
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.sonatype.nexus.proxy.events.EventInspector;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
-/**
- * @author Juven Xu
- */
 public abstract class AbstractEventInspector
-    extends AbstractLogEnabled
     implements EventInspector
 {
+    @Requirement
+    private Logger logger;
 
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 }
