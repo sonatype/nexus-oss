@@ -222,7 +222,12 @@ public class NexusPluginsComponentRepository
     {
         for ( ComponentDescriptor<?> descriptor : getComponentDescriptors( role ).get( roleHint ) )
         {
-            if ( isAssignableFrom( type, descriptor.getImplementationClass() ) )
+            Class<?> implClass = descriptor.getImplementationClass();
+            if ( isAssignableFrom( type, implClass ) )
+            {
+                return (ComponentDescriptor<T>) descriptor;
+            }
+            else if ( Object.class == implClass && role.equals( type.getName() ) )
             {
                 return (ComponentDescriptor<T>) descriptor;
             }
