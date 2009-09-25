@@ -72,9 +72,9 @@ public class Upgrade108to140
 {
     @Requirement( hint = "file" )
     private SecurityConfigurationSource securityConfigurationSource;
-    
+
     @Requirement
-    private PasswordHelper passwordHelper;    
+    private PasswordHelper passwordHelper;
 
     private static final String EXTERNAL_CONFIG = "externalConfiguration";
 
@@ -111,8 +111,7 @@ public class Upgrade108to140
     }
 
     public Object loadConfiguration( File file )
-        throws IOException,
-            ConfigurationIsCorruptedException
+        throws IOException, ConfigurationIsCorruptedException
     {
         FileReader fr = null;
 
@@ -146,7 +145,8 @@ public class Upgrade108to140
         throws ConfigurationIsCorruptedException
     {
         Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.Configuration newc = new org.sonatype.nexus.configuration.model.Configuration();
+        org.sonatype.nexus.configuration.model.Configuration newc =
+            new org.sonatype.nexus.configuration.model.Configuration();
 
         // Security has been moved out of the Nexus.xml
         try
@@ -195,8 +195,8 @@ public class Upgrade108to140
         List<CRepository> repositories = new ArrayList<CRepository>();
         for ( org.sonatype.nexus.configuration.model.v1_0_8.CRepository oldRepo : oldc.getRepositories() )
         {
-            upgradeRepository(oldRepo);
-            
+            upgradeRepository( oldRepo );
+
             repositories.add( copyCRepository1_0_8( oldRepo ) );
         }
         // shadows are repos
@@ -276,8 +276,7 @@ public class Upgrade108to140
             catch ( PlexusCipherException e )
             {
                 getLogger().error(
-                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.",
-                    e );
+                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
             }
             securityConfig.setEnabled( oldsecurity.isEnabled() );
             securityConfig.getRealms().addAll( oldsecurity.getRealms() );
@@ -301,13 +300,21 @@ public class Upgrade108to140
     }
 
     protected CRemoteAuthentication copyCRemoteAuthentication1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRemoteAuthentication oldauth )
+                                                                    org.sonatype.nexus.configuration.model.v1_0_8.CRemoteAuthentication oldauth )
     {
         if ( oldauth != null )
         {
             CRemoteAuthentication newauth = new CRemoteAuthentication();
             newauth.setUsername( oldauth.getUsername() );
-            newauth.setPassword( oldauth.getPassword() );
+            try
+            {
+                newauth.setPassword( passwordHelper.decrypt( oldauth.getPassword() ) );
+            }
+            catch ( PlexusCipherException e )
+            {
+                getLogger().error(
+                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
+            }
             newauth.setNtlmHost( oldauth.getNtlmHost() );
             newauth.setNtlmDomain( oldauth.getNtlmDomain() );
             // not used in pre 1.4.x
@@ -322,7 +329,7 @@ public class Upgrade108to140
     }
 
     protected CRemoteConnectionSettings copyCRemoteConnectionSettings1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRemoteConnectionSettings old )
+                                                                            org.sonatype.nexus.configuration.model.v1_0_8.CRemoteConnectionSettings old )
     {
         CRemoteConnectionSettings cs = new CRemoteConnectionSettings();
 
@@ -337,7 +344,7 @@ public class Upgrade108to140
     }
 
     protected CRemoteHttpProxySettings copyCRemoteHttpProxySettings1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRemoteHttpProxySettings old )
+                                                                          org.sonatype.nexus.configuration.model.v1_0_8.CRemoteHttpProxySettings old )
     {
         if ( old == null )
         {
@@ -371,15 +378,15 @@ public class Upgrade108to140
         newrepo.setUserManaged( oldrepos.isUserManaged() );
 
         // set the write Policy
-        if( oldrepos.isAllowWrite() )
+        if ( oldrepos.isAllowWrite() )
         {
             newrepo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         }
         else
         {
-            newrepo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() ); 
+            newrepo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         }
-                
+
         // Manipulate the dom
         Xpp3Dom externalConfig = new Xpp3Dom( EXTERNAL_CONFIG );
         newrepo.setExternalConfiguration( externalConfig );
@@ -413,18 +420,18 @@ public class Upgrade108to140
             remoteStorage.setProvider( oldrepos.getRemoteStorage().getProvider() );
             if ( oldrepos.getRemoteStorage().getAuthentication() != null )
             {
-                remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_8( oldrepos
-                    .getRemoteStorage().getAuthentication() ) );
+                remoteStorage.setAuthentication( copyCRemoteAuthentication1_0_8( oldrepos.getRemoteStorage()
+                    .getAuthentication() ) );
             }
             if ( oldrepos.getRemoteStorage().getConnectionSettings() != null )
             {
-                remoteStorage.setConnectionSettings( copyCRemoteConnectionSettings1_0_8( oldrepos
-                    .getRemoteStorage().getConnectionSettings() ) );
+                remoteStorage.setConnectionSettings( copyCRemoteConnectionSettings1_0_8( oldrepos.getRemoteStorage()
+                    .getConnectionSettings() ) );
             }
             if ( oldrepos.getRemoteStorage().getHttpProxySettings() != null )
             {
-                remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_8( oldrepos
-                    .getRemoteStorage().getHttpProxySettings() ) );
+                remoteStorage.setHttpProxySettings( copyCRemoteHttpProxySettings1_0_8( oldrepos.getRemoteStorage()
+                    .getHttpProxySettings() ) );
             }
 
             remoteStorage.setMirrors( copyCMirrors1_0_8( oldrepos.getRemoteStorage().getMirrors() ) );
@@ -450,7 +457,7 @@ public class Upgrade108to140
     }
 
     protected CSmtpConfiguration copyCSmtpConfiguration1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CSmtpConfiguration oldsmtp )
+                                                              org.sonatype.nexus.configuration.model.v1_0_8.CSmtpConfiguration oldsmtp )
     {
         CSmtpConfiguration smtp = new CSmtpConfiguration();
 
@@ -458,7 +465,15 @@ public class Upgrade108to140
         {
             smtp.setDebugMode( oldsmtp.isDebugMode() );
             smtp.setHostname( oldsmtp.getHost() );
-            smtp.setPassword( oldsmtp.getPassword() );
+            try
+            {
+                smtp.setPassword( passwordHelper.decrypt( oldsmtp.getPassword() ) );
+            }
+            catch ( PlexusCipherException e )
+            {
+                getLogger().error(
+                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
+            }
             smtp.setPort( oldsmtp.getPort() );
             smtp.setSslEnabled( oldsmtp.isSslEnabled() );
             smtp.setSystemEmailAddress( oldsmtp.getSystemEmailAddress() );
@@ -482,7 +497,7 @@ public class Upgrade108to140
     }
 
     protected CRestApiSettings copyCRestApi1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRestApiSettings oldrestapi )
+                                                  org.sonatype.nexus.configuration.model.v1_0_8.CRestApiSettings oldrestapi )
     {
         if ( oldrestapi == null )
         {
@@ -497,7 +512,7 @@ public class Upgrade108to140
     }
 
     protected CHttpProxySettings copyCHttpProxySettings1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CHttpProxySettings oldproxy )
+                                                              org.sonatype.nexus.configuration.model.v1_0_8.CHttpProxySettings oldproxy )
     {
         CHttpProxySettings proxy = new CHttpProxySettings();
 
@@ -512,7 +527,7 @@ public class Upgrade108to140
     }
 
     protected CRepositoryTarget copyCRepositoryTarget1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryTarget oldtarget )
+                                                            org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryTarget oldtarget )
     {
         CRepositoryTarget target = new CRepositoryTarget();
 
@@ -528,7 +543,7 @@ public class Upgrade108to140
     }
 
     protected CScheduledTask copyCScheduledTask1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldtask )
+                                                      org.sonatype.nexus.configuration.model.v1_0_8.CScheduledTask oldtask )
     {
         CScheduledTask task = new CScheduledTask();
 
@@ -555,7 +570,7 @@ public class Upgrade108to140
     }
 
     protected CScheduleConfig copyCScheduleConfig1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CScheduleConfig oldschedule )
+                                                        org.sonatype.nexus.configuration.model.v1_0_8.CScheduleConfig oldschedule )
     {
         CScheduleConfig schedule = new CScheduleConfig();
 
@@ -579,7 +594,7 @@ public class Upgrade108to140
     }
 
     protected CRepository copyCRepositoryShadow1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow )
+                                                      org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryShadow oldshadow )
         throws ConfigurationIsCorruptedException
     {
         CRepository newShadow = new CRepository();
@@ -617,7 +632,7 @@ public class Upgrade108to140
     }
 
     protected CPathMappingItem copyCGroupsSettingPathMappingItem1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem oldpathmapping )
+                                                                       org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem oldpathmapping )
     {
         CPathMappingItem pathMappingItem = new CPathMappingItem();
 
@@ -637,7 +652,8 @@ public class Upgrade108to140
     }
 
     protected CRepository copyCRepositoryGroup1_0_8(
-        org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup, boolean mergeMetadata )
+                                                     org.sonatype.nexus.configuration.model.v1_0_8.CRepositoryGroup oldgroup,
+                                                     boolean mergeMetadata )
     {
         CRepository groupRepo = new CRepository();
 
@@ -701,7 +717,7 @@ public class Upgrade108to140
     }
 
     private void upgradePathMapping(
-        org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem pathMapping )
+                                     org.sonatype.nexus.configuration.model.v1_0_8.CGroupsSettingPathMappingItem pathMapping )
     {
         pathMapping.setGroupId( upgradeSlashToHyphen( pathMapping.getGroupId(), true ) );
 
