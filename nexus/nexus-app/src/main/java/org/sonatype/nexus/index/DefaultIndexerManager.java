@@ -263,18 +263,28 @@ public class DefaultIndexerManager
     }
 
     public void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
-        throws IOException, NoSuchRepositoryException
+        throws IOException,
+            NoSuchRepositoryException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( !isIndexingSupported( repository ) || !repository.isIndexable() )
+        if ( !isIndexingSupported( repository ) )
         {
             return;
         }
 
-        // remove context for repository
-        nexusIndexer.removeIndexingContext( getRepositoryLocalIndexContext( repository ), deleteFiles );
-        nexusIndexer.removeIndexingContext( getRepositoryRemoteIndexContext( repository ), deleteFiles );
+        IndexingContext localCtx = getRepositoryLocalIndexContext( repository );
+        IndexingContext remoteCtx = getRepositoryRemoteIndexContext( repository );
+
+        if ( localCtx != null )
+        {
+            nexusIndexer.removeIndexingContext( localCtx, deleteFiles );
+        }
+
+        if ( remoteCtx != null )
+        {
+            nexusIndexer.removeIndexingContext( remoteCtx, deleteFiles );
+        }
     }
 
     public void updateRepositoryIndexContext( String repositoryId )
