@@ -139,6 +139,17 @@ Ext.override(Ext.data.Connection, {
 
         var enctype = form.getAttribute("enctype");
         if(o.isUpload || (enctype && enctype.toLowerCase() == 'multipart/form-data')){
+          // hack for IE if a non success response is received, we can't access the response data
+          // IE denies access
+          if ( Ext.isIE ){
+            if ( url.indexOf('?') >= 0 ){
+              url += '&forceSuccess=true';
+            }
+            else {
+              url += '?forceSuccess=true';
+            }
+          }
+            
 		  if ( Sonatype.utils.authToken ) {
 	        // Add auth header to each request
 			return this.doFormUpload(o, p, Sonatype.utils.appendAuth( url ) );

@@ -492,7 +492,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         catch ( Throwable t )
         {            
-            return buildUploadFailedHtmlResponse( t, response );
+            return buildUploadFailedHtmlResponse( t, request, response );
         }
         finally
         {
@@ -505,7 +505,7 @@ public abstract class AbstractArtifactPlexusResource
         return null;
     }
     
-    protected String buildUploadFailedHtmlResponse( Throwable t, Response response )
+    protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
     {
         getLogger().debug( "Got error while uploading artifact", t );
         
@@ -515,14 +515,19 @@ public abstract class AbstractArtifactPlexusResource
         resp.append( "<error>" + t.getMessage() + "</error>" );
         resp.append( "</body>" );
         resp.append( "</html>" );
+
+        String forceSuccess = request.getResourceRef().getQueryAsForm().getFirstValue( "forceSuccess" );
         
-        if ( t instanceof ResourceException )
+        if ( !"true".equals( forceSuccess ))
         {
-            response.setStatus( ( ( ResourceException ) t ).getStatus() );
-        }
-        else
-        {
-            response.setStatus( Status.SERVER_ERROR_INTERNAL );
+            if ( t instanceof ResourceException )
+            {
+                response.setStatus( ( ( ResourceException ) t ).getStatus() );
+            }
+            else
+            {
+                response.setStatus( Status.SERVER_ERROR_INTERNAL );
+            }
         }
         
         return resp.toString();
