@@ -11,7 +11,7 @@ public class PluginResponse
 {
     private final GAVCoordinate pluginCoordinates;
 
-    private final PluginActivationResult wantedGoal;
+    private final PluginActivationRequest wantedGoal;
 
     private PluginDescriptor pluginDescriptor;
 
@@ -19,13 +19,13 @@ public class PluginResponse
 
     private PluginActivationResult achievedGoal;
 
-    public PluginResponse( GAVCoordinate pluginCoordinates, PluginActivationResult action )
+    public PluginResponse( GAVCoordinate pluginCoordinates, PluginActivationRequest action )
     {
         this.pluginCoordinates = pluginCoordinates;
 
         this.wantedGoal = action;
 
-        this.achievedGoal = action;
+        this.achievedGoal = null;
     }
 
     public GAVCoordinate getPluginCoordinates()
@@ -35,7 +35,7 @@ public class PluginResponse
 
     public boolean isSuccessful()
     {
-        return wantedGoal.equals( achievedGoal );
+        return wantedGoal.isSucess( achievedGoal );
     }
 
     public Throwable getThrowable()
@@ -60,7 +60,7 @@ public class PluginResponse
         this.pluginDescriptor = pluginDescriptor;
     }
 
-    public PluginActivationResult getWantedGoal()
+    public PluginActivationRequest getWantedGoal()
     {
         return wantedGoal;
     }

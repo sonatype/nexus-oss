@@ -18,6 +18,7 @@ import java.util.zip.ZipFile;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -211,7 +212,7 @@ public class DefaultNexusPluginManager
         }
         catch ( NoSuchPluginRepositoryArtifactException e )
         {
-            PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationResult.BROKEN );
+            PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationRequest.ACTIVATE );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
 
@@ -226,7 +227,7 @@ public class DefaultNexusPluginManager
         PluginManagerResponse response =
             new PluginManagerResponse( pluginCoordinates, PluginActivationRequest.DEACTIVATE );
 
-        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.DEACTIVATED );
+        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationRequest.DEACTIVATE );
 
         try
         {
@@ -261,6 +262,8 @@ public class DefaultNexusPluginManager
 
                 // send notification
                 applicationEventMulticaster.notifyEventListeners( new PluginDeactivatedEvent( this, pluginDescriptor ) );
+
+                result.setAchievedGoal( PluginActivationResult.DEACTIVATED );
             }
             else
             {
@@ -271,7 +274,7 @@ public class DefaultNexusPluginManager
         {
             result.setThrowable( e );
         }
-
+        
         response.addPluginResponse( result );
 
         return response;
@@ -283,7 +286,7 @@ public class DefaultNexusPluginManager
     {
         GAVCoordinate pluginCoordinates = pluginArtifact.getCoordinate();
 
-        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationResult.ACTIVATED );
+        PluginResponse result = new PluginResponse( pluginCoordinates, PluginActivationRequest.ACTIVATE );
 
         PluginDescriptor pluginDescriptor = null;
 
@@ -309,8 +312,26 @@ public class DefaultNexusPluginManager
             // scan the jar
             pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
 
-            // create plugin realm as container child
-            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.toCompositeForm() ) );
+            ClassRealm pluginRealm;
+            try
+            {
+                // create plugin realm as container child
+                pluginRealm =
+                    plexusContainer.getContainerRealm().getWorld().newRealm( pluginCoordinates.toCompositeForm() );
+            }
+            catch ( DuplicateRealmException e )
+            {
+                result.setThrowable( new IllegalStateException( "Plugin is already loaded?", e ) );
+
+                response.addPluginResponse( result );
+
+                return;
+            }
+
+            // set core as plugin realm
+            pluginRealm.setParentRealm( plexusContainer.getContainerRealm() );
+
+            pluginDescriptor.setPluginRealm( pluginRealm );
 
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
@@ -422,6 +443,9 @@ public class DefaultNexusPluginManager
 
             // stuff the result
             result.setPluginDescriptor( discoveryContext.getPluginDescriptor() );
+            
+            // set result
+            result.setAchievedGoal( PluginActivationResult.ACTIVATED );
         }
         catch ( InvalidPluginException e )
         {
@@ -696,27 +720,27 @@ public class DefaultNexusPluginManager
         {
             List<ComponentDescriptor<?>> discoveredComponentDescriptors = new ArrayList<ComponentDescriptor<?>>();
 
-            // findComponents( pluginDiscoveryContext );
-
+            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm() ) );
+/*
             // HACK -- START
             // to enable "backward compatibility, nexus plugins that are written plexus-way", but circumvent the plexus
             // bug about component descriptor duplication with Realms having parent (will be rediscovered)
+            ClassRealm pluginRealm = pluginDiscoveryContext.getPluginDescriptor().getPluginRealm();
 
             // remember the parent
-            ClassRealm parent = pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().getParentRealm();
+            ClassRealm parent = pluginRealm.getParentRealm();
 
             // make it parentless
             pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().setParentRealm( null );
 
             // discover plexus components in dependencies too. These goes directly into discoveredComponentDescriptors
             // list, since we don't need to register them with plexus, they will be registered by plexus itself
-            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext
-                .getPluginDescriptor().getPluginRealm() ) );
+            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginRealm ) );
 
             // restore original parent
-            pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().setParentRealm( parent );
+            pluginRealm.setParentRealm( parent );
             // HACK -- END
-
+*/
             // collecting
             for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor()
                 .getComponents() )
