@@ -465,15 +465,7 @@ public class Upgrade108to140
         {
             smtp.setDebugMode( oldsmtp.isDebugMode() );
             smtp.setHostname( oldsmtp.getHost() );
-            try
-            {
-                smtp.setPassword( passwordHelper.decrypt( oldsmtp.getPassword() ) );
-            }
-            catch ( PlexusCipherException e )
-            {
-                getLogger().error(
-                    "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
-            }
+            smtp.setPassword( oldsmtp.getPassword() );
             smtp.setPort( oldsmtp.getPort() );
             smtp.setSslEnabled( oldsmtp.isSslEnabled() );
             smtp.setSystemEmailAddress( oldsmtp.getSystemEmailAddress() );
