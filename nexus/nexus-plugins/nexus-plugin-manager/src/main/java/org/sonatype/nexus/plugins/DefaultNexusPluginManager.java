@@ -311,7 +311,7 @@ public class DefaultNexusPluginManager
 
             // scan the jar
             pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
-
+/*
             ClassRealm pluginRealm;
             try
             {
@@ -332,7 +332,10 @@ public class DefaultNexusPluginManager
             pluginRealm.setParentRealm( plexusContainer.getContainerRealm() );
 
             pluginDescriptor.setPluginRealm( pluginRealm );
-
+*/
+            // "old way", since the above way does not work
+            pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.toCompositeForm() ) );
+            
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
 
