@@ -154,7 +154,8 @@ public class HttpVerbMappingAuthorizationFilter
     {
         String[] perms = (String[]) mappedValue;
 
-        if ( super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) ) )
+        if ( getSubject( request, response ) != null
+            && super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) ) )
         {
             // I wanted to record all successful authz events here, but found that, if we do record here, there would be
             // too many feed entries, that's a pollution
