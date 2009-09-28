@@ -318,7 +318,16 @@ public class DefaultAttributeStorage
             catch ( XStreamException e )
             {
                 // it is corrupt
-                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    // we log the stacktrace
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+                }
+                else
+                {
+                    // just remark about this
+                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+                }
 
                 deleteAttributes( uid );
             }
