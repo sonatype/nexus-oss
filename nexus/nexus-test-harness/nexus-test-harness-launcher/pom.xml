@@ -334,6 +334,9 @@
                   <includes>
                     <include>Nexus538SystemFeeds</include>
                   </includes>
+                  <excludes>
+                    <exclude>**Suite*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
               <execution>
@@ -347,6 +350,9 @@
                   <includes>
                     <include>Nexus142UserPermissionTests</include>
                   </includes>
+                  <excludes>
+                    <exclude>**Suite*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
               <execution>
@@ -360,6 +366,9 @@
                   <includes>
                     <include>Nexus2351DisableRedeployUploadTest</include>
                   </includes>
+                  <excludes>
+                    <exclude>**Suite*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
               <execution>
@@ -373,6 +382,9 @@
                   <includes>
                     <include>Nexus532GroupCrudPermissionTests</include>
                   </includes>
+                  <excludes>
+                    <exclude>**Suite*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
               <execution>
@@ -386,6 +398,9 @@
                   <includes>
                     <include>Nexus532GroupsCrudXmlTests</include>
                   </includes>
+                  <excludes>
+                    <exclude>**Suite*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
             </executions>
