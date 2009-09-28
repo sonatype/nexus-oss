@@ -12,8 +12,11 @@
  */
 package org.sonatype.security.rest;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -30,6 +33,7 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
@@ -144,9 +148,9 @@ public abstract class AbstractSecurityPlexusResource
 
         return user;
     }
-
+    
     protected PlexusUserResource securityToRestModel( User user )
-    {
+    {       
         PlexusUserResource resource = new PlexusUserResource();
 
         resource.setUserId( user.getUserId() );
@@ -171,35 +175,53 @@ public abstract class AbstractSecurityPlexusResource
 
         return roleResource;
     }
+    
+    protected List<PlexusUserResource> securityToRestModel( Set<User> users )
+    {
+        List<PlexusUserResource> restUsersList = new ArrayList<PlexusUserResource>();
+        
+        for ( User user : users )
+        {
+            restUsersList.add( securityToRestModel( user ) );
+        }
+        return restUsersList;
+    }
+    
 
     // TODO: come back to this, we need to change the PlexusRoleResource
     protected PlexusRoleResource securityToRestModel( RoleIdentifier role )
     {
-        // TODO: we need to get the name of the Role, this could be slow if a user has 100 roles from an external realm
-        // (JDBC, LDAP), and no caching, we will need to come back to this.
-        // We shouldn't be looking up the role name here anyway... this should get pushed up to the SecuritySystem.
-        SecuritySystem securitySystem = this.getSecuritySystem();
-
+        // TODO: We shouldn't be looking up the role name here anyway... this should get pushed up to the SecuritySystem.
         String roleName = role.getRoleId();
-
-        // if this blows up we don't need to stop, we already have the ID, and really this should never happen because
-        // we just looked up this info
+        
+        SecuritySystem securitySystem = this.getSecuritySystem();
 
         try
         {
-            roleName = securitySystem.getAuthorizationManager( role.getSource() ).getRole( role.getRoleId() ).getName();
+            AuthorizationManager authzManager = securitySystem.getAuthorizationManager( DEFAULT_SOURCE );           
+            roleName = authzManager.getRole( role.getRoleId() ).getName();
+        }
+        catch( NoSuchAuthorizationManager e)
+        {
+          this.getLogger().warn(
+          "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+              + role.getSource() + " but the user has this role.", e );
         }
         catch ( NoSuchRoleException e )
         {
-            this.getLogger().error(
-                                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
-                                        + role.getSource() + " but the user has this role.", e );
-        }
-        catch ( NoSuchAuthorizationManager e )
-        {
-            this.getLogger().error(
-                                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
-                                        + role.getSource() + " but the user has this role.", e );
+            // this is a Warning if the role's source is default, if its not, then we most of the time it would not be found anyway.
+            if( DEFAULT_SOURCE.equals( role.getSource() ))
+            {
+                this.getLogger().warn(
+                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                        + role.getSource() + " but the user has this role.", e );
+            }
+            else
+            {
+                this.getLogger().debug(
+                    "Failed to lookup the users Role: " + role.getRoleId() + " source: "
+                        + role.getSource() + " falling back to the roleId for the role's name."  );
+            }
         }
 
         PlexusRoleResource roleResource = new PlexusRoleResource();
@@ -209,7 +231,7 @@ public abstract class AbstractSecurityPlexusResource
 
         return roleResource;
     }
-
+   
     protected Reference getContextRoot( Request request )
     {
         return this.referenceFactory.getContextRoot( request );

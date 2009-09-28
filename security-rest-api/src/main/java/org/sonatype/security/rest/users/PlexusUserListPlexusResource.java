@@ -81,16 +81,8 @@ public class PlexusUserListPlexusResource
             users = this.getSecuritySystem().searchUsers( new UserSearchCriteria( null, null, source ) );
         }
 
-        for ( User user : users )
-        {
-            PlexusUserResource res = securityToRestModel( user );
-
-            if ( res != null )
-            {
-                result.addData( res );
-            }
-        }
-
+        result.setData( this.securityToRestModel( users ) );
+        
         return result;
     }
 

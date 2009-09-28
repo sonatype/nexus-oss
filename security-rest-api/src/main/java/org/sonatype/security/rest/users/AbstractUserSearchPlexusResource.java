@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.rest.users;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.restlet.data.Request;
@@ -41,17 +42,8 @@ public abstract class AbstractUserSearchPlexusResource
         PlexusUserListResourceResponse result = new PlexusUserListResourceResponse();
         
         Set<User> users = this.getSecuritySystem().searchUsers( criteria );
+        result.setData( this.securityToRestModel( users ) );
         
-        for ( User user : users )
-        {
-            PlexusUserResource res = securityToRestModel( user );
-
-            if ( res != null )
-            {
-                result.addData( res );
-            }
-        }
-
         return result;
     }
 
