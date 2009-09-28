@@ -130,6 +130,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
       },
       { 
         name: 'name',
+        sortType: Ext.data.SortTypes.asUCString,
         header: 'Name',
         width: 175
       },
