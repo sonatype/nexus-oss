@@ -114,7 +114,7 @@ Sonatype.repoServer.UserEditPanel = function( config ) {
         convert: function( value, parent ) {
           return parent.source == 'default' ? 
             ( Sonatype.config.repos.urls.users + '/' + value ) :
-            ( Sonatype.config.repos.urls.plexusUser + '/' + value );
+            ( Sonatype.config.repos.urls.plexusUser + '/' + parent.source + '/' + value );
         }
       },
       { 
