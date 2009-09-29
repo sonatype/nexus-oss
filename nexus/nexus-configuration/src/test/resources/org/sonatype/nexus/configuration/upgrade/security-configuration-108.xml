@@ -6,6 +6,7 @@
   <anonymousUsername>anonymous</anonymousUsername>
   <anonymousPassword>anonymous</anonymousPassword>
   <realms>
+    <realm>SomeOtherPrimaryRealm</realm>
     <realm>XmlAuthenticatingRealm</realm>
     <realm>XmlAuthorizingRealm</realm>
   </realms>

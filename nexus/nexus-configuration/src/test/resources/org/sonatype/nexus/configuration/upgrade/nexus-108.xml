@@ -8,6 +8,7 @@
     <realms>
       <realm>XmlAuthenticatingRealm</realm>
       <realm>XmlAuthorizingRealm</realm>
+      <realm>SomeOtherPrimaryRealm</realm>
     </realms>
   </security>
   <globalConnectionSettings />

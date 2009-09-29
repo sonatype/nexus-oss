@@ -59,6 +59,8 @@ import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.PasswordHelper;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.realms.XmlAuthenticatingRealm;
+import org.sonatype.security.realms.XmlAuthorizingRealm;
 
 /**
  * Upgrades configuration model from version 1.0.8 to 1.4.0.
@@ -279,8 +281,27 @@ public class Upgrade108to140
                     "Failed to decrype anonymous password in nexus.xml, password might be encrypted in memory.", e );
             }
             securityConfig.setEnabled( oldsecurity.isEnabled() );
-            securityConfig.getRealms().addAll( oldsecurity.getRealms() );
+            
+            List<String> realms = oldsecurity.getRealms();
+            
+            // move the XML realms to the bottom of the configured list
+            // in 1.4 we removed the isPrimary and made the realms orderable, auth and authz respect these.
+            if( realms.contains( XmlAuthenticatingRealm.ROLE ) )
+            {
+                realms.remove( XmlAuthenticatingRealm.ROLE );
+                // add to end of list
+                realms.add( XmlAuthenticatingRealm.ROLE );
+            }
+            if( realms.contains( XmlAuthorizingRealm.ROLE ) )
+            {
+                realms.remove( XmlAuthorizingRealm.ROLE );
+                // add to end of list
+                realms.add( XmlAuthorizingRealm.ROLE );
+            }
 
+            // the order has been fixed to mimic the 1.3 functionality
+            securityConfig.getRealms().addAll( realms );
+                
             securityConfigurationSource.setConfiguration( securityConfig );
             securityConfigurationSource.storeConfiguration();
         }

@@ -6,8 +6,8 @@
   <anonymousUsername>anonymous</anonymousUsername>
   <anonymousPassword>anonymous</anonymousPassword>
   <realms>
-    <realm>XmlAuthenticatingRealm</realm>
     <realm>NexusLdapAuthenticationRealm</realm>
+    <realm>XmlAuthenticatingRealm</realm>
     <realm>XmlAuthorizingRealm</realm>
   </realms>
 </security-configuration>
