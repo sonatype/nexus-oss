@@ -26,7 +26,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserResourceResponse;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -87,7 +87,7 @@ public static final String USER_ID_KEY = "userId";
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
         }
-        catch ( NoSuchUserManager e )
+        catch ( NoSuchUserManagerException e )
         {
             this.getLogger().warn( e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND );
