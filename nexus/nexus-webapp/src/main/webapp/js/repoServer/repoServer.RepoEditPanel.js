@@ -153,6 +153,9 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
       var repoPanel = Ext.getCmp('view-repositories');
       repoPanel.statusStart();
       
+      // convert case
+      receivedData.repoPolicy = Sonatype.utils.upperFirstCharLowerRest( receivedData.repoPolicy );
+      
       return;
     }
     
