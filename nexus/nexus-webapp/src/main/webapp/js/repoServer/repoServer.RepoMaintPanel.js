@@ -195,6 +195,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     Sonatype.Events.removeListener( 'nexusRepositoryStatus', this.statusStart, this );
   }, this );
   this.dataStore.addListener( 'load', this.onRepoStoreLoad, this );
+  this.dataStore.addListener( 'loadexception', this.onRepoStoreLoad, this );
   this.dataStore.load();
 };
 
