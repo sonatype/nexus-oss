@@ -46,6 +46,8 @@ public class DefaultMappingConfiguration
 
     private long lastModified;
 
+    private XStream xstream;
+
     public void addMapping( CMapping map )
         throws IOException
     {
@@ -103,10 +105,14 @@ public class DefaultMappingConfiguration
 
     private XStream getXStream()
     {
-        XStream xs = new XStream();
-        xs.processAnnotations( Configuration.class );
-        xs.processAnnotations( CMapping.class );
-        return xs;
+        if ( xstream == null )
+        {
+            xstream = new XStream();
+            xstream.setClassLoader( getClass().getClassLoader() );
+            xstream.processAnnotations( Configuration.class );
+            xstream.processAnnotations( CMapping.class );
+        }
+        return xstream;
     }
 
     private Configuration getConfiguration()

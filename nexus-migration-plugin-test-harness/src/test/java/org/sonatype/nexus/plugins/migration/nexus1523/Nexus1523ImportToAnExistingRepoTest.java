@@ -20,10 +20,9 @@ public class Nexus1523ImportToAnExistingRepoTest
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "artifactoryBackup.zip" ) );
         commitMigration( migrationSummary );
 
-        File logFile = new File( "./target/logs/migration.log" );
-        Assert.assertTrue( "Migration log file not found", logFile.isFile() );
+        Assert.assertTrue( "Migration log file not found", migrationLogFile.isFile() );
 
-        String log = IOUtil.toString( new FileReader( logFile ) );
+        String log = IOUtil.toString( new FileReader( migrationLogFile ) );
         Assert.assertFalse( "Error during migration \n" + log, log.toLowerCase().contains( "error" ) );
 
         File importedArtifact =

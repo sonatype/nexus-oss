@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.migration.nexus1455;
 
-import java.io.File;
 import java.io.FileReader;
 
 import org.codehaus.plexus.util.IOUtil;
@@ -27,10 +26,9 @@ public class Nexus1455ImportTwiceTest
         commitMigration( migrationSummary );
         commitMigration( migrationSummary );
 
-        File logFile = new File( "./target/logs/migration.log" );
-        Assert.assertTrue( "Migration log file not found", logFile.isFile() );
+        Assert.assertTrue( "Migration log file not found", migrationLogFile.isFile() );
 
-        String log = IOUtil.toString( new FileReader( logFile ) );
+        String log = IOUtil.toString( new FileReader( migrationLogFile ) );
         Assert.assertTrue( "Didn't skip second migration " + log,
                            log.contains( "Trying to import the same package twice" ) );
         Assert.assertFalse( "Error during migration", log.toLowerCase().contains( "error" ) );

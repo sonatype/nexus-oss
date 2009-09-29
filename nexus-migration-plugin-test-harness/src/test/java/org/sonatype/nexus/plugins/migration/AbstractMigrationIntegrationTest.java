@@ -49,6 +49,8 @@ public abstract class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
 
+    protected static File migrationLogFile;
+
     protected RepositoryMessageUtil repositoryUtil;
 
     protected GroupMessageUtil groupUtil;
@@ -85,10 +87,10 @@ public abstract class AbstractMigrationIntegrationTest
         NexusStatusUtil.stop();
 
         cleanWorkDir();
-        File logFile = new File( "./target/logs/migration.log" );
-        if ( logFile.isFile() )
+        migrationLogFile = new File( nexusWorkDir, "logs/migration.log" );
+        if ( migrationLogFile.isFile() )
         {
-            FileUtils.writeStringToFile( logFile, "" );
+            FileUtils.writeStringToFile( migrationLogFile, "" );
         }
     }
 
@@ -107,8 +109,7 @@ public abstract class AbstractMigrationIntegrationTest
 
         Thread.sleep( 2000 );
 
-        File logFile = new File( "./target/logs/migration.log" );
-        String log = FileUtils.readFileToString( logFile );
+        String log = FileUtils.readFileToString( migrationLogFile );
         Assert.assertFalse( log, log.toLowerCase().contains( "Exception".toLowerCase() ) );
         Assert.assertFalse( log, log.toLowerCase().contains( "Error".toLowerCase() ) );
 
