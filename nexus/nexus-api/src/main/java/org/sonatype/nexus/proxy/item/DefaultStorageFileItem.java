@@ -37,6 +37,13 @@ public class DefaultStorageFileItem
     private long length;
 
     /**
+     * This is here for backward compatibility only, to enable XStream to load up the old XML attributes.
+     * 
+     * @deprecated The mime-type is now coming from ContentLocator, see getMimeType() method body.
+     */
+    private String mimeType;
+
+    /**
      * Instantiates a new default storage file item.
      * 
      * @param repository the repository
@@ -46,7 +53,7 @@ public class DefaultStorageFileItem
      * @param contentLocator the content locator
      */
     public DefaultStorageFileItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, ContentLocator contentLocator )
+                                   boolean canWrite, ContentLocator contentLocator )
     {
         super( repository, request, canRead, canWrite );
         this.contentLocator = contentLocator;
@@ -63,7 +70,7 @@ public class DefaultStorageFileItem
      * @deprecated supply resourceStoreRequest always
      */
     public DefaultStorageFileItem( Repository repository, String path, boolean canRead, boolean canWrite,
-        ContentLocator contentLocator )
+                                   ContentLocator contentLocator )
     {
         this( repository, new ResourceStoreRequest( path, true, false ), canRead, canWrite, contentLocator );
     }
@@ -78,7 +85,7 @@ public class DefaultStorageFileItem
      * @param contentLocator the content locator
      */
     public DefaultStorageFileItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, ContentLocator contentLocator )
+                                   boolean canWrite, ContentLocator contentLocator )
     {
         super( router, request, canRead, canWrite );
         this.contentLocator = contentLocator;
@@ -86,7 +93,7 @@ public class DefaultStorageFileItem
 
     @Deprecated
     public DefaultStorageFileItem( RepositoryRouter router, String path, boolean canRead, boolean canWrite,
-        ContentLocator contentLocator )
+                                   ContentLocator contentLocator )
     {
         this( router, new ResourceStoreRequest( path, true, false ), canRead, canWrite, contentLocator );
     }
