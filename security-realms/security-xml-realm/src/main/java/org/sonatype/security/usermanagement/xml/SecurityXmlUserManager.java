@@ -33,7 +33,7 @@ import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.StringDigester;
@@ -281,7 +281,7 @@ public class SecurityXmlUserManager
                         this.logger.warn( "User: '" + roleMapping.getUserId() + "' of source: '"
                             + roleMapping.getSource() + "' could not be found.", e );
                     }
-                    catch ( NoSuchUserManager e )
+                    catch ( NoSuchUserManagerException e )
                     {
                         this.logger.warn( "User: '" + roleMapping.getUserId() + "' of source: '"
                             + roleMapping.getSource() + "' could not be found.", e );

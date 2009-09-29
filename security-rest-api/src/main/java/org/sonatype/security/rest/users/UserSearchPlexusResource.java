@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -24,7 +23,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;

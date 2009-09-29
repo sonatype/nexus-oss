@@ -70,7 +70,7 @@ public class AdditinalRoleSecuritySystemTest
         throws Exception
     {
         SecuritySystem userManager = this.getSecuritySystem();
-        UserSearchCriteria criteria = new UserSearchCriteria(null, null, "MockUserLocatorA");
+        UserSearchCriteria criteria = new UserSearchCriteria(null, null, "MockUserManagerA");
         Set<User> users = userManager.searchUsers( criteria );
 
         Map<String, User> userMap = this.toUserMap( users );
@@ -159,11 +159,11 @@ public class AdditinalRoleSecuritySystemTest
         UserSearchCriteria criteria = new UserSearchCriteria();
 
         criteria.setUserId( "pperalez" );
-        User user = searchForSingleUser( criteria, "pperalez", "MockUserLocatorA" );
+        User user = searchForSingleUser( criteria, "pperalez", "MockUserManagerA" );
         Assert.assertNotNull( user );
 
         criteria.setUserId( "jcoder" );
-        user = searchForSingleUser( criteria, "jcoder", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "jcoder", "MockUserManagerA" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 4, user.getRoles().size() );
         // A,B,C,1
@@ -174,7 +174,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "Role1" ) );
 
         criteria.setUserId( "dknudsen" );
-        user = searchForSingleUser( criteria, "dknudsen", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "dknudsen", "MockUserManagerA" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 1, user.getRoles().size() );
         // Role2
@@ -182,7 +182,7 @@ public class AdditinalRoleSecuritySystemTest
         Assert.assertTrue( roleIds.contains( "Role2" ) );
 
         criteria.setUserId( "cdugas" );
-        user = searchForSingleUser( criteria, "cdugas", "MockUserLocatorA" );
+        user = searchForSingleUser( criteria, "cdugas", "MockUserManagerA" );
         Assert.assertNotNull( user );
         Assert.assertEquals( 3, user.getRoles().size() );
 

@@ -176,7 +176,7 @@
 				
 		<userRoleMapping>
 			<userId>jcoder</userId>
-			<source>MockUserLocatorA</source>
+			<source>MockUserManagerA</source>
 			<roles>
 				<role>Role1</role>
 			</roles>
@@ -184,7 +184,7 @@
 		
 		<userRoleMapping>
 			<userId>dknudsen</userId>
-			<source>MockUserLocatorA</source>
+			<source>MockUserManagerA</source>
 			<roles>
 				<role>Role2</role>
 			</roles>

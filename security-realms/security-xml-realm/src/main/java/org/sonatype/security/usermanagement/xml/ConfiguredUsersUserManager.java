@@ -28,7 +28,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
@@ -81,7 +81,7 @@ public class ConfiguredUsersUserManager
                 this.logger.warn( "User: '" + userRoleMapping.getUserId() + "' of source: '"
                     + userRoleMapping.getSource() + "' could not be found.", e );
             }
-            catch ( NoSuchUserManager e )
+            catch ( NoSuchUserManagerException e )
             {
                 this.logger.warn( "User: '" + userRoleMapping.getUserId() + "' of source: '"
                     + userRoleMapping.getSource() + "' could not be found.", e );

@@ -30,7 +30,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -108,7 +108,7 @@ public class UserToRolePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
         }
-        catch ( NoSuchUserManager e )
+        catch ( NoSuchUserManagerException e )
         {
             this.getLogger().warn( e.getMessage(), e );
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "User with id '" + userId + "' not found." );
@@ -167,7 +167,7 @@ public class UserToRolePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Could not find user '" + userId + "'." );
         }
-        catch ( NoSuchUserManager e )
+        catch ( NoSuchUserManagerException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Could not find user manager for source '"
                 + sourceId + "'." );

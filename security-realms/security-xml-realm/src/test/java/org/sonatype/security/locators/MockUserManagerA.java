@@ -21,14 +21,16 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserStatus;
 
-@Component(role=UserManager.class, hint="MockUserLocatorA")
+@Component(role=UserManager.class, hint="MockUserManagerA")
 public class MockUserManagerA
     extends AbstractTestUserManager
 {
 
+    public static final String SOURCE = "MockUserManagerA";
+    
     public String getSource()
     {
-        return "MockUserLocatorA";
+        return SOURCE;
     }
 
     public Set<User> listUsers()

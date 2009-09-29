@@ -18,7 +18,7 @@ import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -91,11 +91,11 @@ public interface SecuritySystem //extends Startable
     // public UserManager getUserManager( String sourceId );
 
     User addUser( User user )
-        throws NoSuchUserManager,
+        throws NoSuchUserManagerException,
             InvalidConfigurationException;
 
     User addUser( User user, String password )
-        throws NoSuchUserManager,
+        throws NoSuchUserManagerException,
             InvalidConfigurationException;
 
     /**
@@ -107,7 +107,7 @@ public interface SecuritySystem //extends Startable
      */
     User getUser( String userId, String source )
         throws UserNotFoundException,
-            NoSuchUserManager;
+            NoSuchUserManagerException;
 
     // TODOE: remove when https://issues.apache.org/jira/browse/KI-77, is implemented
     // I think we might need to keep this one around...
@@ -116,7 +116,7 @@ public interface SecuritySystem //extends Startable
 
     User updateUser( User user )
         throws UserNotFoundException,
-            NoSuchUserManager,
+            NoSuchUserManagerException,
             InvalidConfigurationException;
 
     void deleteUser( String userId )
@@ -124,11 +124,11 @@ public interface SecuritySystem //extends Startable
 
     void deleteUser( String userId, String source )
         throws UserNotFoundException,
-            NoSuchUserManager;
+            NoSuchUserManagerException;
 
     Set<RoleIdentifier> getUsersRoles( String userId, String source )
         throws UserNotFoundException,
-            NoSuchUserManager;
+            NoSuchUserManagerException;
 
     void setUsersRoles( String userId, String source, Set<RoleIdentifier> roleIdentifiers )
         throws InvalidConfigurationException,

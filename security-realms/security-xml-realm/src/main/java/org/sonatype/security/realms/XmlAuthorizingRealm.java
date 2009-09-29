@@ -46,11 +46,13 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-@Component( role = Realm.class, hint = "XmlAuthorizingRealm", description = "Xml Authorizing Realm" )
+@Component( role = Realm.class, hint = XmlAuthorizingRealm.ROLE, description = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm
 {
+    public static final String ROLE = "XmlAuthorizingRealm";
+    
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 

@@ -28,7 +28,7 @@ import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
@@ -119,7 +119,7 @@ public class UserListPlexusResource
                 // build and throw exception
                 handleInvalidConfigurationException( e );
             }
-            catch ( NoSuchUserManager e )
+            catch ( NoSuchUserManagerException e )
             {
                 ErrorResponse errorResponse = getErrorResponse( "*", e.getMessage() );
                 throw new PlexusResourceException(Status.CLIENT_ERROR_BAD_REQUEST, "Unable to create user.", errorResponse);

@@ -47,7 +47,7 @@ import org.sonatype.security.email.SecurityEmailer;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
 import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
-import org.sonatype.security.usermanagement.NoSuchUserManager;
+import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.PasswordGenerator;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
@@ -276,24 +276,24 @@ public class DefaultSecuritySystem
     // *********************
 
     private UserManager getUserManager( String sourceId )
-        throws NoSuchUserManager
+        throws NoSuchUserManagerException
     {
         if ( !this.userManagerMap.containsKey( sourceId ) )
         {
-            throw new NoSuchUserManager( "UserManager with source: '" + sourceId + "' could not be found." );
+            throw new NoSuchUserManagerException( "UserManager with source: '" + sourceId + "' could not be found." );
         }
 
         return this.userManagerMap.get( sourceId );
     }
 
     public User addUser( User user )
-        throws NoSuchUserManager, InvalidConfigurationException
+        throws NoSuchUserManagerException, InvalidConfigurationException
     {
         return this.addUser( user, this.generatePassword() );
     }
 
     public User addUser( User user, String password )
-        throws NoSuchUserManager, InvalidConfigurationException
+        throws NoSuchUserManagerException, InvalidConfigurationException
     {
         // if the password is null, generate one
         if ( password == null )
@@ -345,7 +345,7 @@ public class DefaultSecuritySystem
     }
 
     public User updateUser( User user )
-        throws UserNotFoundException, NoSuchUserManager, InvalidConfigurationException
+        throws UserNotFoundException, NoSuchUserManagerException, InvalidConfigurationException
     {
         // first update the user
         // this is the UserManager that owns the user
@@ -395,7 +395,7 @@ public class DefaultSecuritySystem
         {
             this.deleteUser( userId, user.getSource() );
         }
-        catch ( NoSuchUserManager e )
+        catch ( NoSuchUserManagerException e )
         {
             this.logger.error( "User manager returned user, but could not be found: " + e.getMessage(), e );
             throw new IllegalStateException( "User manager returned user, but could not be found: " + e.getMessage(), e );
@@ -403,14 +403,14 @@ public class DefaultSecuritySystem
     }
 
     public void deleteUser( String userId, String source )
-        throws UserNotFoundException, NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManagerException
     {
         UserManager userManager = this.getUserManager( source );
         userManager.deleteUser( userId );
     }
 
     public Set<RoleIdentifier> getUsersRoles( String userId, String source )
-        throws UserNotFoundException, NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManagerException
     {
         User user = this.getUser( userId, source );
         return user.getRoles();
@@ -463,7 +463,7 @@ public class DefaultSecuritySystem
             {
                 this.logger.debug( "User: '" + userId + "' was not found in: '" + userManager.getSource() + "' " );
             }
-            catch ( NoSuchUserManager e )
+            catch ( NoSuchUserManagerException e )
             {
                 // we should NEVER bet here
                 this.logger.warn( "UserManager: '" + userManager.getSource()
@@ -474,7 +474,7 @@ public class DefaultSecuritySystem
     }
 
     public User getUser( String userId, String source )
-        throws UserNotFoundException, NoSuchUserManager
+        throws UserNotFoundException, NoSuchUserManagerException
     {
         // first get the user
         // this is the UserManager that owns the user
@@ -530,7 +530,7 @@ public class DefaultSecuritySystem
             {
                 users.addAll( this.getUserManager( criteria.getSource() ).searchUsers( criteria ) );
             }
-            catch ( NoSuchUserManager e )
+            catch ( NoSuchUserManagerException e )
             {
                 this.logger.warn( "UserManager: "+ criteria.getSource() +" was not found.", e );
             }
@@ -680,7 +680,7 @@ public class DefaultSecuritySystem
             UserManager userManager = this.getUserManager( user.getSource() );
             userManager.changePassword( userId, newPassword );
         }
-        catch ( NoSuchUserManager e )
+        catch ( NoSuchUserManagerException e )
         {
             // this should NEVER happen
             this.logger.warn( "User '" + userId + "' with source: '" + user.getSource()
