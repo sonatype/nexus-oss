@@ -8,4 +8,11 @@
       </includes>
     </fileSet>
   </fileSets>
+  
+  <requiredProperties>
+    <requiredProperty key="nexus-version">
+      <defaultValue>1.4.0-SNAPSHOT</defaultValue>
+    </requiredProperty>
+  </requiredProperties>
+  
 </archetype-descriptor>

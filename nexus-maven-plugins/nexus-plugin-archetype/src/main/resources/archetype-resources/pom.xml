@@ -9,19 +9,41 @@
   
   <name>Nexus Plugin Archetype</name>
 
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-webapp-dependencies</artifactId>
+          <version>${nexus-version}</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
-      <version>0.0.1-SNAPSHOT</version>
-    	<scope>provided</scope>
+      <version>1.0.0</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-    	<groupId>org.sonatype.nexus</groupId>
-    	<artifactId>nexus-api</artifactId>
-    	<version>1.4.0-SNAPSHOT</version>
-    	<scope>provided</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+      <version>${nexus-version}</version>
+      <scope>provided</scope>
     </dependency>
+    
+    <!-- This dependency is only needed if you want to include REST Resources -->
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-restlet-bridge</artifactId>
+      <version>1.9</version>
+      <scope>provided</scope>
+    </dependency>
+    
+    <!-- Test -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -35,7 +57,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0</version>
         
         <extensions>true</extensions>
         
@@ -43,7 +65,7 @@
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
           </dependency>
         </dependencies>
       </plugin>
@@ -54,6 +76,27 @@
           <source>1.5</source>
           <target>1.5</target>
         </configuration>
+      </plugin>
+      
+      <!-- needed for REST Resources -->
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>RELEASE</version>
+        <executions>
+          <execution>
+            <id>process-classes</id>
+            <goals>
+              <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
