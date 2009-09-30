@@ -26,6 +26,12 @@ under the License.
     <packaging>pom</packaging>
     <name>Sonatype Nexus Aggregator</name>
 
+    <scm>
+      <connection>scm:svn:http://svn.sonatype.org/nexus/trunk</connection>
+      <url>http://svn.sonatype.org/nexus/trunk</url>
+      <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk</developerConnection>
+    </scm>
+
     <modules>
       <module>nexus-parent</module>
       <module>nexus-indexer</module>
