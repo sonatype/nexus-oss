@@ -124,10 +124,10 @@ public abstract class AbstractLocalRepositoryStorage
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
         
-        item.setResourceStoreRequest( request );
-
         if ( item != null )
         {
+            item.setResourceStoreRequest( request );
+
             item.setRepositoryItemUid( uid );
 
             item.setRemoteChecked( timestamp );
@@ -151,10 +151,10 @@ public abstract class AbstractLocalRepositoryStorage
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
         
-        item.setResourceStoreRequest( request );
-
         if ( item != null )
         {
+            item.setResourceStoreRequest( request );
+
             item.setRepositoryItemUid( uid );
 
             item.setLastRequested( timestamp );
