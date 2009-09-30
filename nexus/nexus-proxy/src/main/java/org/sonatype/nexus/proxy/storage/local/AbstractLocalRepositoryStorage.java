@@ -123,6 +123,8 @@ public abstract class AbstractLocalRepositoryStorage
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
+        
+        item.setResourceStoreRequest( request );
 
         if ( item != null )
         {
@@ -148,6 +150,8 @@ public abstract class AbstractLocalRepositoryStorage
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
+        
+        item.setResourceStoreRequest( request );
 
         if ( item != null )
         {
