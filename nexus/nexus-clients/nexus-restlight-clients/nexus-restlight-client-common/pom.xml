@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.sonatype.nexus.restlight</groupId>
     <artifactId>nexus-restlight-clients</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.1-SNAPSHOT</version>
   </parent>
   
   <artifactId>nexus-restlight-client-common</artifactId>

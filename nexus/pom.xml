@@ -10,7 +10,7 @@
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
   <name>Nexus Repository Manager</name>
-  <version>1.4.0-SNAPSHOT</version>
+  <version>1.4.1-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
   <inceptionYear>2007</inceptionYear>
   <mailingLists />
@@ -956,9 +956,9 @@
   </reporting>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/branches/nexus-1.4.0</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/branches/nexus-1.4.0</developerConnection>
-    <url>http://svn.sonatype.org/nexus/branches/nexus-1.4.0</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus</developerConnection>
+    <url>http://svn.sonatype.org/nexus/trunk/nexus</url>
   </scm>
 
   <profiles>
