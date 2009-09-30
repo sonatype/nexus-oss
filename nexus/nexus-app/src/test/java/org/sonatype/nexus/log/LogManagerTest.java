@@ -28,7 +28,8 @@ public class LogManagerTest
     extends AbstractNexusTestCase
 {
     private LogManager manager;
-    
+
+    @SuppressWarnings( "unused" )
     private org.codehaus.plexus.logging.Logger logger;
 
     @Override
@@ -37,14 +38,14 @@ public class LogManagerTest
     {
         super.setUp();
 
-        File logFile = new File( getBasedir(), "target/test-classes/log4j.properties" );
+        File logFile = new File( getBasedir(), "target/test-classes/log/log-manager-log4j.properties" );
 
         assertTrue( logFile.exists() );
 
         System.getProperties().put( "plexus.log4j-prop-file", logFile.getAbsolutePath() );
 
         manager = lookup( LogManager.class );
-        
+
         logger = this.getLoggerManager().getLoggerForComponent( LogManagerTest.class.getName() );
     }
 

@@ -35,7 +35,7 @@ public class LogConfigurationTest
     {
         super.setUp();
 
-        File logFile = new File( getBasedir(), "target/test-classes/log4j.properties" );
+        File logFile = new File( getBasedir(), "target/test-classes/log/log-configuration-log4j.properties" );
 
         assertTrue( logFile.exists() );
 
