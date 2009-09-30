@@ -53,6 +53,7 @@
       <groupId>com.sonatype.nexus.plugin</groupId>
       <artifactId>nexus-licensing-plugin</artifactId>
       <version>${nexus-licensing-plugin.version}</version>
+	  <scope>provided</scope>
     </dependency>
   </dependencies>
 
