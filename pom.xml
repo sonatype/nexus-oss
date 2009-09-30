@@ -3,13 +3,13 @@
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-aggregator</artifactId>
   <packaging>pom</packaging>  
-  <version>1.0.8-SNAPSHOT</version>
+  <version>1.0.8</version>
   <name>Plexus Security Aggregator</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
+    <connection>scm:svn:http://svn.sonatype.org/spice/tags/plexus-security-1.0.8</connection>
+    <url>http://svn.sonatype.org/spice/tags/plexus-security-1.0.8</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/plexus-security-1.0.8</developerConnection>
   </scm>
   
   <modules>
