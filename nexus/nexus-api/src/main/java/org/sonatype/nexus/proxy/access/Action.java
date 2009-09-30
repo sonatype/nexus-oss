@@ -32,9 +32,4 @@ public enum Action
     {
         return read.equals( this );
     }
-
-    public boolean isWritingAction()
-    {
-        return ( create.equals( this ) || update.equals( this ) );
-    }
 }
