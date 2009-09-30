@@ -9,6 +9,10 @@ public class GroupUpdateIndexerManagerTest
     public void testGroupUpdate()
         throws Exception
     {
+        assertTrue( true );
+        
+        //removed as functionallity has been removed for now
+        /*
         fillInRepo();
 
         indexerManager.reindexAllRepositories( null, true );
@@ -34,5 +38,6 @@ public class GroupUpdateIndexerManagerTest
         waitForTasksToStop();
 
         searchFor( "org.sonatype.test-evict", 1, "public" );
+        */
     }
 }

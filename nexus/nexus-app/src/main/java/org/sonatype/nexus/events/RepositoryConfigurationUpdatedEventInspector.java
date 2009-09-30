@@ -29,7 +29,8 @@ public class RepositoryConfigurationUpdatedEventInspector
 
     public void inspect( Event<?> evt )
     {
-        if ( evt instanceof RepositoryGroupMembersChangedEvent )
+        //removed because this is happening far too often
+        /*if ( evt instanceof RepositoryGroupMembersChangedEvent )
         {
             GroupRepository repo = ( (RepositoryGroupMembersChangedEvent) evt ).getGroupRepository();
 
@@ -38,7 +39,7 @@ public class RepositoryConfigurationUpdatedEventInspector
             rt.setRepositoryGroupId( repo.getId() );
             nexusScheduler.submit( "Update group index.", rt );
         }
-        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
+        else*/ if ( evt instanceof RepositoryConfigurationUpdatedEvent )
         {
             boolean indexing = false;
             boolean evicting = false;
