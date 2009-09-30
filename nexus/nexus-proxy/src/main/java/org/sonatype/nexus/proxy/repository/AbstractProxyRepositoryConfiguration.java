@@ -11,6 +11,8 @@ public abstract class AbstractProxyRepositoryConfiguration
 
     private static final String ITEM_MAX_AGE = "itemMaxAge";
 
+    private static final String ITEM_AGING_ACTIVE = "itemAgingActive";
+
     public AbstractProxyRepositoryConfiguration( Xpp3Dom configuration )
     {
         super( configuration );
@@ -28,9 +30,8 @@ public abstract class AbstractProxyRepositoryConfiguration
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
     {
-        return RepositoryStatusCheckMode
-            .valueOf( getNodeValue( getRootNode(), REMOTE_STATUS_CHECK_MODE,
-                                    RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.toString() ) );
+        return RepositoryStatusCheckMode.valueOf( getNodeValue( getRootNode(), REMOTE_STATUS_CHECK_MODE,
+            RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.toString() ) );
     }
 
     public void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode )
@@ -46,5 +47,15 @@ public abstract class AbstractProxyRepositoryConfiguration
     public void setItemMaxAge( int age )
     {
         setNodeValue( getRootNode(), ITEM_MAX_AGE, String.valueOf( age ) );
+    }
+
+    public boolean isItemAgingActive()
+    {
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), ITEM_AGING_ACTIVE, Boolean.TRUE.toString() ) );
+    }
+
+    public void setItemAgingActive( boolean value )
+    {
+        setNodeValue( getRootNode(), ITEM_AGING_ACTIVE, Boolean.toString( value ) );
     }
 }

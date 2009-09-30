@@ -151,6 +151,21 @@ public interface ProxyRepository
      */
     void setProxySelector( ProxySelector proxySelector );
 
+    /**
+     * Returns is the "aging" applied to the items in this proxy repository. If false, then this proxy will not apply
+     * "aging" to items, and will always go for remote to check for change.
+     * 
+     * @return
+     */
+    boolean isItemAgingActive();
+
+    /**
+     * Sets the "aging" algorithm status.
+     * 
+     * @param value
+     */
+    void setItemAgingActive( boolean value );
+
     // --
 
     /**

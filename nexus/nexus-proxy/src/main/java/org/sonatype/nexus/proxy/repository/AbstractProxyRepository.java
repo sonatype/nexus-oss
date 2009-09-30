@@ -139,6 +139,16 @@ public abstract class AbstractProxyRepository
         return itemContentValidators;
     }
 
+    public boolean isItemAgingActive()
+    {
+        return getExternalConfiguration( false ).isItemAgingActive();
+    }
+
+    public void setItemAgingActive( boolean value )
+    {
+        getExternalConfiguration( true ).setItemAgingActive( value );
+    }
+
     public ProxyMode getProxyMode()
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -335,13 +345,13 @@ public abstract class AbstractProxyRepository
         else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
         {
             this.remoteStatusUpdated = System.currentTimeMillis();
-            
+
             // TODO: To enable auto-block feature, uncomment this
             // also take care that REMOTE_STATUS_RETAIN_TIME is a parameter, not
             // constant, so user can tune how long should he keep repository autoblocked.
             // if ( getProxyMode() != null && getProxyMode().shouldProxy() )
             // {
-            //     setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
+            // setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             // }
         }
     }
@@ -994,6 +1004,17 @@ public abstract class AbstractProxyRepository
      */
     protected boolean isOld( int maxAge, StorageItem item )
     {
+        return isOld( maxAge, item, isItemAgingActive() );
+    }
+
+    protected boolean isOld( int maxAge, StorageItem item, boolean shouldCalculate )
+    {
+        if ( !shouldCalculate )
+        {
+            // simply say "is old" always
+            return true;
+        }
+
         // if item is manually expired, true
         if ( item.isExpired() )
         {
