@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -13,9 +12,9 @@
 	<description>Nexus LVO Plugin (Extras).</description>
 
 	<scm>
-		<url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</url>
-		<connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</connection>
-		<developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</developerConnection>
+		<url>http://svn.sonatype.org/nexus-plugins/branches/nexus-1.4.0</url>
+		<connection>scm:svn:http://svn.sonatype.org/nexus-plugins/branches/nexus-1.4.0</connection>
+		<developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/branches/nexus-1.4.0</developerConnection>
 	</scm>
 
 	<developers>

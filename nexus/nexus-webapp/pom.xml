@@ -346,8 +346,7 @@
           <!--
                         prependClasspaths>
                         <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
-                        </prependClasspaths
-                    -->
+                        </prependClasspaths -->
           <systemProperties>
             <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
           </systemProperties>
