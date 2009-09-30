@@ -22,6 +22,12 @@
     <plexus-cipher.version>1.5</plexus-cipher.version>
     <plugin-host-api.version>1.0.0</plugin-host-api.version>
   </properties>
+  
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security/security-parent</connection>
+    <url>http://svn.sonatype.org/spice/trunk/plexus-security/security-parent</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security/security-parent</developerConnection>
+  </scm>
 
   <dependencyManagement>
     <dependencies>

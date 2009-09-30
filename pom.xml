@@ -5,6 +5,12 @@
   <packaging>pom</packaging>  
   <version>1.0.8-SNAPSHOT</version>
   <name>Plexus Security Aggregator</name>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security</connection>
+    <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
+  </scm>
   
   <modules>
   	<module>security-parent</module>
