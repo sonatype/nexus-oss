@@ -63,7 +63,7 @@ public class PluginStaticResource
 
         try
         {
-            urlConnection = classLoader.getRealmResource( resourcePath ).openConnection();
+            urlConnection = classLoader.findResource( resourcePath ).openConnection();
 
             if ( urlConnection != null )
             {

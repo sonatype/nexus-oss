@@ -17,8 +17,6 @@ import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -824,7 +822,7 @@ public class DefaultNexusPluginManager
         {
             String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
 
-            if ( pd.getPluginRealm().getRealmResource( resourceName ) != null )
+            if ( pd.getPluginRealm().findResource( resourceName ) != null )
             {
                 PlexusComponentGleanerRequest request =
                     new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
