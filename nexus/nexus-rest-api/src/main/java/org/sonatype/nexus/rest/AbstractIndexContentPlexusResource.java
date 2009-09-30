@@ -90,33 +90,36 @@ public abstract class AbstractIndexContentPlexusResource
 
         ContentListResourceResponse response = new ContentListResourceResponse();
 
-        try
+        if ( indexingContext != null )
         {
-            if ( "/".equals( path ) )
+            try
             {
-                // get root groups and finish
-                Set<String> rootGroups = indexingContext.getRootGroups();
-                for ( String group : rootGroups )
+                if ( "/".equals( path ) )
                 {
-                    if ( group.length() > 0 )
+                    // get root groups and finish
+                    Set<String> rootGroups = indexingContext.getRootGroups();
+                    for ( String group : rootGroups )
                     {
-                        response.addData( createGroupResource( request, path, group ) );
+                        if ( group.length() > 0 )
+                        {
+                            response.addData( createGroupResource( request, path, group ) );
+                        }
                     }
                 }
+                else
+                {
+                    Set<String> allGroups = indexingContext.getAllGroups();
+    
+                    ContentListResource rootResource = new ContentListResource();
+                    rootResource.setRelativePath( path );
+                    loadChildren( request, rootResource, indexingContext, allGroups );
+                    response.setData( rootResource.getChildren() );
+                }
             }
-            else
+            catch ( IOException e )
             {
-                Set<String> allGroups = indexingContext.getAllGroups();
-
-                ContentListResource rootResource = new ContentListResource();
-                rootResource.setRelativePath( path );
-                loadChildren( request, rootResource, indexingContext, allGroups );
-                response.setData( rootResource.getChildren() );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
             }
-        }
-        catch ( IOException e )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
         }
 
         return response;
