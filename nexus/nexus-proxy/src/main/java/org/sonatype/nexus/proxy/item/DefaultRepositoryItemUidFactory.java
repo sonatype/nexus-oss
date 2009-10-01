@@ -57,7 +57,7 @@ public class DefaultRepositoryItemUidFactory
         {
             path = RepositoryItemUid.PATH_ROOT;
         }
-        
+
         String key = repository.getId() + ":" + path;
 
         RepositoryItemUid newGuy = new DefaultRepositoryItemUid( this, repository, path );
@@ -72,6 +72,9 @@ public class DefaultRepositoryItemUidFactory
 
             toBeReturned = newGuy;
         }
+
+        // do cleansing of the map if needed, this call might do nothing or clean up the itemUidMap for gc'ed UIDs
+        cleanUpItemUidMap( false );
 
         return toBeReturned;
     }
@@ -102,26 +105,47 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
+    /**
+     * Used in UTs only, NOT public method!
+     * 
+     * @return
+     */
     public int getUidCount()
     {
-        cleanUpItemUidMap();
-        
+        cleanUpItemUidMap( true );
+
         return itemUidMap.size();
     }
 
     // ==
 
-    private synchronized void cleanUpItemUidMap()
-    {
-        for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
-            itemUidMap.entrySet().iterator(); i.hasNext(); )
-        {
-            ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
+    // =v=v=v=v=v=v= This part here probably needs polishing: the retention should depend on load too =v=v=v=v=v=v=
 
-            if ( entry.getValue().get() == null )
+    private static final long ITEM_UID_MAP_RETENTION_TIME = 5000;
+
+    private volatile long lastClearedItemUidMap;
+
+    private synchronized void cleanUpItemUidMap( boolean force )
+    {
+        long now = System.currentTimeMillis();
+
+        if ( force || ( now - lastClearedItemUidMap > ITEM_UID_MAP_RETENTION_TIME ) )
+        {
+            lastClearedItemUidMap = now;
+
+            for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
+                itemUidMap.entrySet().iterator(); i.hasNext(); )
             {
-                i.remove();
+                ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
+
+                if ( entry.getValue().get() == null )
+                {
+                    i.remove();
+                }
             }
         }
     }
+
+    // =^=^=^=^=^=^= This part here probably needs polishing: the retention should depend on load too =^=^=^=^=^=^=
+
 }
