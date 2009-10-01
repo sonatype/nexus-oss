@@ -878,7 +878,7 @@ Sonatype.utils = {
   },
   
   openWindow: function( url ){
-    window.open( Sonatype.utils.appendAuth( url ) );
+    window.open( url );
   },
   
   appendAuth: function( url ){
