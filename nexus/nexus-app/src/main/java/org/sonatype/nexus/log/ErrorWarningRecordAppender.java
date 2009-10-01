@@ -5,6 +5,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
 import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.timeline.TimelineException;
 
 /**
  * This class extends log4j, record all error/warning log
@@ -20,6 +21,13 @@ public class ErrorWarningRecordAppender
     protected void append( LoggingEvent event )
     {
         if ( feedRecorder == null )
+        {
+            return;
+        }
+        
+        // hack to prevent infinite loop
+        if ( event.getThrowableInformation() != null
+            && event.getThrowableInformation().getThrowable() instanceof TimelineException )
         {
             return;
         }
