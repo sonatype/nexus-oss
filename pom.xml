@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
@@ -15,8 +15,8 @@
   <description>Nexus Maven Site Plugin (Extras).</description>
 
   <properties>
-    <nexus.version>1.4.0-SNAPSHOT</nexus.version>
-    <nexus-licensing-plugin.version>1.4.0-SNAPSHOT</nexus-licensing-plugin.version>
+    <nexus.version>1.4.1-SNAPSHOT</nexus.version>
+    <nexus-licensing-plugin.version>1.4.1-SNAPSHOT</nexus-licensing-plugin.version>
   </properties>
 
   <dependencyManagement>
