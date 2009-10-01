@@ -10,12 +10,11 @@ import java.net.ServerSocket;
 import java.util.Collection;
 import java.util.Properties;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.NameFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.codehaus.classworlds.Launcher;
+import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.Application;
 import org.restlet.Client;
@@ -33,7 +32,7 @@ import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import com.thoughtworks.xstream.XStream;
 
 public class SimpleTest
-    extends TestCase
+    extends PlexusTestCase
 {
     protected MockNexusEnvironment mockNexusEnvironment;
 
@@ -60,7 +59,8 @@ public class SimpleTest
     protected void setUp()
         throws Exception
     {
-        bundleRoot = MockNexusEnvironment.getBundleRoot( new File( "target/nexus-ui" ) );
+        bundleRoot = MockNexusEnvironment.getBundleRoot( getTestFile( "target/nexus-ui" ) );
+        
         tamperPlexusProperties( bundleRoot );
 
         MockHelper.clearMocks();
