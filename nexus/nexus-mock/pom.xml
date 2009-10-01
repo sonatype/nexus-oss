@@ -55,12 +55,10 @@
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
-      <version>2.0.0</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
-      <version>1.4</version>
     </dependency>
 
     <dependency>
@@ -79,7 +77,6 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
-      <version>1.0.8-SNAPSHOT</version>
     </dependency>
 
     <dependency>
