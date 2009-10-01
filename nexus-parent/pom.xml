@@ -4,18 +4,18 @@
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>4</version>
-    <relativePath></relativePath>
+    <relativePath />
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>10-SNAPSHOT</version>
+  <version>10</version>
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-parent</connection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-parent</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-parent</developerConnection>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-parent-10</connection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-parent-10</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-parent-10</developerConnection>
   </scm>
 
   <properties>
@@ -98,9 +98,9 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator id='org.maven.ide.eclipse.jdt.javaConfigurator' />
-                <configurator id='org.maven.ide.eclipse.modello.modelloConfigurator' />
-                <configurator id='org.maven.ide.eclipse.plexus.annotations.plexusConfigurator' />
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
