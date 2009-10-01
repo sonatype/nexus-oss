@@ -1,0 +1,20 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>demo</groupId>
+		<artifactId>parent</artifactId>
+		<version>2</version>
+	</parent>
+
+	<groupId>demo</groupId>
+	<artifactId>dependency</artifactId>
+	<version>1.0</version>
+
+	<dependencies>
+		<dependency>
+			<groupId>demo</groupId>
+			<artifactId>managed</artifactId>
+		</dependency>
+	</dependencies>
+</project>

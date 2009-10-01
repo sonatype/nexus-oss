@@ -1,0 +1,30 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>demo</groupId>
+	<artifactId>parent</artifactId>
+	<version>2</version>
+	<packaging>pom</packaging>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>demo</groupId>
+				<artifactId>managed</artifactId>
+				<version>${interpolated}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<profiles>
+		<profile>
+			<id>demo</id>
+			<activation>
+				<jdk>[1.4,)</jdk>
+			</activation>
+			<properties>
+				<interpolated>3.8.2</interpolated>
+			</properties>
+		</profile>
+	</profiles>
+</project>
