@@ -6,8 +6,7 @@ import org.apache.maven.model.plugin.LifecycleBindingsInjector;
 import org.apache.maven.model.Model;
 
 /*
- * This is an optional component and only required if the model request has processPlugins=true which is not of interest
- * for dependency related tasks. I'm looking into teaching Plexus optional requirements to get rid of this empty class.
+ * This is an optional component and will not be required when using plexus 1.3.0+.
  */
 public class EmptyLifecycleBindingsInjector
     implements LifecycleBindingsInjector
