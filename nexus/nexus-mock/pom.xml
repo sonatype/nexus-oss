@@ -15,7 +15,7 @@
   <name>Nexus (Mock Application frontend)</name>
 
   <properties>
-    <nexus.version>1.4.1-SNAPSHOT</nexus.version>
+    <nexus.version>${project.version}</nexus.version>
   </properties>
 
   <build>
