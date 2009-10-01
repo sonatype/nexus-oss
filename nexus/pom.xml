@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>10-SNAPSHOT</version>
+    <version>10</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
