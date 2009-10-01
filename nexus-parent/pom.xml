@@ -94,7 +94,7 @@
           <plugin>
             <groupId>org.maven.ide.eclipse</groupId>
             <artifactId>lifecycle-mapping</artifactId>
-            <version>0.9.9-SNAPSHOT</version>
+            <version>0.9.9</version>
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
