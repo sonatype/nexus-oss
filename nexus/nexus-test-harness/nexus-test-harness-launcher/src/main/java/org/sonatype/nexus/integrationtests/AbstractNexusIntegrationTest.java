@@ -883,9 +883,15 @@ public class AbstractNexusIntegrationTest
     {
         String serviceURI = "service/local/repositories/" + repository + "/content/" + groupOrArtifactPath;
 
-        log.debug( "deleting: " + serviceURI );
+        Response response = RequestFacade.doGetRequest( serviceURI );
+        if ( response.getStatus().equals( Status.CLIENT_ERROR_NOT_FOUND ) )
+        {
+            log.debug( "It was not deleted because it didn't exist " + serviceURI );
+            return true;
+        }
 
-        Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
+        log.debug( "deleting: " + serviceURI );
+        response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
 
         boolean deleted = response.getStatus().isSuccess();
 
