@@ -13,9 +13,9 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.isA;
-import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.replay;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class DefaultStorageCollectionItemTest
     public void testNonVirtualCollectionSimple()
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/" ) ).andReturn( uidFactory.createUid( repository, "/" ) );
+        expect( repository.createUid( "/" ) ).andReturn( new DefaultRepositoryItemUid( null,  repository, "/" ) );
 
         replay( repository );
 
@@ -45,13 +45,13 @@ public class DefaultStorageCollectionItemTest
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/a/some/dir/coll" ) ).andReturn(
-            uidFactory.createUid( repository, "/a/some/dir/coll" ) );
+            new DefaultRepositoryItemUid( null, repository, "/a/some/dir/coll" ) );
         expect( repository.createUid( "/a/some/dir/coll/A" ) ).andReturn(
-            uidFactory.createUid( repository, "/a/some/dir/coll/A" ) );
+            new DefaultRepositoryItemUid( null, repository, "/a/some/dir/coll/A" ) );
         expect( repository.createUid( "/a/some/dir/coll/B" ) ).andReturn(
-            uidFactory.createUid( repository, "/a/some/dir/coll/B" ) );
+            new DefaultRepositoryItemUid( null, repository, "/a/some/dir/coll/B" ) );
         expect( repository.createUid( "/a/some/dir/coll/C" ) ).andReturn(
-            uidFactory.createUid( repository, "/a/some/dir/coll/C" ) );
+            new DefaultRepositoryItemUid( null, repository, "/a/some/dir/coll/C" ) );
         expect( repository.list( anyBoolean(), isA( StorageCollectionItem.class ) ) ).andReturn( result );
 
         replay( repository );

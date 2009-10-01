@@ -13,11 +13,11 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -52,26 +52,28 @@ public class DefaultAttributeStorageTest
 
         FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
 
-        repository = createMock( Repository.class );
+        repository = EasyMock.createNiceMock( Repository.class );
 
-        RepositoryItemUid uid = createMock( RepositoryItemUid.class );
+        RepositoryItemUid uidA = EasyMock.createNiceMock( RepositoryItemUid.class );
+        RepositoryItemUid uidB = EasyMock.createNiceMock( RepositoryItemUid.class );
 
-        expect( uid.getRepository() ).andReturn( repository ).anyTimes();
-        expect( uid.getPath() ).andReturn( "/a.txt" ).anyTimes();
+        expect( uidA.getRepository() ).andReturn( repository ).anyTimes();
+        expect( uidA.getPath() ).andReturn( "/a.txt" ).anyTimes();
+        expect( uidB.getRepository() ).andReturn( repository ).anyTimes();
+        expect( uidB.getPath() ).andReturn( "/b.txt" ).anyTimes();
 
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
 
-        expect( repository.createUid( "/a.txt" ) )
-            .andReturn( repositoryItemUidFactory.createUid( repository, "/a.txt" ) );
-        expect( repository.createUid( "/b.txt" ) )
-            .andReturn( repositoryItemUidFactory.createUid( repository, "/b.txt" ) );
+        expect( repository.createUid( "/a.txt" ) ).andReturn( uidA );
+        expect( repository.createUid( "/b.txt" ) ).andReturn( uidB );
 
         replay( repository );
 
         getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
         getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
-        replay( uid );
+        replay( uidA );
+        replay( uidB );
     }
 
     public void testSimplePutGet()

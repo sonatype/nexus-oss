@@ -28,7 +28,8 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andReturn( uidFactory.createUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) )
+            .andReturn( new DefaultRepositoryItemUid( null, repository, "/a.txt" ) );
 
         replay( repository );
 
@@ -50,7 +51,8 @@ public class DefaultStorageFileItemTest
         throws Exception
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
-        expect( repository.createUid( "/a.txt" ) ).andReturn( uidFactory.createUid( repository, "/a.txt" ) );
+        expect( repository.createUid( "/a.txt" ) )
+            .andReturn( new DefaultRepositoryItemUid( null, repository, "/a.txt" ) );
 
         replay( repository );
 
@@ -72,7 +74,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            uidFactory.createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+            new DefaultRepositoryItemUid( null, repository, "/some/dir/hierarchy/a.txt" ) );
 
         replay( repository );
 
@@ -96,7 +98,7 @@ public class DefaultStorageFileItemTest
     {
         expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
         expect( repository.createUid( "/some/dir/hierarchy/a.txt" ) ).andReturn(
-            uidFactory.createUid( repository, "/some/dir/hierarchy/a.txt" ) );
+            new DefaultRepositoryItemUid( null, repository, "/some/dir/hierarchy/a.txt" ) );
 
         replay( repository );
 

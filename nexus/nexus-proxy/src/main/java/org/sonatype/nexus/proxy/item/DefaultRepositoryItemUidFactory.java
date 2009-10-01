@@ -13,12 +13,10 @@
  */
 package org.sonatype.nexus.proxy.item;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -42,12 +40,8 @@ public class DefaultRepositoryItemUidFactory
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    private final ConcurrentHashMap<String, List<RepositoryItemUid>> itemUidMap =
-        new ConcurrentHashMap<String, List<RepositoryItemUid>>();
-
-    private final ConcurrentHashMap<String, ReadWriteLock> itemLockMap = new ConcurrentHashMap<String, ReadWriteLock>();
-
-    private final ConcurrentHashMap<String, ReadWriteLock> attrLockMap = new ConcurrentHashMap<String, ReadWriteLock>();
+    private final ConcurrentHashMap<String, WeakReference<RepositoryItemUid>> itemUidMap =
+        new ConcurrentHashMap<String, WeakReference<RepositoryItemUid>>();
 
     public RepositoryItemUid createUid( Repository repository, String path )
     {
@@ -63,8 +57,23 @@ public class DefaultRepositoryItemUidFactory
         {
             path = RepositoryItemUid.PATH_ROOT;
         }
+        
+        String key = repository.getId() + ":" + path;
 
-        return new DefaultRepositoryItemUid( this, repository, path );
+        RepositoryItemUid newGuy = new DefaultRepositoryItemUid( this, repository, path );
+
+        itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
+
+        RepositoryItemUid toBeReturned = itemUidMap.get( key ).get();
+
+        if ( toBeReturned == null )
+        {
+            itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
+
+            toBeReturned = newGuy;
+        }
+
+        return toBeReturned;
     }
 
     public RepositoryItemUid createUid( String uidStr )
@@ -93,77 +102,26 @@ public class DefaultRepositoryItemUidFactory
         }
     }
 
-    public ReadWriteLock acquireLock( RepositoryItemUid uid )
-    {
-        return register( uid, itemUidMap, itemLockMap );
-    }
-
-    public void releaseLock( RepositoryItemUid uid )
-    {
-        deregister( uid, itemUidMap, itemLockMap );
-    }
-
-    public ReadWriteLock acquireAttributesLock( RepositoryItemUid uid )
-    {
-        return register( uid, itemUidMap, attrLockMap );
-    }
-
-    public void releaseAttributesLock( RepositoryItemUid uid )
-    {
-        deregister( uid, itemUidMap, attrLockMap );
-    }
-
-    public int getLockCount()
-    {
-        return itemLockMap.size();
-    }
-
     public int getUidCount()
     {
+        cleanUpItemUidMap();
+        
         return itemUidMap.size();
     }
 
-    // =====
+    // ==
 
-    private synchronized ReadWriteLock register( RepositoryItemUid uid,
-                                                 ConcurrentMap<String, List<RepositoryItemUid>> uidMap,
-                                                 ConcurrentMap<String, ReadWriteLock> lockMap )
+    private synchronized void cleanUpItemUidMap()
     {
-        String key = uid.toString();
-
-        // maintain locks
-        ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-
-        lockMap.putIfAbsent( key, lock );
-
-        // maintain uidlists
-        ArrayList<RepositoryItemUid> uidList = new ArrayList<RepositoryItemUid>();
-
-        uidMap.putIfAbsent( key, uidList );
-
-        uidMap.get( key ).add( uid );
-
-        return lockMap.get( key );
-    }
-
-    private synchronized void deregister( RepositoryItemUid uid, ConcurrentMap<String, List<RepositoryItemUid>> uidMap,
-                                          ConcurrentMap<String, ReadWriteLock> lockMap )
-    {
-        String key = uid.toString();
-
-        // maintain uidlists
-        if ( uidMap.containsKey( key ) )
+        for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
+            itemUidMap.entrySet().iterator(); i.hasNext(); )
         {
-            if ( uidMap.get( key ).remove( uid ) )
-            {
-                if ( uidMap.get( key ).size() == 0 )
-                {
-                    uidMap.remove( key );
+            ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
 
-                    lockMap.remove( key );
-                }
+            if ( entry.getValue().get() == null )
+            {
+                i.remove();
             }
         }
     }
-
 }

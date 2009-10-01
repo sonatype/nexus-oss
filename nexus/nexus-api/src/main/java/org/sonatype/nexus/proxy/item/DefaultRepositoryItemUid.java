@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
@@ -30,15 +31,19 @@ import org.sonatype.nexus.proxy.repository.Repository;
 public class DefaultRepositoryItemUid
     implements RepositoryItemUid
 {
-    private static final ThreadLocal<Map<String, Object>> threadCtx = new ThreadLocal<Map<String, Object>>()
+    private static final ThreadLocal<Map<String, Lock>> threadCtx = new ThreadLocal<Map<String, Lock>>()
     {
-        protected Map<String, Object> initialValue()
+        protected synchronized Map<String, Lock> initialValue()
         {
-            return new HashMap<String, Object>();
+            return new HashMap<String, Lock>();
         };
     };
 
     private final RepositoryItemUidFactory factory;
+
+    private final ReentrantReadWriteLock contentLock;
+
+    private final ReentrantReadWriteLock attributesLock;
 
     /** The repository. */
     private final Repository repository;
@@ -46,15 +51,24 @@ public class DefaultRepositoryItemUid
     /** The path. */
     private final String path;
 
-    public DefaultRepositoryItemUid( RepositoryItemUidFactory factory, Repository repository, String path )
+    protected DefaultRepositoryItemUid( RepositoryItemUidFactory factory, Repository repository, String path )
     {
         super();
 
         this.factory = factory;
 
+        this.contentLock = new ReentrantReadWriteLock();
+
+        this.attributesLock = new ReentrantReadWriteLock();
+
         this.repository = repository;
 
         this.path = path;
+    }
+
+    public RepositoryItemUidFactory getRepositoryItemUidFactory()
+    {
+        return factory;
     }
 
     public Repository getRepository()
@@ -69,119 +83,22 @@ public class DefaultRepositoryItemUid
 
     public void lock( Action action )
     {
-        Lock lock = (Lock) threadCtx.get().get( getLockKey() );
-
-        if ( lock == null )
-        {
-            // get the needed lock and lock
-            lock = getActionLock( factory.acquireLock( this ), action );
-
-            lock.lock();
-        }
-        else if ( lock != null && lock instanceof ReadLock && !action.isReadAction() )
-        {
-            synchronized ( lock )
-            {
-                // we need lock upgrade (r->w)
-                lock.unlock();
-
-                lock = getActionLock( factory.acquireLock( this ), action );
-
-                lock.lock();
-            }
-        }
-        else if ( lock != null && lock instanceof WriteLock && action.isReadAction() )
-        {
-            synchronized ( lock )
-            {
-                // we need lock downgrade (w->r)
-                Lock wrLock = lock;
-
-                lock = getActionLock( factory.acquireLock( this ), action );
-
-                lock.lock();
-
-                wrLock.unlock();
-            }
-        }
-
-        threadCtx.get().put( getLockKey(), lock );
+        doLock( action, getLockKey(), contentLock );
     }
 
     public void unlock()
     {
-        Lock lock = (Lock) threadCtx.get().get( getLockKey() );
-
-        if ( lock != null )
-        {
-            synchronized ( lock )
-            {
-                lock.unlock();
-
-                threadCtx.get().remove( getLockKey() );
-
-            }
-        }
-
-        factory.releaseLock( this );
+        doUnlock( null, getLockKey(), contentLock );
     }
 
     public void lockAttributes( Action action )
     {
-        Lock lock = (Lock) threadCtx.get().get( getAttributeLockKey() );
-
-        if ( lock == null )
-        {
-            // get the needed lock and lock
-            lock = getActionLock( factory.acquireAttributesLock( this ), action );
-
-            lock.lock();
-        }
-        else if ( lock != null && lock instanceof ReadLock && !action.isReadAction() )
-        {
-            synchronized ( lock )
-            {
-                // we need lock upgrade (r->w)
-                lock.unlock();
-
-                lock = getActionLock( factory.acquireAttributesLock( this ), action );
-
-                lock.lock();
-            }
-        }
-        else if ( lock != null && lock instanceof WriteLock && action.isReadAction() )
-        {
-            synchronized ( lock )
-            {
-                // we need lock downgrade (w->r)
-                Lock wrLock = lock;
-
-                lock = getActionLock( factory.acquireAttributesLock( this ), action );
-
-                lock.lock();
-
-                wrLock.unlock();
-            }
-        }
-
-        threadCtx.get().put( getAttributeLockKey(), lock );
+        doLock( action, getAttributeLockKey(), attributesLock );
     }
 
     public void unlockAttributes()
     {
-        Lock lock = (Lock) threadCtx.get().get( getAttributeLockKey() );
-
-        if ( lock != null )
-        {
-            synchronized ( lock )
-            {
-                lock.unlock();
-
-                threadCtx.get().remove( getAttributeLockKey() );
-            }
-        }
-
-        factory.releaseAttributesLock( this );
+        doUnlock( null, getAttributeLockKey(), attributesLock );
     }
 
     /**
@@ -193,6 +110,85 @@ public class DefaultRepositoryItemUid
     }
 
     // ==
+
+    protected Lock getLastUsedLock( String lockKey )
+    {
+        Map<String, Lock> threadMap = threadCtx.get();
+
+        if ( !threadMap.containsKey( lockKey ) )
+        {
+            return null;
+        }
+        else
+        {
+            return threadMap.get( lockKey );
+        }
+    }
+
+    protected void putLastUsedLock( String lockKey, Lock lock )
+    {
+        Map<String, Lock> threadMap = threadCtx.get();
+
+        if ( lock != null )
+        {
+            threadMap.put( lockKey, lock );
+        }
+        else
+        {
+            threadMap.remove( lockKey );
+        }
+    }
+
+    protected void doLock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
+    {
+        Lock lock = getLastUsedLock( lockKey );
+
+        if ( lock == null )
+        {
+            // get the needed lock and lock
+            lock = getActionLock( rwLock, action );
+
+            lock.lock();
+        }
+        else if ( lock != null && lock instanceof ReadLock && !action.isReadAction() )
+        {
+            // we need lock upgrade (r->w)
+            lock.unlock();
+
+            lock = getActionLock( rwLock, action );
+
+            lock.lock();
+        }
+        else if ( lock != null && lock instanceof WriteLock && action.isReadAction() )
+        {
+            // we need lock downgrade (w->r)
+            Lock wrLock = lock;
+
+            lock = getActionLock( rwLock, action );
+
+            lock.lock();
+
+            wrLock.unlock();
+        }
+
+        putLastUsedLock( lockKey, lock );
+    }
+
+    public void doUnlock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
+    {
+        Lock lock = getLastUsedLock( lockKey );
+
+        // see the doLock: we lock only once! Hence, if the caller already has acquired lock, we do not lock it again,
+        // simply not using the
+        // "reentrant" nature of the locks, to keep this part simple as possible. Hence, the unlock may be called
+        // multiple times (just as lock() is, but will do nothing).
+        if ( lock != null )
+        {
+            lock.unlock();
+
+            putLastUsedLock( lockKey, null );
+        }
+    }
 
     private Lock getActionLock( ReadWriteLock rwLock, Action action )
     {

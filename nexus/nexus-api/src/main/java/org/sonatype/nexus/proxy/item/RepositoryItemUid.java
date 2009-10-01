@@ -46,14 +46,17 @@ public interface RepositoryItemUid
     String getPath();
 
     /**
-     * Locks this UID for action. Will perform lock upgrade is needed (read -> write).
+     * Locks this UID for action. Will perform lock upgrade is needed (read -> write). It is the responsibility of
+     * caller to use lock/unlock properly (ie. boxing of calls).
      * 
      * @param action
      */
     void lock( Action action );
 
     /**
-     * Unlocks UID.
+     * Unlocks UID. It is the responsibility of caller to use lock/unlock properly (ie. boxing of calls).
+     * 
+     * @param action
      */
     void unlock();
 

@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.item;
 
 import static org.easymock.EasyMock.createMock;
 
+import org.easymock.EasyMock;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -25,8 +26,6 @@ public abstract class AbstractStorageItemTest
 {
     protected Repository repository;
 
-    protected RepositoryItemUidFactory uidFactory;
-
     protected RepositoryRouter router;
 
     public void setUp()
@@ -34,9 +33,7 @@ public abstract class AbstractStorageItemTest
     {
         super.setUp();
 
-        uidFactory = lookup( RepositoryItemUidFactory.class );
-
-        repository = createMock( Repository.class );
+        repository = EasyMock.createNiceMock( Repository.class );
 
         router = createMock( RepositoryRouter.class );
     }
