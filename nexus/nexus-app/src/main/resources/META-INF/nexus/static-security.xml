@@ -1191,8 +1191,8 @@
         <privilege>
             <id>67</id>
             <type>method</type>
-            <name>Read Repository Metadata</name>
-            <description>Give permission to read the repository metadata.  Note that this privilege is not currently invoked by the Nexus UI.</description>
+            <name>Read Repository Summary Info</name>
+            <description>Give permission to read the repository summary information.</description>
             <properties>
                 <property>
                     <key>method</key>
