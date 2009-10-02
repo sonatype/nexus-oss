@@ -13,10 +13,7 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
-import java.io.File;
-
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.FileUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -64,8 +61,6 @@ public class RepositoryMetaPlexusResource
         try
         {
             Repository repository = getRepositoryRegistry().getRepository( repoId );
-            
-            File localPath = org.sonatype.nexus.util.FileUtils.getFileFromUrl( repository.getLocalUrl() );
 
             RepositoryMetaResource resource = new RepositoryMetaResource();
 
@@ -80,6 +75,12 @@ public class RepositoryMetaPlexusResource
                 resource.addGroup( group.getId() );
             }
 
+            /*
+            NEXUS-2790 removing as calculation takes too long in certain circumstances
+            will eventually be reimplemented
+            
+            File localPath = org.sonatype.nexus.util.FileUtils.getFileFromUrl( repository.getLocalUrl() );
+            
             try
             {
                 resource.setSizeOnDisk( FileUtils.sizeOfDirectory( localPath ) );
@@ -90,6 +91,7 @@ public class RepositoryMetaPlexusResource
             {
                 // the repo is maybe virgin, so the dir is not created until some request needs it
             }
+            */
 
             // mustang is able to get this with File.getUsableFreeSpace();
             resource.setFreeSpaceOnDisk( -1 );

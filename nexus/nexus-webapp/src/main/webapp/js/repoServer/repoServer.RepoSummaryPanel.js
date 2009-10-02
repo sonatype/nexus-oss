@@ -58,7 +58,6 @@ Ext.extend( Sonatype.repoServer.AbstractRepositorySummaryPanel, Sonatype.ext.For
     this.populateInformationField( 'Repository Policy: ' + this.payload.data.repoPolicy + '\n' );
     this.populateInformationField( 'Repository Format: ' + this.payload.data.format + '\n' );
     this.populateInformationField( 'Contained in groups: ' + '\n' + this.combineGroups( srcObj.groups ) + '\n' );
-    this.populateInformationField( 'Size on Disk: ' + this.getDiskSize( parseInt( srcObj.sizeOnDisk ) ) + '\n' );
   },
   populateInformationField : function( text ) {
     var infoText = this.find( 'name', 'informationField' )[0].getValue();
@@ -85,20 +84,6 @@ Ext.extend( Sonatype.repoServer.AbstractRepositorySummaryPanel, Sonatype.ext.For
     }
     
     return combinedGroups;
-  },
-  getDiskSize : function( bytes ) {
-    if ( bytes < 1024 ) {
-      return bytes + ' Bytes';
-    }
-    else if ( bytes < 1048576 ) {
-      return (bytes/1024).toFixed(2) + ' KB';
-    }
-    else if ( bytes < 1073741824 ) {
-      return (bytes/1048576).toFixed(2) + ' MB'; 
-    }
-    else {
-      return (bytes/1073741824).toFixed(2) + ' GB';
-    }
   }
 } );
 
