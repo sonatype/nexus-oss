@@ -795,7 +795,11 @@ public abstract class AbstractRepository
             {
                 StorageFileItem file = (StorageFileItem) item;
 
-                file.setContentLocator( new ReadLockingContentLocator( uid, file.getContentLocator() ) );
+                // wrap the content locator if needed
+                if ( !( file.getContentLocator() instanceof ReadLockingContentLocator ) )
+                {
+                    file.setContentLocator( new ReadLockingContentLocator( uid, file.getContentLocator() ) );
+                }
             }
 
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventRetrieve( this, item ) );

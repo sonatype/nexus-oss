@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 /**
  * This is a simple wrapper implementation of ContentLocator, that wraps any other ContentLocator, while doing proper
@@ -46,67 +47,15 @@ public class ReadLockingContentLocator
     // ==
 
     private class ReadLockingInputStream
-        extends InputStream
+        extends WrappingInputStream
     {
         private final RepositoryItemUid wrappedUid;
 
-        private final InputStream wrappedStream;
-
         public ReadLockingInputStream( RepositoryItemUid wrappedUid, InputStream wrappedStream )
         {
-            super();
+            super(wrappedStream);
 
             this.wrappedUid = wrappedUid;
-
-            this.wrappedStream = wrappedStream;
-        }
-
-        @Override
-        public int read()
-            throws IOException
-        {
-            return wrappedStream.read();
-        }
-
-        @Override
-        public int read( byte b[] )
-            throws IOException
-        {
-            return wrappedStream.read( b );
-        }
-
-        @Override
-        public int read( byte b[], int off, int len )
-            throws IOException
-        {
-            return wrappedStream.read( b, off, len );
-        }
-
-        @Override
-        public long skip( long n )
-            throws IOException
-        {
-            return wrappedStream.skip( n );
-        }
-
-        @Override
-        public int available()
-            throws IOException
-        {
-            return wrappedStream.available();
-        }
-
-        @Override
-        public synchronized void mark( int readlimit )
-        {
-            wrappedStream.mark( readlimit );
-        }
-
-        @Override
-        public synchronized void reset()
-            throws IOException
-        {
-            wrappedStream.reset();
         }
 
         @Override
@@ -115,7 +64,7 @@ public class ReadLockingContentLocator
         {
             try
             {
-                wrappedStream.close();
+                super.close();
             }
             finally
             {

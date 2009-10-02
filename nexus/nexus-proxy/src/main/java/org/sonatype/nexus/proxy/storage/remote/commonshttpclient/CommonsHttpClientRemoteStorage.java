@@ -33,7 +33,6 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.HeadMethod;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
 import org.apache.commons.httpclient.methods.PutMethod;
-import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.component.annotations.Component;
@@ -293,31 +292,17 @@ public class CommonsHttpClientRemoteStorage
      */
     protected void updateContext( ProxyRepository repository, RemoteStorageContext ctx )
     {
-        HttpClient httpClient = null;
-
         getLogger().info(
             "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
                 + repository.getName() + "\"), updating HttpClient..." );
 
-        int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
-
-        HttpConnectionManagerParams connManagerParams = new HttpConnectionManagerParams();
-        connManagerParams.setConnectionTimeout( timeout );
-        connManagerParams.setSoTimeout( timeout );
-        connManagerParams.setTcpNoDelay( true );
-
-        MultiThreadedHttpConnectionManager connManager = new MultiThreadedHttpConnectionManager();
-        connManager.setParams( connManagerParams );
-
-        httpClient = new HttpClient( connManager );
-
-        HostConfiguration httpConfiguration = httpClient.getHostConfiguration();
+        HttpClient httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
 
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, getLogger() );
 
         ctx.putRemoteConnectionContextObject( CTX_KEY_CLIENT, httpClient );
 
-        ctx.putRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION, httpConfiguration );
+        ctx.putRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION, httpClient.getHostConfiguration() );
     }
 
     /**

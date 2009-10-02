@@ -17,18 +17,16 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.sonatype.nexus.util.WrappingInputStream;
 
 /**
  * The Class HttpClientInputStream.
  */
 public class HttpClientInputStream
-    extends InputStream
+    extends WrappingInputStream
 {
     /** The method. */
-    private HttpMethod method;
-
-    /** The is. */
-    private InputStream is;
+    private final HttpMethod method;
 
     /**
      * Instantiates a new http client input stream.
@@ -38,32 +36,18 @@ public class HttpClientInputStream
      */
     public HttpClientInputStream( HttpMethod method, InputStream is )
     {
-        super();
-        this.is = is;
+        super( is );
+
         this.method = method;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see java.io.InputStream#read()
-     */
-    public int read()
-        throws IOException
-    {
-        return is.read();
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see java.io.InputStream#close()
-     */
+    @Override
     public void close()
         throws IOException
     {
         try
         {
             super.close();
-            is.close();
         }
         finally
         {

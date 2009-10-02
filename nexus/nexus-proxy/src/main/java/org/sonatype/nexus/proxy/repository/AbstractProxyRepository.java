@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -546,23 +547,22 @@ public abstract class AbstractProxyRepository
             getLogger().debug( db.toString() );
         }
 
-        // here, we can get only by some other top level methods in AbstractProxy that does lock?
-        // TODO: confirm or check!
+        // From now on, the retrieve operation becomes WRITE operation,
+        // since this is proxy repository, and it _might_ have "fetch" as side-effect, or should wait for another thread
+        // to finish the fetch side effect.
+        // So, for same UIDs we start serialize the request processing.
+        RepositoryItemUid uid = createUid( request.getRequestPath() );
 
-        // RepositoryItemUid uid = createUid( request.getRequestPath() );
+        uid.lock( Action.create );
 
-        // Lock readLock = getRepositoryItemUidFactory().getLock( uid, Action.read );
-
-        // readLock.lock();
-
-        // try
-        // {
-        return doRetrieveItem0( request );
-        // }
-        // finally
-        // {
-        // readLock.unlock();
-        // }
+        try
+        {
+            return doRetrieveItem0( request );
+        }
+        finally
+        {
+            uid.unlock();
+        }
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request )

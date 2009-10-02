@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -16,14 +17,34 @@ import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.UsernamePasswordRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.util.SystemPropertiesHelper;
 
 public class HttpClientProxyUtil
 {
+    public static final String CONNECTION_POOL_SIZE_KEY = "httpClient.connectionPoolSize";
+
     public static void applyProxyToHttpClient( HttpClient httpClient, RemoteStorageContext ctx, Logger logger )
     {
-        httpClient.getParams().setConnectionManagerTimeout( ctx.getRemoteConnectionSettings().getConnectionTimeout() );
-        httpClient.getParams().setSoTimeout( ctx.getRemoteConnectionSettings().getConnectionTimeout() );
+        // getting the timeout from RemoteStorageContext. The value we get depends on per-repo and global settings.
+        // The value will "cascade" from repo level to global level, see imple of it.
+        int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
 
+        // getting the connection pool size, using a little trick to allow us "backdoor" to tune it using system
+        // properties, but defaulting it to the same we had before (httpClient defaults)
+        int connectionPoolSize =
+            SystemPropertiesHelper.getInteger( CONNECTION_POOL_SIZE_KEY,
+                MultiThreadedHttpConnectionManager.DEFAULT_MAX_TOTAL_CONNECTIONS );
+
+        httpClient.getHttpConnectionManager().getParams().setConnectionTimeout( timeout );
+        httpClient.getHttpConnectionManager().getParams().setSoTimeout( timeout );
+        httpClient.getHttpConnectionManager().getParams().setTcpNoDelay( true );
+        httpClient.getHttpConnectionManager().getParams().setMaxTotalConnections( connectionPoolSize );
+        // NOTE: connPool is _per_ repo, hence all of those will connect to same host (unless mirrors are used)
+        // so, we are violating intentionally the RFC and we let the whole pool size to chase same host
+        httpClient.getHttpConnectionManager().getParams().setMaxConnectionsPerHost(
+            HostConfiguration.ANY_HOST_CONFIGURATION, connectionPoolSize );
+
+        // Setting auth if needed
         HostConfiguration httpConfiguration = httpClient.getHostConfiguration();
 
         // BASIC and DIGEST auth only
@@ -139,7 +160,6 @@ public class HttpClientProxyUtil
 
                 httpClient.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs );
             }
-
         }
     }
 }

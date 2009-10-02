@@ -1334,6 +1334,7 @@ public class DefaultIndexerManager
             {
                 is = item.getInputStream();
 
+                // FileUtils.copyStreamToFile closes the stream!
                 FileUtils.copyStreamToFile( new RawInputStreamFacade( is ), new File( tempDir,
                     IndexingContext.INDEX_FILE + ".properties" ) );
             }
@@ -1341,20 +1342,6 @@ public class DefaultIndexerManager
         catch ( Exception e )
         {
             getLogger().debug( "Unable to copy index properties file, continuing without it", e );
-        }
-        finally
-        {
-            if ( is != null )
-            {
-                try
-                {
-                    is.close();
-                }
-                catch ( IOException e )
-                {
-                    getLogger().debug( "Unable to close file handle!!", e );
-                }
-            }
         }
     }
 
