@@ -44,6 +44,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
+      <version>4.5</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -53,12 +54,81 @@
       <groupId>com.sonatype.nexus.plugin</groupId>
       <artifactId>nexus-licensing-plugin</artifactId>
       <version>${nexus-licensing-plugin.version}</version>
-	  <scope>provided</scope>
+      <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <scope>test</scope>
+      <version>${nexus.version}</version>
+    </dependency>
+
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.2-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-nexus-plugin-environment</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusVersion>${nexus.version}</nexusVersion>
+          <nexusPluginsArtifacts>
+            <license>
+              <groupId>com.sonatype.nexus.plugin</groupId>
+              <artifactId>nexus-licensing-plugin</artifactId>
+            </license>
+            <license>
+              <groupId>com.sonatype.components</groupId>
+              <artifactId>plexus-licensing</artifactId>
+            </license>
+          </nexusPluginsArtifacts>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <configuration>
+          <forkMode>always</forkMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
