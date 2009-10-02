@@ -280,12 +280,14 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
             function( rec, recid ) {
               return rec.id == this.getRoleIdFromPayload( userRoles[i] );
             }, this ) );
-        var childRouteArray = this.getPrivilegeRoleRouteArray( privId, role.data );
-        if ( childRouteArray ){
-          for ( var j = 0 ; j < childRouteArray.length ; j++ ){
-            routeArray[routeArray.length] = childRouteArray[j];
-          }
-        }        
+        if ( role ){
+          var childRouteArray = this.getPrivilegeRoleRouteArray( privId, role.data );
+          if ( childRouteArray ){
+            for ( var j = 0 ; j < childRouteArray.length ; j++ ){
+              routeArray[routeArray.length] = childRouteArray[j];
+            }
+          }  
+        }
       }
     }
     
