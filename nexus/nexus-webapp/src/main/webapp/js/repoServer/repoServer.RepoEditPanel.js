@@ -402,6 +402,7 @@ Sonatype.repoServer.HostedRepositoryEditor = function( config ) {
             displayField: 'display',
             valueField: 'value',
             width: 120,
+            listWidth: 120,
             lastQuery: ''
           },
           {
