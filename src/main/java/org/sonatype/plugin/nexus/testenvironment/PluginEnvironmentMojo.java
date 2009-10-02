@@ -66,7 +66,14 @@ public class PluginEnvironmentMojo
         }
         catch ( AbstractMojoExecutionException e )
         {
-            getLog().warn( "Dependency not found: '" + ma + "', trying with version " + nexusVersion, e );
+            if ( getLog().isDebugEnabled() )
+            {
+                getLog().warn( "Dependency not found: '" + ma + "', trying with version " + nexusVersion, e );
+            }
+            else
+            {
+                getLog().warn( "Dependency not found: '" + ma + "', trying with version " + nexusVersion, e );
+            }
 
             Artifact artifact =
                 artifactFactory.createArtifactWithClassifier( ma.getGroupId(), ma.getArtifactId(), nexusVersion,
