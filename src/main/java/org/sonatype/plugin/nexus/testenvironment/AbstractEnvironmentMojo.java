@@ -832,6 +832,12 @@ public class AbstractEnvironmentMojo
     protected Artifact getMavenArtifact( MavenArtifact mavenArtifact )
         throws MojoExecutionException, MojoFailureException
     {
+        if ( "nexus-plugin".equals( mavenArtifact.getType() ) )
+        {
+            mavenArtifact.setType( "zip" );
+            mavenArtifact.setClassifier( "bundle" );
+        }
+
         Set<Artifact> projectArtifacts =
             getFilteredArtifacts( mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(), mavenArtifact.getType(),
                                   mavenArtifact.getClassifier() );
@@ -921,22 +927,11 @@ public class AbstractEnvironmentMojo
         for ( Artifact artifact : projectArtifacts )
         {
             Artifact ra =
-                artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
-                                                "compile", "jar" );
-            if ( !ra.isResolved() )
-            {
-                try
-                {
-                    resolver.resolve( ra, remoteRepositories, localRepository );
-                }
-                catch ( AbstractArtifactResolutionException e )
-                {
-                    getLog().warn( "Unable to resolve artifact: " + ra );
-                    continue;
-                }
+                artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
+                                                              artifact.getVersion(), artifact.getType(),
+                                                              artifact.getClassifier() );
 
-                resolvedArtifacts.add( ra );
-            }
+            resolvedArtifacts.add( resolve( ra ) );
         }
 
         return resolvedArtifacts;
