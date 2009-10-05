@@ -163,7 +163,7 @@ public class DefaultTaskConfigManager
                     TaskUtils.setName( nexusTask, task.getName() );
 
                     scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
-                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) )
+                                          translateFrom( task.getSchedule(), new Date( task.getLastRun() ) )
                     )
                         .setEnabled( task.isEnabled() );
                 }
@@ -309,6 +309,19 @@ public class DefaultTaskConfigManager
     {
         Schedule schedule = null;
 
+        Date startDate = null;
+        Date endDate = null;
+        
+        if ( modelSchedule.getStartDate() > 0 )
+        {
+            startDate = new Date( modelSchedule.getStartDate() );
+        }
+        
+        if ( modelSchedule.getEndDate() > 0 )
+        {
+            endDate = new Date( modelSchedule.getEndDate() );
+        }
+
         if ( CScheduleConfig.TYPE_ADVANCED.equals( modelSchedule.getType() ) )
         {
             try
@@ -338,10 +351,7 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule =
-                new MonthlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
-                                     daysToRun
-                );
+            schedule = new MonthlySchedule( startDate, endDate, daysToRun );
         }
         else if ( CScheduleConfig.TYPE_WEEKLY.equals( modelSchedule.getType() ) )
         {
@@ -361,24 +371,19 @@ public class DefaultTaskConfigManager
                 }
             }
 
-            schedule =
-                new WeeklySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ),
-                                    daysToRun
-                );
+            schedule = new WeeklySchedule( startDate, endDate, daysToRun );
         }
         else if ( CScheduleConfig.TYPE_DAILY.equals( modelSchedule.getType() ) )
         {
-            schedule =
-                new DailySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ) );
+            schedule = new DailySchedule( startDate, endDate );
         }
         else if ( CScheduleConfig.TYPE_HOURLY.equals( modelSchedule.getType() ) )
         {
-            schedule =
-                new HourlySchedule( new Date( modelSchedule.getStartDate() ), new Date( modelSchedule.getEndDate() ) );
+            schedule = new HourlySchedule( startDate, endDate );
         }
         else if ( CScheduleConfig.TYPE_ONCE.equals( modelSchedule.getType() ) )
         {
-            schedule = new OnceSchedule( new Date( modelSchedule.getStartDate() ) );
+            schedule = new OnceSchedule( startDate );
         }
         else if ( CScheduleConfig.TYPE_RUN_NOW.equals( modelSchedule.getType() ) )
         {
