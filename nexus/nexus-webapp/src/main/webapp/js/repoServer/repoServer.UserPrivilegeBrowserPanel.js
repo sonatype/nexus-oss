@@ -66,7 +66,7 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function( config ) {
     height: '100%',
     autoScroll: true,
     border: false,
-    frame: true,
+    frame: false,
     collapsible: false,
     collapsed: false,
     tbar: [
@@ -81,74 +81,64 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function( config ) {
     items : [
         {
           xtype: 'panel',
-          layout: 'column',
+          layout: 'table',
+          layoutConfig: {
+        	columns: 2
+          },
+          frame: true,
           items: [
             {
-              xtype :'panel',
-              layout :'auto',
-              columnWidth: .5,
-              items :[
-                {
-                  xtype: 'panel',
-                  style :'padding: 10px 0 10px 0',
-                  html: 'Select a privilege to view the role(s) in the user<br>that grant the privilege.'
-                },
-                {
-                  xtype :'treepanel',                  
-                  name :'privilege-list',
-                  title :'Privileges',
-                  border :true,
-                  bodyBorder :true,
-                  bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                  style :'padding: 0 50px 0 0',
-                  width :325,
-                  height :275,
-                  animate :true,
-                  lines :false,
-                  autoScroll :true,
-                  containerScroll :true,
-                  rootVisible :false,
-                  ddScroll: false,
-                  enableDD: false,
-                  root :new Ext.tree.TreeNode( {
-                    text :'root',
-                    draggable: false
-                  })
-                }
-              ]
+              xtype: 'panel',
+              style :'padding: 10px; font-size: 11px;',
+              html: 'Select a privilege to view the role(s) in the user<br>that grant the privilege.'
             },
             {
-              xtype :'panel',
-              layout :'auto',
-              columnWidth: .5,
-              items :[
-                {
-                  xtype: 'panel',
-                  style :'padding: 10px 0 10px 0',
-                  html: 'List of roles in the user that grant the selected privilege.<br>Expand the role to find nested role(s) that contain<br>the privilege.'
-                },
-                {
-                  xtype :'treepanel',
-                  name :'role-tree',
-                  title :'Role Containment',
-                  border :true,
-                  bodyBorder :true,
-                  bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-                  width :325,
-                  height :275,
-                  animate :true,
-                  lines :false,
-                  autoScroll :true,
-                  containerScroll :true,
-                  rootVisible :false,
-                  ddScroll: false,
-                  enableDD: false,
-                  root :new Ext.tree.TreeNode( {
-                    text :'root',
-                    draggable: false
-                  })
-                }
-              ]
+                xtype: 'panel',
+                style :'padding: 10px; font-size: 11px;',
+                html: 'List of roles in the user that grant the selected privilege.<br>Expand the role to find nested role(s) that contain<br>the privilege.'
+            },
+            {
+              xtype :'treepanel',                  
+              name :'privilege-list',
+              title :'Privileges',
+              border :true,
+              bodyBorder :true,
+              bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+              style :'padding: 0 20px 0 0',
+              width :325,
+              height :275,
+              animate :true,
+              lines :false,
+              autoScroll :true,
+              containerScroll :true,
+              rootVisible :false,
+              ddScroll: false,
+              enableDD: false,
+              root :new Ext.tree.TreeNode( {
+                text :'root',
+                draggable: false
+              })
+            },
+            {
+              xtype :'treepanel',
+              name :'role-tree',
+              title :'Role Containment',
+              border :true,
+              bodyBorder :true,
+              bodyStyle :'background-color:#FFFFFF; border: 1px solid #B5B8C8',
+              width :325,
+              height :275,
+              animate :true,
+              lines :false,
+              autoScroll :true,
+              containerScroll :true,
+              rootVisible :false,
+              ddScroll: false,
+              enableDD: false,
+              root :new Ext.tree.TreeNode( {
+                text :'root',
+                draggable: false
+              })
             }
           ]
         }
