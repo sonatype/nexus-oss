@@ -20,12 +20,15 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.metadata.ArtifactMetadataSource;
 import org.apache.maven.artifact.resolver.AbstractArtifactResolutionException;
+import org.apache.maven.artifact.resolver.ArtifactResolutionResult;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectBuilder;
 import org.apache.maven.project.MavenProjectHelper;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactFilterException;
 import org.apache.maven.shared.artifact.filter.collection.ArtifactIdFilter;
@@ -70,6 +73,12 @@ public class AbstractEnvironmentMojo
 
     /** @component */
     private MavenFileFilter mavenFileFilter;
+
+    /** @component */
+    private MavenProjectBuilder mavenProjectBuilder;
+
+    /** @component */
+    private ArtifactMetadataSource artifactMetadataSource;
 
     /**
      * @parameter expression="${session}"
@@ -832,28 +841,41 @@ public class AbstractEnvironmentMojo
     protected Artifact getMavenArtifact( MavenArtifact mavenArtifact )
         throws MojoExecutionException, MojoFailureException
     {
+        Artifact artifact;
+        if ( mavenArtifact.getVersion() != null )
+        {
+            artifact =
+                artifactFactory.createArtifactWithClassifier( mavenArtifact.getGroupId(),
+                                                              mavenArtifact.getArtifactId(),
+                                                              mavenArtifact.getVersion(), mavenArtifact.getType(),
+                                                              mavenArtifact.getClassifier() );
+        }
+        else
+        {
+            Set<Artifact> projectArtifacts =
+                getFilteredArtifacts( mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(),
+                                      mavenArtifact.getType(), mavenArtifact.getClassifier() );
+
+            if ( projectArtifacts.size() == 0 )
+            {
+                throw new MojoFailureException( "Maven artifact: '" + mavenArtifact.toString()
+                    + "' not found on dependencies list" );
+            }
+            else if ( projectArtifacts.size() != 1 )
+            {
+                throw new MojoFailureException( "More then one artifact found on dependencies list: '"
+                    + mavenArtifact.toString() + "'" );
+            }
+
+            artifact = projectArtifacts.iterator().next();
+        }
+
         if ( "nexus-plugin".equals( mavenArtifact.getType() ) )
         {
-            mavenArtifact.setType( "zip" );
-            mavenArtifact.setClassifier( "bundle" );
+            artifact =
+                artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
+                                                              artifact.getVersion(), "zip", "bundle" );
         }
-
-        Set<Artifact> projectArtifacts =
-            getFilteredArtifacts( mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(), mavenArtifact.getType(),
-                                  mavenArtifact.getClassifier() );
-
-        if ( projectArtifacts.size() == 0 )
-        {
-            throw new MojoFailureException( "Maven artifact: '" + mavenArtifact.toString()
-                + "' not found on dependencies list" );
-        }
-        else if ( projectArtifacts.size() != 1 )
-        {
-            throw new MojoFailureException( "More then one artifact found on dependencies list: '"
-                + mavenArtifact.toString() + "'" );
-        }
-
-        Artifact artifact = projectArtifacts.iterator().next();
 
         return resolve( artifact );
     }
@@ -861,6 +883,32 @@ public class AbstractEnvironmentMojo
     @SuppressWarnings( "unchecked" )
     private Set<Artifact> getFilteredArtifacts( String groupId, String artifactId, String type, String classifier )
         throws MojoExecutionException
+    {
+
+        Set<Artifact> projectArtifacts = project.getArtifacts();
+
+        FilterArtifacts filter = getFilters( groupId, artifactId, type, classifier );
+
+        return filtterArtifacts( projectArtifacts, filter );
+    }
+
+    private Set<Artifact> filtterArtifacts( Set<Artifact> projectArtifacts, FilterArtifacts filter )
+        throws MojoExecutionException
+    {
+        // perform filtering
+        try
+        {
+            projectArtifacts = filter.filter( projectArtifacts );
+        }
+        catch ( ArtifactFilterException e )
+        {
+            throw new MojoExecutionException( "Error filtering artifacts", e );
+        }
+
+        return projectArtifacts;
+    }
+
+    private FilterArtifacts getFilters( String groupId, String artifactId, String type, String classifier )
     {
         FilterArtifacts filter = new FilterArtifacts();
 
@@ -880,20 +928,7 @@ public class AbstractEnvironmentMojo
         {
             filter.addFilter( new ArtifactIdFilter( artifactId, null ) );
         }
-
-        Set<Artifact> projectArtifacts = project.getArtifacts();
-
-        // perform filtering
-        try
-        {
-            projectArtifacts = filter.filter( projectArtifacts );
-        }
-        catch ( ArtifactFilterException e )
-        {
-            throw new MojoExecutionException( "Error filtering artifacts", e );
-        }
-
-        return projectArtifacts;
+        return filter;
     }
 
     protected Artifact resolve( Artifact artifact )
@@ -921,6 +956,7 @@ public class AbstractEnvironmentMojo
         Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>();
         projectArtifacts.addAll( getFilteredArtifacts( null, null, "zip", "bundle" ) );
         projectArtifacts.addAll( getFilteredArtifacts( null, null, "nexus-plugin", null ) );
+        projectArtifacts.addAll( getNonTransitivePlugins( projectArtifacts ) );
 
         List<Artifact> resolvedArtifacts = new ArrayList<Artifact>();
 
@@ -935,6 +971,44 @@ public class AbstractEnvironmentMojo
         }
 
         return resolvedArtifacts;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private Collection<Artifact> getNonTransitivePlugins( Set<Artifact> projectArtifacts )
+        throws MojoExecutionException
+    {
+        Collection<Artifact> deps = new LinkedHashSet<Artifact>();
+
+        for ( Artifact artifact : projectArtifacts )
+        {
+            Artifact pomArtifact =
+                artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
+                                                artifact.getClassifier(), "pom" );
+            Set<Artifact> result;
+            try
+            {
+                MavenProject pomProject =
+                    mavenProjectBuilder.buildFromRepository( pomArtifact, remoteRepositories, localRepository );
+
+                Set<Artifact> artifacts = pomProject.createArtifacts( artifactFactory, null, null );
+                ArtifactResolutionResult arr =
+                    resolver.resolveTransitively( artifacts, pomArtifact, localRepository, remoteRepositories,
+                                                  artifactMetadataSource, null );
+                result = arr.getArtifacts();
+            }
+            catch ( Exception e )
+            {
+                throw new MojoExecutionException( "Failed to resolve non-transitive deps " + e.getMessage(), e );
+            }
+
+            LinkedHashSet<Artifact> plugins = new LinkedHashSet<Artifact>();
+            plugins.addAll( filtterArtifacts( result, getFilters( null, null, "nexus-plugin", null ) ) );
+            plugins.addAll( filtterArtifacts( result, getFilters( null, null, "zip", "bundle" ) ) );
+            plugins.addAll( getNonTransitivePlugins( plugins ) );
+            deps.addAll( plugins );
+        }
+
+        return deps;
     }
 
     public void contextualize( Context context )

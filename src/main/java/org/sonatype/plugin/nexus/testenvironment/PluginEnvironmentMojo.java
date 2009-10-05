@@ -8,7 +8,6 @@ import java.util.Set;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojoExecutionException;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * @author velo
@@ -27,31 +26,39 @@ public class PluginEnvironmentMojo
     private String nexusVersion;
 
     @Override
-    public void execute()
-        throws MojoExecutionException, MojoFailureException
-    {
-        if ( !"nexus-plugin".equals( project.getPackaging() ) )
-        {
-            throw new MojoFailureException( "Invalid project type " + project.getPackaging() );
-        }
-        super.execute();
-    }
-
-    @Override
     protected Artifact getMavenArtifact( MavenArtifact ma )
         throws MojoExecutionException
     {
         if ( equivalent( ma, project.getArtifact() ) )
         {
-            Artifact da =
-                artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
-                                                              project.getArtifact().getArtifactId(),
-                                                              project.getArtifact().getVersion(), "zip", "bundle" );
-            da.setResolved( true );
-            File bundle =
-                new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-bundle.zip" );
-            bundle = bundle.getAbsoluteFile();
+            Artifact da;
+            File bundle;
+            if ( "nexus-plugin".equals( ma.getType() ) )
+            {
+                da =
+                    artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
+                                                                  project.getArtifact().getArtifactId(),
+                                                                  project.getArtifact().getVersion(), "zip", "bundle" );
+                bundle =
+                    new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-bundle.zip" );
+            }
+            else
+            {
+                da =
+                    artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
+                                                                  project.getArtifact().getArtifactId(),
+                                                                  project.getArtifact().getVersion(),
+                                                                  project.getArtifact().getType(),
+                                                                  project.getArtifact().getClassifier() );
+                String classifier =
+                    project.getArtifact().getClassifier() == null ? "" : "-" + project.getArtifact().getClassifier();
+                bundle =
+                    new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + classifier + "."
+                        + project.getArtifact().getType() );
+            }
 
+            da.setResolved( true );
+            bundle = bundle.getAbsoluteFile();
             if ( !bundle.exists() )
             {
                 throw new MojoExecutionException( "Project bundle doesn't exists " + bundle );
@@ -165,8 +172,11 @@ public class PluginEnvironmentMojo
         Collection<Artifact> depPlugins = getNexusPlugins();
         for ( Artifact artifact : depPlugins )
         {
-            plugins.add( new MavenArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
-                                            artifact.getType() ) );
+            MavenArtifact ma =
+                new MavenArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
+                                   artifact.getType() );
+            ma.setVersion( artifact.getVersion() );
+            plugins.add( ma );
         }
 
         return plugins;
