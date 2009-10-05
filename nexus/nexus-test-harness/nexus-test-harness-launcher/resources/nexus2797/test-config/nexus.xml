@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
+  <version>1.0.8</version>
+  <security>
+    <enabled>false</enabled>
+    <realms>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
+    </realms>
+  </security>
+  <httpProxy />
+  <repositories>
+    <repository>
+      <id>releases</id>
+      <name>releases</name>
+      <allowWrite>true</allowWrite>
+      <artifactMaxAge>-1</artifactMaxAge>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <pathMappings>
+    </pathMappings>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>public</groupId>
+        <name>public</name>
+        <type>maven2</type>
+        <repositories>
+          <repository>releases</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+  <repositoryTargets>
+    <repositoryTarget>
+      <id>1</id>
+      <name>All (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>2</id>
+      <name>All (Maven1)</name>
+      <contentClass>maven1</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>3</id>
+      <name>All but sources (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>(?!.*-sources.*).*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>4</id>
+      <name>All Metadata (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*maven-metadata\.xml.*</pattern>
+      </patterns>
+    </repositoryTarget>
+  </repositoryTargets>
+  <tasks>
+    <task>
+      <id>23</id>
+      <name>Empty trash</name>
+      <enabled>true</enabled>
+      <type>EmptyTrashTask</type>
+      <status>SUBMITTED</status>
+      <nextRun>1235788200000</nextRun>
+      <schedule>
+        <type>daily</type>
+        <startDate>1230777000000</startDate>
+      </schedule>
+    </task>
+    <task>
+      <id>22</id>
+      <name>Cleanup snapshots</name>
+      <enabled>true</enabled>
+      <type>SnapshotRemoverTask</type>
+      <status>SUBMITTED</status>
+      <nextRun>1235790000000</nextRun>
+      <schedule>
+        <type>daily</type>
+        <startDate>1230778800000</startDate>
+      </schedule>
+      <properties>
+        <property>
+          <key>removeOlderThanDays</key>
+          <value></value>
+        </property>
+        <property>
+          <key>minSnapshotsToKeep</key>
+          <value>1</value>
+        </property>
+        <property>
+          <key>removeIfReleaseExists</key>
+          <value>false</value>
+        </property>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_releases</value>
+        </property>
+      </properties>
+    </task>
+    <task>
+      <id>0</id>
+      <name>Refresh Plexus-Releases Index for Promoted Releases</name>
+      <enabled>true</enabled>
+      <type>ReindexTask</type>
+      <status>SUBMITTED</status>
+      <nextRun>1235787300000</nextRun>
+      <schedule>
+        <type>advanced</type>
+        <cronCommand>0 15 0-23/4 * * ?</cronCommand>
+      </schedule>
+      <properties>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_releases</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
+  <smtpConfiguration>
+    <host>localhost</host>
+    <port>25</port>
+    <systemEmailAddress>nexus@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+</nexusConfiguration>
