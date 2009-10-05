@@ -1191,7 +1191,7 @@
         <privilege>
             <id>67</id>
             <type>method</type>
-            <name>Read Repository Summary Info</name>
+            <name>Repository Summary Info (read)</name>
             <description>Give permission to read the repository summary information.</description>
             <properties>
                 <property>
