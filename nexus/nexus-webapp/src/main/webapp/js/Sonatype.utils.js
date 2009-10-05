@@ -818,7 +818,7 @@ Sonatype.utils = {
       token = window.location.hash.substring( 1 );
     }
 
-    if ( token && Sonatype.user.curr.repoServer.length ) {
+    if ( token && Sonatype.user.curr.repoServer && Sonatype.user.curr.repoServer.length ) {
       Sonatype.view.historyDisabled = true;
 
       var toks = token.split( Sonatype.view.HISTORY_DELIMITER );
