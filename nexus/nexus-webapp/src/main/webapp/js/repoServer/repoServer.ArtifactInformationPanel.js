@@ -32,6 +32,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
       { 
         xtype: 'panel',
         layout: 'column',
+        anchor: Sonatype.view.FIELD_OFFSET + ' -10',
         items: [
           {
             xtype: 'panel',
@@ -81,9 +82,9 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
               {
                 xtype: 'textarea',
                 fieldLabel: 'XML',
+                anchor: Sonatype.view.FIELD_OFFSET,
+                height: '100%',
                 name: 'xml',
-                anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                height: 100,
                 allowBlank: true,
                 readOnly: true
               }
@@ -101,7 +102,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
     collapsible: true,
     collapsed: true,
     split: true,
-    height: 150,
+    height: 160,
     minHeight: 100,
     maxHeight: 400,
     frame: false,
