@@ -477,7 +477,7 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           bodyBorder: true, //note: this seem to have no effect w/in form panel
           //note: this style matches the expected behavior
           bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-          width: 250,
+          width: 400,
           height: 300,
           animate:true,
           lines: false,
@@ -556,7 +556,7 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
           bodyBorder: true, //note: this seem to have no effect w/in form panel
           //note: this style matches the expected behavior
           bodyStyle: 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-          width: 250,
+          width: 400,
           height: Ext.isGecko ? 340 : 300,
           animate:true,
           lines: false,
