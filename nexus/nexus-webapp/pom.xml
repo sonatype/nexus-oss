@@ -189,6 +189,7 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.resources.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.FeedViewPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.ArtifactInformationPanel.js</include>
+                    <include>${compressed-dir}/js/repoServer/repoServer.ArtifactContainer.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.SearchResultGrid.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.SearchPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.LogsViewPanel.js</include>

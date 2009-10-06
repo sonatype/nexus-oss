@@ -83,7 +83,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
                 xtype: 'textarea',
                 fieldLabel: 'XML',
                 anchor: Sonatype.view.FIELD_OFFSET,
-                height: '100%',
+                height: 100,
                 name: 'xml',
                 allowBlank: true,
                 readOnly: true
@@ -99,27 +99,15 @@ Sonatype.repoServer.ArtifactInformationPanel = function( config ) {
     title: 'Artifact Information',
     layout: 'fit',
     region: 'south',
-    collapsible: true,
-    collapsed: true,
+    collapsible: false,
+    collapsed: false,
     split: true,
-    height: 160,
-    minHeight: 100,
-    maxHeight: 400,
     frame: false,
     autoScroll: true,
 
     items: [
       this.formPanel
-    ],
-    
-    listeners: {
-      expand: {
-        fn: function( p ) {
-          this.formPanel.doLayout();
-        },
-        scope: this
-      }
-    }
+    ]
   } );
 };
 
@@ -142,7 +130,7 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
     return String.format( '<a target="_blank" href="{0}">{1}</a>', url, title );
   },
 
-  showArtifact: function( data, collapse ) {
+  showArtifact: function( data ) {
     data.xml = '';
     var empty = data.groupId == null || data.groupId == ''; 
     if ( ! empty ) {
@@ -169,13 +157,27 @@ Ext.extend( Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
 	    	linkDiv.innerHTML =  linkHtml;
 	    }
     }
-
-    if ( collapse ) {
-      this.collapse();
-    }
-    else {
-      this.expand();
-    }
   }
 } );
 
+Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
+  artifactContainer.add( new Sonatype.repoServer.ArtifactInformationPanel( { 
+    name: 'artifactInformationPanel',
+    tabTitle: 'Artifact Information' 
+  } ) );
+});
+
+Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContainer, data) {
+  var panel = artifactContainer.find( 'name', 'artifactInformationPanel' )[0];
+  
+  if ( data == null ) {
+    panel.showArtifact( {
+      groupId: '',
+      artifactId: '',
+      version: ''
+    } );
+    }
+    else {
+    panel.showArtifact( data );
+    }
+});

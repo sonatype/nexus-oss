@@ -275,7 +275,7 @@ Sonatype.repoServer.SearchPanel = function(config){
       items: toolbaritems
    });
   
-  this.artifactInformationPanel = new Sonatype.repoServer.ArtifactInformationPanel({});
+  this.artifactContainer = new Sonatype.repoServer.ArtifactContainer({});
   
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
     layout: 'border',
@@ -283,7 +283,7 @@ Sonatype.repoServer.SearchPanel = function(config){
     tbar: this.searchToolbar,
     items: [
       this.grid,
-      this.artifactInformationPanel
+      this.artifactContainer
     ]
   });
 
@@ -302,15 +302,11 @@ Sonatype.repoServer.SearchPanel = function(config){
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
 
   clearArtifactInformation: function( button, e ) {
-    this.artifactInformationPanel.showArtifact( {
-      groupId: '',
-      artifactId: '',
-      version: ''
-    }, true );
+    this.artifactContainer.collapsePanel();
   },
 
   displayArtifactInformation: function( selectionModel, index, rec ) {
-    this.artifactInformationPanel.showArtifact( rec.data );
+    this.artifactContainer.updateArtifact( rec.data );
   },
   
   startQuickSearch: function( v ) {
@@ -341,7 +337,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   
   fetchFirst50: function( p ) {
-    p.artifactInformationPanel.collapse();
+    p.artifactContainer.collapsePanel();
     p.grid.totalRecords = 0;
     p.grid.store.load({
       params: {
