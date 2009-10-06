@@ -79,7 +79,7 @@ public class PluginEnvironmentMojo
             }
             else
             {
-                getLog().warn( "Dependency not found: '" + ma + "', trying with version " + nexusVersion, e );
+                getLog().warn( "Dependency not found: '" + ma + "', trying with version " + nexusVersion );
             }
 
             Artifact artifact =
