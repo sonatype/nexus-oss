@@ -6,12 +6,12 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
-import org.jsecurity.authc.pam.ModularRealmAuthenticator;
 import org.jsecurity.cache.CacheManager;
 import org.jsecurity.cache.ehcache.EhCacheManager;
 import org.jsecurity.mgt.DefaultSecurityManager;
 import org.jsecurity.mgt.RealmSecurityManager;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
+import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
 @Component( role = RealmSecurityManager.class )
@@ -36,7 +36,7 @@ public class DefaultPlexusSecurityManager
         throws InitializationException
     {
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
-        ModularRealmAuthenticator realmAuthenticator = new ModularRealmAuthenticator();
+        FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
         realmAuthenticator.setModularAuthenticationStrategy( new FirstSuccessfulAuthenticationStrategy() );
 
         // Authenticator
