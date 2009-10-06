@@ -20,6 +20,7 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.SerialMergeScheduler;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -404,6 +405,8 @@ public class DefaultIndexingContext
                 indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
 
                 indexWriter.setRAMBufferSizeMB( 2 );
+                
+                indexWriter.setMergeScheduler(new SerialMergeScheduler());
             }
 
             return indexWriter;
