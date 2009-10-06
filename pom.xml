@@ -76,6 +76,7 @@
           <execution>
             <goals>
               <goal>setup-nexus-plugin-environment</goal>
+              <goal>package</goal>
             </goals>
           </execution>
         </executions>
@@ -111,19 +112,6 @@
             <id>verify</id>
             <goals>
               <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
             </goals>
           </execution>
         </executions>
