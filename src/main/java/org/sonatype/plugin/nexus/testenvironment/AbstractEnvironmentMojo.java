@@ -853,8 +853,10 @@ public class AbstractEnvironmentMojo
     private Set<Artifact> getFilteredArtifacts( String groupId, String artifactId, String type, String classifier )
         throws MojoExecutionException
     {
+        Set<Artifact> projectArtifacts = new LinkedHashSet<Artifact>();
 
-        Set<Artifact> projectArtifacts = project.getArtifacts();
+        projectArtifacts.addAll( project.getAttachedArtifacts() );
+        projectArtifacts.addAll( project.getArtifacts() );
 
         FilterArtifacts filter = getFilters( groupId, artifactId, type, classifier );
 
