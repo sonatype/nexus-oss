@@ -66,6 +66,8 @@ public class ResourceExchange
 
     private boolean locked = true;
 
+    private IOException error;
+
     public ResourceExchange( final File targetFile, final HttpFields httpHeaders, final int maxRedirects,
                              final String url, final TransferListenerSupport listenerSupport )
     {
@@ -279,7 +281,6 @@ public class ResourceExchange
             transferEvent = null;
         }
 
-        locked = false;
         releaseWait();
     }
 
@@ -361,8 +362,18 @@ public class ResourceExchange
     }
 
     public boolean waitFor( final int transactionTimeoutMs )
-        throws InterruptedException
+        throws InterruptedException, IOException
     {
+        if ( error != null )
+        {
+            throw error;
+        }
+
+        if ( isDone( getStatus() ) )
+        {
+            return error == null && !locked;
+        }
+
         if ( locked )
         {
             synchronized ( lock )
@@ -392,6 +403,7 @@ public class ResourceExchange
 
     private void releaseWait()
     {
+        locked = false;
         synchronized ( lock )
         {
             lock.notify();
@@ -399,12 +411,14 @@ public class ResourceExchange
     }
 
     @Override
-    protected void onConnectionFailed( final Throwable x )
+    protected void onConnectionFailed( final Throwable error )
     {
-        super.onConnectionFailed( x );
+        super.onConnectionFailed( error );
 
-        IOException e = new IOException( x.getLocalizedMessage() );
-        e.initCause( x );
+        IOException e = new IOException( "Failed to connect: " + error.getMessage() );
+        e.initCause( error );
+
+        this.error = e;
 
         listenerSupport.fireTransferError( originalUrl, e, TransferEvent.REQUEST_GET );
 
@@ -412,12 +426,14 @@ public class ResourceExchange
     }
 
     @Override
-    protected void onException( final Throwable x )
+    protected void onException( final Throwable error )
     {
-        super.onException( x );
+        super.onException( error );
 
-        IOException e = new IOException( x.getLocalizedMessage() );
-        e.initCause( x );
+        IOException e = new IOException( "Transfer failed: " + error.getMessage() );
+        e.initCause( error );
+
+        this.error = e;
 
         listenerSupport.fireTransferError( originalUrl, e, TransferEvent.REQUEST_GET );
 

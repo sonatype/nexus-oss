@@ -334,6 +334,64 @@ public class DefaultIndexUpdaterEmbeddingIT
         }
     }
 
+    public void testIndexRetrieval_BadHostname()
+        throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
+    {
+        File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
+        basedir.delete();
+        basedir.mkdirs();
+
+        try
+        {
+            IndexingContext ctx = newTestContext( basedir, "http://dummy/" );
+
+            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
+            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
+            {
+                private static final long serialVersionUID = 1L;
+
+                {
+                    setUserName( "user" );
+                    setPassword( "password" );
+                }
+            } );
+            updateRequest.setTransferListener( new TransferListenerFixture()
+            {
+                @Override
+                public void transferError( final TransferEvent transferEvent )
+                {
+                }
+            } );
+
+            ResourceFetcher fetcher =
+                new JettyResourceFetcher().setConnectionTimeoutMillis( 100 )
+                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
+                                          .addTransferListener( updateRequest.getTransferListener() );
+
+            updateRequest.setResourceFetcher( fetcher );
+
+            try
+            {
+                updater.fetchAndUpdateIndex( updateRequest );
+                fail( "Should timeout and throw IOException." );
+            }
+            catch ( Exception e )
+            {
+                System.out.println( "Connection failed as expected." );
+            }
+        }
+        finally
+        {
+            try
+            {
+                FileUtils.forceDelete( basedir );
+            }
+            catch ( IOException e )
+            {
+            }
+        }
+    }
+
     private IndexingContext newTestContext( final File basedir, final String baseUrl )
         throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
     {

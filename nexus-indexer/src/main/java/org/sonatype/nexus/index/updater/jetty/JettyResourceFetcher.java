@@ -71,10 +71,17 @@ public class JettyResourceFetcher
         ResourceExchange exchange =
             new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, getUrl.toString(), listenerSupport );
 
-        exchange = get( exchange );
-        while ( exchange.prepareForRedirect() )
+        try
         {
             exchange = get( exchange );
+            while ( exchange.prepareForRedirect() )
+            {
+                exchange = get( exchange );
+            }
+        }
+        catch ( Throwable t )
+        {
+            t.printStackTrace();
         }
 
         if ( exchange.isRedirectionPrevented() )
@@ -87,12 +94,15 @@ public class JettyResourceFetcher
         throws IOException
     {
         String url = exchange.getOriginalUrl();
+
         httpClient.send( exchange );
+
         try
         {
             // TODO: This should happen outside of the whole get/redirect loop, to enforce overall transaction timeout.
             if ( !exchange.waitFor( transactionTimeoutMs ) )
             {
+                // !exchange.isDone( exchange.getStatus() ) &&
                 listenerSupport.fireTransferError( url, new IOException( "Transaction timed out." ),
                                                    TransferEvent.REQUEST_GET );
             }
