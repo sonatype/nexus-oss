@@ -353,6 +353,23 @@ public abstract class AbstractGroupRepository
         return items;
     }
 
-    // ==
+    // ===================================================================================
+    // Inner stuff
+
+    @Override
+    public void maintainNotFoundCache( String path )
+        throws ItemNotFoundException
+    {
+        // just maintain the cache (ie. expiration), but don't make NFC
+        // affect call delegation to members
+        try
+        {
+            super.maintainNotFoundCache( path );
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // ignore it
+        }
+    }
 
 }

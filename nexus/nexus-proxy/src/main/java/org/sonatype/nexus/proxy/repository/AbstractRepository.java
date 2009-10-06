@@ -1094,6 +1094,7 @@ public abstract class AbstractRepository
                         getLogger().debug(
                             "The path " + path + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
+
                     throw new ItemNotFoundException( path );
                 }
             }
