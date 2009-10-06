@@ -26,12 +26,19 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2-SNAPSHOT</version>
         <executions>
           <execution>
+            <id>env</id>
             <phase>initialize</phase>
             <goals>
               <goal>setup-environment</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>package</id>
+            <goals>
+              <goal>package</goal>
             </goals>
           </execution>
         </executions>
