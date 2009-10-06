@@ -26,7 +26,8 @@ Sonatype.panels.AutoTabPanel = function( config ) {
     deferredRender: false,
     autoScroll: false,
     frame: false,
-    border: false
+    border: false,
+    activeTab: 0
   };
   Ext.apply( this, config, defaultConfig );
   Sonatype.panels.AutoTabPanel.superclass.constructor.call( this, {} );
@@ -41,7 +42,7 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
         first.setTitle( first.tabTitle );
   
         this.tabPanel = new Ext.TabPanel( { 
-          activeItem: 0,
+          activeItem: this.activeTab == -1 ? null : this.activeTab,
           deferredRender: false,
           autoScroll: false,
           frame: false,
@@ -411,7 +412,8 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
     if ( ! panel ) {
       panel = new Sonatype.panels.AutoTabPanel( { 
         id: id,
-        title: rec.data[this.titleColumn]
+        title: rec.data[this.titleColumn],
+        activeTab: -1
       } );
       
       if ( this.rowClickHandler ) {
@@ -429,6 +431,26 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
           var child = panel.getComponent( 0 );
           child.on( 'cancel', this.cancelHandler.createDelegate( this, [child] ), this );
         }
+        else {          
+          panel.tabPanel.on( 'beforetabchange', function ( tabpanel, newtab, currenttab ) {
+            //don't want to set this unless user clicked
+            if ( currenttab ) {
+              this.selectedTabName = newtab.name;
+            }
+          }, this );
+          
+          if ( this.selectedTabName ) {
+            var tab = panel.find( 'name', this.selectedTabName )[0];
+            
+            if ( tab ) {
+              panel.tabPanel.setActiveTab( tab.id );
+            }
+          }
+          else {
+            panel.tabPanel.setActiveTab( 0 );
+          }
+        }
+        
         this.cardPanel.add( panel );
       }
       else {

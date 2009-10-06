@@ -193,6 +193,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec, gri
       && sp.checkPermission( 'nexus:repometa', sp.READ ) ) {
     cardPanel.add( new panel( {
       tabTitle: 'Summary',
+      name: 'summary',
       payload: rec,
       groupStore: gridPanel.groupStore
     } ) );

@@ -259,6 +259,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
       		if ( isSuccess ) {
       			cardPanel.add( new Sonatype.repoServer.RepositoryGroupEditor( {
         				tabTitle: 'Configuration',
+        				name: 'configuration',
         				payload: rec 
       			} ) );
       		}

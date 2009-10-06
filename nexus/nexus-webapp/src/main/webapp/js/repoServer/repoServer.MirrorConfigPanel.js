@@ -528,13 +528,15 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
     if ( rec.data.repoType == 'proxy' ){
       cardPanel.add(new Sonatype.repoServer.ProxyMirrorEditor( {
         payload :rec,
-        tabTitle :'Mirrors'
+        tabTitle :'Mirrors',
+        name: 'mirrors'
       }));
     }
     else if ( rec.data.repoType == 'hosted' ) {
       cardPanel.add(new Sonatype.repoServer.HostedMirrorEditor( {
         payload :rec,
-        tabTitle :'Mirrors'
+        tabTitle :'Mirrors',
+        name: 'mirrors'
       }));
     }
   }

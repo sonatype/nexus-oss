@@ -1338,6 +1338,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
         sp.checkPermission( 'nexus:repositories', sp.EDIT ) ) ) {
     cardPanel.add( new editor( {
       tabTitle: 'Configuration',
+      name: 'configuration',
       payload: rec 
     } ) );
   }

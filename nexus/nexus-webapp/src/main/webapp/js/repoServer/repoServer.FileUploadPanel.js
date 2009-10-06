@@ -962,7 +962,10 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
           var statusResp = Ext.decode( response.responseText );
           if ( statusResp.data ) {
             if ( statusResp.data.writePolicy == 'ALLOW_WRITE' || statusResp.data.writePolicy == 'ALLOW_WRITE_ONCE' ) {
-              var uploadPanel = new Sonatype.repoServer.ArtifactUploadPanel( { payload: rec } ); 
+              var uploadPanel = new Sonatype.repoServer.ArtifactUploadPanel( { 
+                payload: rec,
+                name: 'upload'
+              } ); 
               var card = cardPanel.add( {
                 xtype: 'panel',
                 layout: 'fit',
@@ -994,6 +997,7 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
               cardPanel.add( {
                 xtype: 'panel',
                 tabTitle: 'Artifact Upload',
+                name: 'upload',
                 items: [
                   {
                     border: false,

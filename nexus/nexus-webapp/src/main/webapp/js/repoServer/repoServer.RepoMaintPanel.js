@@ -620,12 +620,14 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   if ( rec.data.resourceURI ) {
     cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
       payload: rec,
+      name: 'browsestorage',
       tabTitle: 'Browse Storage'
     } ) );
     if ( rec.data.repoType != 'virtual' 
       && rec.data.format == 'maven2' ) {
       cardPanel.add( new Sonatype.repoServer.RepositoryBrowsePanel( { 
         payload: rec,
+        name: 'browseindex',
         tabTitle: 'Browse Index',
         browseIndex: true
       } ) );
