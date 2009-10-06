@@ -347,6 +347,10 @@ public class FullIndexNexusIndexerTest
 
         newContext.close( false );
 
+        newIndexDir = FSDirectory.getDirectory( newIndex );
+
+        DefaultIndexUpdater.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir, context );
+        
         newContext =
             nexusIndexer.addIndexingContext( "test-new", "test", null, newIndexDir, null, null, DEFAULT_CREATORS );
 
