@@ -1,0 +1,13 @@
+<user-response>
+  <data>
+    <resourceURI>http://localhost:8081/nexus/service/local/users/bbb</resourceURI>
+    <userId>bbb</userId>
+    <name>bbb</name>
+    <status>active</status>
+    <email>b@b.b</email>
+    <roles>
+      <role>admin</role>
+    </roles>
+    <userManaged>true</userManaged>
+  </data>
+</user-response>

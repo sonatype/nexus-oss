@@ -1,0 +1,16 @@
+<assembly>
+  <id>resources</id>
+
+  <formats>
+    <format>zip</format>
+  </formats>
+  
+  <baseDirectory>/</baseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <outputDirectory>/</outputDirectory>
+      <directory>resources</directory>
+    </fileSet>
+  </fileSets>
+</assembly>

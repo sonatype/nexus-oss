@@ -1,0 +1,10 @@
+<user-to-role>
+	<data>
+		<userId>test</userId>
+		<source>url</source>
+		<roles>
+			<role>anonymous</role>
+			<role>developer</role>
+		</roles>
+	</data>
+</user-to-role>

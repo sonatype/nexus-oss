@@ -1,0 +1,29 @@
+<plexus>
+
+	<load-on-start>
+		<component>
+			<role>org.sonatype.plexus.jetty.ServletContainer</role>
+		</component>
+	</load-on-start>
+
+	<components>
+
+		<component>
+			<role>org.codehaus.plexus.logging.LoggerManager</role>
+			<implementation>org.codehaus.plexus.logging.slf4j.Slf4jLoggerManager</implementation>
+			<configuration>
+				<threshold>DEBUG</threshold>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.sonatype.plexus.jetty.ServletContainer</role>
+			<implementation>org.sonatype.plexus.jetty.DefaultServletContainer</implementation>
+			<configuration>
+			  <jettyXml>${jetty.xml}</jettyXml>
+			</configuration>
+		</component>
+
+	</components>
+
+</plexus>

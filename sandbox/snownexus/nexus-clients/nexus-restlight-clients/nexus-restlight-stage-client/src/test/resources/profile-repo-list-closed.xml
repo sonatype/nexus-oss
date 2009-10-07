@@ -1,0 +1,37 @@
+<stagingRepositories>
+  <data>
+    <stagingProfileRepository>
+      <profileId>112cc490b91265a1</profileId>
+      <repositoryId>tp1-001</repositoryId>
+      <repositoryName>tp1--001 (u:admin, a:127.0.0.1)</repositoryName>
+      <type>closed</type>
+      <policy>release</policy>
+      <userId>admin</userId>
+      <userAgent>Apache-Maven/2.1 (Java 1.4.2_18; Mac OS X 10.5.6) maven-artifact/2.1.0</userAgent>
+      <ipAddress>127.0.0.1</ipAddress>
+      <repositoryURI>http://localhost:8082/nexus/content/repositories/tp1-001</repositoryURI>
+    </stagingProfileRepository>
+    <stagingProfileRepository>
+      <profileId>112cc490b91265a1</profileId>
+      <repositoryId>tp1-002</repositoryId>
+      <repositoryName>tp1--002 (u:testuser, a:127.0.0.1)</repositoryName>
+      <type>closed</type>
+      <policy>release</policy>
+      <userId>testuser</userId>
+      <userAgent>Apache-Maven/2.1 (Java 1.4.2_18; Mac OS X 10.5.6) maven-artifact/2.1.0</userAgent>
+      <ipAddress>127.0.0.1</ipAddress>
+      <repositoryURI>http://localhost:8082/nexus/content/repositories/tp1-002</repositoryURI>
+    </stagingProfileRepository>
+    <stagingProfileRepository>
+      <profileId>112cc490b91265a1</profileId>
+      <repositoryId>tp1-003</repositoryId>
+      <repositoryName>tp1--003 (u:testuser, a:127.0.0.1)</repositoryName>
+      <type>closed</type>
+      <policy>release</policy>
+      <userId>testuser</userId>
+      <userAgent>Apache-Maven/2.1 (Java 1.4.2_18; Mac OS X 10.5.6) maven-artifact/2.1.0</userAgent>
+      <ipAddress>127.0.0.1</ipAddress>
+      <repositoryURI>http://localhost:8082/nexus/content/repositories/tp1-003</repositoryURI>
+    </stagingProfileRepository>
+  </data>
+</stagingRepositories>

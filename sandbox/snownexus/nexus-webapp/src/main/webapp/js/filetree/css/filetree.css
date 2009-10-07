@@ -1,0 +1,156 @@
+/* Ext.ux.FileTreePanel css file
+ *
+ * vim:sw=2:ts=2:fdc=4 
+ * $Id: filetree.css 150 2008-04-08 21:50:58Z jozo $ 
+ */
+
+/* {{{
+// layout rules */
+#west {
+	width:280px;
+}
+.ext-ie #west {
+	width:270px;
+}
+#center {
+	width:640px;
+}
+#north h1 {
+	font-size:20px;
+}
+#east {
+	width: 0px;
+}
+#west-content {
+	margin:0 10px 0 0;
+	font-family:arial, sans-serif;
+}
+
+#west a, #center a {
+	text-decoration:none;
+}
+#west a:hover, #center a:hover {
+	text-decoration:underline;
+}
+#treepanel a:hover {
+	text-decoration:none;
+}
+#center a {
+	opacity:.7;
+	filter:alpha(opacity=70);
+	-moz-opacity:.7;
+}
+
+#adsense-top {
+margin: 10px 0 10px 0;
+}
+.adsense {
+	opacity:.55;
+	filter:alpha(opacity=55);
+	-moz-opacity:.55;
+}
+
+#center-content {
+	color:#777777;
+	text-align:justify;
+	font-size:13px;
+	font-family:arial, sans-serif;
+}
+#center-content h1 {
+	font-size:20px;
+	margin: 0 0 10px 0;
+}
+#center-content h2 {
+	margin: 18px 0 4px 0;
+	float:none;
+	font-size:16px;
+	color:#777777;
+}
+#center-content h3 {
+	margin: 0 0 10px 0;
+}
+#center-content p, #west-content p {
+	margin: 0 0 8px 0;
+}
+#center-content pre {
+	color:#222222;
+	border: 1px solid silver;
+	border-left-width: 10px;
+	padding: 8px;
+	background-color: #efefef;
+	overflow: auto;
+	font-size: 8pt;
+	margin-bottom: 1em;
+}
+#center-content code {
+	font-weight: bold;
+}
+/* }}} */
+
+.ux-up-item {
+	line-height:17px;
+	height:17px;
+	cursor:default;
+/*	border: 1px solid transparent; */
+	margin-bottom:1px;
+	position:relative;
+	background-color:#f0f0f0;
+	background-image:url(../img/white_bg.png);
+	background-repeat:no-repeat
+}
+.ux-up-icon-file {
+	width:16px;
+	height:16px;
+	vertical-align:-3px;
+	margin-right:4px;
+	background-image:url(../ext/resources/images/default/tree/leaf.gif);
+	float:left;
+}
+.ux-up-item-selected {
+	/*
+	border-color:#c0c0c0;
+	background-color:#f0f0f0;
+	*/
+}
+.ux-up-indicator {
+	background-color:yellow;
+	height:17px;
+	width:40px;
+	position:absolute;
+	opacity:0.4;
+}
+.ux-up-icon-state {
+	width:16px;
+	float:right;
+	margin-right:2px;
+	cursor:pointer;
+	z-index:-1;
+}
+.ux-up-icon-queued {
+	background-image:url(../img/silk/icons/page_white_get.png);
+}
+.ux-up-icon-uploading {
+	background-image:url(../ext/resources/images/default/grid/wait.gif);
+}
+.ux-up-icon-done {
+	background-image:url(../img/silk/icons/accept.png);
+}
+.ux-up-icon-failed {
+	background-image:url(../img/silk/icons/error.png);
+}
+.ux-up-icon-stopped {
+	background-image:url(../img/silk/icons/stop.png);
+}
+.ux-up-text {
+	float:left;
+}
+.ux-ftm-nodename {
+	color:black;
+	font-weight:bold;
+	cursor:default ! important;
+}
+.folder {
+	background-image:url(../ext/resources/images/default/tree/folder.gif) ! important;
+/*	background-repeat:no-repeat; */
+}
+/* eof */

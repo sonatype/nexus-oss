@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default nexus configuration -->
+<!-- used as default config source -->
+
+<nexusConfiguration>
+	<version>1.0.5</version>
+	
+    <smtpConfiguration>
+        <host>smtp-host</host>
+        <port>1234</port>
+        <sslEnabled>false</sslEnabled>
+        <tlsEnabled>false</tlsEnabled>
+        <username>smtp-username</username>
+        <password>smtp-password</password>
+        <debugMode>false</debugMode>
+        <systemEmailAddress>system@nexus.org</systemEmailAddress>
+    </smtpConfiguration>
+    
+	<security>
+		<enabled>false</enabled>
+	</security>
+
+	<globalConnectionSettings>
+		<connectionTimeout>10000</connectionTimeout>
+		<retrievalRetryCount>3</retrievalRetryCount>
+		<queryString></queryString>
+	</globalConnectionSettings>
+
+	<routing>
+		<followLinks>true</followLinks>
+		<notFoundCacheTTL>1440</notFoundCacheTTL>
+		<groups>
+			<stopItemSearchOnFirstFoundFile>true</stopItemSearchOnFirstFoundFile>
+			<mergeMetadata>true</mergeMetadata>
+		</groups>
+	</routing>
+	
+	<restApi>
+		<accessAllowedFrom>*</accessAllowedFrom>
+	</restApi>
+	
+	<httpProxy>
+		<enabled>true</enabled>
+		<port>8082</port>
+		<proxyPolicy>strict</proxyPolicy>
+	</httpProxy>
+
+	<repositories>
+
+		<!-- PUBLIC RELEASE REPOSITORIES -->
+		
+		<repository>
+			<id>central</id>
+			<name>Maven Central</name>
+			<localStatus>inService</localStatus>
+			<proxyMode>allow</proxyMode>
+			<allowWrite>false</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>-1</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>badPolicy</repositoryPolicy>
+			<remoteStorage>
+				<provider>apacheHttpClient3x</provider>
+				<url>http://repo1.maven.org/maven2/</url>
+			</remoteStorage>
+		</repository>
+		
+		<!-- SNAPSHOT SNAPSHOT REPOSITORIES -->
+		
+		<repository>
+			<id>central</id>
+			<name>Apache Snapshots</name>
+			<localStatus>inService</localStatus>
+			<proxyMode>allow</proxyMode>
+			<allowWrite>false</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>1440</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>snapshot</repositoryPolicy>
+			<remoteStorage>
+				<provider>apacheHttpClient3x</provider>
+				<url>http://people.apache.org/repo/m2-snapshot-repository</url>
+			</remoteStorage>
+		</repository>
+
+		<repository>
+			<id>codehaus-snapshots</id>
+			<name>Codehaus Snapshots</name>
+			<localStatus>inService</localStatus>
+			<proxyMode>allow</proxyMode>
+			<allowWrite>false</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>1440</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>snapshot</repositoryPolicy>
+			<remoteStorage>
+				<provider>apacheHttpClient3x</provider>
+				<url>http://snapshots.repository.codehaus.org/</url>
+			</remoteStorage>
+		</repository>
+
+		<!-- PRIVATE REPOSITORIES -->
+		
+		<repository>
+			<id>releases</id>
+			<name>Releases</name>
+			<localStatus>inService</localStatus>
+			<allowWrite>true</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>-1</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>release</repositoryPolicy>
+		</repository>
+
+		<repository>
+			<id>snapshots</id>
+			<name>Snapshots</name>
+			<localStatus>inService</localStatus>
+			<allowWrite>true</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>1440</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>snapshot</repositoryPolicy>
+		</repository>
+
+		<repository>
+			<id>thirdparty</id>
+			<name>3rd party</name>
+			<localStatus>inService</localStatus>
+			<allowWrite>true</allowWrite>
+			<browseable>true</browseable>
+			<indexable>true</indexable>
+			<notFoundCacheTTL>1440</notFoundCacheTTL>
+			<artifactMaxAge>-1</artifactMaxAge>
+			<metadataMaxAge>1440</metadataMaxAge>
+			<maintainProxiedRepositoryMetadata>false</maintainProxiedRepositoryMetadata>
+			<repositoryPolicy>release</repositoryPolicy>
+		</repository>
+
+	</repositories>
+
+	<repositoryShadows>
+
+		<repositoryShadow>
+			<id>central-m1</id>
+			<name>Central M1 shadow</name>
+			<localStatus>inService</localStatus>
+			<shadowOf>central</shadowOf>
+			<type>m2-m1-shadow</type>
+			<syncAtStartup>false</syncAtStartup>
+		</repositoryShadow>
+
+		<repositoryShadow>
+			<id>central-m1</id>
+			<name>Central M1 shadow</name>
+			<localStatus>inService</localStatus>
+			<shadowOf>nonexistent</shadowOf>
+			<type>m2-m1-shadow</type>
+			<syncAtStartup>false</syncAtStartup>
+		</repositoryShadow>
+
+	</repositoryShadows>
+
+	<repositoryGrouping>
+
+		<pathMappings>
+			<pathMapping>
+				<id>inhouse-stuff</id>
+				<groupId>*</groupId>
+				<routePattern>.*/(com|org)/somecompany/.*</routePattern>
+				<routeType>inclusive</routeType>
+				<repositories>
+					<repository>snapshots</repository>
+					<repository>releases</repository>
+				</repositories>
+			</pathMapping>
+			<pathMapping>
+				<id>maven-stuff</id>
+				<groupId>*</groupId>
+				<routePattern>.*/org/apache/maven/.*</routePattern>
+				<routeType>inclusive</routeType>
+				<repositories>
+					<repository>apache-snapshots</repository>
+					<repository>central</repository>
+				</repositories>
+			</pathMapping>
+			<pathMapping>
+				<id>plexus-stuff</id>
+				<groupId>*</groupId>
+				<routePattern>.*/org/codehaus/plexus/.*</routePattern>
+				<routeType>inclusive</routeType>
+				<repositories>
+					<repository>codehaus-snapshots</repository>
+					<repository>central</repository>
+				</repositories>
+			</pathMapping>
+			<pathMapping>
+				<id>apache-stuff</id>
+				<groupId>*</groupId>
+				<routePattern>.*/org/apache/.*</routePattern>
+				<routeType>exclusive</routeType>
+				<repositories>
+					<repository>releases</repository>
+					<repository>snapshots</repository>
+				</repositories>
+			</pathMapping>
+		</pathMappings>
+
+		<repositoryGroups>
+			<repositoryGroup>
+				<groupId>public</groupId>
+				<name>Public Repositories</name>
+				<repositories>
+                	<repository>releases</repository>
+					<repository>snapshots</repository>
+					<repository>thirdparty</repository>
+					<repository>central</repository>
+				</repositories>
+			</repositoryGroup>
+			<repositoryGroup>
+				<groupId>public-snapshots</groupId>
+				<name>Public Snapshot Repositories</name>
+				<repositories>
+					<repository>apache-snapshots</repository>
+					<repository>codehaus-snapshots</repository>
+				</repositories>
+			</repositoryGroup>
+		</repositoryGroups>
+
+	</repositoryGrouping>
+
+</nexusConfiguration>
