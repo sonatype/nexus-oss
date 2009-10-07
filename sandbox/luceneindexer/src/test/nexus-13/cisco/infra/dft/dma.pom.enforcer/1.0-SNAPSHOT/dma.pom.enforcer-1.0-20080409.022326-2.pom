@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cisco.infra.dft</groupId>
+	<artifactId>dma.pom.enforcer</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>DFT POM Enforcer Rules</name>
+	<url>http://maven.apache.org</url>
+
+	<!-- ============================================================= -->
+	<!-- PARENT                                                        -->
+	<!-- Don't enherit from the parent as the parent depends on this   -->
+	<!-- plugin for rules and we might end up in circle of             -->
+	<!-- dependencies -->
+	<!-- 
+
+			<parent>
+			<groupId>cisco.infra.dft</groupId>
+			<artifactId>dma.maven.plugins</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			</parent>
+		  -->
+	<!-- ============================================================= -->
+  
+	<!-- ============================================================= -->
+	<!-- PARENT                                                        -->
+	<!-- ============================================================= -->
+	<parent>
+		<groupId>cisco.infra.dft</groupId>
+		<artifactId>dma.maven.plugins</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+  
+	<properties>
+		<api.version>1.0-SNAPSHOT</api.version>
+		<maven.version>2.0.6</maven.version>
+	</properties>
+
+	<!-- ============================================================= -->
+	<!-- DEPENDENCIES                                                   -->
+	<!-- ============================================================= -->
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>cisco.infra.dft</groupId>
+			<artifactId>dma.plugin.utils</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-project</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-plugin-api</artifactId>
+			<version>${maven.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.3</version>
+		</dependency>
+		<!-- ============================================================= -->
+		<!-- ENFORCER                                                      -->
+		<!-- ============================================================= -->
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-api</artifactId>
+			<version>${api.version}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-rules</artifactId>
+			<version>${api.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-rules</artifactId>
+			<version>${api.version}</version>
+			<classifier>tests</classifier>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-enforcer-plugin</artifactId>
+			<version>${api.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<!-- ============================================================= -->
+	<!-- DIST                                                          -->
+	<!-- ============================================================= -->
+	<distributionManagement>
+		<repository>
+			<id>dma.snapshots</id>
+			<name>DMA Repo</name>
+			<url>scp://releng.cisco.com/mvn-repo/snapshots</url>
+		</repository>
+
+		<site>
+			<id>dma.projectSites</id>
+			<url>
+        scp://releng.cisco.com/mvn-repo/project-sites/${project.groupId}/${project.artifactId}/
+			</url>
+		</site>
+	</distributionManagement>
+</project>

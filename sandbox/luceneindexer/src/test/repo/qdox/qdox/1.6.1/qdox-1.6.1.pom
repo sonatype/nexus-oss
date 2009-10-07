@@ -1,0 +1,133 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>qdox</groupId>
+  <artifactId>qdox</artifactId>
+  <name>QDox</name>
+  <version>1.6.1</version>
+  <description>
+    QDox is a high speed, small footprint parser for extracting
+    class/interface/method definitions from source files complete with
+    JavaDoc @tags. It is designed to be used by active code generators or
+   documentation tools.
+  </description>
+  <url>http://qdox.codehaus.org/</url>
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.codehaus.org/browse/QDOX</url>
+  </issueManagement>
+  <inceptionYear>2002</inceptionYear>
+  <mailingLists>
+    <mailingList>
+      <name>QDox User List</name>
+      <subscribe>mailto:user-subscribe@qdox.codehaus.org</subscribe>
+      <unsubscribe>mailto:user-unsubscribe@qdox.codehaus.org</unsubscribe>
+      <archive>http://archive.qdox.codehaus.org/user</archive>
+    </mailingList>
+    <mailingList>
+      <name>QDox Announce List</name>
+      <subscribe>mailto:announce-subscribe@qdox.codehaus.org</subscribe>
+      <unsubscribe>mailto:announce-unsubscribe@qdox.codehaus.org</unsubscribe>
+      <archive>http://archive.qdox.codehaus.org/announce</archive>
+    </mailingList>
+    <mailingList>
+      <name>QDox Dev List</name>
+      <subscribe>mailto:dev-subscribe@qdox.codehaus.org</subscribe>
+      <unsubscribe>mailto:dev-unsubscribe@qdox.codehaus.org</unsubscribe>
+      <archive>http://archive.qdox.codehaus.org/dev</archive>
+    </mailingList>
+    <mailingList>
+      <name>QDox SCM List</name>
+      <subscribe>mailto:scm-subscribe@qdox.codehaus.org</subscribe>
+      <unsubscribe>mailto:scm-unsubscribe@qdox.codehaus.org</unsubscribe>
+      <archive>http://archive.qdox.codehaus.org/scm</archive>
+    </mailingList>
+  </mailingLists>
+  <developers>
+    <developer>
+      <id>rinkrank</id>
+      <name>Aslak Helles&oslash;y</name>
+      <email>nospam.aslak@thoughtworks.net</email>
+      <organization>ThoughtWorks</organization>
+      <roles>
+        <role>Administrator</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Joe Walnes</name>
+      <id>joeretro</id>
+      <email>joew@thoughtworks.com</email>
+      <organization>ThoughtWorks</organization>
+      <roles>
+        <role>Founder</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mike Royle</name>
+      <id>mlroyle</id>
+      <email>mroyle@thoughtworks.com</email>
+      <organization>ThoughtWorks</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Paul Hammant</name>
+      <id>paul</id>
+      <email>Paul_Hammant@yahoo.com</email>
+      <organization>ThoughtWorks</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Mike Williams</name>
+      <id>mdub</id>
+      <email>mdub@dogbiscuit.org</email>
+      <roles>
+        <role>Developer</role>
+      </roles>
+    </developer>
+  </developers>
+  <contributors>
+    <contributor>
+      <name>Peter Donald</name>
+      <email>peter@realityforge.org</email>
+    </contributor>
+    <contributor>
+      <name>James Strachan</name>
+      <email>jstrachan@apache.org</email>
+    </contributor>
+    <contributor>
+      <name>Nick Pomfret</name>
+      <email></email>
+    </contributor>
+    <contributor>
+      <name>Chris Stevenson</name>
+      <email>cstevenson@thoughtworks.com</email>
+    </contributor>
+    <contributor>
+      <name>Ben Hogan</name>
+      <email>ben@lizardsoftware.com</email>
+    </contributor>
+    <contributor>
+      <name>Laurent Etiemble</name>
+      <email></email>
+    </contributor>
+  </contributors>
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <connection>scm:svn:http://svn.codehaus.org/qdox/trunk/</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/qdox/trunk/</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/qdox/trunk/qdox</url>   
+  </scm>
+  <organization>
+    <name>ThoughtWorks, Inc</name>
+    <url>http://www.thoughtworks.com/</url>
+  </organization>
+</project>

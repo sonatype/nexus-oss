@@ -1,0 +1,135 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>cisco.infra.dft</groupId>
+	<artifactId>maven-dma-mgmt-plugin</artifactId>
+	<packaging>maven-plugin</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>DMA AuthZ Maven Mojo</name>
+	<url>http://maven.apache.org</url>
+
+	<parent>
+		<groupId>cisco.infra.dft</groupId>
+		<artifactId>dma.maven.plugins</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+
+	<description>
+
+		This plugin is used to mange authorization and commit
+		notifications.
+
+		To report a bug please visit:
+
+		http://zed.cisco.com/jira/browse/DFTTD
+
+	</description>
+
+	<properties>
+		<api.version>1.0-SNAPSHOT</api.version>
+		<maven.version>2.0.6</maven.version>
+	</properties>
+
+	<!-- ============================================================= -->
+	<!-- BUILD                                                         -->
+	<!-- ============================================================= -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>generated-helpmojo</id>
+						<goals>
+							<goal>helpmojo</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+
+	<!-- ============================================================= -->
+	<!-- DEPENDENCIES                                                  -->
+	<!-- ============================================================= -->
+	<dependencies>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cisco.infra.dft</groupId>
+			<artifactId>dma.pom.enforcer</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>httpunit</groupId>
+			<artifactId>httpunit</artifactId>
+			<version>1.6.2</version>
+
+		</dependency>
+		<dependency>
+			<groupId>cisco.infra.dft</groupId>
+			<artifactId>dma.plugin.utils</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-api</artifactId>
+			<version>${api.version}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-rules</artifactId>
+			<version>${api.version}</version>
+
+		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.enforcer</groupId>
+			<artifactId>enforcer-rules</artifactId>
+			<version>${api.version}</version>
+			<classifier>tests</classifier>
+
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-enforcer-plugin</artifactId>
+			<version>${api.version}</version>
+
+		</dependency>
+	</dependencies>
+
+	<!-- ============================================================= -->
+	<!-- REPORTING                                                     -->
+	<!-- ============================================================= -->
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.4</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<!-- ============================================================= -->
+	<!-- DIST                                                          -->
+	<!-- ============================================================= -->
+	<distributionManagement>
+		<site>
+			<id>dma.projectSite</id>
+			<url>
+				scp://dft-releng-03.cisco.com/mvn-repo/project-sites/${project.parent.groupId}/${project.parent.artifactId}/${project.artifactId}/
+			</url>
+		</site>
+	</distributionManagement>
+</project>
