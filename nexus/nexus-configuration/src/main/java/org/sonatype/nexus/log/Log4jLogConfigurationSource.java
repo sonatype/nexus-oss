@@ -16,6 +16,7 @@ package org.sonatype.nexus.log;
 import java.io.File;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * @author juven
@@ -28,6 +29,13 @@ public class Log4jLogConfigurationSource
 
     public File getSource()
     {
-        return new File( System.getProperty( KEY ) );
+        String logConfigFilePath = System.getProperty( KEY );
+
+        if ( StringUtils.isEmpty( logConfigFilePath ) )
+        {
+            return null;
+        }
+
+        return new File( logConfigFilePath );
     }
 }

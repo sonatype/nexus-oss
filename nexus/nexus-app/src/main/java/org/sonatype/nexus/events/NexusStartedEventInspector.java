@@ -48,9 +48,12 @@ public class NexusStartedEventInspector
 
     public void inspect( Event<?> evt )
     {
-        ensureErrorWarningAppender();
+        if ( logConfigEnabled() )
+        {
+            ensureErrorWarningAppender();
 
-        startToRecordErrorWarningLog();
+            startToRecordErrorWarningLog();
+        }
     }
 
     @SuppressWarnings( "unchecked" )
@@ -97,6 +100,25 @@ public class NexusStartedEventInspector
         catch ( IOException e )
         {
             getLogger().warn( "Unable to get log4j configuration.", e );
+        }
+    }
+
+    private boolean logConfigEnabled()
+    {
+        try
+        {
+            if ( logManager.getLogConfig().isEmpty() )
+            {
+                return false;
+            }
+            
+            return true;
+        }
+        catch ( IOException e )
+        {
+            getLogger().warn( "Unable to get log4j configuration.", e );
+
+            return false;
         }
     }
 }
