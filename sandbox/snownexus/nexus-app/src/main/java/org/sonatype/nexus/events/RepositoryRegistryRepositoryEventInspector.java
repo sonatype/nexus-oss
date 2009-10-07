@@ -16,7 +16,6 @@ package org.sonatype.nexus.events;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
@@ -34,7 +33,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
-import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -44,8 +42,6 @@ import org.sonatype.plexus.appevents.Event;
 public class RepositoryRegistryRepositoryEventInspector
     extends AbstractFeedRecorderEventInspector
 {
-    @Requirement
-    private IndexerManager indexerManager;
 
     @Requirement
     private RepositoryRegistry repoRegistry;
@@ -54,11 +50,6 @@ public class RepositoryRegistryRepositoryEventInspector
     private NexusScheduler nexusScheduler;
 
     private boolean nexusStarted = false;
-
-    protected IndexerManager getIndexerManager()
-    {
-        return indexerManager;
-    }
 
     public boolean accepts( Event<?> evt )
     {
@@ -179,6 +170,7 @@ public class RepositoryRegistryRepositoryEventInspector
         }
     }
 
+    // TODO TONI - should be moved to plugin.
     private void inspectForIndexerManager( Event<?> evt, Repository repository )
     {
         try
@@ -186,30 +178,32 @@ public class RepositoryRegistryRepositoryEventInspector
             // we are handling repo events, like addition and removal
             if ( evt instanceof RepositoryRegistryEventAdd )
             {
-                getIndexerManager().addRepositoryIndexContext( repository.getId() );
+                // getIndexerManager().addRepositoryIndexContext( repository.getId() );
 
-                getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isSearchable() );
+                // getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(),
+                // repository.isSearchable() );
 
+                // TODO TONI - reinvent indexing tasks through event system.
                 // create the initial index
                 if ( nexusStarted && repository.isIndexable() )
                 {
                     // Create the initial index for the repository
-                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                    
-                    if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class  ) )
+                    // ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+
+                    if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
                     {
-                        rt.setRepositoryGroupId( repository.getId() );
+                        // rt.setRepositoryGroupId( repository.getId() );
                     }
                     else
                     {
-                        rt.setRepositoryId( repository.getId() );
+                        // rt.setRepositoryId( repository.getId() );
                     }
-                    nexusScheduler.submit( "Create initial index.", rt );
+                    // nexusScheduler.submit( "Create initial index.", rt );
                 }
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
             {
-                getIndexerManager().removeRepositoryIndexContext( repository.getId(), false );
+                // getIndexerManager().removeRepositoryIndexContext( repository.getId(), false );
 
                 // remove the storage folders for the repository
                 DeleteRepositoryFoldersTask task =
@@ -221,7 +215,7 @@ public class RepositoryRegistryRepositoryEventInspector
             }
             else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {
-                getIndexerManager().updateRepositoryIndexContext( repository.getId() );
+                // getIndexerManager().updateRepositoryIndexContext( repository.getId() );
             }
         }
         catch ( Exception e )

@@ -53,12 +53,12 @@
       <groupId>org.sonatype.configuration</groupId>
       <artifactId>base-configuration</artifactId>
     </dependency>
-
+<!-- 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer</artifactId>
     </dependency>
-
+ -->
     <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>

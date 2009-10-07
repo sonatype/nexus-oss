@@ -118,6 +118,7 @@
     <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-api</module>
+    <module>nexus-indexer-related</module>
     <module>nexus-oss-edition</module>
     <module>nexus-configuration</module>
     <module>nexus-proxy</module>
@@ -136,7 +137,7 @@
     <plexus-security.version>1.1.1</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
-    <nexus.indexer.version>2.0.1</nexus.indexer.version>
+    <nexus.indexer.version>3</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.0</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.10</plexus.restlet.bridge.version>
@@ -678,11 +679,13 @@
       </dependency>
 
       <!-- The modules -->
+      <!-- 
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-indexer</artifactId>
         <version>${nexus.indexer.version}</version>
       </dependency>
+      -->
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-repository-metadata-api</artifactId>
@@ -696,6 +699,11 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-related</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -45,7 +44,8 @@ public abstract class AbstractDeleteArtifactsTest
     }
 
     @Before
-    public void init() throws IllegalArtifactCoordinateException
+    public void init()
+        throws IllegalArtifactCoordinateException
     {
         artifact = getTestFile( "artifact.jar" );
         artifact1v1 = GavUtil.newGav( "nexus1954", "artifact1", "1.0" );
@@ -109,7 +109,7 @@ public abstract class AbstractDeleteArtifactsTest
 
     static
     {
-        df = new SimpleDateFormat( IndexingContext.INDEX_TIME_FORMAT );
+        df = new SimpleDateFormat( "IndexingContext.INDEX_TIME_FORMAT" );
         df.setTimeZone( TimeZone.getTimeZone( "GMT" ) );
     }
 
@@ -121,7 +121,7 @@ public abstract class AbstractDeleteArtifactsTest
 
         File hostedIndexProps =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO
-                + "/.index/nexus-maven-repository-index.properties" );
+            + "/.index/nexus-maven-repository-index.properties" );
         if ( hostedIndexProps.exists() )
         {
             hostedLastMod = readLastMod( hostedIndexProps );
@@ -130,7 +130,7 @@ public abstract class AbstractDeleteArtifactsTest
         long proxyLastMod = -1;
         File proxyIndexProps =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO
-                + "/.index/nexus-maven-repository-index.properties" );
+            + "/.index/nexus-maven-repository-index.properties" );
         if ( proxyIndexProps.exists() )
         {
             proxyLastMod = readLastMod( proxyIndexProps );
@@ -145,7 +145,8 @@ public abstract class AbstractDeleteArtifactsTest
         Assert.assertTrue( proxyLastMod < proxyLastMod2 );
     }
 
-    protected abstract void runUpdateIndex() throws Exception;
+    protected abstract void runUpdateIndex()
+        throws Exception;
 
     private long readLastMod( File indexProps )
         throws Exception

@@ -13,68 +13,49 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.apache.lucene.document.Document;
-import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.context.DocumentFilter;
 
 public enum RepositoryPolicy
 {
     RELEASE
-    {
-        public DocumentFilter getFilter()
         {
-            return new DocumentFilter()
+        public DocumentFilter getFilter()
             {
-                public boolean accept( Document doc )
+            return new DocumentFilter()
                 {
-                    String uinfo = doc.get( ArtifactInfo.UINFO );
 
-                    if ( uinfo == null )
+                public boolean accept( Object doc )
                     {
-                        return true;
-                    }
-
-                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
-
-                    return !VersionUtils.isSnapshot( r[2] );
+                    throw new UnsupportedOperationException( "We don't support this filters anymore." );
                 }
             };
         }
     },
 
     SNAPSHOT
-    {
-        public DocumentFilter getFilter()
         {
-            return new DocumentFilter()
+        public DocumentFilter getFilter()
             {
-                public boolean accept( Document doc )
+            return new DocumentFilter()
                 {
-                    String uinfo = doc.get( ArtifactInfo.UINFO );
-
-                    if ( uinfo == null )
+                public boolean accept( Object doc )
                     {
-                        return true;
-                    }
+                    throw new UnsupportedOperationException( "We don't support this filters anymore." );
 
-                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
-
-                    return VersionUtils.isSnapshot( r[2] );
                 }
             };
         }
     },
 
     MIXED
-    {
-        public DocumentFilter getFilter()
         {
-            return new DocumentFilter()
+        public DocumentFilter getFilter()
             {
-                public boolean accept( Document doc )
+            return new DocumentFilter()
                 {
-                    return true;
+                public boolean accept( Object doc )
+                    {
+                    throw new UnsupportedOperationException( "We don't support this filters anymore." );
                 }
             };
         }

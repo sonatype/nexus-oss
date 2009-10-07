@@ -13,29 +13,19 @@
  */
 package org.sonatype.nexus.events;
 
-import java.io.File;
-
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.index.ArtifactContext;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.maven.tasks.SnapshotRemover;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
 import org.sonatype.plexus.appevents.Event;
 
 /**
+ * 
+ * TODO: TONI - SHOULD LIVE IN ITS OWN PLUGIN.
+ * 
  * Event inspector that maintains indexes.
  * 
  * @author cstamas
@@ -44,20 +34,13 @@ import org.sonatype.plexus.appevents.Event;
 public class IndexerManagerEventInspector
     extends AbstractEventInspector
 {
-    @Requirement
-    private IndexerManager indexerManager;
-
-    protected IndexerManager getIndexerManager()
-    {
-        return indexerManager;
-    }
 
     public boolean accepts( Event<?> evt )
     {
         // listen for STORE, CACHE, DELETE only
         return ( RepositoryItemEventStore.class.isAssignableFrom( evt.getClass() )
             || RepositoryItemEventCache.class.isAssignableFrom( evt.getClass() ) || RepositoryItemEventDelete.class
-            .isAssignableFrom( evt.getClass() ) );
+                                                                                                                   .isAssignableFrom( evt.getClass() ) );
     }
 
     public void inspect( Event<?> evt )
@@ -76,11 +59,12 @@ public class IndexerManagerEventInspector
             {
                 if ( ievt instanceof RepositoryItemEventCache || ievt instanceof RepositoryItemEventStore )
                 {
-                    getIndexerManager().addItemToIndex( ievt.getRepository(), ievt.getItem() );
+
+                    // getIndexerManager().addItemToIndex( ievt.getRepository(), ievt.getItem() );
                 }
                 else if ( ievt instanceof RepositoryItemEventDelete )
                 {
-                    getIndexerManager().removeItemFromIndex( ievt.getRepository(), ievt.getItem() );
+                    // getIndexerManager().removeItemFromIndex( ievt.getRepository(), ievt.getItem() );
                 }
             }
         }

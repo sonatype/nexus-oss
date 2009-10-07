@@ -7,11 +7,8 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.ResetGroupIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "RepositoryConfigurationUpdatedEventInspector" )
@@ -87,10 +84,10 @@ public class RepositoryConfigurationUpdatedEventInspector
                                           + "' has been changed, now reindex the repository." );
 
                     // Create the initial index for the repository
-                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                    rt.setRepositoryId( event.getRepository().getId() );
-                    rt.setFullReindex( true );
-                    nexusScheduler.submit( "Remote URL Changed.", rt );
+                    //ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    //rt.setRepositoryId( event.getRepository().getId() );
+                    //rt.setFullReindex( true );
+                    //nexusScheduler.submit( "Remote URL Changed.", rt );
 
                     indexing = true;
                 }
@@ -105,10 +102,10 @@ public class RepositoryConfigurationUpdatedEventInspector
                                           + "' has been changed, now reindex the repository." );
 
                     // Create the initial index for the repository
-                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                    rt.setRepositoryId( event.getRepository().getId() );
-                    rt.setFullReindex( true );
-                    nexusScheduler.submit( "Download remote index enabled.", rt );
+                    //ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    //rt.setRepositoryId( event.getRepository().getId() );
+                    //rt.setFullReindex( true );
+                    //nexusScheduler.submit( "Download remote index enabled.", rt );
                     indexing = true;
                 }
             }
@@ -122,11 +119,11 @@ public class RepositoryConfigurationUpdatedEventInspector
                                           + "' is made searchable, now reindex the repository." );
 
                     // Create the initial index for the repository
-                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-                    rt.setRepositoryId( event.getRepository().getId() );
-                    rt.setFullReindex( true );
-                    nexusScheduler.submit( "Searchable enabled (repository \"" + event.getRepository().getName()
-                        + "\").", rt );
+                    //ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+                    //rt.setRepositoryId( event.getRepository().getId() );
+                    //rt.setFullReindex( true );
+                    //nexusScheduler.submit( "Searchable enabled (repository \"" + event.getRepository().getName()
+                    //    + "\").", rt );
                     indexing = true;
                 }
             }

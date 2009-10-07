@@ -14,11 +14,8 @@
 package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
@@ -30,13 +27,6 @@ import org.sonatype.plexus.appevents.Event;
 public class ConfigurationChangeEventInspector
     extends AbstractFeedRecorderEventInspector
 {
-    @Requirement
-    private IndexerManager indexerManager;
-
-    protected IndexerManager getIndexerManager()
-    {
-        return indexerManager;
-    }
 
     public boolean accepts( Event<?> evt )
     {
@@ -46,8 +36,6 @@ public class ConfigurationChangeEventInspector
     public void inspect( Event<?> evt )
     {
         inspectForNexus( evt );
-
-        inspectForIndexerManager( evt );
     }
 
     private void inspectForNexus( Event<?> evt )
@@ -66,11 +54,11 @@ public class ConfigurationChangeEventInspector
 
         msg.append( "Nexus server configuration was changed" );
 
-        //TODO: refine _what_ is changed
-/*        for ( Configurable change : event.getChanges() )
-        {
-            msg.append( " '" ).append( change.getName() ).append( "', " );
-        }*/
+        // TODO: refine _what_ is changed
+        /*
+         * for ( Configurable change : event.getChanges() ) { msg.append( " '" ).append( change.getName() ).append(
+         * "', " ); }
+         */
 
         if ( event.getSubject() != null && event.getSubject().getPrincipal() != null )
         {
@@ -78,11 +66,6 @@ public class ConfigurationChangeEventInspector
         }
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, msg.toString() );
-    }
-
-    private void inspectForIndexerManager( Event<?> evt )
-    {
-        getIndexerManager().resetConfiguration();
     }
 
 }

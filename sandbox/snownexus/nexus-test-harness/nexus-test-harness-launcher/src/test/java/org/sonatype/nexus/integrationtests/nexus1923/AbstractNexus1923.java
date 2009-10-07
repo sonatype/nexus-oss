@@ -13,7 +13,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -349,7 +348,7 @@ public abstract class AbstractNexus1923
 
     protected File getRepositoryIndex( File directory )
     {
-        return new File( directory, IndexingContext.INDEX_FILE + ".gz" );
+        return new File( directory, "IndexingContext.INDEX_FILE" + ".gz" );
     }
 
     protected File getHostedRepositoryIndex()
@@ -385,7 +384,7 @@ public abstract class AbstractNexus1923
         FileInputStream fis = null;
         try
         {
-            fis = new FileInputStream( new File( baseDir, IndexingContext.INDEX_FILE + ".properties" ) );
+            fis = new FileInputStream( new File( baseDir, "IndexingContext.INDEX_FILE" + ".properties" ) );
             props.load( fis );
         }
         finally
@@ -431,7 +430,7 @@ public abstract class AbstractNexus1923
 
     protected File getRepositoryIndexIncrement( File directory, String id )
     {
-        return new File( directory, IndexingContext.INDEX_FILE + "." + id + ".gz" );
+        return new File( directory, "IndexingContext.INDEX_FILE" + "." + id + ".gz" );
     }
 
     protected File getHostedRepositoryIndexIncrement( String id )
@@ -494,11 +493,11 @@ public abstract class AbstractNexus1923
     {
         if ( current == null )
         {
-            Assert.assertNull( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ) );
+            Assert.assertNull( properties.getProperty( "IndexingContext.INDEX_CHUNK_COUNTER" ) );
         }
         else
         {
-            Assert.assertEquals( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ),
+            Assert.assertEquals( properties.getProperty( "IndexingContext.INDEX_CHUNK_COUNTER" ),
                                  Integer.toString( current ) );
         }
     }

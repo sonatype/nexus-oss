@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -64,12 +62,6 @@ public abstract class AbstractNexusTestCase
     protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
 
     protected NexusConfiguration nexusConfiguration;
-
-    public List<IndexCreator> DEFAULT_CREATORS;
-
-    public List<IndexCreator> FULL_CREATORS;
-
-    public List<IndexCreator> MIN_CREATORS;
 
     @Override
     protected void customizeContext( Context ctx )
@@ -170,20 +162,6 @@ public abstract class AbstractNexusTestCase
         CONF_HOME.mkdirs();
 
         super.setUp();
-
-        DEFAULT_CREATORS = new ArrayList<IndexCreator>();
-        FULL_CREATORS = new ArrayList<IndexCreator>();
-        MIN_CREATORS = new ArrayList<IndexCreator>();
-
-        IndexCreator min = lookup( IndexCreator.class, "min" );
-        IndexCreator jar = lookup( IndexCreator.class, "jarContent" );
-
-        MIN_CREATORS.add( min );
-
-        FULL_CREATORS.add( min );
-        FULL_CREATORS.add( jar );
-
-        DEFAULT_CREATORS.addAll( FULL_CREATORS );
 
         if ( loadConfigurationAtSetUp() )
         {

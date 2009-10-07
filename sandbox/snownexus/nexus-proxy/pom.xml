@@ -12,10 +12,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
+      <artifactId>nexus-indexer-related</artifactId>
     </dependency>
+     
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-repository-metadata-api</artifactId>
