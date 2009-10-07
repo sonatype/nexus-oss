@@ -33,11 +33,11 @@ public class DefaultRepositoryItemUid
 {
     private static enum LockStep
     {
-        READ, WRITE, READ_WRITE_UPGRADE, WRITE_READ_DOWNGRADE, SAME_AS_BEFORE;
+        READ, WRITE, READ_WRITE_UPGRADE, SAME_AS_BEFORE;
 
         public boolean isReadLockLastLocked()
         {
-            return READ.equals( this ) || WRITE_READ_DOWNGRADE.equals( this );
+            return READ.equals( this );
         }
     }
 
@@ -164,6 +164,10 @@ public class DefaultRepositoryItemUid
 
     protected void doLock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
     {
+        // we always go from "weaker" to "stronger" lock (read is shared, while write is exclusive lock)
+        // because of Nexus nature (wrong nature?), the calls are heavily boxed, hence a thread once acquired write
+        // may re-lock with read action. In this case, we keep the write lock, since it is "stronger"
+        // The proper downgrade of locks happens in unlock method, while unraveling the stack of locking steps.
         LockStep step = getLastStep( lockKey );
 
         if ( step != null && step.isReadLockLastLocked() && !action.isReadAction() )
@@ -174,15 +178,6 @@ public class DefaultRepositoryItemUid
             getActionLock( rwLock, action.isReadAction() ).lock();
 
             step = LockStep.READ_WRITE_UPGRADE;
-        }
-        else if ( step != null && !step.isReadLockLastLocked() && action.isReadAction() )
-        {
-            // we need lock downgrade (w->r)
-            getActionLock( rwLock, action.isReadAction() ).lock();
-
-            getActionLock( rwLock, false ).unlock();
-
-            step = LockStep.WRITE_READ_DOWNGRADE;
         }
         else if ( step == null )
         {
@@ -235,13 +230,6 @@ public class DefaultRepositoryItemUid
             getActionLock( rwLock, true ).lock();
 
             getActionLock( rwLock, false ).unlock();
-        }
-        else if ( LockStep.WRITE_READ_DOWNGRADE.equals( step ) )
-        {
-            // now we need to upgrade (r->w)
-            getActionLock( rwLock, true ).unlock();
-
-            getActionLock( rwLock, false ).lock();
         }
         else if ( LockStep.SAME_AS_BEFORE.equals( step ) )
         {

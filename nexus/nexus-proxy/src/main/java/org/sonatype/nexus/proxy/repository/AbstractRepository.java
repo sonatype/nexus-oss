@@ -699,36 +699,26 @@ public abstract class AbstractRepository
 
     public Action getResultingActionOnWrite( ResourceStoreRequest rsr )
     {
-        boolean originalLocalOnly = rsr.isRequestLocalOnly();
-
         try
         {
-            // enforce localOnly check
-            rsr.setRequestLocalOnly( true );
+            boolean isInLocalStorage = getLocalStorage().containsItem( this, rsr );
 
-            retrieveItem( false, rsr );
-
-            return Action.update;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            return Action.create;
+            if ( isInLocalStorage )
+            {
+                return Action.update;
+            }
+            else
+            {
+                return Action.create;
+            }
         }
         catch ( StorageException e )
         {
-            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
+            getLogger().error(
+                "Could not resolve the local presence of \"" + rsr.getRequestPath() + "\" path in repository ID=\""
+                    + getId() + "\"!", e );
 
             return null;
-        }
-        catch ( IllegalOperationException e )
-        {
-            getLogger().warn( "Got exception while checking for resulting actionOnWrite", e );
-
-            return null;
-        }
-        finally
-        {
-            rsr.setRequestLocalOnly( originalLocalOnly );
         }
     }
 

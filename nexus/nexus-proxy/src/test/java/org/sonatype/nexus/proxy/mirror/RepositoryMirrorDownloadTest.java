@@ -454,6 +454,9 @@ public class RepositoryMirrorDownloadTest
 
         expect( ls.getProviderId() ).andReturn( "dummy" );
 
+        expect( ls.containsItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andReturn( false )
+            .anyTimes();
+
         expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
             itemNotFount ).anyTimes();
 
