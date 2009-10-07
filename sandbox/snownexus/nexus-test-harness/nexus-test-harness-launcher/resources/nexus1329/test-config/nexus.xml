@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
+  <version>1.0.8</version>
+
+  <smtpConfiguration>
+    <host>localhost</host>
+    <port>${email-server-port}</port>
+    <sslEnabled>false</sslEnabled>
+    <tlsEnabled>false</tlsEnabled>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <debugMode>false</debugMode>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+
+  <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+    <anonymousPassword>anonymous</anonymousPassword>
+    <realms>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
+    </realms>
+  </security>
+  <globalConnectionSettings />
+  <restApi />
+
+  <httpProxy>
+    <enabled>false</enabled>
+  </httpProxy>
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>nexus1329-repo</id>
+      <name>Repo NEXUS-1329 With Mirrors</name>
+      <proxyMode>allow</proxyMode>
+      <remoteStorage>
+        <url>http://localhost:${webproxy-server-port}/repository</url>
+        <mirrors>
+          <mirror>
+            <id>b31d7d17f2ab</id>
+            <url>http://localhost:${webproxy-server-port}/mirror1</url>
+          </mirror>
+          <mirror>
+            <id>b31d7d241165</id>
+            <url>http://localhost:${webproxy-server-port}/mirror2</url>
+          </mirror>
+        </mirrors>
+      </remoteStorage>
+    </repository>
+  </repositories>
+  <repositoryGrouping>
+    <repositoryGroups>
+
+      <repositoryGroup>
+        <groupId>nexus1329-group</groupId>
+        <name>nexus1329-group</name>
+        <repositories>
+          <repository>nexus1329-repo</repository>
+        </repositories>
+      </repositoryGroup>
+
+    </repositoryGroups>
+  </repositoryGrouping>
+
+
+</nexusConfiguration>

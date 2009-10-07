@@ -1,0 +1,25 @@
+<component-set>
+	<components>
+<!-- is this needed or is a leftover when sec was here?
+		<component>
+            <role>org.sonatype.nexus.configuration.security.SecurityConfiguration</role>
+            <implementation>org.sonatype.nexus.configuration.security.SimpleSecurityConfiguration</implementation>
+        </component>
+-->
+		<component>
+            <role>org.sonatype.nexus.proxy.repository.Repository</role>
+            <role-hint>maven1</role-hint>
+            <implementation>org.sonatype.nexus.proxy.dummy.DummyRepository</implementation>
+        </component>
+		<component>
+            <role>org.sonatype.nexus.proxy.repository.Repository</role>
+            <role-hint>maven2</role-hint>
+            <implementation>org.sonatype.nexus.proxy.dummy.DummyRepository</implementation>
+        </component>
+		<component>
+            <role>org.sonatype.nexus.proxy.repository.ShadowRepository</role>
+            <role-hint>m2-m1-shadow</role-hint>
+            <implementation>org.sonatype.nexus.proxy.dummy.DummyRepository</implementation>
+        </component>
+	</components>
+</component-set>

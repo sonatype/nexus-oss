@@ -1,0 +1,15 @@
+<role-request>
+  <data>
+    <id>a1</id>
+    <name>a11</name>
+    <description>a111</description>
+    <sessionTimeout>100</sessionTimeout>
+    <roles>
+      <role>anonymous</role>
+    </roles>
+    <privileges>
+      <privilege>18</privilege>
+    </privileges>
+    <userManaged>true</userManaged>
+  </data>
+</role-request>

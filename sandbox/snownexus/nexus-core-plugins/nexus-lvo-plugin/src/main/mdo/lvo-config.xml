@@ -1,0 +1,126 @@
+<model xsd.namespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0" xsd.target-namespace="http://www.sonatype.org/xsd/nexus-lvo-plugin-1.0.0">
+
+  <id>lvo</id>
+
+  <name>NexusLvoPluginConfiguration</name>
+
+  <description>
+        <![CDATA[
+        <p>Nexus LVO Plugin Configuration.</p>
+        ]]>
+  </description>
+
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.sonatype.nexus.plugins.lvo.config.model</value>
+    </default>
+  </defaults>
+
+  <classes>
+    <class rootElement="true" xml.tagName="lvoConfiguration">
+      <name>Configuration</name>
+      <version>1.0.0+</version>
+      <description>The root element of Nexus LVO Plugin configuration.</description>
+      <fields>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <description>The version of the persisted model.</description>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>lvoKeys</name>
+          <version>1.0.0+</version>
+          <description>A list of LVO keys.</description>
+          <required>false</required>
+          <association>
+            <type>CLvoKey</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>enabled</name>
+          <version>1.0.1+</version>
+          <description>Enable the LVO check</description>
+          <required>true</required>
+          <type>boolean</type>
+          <defaultValue>true</defaultValue>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.0";
+]]></code>
+        </codeSegment>
+        <codeSegment>
+          <version>1.0.1</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.0.1";
+]]></code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class>
+      <name>CLvoKey</name>
+      <version>1.0.0+</version>
+      <description>An key that is published for LVO query.</description>
+      <fields>
+        <field>
+          <name>key</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository id.</description>
+        </field>
+        <field>
+          <name>strategy</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository id.</description>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The repository id.</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The repository id.</description>
+        </field>
+        <field>
+          <name>repositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The repository id.</description>
+        </field>
+        <field>
+          <name>remoteUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The URL of remote target.</description>
+        </field>
+        <field>
+          <name>localPath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The path of local content target.</description>
+        </field>
+      </fields>
+    </class>
+
+  </classes>
+</model>

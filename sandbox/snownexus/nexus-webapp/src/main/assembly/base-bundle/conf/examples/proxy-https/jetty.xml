@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+<!-- =============================================================== -->
+<!--                                                                 -->
+<!--  NOTE: Copy this file to ../../jetty.xml to use it.             -->
+<!--                                                                 -->
+<!-- Configure the Jetty Server                                      -->
+<!--                                                                 -->
+<!-- Documentation of this file format can be found at:              -->
+<!-- http://docs.codehaus.org/display/JETTY/jetty.xml                -->
+<!--                                                                 -->
+<!-- =============================================================== -->
+<Configure id="Server" class="org.mortbay.jetty.Server">
+    <Call name="addConnector">
+        <Arg>
+            <New class="org.mortbay.jetty.nio.SelectChannelConnector">
+              <Set name="host">${application-host}</Set>
+              <Set name="port">${application-port}</Set>
+            </New>
+        </Arg>
+    </Call>
+    
+    <New id="Contexts" class="org.mortbay.jetty.handler.ContextHandlerCollection">
+        <!-- The following configuration is REQUIRED, and MUST BE FIRST. 
+             It makes the Plexus container available for use in the Nexus webapp. -->
+        <Call name="addLifeCycleListener">
+            <Arg>
+              <New class="org.sonatype.plexus.jetty.custom.InjectExistingPlexusListener" />
+            </Arg>
+        </Call>
+  
+        <!-- The following configuration disables JSP taglib support, the validation of which
+             slows down Jetty's startup significantly. -->
+        <Call name="addLifeCycleListener">
+            <Arg>
+              <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+            </Arg>
+        </Call>
+    </New>
+    
+    <New id="NexusWebAppContext" class="org.mortbay.jetty.webapp.WebAppContext">
+      <Arg><Ref id="Contexts"/></Arg>
+      <Arg>${webapp}</Arg>
+      <Arg>${webapp-context-path}</Arg>
+      <Set name="extractWAR">false</Set>
+    </New>
+    
+    <!--
+        Documentation for this found at:
+        http://jetty.mortbay.org/jetty/jetty-6/apidocs/org/mortbay/jetty/handler/rewrite/RewriteHandler.html
+    -->
+    <Set name="handler">
+        <New id="Handlers" class="org.mortbay.jetty.handler.rewrite.RewriteHandler">
+            <Set name="rules">
+                <Array type="org.mortbay.jetty.handler.rewrite.Rule">
+                    <Item>
+                        <New id="forwardedHttps"
+                            class="org.mortbay.jetty.handler.rewrite.ForwardedSchemeHeaderRule">
+                            
+                            <!-- If this header is present, and the specified headerValue matches, 
+                                 then the specified scheme will be passed on. If the headerValue isn't
+                                 specified, then the presence of the header with any value will trigger
+                                 the scheme modification.
+                            -->
+                            <Set name="header">X-Forwarded-Scheme</Set>
+                            <Set name="headerValue">https</Set>
+                            <Set name="scheme">https</Set>
+                        </New>
+                    </Item>
+                </Array>
+            </Set>
+            <Set name="handler">
+                <New id="Handlers" class="org.mortbay.jetty.handler.HandlerCollection">
+                    <Set name="handlers">
+                        <Array type="org.mortbay.jetty.Handler">
+                            <Item><Ref id="Contexts"/></Item>
+                            <Item><New id="DefaultHandler" class="org.mortbay.jetty.handler.DefaultHandler"/></Item>
+                            <Item><New id="RequestLog" class="org.mortbay.jetty.handler.RequestLogHandler"/></Item>
+                        </Array>
+                    </Set>
+                </New>
+            </Set>
+        </New>
+    </Set>
+    
+    <Set name="stopAtShutdown">true</Set>
+    <Set name="sendServerVersion">true</Set>
+    <Set name="sendDateHeader">true</Set>
+    <Set name="gracefulShutdown">1000</Set>
+</Configure>

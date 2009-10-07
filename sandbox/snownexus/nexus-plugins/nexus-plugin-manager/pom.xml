@@ -1,0 +1,116 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- Parent POM -->
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugins</artifactId>
+    <version>1.4.1-SNAPSHOT</version>
+  </parent>
+
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- a unique name for this project -->
+  <artifactId>nexus-plugin-manager</artifactId>
+
+  <!-- POM packaging -->
+  <packaging>jar</packaging>
+
+  <!-- a short but descriptive name for the project -->
+  <name>Nexus Plugins : Manager</name>
+
+  <dependencies>
+
+    <!-- General dependencies for plugin support -->
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-gleaner</artifactId>
+    </dependency>
+
+    <!-- Nexus, out target -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- Need a BooterCustomizer -->
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-app-booter</artifactId>
+      <version>${plexus.appbooter.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>plexus-app-events-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>simple-event-multicaster</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <executions>
+          <execution>
+            <id>process-classes</id>
+            <goals>
+              <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

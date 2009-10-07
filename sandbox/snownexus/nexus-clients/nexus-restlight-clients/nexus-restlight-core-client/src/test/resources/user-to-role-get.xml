@@ -1,0 +1,10 @@
+<user-to-role>
+  <data>
+    <userId>juven</userId>
+    <source>url</source>
+    <roles>
+      <role>ui-basic</role>
+      <role>ui-logs-config-files</role>
+    </roles>
+  </data>
+</user-to-role>

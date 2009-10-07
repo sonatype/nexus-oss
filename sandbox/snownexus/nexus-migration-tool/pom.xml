@@ -1,0 +1,39 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<!-- Parent POM -->
+	<parent>
+		<groupId>org.sonatype.nexus</groupId>
+		<artifactId>nexus</artifactId>
+		<version>1.4.1-SNAPSHOT</version>
+	</parent>
+
+	<!-- the version of maven's project object model -->
+	<modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.sonatype.nexus.tools</groupId>
+	<!-- a unique name for this project -->
+	<artifactId>nexus-migration-tool</artifactId>
+
+	<!-- POM packaging -->
+	<packaging>pom</packaging>
+
+	<!-- a short but descriptive name for the project -->
+	<name>Nexus Tools</name>
+
+	<modules>
+	  <module>nexus-repository-conversion-tool</module>
+	  <module>nexus-metadata-rebuild-tool</module>
+	</modules>
+			
+
+	<!-- build information for the project -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

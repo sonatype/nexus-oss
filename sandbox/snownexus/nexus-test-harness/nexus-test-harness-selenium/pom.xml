@@ -1,0 +1,378 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>nexus-test-harness</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <version>1.4.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-test-harness-selenium</artifactId>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>setup-environment</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusPluginsArtifacts>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-simple-memory-realm</artifactId>
+            </plugin>
+          </nexusPluginsArtifacts>
+          <extraResourcesArtifacts>
+            <artifact>
+              <groupId>com.getfirebug</groupId>
+              <artifactId>firebug-lite</artifactId>
+              <outputDirectory>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</outputDirectory>
+            </artifact>
+          </extraResourcesArtifacts>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <version>2.4.3-alpha-1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/*$*.java</exclude>
+          </excludes>
+          <systemProperties>
+            <property>
+              <name>seleniumPort</name>
+              <value>${seleniumPort}</value>
+            </property>
+            <property>
+              <name>seleniumServer</name>
+              <value>${seleniumServer}</value>
+            </property>
+            <property>
+              <name>seleniumBrowser</name>
+              <value>${seleniumBrowser}</value>
+            </property>
+          </systemProperties>
+          <properties>
+            <property>
+              <name>objectfactory</name>
+              <value>org.sonatype.nexus.testng.PlexusObjectFactory</value>
+            </property>
+            <property>
+              <name>listener</name>
+              <value>org.sonatype.nexus.testng.ScreenShotListener</value>
+            </property>
+          </properties>
+          <argLine>-Xmx512M</argLine>
+        </configuration>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>surefire-booter</artifactId>
+            <version>2.5-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>jscoverage-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</source>
+          <doNotInstrument>
+            <js>ext-2.2</js>
+            <js>firebug-lite-1.2-compressed.js</js>
+          </doNotInstrument>
+          <exclude>
+            <js>js/sonatype-all.js</js>
+          </exclude>
+          <scripts>
+            <![CDATA[
+  <script src="ext-2.2/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="ext-2.2/ext-all.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/ext-override.js" type="text/javascript" charset="utf-8"></script> 
+ 
+  <script src="js/filetree/js/Ext.ux.form.BrowseButton.js" type="text/javascript" charset="utf-8"></script> 
+  
+  <script src="js/Sonatype.js" type="text/javascript" charset="utf-8"></script> 
+  
+  <script src="js/extensions/Ext.messagebox.js" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/extensions/Ext.form.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/SearchField.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/Sonatype.ext.FeedGrid.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/Ext.tree.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/TwinPanelController.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/Sonatype.events.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/Sonatype.navigation.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/extensions/Sonatype.panels.js" type="text/javascript" charset="utf-8"></script> 
+  
+  <script src="js/Sonatype.utils.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.config.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.lib.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.resources.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.view.js" type="text/javascript" charset="utf-8"></script> 
+  
+  <script src="js/repoServer/repoServer.referenceData.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.resources.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/Sonatype.headLinks.js" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.FeedViewPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.ArtifactInformationPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.SearchResultGrid.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.SearchPanel.js" type="text/javascript" charset="utf-8"></script> 
+  
+  <script src="js/repoServer/repoServer.LogsViewPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.ServerEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.RoutesEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.SchedulesEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.UserEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.RoleEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.PrivilegeEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.AbstractRepoPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.FileUploadPanel.js" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/repoServer/repoServer.RepoMaintPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.RepoEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.GroupsEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.RepoServer.js" type="text/javascript" charset="utf-8"></script>  
+  <script src="js/repoServer/repoServer.RepoTargetEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.helpAbout.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.LogEditPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.MirrorConfigPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.UserBrowserPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.UserPrivilegeBrowserPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/repoServer.RepoSummaryPanel.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="js/repoServer/nexus-lvo-plugin-all.js" type="text/javascript" charset="utf-8"></script>
+            ]]>
+          </scripts>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>${basedir}</directory>
+              <includes>
+                <include>jscoverage.json.result</include>
+              </includes>
+            </fileset>
+          </filesets>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce-banned-dependencies</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>junit:junit</exclude>
+                  </excludes>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.seleniumhq.selenium.client-drivers</groupId>
+      <artifactId>selenium-java-client-driver</artifactId>
+      <version>1.0.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.server</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium.core</groupId>
+          <artifactId>selenium-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.mortbay.jetty</groupId>
+          <artifactId>servlet-api-2.5</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-mock</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>jscoverage-component</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>5.9</version>
+      <classifier>jdk15</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.getfirebug</groupId>
+      <artifactId>firebug-lite</artifactId>
+      <version>1.2</version>
+      <type>js</type>
+      <classifier>compressed</classifier>
+    </dependency>
+  </dependencies>
+
+  <profiles>
+    <profile>
+      <activation>
+        <property>
+          <name>!use-remote-selenium</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>selenium-maven-plugin</artifactId>
+            <version>1.0</version>
+            <configuration>
+              <port>${seleniumPort}</port>
+              <background>true</background>
+            </configuration>
+            <executions>
+              <execution>
+                <id>start-server</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start-server</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-server</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop-server</goal>
+                </goals>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.seleniumhq.selenium.server</groupId>
+                <artifactId>selenium-server</artifactId>
+                <version>1.0.1</version>
+                <classifier>standalone</classifier>
+              </dependency>
+            </dependencies>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
