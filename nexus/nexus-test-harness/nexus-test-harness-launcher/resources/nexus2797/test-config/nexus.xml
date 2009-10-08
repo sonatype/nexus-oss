@@ -67,8 +67,8 @@
   </repositoryTargets>
   <tasks>
     <task>
-      <id>23</id>
-      <name>Empty trash</name>
+      <id>task1</id>
+      <name>task1</name>
       <enabled>true</enabled>
       <type>EmptyTrashTask</type>
       <status>SUBMITTED</status>
@@ -80,8 +80,8 @@
       </schedule>
     </task>
     <task>
-      <id>22</id>
-      <name>Cleanup snapshots</name>
+      <id>task2</id>
+      <name>task2</name>
       <enabled>true</enabled>
       <type>SnapshotRemoverTask</type>
       <status>SUBMITTED</status>
@@ -111,12 +111,30 @@
       </properties>
     </task>
     <task>
-      <id>0</id>
-      <name>Refresh Plexus-Releases Index for Promoted Releases</name>
+      <id>task3</id>
+      <name>task3</name>
       <enabled>true</enabled>
       <type>ReindexTask</type>
       <status>SUBMITTED</status>
       <lastRun>1111111111111</lastRun>
+      <nextRun>1230777000000</nextRun>
+      <schedule>
+        <type>daily</type>
+        <startDate>1230777000000</startDate>
+      </schedule>
+      <properties>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>repo_releases</value>
+        </property>
+      </properties>
+    </task>
+    <task>
+      <id>task4</id>
+      <name>task4</name>
+      <enabled>true</enabled>
+      <type>ReindexTask</type>
+      <status>SUBMITTED</status>
       <nextRun>1230777000000</nextRun>
       <schedule>
         <type>daily</type>

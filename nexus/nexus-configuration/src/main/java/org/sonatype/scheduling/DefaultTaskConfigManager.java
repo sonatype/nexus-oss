@@ -168,7 +168,14 @@ public class DefaultTaskConfigManager
                                           translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) );
                     
                     scheduledTask.setEnabled( task.isEnabled() );
+                    
+                    // since the default schedules task appends 20 ms to the last run time, we don't want
+                    // set the value if it is 0, otherwise will give appearance that task did run, since
+                    // timestamp greater than 0
+                    if ( task.getLastRun() > 0 )
+                    {
                     scheduledTask.setLastRun( new Date( task.getLastRun() ) );
+                }
                 }
                 catch ( IllegalArgumentException e )
                 {
