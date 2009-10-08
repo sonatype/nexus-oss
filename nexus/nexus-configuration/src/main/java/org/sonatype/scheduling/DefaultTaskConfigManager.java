@@ -162,10 +162,13 @@ public class DefaultTaskConfigManager
                     TaskUtils.setId( nexusTask, task.getId() );
                     TaskUtils.setName( nexusTask, task.getName() );
 
-                    scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
-                                          translateFrom( task.getSchedule(), new Date( task.getLastRun() ) )
-                    )
-                        .setEnabled( task.isEnabled() );
+                    
+
+                    DefaultScheduledTask<?> scheduledTask = ( DefaultScheduledTask<?> ) scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
+                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) );
+                    
+                    scheduledTask.setEnabled( task.isEnabled() );
+                    scheduledTask.setLastRun( new Date( task.getLastRun() ) );
                 }
                 catch ( IllegalArgumentException e )
                 {
@@ -202,6 +205,8 @@ public class DefaultTaskConfigManager
                 if ( foundTask != null )
                 {
                     tasks.remove( foundTask );
+                    
+                    storeableTask.setLastRun( foundTask.getLastRun() );
                 }
 
                 tasks.add( storeableTask );
@@ -305,7 +310,7 @@ public class DefaultTaskConfigManager
         return map;
     }
 
-    private Schedule translateFrom( CScheduleConfig modelSchedule, Date lastRun )
+    private Schedule translateFrom( CScheduleConfig modelSchedule, Date nextRun )
     {
         Schedule schedule = null;
 
@@ -398,9 +403,9 @@ public class DefaultTaskConfigManager
             throw new IllegalArgumentException( "Unknown Schedule type: " + modelSchedule.getClass().getName() );
         }
 
-        if ( lastRun != null )
+        if ( nextRun != null )
         {
-            schedule.getIterator().resetFrom( lastRun );
+            schedule.getIterator().resetFrom( nextRun );
         }
 
         return schedule;

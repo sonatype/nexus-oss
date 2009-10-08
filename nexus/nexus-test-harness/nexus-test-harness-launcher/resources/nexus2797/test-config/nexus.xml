@@ -72,7 +72,8 @@
       <enabled>true</enabled>
       <type>EmptyTrashTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1235788200000</nextRun>
+      <lastRun>1111111111111</lastRun>
+      <nextRun>1230777000000</nextRun>
       <schedule>
         <type>daily</type>
         <startDate>1230777000000</startDate>
@@ -84,10 +85,11 @@
       <enabled>true</enabled>
       <type>SnapshotRemoverTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1235790000000</nextRun>
+      <lastRun>1111111111111</lastRun>
+      <nextRun>1230777000000</nextRun>
       <schedule>
         <type>daily</type>
-        <startDate>1230778800000</startDate>
+        <startDate>1230777000000</startDate>
       </schedule>
       <properties>
         <property>
@@ -114,10 +116,11 @@
       <enabled>true</enabled>
       <type>ReindexTask</type>
       <status>SUBMITTED</status>
-      <nextRun>1235787300000</nextRun>
+      <lastRun>1111111111111</lastRun>
+      <nextRun>1230777000000</nextRun>
       <schedule>
-        <type>advanced</type>
-        <cronCommand>0 15 0-23/4 * * ?</cronCommand>
+        <type>daily</type>
+        <startDate>1230777000000</startDate>
       </schedule>
       <properties>
         <property>
