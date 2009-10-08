@@ -445,6 +445,9 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
             if ( tab ) {
               panel.tabPanel.setActiveTab( tab.id );
             }
+            else {
+              panel.tabPanel.setActiveTab( 0 );
+          }
           }
           else {
             panel.tabPanel.setActiveTab( 0 );
@@ -455,6 +458,17 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
       }
       else {
         return;
+      }
+    }
+    else {
+      if ( this.selectedTabName ) {
+        var tab = panel.find( 'name', this.selectedTabName )[0];
+    
+        if ( tab 
+            && panel.tabPanel 
+            && tab.id != panel.tabPanel.getActiveTab().id ) {
+          panel.tabPanel.setActiveTab( tab.id );
+        }
       }
     }
     
