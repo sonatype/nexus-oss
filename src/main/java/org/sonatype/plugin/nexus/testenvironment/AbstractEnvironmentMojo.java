@@ -62,16 +62,16 @@ public class AbstractEnvironmentMojo
     private org.apache.maven.artifact.resolver.ArtifactResolver resolver;
 
     /** @parameter expression="${localRepository}" */
-    private org.apache.maven.artifact.repository.ArtifactRepository localRepository;
+    protected org.apache.maven.artifact.repository.ArtifactRepository localRepository;
 
     /** @parameter expression="${project.remoteArtifactRepositories}" */
-    private java.util.List<?> remoteRepositories;
+    protected java.util.List<?> remoteRepositories;
 
     /** @component */
     private MavenFileFilter mavenFileFilter;
 
     /** @component */
-    private MavenProjectBuilder mavenProjectBuilder;
+    protected MavenProjectBuilder mavenProjectBuilder;
 
     /** @component */
     private ArtifactMetadataSource artifactMetadataSource;
@@ -156,7 +156,7 @@ public class AbstractEnvironmentMojo
     /**
      * @parameter default-value="${basedir}/resources"
      */
-    private File resourcesSourceLocation;
+    protected File resourcesSourceLocation;
 
     /**
      * @parameter default-value="${project.build.directory}/resources"
@@ -172,6 +172,21 @@ public class AbstractEnvironmentMojo
      * @parameter default-value="false"
      */
     private boolean extractNexusPluginsJavascript;
+
+    /**
+     * @parameter default-value="${project.build.testOutputDirectory}"
+     */
+    protected File testOutputDirectory;
+
+    /**
+     * @parameter default-value="${basedir}/src/test/resources"
+     */
+    protected File testResourcesDirectory;
+
+    /**
+     * @parameter default-value="false"
+     */
+    private boolean promoteOptionalPlugin;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -216,7 +231,7 @@ public class AbstractEnvironmentMojo
         final File plexusProps = new File( nexusBaseDir, "conf/plexus.properties" );
         copyUrl( "/default-config/plexus.properties", plexusProps );
 
-        File extraPlexusProps = new File( project.getBasedir(), "src/test/resources/plexus.properties" );
+        File extraPlexusProps = new File( testResourcesDirectory, "plexus.properties" );
         if ( extraPlexusProps.exists() )
         {
             merge( plexusProps, extraPlexusProps, "properties" );
@@ -231,6 +246,23 @@ public class AbstractEnvironmentMojo
         if ( nexusPluginsArtifacts != null )
         {
             setupPlugins( nexusBaseDir, nexusPluginsArtifacts, libFolder, pluginFolder );
+        }
+
+        if ( promoteOptionalPlugin )
+        {
+            File optionalPluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/optional-plugins" );
+            try
+            {
+                if ( optionalPluginFolder.exists() )
+                {
+                    FileUtils.copyDirectoryStructure( optionalPluginFolder, pluginFolder );
+                    FileUtils.deleteDirectory( optionalPluginFolder );
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to promote optinal plugins", e );
+            }
         }
 
         if ( setupMaven )
@@ -292,7 +324,7 @@ public class AbstractEnvironmentMojo
         // end default configs
 
         // start baseTest.properties
-        File baseTestProperties = new File( project.getBuild().getTestOutputDirectory(), "baseTest.properties" );
+        File baseTestProperties = new File( testOutputDirectory, "baseTest.properties" );
         copyUrl( "/default-config/baseTest.properties", baseTestProperties );
 
         File testSuiteProperties = new File( resourcesSourceLocation, "baseTest.properties" );
@@ -306,11 +338,10 @@ public class AbstractEnvironmentMojo
 
         copyExtraResources();
 
-        File destinationComponents =
-            new File( project.getBuild().getTestOutputDirectory(), "META-INF/plexus/components.xml" );
+        File destinationComponents = new File( testOutputDirectory, "META-INF/plexus/components.xml" );
         copyUrl( "/default-config/components.xml", destinationComponents );
 
-        File componentsXml = new File( project.getBasedir(), "src/test/resources/components.xml" );
+        File componentsXml = new File( testResourcesDirectory, "components.xml" );
         if ( componentsXml.exists() )
         {
             copyAndInterpolate( componentsXml.getParentFile(), destinationComponents.getParentFile() );

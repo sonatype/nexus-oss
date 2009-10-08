@@ -104,6 +104,8 @@ public class PackageTestsMojo
                 archiver.addDirectory( dir, "test-resources/", includes, excludes );
             }
 
+            archiver.addFile( project.getFile(), "pom.xml" );
+
             archiver.createArchive();
         }
         catch ( ArchiverException e )
