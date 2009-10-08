@@ -136,9 +136,12 @@ public class PluginEnvironmentMojo
         }
         if ( ma.getType() == null )
         {
-            if ( artifact.getType() != null )
+            if ( !"jar".equals( artifact.getType() ) )
             {
-                return false;
+                if ( artifact.getType() != null )
+                {
+                    return false;
+                }
             }
         }
         else if ( !ma.getType().equals( artifact.getType() ) )
