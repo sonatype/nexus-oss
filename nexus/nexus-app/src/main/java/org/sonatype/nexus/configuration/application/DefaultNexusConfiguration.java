@@ -48,6 +48,8 @@ import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.events.VetoFormatter;
+import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -111,6 +113,9 @@ public class DefaultNexusConfiguration
     @org.codehaus.plexus.component.annotations.Configuration( value = "${nexus-work}" )
     private File workingDirectory;
 
+    @Requirement
+    private VetoFormatter vetoFormatter;
+
     /** The config dir */
     private File configurationDirectory;
 
@@ -171,7 +176,8 @@ public class DefaultNexusConfiguration
 
             if ( loadEvent.isVetoed() )
             {
-                // spit out the reason
+                getLogger().info(
+                    vetoFormatter.format( new VetoFormatterRequest( loadEvent, getLogger().isDebugEnabled() ) ) );
 
                 throw new ConfigurationException( "The Nexus configuration is invalid!" );
             }
@@ -210,7 +216,8 @@ public class DefaultNexusConfiguration
         }
         else
         {
-            getLogger().info( "... applying was vetoed by: " + prepare.getVetos() );
+            getLogger()
+                .info( vetoFormatter.format( new VetoFormatterRequest( prepare, getLogger().isDebugEnabled() ) ) );
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationRollbackEvent( this ) );
 
