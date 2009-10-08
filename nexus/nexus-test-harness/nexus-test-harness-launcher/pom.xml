@@ -61,43 +61,8 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.4.3</version>
         <configuration>
-          <argLine>-Xmx512M</argLine>
-          <skip>false</skip>
-          <includes>
-            <include>**/Nexus*.java</include>
-          </includes>
-          <excludes>
-            <exclude>**Suite*</exclude>
-            <!-- START This are start/stop tests, shouldn't be runned -->
-            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
-            <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>**/Nexus748MultipleStartTest.*</exclude>
-            <!-- END This are start/stop tests, shouldn't be runned -->
-
-            <!-- inner classes -->
-            <exclude>**/*$*.*</exclude>
-
-            <!-- The following tests are executed on a forked process, check 'forked-ITs' profile  -->
-            <exclude>**/Nexus142UserPermissionTests.*</exclude>
-            <exclude>**/Nexus538SystemFeeds.*</exclude>
-            <exclude>**/Nexus2351DisableRedeployUploadTest.*</exclude>
-            <exclude>**/Nexus532*.*</exclude>
-          </excludes>
+          <skipTests>true</skipTests>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>test-jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
@@ -117,6 +82,38 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <configuration>
+          <argLine>-Xmx512M</argLine>
+          <excludes>
+            <exclude>**Suite*</exclude>
+            <!-- START This are start/stop tests, shouldn't be runned -->
+            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
+            <exclude>**/Nexus758StatusService.*</exclude>
+            <exclude>**/Nexus748MultipleStartTest.*</exclude>
+            <!-- END This are start/stop tests, shouldn't be runned -->
+
+            <!-- inner classes -->
+            <exclude>**/*$*.*</exclude>
+
+            <!-- The following tests are executed on a forked process, check 'forked-ITs' profile  -->
+            <exclude>**/Nexus142UserPermissionTests.*</exclude>
+            <exclude>**/Nexus538SystemFeeds.*</exclude>
+            <exclude>**/Nexus2351DisableRedeployUploadTest.*</exclude>
+            <exclude>**/Nexus532*.*</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -308,8 +305,8 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>failsafe-maven-plugin</artifactId>
             <configuration>
               <skip>true</skip>
             </configuration>
@@ -327,19 +324,18 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>failsafe-maven-plugin</artifactId>
             <executions>
               <execution>
                 <id>nexus538</id>
-                <phase>test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
                   <includes>
-                    <include>Nexus538SystemFeeds</include>
+                    <include>Nexus538SystemFeedsIT</include>
                   </includes>
                   <excludes>
                     <exclude>**Suite*</exclude>
@@ -348,14 +344,13 @@
               </execution>
               <execution>
                 <id>nexus142</id>
-                <phase>test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
                   <includes>
-                    <include>Nexus142UserPermissionTests</include>
+                    <include>Nexus142UserPermissionIT</include>
                   </includes>
                   <excludes>
                     <exclude>**Suite*</exclude>
@@ -364,14 +359,13 @@
               </execution>
               <execution>
                 <id>nexus2351</id>
-                <phase>test</phase>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
                   <includes>
-                    <include>Nexus2351DisableRedeployUploadTest</include>
+                    <include>Nexus2351DisableRedeployUploadIT</include>
                   </includes>
                   <excludes>
                     <exclude>**Suite*</exclude>
@@ -379,15 +373,14 @@
                 </configuration>
               </execution>
               <execution>
-                <id>Nexus532GroupCrudPermissionTests</id>
-                <phase>test</phase>
+                <id>Nexus532GroupCrudPermissionIT</id>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
                   <includes>
-                    <include>Nexus532GroupCrudPermissionTests</include>
+                    <include>Nexus532GroupCrudPermissionIT</include>
                   </includes>
                   <excludes>
                     <exclude>**Suite*</exclude>
@@ -395,20 +388,25 @@
                 </configuration>
               </execution>
               <execution>
-                <id>Nexus532GroupsCrudXmlTests</id>
-                <phase>test</phase>
+                <id>Nexus532GroupsCrudXmlIT</id>
                 <goals>
-                  <goal>test</goal>
+                  <goal>integration-test</goal>
                 </goals>
                 <configuration>
                   <forkMode>always</forkMode>
                   <includes>
-                    <include>Nexus532GroupsCrudXmlTests</include>
+                    <include>Nexus532GroupsCrudXmlIT</include>
                   </includes>
                   <excludes>
                     <exclude>**Suite*</exclude>
                   </excludes>
                 </configuration>
+              </execution>
+              <execution>
+                <id>verify</id>
+                <goals>
+                  <goal>verify</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

@@ -11,22 +11,31 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.integrationtests;
+package org.sonatype.nexus.integrationtests.nexus597;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleIT;
+import org.junit.Assert;
+import org.junit.Test;
+import org.restlet.data.Status;
+import org.sonatype.nexus.integrationtests.nexus395.AbstractForgotUserNameIT;
+import org.sonatype.nexus.test.utils.ForgotUsernameUtils;
 
 /**
- *
+ * @author juven
  */
-@RunWith( Suite.class )
-@SuiteClasses( {
-    Nexus166SampleIT.class,
-    Nexus166SampleIT.class
-} )
-public class IntegrationTestSuiteClasses
+public class Nexus597ForgotUserNameSharedEmailIT
+    extends AbstractForgotUserNameIT
 {
+    @Test
+    public void recoverUserNameWithSharedEmail()
+        throws Exception
+    {
+        String anonymousEmail = "changeme2@yourcompany.com";
 
+        // username should be recovered with anonymous being ignored
+        Status status = ForgotUsernameUtils.recoverUsername( anonymousEmail );
+
+        Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
+
+        assertRecoveredUserName( "test-user-1" );
+    }
 }

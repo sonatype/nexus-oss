@@ -11,22 +11,33 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.integrationtests;
+package org.sonatype.nexus.integrationtests.nexus142;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleIT;
+import java.io.IOException;
+
+import org.junit.Test;
+import org.restlet.data.MediaType;
+import org.sonatype.nexus.test.utils.UserMessageUtil;
 
 /**
- *
+ * CRUD tests for XML request/response.
  */
-@RunWith( Suite.class )
-@SuiteClasses( {
-    Nexus166SampleIT.class,
-    Nexus166SampleIT.class
-} )
-public class IntegrationTestSuiteClasses
+public class Nexus142UserCrudXmlIT
+    extends Nexus142UserCrudJsonIT
 {
 
+    public Nexus142UserCrudXmlIT()
+    {
+        this.messageUtil = new UserMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML );
+    }
+    
+    
+    
+    @Test
+    public void readTest()
+        throws IOException
+    {
+        super.readTest();
+    }
+    
 }

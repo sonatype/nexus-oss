@@ -11,22 +11,29 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.integrationtests;
+package org.sonatype.nexus.integrationtests.nexus810;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleIT;
+import java.io.IOException;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
 
 /**
- *
+ * Checks to make sure the tasks don't have packages in the type field.
  */
-@RunWith( Suite.class )
-@SuiteClasses( {
-    Nexus166SampleIT.class,
-    Nexus166SampleIT.class
-} )
-public class IntegrationTestSuiteClasses
+public class Nexus810PackageNamesInRestMessagesIT extends AbstractNexusIntegrationTest
 {
 
+    @Test
+    public void checkForPackageNamesInResponse() throws IOException
+    {
+        // I like simple tests
+        Response response = RequestFacade.doGetRequest( "service/local/schedule_types" );
+        String responseText = response.getEntity().getText();
+        Assert.assertFalse( "Found package names in response.", responseText.contains( "org.sonatype." ) );
+    }
 }
