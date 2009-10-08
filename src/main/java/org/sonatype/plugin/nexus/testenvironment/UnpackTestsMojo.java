@@ -1,13 +1,19 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
@@ -18,9 +24,7 @@ import org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-
-import de.schlichtherle.io.File;
-import de.schlichtherle.io.FileInputStream;
+import org.codehaus.plexus.util.io.InputStreamFacade;
 
 /**
  * @author velo
@@ -31,6 +35,11 @@ import de.schlichtherle.io.FileInputStream;
 public class UnpackTestsMojo
     extends AbstractEnvironmentMojo
 {
+
+    /**
+     * @parameter
+     */
+    private MavenArtifact[] extraTestSuites;
 
     @SuppressWarnings( "unchecked" )
     @Override
@@ -48,7 +57,9 @@ public class UnpackTestsMojo
         resource.setTargetPath( testOutputDirectory.getAbsolutePath() );
         project.addResource( resource );
 
-        Collection<Artifact> plugins = getNexusPlugins();
+        Collection<Artifact> plugins = new LinkedHashSet<Artifact>();
+        plugins.addAll( getNexusPlugins() );
+        plugins.addAll( getExtraTestSuites() );
 
         Set<Artifact> classpath = new LinkedHashSet<Artifact>();
 
@@ -89,32 +100,33 @@ public class UnpackTestsMojo
                 continue;
             }
 
-            File zip = new File( testResources.getFile() );
-
-            new File( zip, "classes" ).copyAllTo( new File( testOutputDirectory ) );
-            new File( zip, "test-resources" ).copyAllTo( new File( testResourcesDirectory ) );
-            new File( zip, "resources" ).copyAllTo( new File( resourcesSourceLocation ) );
-
+            ZipFile zip = null;
             try
             {
-                File plexusXml = new File( zip, "test-resources/META-INF/plexus/components.xml" );
-                if ( plexusXml.exists() )
+                zip = new ZipFile( testResources.getFile() );
+
+                copyAllTo( zip, "classes/", testOutputDirectory );
+                copyAllTo( zip, "test-resources/", testResourcesDirectory );
+                copyAllTo( zip, "resources/", resourcesSourceLocation );
+
+                ZipEntry plexusXml = zip.getEntry( "test-resources/META-INF/plexus/components.xml" );
+                if ( plexusXml != null )
                 {
-                    FileInputStream is = new FileInputStream( plexusXml );
+                    InputStream is = zip.getInputStream( plexusXml );
                     plxXml.processResource( is );
                     IOUtil.close( is );
                 }
-                File componentsXml = new File( zip, "test-resources/components.xml" );
-                if ( componentsXml.exists() )
+                ZipEntry componentsXml = zip.getEntry( "test-resources/components.xml" );
+                if ( componentsXml != null )
                 {
-                    FileInputStream is = new FileInputStream( componentsXml );
+                    InputStream is = zip.getInputStream( componentsXml );
                     compXml.processResource( is );
                     IOUtil.close( is );
                 }
-                File testProperties = new File( zip, "test-resources/baseTest.properties" );
-                if ( testProperties.exists() )
+                ZipEntry testProperties = zip.getEntry( "test-resources/baseTest.properties" );
+                if ( testProperties != null )
                 {
-                    FileInputStream is = new FileInputStream( testProperties );
+                    InputStream is = zip.getInputStream( testProperties );
                     baseProps.load( is );
                     IOUtil.close( is );
                 }
@@ -166,6 +178,62 @@ public class UnpackTestsMojo
         }
 
         project.setDependencyArtifacts( classpath );
+    }
+
+    private void copyAllTo( ZipFile zip, String baseEntry, java.io.File testOutputDirectory )
+        throws IOException
+    {
+        Enumeration<? extends ZipEntry> entries = zip.entries();
+        while ( entries.hasMoreElements() )
+        {
+            ZipEntry entry = entries.nextElement();
+            String name = entry.getName();
+            if ( !name.startsWith( baseEntry ) )
+            {
+                continue;
+            }
+
+            name = name.replace( baseEntry, "" );
+
+            File dest = new File( testOutputDirectory, name );
+            if ( entry.isDirectory() )
+            {
+                dest.mkdirs();
+            }
+            else
+            {
+                final InputStream in = zip.getInputStream( entry );
+                FileUtils.copyStreamToFile( new InputStreamFacade()
+                {
+                    public InputStream getInputStream()
+                        throws IOException
+                    {
+                        return in;
+                    }
+                }, dest );
+                IOUtil.close( in );
+            }
+        }
+    }
+
+    private Collection<? extends Artifact> getExtraTestSuites()
+        throws MojoExecutionException, MojoFailureException
+    {
+        if ( extraTestSuites == null )
+        {
+            return Collections.emptyList();
+        }
+        Collection<Artifact> extra = new LinkedHashSet<Artifact>();
+
+        for ( MavenArtifact ma : extraTestSuites )
+        {
+            ma.setClassifier( "test-resources" );
+            ma.setType( "zip" );
+
+            extra.add( getMavenArtifact( ma ) );
+        }
+
+        return extra;
     }
 
 }
