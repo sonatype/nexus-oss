@@ -93,7 +93,14 @@ public class ErrorWarningFeedSource
 
             if ( StringUtils.isNotEmpty( item.getStackTrace() ) )
             {
-                contentValue.append( "\n" ).append( item.getStackTrace() );
+                // we need <br/> and &nbsp; to display stack trace on RSS
+                String stackTrace = item.getStackTrace().replace(
+                    (String) System.getProperties().get( "line.separator" ),
+                    "<br/>" );
+                
+                stackTrace = stackTrace.replace( "\t", "&nbsp;&nbsp;&nbsp;&nbsp;" );
+
+                contentValue.append( "<br/>" ).append( stackTrace );
             }
 
             content.setType( MediaType.TEXT_PLAIN.toString() );

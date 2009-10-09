@@ -475,10 +475,6 @@ public class DefaultFeedRecorder
     {
         String stackTrace = ExceptionUtils.getFullStackTrace( throwable );
 
-        // we need <br/> and &nbsp; to display stack trace on RSS
-        stackTrace = stackTrace.replace( (String) System.getProperties().get( "line.separator" ), "<br/>" );
-        stackTrace = stackTrace.replace( "\t", "&nbsp;&nbsp;&nbsp;&nbsp;" );
-
         addErrorWarningEvent( new ErrorWarningEvent( action, message, stackTrace ) );
     }
 
