@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.feeds;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -29,6 +27,7 @@ import java.util.Set;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.NexusTimeline;
@@ -474,11 +473,11 @@ public class DefaultFeedRecorder
 
     public void addErrorWarningEvent( String action, String message, Throwable throwable )
     {
-        StringWriter stringWriter = new StringWriter();
+        String stackTrace = ExceptionUtils.getFullStackTrace( throwable );
 
-        throwable.printStackTrace( new PrintWriter( stringWriter ) );
-
-        String stackTrace = stringWriter.toString();
+        // we need <br/> and &nbsp; to display stack trace on RSS
+        stackTrace = stackTrace.replace( (String) System.getProperties().get( "line.separator" ), "<br/>" );
+        stackTrace = stackTrace.replace( "\t", "&nbsp;&nbsp;&nbsp;&nbsp;" );
 
         addErrorWarningEvent( new ErrorWarningEvent( action, message, stackTrace ) );
     }
