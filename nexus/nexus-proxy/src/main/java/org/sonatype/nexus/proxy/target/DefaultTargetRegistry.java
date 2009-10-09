@@ -121,8 +121,16 @@ public class DefaultTargetRegistry
 
     protected Target convert( CRepositoryTarget target )
     {
-        return new Target( target.getId(), target.getName(), getContentClassById( target.getContentClass() ), target
-            .getPatterns() );
+        ContentClass contentClass = getContentClassById( target.getContentClass() );
+
+        // If content class is null, we have a target for a repo type that no longer exists
+        // plugin was removed most likely, so we ignore in this case
+        if ( contentClass != null )
+        {
+            return new Target( target.getId(), target.getName(), contentClass, target.getPatterns() );
+    }
+
+        return null;
     }
 
     protected CRepositoryTarget convert( Target target )
@@ -162,10 +170,15 @@ public class DefaultTargetRegistry
 
             targets = new ArrayList<Target>( ctargets.size() );
 
-            for ( CRepositoryTarget target : ctargets )
+            for ( CRepositoryTarget ctarget : ctargets )
             {
-                targets.add( convert( target ) );
+                Target target = convert( ctarget );
+                
+                if ( target != null )
+                {
+                    targets.add( target );
             }
+        }
         }
 
         return Collections.unmodifiableCollection( targets );
