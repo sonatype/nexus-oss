@@ -133,7 +133,7 @@
   <properties>
     <plexus.appbooter.version>2.0.0</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.1</plexus-security.version>
+    <plexus-security.version>1.1.2-SNAPSHOT</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
     <nexus.indexer.version>2.0.1</nexus.indexer.version>
@@ -150,7 +150,7 @@
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
     <plexus-slf4j-logging.version>1.1-alpha-1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
-    <jsecurity.version>0.9.0-RC2</jsecurity.version>
+    <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.0.2</plexus-ehcache.version>
