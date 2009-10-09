@@ -154,11 +154,14 @@ public class FileConfigurationSource
             configurationDefaulted = false;
         }
 
-        loadConfiguration( getConfigurationFile() );
-
-        // check for loaded model
-        if ( getConfiguration() == null )
+        try
         {
+        loadConfiguration( getConfigurationFile() );
+        }
+        catch ( ConfigurationException e )
+        {
+            getLogger().info( "Configuration file is invalid, attempting upgrade" );
+
             upgradeConfiguration( getConfigurationFile() );
 
             loadConfiguration( getConfigurationFile() );
@@ -246,7 +249,8 @@ public class FileConfigurationSource
      * @throws IOException Signals that an I/O exception has occurred.
      */
     private void loadConfiguration( File file )
-        throws IOException
+        throws IOException,
+            ConfigurationException
     {
         getLogger().info( "Loading Nexus configuration from " + file.getAbsolutePath() );
 
