@@ -20,7 +20,6 @@ import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
@@ -41,22 +40,22 @@ public class Nexus758StatusService
         return client;
     }
 
-    @Test
-    public void startAndStopTest()
-        throws Exception
-    {
-        NexusClient client = this.getConnectedNexusClient();
-
-        // stop Nexus
-        client.stopNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Stopped", NexusStatusUtil.waitForStop() );
-
-        // start Nexus
-        client.startNexus(); // blocking
-        Assert.assertTrue( "Expected Nexus to be Started", NexusStatusUtil.waitForStart() );
-
-        client.disconnect();
-    }
+    // @Test
+    // public void startAndStopTest()
+    // throws Exception
+    // {
+    // NexusClient client = this.getConnectedNexusClient();
+    //
+    // // stop Nexus
+    // client.stopNexus(); // blocking
+    // Assert.assertTrue( "Expected Nexus to be Stopped", NexusStatusUtil.waitForStop() );
+    //
+    // // start Nexus
+    // client.startNexus(); // blocking
+    // Assert.assertTrue( "Expected Nexus to be Started", NexusStatusUtil.waitForStart() );
+    //
+    // client.disconnect();
+    // }
 
     @Test
     public void restartTest()

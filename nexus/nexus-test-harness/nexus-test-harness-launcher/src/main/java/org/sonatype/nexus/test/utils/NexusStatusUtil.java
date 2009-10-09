@@ -101,22 +101,53 @@ public class NexusStatusUtil
     public static void start()
         throws Exception
     {
-        getAppBooterService().start();
+        int totalWaitCycles = 200 * 5; // 200 sec
+        int retryStartCycles = 50 * 5; // 50 sec
+        int pollingFreq = 200; // 200 ms
 
-        if ( !waitForStart() )
+        log.info( "wait for Nexus start" );
+        for ( int i = 0; i < totalWaitCycles; i++ )
         {
+
+            if ( i % retryStartCycles == 0 )
+            {
+                getAppBooterService().start();
+            }
+
+            // log.debug( "wait for Nexus start, attempt: " + i );
             try
             {
-                getAppBooterService().shutdown();
+                if ( isNexusRunning() )
+                {
+                    // nexus started
+                    return;
+                }
             }
-            catch ( Throwable t )
+            catch ( NexusIllegalStateException e )
             {
-                t.printStackTrace();
+                // let's give it more time
             }
-            throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
+
+            try
+            {
+                Thread.sleep( pollingFreq );
+            }
+            catch ( InterruptedException e )
+            {
+                // no problem
+            }
         }
 
-        isNexusRunning();
+        try
+        {
+            getAppBooterService().shutdown();
+        }
+        catch ( Throwable t )
+        {
+            t.printStackTrace();
+        }
+        throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
+
     }
 
     @Deprecated
@@ -226,43 +257,6 @@ public class NexusStatusUtil
         throws NexusIllegalStateException
     {
         return !isNexusAlive() || ( STATUS_STOPPED.equals( getNexusStatus().getData().getState() ) );
-    }
-
-    public static boolean waitForStart()
-        throws NexusIllegalStateException
-    {
-        int totalWaitTime = 200 * 1000; // 20 sec
-        int pollingFreq = 200; // 200 ms
-
-        log.info( "wait for Nexus start" );
-        for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
-        {
-//            log.debug( "wait for Nexus start, attempt: " + i );
-            try
-            {
-                if ( isNexusRunning() )
-                {
-                    // nexus started
-                    return true;
-                }
-            }
-            catch ( NexusIllegalStateException e )
-            {
-                // let's give it more time
-            }
-
-            try
-            {
-                Thread.sleep( pollingFreq );
-            }
-            catch ( InterruptedException e )
-            {
-                // no problem
-            }
-        }
-
-        // Didn't start
-        return false;
     }
 
     public static boolean waitForStop()
