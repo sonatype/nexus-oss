@@ -373,6 +373,36 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
+      <id>yourkit-profile</id>
+
+      <properties>
+        <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 8.0.13</yourkit.home>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <groupId>com.yourkit</groupId>
+          <artifactId>yjp</artifactId>
+          <version>8.0.13</version>
+          <scope>system</scope>
+          <systemPath>${yourkit.home}\lib\yjp.jar</systemPath>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>failsafe-maven-plugin</artifactId>
+            <configuration>
+              <argLine>-agentpath:"${yourkit.home}\bin\win64\yjpagent.dll"</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
 </project>

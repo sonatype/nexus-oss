@@ -24,6 +24,7 @@ import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testng.PlexusObjectFactory;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
+import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -44,6 +45,8 @@ public abstract class SeleniumTest
     protected static MainPage main;
 
     private static Connection sshConn;
+
+    private static JsonReportHandler handler;
 
     @BeforeSuite
     public void openTunnel()
@@ -188,7 +191,7 @@ public abstract class SeleniumTest
      * Takes a screenshot of the browser and saves it to the target/screenshots directory. The exact name of the file is
      * based on the currently executing test class and method name plus the line number of the source code that called
      * this method.
-     *
+     * 
      * @throws java.io.IOException If the screenshot could not be taken.
      */
     public void takeScreenshot()
@@ -202,7 +205,7 @@ public abstract class SeleniumTest
      * Takes a screenshot of the browser and saves it to the target/screenshots directory. The name is a combination of
      * the currently executing test class and method name, plus the name parameterized supplied when calling this
      * method.
-     *
+     * 
      * @param name A specific name to append to the screenshot file name.
      * @throws IOException If the screenshot could not be taken.
      */
@@ -243,10 +246,16 @@ public abstract class SeleniumTest
         }
     }
 
+    @BeforeSuite
+    public void coverageInit()
+        throws ComponentLookupException
+    {
+        handler = lookup( JsonReportHandler.class );
+    }
+
     protected void getCoverage()
         throws ComponentLookupException, IOException
     {
-        JsonReportHandler handler = lookup( JsonReportHandler.class );
         handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
         handler.persist();
     }
@@ -341,6 +350,51 @@ public abstract class SeleniumTest
         fields.addAll( Arrays.asList( f ) );
         fields.addAll( getFields( clazz.getSuperclass() ) );
         return fields;
+    }
+
+    // profiling with yourkit, activate using -P youtkit-profile
+    private static Object profiler;
+
+    @BeforeSuite
+    public void startProfiler()
+    {
+        Class<?> controllerClazz;
+        try
+        {
+            controllerClazz = Class.forName( "com.yourkit.api.Controller" );
+        }
+        catch ( Exception e )
+        {
+            log.info( "Profiler not present" );
+            return;
+        }
+
+        try
+        {
+            profiler = controllerClazz.newInstance();
+            controllerClazz.getMethod( "captureMemorySnapshot" ).invoke( profiler );
+        }
+        catch ( Exception e )
+        {
+            Assert.fail( "Profiler was active, but failed due: " + e.getMessage(), e );
+        }
+    }
+
+    @AfterMethod
+    public void takeSnapshot()
+    {
+        if ( profiler != null )
+        {
+            try
+            {
+                profiler.getClass().getMethod( "forceGC" ).invoke( profiler );
+                profiler.getClass().getMethod( "captureMemorySnapshot" ).invoke( profiler );
+            }
+            catch ( Exception e )
+            {
+                Assert.fail( "Profiler was active, but failed due: " + e.getMessage(), e );
+            }
+        }
     }
 
 }
