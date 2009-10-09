@@ -462,7 +462,10 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
     },
     {
       xtype: 'panel',
-      layout: 'column',
+      layout: 'table',
+      layoutConfig: {
+        columns: 3
+      },
       autoHeight: true,
       style: 'padding: 10px 0 0 0',
       name: 'privileges',
@@ -546,7 +549,8 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
         },
         {
           xtype: 'twinpanelcontroller',
-          name: 'twinpanel'
+          name: 'twinpanel',
+          halfSize: true
         },
         {
           xtype: 'multiselecttreepanel',
