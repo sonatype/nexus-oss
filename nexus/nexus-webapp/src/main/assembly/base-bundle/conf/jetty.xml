@@ -1,16 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
 
-<!-- =============================================================== -->
-<!--                                                                 -->
-<!--  NOTE: Copy this file to ../jetty.xml to use it.                -->
-<!--                                                                 -->
-<!-- Configure the Jetty Server                                      -->
-<!--                                                                 -->
-<!-- Documentation of this file format can be found at:              -->
-<!-- http://docs.codehaus.org/display/JETTY/jetty.xml                -->
-<!--                                                                 -->
-<!-- =============================================================== -->
+<!-- ============================================================ -->
+<!--                                                              -->
+<!-- For help using this configuration, see:                      -->
+<!--                                                              -->
+<!--   https://docs.sonatype.com/display/NX/Jetty+Configuration   -->
+<!--                                                              -->
+<!-- ============================================================ -->
 <Configure id="Server" class="org.mortbay.jetty.Server">
     <Call name="addConnector">
         <Arg>

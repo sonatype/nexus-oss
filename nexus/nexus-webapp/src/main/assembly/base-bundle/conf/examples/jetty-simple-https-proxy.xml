@@ -1,19 +1,22 @@
 <?xml version="1.0"?>
 <!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
 
-<!-- =============================================================== -->
-<!--                                                                 -->
-<!--  NOTE: Copy this file to ../jetty.xml to use it.                -->
-<!--   NOTE: As of this writing, the above configuration also requires an additional Jetty library, called jetty-rewrite-handler, -->
-<!--              that includes the rewrite support. Add this jar to the $(basedir)/runtime/apps/nexus/lib directory, so it is available when Nexus starts.-->
-<!--              http://repository.sonatype.org/content/groups/public/org/mortbay/jetty/jetty-rewrite-handler/6.1.14/jetty-rewrite-handler-6.1.14.jar -->
-<!--              See here for more information: https://docs.sonatype.com/display/NX/Jetty+Configuration -->
-<!-- Configure the Jetty Server                                      -->
-<!--                                                                 -->
-<!-- Documentation of this file format can be found at:              -->
-<!-- http://docs.codehaus.org/display/JETTY/jetty.xml                -->
-<!--                                                                 -->
-<!-- =============================================================== -->
+<!-- ==================================================================================================== -->
+<!--                                                                                                      -->
+<!-- NOTE: Copy this file to ../jetty.xml to use it.                                                      -->
+<!--                                                                                                      -->
+<!-- For help using this configuration, see:                                                              -->
+<!--                                                                                                      -->
+<!--   https://docs.sonatype.com/display/NX/Jetty+Configuration                                           -->
+<!--                                                                                                      -->
+<!--                                                                                                      -->
+<!-- NOTE: To use this configuration, you must first download and install the jetty-rewrite-handler       -->
+<!--   artifact. To get this artifact, check the version of $basedir/runtime/apps/nexus/lib/jetty-*.jar,  -->
+<!--   then select the matching jetty-rewrite-handler version from here:                                  -->
+<!--                                                                                                      -->
+<!--   http://repository.sonatype.org/index.html#nexus-search;quick~jetty-rewrite-handler                 -->
+<!--                                                                                                      -->
+<!-- ==================================================================================================== -->
 <Configure id="Server" class="org.mortbay.jetty.Server">
     <Call name="addConnector">
         <Arg>
