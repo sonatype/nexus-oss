@@ -10,7 +10,7 @@ import org.sonatype.timeline.TimelineException;
 /**
  * This class extends log4j, record all error/warning log
  * 
- * @author juven
+ * @author juven xu
  */
 public class ErrorWarningRecordAppender
     extends AppenderSkeleton
