@@ -158,7 +158,15 @@ public class DefaultRepositoryItemUid
         }
         else
         {
-            threadMap.get( lockKey ).pop();
+            Stack<LockStep> stack = threadMap.get( lockKey );
+
+            stack.pop();
+
+            // cleanup if stack is empty
+            if ( stack.isEmpty() )
+            {
+                threadMap.remove( lockKey );
+            }
         }
     }
 
@@ -212,7 +220,7 @@ public class DefaultRepositoryItemUid
         putLastStep( lockKey, step );
     }
 
-    public void doUnlock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
+    protected void doUnlock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
     {
         LockStep step = getLastStep( lockKey );
 
