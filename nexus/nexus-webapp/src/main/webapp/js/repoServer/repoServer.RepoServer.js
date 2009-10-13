@@ -260,30 +260,6 @@ Sonatype.repoServer.RepoServer = function(){
                 id: 'quick-search--field',
                 width: 140
               }, searchConfig ),
-//              {
-//                xtype: 'trigger',
-//                id: 'quick-search--field',
-//                triggerClass: 'x-form-search-trigger',
-//                repoPanel: this,
-//                width: 140,
-//                listeners: {
-//                  'specialkey': {
-//                    fn: function(f, e){
-//                      if(e.getKey() == e.ENTER){
-//                        this.onTriggerClick();
-//                      }
-//                    }
-//                  }
-//                },
-//                onTriggerClick: function(a,b,c){
-//                  var v = this.getRawValue();
-//                  if ( v.length > 0 ) {
-//                    var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-//                        'nexus-search', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
-//                    panel.startQuickSearch( v );
-//                  }
-//                }
-//              },
               {
                 title: 'Advanced Search',
                 tabCode: Sonatype.repoServer.SearchPanel,
@@ -510,7 +486,6 @@ Sonatype.repoServer.RepoServer = function(){
             }
           ]
         };
-        
 
         var welcomeMsg = '<p><a href="http://nexus.sonatype.org" target="new" style="text-decoration: none;">' +
           '<img src="images/nexus50.png" style="width: 50px; height: 50px; border: 0; margin-right: 9px; margin-top: 9px;" alt="Nexus" align="left">' +
