@@ -485,15 +485,37 @@ Sonatype.repoServer.RepoServer = function(){
         Sonatype.view.mainTabPanel.activeTab = null;
         Sonatype.view.supportedNexusTabs = {};
         
+        var welcomePanelConfig = { 
+          layout: 'auto',
+          width: 500,
+          items: []
+        };
         var welcomeTabConfig = {
           title: 'Welcome',
           id: 'welcome',
-          layout: 'auto',
-//          bodyStyle: 'display: table-cell; vertical-align: middle;',
-          items: []
+          layout: 'column',
+          defaults: {
+            border: false,
+            style: 'padding-top: 30px;'
+          },
+          items: [
+            { 
+              columnWidth: .5,
+              html: '&nbsp;' 
+            },
+            welcomePanelConfig,
+            { 
+              columnWidth: .5,
+              html: '&nbsp;' 
+            }
+          ]
         };
         
-        var welcomeMsg = '<p>Welcome to the <a href="http://nexus.sonatype.org" target="new">Sonatype Nexus Maven Repository Manager</a>.</p>' ;
+
+        var welcomeMsg = '<p><a href="http://nexus.sonatype.org" target="new" style="text-decoration: none;">' +
+          '<img src="images/nexus50.png" style="width: 50px; height: 50px; border: 0; margin-right: 9px; margin-top: 9px;" alt="Nexus" align="left">' +
+          '<span style="font-face: Trebuchet MS; font-size: 36px; color: black;">Sonatype Nexus</span></a><br/>' +
+          'Welcome to the Maven Repository Manager</p>';
 
         var statusEnabled = sp.checkPermission('nexus:status', sp.READ);
         if ( !statusEnabled ){
@@ -522,20 +544,16 @@ Sonatype.repoServer.RepoServer = function(){
       	}
 //        }
 
-        welcomeTabConfig.items.push( {
+      	welcomePanelConfig.items.push( {
           border: false,
-          style: 'margin-left: auto; margin-right: auto; width: 500px; padding-top: 30px;',
-          width: 500,
           html: '<div class="little-padding">' + welcomeMsg + '</div>'
         } );
         
         if ( searchEnabled ) {
-          welcomeTabConfig.items.push( {
+          welcomePanelConfig.items.push( {
             layout: 'form',
             border: false,
             frame: false,
-            style: 'margin-left: auto; margin-right: auto; width: 500px',
-            width: 500,
             labelWidth: 10,
             items: [
               {
