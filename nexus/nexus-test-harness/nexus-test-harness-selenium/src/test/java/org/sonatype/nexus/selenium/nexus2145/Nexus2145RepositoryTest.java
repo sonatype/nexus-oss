@@ -27,11 +27,13 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
+import org.sonatype.nexus.testng.Priority;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+@Priority( 10 )
 @Component( role = Nexus2145RepositoryTest.class )
 public class Nexus2145RepositoryTest
     extends SeleniumTest
@@ -210,8 +212,9 @@ public class Nexus2145RepositoryTest
         throws Exception
     {
         Maven2ProxyRepositoryTemplate template =
-            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                                                                                         Maven2ProxyRepositoryTemplate.class,
+                                                                                         RepositoryPolicy.RELEASE ).pick();
 
         template.getConfigurableRepository().setId( "nexus2145" );
         template.getConfigurableRepository().setName( "nexus2145" );
@@ -228,8 +231,9 @@ public class Nexus2145RepositoryTest
         proxyRepo = (M2Repository) template.create();
 
         Maven2ProxyRepositoryTemplate hostedTemplate =
-            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                                                                                         Maven2ProxyRepositoryTemplate.class,
+                                                                                         RepositoryPolicy.RELEASE ).pick();
 
         hostedTemplate.getConfigurableRepository().setId( "hosted-nexus2145" );
         hostedTemplate.getConfigurableRepository().setName( "hosted-nexus2145" );
@@ -358,8 +362,7 @@ public class Nexus2145RepositoryTest
         RepositoriesTab repositories = startContextMenuTest();
 
         // put out of service
-        MockHelper
-            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuPutOutOfService( hostedRepo.getId() );
         new MessageBox( selenium ).clickOk();
 
@@ -407,8 +410,7 @@ public class Nexus2145RepositoryTest
         RepositoriesTab repositories = startContextMenuTest();
 
         // block proxy
-        MockHelper
-            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuBlockProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
 
@@ -429,8 +431,7 @@ public class Nexus2145RepositoryTest
                            equalTo( "In Service - Remote Manually Blocked and Unavailable" ) ) );
 
         // allow proxy
-        MockHelper
-            .expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
+        MockHelper.expect( "/repositories/{repositoryId}/status", new MockResponse( Status.SERVER_ERROR_INTERNAL, null ) );
         repositories.contextMenuAllowProxy( proxyRepo.getId() );
         new MessageBox( selenium ).clickOk();
 

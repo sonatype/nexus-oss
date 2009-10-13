@@ -1,9 +1,5 @@
 package org.sonatype.nexus.mock;
 
-import static org.sonatype.nexus.mock.TestContext.RESOURCES_DIR;
-import static org.sonatype.nexus.mock.TestContext.RESOURCES_SOURCE_DIR;
-import static org.sonatype.nexus.mock.TestContext.getTestResourceAsFile;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -79,7 +75,7 @@ public abstract class NexusMockTestCase
             nexusBaseURL = TestProperties.getString( "nexus.base.url" );
 
             env = new MockNexusEnvironment( (PlexusAppBooter) container.getContext().get( "plexus.app.booter" ) );
-            //Don't do this env.start();
+            // Don't do this env.start();
 
             Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
             {
@@ -110,13 +106,13 @@ public abstract class NexusMockTestCase
     protected void copyTestResources()
         throws IOException
     {
-        File source = new File( RESOURCES_SOURCE_DIR, TestContext.getTestId() );
+        File source = new File( RESOURCES_SOURCE_DIR, testId );
         if ( !source.exists() )
         {
             return;
         }
 
-        File destination = new File( RESOURCES_DIR, TestContext.getTestId() );
+        File destination = new File( RESOURCES_DIR, testId );
 
         FileTestingUtils.interpolationDirectoryCopy( source, destination, TestProperties.getAll() );
     }
@@ -233,7 +229,7 @@ public abstract class NexusMockTestCase
                 }
                 catch ( Exception e )
                 {
-                    log.error( TestContext.getTestId() + " Unable to deploy " + artifactFileName, e );
+                    log.error( testId + " Unable to deploy " + artifactFileName, e );
                     throw e;
                 }
             }
@@ -254,13 +250,13 @@ public abstract class NexusMockTestCase
         MockHelper.clearMocks();
     }
 
-    public <E> E lookup( Class<E> role )
+    protected <E> E lookup( Class<E> role )
         throws ComponentLookupException
     {
         return env.getPlexusContainer().lookup( role );
     }
 
-    public <E> E lookup( Class<E> role, String hint )
+    protected <E> E lookup( Class<E> role, String hint )
         throws ComponentLookupException
     {
         return env.getPlexusContainer().lookup( role, hint );
@@ -271,9 +267,44 @@ public abstract class NexusMockTestCase
     {
         String packageName = this.getClass().getPackage().getName();
         this.testId = packageName.substring( packageName.lastIndexOf( '.' ) + 1, packageName.length() );
-        TestContext.setTestId( testId );
 
         this.testName = getClass().getSimpleName();
     }
 
+    protected static final File RESOURCES_DIR = new File( "target/resources" );
+
+    protected static final File RESOURCES_SOURCE_DIR = new File( "resources" );
+
+    protected File getTestResourceAsFile( String relativePath )
+    {
+        String resource = testId + "/" + relativePath;
+        return getResource( resource );
+    }
+
+    protected File getResource( String resource )
+    {
+        log.debug( "Looking for resource: " + resource );
+
+        File file = new File( RESOURCES_DIR, resource );
+
+        if ( !file.exists() )
+        {
+            return null;
+        }
+
+        log.debug( "found: " + file );
+
+        return file.getAbsoluteFile();
+    }
+
+    @Deprecated
+    protected File getTestFile( String relativePath )
+    {
+        return getFile( relativePath );
+    }
+
+    protected File getFile( String relativePath )
+    {
+        return getTestResourceAsFile( "files/" + relativePath );
+    }
 }

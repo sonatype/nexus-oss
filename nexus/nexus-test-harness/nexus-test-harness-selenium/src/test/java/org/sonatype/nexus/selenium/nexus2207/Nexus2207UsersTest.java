@@ -16,7 +16,6 @@ import org.sonatype.nexus.mock.pages.SetPasswordWindow;
 import org.sonatype.nexus.mock.pages.UsersConfigurationForm;
 import org.sonatype.nexus.mock.pages.UsersTab;
 import org.sonatype.nexus.mock.rest.MockHelper;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
@@ -68,7 +67,7 @@ public class Nexus2207UsersTest
     public void errorMessages()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         UsersTab users = main.openUsers();
 
@@ -110,7 +109,7 @@ public class Nexus2207UsersTest
     public void userCrud()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         // create
         UsersTab users = main.openUsers();
@@ -165,7 +164,7 @@ public class Nexus2207UsersTest
     public void contextMenu()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         UsersTab users = main.openUsers();
         final String userId = "developer";

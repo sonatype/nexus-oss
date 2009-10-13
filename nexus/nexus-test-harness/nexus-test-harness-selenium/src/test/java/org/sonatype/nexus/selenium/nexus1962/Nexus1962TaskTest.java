@@ -1,6 +1,9 @@
 package org.sonatype.nexus.selenium.nexus1962;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -18,7 +21,6 @@ import org.sonatype.nexus.mock.pages.SchedulesConfigTab;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.sonatype.nexus.tasks.EmptyTrashTask;
 import org.sonatype.scheduling.NoSuchTaskException;
@@ -36,7 +38,7 @@ public class Nexus1962TaskTest
     public void errorMessages()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         ScheduleGrid scheduleGrid = main.openTasks().getScheduleGrid();
         SchedulesConfigFormTab newTask = scheduleGrid.newTask();
@@ -52,7 +54,7 @@ public class Nexus1962TaskTest
     public void crudTask()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         ScheduleGrid scheduleGrid = main.openTasks().getScheduleGrid();
         // CREATE
@@ -62,7 +64,7 @@ public class Nexus1962TaskTest
             public void onPayload( Object payload )
             {
                 System.out.println( payload );
-                Assert.assertNotNull( payload );
+                assertNotNull( payload );
             }
         } );
 
@@ -70,23 +72,24 @@ public class Nexus1962TaskTest
         taskForm.populate( true, "seleniumTask", "EmptyTrashTask", "Manual" ).save();
 
         ScheduledServiceResourceStatusResponse task = (ScheduledServiceResourceStatusResponse) ml.getResult();
+        assertNotNull( task );
         String taskId = task.getData().getResource().getId();
         String uiTaskId = nexusBaseURL + "service/local/schedules/" + taskId;
 
         scheduleGrid.refresh();
-        Assert.assertTrue( scheduleGrid.contains( uiTaskId ) );
+        assertTrue( scheduleGrid.contains( uiTaskId ) );
 
         // READ
         scheduleGrid.refresh().select( uiTaskId );
-        Assert.assertEquals( "seleniumTask", taskForm.getName().getValue() );
-        Assert.assertEquals( "EmptyTrashTask", taskForm.getTaskType().getValue() );
-        Assert.assertEquals( "Manual", taskForm.getRecurrence().getValue() );
+        assertEquals( "seleniumTask", taskForm.getName().getValue() );
+        assertEquals( "EmptyTrashTask", taskForm.getTaskType().getValue() );
+        assertEquals( "Manual", taskForm.getRecurrence().getValue() );
 
         // UPDATE
         taskForm.getName().type( "seleniumTaskUpdated" );
         taskForm.save();
         scheduleGrid.refresh().select( 0 );
-        Assert.assertEquals( "seleniumTaskUpdated", taskForm.getName().getValue() );
+        assertEquals( "seleniumTaskUpdated", taskForm.getName().getValue() );
 
         // DELETE
         scheduleGrid.deleteTask().clickYes();
@@ -101,13 +104,14 @@ public class Nexus1962TaskTest
     public void contextMenuRefresh()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         SchedulesConfigTab tasks = main.openTasks();
         ScheduleGrid scheduleGrid = tasks.getScheduleGrid();
 
-        ScheduledTask<Object> task = nexusScheduler.schedule( "selenium-context-task", nexusScheduler.createTaskInstance( EmptyTrashTask.class ),
-                                 new ManualRunSchedule() );
+        ScheduledTask<Object> task =
+            nexusScheduler.schedule( "selenium-context-task",
+                                     nexusScheduler.createTaskInstance( EmptyTrashTask.class ), new ManualRunSchedule() );
         String uiTaskId = nexusBaseURL + "service/local/schedules/" + task.getId();
 
         // refresh
@@ -119,10 +123,11 @@ public class Nexus1962TaskTest
     public void contextMenuRun()
         throws InterruptedException
     {
-        ScheduledTask<Object> task = nexusScheduler.schedule( "selenium-context-task", nexusScheduler.createTaskInstance( EmptyTrashTask.class ),
-                                 new ManualRunSchedule() );
+        ScheduledTask<Object> task =
+            nexusScheduler.schedule( "selenium-context-task",
+                                     nexusScheduler.createTaskInstance( EmptyTrashTask.class ), new ManualRunSchedule() );
 
-        LoginTest.doLogin( main );
+        doLogin();
         SchedulesConfigTab tasks = main.openTasks();
 
         String uiTaskId = nexusBaseURL + "service/local/schedules/" + task.getId();
@@ -139,7 +144,7 @@ public class Nexus1962TaskTest
         MockHelper.expect( "/schedule_run/{scheduledServiceId}", new MockResponse( Status.CLIENT_ERROR_BAD_REQUEST,
                                                                                    null ) );
         tasks.contextMenuRun( uiTaskId );
-        new MessageBox(selenium).clickOk();
+        new MessageBox( selenium ).clickOk();
 
         MockHelper.checkExecutions();
         MockHelper.checkAssertions();
@@ -150,10 +155,11 @@ public class Nexus1962TaskTest
     public void contextMenuDelete()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
-        ScheduledTask<Object> task = nexusScheduler.schedule( "selenium-context-task", nexusScheduler.createTaskInstance( EmptyTrashTask.class ),
-                                 new ManualRunSchedule() );
+        ScheduledTask<Object> task =
+            nexusScheduler.schedule( "selenium-context-task",
+                                     nexusScheduler.createTaskInstance( EmptyTrashTask.class ), new ManualRunSchedule() );
         SchedulesConfigTab tasks = main.openTasks();
 
         String uiTaskId = nexusBaseURL + "service/local/schedules/" + task.getId();

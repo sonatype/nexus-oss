@@ -39,7 +39,7 @@ public class LoginTest
         assertFalse( "Login link should not be available", main.loginLinkAvailable() );
     }
 
-    public static void doLogin( MainPage main )
+    protected void doLogin( MainPage main )
     {
         main.getSelenium().runScript(
                                       "window.Sonatype.utils.doLogin( null, '" + User.ADMIN.getUsername() + "', '"

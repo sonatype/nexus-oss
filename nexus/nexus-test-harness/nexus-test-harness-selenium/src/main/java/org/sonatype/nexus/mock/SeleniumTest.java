@@ -1,13 +1,12 @@
 package org.sonatype.nexus.mock;
 
+import static com.thoughtworks.selenium.grid.tools.ThreadSafeSeleniumSessionStorage.startSeleniumSession;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,141 +17,62 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.MainPage;
-import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
-import org.sonatype.nexus.mock.util.SocketTestWaitCondition;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testng.PlexusObjectFactory;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
 
-import ch.ethz.ssh2.Connection;
-
-import com.thoughtworks.selenium.DefaultSelenium;
 import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.grid.tools.ThreadSafeSeleniumSessionStorage;
 
+@Test( sequential = true )
 public abstract class SeleniumTest
     extends NexusMockTestCase
 
 {
-    protected static Selenium selenium;
+    protected Selenium selenium;
 
-    protected static MainPage main;
-
-    private static Connection sshConn;
+    protected MainPage main;
 
     private static JsonReportHandler handler;
 
-    @BeforeSuite
-    public void openTunnel()
+    @BeforeClass
+    public void createSelenium()
         throws Exception
     {
-        if ( !new SocketTestWaitCondition( "localhost", 4444, 250 ).checkCondition( 0 ) )
+        if ( ( selenium = ThreadSafeSeleniumSessionStorage.session() ) == null )
         {
-            if ( sshConn == null )
+            System.out.println( "getSelenium: " + Thread.currentThread().getId() );
+            final String seleniumServer = PropUtil.get( "seleniumServer", "localhost" );
+            final int seleniumPort = PropUtil.get( "seleniumPort", 4444 );
+            final String seleniumBrowser = PropUtil.get( "seleniumBrowser", "*firefox" );
+            startSeleniumSession( seleniumServer, seleniumPort, seleniumBrowser,
+                                  TestProperties.getString( "nexus.base.url" ) );
+
+            selenium = ThreadSafeSeleniumSessionStorage.session();
+            if ( !seleniumBrowser.contains( "iexplore" ) )
             {
-                int port = TestProperties.getInteger( "nexus.application.port" );
-
-                // spin up SSH connection
-                sshConn = new Connection( "grid.sonatype.org", PropUtil.get( "serverPort", 10023 ) );
-                sshConn.connect();
-
-                // authenticate
-                boolean usingPersonal = false;
-                File pemFile = new File( System.getenv().get( "HOME" ) + "/.ssh/nexus_selenium_rsa" );
-                String password = null;
-                if ( !pemFile.exists() )
-                {
-                    pemFile = new File( System.getenv().get( "HOME" ) + "/.ssh/id_rsa" );
-                    usingPersonal = true;
-                    password = System.getProperty( "sshPassword" );
-                }
-
-                boolean isAuthenticated = false;
-                try
-                {
-                    isAuthenticated = sshConn.authenticateWithPublicKey( "hudson", pemFile, password );
-                }
-                catch ( IOException e )
-                {
-                    // ignore
-                }
-
-                if ( !isAuthenticated )
-                {
-                    System.err.println( "**************************************************************" );
-                    System.err.println( "**************************************************************" );
-                    System.err.println( "" );
-                    System.err.println( "Could not authenticate SSH using key:" );
-                    System.err.println( pemFile.getPath() );
-                    if ( usingPersonal )
-                    {
-                        System.err.println( "" );
-                        System.err.println( "Perhaps you need to specify the password using -DsshPassword=... ?" );
-                        System.err.println( "" );
-                        System.err.println( "Alternatively, grab the nexus_selenium_rsa private key and put it in ~/.ssh" );
-                        System.err.println( "" );
-                    }
-                    System.err.println( "" );
-                    System.err.println( "**************************************************************" );
-                    System.err.println( "**************************************************************" );
-                }
-
-                System.out.println( "Requesting remote port forwarding for port " + port );
-                sshConn.requestRemotePortForwarding( "", port, "localhost", port );
-                sshConn.createLocalPortForwarder( 4444, "localhost", 4444 );
-
-                Runtime.getRuntime().addShutdownHook( new Thread( new Runnable()
-                {
-                    public void run()
-                    {
-                        sshConn.close();
-                    }
-                } ) );
+                selenium.setSpeed( "500" );
             }
+            selenium.getEval( "window.moveTo(1,1); window.resizeTo(1021,737);" );
         }
-    }
 
-    @BeforeSuite
-    public void seleniumSetup()
-        throws Exception
-    {
-        final String seleniumServer = PropUtil.get( "seleniumServer", "localhost" );
-        final int seleniumPort = PropUtil.get( "seleniumPort", 4444 );
-        final String seleniumBrowser = PropUtil.get( "seleniumBrowser", "*firefox" );
-        final Selenium original =
-            new DefaultSelenium( seleniumServer, seleniumPort, seleniumBrowser,
-                                 TestProperties.getString( "nexus.base.url" ) );
-
-        selenium =
-            (Selenium) Proxy.newProxyInstance( Selenium.class.getClassLoader(), new Class<?>[] { Selenium.class },
-                                               new InvocationHandler()
-                                               {
-                                                   public Object invoke( Object proxy, Method method, Object[] args )
-                                                       throws Throwable
-                                                   {
-                                                       // check assertions on every remote call we do!
-                                                       MockHelper.checkAssertions();
-                                                       return method.invoke( original, args );
-                                                   }
-                                               } );
-        selenium.start( "captureNetworkTraffic=true" );
-        if ( !seleniumBrowser.contains( "iexplore" ) )
-        {
-            selenium.setSpeed( "500" );
-        }
-        selenium.getEval( "window.moveTo(1,1); window.resizeTo(1021,737);" );
         main = new MainPage( selenium );
     }
 
     @BeforeMethod
     public void loadUrl()
+        throws Exception
     {
+        System.out.println( "loadUrl: " + Thread.currentThread().getId() );
+
         selenium.open( "/nexus" );
 
         // sometimes the browser window just froze between tasks
@@ -162,8 +82,6 @@ public abstract class SeleniumTest
         }
         catch ( Exception e )
         {
-            selenium.stop();
-            selenium.start();
             selenium.open( "/nexus" );
 
             selenium.getEval( "window.isRunning()" );
@@ -175,16 +93,12 @@ public abstract class SeleniumTest
     public void logout()
         throws Exception
     {
-        main.clickLogout();
+        if ( selenium != null )
+        {
+            main.clickLogout();
+            getCoverage();
 
-        getCoverage();
-    }
-
-    @AfterSuite( alwaysRun = true )
-    public void seleniumCleanup()
-        throws Exception
-    {
-        selenium.stop();
+        }
     }
 
     /**
@@ -194,7 +108,7 @@ public abstract class SeleniumTest
      * 
      * @throws java.io.IOException If the screenshot could not be taken.
      */
-    public void takeScreenshot()
+    protected void takeScreenshot()
         throws IOException
     {
         StackTraceElement ste = new Exception().getStackTrace()[1];
@@ -209,6 +123,7 @@ public abstract class SeleniumTest
      * @param name A specific name to append to the screenshot file name.
      * @throws IOException If the screenshot could not be taken.
      */
+    @Test( enabled = false )
     public void takeScreenshot( String name )
     {
         File parent = new File( "target/screenshots/" );
@@ -229,6 +144,7 @@ public abstract class SeleniumTest
         }
     }
 
+    @Test( enabled = false )
     public void captureNetworkTraffic()
     {
         try

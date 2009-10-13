@@ -13,7 +13,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.sonatype.nexus.templates.repository.maven.Maven2HostedRepositoryTemplate;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;
@@ -40,8 +39,9 @@ public class Nexus2261RepositoryMirrorTest
         nexus = lookup( Nexus.class );
 
         Maven2ProxyRepositoryTemplate template =
-            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2ProxyRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2ProxyRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                                                                                         Maven2ProxyRepositoryTemplate.class,
+                                                                                         RepositoryPolicy.RELEASE ).pick();
 
         template.getConfigurableRepository().setId( "nexus2261" );
         template.getConfigurableRepository().setName( "nexus2261" );
@@ -58,8 +58,9 @@ public class Nexus2261RepositoryMirrorTest
         proxyRepo = (M2Repository) template.create();
 
         Maven2HostedRepositoryTemplate hostedTemplate =
-            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates()
-                .getTemplates( Maven2HostedRepositoryTemplate.class, RepositoryPolicy.RELEASE ).pick();
+            (Maven2HostedRepositoryTemplate) nexus.getRepositoryTemplates().getTemplates(
+                                                                                          Maven2HostedRepositoryTemplate.class,
+                                                                                          RepositoryPolicy.RELEASE ).pick();
 
         hostedTemplate.getConfigurableRepository().setId( "hosted-nexus2261" );
         hostedTemplate.getConfigurableRepository().setName( "hosted-nexus2261" );
@@ -88,7 +89,7 @@ public class Nexus2261RepositoryMirrorTest
     public void fieldValidationProxy()
         throws Exception
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepositoryMirror mirror = main.openRepositories().select( proxyRepo.getId(), RepoKind.PROXY ).selectMirror();
 
@@ -112,7 +113,7 @@ public class Nexus2261RepositoryMirrorTest
     public void fieldValidationHosted()
         throws Exception
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepositoryMirror mirror = main.openRepositories().select( hostedRepo.getId(), RepoKind.HOSTED ).selectMirror();
 
@@ -136,7 +137,7 @@ public class Nexus2261RepositoryMirrorTest
     public void mirrorProxy()
         throws Exception
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         MirrorResourceListResponse mirrors = new MirrorResourceListResponse();
         MirrorResource m = new MirrorResource();
@@ -165,7 +166,7 @@ public class Nexus2261RepositoryMirrorTest
     public void mirrorHosted()
         throws Exception
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepositoryMirror mirror = main.openRepositories().select( hostedRepo.getId(), RepoKind.HOSTED ).selectMirror();
 

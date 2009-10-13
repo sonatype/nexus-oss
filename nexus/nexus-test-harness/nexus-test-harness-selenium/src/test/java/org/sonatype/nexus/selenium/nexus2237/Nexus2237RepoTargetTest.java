@@ -12,7 +12,6 @@ import org.sonatype.nexus.mock.pages.RepoTargetForm;
 import org.sonatype.nexus.mock.pages.RepoTargetTab;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -26,7 +25,7 @@ public class Nexus2237RepoTargetTest
     public void errorMessages()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepoTargetForm target = main.openRepoTargets().addRepoTarget();
 
@@ -46,7 +45,7 @@ public class Nexus2237RepoTargetTest
     public void repoTargetCRUD()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RepoTargetTab targets = main.openRepoTargets();
 

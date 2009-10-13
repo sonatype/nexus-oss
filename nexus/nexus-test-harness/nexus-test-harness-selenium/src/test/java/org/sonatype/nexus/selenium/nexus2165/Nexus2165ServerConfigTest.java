@@ -7,7 +7,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.components.TextField;
 import org.sonatype.nexus.mock.pages.ServerTab;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -19,25 +18,25 @@ public class Nexus2165ServerConfigTest
     @Test
     public void requiredFields()
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         ServerTab serverCfg = main.openServer();
         assertErrorText( serverCfg.getSmtpHost(), "127.0.0.1" );
         assertErrorText( serverCfg.getSmtpPort(), 1125 );
-        assertErrorText( serverCfg.getSmtpEmail(), "admin@sonatype.org");
+        assertErrorText( serverCfg.getSmtpEmail(), "admin@sonatype.org" );
 
-        assertErrorText( serverCfg.getGlobalTimeout(), 10);
-        assertErrorText( serverCfg.getGlobalRetry(), 3);
+        assertErrorText( serverCfg.getGlobalTimeout(), 10 );
+        assertErrorText( serverCfg.getGlobalRetry(), 3 );
 
         serverCfg.getSecurityRealms().removeAll();
         Assert.assertTrue( serverCfg.getSecurityRealms().hasErrorText( "Select one or more items" ) );
         serverCfg.getSecurityRealms().addAll();
         Assert.assertFalse( serverCfg.getSecurityRealms().hasErrorText( "Select one or more items" ) );
 
-        assertErrorText( serverCfg.getSecurityAnonymousUsername(), "anonymous");
-        assertErrorText( serverCfg.getSecurityAnonymousPassword(), "anonymous");
+        assertErrorText( serverCfg.getSecurityAnonymousUsername(), "anonymous" );
+        assertErrorText( serverCfg.getSecurityAnonymousPassword(), "anonymous" );
 
-        assertErrorText( serverCfg.getApplicationBaseUrl(), "http://localhost:8081/nexus");
+        assertErrorText( serverCfg.getApplicationBaseUrl(), "http://localhost:8081/nexus" );
     }
 
     private void assertErrorText( TextField tf, String validText )

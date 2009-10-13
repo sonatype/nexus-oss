@@ -4,7 +4,7 @@
   <parent>
     <artifactId>nexus-test-harness</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>1.4.0-SNAPSHOT</version>
+    <version>1.4.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-selenium</artifactId>
@@ -89,9 +89,11 @@
             </property>
             <property>
               <name>listener</name>
-              <value>org.sonatype.nexus.testng.ScreenShotListener</value>
+              <value>org.sonatype.nexus.testng.ScreenShotListener,org.sonatype.nexus.testng.PriorityInterceptor</value>
             </property>
           </properties>
+          <parallel>true</parallel>
+          <threadCount>4</threadCount>
           <argLine>-Xmx512M</argLine>
         </configuration>
         <dependencies>
@@ -233,6 +235,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.openqa.selenium.grid</groupId>
+      <artifactId>selenium-grid-tools</artifactId>
+      <version>1.0.2</version>
+    </dependency>
+    <dependency>
       <groupId>org.seleniumhq.selenium.client-drivers</groupId>
       <artifactId>selenium-java-client-driver</artifactId>
       <version>1.0.1</version>
@@ -247,6 +254,7 @@
         </exclusion>
       </exclusions>
     </dependency>
+
 
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -303,7 +311,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>5.9</version>
+      <version>5.10</version>
       <classifier>jdk15</classifier>
       <exclusions>
         <exclusion>
@@ -338,37 +346,20 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>selenium-maven-plugin</artifactId>
-            <version>1.0</version>
-            <configuration>
-              <port>${seleniumPort}</port>
-              <background>true</background>
-            </configuration>
+            <groupId>org.sonatype.maven.plugin</groupId>
+            <artifactId>selenium-grid-maven-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <executions>
               <execution>
-                <id>start-server</id>
-                <phase>pre-integration-test</phase>
                 <goals>
-                  <goal>start-server</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>stop-server</id>
-                <phase>post-integration-test</phase>
-                <goals>
-                  <goal>stop-server</goal>
+                  <goal>start-grid</goal>
+                  <goal>stop-grid</goal>
                 </goals>
               </execution>
             </executions>
-            <dependencies>
-              <dependency>
-                <groupId>org.seleniumhq.selenium.server</groupId>
-                <artifactId>selenium-server</artifactId>
-                <version>1.0.1</version>
-                <classifier>standalone</classifier>
-              </dependency>
-            </dependencies>
+            <configuration>
+              <numberOfInstances>4</numberOfInstances>
+            </configuration>
           </plugin>
         </plugins>
       </build>

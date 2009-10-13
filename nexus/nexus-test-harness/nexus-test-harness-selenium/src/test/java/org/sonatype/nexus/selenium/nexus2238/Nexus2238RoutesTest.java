@@ -11,7 +11,6 @@ import org.sonatype.nexus.mock.pages.RotesTab;
 import org.sonatype.nexus.mock.pages.RouteForm;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -25,7 +24,7 @@ public class Nexus2238RoutesTest
     public void errorMessages()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RouteForm route = main.openRoutes().addRoute();
 
@@ -46,7 +45,7 @@ public class Nexus2238RoutesTest
     public void routesCRUD()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RotesTab routes = main.openRoutes();
 

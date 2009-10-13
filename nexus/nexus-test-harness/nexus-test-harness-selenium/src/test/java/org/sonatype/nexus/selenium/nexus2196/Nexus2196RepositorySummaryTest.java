@@ -5,9 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.StringContains.containsString;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
-import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RepositorySummary;
@@ -15,7 +13,6 @@ import org.sonatype.nexus.mock.pages.RepositoriesEditTabs.RepoKind;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.testng.annotations.Test;
 
 @Component( role = Nexus2196RepositorySummaryTest.class )
@@ -63,54 +60,6 @@ public class Nexus2196RepositorySummaryTest
         validateRepoInfo( repo, meta );
     }
 
-    @Test
-    public void byteSize()
-        throws InterruptedException
-    {
-        RepositorySummary repo = mockSize( 512 );
-        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 Bytes" ) );
-    }
-
-    @Test
-    public void kilobyteSize()
-    throws InterruptedException
-    {
-        RepositorySummary repo = mockSize( 524288 );
-        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 KB" ) );
-    }
-
-    @Test
-    public void megabyteSize()
-    throws InterruptedException
-    {
-        RepositorySummary repo = mockSize( 536870912 );
-        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 MB" ) );
-    }
-
-    @Test
-    public void gigabyteSize()
-    throws InterruptedException
-    {
-        RepositorySummary repo = mockSize( 549755813888L );
-        assertThat( repo.getRepositoryInformation().getValue(), containsString( "512 GB" ) );
-    }
-
-    private RepositorySummary mockSize( long size )
-    {
-        RepositoryMetaResourceResponse result = new RepositoryMetaResourceResponse();
-        RepositoryMetaResource data = new RepositoryMetaResource();
-        data.setId( "thridparty" );
-        data.setFormat( "maven2" );
-        data.setRepoType( "hosted" );
-        data.setSizeOnDisk( size );
-        result.setData( data );
-
-        MockHelper.expect( "/repositories/{repositoryId}/meta", new MockResponse( Status.SUCCESS_OK, result ) );
-
-        RepositorySummary repo = openSummary( "thirdparty", RepoKind.HOSTED );
-        return repo;
-    }
-
     private MockListener listenResult()
     {
         MockListener ml = new MockListener()
@@ -122,7 +71,7 @@ public class Nexus2196RepositorySummaryTest
 
     private RepositorySummary openSummary( String repoId, RepoKind kind )
     {
-        LoginTest.doLogin( main );
+        doLogin();
         RepositorySummary repo = main.openRepositories().select( repoId, kind ).selectSummary();
         repo.getRepositoryInformation().waitToLoad();
         return repo;
@@ -132,8 +81,7 @@ public class Nexus2196RepositorySummaryTest
     {
         String distMgmt = repo.getDistributionManagement().getValue();
         assertThat( distMgmt, notNullValue() );
-        assertThat( distMgmt, containsString( NexusMockTestCase.nexusBaseURL + "content/repositories/"
-            + meta.getId() ) );
+        assertThat( distMgmt, containsString( NexusMockTestCase.nexusBaseURL + "content/repositories/" + meta.getId() ) );
     }
 
     private void validateRepoInfo( RepositorySummary repo, RepositoryMetaResource meta )

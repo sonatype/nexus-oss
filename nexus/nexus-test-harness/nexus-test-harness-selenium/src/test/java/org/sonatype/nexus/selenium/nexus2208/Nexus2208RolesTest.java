@@ -4,7 +4,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RolesConfigurationForm;
 import org.sonatype.nexus.mock.pages.RolesTab;
-import org.sonatype.nexus.selenium.nexus1815.LoginTest;
 import org.sonatype.nexus.selenium.util.NxAssert;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -18,7 +17,7 @@ public class Nexus2208RolesTest
     public void errorMessages()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RolesConfigurationForm roles = main.openRoles().addRole();
 
@@ -38,7 +37,7 @@ public class Nexus2208RolesTest
     public void roleCRUD()
         throws InterruptedException
     {
-        LoginTest.doLogin( main );
+        doLogin();
 
         RolesTab roles = main.openRoles();
 
@@ -78,7 +77,7 @@ public class Nexus2208RolesTest
 
         roles.refresh();
 
-        //delete
+        // delete
         roles.select( roleId );
         roles.delete().clickYes();
         roles.refresh();
