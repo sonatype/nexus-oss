@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -162,8 +163,16 @@ public class DefaultRequestRepositoryMapper
             compile();
         }
 
-        ArrayList<Repository> reposList = new ArrayList<Repository>( resolvedRepositories );
+        // NEXUS-2852: to make our life easier, we will work with repository IDs,
+        // and will fill the result with Repositories at the end
+        LinkedHashSet<String> reposIdSet = new LinkedHashSet<String>( resolvedRepositories.size() );
 
+        for ( Repository resolvedRepositorty : resolvedRepositories )
+        {
+            reposIdSet.add( resolvedRepositorty.getId() );
+        }
+
+        // for tracking what is applied
         ArrayList<RepositoryPathMapping> appliedMappings = new ArrayList<RepositoryPathMapping>();
 
         // if include found, add it to the list.
@@ -173,16 +182,17 @@ public class DefaultRequestRepositoryMapper
         {
             if ( mapping.matches( repository, request ) )
             {
-                reposList.clear();
-
                 getLogger().info(
                     "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString() );
 
-                return reposList;
+                return Collections.emptyList();
             }
         }
 
         // include, if found a match
+        // NEXUS-2852: watch to not add multiple times same repository
+        // ie. you have different inclusive rules that are triggered by same request
+        // and contains some repositories. This is now solved using LinkedHashSet and using repo IDs.
         for ( RepositoryPathMapping mapping : inclusions )
         {
             if ( mapping.matches( repository, request ) )
@@ -191,7 +201,7 @@ public class DefaultRequestRepositoryMapper
 
                 if ( firstAdd )
                 {
-                    reposList.clear();
+                    reposIdSet.clear();
 
                     firstAdd = false;
                 }
@@ -203,7 +213,7 @@ public class DefaultRequestRepositoryMapper
                 {
                     for ( Repository repo : resolvedRepositories )
                     {
-                        reposList.add( repo );
+                        reposIdSet.add( repo.getId() );
                     }
                 }
                 else
@@ -212,7 +222,7 @@ public class DefaultRequestRepositoryMapper
                     {
                         if ( mapping.getMappedRepositories().contains( repo.getId() ) || !repo.isUserManaged() )
                         {
-                            reposList.add( repo );
+                            reposIdSet.add( repo.getId() );
                         }
                     }
                 }
@@ -229,19 +239,19 @@ public class DefaultRequestRepositoryMapper
                 if ( mapping.getMappedRepositories().size() == 1
                     && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
                 {
-                    reposList.clear();
+                    reposIdSet.clear();
 
                     break;
                 }
 
                 for ( String repositoryId : mapping.getMappedRepositories() )
                 {
-                    Repository store = repositoryRegistry.getRepository( repositoryId );
+                    Repository mappedRepository = repositoryRegistry.getRepository( repositoryId );
 
                     // but only if is user managed
-                    if ( store.isUserManaged() )
+                    if ( mappedRepository.isUserManaged() )
                     {
-                        reposList.remove( store );
+                        reposIdSet.remove( mappedRepository.getId() );
                     }
                 }
             }
@@ -279,7 +289,7 @@ public class DefaultRequestRepositoryMapper
 
                 getLogger().debug( sb.toString() );
 
-                if ( reposList.size() == 0 )
+                if ( reposIdSet.size() == 0 )
                 {
                     getLogger().debug(
                         "Mapping for path [" + request.toString()
@@ -288,13 +298,30 @@ public class DefaultRequestRepositoryMapper
                 else
                 {
                     getLogger().debug(
-                        "Request path for [" + request.toString() + "] is MAPPED to reposes: "
-                            + ResourceStoreUtils.getResourceStoreListAsString( reposList ) );
+                        "Request path for [" + request.toString() + "] is MAPPED to reposes: " + reposIdSet );
                 }
             }
         }
 
-        return reposList;
+        ArrayList<Repository> result = new ArrayList<Repository>( reposIdSet.size() );
+
+        try
+        {
+            for ( String repoId : reposIdSet )
+            {
+                result.add( repositoryRegistry.getRepository( repoId ) );
+            }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            getLogger().error(
+                "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
+                    + appliedMappingsList.toString() + "\"." );
+            
+            throw e;
+        }
+
+        return result;
     }
 
     // ==

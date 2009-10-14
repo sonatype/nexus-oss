@@ -738,7 +738,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        request.getProcessedRepositories().add( this.getId() );
+        request.addProcessedRepository( this );
 
         maintainNotFoundCache( request.getRequestPath() );
 
@@ -1010,7 +1010,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        request.getProcessedRepositories().add( getId() );
+        request.addProcessedRepository( this );
 
         StorageItem item = retrieveItem( fromTask, request );
 

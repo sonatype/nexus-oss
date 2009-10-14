@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -211,7 +212,7 @@ public class ResourceStoreRequest
      */
     public List<String> getProcessedRepositories()
     {
-        return processedRepositories;
+        return Collections.unmodifiableList( processedRepositories);
     }
 
     /**
