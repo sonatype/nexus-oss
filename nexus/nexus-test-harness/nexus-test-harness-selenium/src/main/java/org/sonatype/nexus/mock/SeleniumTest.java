@@ -49,7 +49,6 @@ public abstract class SeleniumTest
     {
         if ( ( selenium = ThreadSafeSeleniumSessionStorage.session() ) == null )
         {
-            System.out.println( "getSelenium: " + Thread.currentThread().getId() );
             final String seleniumServer = PropUtil.get( "seleniumServer", "localhost" );
             final int seleniumPort = PropUtil.get( "seleniumPort", 4444 );
             final String seleniumBrowser = PropUtil.get( "seleniumBrowser", "*firefox" );
@@ -71,8 +70,6 @@ public abstract class SeleniumTest
     public void loadUrl()
         throws Exception
     {
-        System.out.println( "loadUrl: " + Thread.currentThread().getId() );
-
         selenium.open( "/nexus" );
 
         // sometimes the browser window just froze between tasks

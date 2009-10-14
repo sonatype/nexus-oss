@@ -40,28 +40,28 @@ public class MockListener
         return result;
     }
 
-    protected void onError( ResourceException e )
+    protected void onError( ResourceException e, MockEvent evt )
     {
         // to be overwritten
     }
 
-    protected void onPayload( Object payload )
+    protected void onPayload( Object payload, MockEvent evt )
     {
         // to be overwritten
     }
 
-    protected void onResult( Object result )
+    protected void onResult( Object result, MockEvent evt )
     {
         // to be overwritten
     }
 
-    final void setError( ResourceException error )
+    final void setError( ResourceException error, MockEvent evt )
     {
         this.error = error;
 
         try
         {
-            onError( error );
+            onError( error, evt );
         }
         catch ( AssertionError e )
         {
@@ -69,13 +69,13 @@ public class MockListener
         }
     }
 
-    final void setPayload( Object payload )
+    final void setPayload( Object payload, MockEvent evt )
     {
         this.payload = payload;
 
         try
         {
-            onPayload( payload );
+            onPayload( payload, evt );
         }
         catch ( AssertionError e )
         {
@@ -83,17 +83,20 @@ public class MockListener
         }
     }
 
-    final void setResult( Object result )
+    final void setResult( Object result, MockEvent evt )
     {
-        this.result = result;
 
         try
         {
-            onResult( result );
+            onResult( result, evt );
         }
         catch ( AssertionError e )
         {
             this.assertionFailedError = e;
+        }
+        if ( !evt.isBlocked() )
+        {
+            this.result = result;
         }
     }
 

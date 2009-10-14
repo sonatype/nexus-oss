@@ -22,6 +22,15 @@ public class ProxyPlexusResource
     private PlexusResource plexusResource;
 
     // ==
+    private static final MockEvent GET = new MockEvent( Method.GET );
+
+    private static final MockEvent POST = new MockEvent( Method.POST );
+
+    private static final MockEvent DELETE = new MockEvent( Method.DELETE );
+
+    private static final MockEvent PUT = new MockEvent( Method.PUT );
+
+    private static final MockEvent UPLOAD = new MockEvent( new Method( "UPLOAD", "upload", "#METHOD_COPY" ) );
 
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -42,11 +51,11 @@ public class ProxyPlexusResource
                 try
                 {
                     result = plexusResource.get( context, request, response, variant );
-                    ml.setResult( result );
+                    ml.setResult( result, GET );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e );
+                    ml.setError( e, GET );
 
                     throw e;
                 }
@@ -85,11 +94,11 @@ public class ProxyPlexusResource
                 try
                 {
                     plexusResource.delete( context, request, response );
-                    ml.setResult( null );
+                    ml.setResult( null, DELETE );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e );
+                    ml.setError( e, DELETE );
 
                     throw e;
                 }
@@ -123,17 +132,17 @@ public class ProxyPlexusResource
             else
             {
                 ml.executed = true;
-                ml.setPayload( payload );
+                ml.setPayload( payload, POST );
 
                 Object result;
                 try
                 {
                     result = plexusResource.post( context, request, response, payload );
-                    ml.setResult( result );
+                    ml.setResult( result, POST );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e );
+                    ml.setError( e, POST );
 
                     throw e;
                 }
@@ -177,17 +186,17 @@ public class ProxyPlexusResource
             else
             {
                 ml.executed = true;
-                ml.setPayload( payload );
+                ml.setPayload( payload, PUT );
 
                 Object result;
                 try
                 {
                     result = plexusResource.put( context, request, response, payload );
-                    ml.setResult( result );
+                    ml.setResult( result, PUT );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e );
+                    ml.setError( e, PUT );
 
                     throw e;
                 }
@@ -236,11 +245,11 @@ public class ProxyPlexusResource
                 try
                 {
                     result = plexusResource.upload( context, request, response, files );
-                    ml.setResult( result );
+                    ml.setResult( result, UPLOAD );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e );
+                    ml.setError( e, UPLOAD );
 
                     throw e;
                 }

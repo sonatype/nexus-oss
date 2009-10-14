@@ -7,6 +7,7 @@ import static org.testng.AssertJUnit.assertTrue;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.hamcrest.text.StringContains;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -59,7 +60,7 @@ public class Nexus2209PrivilegesTest
         MockListener ml = MockHelper.listen( "/privileges_target", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
                 System.out.println( payload );
                 Assert.assertNotNull( payload );
@@ -126,7 +127,7 @@ public class Nexus2209PrivilegesTest
         MockListener ml = MockHelper.listen( "/privileges_target", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
                 Assert.assertNotNull( payload );
             }
@@ -216,7 +217,7 @@ public class Nexus2209PrivilegesTest
         MockListener ml = MockHelper.listen( "/privileges_target", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
                 System.out.println( payload );
                 Assert.assertNotNull( payload );

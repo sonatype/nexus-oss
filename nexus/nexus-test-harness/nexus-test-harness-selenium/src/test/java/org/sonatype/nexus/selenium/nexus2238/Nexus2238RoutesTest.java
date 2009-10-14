@@ -5,6 +5,8 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.data.Method;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RotesTab;
@@ -58,8 +60,12 @@ public class Nexus2238RoutesTest
         MockListener ml = MockHelper.listen( "/repo_routes", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
+                if ( !Method.POST.equals( evt.getMethod() ) )
+                {
+                    evt.block();
+                }
                 assertThat( payload, not( nullValue() ) );
             }
         } );

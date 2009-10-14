@@ -6,6 +6,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.hamcrest.collection.IsCollectionContaining;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.RepoTargetForm;
@@ -58,7 +59,7 @@ public class Nexus2237RepoTargetTest
         MockListener ml = MockHelper.listen( "/repo_targets", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
                 assertThat( payload, not( nullValue() ) );
                 RepositoryTargetResourceResponse result = (RepositoryTargetResourceResponse) payload;

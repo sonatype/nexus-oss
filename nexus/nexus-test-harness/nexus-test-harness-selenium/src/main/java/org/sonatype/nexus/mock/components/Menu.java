@@ -23,13 +23,15 @@ public class Menu
 
     public void click( String itemKey )
     {
-        String id = getEval( ".items.items[" + expression + ".items.indexOfKey('" + itemKey + "')].el.id" );
+        String id = getEval( ".items.items[" + expression + ".items.indexOfKey('" + itemKey + "')].id" );
         selenium.click( "//*[@id='" + id + "']" );
     }
 
     public void click( String propName, String propValue )
     {
-        String id = getEval( ".items.items[" + expression + ".items.findIndex('" + propName + "', '" + propValue + "')].el.id" );
+        getEval( ".items.items[" + expression + ".items.findIndex('" + propName + "', '" + propValue + "')].id" );
+        String id =
+            getEval( ".items.items[" + expression + ".items.findIndex('" + propName + "', '" + propValue + "')].el.id" );
         selenium.click( "//*[@id='" + id + "']" );
     }
 }

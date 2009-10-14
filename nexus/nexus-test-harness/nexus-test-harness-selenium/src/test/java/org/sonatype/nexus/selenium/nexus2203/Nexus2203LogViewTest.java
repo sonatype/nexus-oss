@@ -12,6 +12,7 @@ import static org.sonatype.nexus.selenium.util.NxAssert.valueEqualsTo;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Status;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -139,7 +140,7 @@ public class Nexus2203LogViewTest
         MockHelper.listen( "/log/config", new MockListener()
         {
             @Override
-            protected void onPayload( Object payload )
+            protected void onPayload( Object payload, MockEvent evt )
             {
                 assertThat( payload, is( LogConfigResourceResponse.class ) );
                 LogConfigResource data = ( (LogConfigResourceResponse) payload ).getData();
@@ -148,7 +149,7 @@ public class Nexus2203LogViewTest
             }
 
             @Override
-            protected void onResult( Object result )
+            protected void onResult( Object result, MockEvent evt )
             {
                 assertThat( result, is( LogConfigResourceResponse.class ) );
                 LogConfigResource data = ( (LogConfigResourceResponse) result ).getData();

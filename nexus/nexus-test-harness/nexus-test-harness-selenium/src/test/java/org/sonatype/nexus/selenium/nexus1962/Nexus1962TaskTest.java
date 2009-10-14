@@ -11,6 +11,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.hamcrest.collection.IsCollectionContaining;
 import org.restlet.data.Status;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -61,7 +62,7 @@ public class Nexus1962TaskTest
         MockListener ml = MockHelper.listen( "/schedules", new MockListener()
         {
             @Override
-            public void onPayload( Object payload )
+            public void onPayload( Object payload, MockEvent evt )
             {
                 System.out.println( payload );
                 assertNotNull( payload );

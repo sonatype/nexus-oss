@@ -7,6 +7,7 @@ import java.util.Collections;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.jsecurity.authc.UsernamePasswordToken;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.ChangePasswordWindow;
@@ -69,7 +70,7 @@ public class ChangePasswordTest
         MockHelper.listen( "/users_changepw", new MockListener()
         {
             @Override
-            protected void onPayload( Object payload )
+            protected void onPayload( Object payload, MockEvent evt )
             {
                 UserChangePasswordRequest r = (UserChangePasswordRequest) payload;
                 assertEquals( ORIGINAL_PW, r.getData().getOldPassword() );
