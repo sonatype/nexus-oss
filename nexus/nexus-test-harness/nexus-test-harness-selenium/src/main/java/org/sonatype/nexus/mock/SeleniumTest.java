@@ -30,6 +30,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import com.thoughtworks.selenium.Selenium;
+import com.thoughtworks.selenium.SeleniumException;
 import com.thoughtworks.selenium.grid.tools.ThreadSafeSeleniumSessionStorage;
 
 @Test( sequential = true )
@@ -167,10 +168,17 @@ public abstract class SeleniumTest
     }
 
     protected void getCoverage()
-        throws ComponentLookupException, IOException
+        throws IOException
     {
-        handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
-        handler.persist();
+        try
+        {
+            handler.appendResults( selenium.getEval( "window.jscoverage_serializeCoverageToJSON()" ) );
+            handler.persist();
+        }
+        catch ( SeleniumException e )
+        {
+            // ignore probably coverage was turned off
+        }
     }
 
     protected void doLogin()
