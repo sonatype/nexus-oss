@@ -35,6 +35,9 @@ public class Spice21Test
         // runtime gleaning should not happen
         assertTrue( "Inner class should be gleaned!", inner != null );
         assertEquals( "org.sonatype.nexus.plugins.spice21.ASomeComponent$BSomeComponent", inner.getImplementation() );
+
+        assertNotNull( "We should be able to lookup the inner class component!", getContainer().lookup(
+            "org.sonatype.nexus.plugins.spice21.SomeComponent", "B" ) );
     }
 
 }

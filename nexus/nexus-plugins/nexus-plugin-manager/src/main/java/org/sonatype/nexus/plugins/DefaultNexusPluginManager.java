@@ -49,6 +49,7 @@ import org.sonatype.nexus.plugins.repository.UserNexusPluginRepository;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.util.ClasspathUtils;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugin.metadata.gleaner.GleanerException;
@@ -357,7 +358,7 @@ public class DefaultNexusPluginManager
             {
                 PluginDescriptor importPlugin = getActivatedPlugins().get( coord );
 
-                List<String> exports = importPlugin.getExports();
+                List<String> exports = importPlugin.getExportedResources();
 
                 for ( String export : exports )
                 {
@@ -378,7 +379,12 @@ public class DefaultNexusPluginManager
             // add classpaths dependencies needed to take part in gleaning
             try
             {
-                addClasspathDependencies( pluginArtifact, discoveryContext, true );
+                List<File> dependenciesToBeGleaned = addClasspathDependencies( pluginArtifact, discoveryContext, true );
+
+                for ( File dependency : dependenciesToBeGleaned )
+                {
+                    pluginDescriptor.getGleanedResources().addAll( extractContents( dependency ) );
+                }
             }
             catch ( NoSuchPluginRepositoryArtifactException e )
             {
@@ -487,8 +493,8 @@ public class DefaultNexusPluginManager
         }
     }
 
-    protected void addClasspathDependencies( PluginRepositoryArtifact pluginArtifact, PluginDiscoveryContext context,
-                                             boolean hasComponentsFilter )
+    protected List<File> addClasspathDependencies( PluginRepositoryArtifact pluginArtifact,
+                                                   PluginDiscoveryContext context, boolean hasComponentsFilter )
         throws NoSuchPluginRepositoryArtifactException
     {
         PluginDescriptor pluginDescriptor = context.getPluginDescriptor();
@@ -518,6 +524,8 @@ public class DefaultNexusPluginManager
             // TODO: check dependency clashes
             pluginDescriptor.getPluginRealm().addURL( toUrl( dependencyFile ) );
         }
+
+        return dependencies;
     }
 
     // ==
@@ -543,14 +551,19 @@ public class DefaultNexusPluginManager
                 + "\" is not a Nexus Plugin, it does not have plugin metadata!" );
         }
 
-        List<String> exports = extractExports( pluginJar );
+        // extract the contents of the plugin jar, that will be exported
+        List<String> exports = extractContents( pluginJar );
 
         if ( exports != null && exports.size() > 0 )
         {
-            pluginDescriptor.getExports().addAll( exports );
+            // add them to exports
+            pluginDescriptor.getExportedResources().addAll( exports );
+
+            // but also to the stuff "to be gleaned"
+            pluginDescriptor.getGleanedResources().addAll( exports );
         }
 
-        List<PluginStaticResourceModel> staticResources = extractStaticResources( pluginJar );
+        List<PluginStaticResourceModel> staticResources = extractStaticResources( pluginDescriptor );
 
         if ( staticResources != null && staticResources.size() > 0 )
         {
@@ -615,7 +628,7 @@ public class DefaultNexusPluginManager
         }
     }
 
-    protected List<String> extractExports( File pluginJar )
+    protected List<String> extractContents( File pluginJar )
         throws IOException
     {
         ZipFile jar = null;
@@ -631,32 +644,13 @@ public class DefaultNexusPluginManager
 
             while ( en.hasMoreElements() )
             {
-                StringBuilder sb = new StringBuilder();
-
                 ZipEntry e = (ZipEntry) en.nextElement();
 
                 if ( !e.isDirectory() )
                 {
                     String name = e.getName();
 
-                    // for now, only classes are in, and META-INF is filtered out
-                    if ( name.startsWith( "META-INF" ) )
-                    {
-                        // skip it
-                    }
-                    else if ( name.endsWith( ".class" ) )
-                    {
-                        // class name without ".class"
-                        sb.append( name.substring( 0, name.length() - 6 ).replace( "/", "." ) );
-
-                        result.add( sb.toString() );
-                    }
-                    else
-                    {
-                        sb.append( name );
-
-                        result.add( sb.toString() );
-                    }
+                    result.add( name );
                 }
             }
 
@@ -671,55 +665,22 @@ public class DefaultNexusPluginManager
         }
     }
 
-    protected List<PluginStaticResourceModel> extractStaticResources( File pluginJar )
+    protected List<PluginStaticResourceModel> extractStaticResources( PluginDescriptor plugin )
         throws IOException
     {
-        ZipFile jar = null;
+        ArrayList<PluginStaticResourceModel> result = new ArrayList<PluginStaticResourceModel>();
 
-        try
+        for ( String resourceName : plugin.getExportedResources() )
         {
-            jar = new ZipFile( pluginJar );
-
-            ArrayList<PluginStaticResourceModel> result = new ArrayList<PluginStaticResourceModel>();
-
-            @SuppressWarnings( "unchecked" )
-            Enumeration en = jar.entries();
-
-            while ( en.hasMoreElements() )
+            if ( resourceName.startsWith( "static/" ) )
             {
-                ZipEntry e = (ZipEntry) en.nextElement();
+                PluginStaticResourceModel model =
+                    new PluginStaticResourceModel( resourceName, "/" + resourceName, mimeUtil
+                        .getMimeType( resourceName ) );
 
-                if ( !e.isDirectory() )
-                {
-                    String name = e.getName();
-
-                    if ( name.startsWith( "static/" ) )
-                    {
-                        PluginStaticResourceModel model =
-                            new PluginStaticResourceModel( name, "/" + name, mimeUtil.getMimeType( jarEntryToUrl(
-                                pluginJar, name ) ) );
-
-                        result.add( model );
-                    }
-                }
-            }
-
-            return result;
-        }
-        finally
-        {
-            if ( jar != null )
-            {
-                jar.close();
+                result.add( model );
             }
         }
-    }
-
-    private URL jarEntryToUrl( File jar, String entryName )
-        throws IOException
-    {
-        // ugh, ugly
-        URL result = new URL( "jar:" + toUrl( jar ).toString() + "!/" + entryName );
 
         return result;
     }
@@ -737,17 +698,7 @@ public class DefaultNexusPluginManager
 
             discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext
                 .getPluginDescriptor().getPluginRealm() ) );
-            /*
-             * // HACK -- START // to enable "backward compatibility, nexus plugins that are written plexus-way", but
-             * circumvent the plexus // bug about component descriptor duplication with Realms having parent (will be
-             * rediscovered) ClassRealm pluginRealm = pluginDiscoveryContext.getPluginDescriptor().getPluginRealm(); //
-             * remember the parent ClassRealm parent = pluginRealm.getParentRealm(); // make it parentless
-             * pluginDiscoveryContext.getPluginDescriptor().getPluginRealm().setParentRealm( null ); // discover plexus
-             * components in dependencies too. These goes directly into discoveredComponentDescriptors // list, since we
-             * don't need to register them with plexus, they will be registered by plexus itself
-             * discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginRealm ) ); // restore
-             * original parent pluginRealm.setParentRealm( parent ); // HACK -- END
-             */
+
             // collecting
             for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor()
                 .getComponents() )
@@ -824,14 +775,14 @@ public class DefaultNexusPluginManager
     {
         PluginDescriptor pd = pluginDiscoveryContext.getPluginDescriptor();
 
-        for ( String className : pd.getExports() )
+        for ( String resourceName : pd.getGleanedResources() )
         {
-            String resourceName = className.replaceAll( "\\.", "/" ) + ".class";
+            String className = ClasspathUtils.convertClassBinaryNameToCanonicalName( resourceName );
 
-            if ( pd.getPluginRealm().getRealmResource( resourceName ) != null )
+            if ( className != null && pd.getPluginRealm().getRealmResource( resourceName ) != null )
             {
                 PlexusComponentGleanerRequest request =
-                    new PlexusComponentGleanerRequest( className, pd.getPluginRealm() );
+                    new PlexusComponentGleanerRequest( className, resourceName, pd.getPluginRealm() );
 
                 // ignore implemented interfaces that are not (yet?) on classpath
                 request.setIgnoreNotFoundImplementedInterfaces( true );

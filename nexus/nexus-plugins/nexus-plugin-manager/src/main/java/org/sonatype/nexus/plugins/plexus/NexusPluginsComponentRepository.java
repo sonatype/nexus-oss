@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins.plexus;
 
+import static org.codehaus.plexus.component.CastUtils.isAssignableFrom;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -10,10 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import static org.codehaus.plexus.component.CastUtils.*;
 import org.codehaus.plexus.component.composition.CompositionResolver;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.composition.DefaultCompositionResolver;
@@ -23,6 +23,9 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginDescriptor;
 import org.sonatype.plugin.metadata.GAVCoordinate;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 /**
  * @author Jason van Zyl
@@ -104,7 +107,7 @@ public class NexusPluginsComponentRepository
                 // and add parents too
                 ClassRealm aRealm = realm.getParentRealm();
 
-                while( aRealm != null )
+                while ( aRealm != null )
                 {
                     realms.add( aRealm );
 
@@ -180,7 +183,6 @@ public class NexusPluginsComponentRepository
                         filterPrivateComponents( roleHintIndex, pluginDescriptor, realm, descriptors );
                     }
 
-
                 }
             }
         }
@@ -191,25 +193,27 @@ public class NexusPluginsComponentRepository
     /**
      * Filter (remove) all private components (descriptors). Private components are those components that are
      * implementing a role that is not exported by an imported plugin.
-     *
-     * @param roleHintIndex    components to be filtered
+     * 
+     * @param roleHintIndex components to be filtered
      * @param pluginDescriptor descriptor of the plugin requiring the components
-     * @param realm            realm providing unfiltered list of components
-     * @param descriptors      unfiltered list of components
+     * @param realm realm providing unfiltered list of components
+     * @param descriptors unfiltered list of components
      */
     private void filterPrivateComponents( final Multimap<String, ComponentDescriptor<?>> roleHintIndex,
-                                          final PluginDescriptor pluginDescriptor,
-                                          final ClassRealm realm,
+                                          final PluginDescriptor pluginDescriptor, final ClassRealm realm,
                                           final Multimap<String, ComponentDescriptor<?>> descriptors )
     {
         for ( PluginDescriptor importedPlugin : pluginDescriptor.getImportedPlugins() )
         {
             if ( realm.equals( importedPlugin.getPluginRealm() ) )
             {
+                List<String> exportedClassNames = importedPlugin.getExportedClassnames();
+
                 for ( Map.Entry<String, ComponentDescriptor<?>> entry : descriptors.entries() )
                 {
                     final ComponentDescriptor<?> cd = entry.getValue();
-                    if ( !importedPlugin.getExports().contains( cd.getRoleClass().getName() ) )
+
+                    if ( !exportedClassNames.contains( cd.getRoleClass().getName() ) )
                     {
                         roleHintIndex.remove( entry.getKey(), entry.getValue() );
                     }
