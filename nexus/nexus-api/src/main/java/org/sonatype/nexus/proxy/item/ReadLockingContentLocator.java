@@ -49,11 +49,11 @@ public class ReadLockingContentLocator
     private class ReadLockingInputStream
         extends WrappingInputStream
     {
-        private final RepositoryItemUid wrappedUid;
+        private volatile RepositoryItemUid wrappedUid;
 
         public ReadLockingInputStream( RepositoryItemUid wrappedUid, InputStream wrappedStream )
         {
-            super(wrappedStream);
+            super( wrappedStream );
 
             this.wrappedUid = wrappedUid;
         }
@@ -68,7 +68,12 @@ public class ReadLockingContentLocator
             }
             finally
             {
-                wrappedUid.unlock();
+                if ( wrappedUid != null )
+                {
+                    wrappedUid.unlock();
+
+                    wrappedUid = null;
+                }
             }
         }
     }
