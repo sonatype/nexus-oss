@@ -487,10 +487,9 @@ Sonatype.repoServer.RepoServer = function(){
           ]
         };
 
-        var welcomeMsg = '<p><a href="http://nexus.sonatype.org" target="new" style="text-decoration: none;">' +
-          '<img src="images/nexus50.png" style="width: 50px; height: 50px; border: 0; margin-right: 9px; margin-top: 9px;" alt="Nexus" align="left">' +
-          '<span style="font-face: Trebuchet MS; font-size: 36px; color: black;">Sonatype Nexus</span></a><br/>' +
-          'Welcome to the Maven Repository Manager</p>';
+        var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' +
+          '<img src="images/nexus.png" border="0" alt="Welcome to the Sonatype Nexus Maven Repository Manager"></a>' +
+          '</p>';
 
         var statusEnabled = sp.checkPermission('nexus:status', sp.READ);
         if ( !statusEnabled ){
@@ -534,9 +533,8 @@ Sonatype.repoServer.RepoServer = function(){
               {
                 border: false,
                 html: '<div class="little-padding">' +
-                  'Use the box below to search the repositories. Enter a project name, ' +
-                  'a Java class or even an SHA1 checksum to find matching Maven aftifacts. ' +
-                  'Click "Advanced Search" on the left for more options.' +
+                  'Type in the name of a project, class, or artifact into the text box ' +
+                  'below, and click Search. Use "Advanced Search" on the left for more options.' +
                   '</div>'
               },
               Ext.apply( {
