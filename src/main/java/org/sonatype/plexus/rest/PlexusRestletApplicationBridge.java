@@ -12,6 +12,7 @@
  */
 package org.sonatype.plexus.rest;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,7 @@ import org.restlet.Context;
 import org.restlet.Restlet;
 import org.restlet.Route;
 import org.restlet.Router;
+import org.restlet.data.MediaType;
 import org.restlet.ext.wadl.WadlApplication;
 import org.restlet.util.Template;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -230,10 +232,16 @@ public class PlexusRestletApplicationBridge
             }
 
             doCreateRoot( rootRouter, isStarted );
-
+            
             // encoding support
-            Encoder encoder = new Encoder( getContext() );
-
+            ArrayList<MediaType> ignoredMediaTypes = new ArrayList<MediaType>(Encoder.getDefaultIgnoredMediaTypes());
+            ignoredMediaTypes.add( MediaType.APPLICATION_COMPRESS ); // anything compressed
+            ignoredMediaTypes.add( new MediaType( "application/x-compressed" ) );
+            ignoredMediaTypes.add(  new MediaType( "application/x-shockwave-flash" ) );
+            
+            Encoder encoder = new Encoder( getContext(), false, true, Encoder.ENCODE_ALL_SIZES,
+                Encoder.getDefaultAcceptedMediaTypes(), ignoredMediaTypes);
+            
             encoder.setNext( rootRouter );
 
             // set it
