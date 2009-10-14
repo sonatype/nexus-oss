@@ -484,7 +484,19 @@ Sonatype.repoServer.RepoServer = function(){
               columnWidth: .5,
               html: '&nbsp;' 
             }
-          ]
+          ],
+          listeners: {
+            render: {
+              fn: function() {
+                var c = Ext.getCmp( 'quick-search-welcome-field' );
+                if ( c ) {
+                  c.focus( true, 100 );
+                }
+              },
+              single: true,
+              delay: 300
+            }
+          }
         };
 
         var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' +
