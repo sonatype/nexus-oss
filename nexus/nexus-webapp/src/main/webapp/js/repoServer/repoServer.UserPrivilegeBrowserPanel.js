@@ -252,7 +252,7 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
     }
     if ( role.data.roles ){
       for ( var i = 0 ; i < role.data.roles.length ; i++ ){
-        if ( this.roleHasPrivilege( privId, role.data.roles[i] ) ){
+        if ( this.roleHasPrivilege( privId, this.getRoleIdFromPayload( role.data.roles[i] ) ) ){
           return true;
         }
       }
@@ -316,6 +316,9 @@ Ext.extend( Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
   getRoleIdFromPayload : function( role ) {
     if ( role.roleId ) {
       return role.roleId;
+    }
+    else if ( role.id ) {
+      return role.id;
     }
     
     return role;
