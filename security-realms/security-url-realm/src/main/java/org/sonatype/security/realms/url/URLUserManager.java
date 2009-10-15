@@ -27,7 +27,6 @@ import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
@@ -68,11 +67,11 @@ public class URLUserManager
         Set<User> users = this.searchUsers( new UserSearchCriteria( userId ) );
 
         // now find the user
-        for ( User User : users )
+        for ( User user : users )
         {
-            if ( User.getUserId().equals( userId ) )
+            if ( user.getUserId().equals( userId ) )
             {
-                return User;
+                return user;
             }
         }
 
@@ -89,11 +88,22 @@ public class URLUserManager
         Set<User> users = new HashSet<User>();
 
         List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+
         for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
         {
             if ( SOURCE.equals( userRoleMapping.getSource() ) )
             {
-                User user = this.toUser( userRoleMapping.getUserId() );
+                User user = null;
+
+                if ( userRoleMapping.getRoles().contains( this.defaultRole ) )
+                {
+                    user = this.toUser( userRoleMapping.getUserId(), false );
+                }
+                else
+                {
+                    user = this.toUser( userRoleMapping.getUserId(), true );
+                }
+
                 if ( user != null )
                 {
                     users.add( user );
@@ -138,11 +148,11 @@ public class URLUserManager
                 return result;
             }
 
-            for ( User User : this.listUsers() )
+            for ( User user : this.listUsers() )
             {
-                if ( User.getUserId().toLowerCase().startsWith( userId.toLowerCase() ) )
+                if ( user.getUserId().toLowerCase().startsWith( userId.toLowerCase() ) )
                 {
-                    result.add( User );
+                    result.add( user );
                 }
             }
 
@@ -150,17 +160,17 @@ public class URLUserManager
             // first check if we had an exact match
 
             User exactUser = null;
-            for ( User User : result )
+            for ( User user : result )
             {
-                if ( User.getUserId().toLowerCase().equals( userId.toLowerCase() ) )
+                if ( user.getUserId().toLowerCase().equals( userId.toLowerCase() ) )
                 {
-                    exactUser = User;
+                    exactUser = user;
                 }
             }
             // if not exact user is found, fake it
             if ( exactUser == null )
             {
-                result.add( this.toUser( userId ) );
+                result.add( this.toUser( userId, true ) );
             }
         }
         else
@@ -172,7 +182,7 @@ public class URLUserManager
         return this.filterListInMemeory( result, criteria );
     }
 
-    private User toUser( String userId )
+    private User toUser( String userId, boolean addDefaultRole )
     {
         DefaultUser user = new DefaultUser();
         user.setEmailAddress( userId + "@" + emailDomain );
@@ -180,7 +190,10 @@ public class URLUserManager
         user.setSource( SOURCE );
         user.setUserId( userId );
 
-        user.addRole( new RoleIdentifier( SOURCE, this.defaultRole ) );
+        if ( addDefaultRole )
+        {
+            user.addRole( new RoleIdentifier( SOURCE, this.defaultRole ) );
+        }
 
         return user;
     }
