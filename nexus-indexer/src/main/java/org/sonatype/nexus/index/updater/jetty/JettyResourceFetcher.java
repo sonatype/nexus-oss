@@ -71,17 +71,10 @@ public class JettyResourceFetcher
         ResourceExchange exchange =
             new ResourceExchange( targetFile, exchangeHeaders, maxRedirects, getUrl.toString(), listenerSupport );
 
-        try
+        exchange = get( exchange );
+        while ( exchange.prepareForRedirect() )
         {
             exchange = get( exchange );
-            while ( exchange.prepareForRedirect() )
-            {
-                exchange = get( exchange );
-            }
-        }
-        catch ( Throwable t )
-        {
-            t.printStackTrace();
         }
 
         if ( exchange.isRedirectionPrevented() )

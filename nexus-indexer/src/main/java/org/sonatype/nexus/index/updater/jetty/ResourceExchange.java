@@ -28,8 +28,6 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.zip.GZIPInputStream;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 public class ResourceExchange
     extends ContentExchange
 {
@@ -316,7 +314,10 @@ public class ResourceExchange
             while ( ( read = in.read( buf ) ) > -1 )
             {
                 transferEvent.setTimestamp( System.currentTimeMillis() );
-                listenerSupport.fireTransferProgress( transferEvent, Arrays.copyOf( buf, read ), contentLength );
+                byte[] copy = new byte[read];
+                System.arraycopy( buf, 0, copy, 0, read );
+
+                listenerSupport.fireTransferProgress( transferEvent, copy, contentLength );
 
                 out.write( buf, 0, read );
             }
