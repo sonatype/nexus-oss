@@ -17,7 +17,8 @@ public interface TargetRegistry
     extends Configurable
 {
     /**
-     * Gets the existing targets.
+     * Gets the existing targets. It returns an umodifiable collection. To modify targets, use methods below
+     * (add/remove).
      * 
      * @return
      */
@@ -47,10 +48,10 @@ public interface TargetRegistry
      * @return
      */
     boolean removeRepositoryTarget( String id );
-    
+
     /**
-     * This method will match all existing targets against a content class.  You will end up with a simple set
-     * of matched targets.  The cardinality of this set is equal to existing targets cardinality.
+     * This method will match all existing targets against a content class. You will end up with a simple set of matched
+     * targets. The cardinality of this set is equal to existing targets cardinality.
      * 
      * @param contentClass
      * @return

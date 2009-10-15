@@ -44,7 +44,7 @@ public class DefaultTargetRegistry
 
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
-    
+
     @Requirement
     private ApplicationConfigurationValidator validator;
 
@@ -68,7 +68,6 @@ public class DefaultTargetRegistry
             configure( getApplicationConfiguration() );
         }
     }
-
 
     @Override
     protected ApplicationConfiguration getApplicationConfiguration()
@@ -142,16 +141,17 @@ public class DefaultTargetRegistry
         ArrayList<String> patterns = new ArrayList<String>( target.getPatternTexts().size() );
         patterns.addAll( target.getPatternTexts() );
         result.setPatterns( patterns );
-        
+
         return result;
     }
-    
-    protected void validate( CRepositoryTarget target ) throws InvalidConfigurationException
+
+    protected void validate( CRepositoryTarget target )
+        throws InvalidConfigurationException
     {
-        ValidationResponse response =  this.validator.validateRepositoryTarget( null, target );
-        if( !response.isValid() )
+        ValidationResponse response = this.validator.validateRepositoryTarget( null, target );
+        if ( !response.isValid() )
         {
-            throw new InvalidConfigurationException( response ); 
+            throw new InvalidConfigurationException( response );
         }
     }
 
@@ -173,7 +173,7 @@ public class DefaultTargetRegistry
             for ( CRepositoryTarget ctarget : ctargets )
             {
                 Target target = convert( ctarget );
-                
+
                 if ( target != null )
                 {
                     targets.add( target );
@@ -181,7 +181,10 @@ public class DefaultTargetRegistry
         }
         }
 
-        return Collections.unmodifiableCollection( targets );
+        // copy the list, since processing it may take longer
+        ArrayList<Target> result = new ArrayList<Target>( targets );
+
+        return Collections.unmodifiableCollection( result );
     }
 
     public Target getRepositoryTarget( String id )
@@ -199,12 +202,13 @@ public class DefaultTargetRegistry
         return null;
     }
 
-    public boolean addRepositoryTarget( Target target ) throws ConfigurationException 
+    public boolean addRepositoryTarget( Target target )
+        throws ConfigurationException
     {
         CRepositoryTarget cnf = convert( target );
-        
+
         this.validate( cnf );
-        
+
         removeRepositoryTarget( cnf.getId() );
 
         getCurrentConfiguration( true ).add( cnf );
@@ -230,15 +234,14 @@ public class DefaultTargetRegistry
 
         return false;
     }
-    
+
     public Set<Target> getTargetsForContentClass( ContentClass contentClass )
     {
         Set<Target> result = new HashSet<Target>();
 
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                               "Resolving targets for contentClass='" + contentClass.getId() + "'" );
+            getLogger().debug( "Resolving targets for contentClass='" + contentClass.getId() + "'" );
         }
 
         for ( Target t : getRepositoryTargets() )
@@ -259,8 +262,7 @@ public class DefaultTargetRegistry
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path
-                                   + "'" );
+                "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path + "'" );
         }
 
         for ( Target t : getRepositoryTargets() )
