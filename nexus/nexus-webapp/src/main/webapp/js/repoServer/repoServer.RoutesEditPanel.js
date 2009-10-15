@@ -117,7 +117,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
         helpText: ht.ruleType,
         name: 'ruleType',
         //hiddenName: 'connectionTimeout',
-        width: 75,
+        width: 100,
         store: this.ruleTypeStore,
         displayField:'value',
         editable: false,
