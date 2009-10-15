@@ -110,7 +110,11 @@ Sonatype.utils = {
       }
     }
     
-    return sOut.substring(0, sOut.length - sep.length);
+    if(sOut != "") {    
+      return sOut.substring(0, sOut.length - sep.length);
+    } else {
+      return sOut;
+    }
   },
 
   connectionError: function( response, message, offerRestart, options, showResponseText ) {

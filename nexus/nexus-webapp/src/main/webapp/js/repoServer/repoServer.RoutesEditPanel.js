@@ -183,6 +183,15 @@ Sonatype.repoServer.RoutesEditPanel = function(config){
     return Sonatype.utils.joinArrayObject(val, 'name');
   };
   
+  this.nameFinder = function(val, parent) {
+    var repos = [];
+    for(var i = 0; i < val.length; i++){
+      repos[i] = this.repoDataStore.getById( val[i].id ).data;
+    }
+
+    return Sonatype.utils.joinArrayObject(repos, 'name');
+  };  
+  
   // START: Repo list ******************************************************
   this.routeRecordConstructor = Ext.data.Record.create([
     {name:'resourceURI'},
@@ -543,7 +552,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
         //@ext: this application of the convert function is needed because Ext only
         //      applies the convert functions in Ext.data.XXXReader.readRecords(), 
         //      not in the constructor yielded from Ext.data.Record.create()
-        respData.sRepositories = this.nameConcatinator(respData.repositories);
+        respData.sRepositories = this.nameFinder(respData.repositories);
 
         var newRec = new this.routeRecordConstructor(respData, action.options.fpanel.id); //form and grid data id match, keep the new id
 
@@ -578,7 +587,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
         rec.set('pattern', sentData.pattern);
         rec.set('ruleType', sentData.ruleType);
         rec.set('repositories', sentData.repositories);
-        rec.set('sRepositories', Sonatype.utils.joinArrayObject(sentData.repositories, 'name'));
+        rec.set('sRepositories', this.nameFinder(sentData.repositories));
         rec.commit();
         rec.endEdit();
         
