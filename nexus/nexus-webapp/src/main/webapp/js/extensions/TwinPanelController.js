@@ -475,7 +475,11 @@ Ext.extend( Sonatype.ext.TwinPanelChooser, Ext.Panel, {
           }
         };
         rec.data[this.valueField] = valueId;
-        rec.data[this.displayField] = valueId + ' - (Invalid)';
+		var displayValue = valueId;
+		if ( this.validateLeftItems ){
+			displayValue += ' - (Invalid)';
+		}
+		rec.data[this.displayField] = displayValue;
         rec.invalid = true;
         this.createNode( leftRoot, rec );
       }
