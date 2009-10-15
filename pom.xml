@@ -98,23 +98,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>failsafe-maven-plugin</artifactId>
-        <configuration>
-          <forkMode>always</forkMode>
-        </configuration>
-        <executions>
-          <execution>
-            <id>integration-test</id>
-            <goals>
-              <goal>integration-test</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>verify</id>
-            <goals>
-              <goal>verify</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
