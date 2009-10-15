@@ -25,15 +25,21 @@ public class PasswordHelper
     {
         return encrypt( password, ENC );
     }
-    
+
     public String encrypt( String password, String encoding )
         throws PlexusCipherException
     {
+        // check if the password is encrypted
+        if ( plexusCipher.isEncryptedString( password ) )
+        {
+            return password;
+        }
+
         if ( password != null )
         {
             return plexusCipher.encryptAndDecorate( password, encoding );
         }
-        
+
         return null;
     }
 
@@ -42,16 +48,16 @@ public class PasswordHelper
     {
         return decrypt( encodedPassword, ENC );
     }
-    
+
     public String decrypt( String encodedPassword, String encoding )
         throws PlexusCipherException
     {
         // check if the password is encrypted
-        if( !plexusCipher.isEncryptedString( encodedPassword ))
+        if ( !plexusCipher.isEncryptedString( encodedPassword ) )
         {
             return encodedPassword;
         }
-        
+
         if ( encodedPassword != null )
         {
             return plexusCipher.decryptDecorated( encodedPassword, encoding );
