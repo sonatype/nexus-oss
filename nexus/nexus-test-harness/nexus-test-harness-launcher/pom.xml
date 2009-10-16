@@ -52,6 +52,10 @@
               <groupId>${project.groupId}</groupId>
               <artifactId>nexus-exception-plugin</artifactId>
             </plugin>
+            <plugin>
+              <groupId>org.sonatype.security.realms</groupId>
+              <artifactId>security-url-realm</artifactId>
+            </plugin>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
@@ -288,6 +292,12 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-exception-plugin</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-url-realm</artifactId>
+      <version>${plexus-security.version}</version>
     </dependency>
   </dependencies>
 

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
-public class Nexus2860SMTPPasswordUpgradeTest
+public class Nexus2860SMTPPasswordUpgradeIT
     extends AbstractNexusIntegrationTest
 {
 

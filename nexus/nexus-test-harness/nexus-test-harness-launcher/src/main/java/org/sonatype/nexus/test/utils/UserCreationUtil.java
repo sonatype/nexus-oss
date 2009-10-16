@@ -17,6 +17,7 @@ import java.io.IOException;
 
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 
 public class UserCreationUtil
 {
@@ -26,6 +27,22 @@ public class UserCreationUtil
     {
         String serviceURI = "service/local/authentication/login";
 
+        return RequestFacade.doGetRequest( serviceURI ).getStatus();
+    }
+
+    public static Status login( String username, String password )
+        throws IOException
+    {
+        TestContainer.getInstance().getTestContext().setUsername( username );
+        TestContainer.getInstance().getTestContext().setPassword( password );
+
+        return login();
+    }
+
+    public static Status logout()
+        throws IOException
+    {
+        String serviceURI = "service/local/authentication/logout";
         return RequestFacade.doGetRequest( serviceURI ).getStatus();
     }
 
