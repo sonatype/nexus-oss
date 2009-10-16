@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>nexus-migration-plugin</artifactId>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>pom</packaging>
 
   <name>Nexus Migration Plugin</name>
@@ -125,4 +125,10 @@
     </plugins>
   </build>
 
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.2</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.2</developerConnection>
+    <url>http://svn.sonatype.org/nexus-plugins/tags/nexus-migration-plugin-1.2</url>
+  </scm>
 </project>
