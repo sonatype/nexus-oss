@@ -162,6 +162,10 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
             <groupId>com.pyx4me</groupId>
             <artifactId>proguard-maven-plugin</artifactId>
             <executions>
@@ -189,7 +193,9 @@
                 <option>-keep public class * implements org.sonatype.nexus.scheduling.NexusTask { }</option>
                 <option>-keep public class * implements org.sonatype.nexus.plugins.rest.NexusResourceBundle { }</option>
                 <option>-dontusemixedcaseclassnames</option>
-                <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature</option>
+                <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable</option>
+                <option>-renamesourcefileattribute SourceFile</option>
+                <option>-printmapping ${project.build.directory}/out.map</option>
                 <option>-dontoptimize</option>
                 <option>-dontshrink</option>
                 <option>-repackageclasses 'codeguard.nexusmsiteplugin'</option>
