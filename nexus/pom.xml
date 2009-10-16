@@ -133,13 +133,13 @@
   <properties>
     <plexus.appbooter.version>2.0.0</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.2-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>1.1.2</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
     <nexus.indexer.version>2.0.1</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.0</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.11-SNAPSHOT</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.11</plexus.restlet.bridge.version>
     <micromailer.version>1.0.3</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
