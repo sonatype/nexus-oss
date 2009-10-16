@@ -485,12 +485,18 @@ public class DefaultFeedRecorder
         putContext( map, errorEvt.getEventContext() );
 
         map.put( ACTION, errorEvt.getAction() );
-        
+
         map.put( DATE, getDateFormat().format( errorEvt.getEventDate() ) );
 
-        map.put( MESSAGE, errorEvt.getMessage() );
+        if ( errorEvt.getMessage() != null )
+        {
+            map.put( MESSAGE, errorEvt.getMessage() );
+        }
 
-        map.put( STACK_TRACE, errorEvt.getStackTrace() );
+        if ( errorEvt.getStackTrace() != null )
+        {
+            map.put( STACK_TRACE, errorEvt.getStackTrace() );
+        }
 
         addToTimeline( map, ERROR_WARNING_EVENT_TYPE, errorEvt.getAction() );
     }
