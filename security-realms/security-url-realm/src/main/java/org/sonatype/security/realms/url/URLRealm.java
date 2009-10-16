@@ -36,6 +36,7 @@ import org.jsecurity.authz.Permission;
 import org.jsecurity.authz.SimpleAuthorizationInfo;
 import org.jsecurity.authz.permission.WildcardPermission;
 import org.jsecurity.cache.Cache;
+import org.jsecurity.crypto.hash.Sha1Hash;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.PrincipalCollection;
@@ -98,14 +99,14 @@ public class URLRealm
         throws AuthenticationException
     {
 
+        UsernamePasswordToken upToken = (UsernamePasswordToken) token;
+
         // check cache
-        AuthenticationInfo authInfo = this.getAuthInfoFromCache( token );
+        AuthenticationInfo authInfo = this.getAuthInfoFromCache( upToken );
 
         // to normal authentication
         if ( authInfo == null )
         {
-
-            UsernamePasswordToken upToken = (UsernamePasswordToken) token;
             String username = upToken.getUsername();
             String pass = String.valueOf( upToken.getPassword() );
 
@@ -113,7 +114,7 @@ public class URLRealm
             if ( this.authenticateViaUrl( username, pass ) )
             {
                 authInfo = buildAuthenticationInfo( username, null );
-                this.putUserInCache( username );
+                this.putUserInCache( username, pass );
             }
             else
             {
@@ -124,7 +125,7 @@ public class URLRealm
         return authInfo;
     }
 
-    private void putUserInCache( String username )
+    private void putUserInCache( String username, String pass )
     {
         // get cache
         Cache authCache = this.getAuthenticationCache();
@@ -132,7 +133,7 @@ public class URLRealm
         // check if null
         if ( authCache != null )
         {
-            authCache.put( this.getAuthenticationCacheKey( username ), Boolean.TRUE );
+            authCache.put( this.getAuthenticationCacheKey( username, pass ), Boolean.TRUE );
             this.logger.debug( "Added user: '" + username + "' to cache." );
         }
         else
@@ -141,7 +142,7 @@ public class URLRealm
         }
     }
 
-    private AuthenticationInfo getAuthInfoFromCache( AuthenticationToken token )
+    private AuthenticationInfo getAuthInfoFromCache( UsernamePasswordToken token )
     {
         // get cache
         Cache authCache = this.getAuthenticationCache();
@@ -150,10 +151,10 @@ public class URLRealm
         if ( authCache != null )
         {
             // the supports method already only allows supported tokens
-            UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-            String username = upToken.getUsername();
+            String username = token.getUsername();
+            String pass = String.valueOf( token.getPassword() );
 
-            String cacheKey = this.getAuthenticationCacheKey( username );
+            String cacheKey = this.getAuthenticationCacheKey( username, pass );
             if ( authCache.get( cacheKey ) != null )
             {
                 // return an AuthenticationInfo if we found the username in the cache
@@ -164,9 +165,10 @@ public class URLRealm
         return null;
     }
 
-    private String getAuthenticationCacheKey( String username )
+    private String getAuthenticationCacheKey( String username, String pass )
     {
-        return username + "-" + this.getClass().getSimpleName();
+        Sha1Hash h = new Sha1Hash( pass );
+        return username + "-" + h.toString() + "-" + this.getClass().getSimpleName();
     }
 
     private Cache getAuthenticationCache()
