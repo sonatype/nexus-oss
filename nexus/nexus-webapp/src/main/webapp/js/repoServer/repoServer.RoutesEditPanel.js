@@ -586,6 +586,7 @@ Ext.extend(Sonatype.repoServer.RoutesEditPanel, Ext.Panel, {
         rec.beginEdit();
         rec.set('pattern', sentData.pattern);
         rec.set('ruleType', sentData.ruleType);
+        rec.set('groupId', sentData.groupId);
         rec.set('repositories', sentData.repositories);
         rec.set('sRepositories', this.nameFinder(sentData.repositories));
         rec.commit();
