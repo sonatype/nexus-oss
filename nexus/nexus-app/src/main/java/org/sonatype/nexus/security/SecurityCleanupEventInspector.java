@@ -69,7 +69,8 @@ public class SecurityCleanupEventInspector
         for ( Privilege privilege : privileges )
         {
             // Delete target privs that match repo/groupId
-            if ( privilege.getType().equals( TargetPrivilegeDescriptor.TYPE ) 
+            if ( !privilege.isReadOnly()
+                && privilege.getType().equals( TargetPrivilegeDescriptor.TYPE ) 
                 && ( repositoryId.equals( privilege.getPrivilegeProperty( TargetPrivilegeRepositoryPropertyDescriptor.ID ) ) 
                 || repositoryId.equals( privilege.getPrivilegeProperty( TargetPrivilegeGroupPropertyDescriptor.ID ) ) ) )
             {
