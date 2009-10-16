@@ -2,13 +2,13 @@
   <parent>
     <groupId>org.sonatype.security</groupId>
     <artifactId>security-parent</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>security-system</artifactId>
   <name>Security: System</name>
   <description>Main entry point and Facade around all things security.</description>
-  <version>1.1.2-SNAPSHOT</version>
+  <version>1.1.2</version>
 
   <dependencies>
     <dependency>
