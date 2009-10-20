@@ -14,6 +14,26 @@ public abstract class AbstractLoggingComponent
     @Requirement
     private LoggerProvider loggerProvider;
 
+    /**
+     * Default constructor.
+     */
+    // TODO Drop this when switching to Guice (use constructor injection)
+    public AbstractLoggingComponent()
+    {
+
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param loggerProvider logger provider
+     */
+    @Inject
+    public AbstractLoggingComponent( final LoggerProvider loggerProvider )
+    {
+        this.loggerProvider = loggerProvider;
+    }
+
     protected Logger getLogger()
     {
         if ( logger == null )
