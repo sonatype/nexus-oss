@@ -320,7 +320,7 @@
       <id>forked-ITs</id>
       <activation>
         <property>
-          <name>!test</name>
+          <name>!it.test</name>
         </property>
       </activation>
       <build>
