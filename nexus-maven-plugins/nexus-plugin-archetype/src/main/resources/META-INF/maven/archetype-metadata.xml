@@ -11,7 +11,7 @@
   
   <requiredProperties>
     <requiredProperty key="nexus-version">
-      <defaultValue>1.4.0-SNAPSHOT</defaultValue>
+      <defaultValue>1.4.0</defaultValue>
     </requiredProperty>
   </requiredProperties>
   
