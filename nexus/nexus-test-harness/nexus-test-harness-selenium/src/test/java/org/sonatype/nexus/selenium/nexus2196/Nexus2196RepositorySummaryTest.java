@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.text.StringContains.containsString;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.mock.MockEvent;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.NexusMockTestCase;
 import org.sonatype.nexus.mock.SeleniumTest;
@@ -24,46 +25,60 @@ public class Nexus2196RepositorySummaryTest
     public void summaryHosted()
         throws InterruptedException
     {
-        MockListener ml = listenResult();
+        MockListener<RepositoryMetaResourceResponse> ml = listenResult( "thirdparty" );
 
         RepositorySummary repo = openSummary( "thirdparty", RepoKind.HOSTED );
 
-        RepositoryMetaResource meta = ( (RepositoryMetaResourceResponse) ml.getResult() ).getData();
+        RepositoryMetaResource meta = ml.waitForResult( RepositoryMetaResourceResponse.class ).getData();
 
         validateRepoInfo( repo, meta );
         validateDistMngt( repo, meta );
+
+        MockHelper.checkAndClean();
     }
 
     @Test
     public void summaryProxy()
         throws InterruptedException
     {
-        MockListener ml = listenResult();
+        MockListener ml = listenResult( "central" );
 
         RepositorySummary repo = openSummary( "central", RepoKind.PROXY );
 
         RepositoryMetaResource meta = ( (RepositoryMetaResourceResponse) ml.getResult() ).getData();
 
         validateRepoInfo( repo, meta );
+
+        MockHelper.checkAndClean();
     }
 
     @Test
     public void summaryShadow()
         throws InterruptedException
     {
-        MockListener ml = listenResult();
+        MockListener ml = listenResult( "central-m1" );
 
         RepositorySummary repo = openSummary( "central-m1", RepoKind.VIRTUAL );
 
         RepositoryMetaResource meta = ( (RepositoryMetaResourceResponse) ml.getResult() ).getData();
 
         validateRepoInfo( repo, meta );
+
+        MockHelper.checkAndClean();
     }
 
-    private MockListener listenResult()
+    private MockListener<RepositoryMetaResourceResponse> listenResult( final String repoId )
     {
-        MockListener ml = new MockListener()
+        MockListener<RepositoryMetaResourceResponse> ml = new MockListener<RepositoryMetaResourceResponse>()
         {
+            @Override
+            protected void onResult( RepositoryMetaResourceResponse result, MockEvent evt )
+            {
+                if ( !repoId.equals( ( result ).getData().getId() ) )
+                {
+                    evt.block();
+                }
+            }
         };
         MockHelper.listen( "/repositories/{repositoryId}/meta", ml );
         return ml;

@@ -159,7 +159,7 @@ public class SearchTab
     {
         grid.select( i );
 
-        return new ArtifactInformationPanel(selenium, expression + ".artifactInformationPanel");
+        return new ArtifactInformationPanel( selenium, expression + ".artifactContainer" );
     }
 
 }

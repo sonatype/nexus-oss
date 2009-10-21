@@ -101,11 +101,14 @@ public class ServerTab
 
         securityAnonymousAccess =
             new Checkbox( selenium, expression + ".find('name', 'anonymousAccessFields')[0].checkbox" );
-        securityAnonymousUsername = new TextField( selenium, expression + ".find('name', 'securityAnonymousUsername')[0]" );
-        securityAnonymousPassword = new TextField( selenium, expression + ".find('name', 'securityAnonymousPassword')[0]" );
+        securityAnonymousUsername =
+            new TextField( selenium, expression + ".find('name', 'securityAnonymousUsername')[0]" );
+        securityAnonymousPassword =
+            new TextField( selenium, expression + ".find('name', 'securityAnonymousPassword')[0]" );
 
-        applicationBaseUrl = new TextField( selenium, expression + ".find('name', 'baseUrl')[0]" );
-        applicationForceBaseUrl = new Checkbox( selenium, expression + ".find('name', 'forceBaseUrl')[0]" );
+        applicationBaseUrl = new TextField( selenium, expression + ".find('name', 'globalRestApiSettings.baseUrl')[0]" );
+        applicationForceBaseUrl =
+            new Checkbox( selenium, expression + ".find('name', 'globalRestApiSettings.forceBaseUrl')[0]" );
 
         proxyHost = new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.proxyHostname')[0]" );
         proxyPort = new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.proxyPort')[0]" );
@@ -114,20 +117,24 @@ public class ServerTab
         proxyPassword =
             new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication.password')[0]" );
         proxyPrivatekey =
-            new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication.privateKey')[0]" );
+            new TextField( selenium, expression
+                + ".find('name', 'globalHttpProxySettings.authentication.privateKey')[0]" );
         proxyKeyPhrase =
-            new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication.passphrase')[0]" );
+            new TextField( selenium, expression
+                + ".find('name', 'globalHttpProxySettings.authentication.passphrase')[0]" );
         proxyNtlmHost =
             new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication.ntlmHost')[0]" );
         proxyNtlmDomain =
-            new TextField( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication.ntlmDomain')[0]" );
+            new TextField( selenium, expression
+                + ".find('name', 'globalHttpProxySettings.authentication.ntlmDomain')[0]" );
 
         saveButton = new Button( selenium, "window.Ext.getCmp('savebutton')" );
         cancelButton = new Button( selenium, "window.Ext.getCmp('cancelbutton')" );
 
         serverSettings = new Fieldset( selenium, expression + ".find('name', 'applicationServerSettings')[0]" );
         proxySettings = new Fieldset( selenium, expression + ".find('name', 'globalHttpProxySettings')[0]" );
-        proxyAuthentication = new Fieldset( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication')[0]" );
+        proxyAuthentication =
+            new Fieldset( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication')[0]" );
     }
 
     public ServerTab save()

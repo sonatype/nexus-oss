@@ -22,15 +22,30 @@ public class ProxyPlexusResource
     private PlexusResource plexusResource;
 
     // ==
-    private static final MockEvent GET = new MockEvent( Method.GET );
+    private static final MockEvent get()
+    {
+        return new MockEvent( Method.GET );
+    }
 
-    private static final MockEvent POST = new MockEvent( Method.POST );
+    private static final MockEvent post()
+    {
+        return new MockEvent( Method.POST );
+    }
 
-    private static final MockEvent DELETE = new MockEvent( Method.DELETE );
+    private static final MockEvent delete()
+    {
+        return new MockEvent( Method.DELETE );
+    }
 
-    private static final MockEvent PUT = new MockEvent( Method.PUT );
+    private static final MockEvent put()
+    {
+        return new MockEvent( Method.PUT );
+    }
 
-    private static final MockEvent UPLOAD = new MockEvent( new Method( "UPLOAD", "upload", "#METHOD_COPY" ) );
+    private static final MockEvent upload()
+    {
+        return new MockEvent( new Method( "UPLOAD", "upload", "#METHOD_COPY" ) );
+    }
 
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
@@ -39,7 +54,7 @@ public class ProxyPlexusResource
 
         if ( mr == null )
         {
-            MockListener ml = MockHelper.getListenerFor( getResourceUri() );
+            MockListener<Object> ml = MockHelper.getListenerFor( getResourceUri() );
             if ( ml == null )
             {
                 return plexusResource.get( context, request, response, variant );
@@ -51,11 +66,11 @@ public class ProxyPlexusResource
                 try
                 {
                     result = plexusResource.get( context, request, response, variant );
-                    ml.setResult( result, GET );
+                    ml.setResult( result, get() );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e, GET );
+                    ml.setError( e, get() );
 
                     throw e;
                 }
@@ -83,7 +98,7 @@ public class ProxyPlexusResource
 
         if ( mr == null )
         {
-            MockListener ml = MockHelper.getListenerFor( getResourceUri() );
+            MockListener<Object> ml = MockHelper.getListenerFor( getResourceUri() );
             if ( ml == null )
             {
                 plexusResource.delete( context, request, response );
@@ -94,11 +109,11 @@ public class ProxyPlexusResource
                 try
                 {
                     plexusResource.delete( context, request, response );
-                    ml.setResult( null, DELETE );
+                    ml.setResult( null, delete() );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e, DELETE );
+                    ml.setError( e, delete() );
 
                     throw e;
                 }
@@ -124,7 +139,7 @@ public class ProxyPlexusResource
 
         if ( mr == null )
         {
-            MockListener ml = MockHelper.getListenerFor( getResourceUri() );
+            MockListener<Object> ml = MockHelper.getListenerFor( getResourceUri() );
             if ( ml == null )
             {
                 return plexusResource.post( context, request, response, payload );
@@ -132,17 +147,17 @@ public class ProxyPlexusResource
             else
             {
                 ml.executed = true;
-                ml.setPayload( payload, POST );
+                ml.setPayload( payload, post() );
 
                 Object result;
                 try
                 {
                     result = plexusResource.post( context, request, response, payload );
-                    ml.setResult( result, POST );
+                    ml.setResult( result, post() );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e, POST );
+                    ml.setError( e, post() );
 
                     throw e;
                 }
@@ -178,7 +193,7 @@ public class ProxyPlexusResource
 
         if ( mr == null )
         {
-            MockListener ml = MockHelper.getListenerFor( getResourceUri() );
+            MockListener<Object> ml = MockHelper.getListenerFor( getResourceUri() );
             if ( ml == null )
             {
                 return plexusResource.put( context, request, response, payload );
@@ -186,17 +201,17 @@ public class ProxyPlexusResource
             else
             {
                 ml.executed = true;
-                ml.setPayload( payload, PUT );
+                ml.setPayload( payload, put() );
 
                 Object result;
                 try
                 {
                     result = plexusResource.put( context, request, response, payload );
-                    ml.setResult( result, PUT );
+                    ml.setResult( result, put() );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e, PUT );
+                    ml.setError( e, put() );
 
                     throw e;
                 }
@@ -233,7 +248,7 @@ public class ProxyPlexusResource
 
         if ( mr == null )
         {
-            MockListener ml = MockHelper.getListenerFor( getResourceUri() );
+            MockListener<Object> ml = MockHelper.getListenerFor( getResourceUri() );
             if ( ml == null )
             {
                 return plexusResource.upload( context, request, response, files );
@@ -245,11 +260,11 @@ public class ProxyPlexusResource
                 try
                 {
                     result = plexusResource.upload( context, request, response, files );
-                    ml.setResult( result, UPLOAD );
+                    ml.setResult( result, upload() );
                 }
                 catch ( ResourceException e )
                 {
-                    ml.setError( e, UPLOAD );
+                    ml.setError( e, upload() );
 
                     throw e;
                 }
@@ -266,7 +281,7 @@ public class ProxyPlexusResource
         }
     }
 
-    // == unodified stuff below
+    // == unmodified stuff below
 
     public boolean acceptsUpload()
     {

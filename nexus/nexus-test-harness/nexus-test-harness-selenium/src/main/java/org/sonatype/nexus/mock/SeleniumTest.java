@@ -17,6 +17,7 @@ import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.MainPage;
+import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testng.PlexusObjectFactory;
@@ -95,8 +96,9 @@ public abstract class SeleniumTest
         {
             main.clickLogout();
             getCoverage();
-
         }
+
+        MockHelper.clearMocks();
     }
 
     /**
@@ -198,16 +200,8 @@ public abstract class SeleniumTest
 
         saveLogs();
 
-        System.out.println( "Memory... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
-            + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
-
         PlexusObjectFactory.getContainer().release( this );
         cleanFields();
-
-        System.gc();
-        System.out.println( "Memory gc... free: " + Runtime.getRuntime().freeMemory() / 1024 / 1024 + " - total: "
-            + Runtime.getRuntime().totalMemory() / 1024 / 1024 );
-
     }
 
     private void saveLogs()

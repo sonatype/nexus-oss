@@ -2,7 +2,7 @@ package org.sonatype.nexus.mock;
 
 import org.restlet.resource.ResourceException;
 
-public class MockListener
+public class MockListener<E>
 {
 
     private AssertionError assertionFailedError;
@@ -11,7 +11,7 @@ public class MockListener
 
     private Object payload;
 
-    private Object result;
+    private E result;
 
     protected boolean executed = false;
 
@@ -35,7 +35,7 @@ public class MockListener
         return payload;
     }
 
-    public final Object getResult()
+    public final E getResult()
     {
         return result;
     }
@@ -50,7 +50,7 @@ public class MockListener
         // to be overwritten
     }
 
-    protected void onResult( Object result, MockEvent evt )
+    protected void onResult( E result, MockEvent evt )
     {
         // to be overwritten
     }
@@ -83,25 +83,50 @@ public class MockListener
         }
     }
 
-    final void setResult( Object result, MockEvent evt )
+    final void setResult( E result, MockEvent evt )
     {
-
-        try
+        synchronized ( lock )
         {
-            onResult( result, evt );
-        }
-        catch ( AssertionError e )
-        {
-            this.assertionFailedError = e;
-        }
-        if ( !evt.isBlocked() )
-        {
-            this.result = result;
+            try
+            {
+                onResult( result, evt );
+            }
+            catch ( AssertionError e )
+            {
+                this.assertionFailedError = e;
+            }
+            if ( !evt.isBlocked() )
+            {
+                this.result = result;
+            }
+            lock.notifyAll();
         }
     }
 
     public final boolean wasExecuted()
     {
         return executed;
+    }
+
+    private static final Object lock = new Object();
+
+    public E waitForResult( Class<E> class1 )
+    {
+        synchronized ( lock )
+        {
+            while ( result == null || !class1.isAssignableFrom( result.getClass() ) )
+            {
+                try
+                {
+                    lock.wait( 1000 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // is it recovereable?
+                }
+            }
+
+            return result;
+        }
     }
 }

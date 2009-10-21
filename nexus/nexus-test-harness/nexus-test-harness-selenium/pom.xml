@@ -9,6 +9,10 @@
 
   <artifactId>nexus-test-harness-selenium</artifactId>
 
+  <properties>
+    <threads>4</threads>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -93,7 +97,7 @@
             </property>
           </properties>
           <parallel>true</parallel>
-          <threadCount>4</threadCount>
+          <threadCount>${threads}</threadCount>
           <argLine>-Xmx512M</argLine>
         </configuration>
         <dependencies>
@@ -358,7 +362,7 @@
               </execution>
             </executions>
             <configuration>
-              <numberOfInstances>4</numberOfInstances>
+              <numberOfInstances>${threads}</numberOfInstances>
             </configuration>
           </plugin>
         </plugins>
