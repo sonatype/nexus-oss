@@ -260,6 +260,8 @@ Sonatype.repoServer.SearchPanel = function(config){
     };
   }
   
+  Sonatype.Events.fireEvent( 'searchMenuInit', this.searchComponents, this.searchTypeButtonConfig, this );
+  
   this.gavFields = [];
   this.gavParams = [ 'g', 'a', 'v', 'p', 'c' ];
 
