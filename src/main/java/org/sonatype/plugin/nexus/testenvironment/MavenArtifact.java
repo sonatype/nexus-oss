@@ -86,6 +86,10 @@ public class MavenArtifact
 
     public String getType()
     {
+        if ( type == null )
+        {
+            return "jar";
+        }
         return type;
     }
 
