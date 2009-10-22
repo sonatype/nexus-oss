@@ -1,4 +1,4 @@
-package org.nexus.plugins.plugin.console;
+package org.sonatype.nexus.plugins.plugin.console;
 
 import java.util.List;
 

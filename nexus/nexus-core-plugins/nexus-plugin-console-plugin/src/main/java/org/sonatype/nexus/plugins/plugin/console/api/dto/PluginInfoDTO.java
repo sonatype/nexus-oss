@@ -1,4 +1,4 @@
-package org.nexus.plugins.plugin.console.api.dto;
+package org.sonatype.nexus.plugins.plugin.console.api.dto;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

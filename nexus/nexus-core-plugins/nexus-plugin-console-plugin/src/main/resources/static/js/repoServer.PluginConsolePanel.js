@@ -1,0 +1,52 @@
+Sonatype.repoServer.PluginConsolePanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {
+    title: 'Plugin Console'
+  };
+  Ext.apply( this, config, defaultConfig );
+    
+  Sonatype.repoServer.PluginConsolePanel.superclass.constructor.call( this, {
+    url: Sonatype.config.servicePath + '/plugin_console/plugin_infos',
+    dataAntoLoad: true,
+    tabbedChildren: true,
+    dataSortInfo: { field: 'name', direction: 'asc' },
+    tbar: [],
+    columns: [
+    { name: 'name',
+      header: 'Name',
+      width: 150
+    },
+    { name: 'description',
+      header: 'Description',
+      width: 200
+    },
+    { name: 'version',
+      header: 'Version',
+      width: 150
+    },
+    { name: 'status',
+      header: 'Status',
+      width: 100
+    },
+    { name: 'scmVersion' },
+    { name: 'scmTimestamp' },
+    { name: 'failureReason' }
+    ],
+    rowClickEvent: 'pluginInfoInit'
+  });
+};
+
+Ext.extend( Sonatype.repoServer.PluginConsolePanel, Sonatype.panels.GridViewer, {
+  doSomething: function(){}
+} );
+
+Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
+  nexusPanel.add( {
+    enabled: true,
+    sectionId: 'st-nexus-config',
+    title: 'Plugin Console',
+    tabId: 'plugin_console',
+    tabTitle: 'Plugin Console',
+    tabCode: Sonatype.repoServer.PluginConsolePanel
+  } );
+} );

@@ -1,4 +1,4 @@
-package org.nexus.plugins.plugin.console;
+package org.sonatype.nexus.plugins.plugin.console;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,13 +39,17 @@ public class DefaultPluginConsoleManager
     {
         PluginInfo result = new PluginInfo();
 
-        result.setName( pluginResponse.getPluginDescriptor().getPluginMetadata().getName() );
-        result.setDescription( pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription() );
         result.setStatus( pluginResponse.getAchievedGoal().name() );
-        // TODO setScmVersion
-        // TODO setScmTimestamp
-        if ( !pluginResponse.isSuccessful() )
+        result.setVersion( pluginResponse.getPluginCoordinates().getVersion() );
+        if ( pluginResponse.isSuccessful() )
         {
+            result.setName( pluginResponse.getPluginDescriptor().getPluginMetadata().getName() );
+            result.setDescription( pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription() );
+
+        }
+        else
+        {
+            result.setName( pluginResponse.getPluginCoordinates().toString() );
             result.setFailureReason( pluginResponse.formatAsString( false ) );
         }
 

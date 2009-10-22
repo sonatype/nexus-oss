@@ -1,16 +1,16 @@
-package org.nexus.plugins.plugin.console.api;
+package org.sonatype.nexus.plugins.plugin.console.api;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.nexus.plugins.plugin.console.PluginConsoleManager;
-import org.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
+import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -87,11 +87,11 @@ public class PluginInfoListPlexusResource
         result.setName( pluginInfo.getName() );
         result.setDescription( pluginInfo.getDescription() );
         result.setStatus( pluginInfo.getStatus() );
+        result.setVersion( pluginInfo.getVersion() );
         result.setScmVersion( StringUtils.isEmpty( pluginInfo.getScmVersion() ) ? "N/A" : pluginInfo.getScmVersion() );
         result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A" : pluginInfo
             .getScmTimestamp() );
-        result.setFailureReason( StringUtils.isEmpty( pluginInfo.getFailureReason() ) ? "N/A" : pluginInfo
-            .getFailureReason() );
+        result.setFailureReason( pluginInfo.getFailureReason() );
 
         return result;
     }
