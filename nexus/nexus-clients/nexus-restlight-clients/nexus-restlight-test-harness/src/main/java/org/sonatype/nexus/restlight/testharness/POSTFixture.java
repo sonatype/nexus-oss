@@ -46,6 +46,11 @@ extends AbstractRESTTestFixture
 
     private Map<String, Set<String>> responseHeaders;
 
+    public POSTFixture( final String user, final String password )
+    {
+        super( user, password );
+    }
+
     /**
      * Retrieve the map of HTTP headers expected to be present in the client request.
      */
@@ -285,7 +290,7 @@ extends AbstractRESTTestFixture
      */
     public POSTFixture copy()
     {
-        POSTFixture fixture = new POSTFixture();
+        POSTFixture fixture = new POSTFixture( getAuthUser(), getAuthPassword() );
 
         fixture.setRequestDocument( getRequestDocument() );
         fixture.setResponseStatus( getResponseStatus() );

@@ -34,6 +34,8 @@ public class NxBasicScheme
 
     static final String NAME = "NxBASIC";
 
+    public static final String POLICY_NAME = NAME;
+
     @Override
     public String getSchemeName()
     {

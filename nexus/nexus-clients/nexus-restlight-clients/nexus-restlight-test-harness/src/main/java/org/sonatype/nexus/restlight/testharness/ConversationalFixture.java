@@ -25,12 +25,17 @@ import javax.servlet.http.HttpServletResponse;
  * full expected conversation took place, as an additional validation step for the client test. 
  */
 public class ConversationalFixture
-extends AbstractRESTTestFixture
+    extends AbstractRESTTestFixture
 {
 
     private List<RESTTestFixture> conversation;
 
     private List<RESTTestFixture> traversedConversation;
+
+    public ConversationalFixture( final String user, final String password )
+    {
+        super( user, password );
+    }
 
     /**
      * Retrieve the list of {@link RESTTestFixture} instances that represent the ordered script of exchanges expected
@@ -124,7 +129,7 @@ extends AbstractRESTTestFixture
      */
     public ConversationalFixture copy()
     {
-        ConversationalFixture fixture = new ConversationalFixture();
+        ConversationalFixture fixture = new ConversationalFixture( getAuthUser(), getAuthPassword() );
 
         fixture.conversation = conversation == null ? null : new ArrayList<RESTTestFixture>( conversation );
         fixture.traversedConversation = conversation == null ? null : new ArrayList<RESTTestFixture>();

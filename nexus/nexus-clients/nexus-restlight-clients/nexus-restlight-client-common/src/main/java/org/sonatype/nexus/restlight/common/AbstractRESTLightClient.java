@@ -186,9 +186,9 @@ public abstract class AbstractRESTLightClient
         UsernamePasswordCredentials creds = new UsernamePasswordCredentials( user, password );
 
         List<String> policies = new ArrayList<String>();
-        policies.add( "NxBASIC" );
+        policies.add( NxBasicScheme.POLICY_NAME );
 
-        AuthPolicy.registerAuthScheme( "NxBASIC", NxBasicScheme.class );
+        AuthPolicy.registerAuthScheme( NxBasicScheme.POLICY_NAME, NxBasicScheme.class );
 
         client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, policies );
 
@@ -407,7 +407,7 @@ public abstract class AbstractRESTLightClient
     protected Document get( final String url, final Map<String, ? extends Object> requestParams, final boolean urlIsAbsolute )
     throws RESTLightClientException
     {
-        GetMethod method = urlIsAbsolute ? new GetMethod( url ) : new GetMethod( baseUrl + url );
+        GetMethod method = urlIsAbsolute ? new GetMethod( url ) : new GetMethod( formatUrl( baseUrl, url ) );
         method.addRequestHeader( "Content-Type", "application/xml" );
 
         addRequestParams( method, requestParams );
@@ -449,6 +449,26 @@ public abstract class AbstractRESTLightClient
         {
             method.releaseConnection();
         }
+    }
+
+    private String formatUrl( final String baseUrl, final String path )
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append( baseUrl );
+        if ( !baseUrl.endsWith( "/" ) && !path.startsWith( "/" ) )
+        {
+            sb.append( "/" );
+            sb.append( path );
+        }
+        else if ( baseUrl.endsWith( "/" ) && path.startsWith( "/" ) )
+        {
+            if ( path.length() > 1 )
+            {
+                sb.append( path.substring( 1 ) );
+            }
+        }
+
+        return sb.toString();
     }
 
     /**
@@ -494,7 +514,7 @@ public abstract class AbstractRESTLightClient
     {
         LogManager.getLogger( getClass().getName() ).debug( "Posting to: '" + path + "'" );
 
-        PostMethod method = new PostMethod( baseUrl + path );
+        PostMethod method = new PostMethod( formatUrl( baseUrl, path ) );
         method.addRequestHeader( "Content-Type", "application/xml" );
         method.addRequestHeader( "Accept", "application/xml" );
 

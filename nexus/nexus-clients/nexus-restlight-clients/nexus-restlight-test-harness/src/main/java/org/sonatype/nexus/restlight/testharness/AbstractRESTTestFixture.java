@@ -6,6 +6,11 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.SimpleLayout;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.HandlerWrapper;
+import org.mortbay.jetty.security.Constraint;
+import org.mortbay.jetty.security.ConstraintMapping;
+import org.mortbay.jetty.security.HashUserRealm;
+import org.mortbay.jetty.security.SecurityHandler;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -31,6 +36,16 @@ implements RESTTestFixture
     private int port;
 
     private boolean debugEnabled;
+
+    private String authUser;
+
+    private String authPassword;
+
+    protected AbstractRESTTestFixture( final String user, final String password )
+    {
+        this.authUser = user;
+        this.authPassword = password;
+    }
 
     /**
      * {@inheritDoc}
@@ -145,7 +160,32 @@ implements RESTTestFixture
 
         server = new Server( port );
 
-        server.addHandler( getTestHandler() );
+        Constraint constraint = new Constraint();
+
+        constraint.setRoles( new String[] { "allowed" } );
+        constraint.setAuthenticate( true );
+
+        ConstraintMapping cm = new ConstraintMapping();
+        cm.setConstraint( constraint );
+        cm.setPathSpec( "/*" );
+
+        SecurityHandler securityHandler = new SecurityHandler();
+        securityHandler.setAuthMethod( NxBasicAuthenticator.AUTH_TYPE );
+        securityHandler.setAuthenticator( new NxBasicAuthenticator() );
+
+        HashUserRealm securityRealm = new HashUserRealm( "Nexus REST Test Fixture" );
+
+        securityRealm.put( authUser, authPassword );
+        securityRealm.addUserToRole( authUser, "allowed" );
+
+        securityHandler.setUserRealm( securityRealm );
+        securityHandler.setConstraintMappings( new ConstraintMapping[] { cm } );
+
+        HandlerWrapper wrapper = new HandlerWrapper();
+        wrapper.addHandler( getTestHandler() );
+        wrapper.addHandler( securityHandler );
+
+        server.setHandler( wrapper );
 
         server.start();
     }
@@ -162,6 +202,26 @@ implements RESTTestFixture
         {
             server.stop();
         }
+    }
+
+    public String getAuthUser()
+    {
+        return authUser;
+    }
+
+    public void setAuthUser( final String authUser )
+    {
+        this.authUser = authUser;
+    }
+
+    public String getAuthPassword()
+    {
+        return authPassword;
+    }
+
+    public void setAuthPassword( final String authPassword )
+    {
+        this.authPassword = authPassword;
     }
 
 }

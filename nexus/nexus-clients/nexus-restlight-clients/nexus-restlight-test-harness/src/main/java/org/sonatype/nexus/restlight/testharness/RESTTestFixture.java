@@ -27,6 +27,10 @@ public interface RESTTestFixture
      */
     int getPort();
 
+    String getAuthUser();
+
+    String getAuthPassword();
+
     /**
      * Retrieve the {@link Handler} instance that will perform validation of client HTTP requests, and respond with
      * either the data specified in this fixture, or else an appropriate HTTP status code in case validation fails.
