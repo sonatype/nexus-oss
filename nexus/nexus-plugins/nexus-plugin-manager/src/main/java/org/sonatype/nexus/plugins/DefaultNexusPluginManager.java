@@ -198,7 +198,7 @@ public class DefaultNexusPluginManager
         if ( getActivatedPlugins().containsKey( pluginCoordinate ) )
         {
             // already is active, let's play dumb
-
+            
             return response;
         }
 
@@ -215,6 +215,8 @@ public class DefaultNexusPluginManager
             PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationRequest.ACTIVATE );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
+            
+            this.pluginActions.put( pluginCoordinate, result );
 
             response.addPluginResponse( result );
 
@@ -302,7 +304,9 @@ public class DefaultNexusPluginManager
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
 
                 response.addPluginResponse( result );
-
+                
+                this.pluginActions.put( pluginCoordinates, result );
+                
                 return;
             }
 
@@ -392,6 +396,8 @@ public class DefaultNexusPluginManager
                     .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
+                
+                this.pluginActions.put( pluginCoordinates, result );
             }
 
             // glean the realm with plugin JAR only
@@ -415,6 +421,8 @@ public class DefaultNexusPluginManager
                     .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
+                
+                this.pluginActions.put( pluginCoordinates, result );
             }
 
             // ==
@@ -472,6 +480,8 @@ public class DefaultNexusPluginManager
         }
 
         response.addPluginResponse( result );
+        
+        this.pluginActions.put( pluginCoordinates, result );
     }
 
     /**
