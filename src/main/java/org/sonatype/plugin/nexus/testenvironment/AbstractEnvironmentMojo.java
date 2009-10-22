@@ -188,6 +188,11 @@ public class AbstractEnvironmentMojo
      */
     private boolean promoteOptionalPlugin;
 
+    /**
+     * @parameter
+     */
+    private String mavenBaseDir;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -269,8 +274,11 @@ public class AbstractEnvironmentMojo
         {
             String mavenVersion = setupMaven().getBaseVersion();
             project.getProperties().put( "maven-version", mavenVersion );
-            project.getProperties().put( "maven-basedir",
-                                         getPath( new File( mavenLocation, "apache-maven-" + mavenVersion ) ) );
+            if ( this.mavenBaseDir == null )
+            {
+                this.mavenBaseDir = "apache-maven-" + mavenVersion;
+            }
+            project.getProperties().put( "maven-basedir", getPath( new File( mavenLocation, mavenBaseDir ) ) );
 
             File fakeRepository = new File( resourcesSourceLocation, "fake-central" );
             File fakeRepoDest = new File( mavenLocation, "fake-repo" );
