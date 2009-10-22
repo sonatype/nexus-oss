@@ -32,6 +32,18 @@ public final class VocabularyKeys
      * 1.3.2, the element has been simplified to <code>promoteRequest</code>.
      */
     public static final String PROMOTE_STAGE_REPO_ROOT_ELEMENT = "promoteRepository.rootElement";
+    
+    /**
+     * This is the description element name to use when finishing a staged repository. In Nexus Professional 1.3.1, it
+     * wasn't used at all, so the value is {@link VocabularyKeys#SUPPRESS_ELEMENT_VALUE}. In Nexus Professional 1.3.2+,
+     * the element is <code>description</code>.
+     */
+    public static final String PROMOTE_STAGE_REPO_DESCRIPTION_ELEMENT = "promoteRepository.descriptionElement";
+
+    /**
+     * Flag value that tells the REST client to suppress that element.
+     */
+    public static final String SUPPRESS_ELEMENT_VALUE = "NONE";
 
     private VocabularyKeys()
     {

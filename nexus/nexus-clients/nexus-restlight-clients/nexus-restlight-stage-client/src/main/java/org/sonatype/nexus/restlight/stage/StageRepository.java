@@ -32,6 +32,10 @@ public class StageRepository
     private final String repositoryId;
 
     private String url;
+    
+    private String profileName;
+    
+    private String description;
 
     private final boolean isOpen;
 
@@ -78,19 +82,43 @@ public class StageRepository
      * Set the publicly-available repository URL for this repository. This is the URL that Maven and other clients would
      * use to access artifacts in this repository.
      */
-    public void setUrl( final String url )
+    public StageRepository setUrl( final String url )
     {
         this.url = url;
+        return this;
     }
 
-    public void setUser( final String user )
+    public StageRepository setUser( final String user )
     {
         this.user = user;
+        return this;
     }
 
     public String getUser()
     {
         return user;
+    }
+
+    public String getProfileName()
+    {
+        return profileName;
+    }
+
+    public StageRepository setProfileName( final String profileName )
+    {
+        this.profileName = profileName;
+        return this;
+    }
+
+    public String getDescription()
+    {
+        return description;
+    }
+
+    public StageRepository setDescription( final String description )
+    {
+        this.description = description;
+        return this;
     }
 
 }

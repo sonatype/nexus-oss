@@ -127,7 +127,7 @@ public class StageClientTest
         assertEquals( "tp1-002", repo.getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repo.getUrl() );
         
-        client.finishRepository( repo );
+        client.finishRepository( repo, "this is a description" );
 
         List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
         if ( unused != null && !unused.isEmpty() )
