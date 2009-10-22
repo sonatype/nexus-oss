@@ -394,6 +394,7 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
   },
   
   createChildPanel: function( rec, recreateIfExists ) {
+    rec.data.showCtx = this.showRecordContextMenu( rec );
     if ( this.collapsibleDetails ) {
       this.cardPanel.expand();
     }
@@ -639,7 +640,6 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 
   rowSelectHandler: function( selectionModel, index, rec ) {
     if ( this.rowClickEvent || this.rowClickHandler ) {
-      rec.data.showCtx = this.showRecordContextMenu( rec ); 
       this.createChildPanel( rec );
       
       var bookmark = rec.data[this.dataBookmark];
