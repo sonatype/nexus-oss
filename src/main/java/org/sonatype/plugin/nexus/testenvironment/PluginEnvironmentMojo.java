@@ -26,47 +26,63 @@ public class PluginEnvironmentMojo
     private String nexusVersion;
 
     @Override
-    protected Artifact getMavenArtifact( MavenArtifact ma )
+    protected Artifact resolve( Artifact artifact )
         throws MojoExecutionException
     {
-        if ( equivalent( ma, project.getArtifact() ) )
+        if ( !artifact.isResolved() )
         {
-            Artifact da;
-            File bundle;
-            if ( "nexus-plugin".equals( ma.getType() ) )
+            if ( equivalent( artifact, project.getArtifact() ) )
             {
-                da =
-                    artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
-                                                                  project.getArtifact().getArtifactId(),
-                                                                  project.getArtifact().getVersion(), "zip", "bundle" );
-                bundle =
-                    new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-bundle.zip" );
+                Artifact da;
+                File bundle;
+                if ( "nexus-plugin".equals( project.getArtifact().getType() ) )
+                {
+                    da =
+                        artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
+                                                                      project.getArtifact().getArtifactId(),
+                                                                      project.getArtifact().getVersion(), "zip",
+                                                                      "bundle" );
+                    bundle =
+                        new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + "-bundle.zip" );
+                }
+                else
+                {
+                    da =
+                        artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
+                                                                      project.getArtifact().getArtifactId(),
+                                                                      project.getArtifact().getVersion(),
+                                                                      project.getArtifact().getType(),
+                                                                      project.getArtifact().getClassifier() );
+                    String classifier =
+                        project.getArtifact().getClassifier() == null ? "" : "-"
+                            + project.getArtifact().getClassifier();
+                    bundle =
+                        new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + classifier
+                            + "." + project.getArtifact().getType() );
+                }
+
+                da.setResolved( true );
+                bundle = bundle.getAbsoluteFile();
+                if ( !bundle.exists() )
+                {
+                    throw new MojoExecutionException( "Project bundle doesn't exists " + bundle );
+                }
+                da.setFile( bundle );
+                return da;
             }
             else
             {
-                da =
-                    artifactFactory.createArtifactWithClassifier( project.getArtifact().getGroupId(),
-                                                                  project.getArtifact().getArtifactId(),
-                                                                  project.getArtifact().getVersion(),
-                                                                  project.getArtifact().getType(),
-                                                                  project.getArtifact().getClassifier() );
-                String classifier =
-                    project.getArtifact().getClassifier() == null ? "" : "-" + project.getArtifact().getClassifier();
-                bundle =
-                    new File( project.getBuild().getDirectory(), project.getBuild().getFinalName() + classifier + "."
-                        + project.getArtifact().getType() );
+                return super.resolve( artifact );
             }
-
-            da.setResolved( true );
-            bundle = bundle.getAbsoluteFile();
-            if ( !bundle.exists() )
-            {
-                throw new MojoExecutionException( "Project bundle doesn't exists " + bundle );
-            }
-            da.setFile( bundle );
-            return da;
         }
 
+        return artifact;
+    }
+
+    @Override
+    protected Artifact getMavenArtifact( MavenArtifact ma )
+        throws MojoExecutionException
+    {
         try
         {
             return super.getMavenArtifact( ma );
@@ -90,7 +106,7 @@ public class PluginEnvironmentMojo
         }
     }
 
-    private boolean equivalent( MavenArtifact ma, Artifact artifact )
+    private boolean equivalent( Artifact ma, Artifact artifact )
     {
         if ( ma == artifact )
         {
@@ -112,17 +128,6 @@ public class PluginEnvironmentMojo
         {
             return false;
         }
-        if ( ma.getClassifier() == null )
-        {
-            if ( artifact.getClassifier() != null )
-            {
-                return false;
-            }
-        }
-        else if ( !ma.getClassifier().equals( artifact.getClassifier() ) )
-        {
-            return false;
-        }
         if ( ma.getGroupId() == null )
         {
             if ( artifact.getGroupId() != null )
@@ -134,20 +139,55 @@ public class PluginEnvironmentMojo
         {
             return false;
         }
-        if ( ma.getType() == null )
+
+        if ( !( "nexus-plugin".equals( ma.getType() ) || "nexus-plugin".equals( artifact.getType() )
+            || ma.getType() == null || artifact.getType() == null ) )
         {
-            if ( !"jar".equals( artifact.getType() ) )
+            if ( ma.getType() == null )
             {
-                if ( artifact.getType() != null )
+                if ( !"jar".equals( artifact.getType() ) )
+                {
+                    if ( artifact.getType() != null )
+                    {
+                        return false;
+                    }
+                }
+            }
+            else if ( !ma.getType().equals( artifact.getType() ) )
+            {
+                return false;
+            }
+
+            if ( ma.getClassifier() == null )
+            {
+                if ( artifact.getClassifier() != null )
+                {
+                    return false;
+                }
+            }
+            else if ( !ma.getClassifier().equals( artifact.getClassifier() ) )
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if ( "nexus-plugin".equals( ma.getType() ) )
+            {
+                if ( !"bundle".equals( artifact.getClassifier() ) && !"zip".equals( artifact.getType() ) )
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                if ( !"bundle".equals( ma.getClassifier() ) && !"zip".equals( ma.getType() ) )
                 {
                     return false;
                 }
             }
         }
-        else if ( !ma.getType().equals( artifact.getType() ) )
-        {
-            return false;
-        }
+
         return true;
     }
 
