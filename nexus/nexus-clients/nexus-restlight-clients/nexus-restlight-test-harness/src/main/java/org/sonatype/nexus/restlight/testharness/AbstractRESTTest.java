@@ -24,7 +24,7 @@ public abstract class AbstractRESTTest
 
     protected static final String TEST_NX_API_VERSION_SYSPROP = "test.nexus.api.version";
 
-    private static final String DEFAULT_TEST_NX_API_VERSION = "1.3.1";
+    private static final String DEFAULT_TEST_NX_API_VERSION = "1.3.2";
 
     /**
      * <p>
