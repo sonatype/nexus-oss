@@ -30,9 +30,16 @@ import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
+import org.sonatype.nexus.proxy.AccessDeniedException;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -82,6 +89,23 @@ public class UnpackResource
 
             String basePath = getResourceStorePath( request );
 
+            if ( basePath.toLowerCase().endsWith( ".md5" ) || basePath.toLowerCase().endsWith( ".sha1" ) )
+            {
+                // maven deploys checksums even if not asked to
+                return null;
+            }
+
+            try
+            {
+                StorageItem item = repository.retrieveItem( getResourceStoreRequest( request, basePath ) );
+
+                deleteItem( repository, item );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // that's good
+            }
+
             for ( FileItem fileItem : files )
             {
                 File tempFile = File.createTempFile( "unzip", ".zip" );
@@ -97,6 +121,12 @@ public class UnpackResource
                         while ( entries.hasMoreElements() )
                         {
                             ZipEntry entry = entries.nextElement();
+
+                            if ( entry.getName().endsWith( "/" ) )
+                            {
+                                // must be a folder
+                                continue;
+                            }
 
                             ResourceStoreRequest storeRequest =
                                 getResourceStoreRequest( request, basePath + "/" + entry.getName() );
@@ -129,6 +159,23 @@ public class UnpackResource
         }
 
         return null;
+    }
+
+    private void deleteItem( Repository repository, StorageItem item )
+        throws AccessDeniedException, StorageException, NoSuchResourceStoreException, IllegalOperationException,
+        ItemNotFoundException, UnsupportedStorageOperationException
+    {
+        if ( item instanceof StorageCollectionItem )
+        {
+            for ( StorageItem child : ( (StorageCollectionItem) item ).list() )
+            {
+                deleteItem( repository, child );
+            }
+        }
+        else
+        {
+            repository.deleteItem( item.getResourceStoreRequest() );
+        }
     }
 
     private void close( ZipFile zip )
