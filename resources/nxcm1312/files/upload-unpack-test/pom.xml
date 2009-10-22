@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.sonatype.tests</groupId>
+  <artifactId>upload-unpack-test</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.sonatype.maven.plugins</groupId>
+        <artifactId>maven-upload-plugin</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>publish-site</id>
+            <phase>package</phase>
+            <goals>
+              <goal>upload-file</goal>
+            </goals>
+            <configuration>
+              <serverId>nexus</serverId>
+              <repositoryUrl>${nexus-base-url}service/local/repositories/nexus-test-harness-repo2/content-compressed</repositoryUrl>
+              <file>target/${project.artifactId}-${project.version}.jar</file>
+              <repositoryPath>some/path</repositoryPath>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

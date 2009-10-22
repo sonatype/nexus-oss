@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -13,22 +12,155 @@
 
   <properties>
     <nexus.version>1.4.1-SNAPSHOT</nexus.version>
+    <tycho.version>0.4.0-DEV-3170</tycho.version>
+    <nexus-licensing-plugin.version>1.4.1-SNAPSHOT</nexus-licensing-plugin.version>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.3-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-nexus-plugin-environment</goal>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusVersion>${nexus.version}</nexusVersion>
+          <mavenArtifact>
+            <groupId>org.codehaus.tycho</groupId>
+            <artifactId>tycho-distribution</artifactId>
+            <classifier>bin</classifier>
+            <type>tar.gz</type>
+          </mavenArtifact>
+          <mavenBaseDir>tycho-distribution-${tycho.version}</mavenBaseDir>
+          <nexusPluginsArtifacts>
+            <license>
+              <groupId>com.sonatype.nexus.plugin</groupId>
+              <artifactId>nexus-licensing-plugin</artifactId>
+            </license>
+            <license>
+              <groupId>com.sonatype.components</groupId>
+              <artifactId>plexus-licensing</artifactId>
+            </license>
+          </nexusPluginsArtifacts>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus.version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
+    </dependency>
+
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
       <version>${nexus.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.sonatype.nexus.plugin</groupId>
+      <artifactId>nexus-licensing-plugin</artifactId>
+      <version>${nexus-licensing-plugin.version}</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.tycho</groupId>
+      <artifactId>tycho-distribution</artifactId>
+      <version>${tycho.version}</version>
+      <classifier>bin</classifier>
+      <type>tar.gz</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>obfuscation</id>
+      <activation>
+        <property>
+          <name>!skip-obfuscation</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+          </plugin>
+          <plugin>
+            <groupId>com.pyx4me</groupId>
+            <artifactId>proguard-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>process-classes</phase>
+                <goals>
+                  <goal>proguard</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <injar>classes</injar>
+              <options>
+                <option>-keep public interface * { public *; }</option>
+                <option>-dontusemixedcaseclassnames</option>
+                <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable</option>
+                <option>-renamesourcefileattribute SourceFile</option>
+                <option>-printmapping ${project.build.directory}/out.map</option>
+                <option>-dontoptimize</option>
+                <option>-dontshrink</option>
+                <option>-repackageclasses 'codeguard.nexusunpackplugin'</option>
+                <option>-allowaccessmodification</option>
+                <option>-useuniqueclassmembernames</option>
+                <option>-obfuscationdictionary ${project.build.directory}/dictionary.txt</option>
+                <option>-classobfuscationdictionary ${project.build.directory}/dictionary.txt</option>
+              </options>
+              <libs>
+                <lib>${java-runtime}</lib>
+              </libs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

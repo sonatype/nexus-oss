@@ -23,12 +23,14 @@ import java.util.zip.ZipFile;
 
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -45,10 +47,20 @@ import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
+import com.sonatype.license.PlexusLicensingException;
+import com.sonatype.license.feature.PlexusFeature;
+import com.sonatype.nexus.licensing.NexusLicensingManager;
+
 @Component( role = PlexusResource.class, hint = "UnpackPlexusResource" )
 public class UnpackResource
     extends AbstractResourceStoreContentPlexusResource
 {
+
+    @Requirement( role = NexusLicensingManager.class )
+    private NexusLicensingManager licenseManager;
+
+    @Requirement( role = PlexusFeature.class, hint = "NexusProfessional" )
+    private PlexusFeature feature;
 
     public UnpackResource()
     {
@@ -83,6 +95,15 @@ public class UnpackResource
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
+        try
+        {
+            licenseManager.verifyLicenseAndFeature( feature );
+        }
+        catch ( PlexusLicensingException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_PAYMENT_REQUIRED, e );
+        }
+
         try
         {
             Repository repository = getResourceStore( request );
