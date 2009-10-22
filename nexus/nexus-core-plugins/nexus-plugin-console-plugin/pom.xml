@@ -1,0 +1,130 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.sonatype.nexus.plugins</groupId>
+		<artifactId>nexus-core-plugins</artifactId>
+		<version>1.4.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>nexus-plugin-console-plugin</artifactId>
+	<packaging>nexus-plugin</packaging>
+	<name>Nexus Plugin Console Plugin</name>
+	<description>Nexus Core Plugin :: Plugin Console</description>
+
+	<developers>
+		<developer>
+			<id>juven</id>
+			<name>Juven Xu</name>
+			<email>juven@sonatype.com</email>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.sonatype.nexus</groupId>
+				<artifactId>nexus-webapp-dependencies</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+
+		<!-- Because this is a nexus-plugin -->
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-plugin-api</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Because we extend current "ugly" REST API -->
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-rest-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-component-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-container-default</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.modello</groupId>
+				<artifactId>modello-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>model.xml</id>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<version>1.0.0</version>
+							<packagedVersions>
+								<packagedVersion>1.0.0</packagedVersion>
+							</packagedVersions>
+							<models>
+								<model>src/main/mdo/model.xml</model>
+							</models>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<packageWithVersion>false</packageWithVersion>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>app-lifecycle-maven-plugin</artifactId>
+				<version>1.0</version>
+				<extensions>true</extensions>
+				<dependencies>
+					<dependency>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>app-lifecycle-nexus</artifactId>
+						<version>1.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
