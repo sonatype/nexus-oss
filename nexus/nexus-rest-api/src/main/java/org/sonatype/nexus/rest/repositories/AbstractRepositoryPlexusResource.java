@@ -300,7 +300,7 @@ public abstract class AbstractRepositoryPlexusResource
         }
         else if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
         {
-            return getRepositoryShadowRestModel( repository.adaptToFacet( ShadowRepository.class ) );
+            return getRepositoryShadowRestModel( request, repository.adaptToFacet( ShadowRepository.class ) );
         }
         else
         {
@@ -419,13 +419,15 @@ public abstract class AbstractRepositoryPlexusResource
         return resource;
     }
 
-    public RepositoryShadowResource getRepositoryShadowRestModel( ShadowRepository shadow )
+    public RepositoryShadowResource getRepositoryShadowRestModel( Request request, ShadowRepository shadow )
     {
         RepositoryShadowResource resource = new RepositoryShadowResource();
 
         resource.setId( shadow.getId() );
 
         resource.setName( shadow.getName() );
+
+        resource.setContentResourceURI( createRepositoryContentReference( request, shadow.getId() ).toString() );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( shadow ) );
 
