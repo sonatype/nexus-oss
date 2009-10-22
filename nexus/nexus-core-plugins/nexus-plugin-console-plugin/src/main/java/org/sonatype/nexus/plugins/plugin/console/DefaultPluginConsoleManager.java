@@ -49,7 +49,8 @@ public class DefaultPluginConsoleManager
         }
         else
         {
-            result.setName( pluginResponse.getPluginCoordinates().toString() );
+            result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":"
+                + pluginResponse.getPluginCoordinates().getArtifactId() );
             result.setFailureReason( pluginResponse.formatAsString( false ) );
         }
 

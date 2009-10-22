@@ -1,15 +1,7 @@
 Sonatype.repoServer.PluginInfoTab = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    readOnly: true,
-    dataModifiers: {
-      load: {}
-    },
-    referenceData: {
-      name: "",
-      description: "",
-      status: ""
-    }
+    readOnly: true
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -20,42 +12,42 @@ Sonatype.repoServer.PluginInfoTab = function( config ) {
       fieldLabel: 'Name',
       name: 'name',
       readOnly: true,
-      width: '200',
+      width: '320',
       helpText: 'The name of the plugin.'
-    },
-    { xtype: 'textfield',
-      fieldLabel: 'Description',
-      name: 'description',
-      readOnly: true,
-      width: '200',
-      helpText: 'The description of the plugin.'
     },
     { xtype: 'textfield',
       fieldLabel: 'Version',
       name: 'version',
       readOnly: true,
-      width: '200',
+      width: '320',
       helpText: 'The version of the plugin.'
+    },    
+    { xtype: 'textfield',
+      fieldLabel: 'Description',
+      name: 'description',
+      readOnly: true,
+      width: '320',
+      helpText: 'The description of the plugin.'
     },
     { xtype: 'textfield',
       fieldLabel: 'Status',
       name: 'status',
       readOnly: true,
-      width: '200',
+      width: '320',
       helpText: 'The status of the plugin.'
     },    
     { xtype: 'textfield',
       fieldLabel: 'SCM Version',
       name: 'scmVersion',
       readOnly: true,
-      width: '200',
+      width: '320',
       helpText: 'The SCM version of the plugin.'
     },
     { xtype: 'textfield',
       fieldLabel: 'SCM Timestamp',
       name: 'scmTimestamp',
       readOnly: true,
-      width: '200',
+      width: '320',
       helpText: 'The SCM timestamp of the plugin, corresponding to the SCM version.'
     }
     ]
@@ -74,7 +66,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Sonatype.ext.FormPanel, {
       
       var failureReason = this.payload.data.failureReason;
       if ( failureReason ) {
-        var html = '<h4 style="color:red">Plugin was failed to be activated</h4><br/>';
+        var html = '<h4 style="color:red">This plugin was not able to be activated</h4><br/>';
         html = html + '<pre> ' + failureReason + '</pre><br/>';
         this.add ( {
             frame: true,

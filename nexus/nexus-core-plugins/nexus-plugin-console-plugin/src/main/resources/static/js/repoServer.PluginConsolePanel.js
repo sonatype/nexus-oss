@@ -14,15 +14,15 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
     columns: [
     { name: 'name',
       header: 'Name',
-      width: 150
-    },
-    { name: 'description',
-      header: 'Description',
-      width: 200
+      width: 300
     },
     { name: 'version',
       header: 'Version',
       width: 150
+    },    
+    { name: 'description',
+      header: 'Description',
+      width: 300
     },
     { name: 'status',
       header: 'Status',
