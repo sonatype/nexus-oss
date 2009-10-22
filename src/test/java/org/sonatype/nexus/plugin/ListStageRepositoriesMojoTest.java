@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.plugin;
 
+import static junit.framework.Assert.fail;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.logging.SystemStreamLog;
@@ -47,7 +49,7 @@ public class ListStageRepositoriesMojoTest
     extends AbstractRESTTest
 {
 
-    private final ConversationalFixture fixture = new ConversationalFixture();
+    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
 
     private final Set<File> toDelete = new HashSet<File>();
 
@@ -93,11 +95,52 @@ public class ListStageRepositoriesMojoTest
         
         ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
         
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
         mojo.setNexusUrl( getBaseUrl() );
-        mojo.setUsername( "testuser" );
-        mojo.setPassword( "unused" );
-        
+
         runMojo( mojo );
+    }
+
+    @Test
+    public void baseUrlWithTrailingSlash()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+
+        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
+        mojo.setNexusUrl( getBaseUrl() + "/" );
+
+        mojo.setVerboseDebug( true );
+        fixture.setDebugEnabled( true );
+
+        runMojo( mojo );
+    }
+
+    @Test
+    public void badPassword()
+        throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
+    {
+        printTestName();
+
+        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( "wrong" );
+        mojo.setNexusUrl( getBaseUrl() );
+
+        try
+        {
+            runMojo( mojo );
+            fail( "should fail to connect due to bad password" );
+        }
+        catch ( MojoExecutionException e )
+        {
+            // expected.
+        }
     }
 
     @Test
@@ -110,12 +153,12 @@ public class ListStageRepositoriesMojoTest
         
         ExpectPrompter prompter = new ExpectPrompter();
         
-        prompter.addExpectation( "Password", "unused" );
+        prompter.addExpectation( "Password", getExpectedPassword() );
         
         mojo.setPrompter( prompter );
         
+        mojo.setUsername( getExpectedUser() );
         mojo.setNexusUrl( getBaseUrl() );
-        mojo.setUsername( "testuser" );
         
         runMojo( mojo );
     }
@@ -131,11 +174,11 @@ public class ListStageRepositoriesMojoTest
         ExpectPrompter prompter = new ExpectPrompter();
         
         prompter.addExpectation( "Nexus URL", getBaseUrl() );
-        
+
         mojo.setPrompter( prompter );
         
-        mojo.setUsername( "testuser" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
         
         runMojo( mojo );
     }
@@ -152,8 +195,8 @@ public class ListStageRepositoriesMojoTest
         
         Server server = new Server();
         server.setId( serverId );
-        server.setUsername( "testuser" );
-        server.setPassword( "unused" );
+        server.setUsername( getExpectedUser() );
+        server.setPassword( getExpectedPassword() );
         
         Settings settings = new Settings();
         settings.addServer( server );
@@ -175,25 +218,25 @@ public class ListStageRepositoriesMojoTest
 
         conversation.add( getVersionCheckFixture() );
 
-        GETFixture repoListGet = new GETFixture();
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "list/profile-list.xml" ) );
 
         conversation.add( repoListGet );
 
-        GETFixture reposGet = new GETFixture();
+        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "list/profile-repo-list.xml" ) );
 
         conversation.add( reposGet );
 
-        repoListGet = new GETFixture();
+        repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "list/profile-list-closed.xml" ) );
 
         conversation.add( repoListGet );
 
-        reposGet = new GETFixture();
+        reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "list/profile-repo-list-closed.xml" ) );
 

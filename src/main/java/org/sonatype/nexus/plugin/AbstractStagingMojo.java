@@ -61,10 +61,27 @@ public abstract class AbstractStagingMojo
     protected synchronized void connect()
         throws RESTLightClientException
     {
-        getLog().info( "Logging into Nexus: " + getNexusUrl() );
+        String url = formatUrl( getNexusUrl() );
+
+        getLog().info( "Logging into Nexus: " + url );
         getLog().info( "User: " + getUsername() );
 
-        client = new StageClient( getNexusUrl(), getUsername(), getPassword() );
+        client = new StageClient( url, getUsername(), getPassword() );
+    }
+
+    protected String formatUrl( final String url )
+    {
+        if ( url == null )
+        {
+            return null;
+        }
+
+        if ( url.length() < 1 )
+        {
+            return url;
+        }
+
+        return url.endsWith( "/" ) ? url.substring( 0, url.length() - 1 ) : url;
     }
 
     protected StageClient getClient()

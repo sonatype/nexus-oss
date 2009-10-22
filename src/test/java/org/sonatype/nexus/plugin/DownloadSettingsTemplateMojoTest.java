@@ -57,7 +57,7 @@ public class DownloadSettingsTemplateMojoTest
     extends AbstractRESTTest
 {
 
-    private final ConversationalFixture fixture = new ConversationalFixture();
+    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
 
     private final Set<File> toDelete = new HashSet<File>();
 
@@ -363,7 +363,7 @@ public class DownloadSettingsTemplateMojoTest
 
         conversation.add( getVersionCheckFixture() );
 
-        GETFixture settingsGet = new GETFixture();
+        GETFixture settingsGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         settingsGet.setExactURI( M2SettingsClient.SETTINGS_TEMPLATE_BASE + token + M2SettingsClient.GET_CONTENT_ACTION );
 
         Document testDoc = readTestDocumentResource( "settings/settings-template-" + token + ".xml" );

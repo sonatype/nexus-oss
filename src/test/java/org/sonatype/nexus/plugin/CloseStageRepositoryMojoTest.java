@@ -48,7 +48,7 @@ public class CloseStageRepositoryMojoTest
     extends AbstractRESTTest
 {
 
-    private final ConversationalFixture fixture = new ConversationalFixture();
+    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
 
     private final Set<File> toDelete = new HashSet<File>();
 
@@ -208,19 +208,19 @@ public class CloseStageRepositoryMojoTest
 
         conversation.add( getVersionCheckFixture() );
 
-        GETFixture repoListGet = new GETFixture();
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "finish/profile-list.xml" ) );
 
         conversation.add( repoListGet );
 
-        GETFixture reposGet = new GETFixture();
+        GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "finish/profile-repo-list.xml" ) );
 
         conversation.add( reposGet );
 
-        POSTFixture finishPost = new POSTFixture();
+        POSTFixture finishPost = new POSTFixture( getExpectedUser(), getExpectedPassword() );
 
         finishPost.setExactURI( StageClient.PROFILES_PATH + "/112cc490b91265a1" + StageClient.STAGE_REPO_FINISH_ACTION );
 
@@ -237,13 +237,13 @@ public class CloseStageRepositoryMojoTest
         
         conversation.add( finishPost );
 
-        repoListGet = new GETFixture();
+        repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "finish/profile-list-closed.xml" ) );
 
         conversation.add( repoListGet );
 
-        reposGet = new GETFixture();
+        reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "finish/profile-repo-list-closed.xml" ) );
 

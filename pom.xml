@@ -38,7 +38,7 @@
 	
 	<properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
-	  <restlight.version>1.3.2</restlight.version>
+    <restlight.version>1.4.0-SNAPSHOT</restlight.version>
 	</properties>
 	
   <scm>
