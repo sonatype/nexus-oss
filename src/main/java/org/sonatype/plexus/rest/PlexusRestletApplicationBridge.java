@@ -18,10 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+import org.apache.commons.collections.functors.TruePredicate;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.context.ContextException;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
@@ -62,6 +64,8 @@ public class PlexusRestletApplicationBridge
     /** Key to store the flag should plexus discover resource or no */
     public static final String PLEXUS_DISCOVER_RESOURCES = "plexus.discoverResources";
 
+    private static final String ENABLE_ENCODER_KEY = "enable-restlet-encoder";
+    
     @Requirement
     private PlexusContainer plexusContainer;
 
@@ -233,21 +237,42 @@ public class PlexusRestletApplicationBridge
 
             doCreateRoot( rootRouter, isStarted );
             
+            // check if we want to compress stuff
+            boolean enableCompression = false;
+            try
+            {
+                if( this.plexusContainer.getContext().contains( ENABLE_ENCODER_KEY ) && 
+                    Boolean.parseBoolean( this.plexusContainer.getContext().get( ENABLE_ENCODER_KEY ).toString() ) )
+                {
+                    enableCompression = true;
+                    getLogger().fine( "Restlet Encoder will compress output." );
+                }
+            }
+            catch ( ContextException e )
+            {
+                getLogger().log( Level.WARNING, "Failed to get plexus property: "+ ENABLE_ENCODER_KEY + ", this property was found in the context.", e );
+            }
+            
             // encoding support
             ArrayList<MediaType> ignoredMediaTypes = new ArrayList<MediaType>(Encoder.getDefaultIgnoredMediaTypes());
             ignoredMediaTypes.add( MediaType.APPLICATION_COMPRESS ); // anything compressed
+            ignoredMediaTypes.add( new MediaType( "application/x-bzip2" ) );
+            ignoredMediaTypes.add( new MediaType( "application/x-bzip" ) );
             ignoredMediaTypes.add( new MediaType( "application/x-compressed" ) );
-            ignoredMediaTypes.add(  new MediaType( "application/x-shockwave-flash" ) );
+            ignoredMediaTypes.add( new MediaType( "application/x-shockwave-flash" ) );
             
-            Encoder encoder = new Encoder( getContext(), false, true, Encoder.ENCODE_ALL_SIZES,
+            Encoder encoder = new Encoder( getContext(), false, enableCompression, Encoder.ENCODE_ALL_SIZES,
                 Encoder.getDefaultAcceptedMediaTypes(), ignoredMediaTypes);
             
             encoder.setNext( rootRouter );
-
+            
             // set it
             root.setNext( encoder );
+            
         }
     }
+    
+    
 
     protected final XStream createAndConfigureXstream( HierarchicalStreamDriver driver )
     {

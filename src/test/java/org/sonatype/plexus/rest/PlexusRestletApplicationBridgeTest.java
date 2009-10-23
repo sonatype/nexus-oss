@@ -20,18 +20,12 @@ import org.restlet.data.Protocol;
 public class PlexusRestletApplicationBridgeTest
     extends PlexusTestCase
 {
+
+    private Component component;
+
     public void testRest()
         throws Exception
     {
-        Component component = new Component();
-
-        component.getServers().add( Protocol.HTTP, 8182 );
-
-        TestApplication app = (TestApplication) getContainer().lookup( Application.class, "test" );
-
-        component.getDefaultHost().attach( app );
-
-        component.start();
 
         TestClient client = new TestClient();
 
@@ -41,6 +35,35 @@ public class PlexusRestletApplicationBridgeTest
 
         assertEquals( "manual", client.request( "http://localhost:8182/manual" ) );
 
-        component.stop();
     }
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        component = new Component();
+
+        component.getServers().add( Protocol.HTTP, 8182 );
+
+        TestApplication app = (TestApplication) getContainer().lookup( Application.class, "test" );
+
+        component.getDefaultHost().attach( app );
+
+        component.start();
+    }
+
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+
+        if ( component != null )
+        {
+            component.stop();
+        }
+    }
+
 }
