@@ -104,8 +104,8 @@ public class DownloadSettingsTemplateMojoTest
 
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         mojo.setDestination( SettingsDestination.user.toString() );
 
@@ -164,8 +164,8 @@ public class DownloadSettingsTemplateMojoTest
 
         mojo.setPrompter( prompter );
 
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
@@ -190,12 +190,12 @@ public class DownloadSettingsTemplateMojoTest
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
 
         ExpectPrompter prompter = new ExpectPrompter();
-        prompter.addExpectation( "Password", "unused" );
+        prompter.addExpectation( "Password", getExpectedPassword() );
 
         mojo.setPrompter( prompter );
 
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
+        mojo.setUsername( getExpectedUser() );
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
@@ -228,8 +228,8 @@ public class DownloadSettingsTemplateMojoTest
         Server server = new Server();
         
         server.setId( serverId );
-        server.setUsername( "unused" );
-        server.setPassword( "unused" );
+        server.setUsername( getExpectedUser() );
+        server.setPassword( getExpectedPassword() );
         
         settings.addServer( server );
         
@@ -252,8 +252,8 @@ public class DownloadSettingsTemplateMojoTest
 
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         Settings settings = new Settings();
         mojo.setSettings( settings );
@@ -275,8 +275,8 @@ public class DownloadSettingsTemplateMojoTest
 
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         mojo.setDestination( SettingsDestination.global.toString() );
 
@@ -305,8 +305,8 @@ public class DownloadSettingsTemplateMojoTest
 
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         mojo.setDestination( SettingsDestination.user.toString() );
 
@@ -335,8 +335,8 @@ public class DownloadSettingsTemplateMojoTest
 
         DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
         mojo.setUrl( getTemplateURL( token ) );
-        mojo.setUsername( "unused" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
 
         Settings settings = new Settings();
         mojo.setSettings( settings );

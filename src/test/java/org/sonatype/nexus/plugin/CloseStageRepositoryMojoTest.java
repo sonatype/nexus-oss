@@ -104,8 +104,8 @@ public class CloseStageRepositoryMojoTest
         mojo.setVersion( "1" );
         
         mojo.setNexusUrl( getBaseUrl() );
-        mojo.setUsername( "testuser" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
         mojo.setDescription( "this is a description" );
         
         runMojo( mojo );
@@ -121,7 +121,7 @@ public class CloseStageRepositoryMojoTest
         
         ExpectPrompter prompter = new ExpectPrompter();
         
-        prompter.addExpectation( "Password", "unused" );
+        prompter.addExpectation( "Password", getExpectedPassword() );
         prompter.addExpectation( "1", "1" );
         
         mojo.setPrompter( prompter );
@@ -132,7 +132,7 @@ public class CloseStageRepositoryMojoTest
         mojo.setDescription( "this is a description" );
         
         mojo.setNexusUrl( getBaseUrl() );
-        mojo.setUsername( "testuser" );
+        mojo.setUsername( getExpectedUser() );
         
         runMojo( mojo );
     }
@@ -157,8 +157,8 @@ public class CloseStageRepositoryMojoTest
         mojo.setVersion( "1" );
         mojo.setDescription( "this is a description" );
         
-        mojo.setUsername( "testuser" );
-        mojo.setPassword( "unused" );
+        mojo.setUsername( getExpectedUser() );
+        mojo.setPassword( getExpectedPassword() );
         
         runMojo( mojo );
     }
@@ -180,8 +180,8 @@ public class CloseStageRepositoryMojoTest
         
         Server server = new Server();
         server.setId( serverId );
-        server.setUsername( "testuser" );
-        server.setPassword( "unused" );
+        server.setUsername( getExpectedUser() );
+        server.setPassword( getExpectedPassword() );
         
         Settings settings = new Settings();
         settings.addServer( server );
