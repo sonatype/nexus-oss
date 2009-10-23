@@ -34,6 +34,7 @@ public class POSTFixtureTest
         
         String url = "http://localhost:" + fixture.getPort();
         HttpClient client = new HttpClient();
+        setupAuthentication( client );
         
         PostMethod post = new PostMethod( url );
         

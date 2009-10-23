@@ -32,6 +32,7 @@ public class GETFixtureTest
         
         String url = "http://localhost:" + fixture.getPort();
         HttpClient client = new HttpClient();
+        setupAuthentication( client );
         
         GetMethod get = new GetMethod( url );
         

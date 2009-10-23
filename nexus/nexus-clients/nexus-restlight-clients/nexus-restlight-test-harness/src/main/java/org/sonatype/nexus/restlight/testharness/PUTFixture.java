@@ -1,16 +1,5 @@
 package org.sonatype.nexus.restlight.testharness;
 
-import java.io.IOException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -21,6 +10,17 @@ import org.jdom.output.XMLOutputter;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Request;
 import org.mortbay.jetty.handler.AbstractHandler;
+
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 public class PUTFixture
     extends AbstractRESTTestFixture
@@ -39,12 +39,17 @@ public class PUTFixture
 
     private Map<String, Set<String>> responseHeaders;
 
+    public PUTFixture( final String user, final String password )
+    {
+        super( user, password );
+    }
+
     public Document getRequestDocument()
     {
         return requestDocument;
     }
 
-    public void setRequestDocument( Document requestDocument )
+    public void setRequestDocument( final Document requestDocument )
     {
         this.requestDocument = requestDocument;
     }
@@ -54,7 +59,7 @@ public class PUTFixture
         return responseDocument;
     }
 
-    public void setResponseDocument( Document responseDocument )
+    public void setResponseDocument( final Document responseDocument )
     {
         this.responseDocument = responseDocument;
     }
@@ -64,7 +69,7 @@ public class PUTFixture
         return uriPattern;
     }
 
-    public void setUriPattern( String uriPattern )
+    public void setUriPattern( final String uriPattern )
     {
         this.uriPattern = uriPattern;
     }
@@ -74,7 +79,7 @@ public class PUTFixture
         return exactURI;
     }
 
-    public void setExactURI( String exactURI )
+    public void setExactURI( final String exactURI )
     {
         this.exactURI = exactURI;
     }
@@ -84,7 +89,7 @@ public class PUTFixture
         return strictHeaders;
     }
 
-    public void setStrictHeaders( boolean strictHeaders )
+    public void setStrictHeaders( final boolean strictHeaders )
     {
         this.strictHeaders = strictHeaders;
     }
@@ -94,7 +99,7 @@ public class PUTFixture
         return expectedRequestHeaders;
     }
 
-    public void setExpectedRequestHeaders( Map<String, Set<String>> expectedRequestHeaders )
+    public void setExpectedRequestHeaders( final Map<String, Set<String>> expectedRequestHeaders )
     {
         this.expectedRequestHeaders = expectedRequestHeaders;
     }
@@ -104,7 +109,7 @@ public class PUTFixture
         return responseHeaders;
     }
 
-    public void setResponseHeaders( Map<String, Set<String>> responseHeaders )
+    public void setResponseHeaders( final Map<String, Set<String>> responseHeaders )
     {
         this.responseHeaders = responseHeaders;
     }
@@ -205,7 +210,7 @@ public class PUTFixture
 
     public RESTTestFixture copy()
     {
-        PUTFixture fixture = new PUTFixture();
+        PUTFixture fixture = new PUTFixture( getAuthUser(), getAuthPassword() );
 
         fixture.setRequestDocument( getRequestDocument() );
         fixture.setExpectedRequestHeaders( getExpectedRequestHeaders() );

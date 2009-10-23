@@ -66,7 +66,7 @@ public class M2SettingsClientTest
         
         fixture.setConversation( conversation );
         
-        M2SettingsClient client = new M2SettingsClient( getBaseUrl(), "unused", "unused" );
+        M2SettingsClient client = new M2SettingsClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
         
         Document doc = client.getSettingsTemplate( token );
         
@@ -95,7 +95,7 @@ public class M2SettingsClientTest
         
         fixture.setConversation( conversation );
         
-        M2SettingsClient client = new M2SettingsClient( getBaseUrl(), "unused", "unused" );
+        M2SettingsClient client = new M2SettingsClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
         
         String url = getBaseUrl() + M2SettingsClient.SETTINGS_TEMPLATE_BASE + token + M2SettingsClient.GET_CONTENT_ACTION;
         Document doc = client.getSettingsTemplateAbsolute( url );

@@ -50,7 +50,7 @@ public class StageClientTest
     {
         setupOpenReposConversation();
 
-        StageClient client = new StageClient( getBaseUrl(), "testuser", "unused" );
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         List<StageRepository> repositories = client.getOpenStageRepositoriesForUser();
 
@@ -78,7 +78,7 @@ public class StageClientTest
     {
         setupOpenReposConversation();
 
-        StageClient client = new StageClient( getBaseUrl(), "testuser", "unused" );
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         StageRepository repo = client.getOpenStageRepositoryForUser( "group", "artifact", "version" );
 
@@ -118,7 +118,7 @@ public class StageClientTest
         
         fixture.getConversation().add( finishPost );
 
-        StageClient client = new StageClient( getBaseUrl(), "testuser", "unused" );
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         StageRepository repo = client.getOpenStageRepositoryForUser( "group", "artifact", "version" );
         
@@ -143,7 +143,7 @@ public class StageClientTest
     {
         setupClosedReposConversation();
 
-        StageClient client = new StageClient( getBaseUrl(), "testuser", "unused" );
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         List<StageRepository> repos = client.getClosedStageRepositoriesForUser( "group", "artifact", "version" );
 
@@ -170,7 +170,7 @@ public class StageClientTest
     {
         setupClosedReposConversation();
 
-        StageClient client = new StageClient( getBaseUrl(), "testuser", "unused" );
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         List<StageRepository> repos = client.getClosedStageRepositoriesForUser();
 

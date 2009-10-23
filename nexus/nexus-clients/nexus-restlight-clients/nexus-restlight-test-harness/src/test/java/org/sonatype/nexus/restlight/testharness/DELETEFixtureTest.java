@@ -2,8 +2,6 @@ package org.sonatype.nexus.restlight.testharness;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -15,10 +13,12 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class DELETEFixtureTest
     extends AbstractRESTTest
 {
-    DELETEFixture fixture = new DELETEFixture();
+    DELETEFixture fixture = new DELETEFixture( getExpectedUser(), getExpectedPassword() );
 
     @Override
     protected RESTTestFixture getTestFixture()
@@ -36,6 +36,7 @@ public class DELETEFixtureTest
         
         String url = "http://localhost:" + fixture.getPort();
         HttpClient client = new HttpClient();
+        setupAuthentication( client );
         
         DeleteMethod get = new DeleteMethod( url );
         

@@ -1,5 +1,14 @@
 package org.sonatype.nexus.restlight.testharness;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
+import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Request;
+import org.mortbay.jetty.handler.AbstractHandler;
+
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -10,15 +19,6 @@ import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.handler.AbstractHandler;
 
 public class DELETEFixture
     extends AbstractRESTTestFixture
@@ -36,12 +36,17 @@ public class DELETEFixture
 
     private Map<String, Set<String>> responseHeaders;
 
+    public DELETEFixture( final String user, final String password )
+    {
+        super( user, password );
+    }
+
     public Document getResponseDocument()
     {
         return responseDocument;
     }
 
-    public void setResponseDocument( Document responseDocument )
+    public void setResponseDocument( final Document responseDocument )
     {
         this.responseDocument = responseDocument;
     }
@@ -51,7 +56,7 @@ public class DELETEFixture
         return uriPattern;
     }
 
-    public void setUriPattern( String uriPattern )
+    public void setUriPattern( final String uriPattern )
     {
         this.uriPattern = uriPattern;
     }
@@ -61,7 +66,7 @@ public class DELETEFixture
         return exactURI;
     }
 
-    public void setExactURI( String exactURI )
+    public void setExactURI( final String exactURI )
     {
         this.exactURI = exactURI;
     }
@@ -71,7 +76,7 @@ public class DELETEFixture
         return strictHeaders;
     }
 
-    public void setStrictHeaders( boolean strictHeaders )
+    public void setStrictHeaders( final boolean strictHeaders )
     {
         this.strictHeaders = strictHeaders;
     }
@@ -81,7 +86,7 @@ public class DELETEFixture
         return expectedRequestHeaders;
     }
 
-    public void setExpectedRequestHeaders( Map<String, Set<String>> expectedRequestHeaders )
+    public void setExpectedRequestHeaders( final Map<String, Set<String>> expectedRequestHeaders )
     {
         this.expectedRequestHeaders = expectedRequestHeaders;
     }
@@ -91,7 +96,7 @@ public class DELETEFixture
         return responseHeaders;
     }
 
-    public void setResponseHeaders( Map<String, Set<String>> responseHeaders )
+    public void setResponseHeaders( final Map<String, Set<String>> responseHeaders )
     {
         this.responseHeaders = responseHeaders;
     }

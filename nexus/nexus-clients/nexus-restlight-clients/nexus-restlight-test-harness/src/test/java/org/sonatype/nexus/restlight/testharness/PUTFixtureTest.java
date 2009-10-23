@@ -2,8 +2,6 @@ package org.sonatype.nexus.restlight.testharness;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
@@ -13,11 +11,13 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.junit.Test;
 
+import javax.servlet.http.HttpServletResponse;
+
 public class PUTFixtureTest
     extends AbstractRESTTest
 {
 
-    private PUTFixture fixture = new PUTFixture();
+    private final PUTFixture fixture = new PUTFixture( getExpectedUser(), getExpectedPassword() );
 
     @Override
     protected RESTTestFixture getTestFixture()
@@ -36,6 +36,7 @@ public class PUTFixtureTest
         String url = "http://localhost:" + fixture.getPort();
 
         HttpClient client = new HttpClient();
+        setupAuthentication( client );
 
         PutMethod put = new PutMethod( url );
 
