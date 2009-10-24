@@ -79,6 +79,44 @@ public class UserPRTest
         resource.get( null, this.buildRequest(), null, null );
     }
 
+    public void testUserIdWithSpace()
+    throws Exception
+    {
+    
+        PlexusResource resource = this.lookup( PlexusResource.class, "UserListPlexusResource" );
+    
+        UserResourceRequest resourceRequest = new UserResourceRequest();
+        UserResource userResource = new UserResource();
+        resourceRequest.setData( userResource );
+        userResource.setEmail( "testUserIdWithSpace@testUserIdWithSpace.com" );
+        userResource.setName( "testUserIdWithSpace" );
+        userResource.setStatus( "active" );
+        userResource.setUserId( "test User Id With Space" );
+        userResource.addRole( "admin" );
+    
+        try
+        {
+    
+            resource.post( null, this.buildRequest(), null, resourceRequest );
+            Assert.fail( "expected PlexusResourceException" );
+        }
+        catch ( PlexusResourceException e )
+        {
+            ErrorResponse errorResponse = (ErrorResponse) e.getResultObject();
+            ErrorMessage errorMessage = (ErrorMessage) errorResponse.getErrors().get( 0 );
+            Assert.assertTrue( errorMessage.getId().contains( "userId" ) );
+        }
+    
+        // fix it
+        userResource.setUserId( "testUserIdWithSpace" );
+        resource.post( null, this.buildRequest(), null, resourceRequest );
+        
+        // NOTE: update not supported
+        
+    }
+    
+    
+    
     public void testUpdateUserValidation()
         throws Exception
     {

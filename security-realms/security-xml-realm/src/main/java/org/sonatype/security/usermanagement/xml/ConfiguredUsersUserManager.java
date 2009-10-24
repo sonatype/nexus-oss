@@ -79,7 +79,9 @@ public class ConfiguredUsersUserManager
             catch ( UserNotFoundException e )
             {
                 this.logger.warn( "User: '" + userRoleMapping.getUserId() + "' of source: '"
-                    + userRoleMapping.getSource() + "' could not be found.", e );
+                    + userRoleMapping.getSource() + "' could not be found." );
+                
+                this.logger.debug( "Most likely caused by a user role mapping that is invalid.", e );
             }
             catch ( NoSuchUserManagerException e )
             {

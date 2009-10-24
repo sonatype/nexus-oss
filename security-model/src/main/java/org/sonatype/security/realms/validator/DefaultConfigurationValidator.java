@@ -430,6 +430,14 @@ public class DefaultConfigurationValidator
 
             response.addValidationError( message );
         }
+        
+        if ( StringUtils.isNotEmpty( user.getId() ) && user.getId().contains( " " ) )
+        {
+            ValidationMessage message = new ValidationMessage( "userId", "User ID '" + user.getId()
+                + "' cannot contain spaces.", "User ID '" + user.getId() + "' cannot contain spaces." );
+
+            response.addValidationError( message );
+        }
 
         if ( StringUtils.isEmpty( user.getName() ) )
         {
