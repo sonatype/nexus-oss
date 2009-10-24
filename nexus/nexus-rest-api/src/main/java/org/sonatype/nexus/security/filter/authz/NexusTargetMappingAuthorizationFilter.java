@@ -67,12 +67,12 @@ public class NexusTargetMappingAuthorizationFilter
                 // TODO: hardcoded currently
                 if ( path.contains( "@1" ) )
                 {
-                    path = path.replaceAll( "@1", m.group( 1 ) );
+                    path = path.replaceAll( "@1", Matcher.quoteReplacement(  m.group( 1 ) ) );
                 }
 
                 if ( path.contains( "@2" ) )
                 {
-                    path = path.replaceAll( "@2", m.group( 2 ) );
+                    path = path.replaceAll( "@2", Matcher.quoteReplacement( m.group( 2 ) ) );
                 }
                 // and so on... this will be reworked to be dynamic
             }
