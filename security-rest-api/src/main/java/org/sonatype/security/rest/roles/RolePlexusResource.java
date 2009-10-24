@@ -12,6 +12,11 @@
  */
 package org.sonatype.security.rest.roles;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
+
+import org.apache.commons.codec.StringDecoder;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -65,7 +70,17 @@ public class RolePlexusResource
 
     protected String getRoleId( Request request )
     {
-        return request.getAttributes().get( ROLE_ID_KEY ).toString();
+        String value = request.getAttributes().get( ROLE_ID_KEY ).toString();
+        try
+        {
+            value = URLDecoder.decode( value, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            this.getLogger().warn( "Failed to decode URL attribute.", e );
+        }
+        
+        return value;
     }
 
     @Override
