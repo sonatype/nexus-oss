@@ -608,7 +608,8 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
       name: 'userId',
       disabled: ! this.isNew,
       allowBlank: false,
-      width: this.COMBO_WIDTH
+      width: this.COMBO_WIDTH,
+      validator: Sonatype.utils.validateNoSpaces
     },
     {
       xtype: 'textfield',

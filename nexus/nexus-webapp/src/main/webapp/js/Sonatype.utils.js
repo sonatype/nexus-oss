@@ -57,6 +57,15 @@ Sonatype.utils = {
     }
   },
 
+  validateNoSpaces: function( value ) {
+    if ( value 
+        && value.indexOf( ' ' ) != -1 ) {
+      return 'Spaces are not allowed in ID';
+    }
+    
+    return true;
+  },
+
   validateId: function( value ) {
   	var idPattern = /^[a-zA-Z0-9_\-\.]+$/;
   	if ( idPattern.test(value) ) {

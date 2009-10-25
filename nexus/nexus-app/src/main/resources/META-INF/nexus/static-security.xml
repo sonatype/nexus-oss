@@ -42,7 +42,6 @@
             <roles>
                 <role>ui-repo-browser</role>
                 <role>ui-search</role>
-                <role>ui-system-feeds</role>
             </roles>
         </role>
         <role>

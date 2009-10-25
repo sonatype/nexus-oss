@@ -33,6 +33,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
+import org.mortbay.jetty.EofException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
@@ -228,7 +229,7 @@ public class DefaultErrorReportingManager
     {
         getLogger().error( "Detected Error in Nexus", request.getThrowable() );
         
-        if ( isEnabled() && shouldHandleReport( request ) )
+        if ( isEnabled() && !shouldIgnore( request.getThrowable() ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( request );
             
@@ -641,5 +642,25 @@ public class DefaultErrorReportingManager
     public String getName()
     {
         return "Error Report Settings";
+    }
+    
+    protected boolean shouldIgnore( Throwable throwable )
+    {
+        if ( throwable != null )
+        {
+            if ( throwable instanceof EofException )
+            {
+                return true;
+}
+            else if ( throwable.getMessage() != null 
+                && ( throwable.getMessage().contains( "An exception occured writing the response entity" ) 
+                || throwable.getMessage().contains( "Error while handling an HTTP server call" ) ) )
+            {
+                return true;
+            }
+        }
+        
+        return false;
+        
     }
 }
