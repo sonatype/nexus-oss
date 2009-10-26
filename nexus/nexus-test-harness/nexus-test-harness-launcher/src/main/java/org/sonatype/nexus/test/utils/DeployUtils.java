@@ -47,8 +47,7 @@ public class DeployUtils
 
     public static void deployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
                                         File fileToDeploy, String artifactPath )
-        throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
-        ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
+        throws Exception
     {
         TestContext testContext = TestContainer.getInstance().getTestContext();
         if ( testContext.isSecureTest() )

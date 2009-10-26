@@ -36,6 +36,8 @@ public class MavenDeployer
         File mavenProjectDir = new File( "target" );
         mavenProjectDir.mkdirs();
 
+        System.setProperty( "maven.home", TestProperties.getString( "maven-basedir" ) );
+
         Verifier verifier = new Verifier( mavenProjectDir.getAbsolutePath(), false );
 
         String logname = "logs/maven-deploy/" + gav.getGroupId() + "/" + fileToDeploy.getName() + ".log";
