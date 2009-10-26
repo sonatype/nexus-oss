@@ -765,6 +765,7 @@ public class AbstractNexusIntegrationTest
         return GavUtil.getRelitiveArtifactPath( groupId, artifactId, version, extension, classifier );
     }
 
+    @SuppressWarnings( "deprecation" )
     protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
         throws IOException
     {
@@ -782,6 +783,10 @@ public class AbstractNexusIntegrationTest
                 + gav.getArtifactId() + "&v=" + gav.getVersion();
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
+        if ( status.isError() )
+        {
+            throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
+        }
         Assert.assertEquals( "Snapshot download should redirect to a new file\n "
             + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
                              status.getCode() );
