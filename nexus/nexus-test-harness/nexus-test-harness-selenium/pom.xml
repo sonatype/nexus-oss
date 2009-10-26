@@ -54,6 +54,11 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>selenium-grid-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>failsafe-maven-plugin</artifactId>
         <version>2.4.3-alpha-1</version>
@@ -79,11 +84,11 @@
             </property>
             <property>
               <name>seleniumServer</name>
-              <value>${seleniumServer}</value>
+              <value>${remote-selenium-url}</value>
             </property>
             <property>
               <name>seleniumBrowser</name>
-              <value>${seleniumBrowser}</value>
+              <value>${selenium.environment}</value>
             </property>
           </systemProperties>
           <properties>
@@ -344,7 +349,7 @@
     <profile>
       <activation>
         <property>
-          <name>!use-remote-selenium</name>
+          <name>!remote-selenium-url</name>
         </property>
       </activation>
       <build>
@@ -352,11 +357,11 @@
           <plugin>
             <groupId>org.sonatype.maven.plugin</groupId>
             <artifactId>selenium-grid-maven-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
             <executions>
               <execution>
                 <goals>
                   <goal>start-grid</goal>
+                  <goal>test-grid</goal>
                   <goal>stop-grid</goal>
                 </goals>
               </execution>
