@@ -61,6 +61,9 @@ public class Maven2ProxyRepositoryTemplate
         repo.setNotFoundCacheTTL( 1440 );
         exConf.setArtifactMaxAge( -1 );
 
+        repo.setIndexable( true );
+        repo.setSearchable( true );
+
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(
                                               getTemplateProvider().getApplicationConfiguration(),

@@ -53,6 +53,8 @@ public class Maven2HostedRepositoryTemplate
 
         repo.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
         repo.setNotFoundCacheTTL( 1440 );
+        repo.setIndexable( true );
+        repo.setSearchable( true );
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(
