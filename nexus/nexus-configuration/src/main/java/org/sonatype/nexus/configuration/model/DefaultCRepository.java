@@ -23,5 +23,6 @@ public class DefaultCRepository
         setBrowseable( true );
         setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE_ONCE.name() );
         setIndexable( true );
+        setSearchable( true );
     }
 }
