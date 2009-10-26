@@ -457,7 +457,9 @@ public abstract class LayoutConverterShadowRepository
 
         if ( shadowPath != null )
         {
-            ResourceStoreRequest request = new ResourceStoreRequest( item );
+            ResourceStoreRequest request = new ResourceStoreRequest( shadowPath );
+
+            request.getRequestContext().putAll( item.getItemContext() );
 
             deleteItem( false, request );
         }

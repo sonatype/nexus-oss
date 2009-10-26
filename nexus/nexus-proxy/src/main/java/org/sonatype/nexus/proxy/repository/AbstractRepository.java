@@ -1148,7 +1148,7 @@ public abstract class AbstractRepository
 
         // check for writing to read only repo
         // Readonly is ALWAYS read only
-        if ( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && !action.isReadAction() )
+        if ( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && !isActionAllowedReadOnly( action ) )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is Read Only, but action was '" + action.toString() + "'!" );
@@ -1249,4 +1249,9 @@ public abstract class AbstractRepository
 
         return localItem;
     }
+    
+    protected boolean isActionAllowedReadOnly( Action action )
+    {
+        return action.isReadAction();
+}
 }
