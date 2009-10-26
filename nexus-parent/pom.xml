@@ -22,7 +22,7 @@
     <jetty.version>6.1.19</jetty.version>
     <plexus-utils.version>1.5.5</plexus-utils.version>
     <plexus-container.version>1.2.1.4</plexus-container.version>
-	<plexus.version>1.2.1</plexus.version>
+    <plexus.version>1.2.1</plexus.version>
   </properties>
 
   <dependencyManagement>
@@ -167,6 +167,18 @@
           <configuration>
             <useJava5>true</useJava5>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>net.sf.alchim</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>0.7.1</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.codehaus.plexus</groupId>
+              <artifactId>plexus-utils</artifactId>
+              <version>2.0.1</version>
+            </dependency>
+          </dependencies>
         </plugin>
       </plugins>
     </pluginManagement>
