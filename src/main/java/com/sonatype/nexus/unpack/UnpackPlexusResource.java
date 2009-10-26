@@ -52,7 +52,7 @@ import com.sonatype.license.feature.PlexusFeature;
 import com.sonatype.nexus.licensing.NexusLicensingManager;
 
 @Component( role = PlexusResource.class, hint = "UnpackPlexusResource" )
-public class UnpackResource
+public class UnpackPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
 
@@ -62,7 +62,7 @@ public class UnpackResource
     @Requirement( role = PlexusFeature.class, hint = "NexusProfessional" )
     private PlexusFeature feature;
 
-    public UnpackResource()
+    public UnpackPlexusResource()
     {
         this.setModifiable( true );
     }
@@ -76,7 +76,8 @@ public class UnpackResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( "/repositories/*/content-compressed/**", "authcBasic,trperms" );
+        return new PathProtectionDescriptor( "/repositories/*/content-compressed/**",
+                                             "contentAuthcBasic,perms[nexus:contentcompressed]" );
     }
 
     @Override

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default nexus security configuration -->
+<!-- used as default config source -->
+<security>
+    <version>2.0.1</version>
+    <roles>
+        <role>
+            <id>unpack</id>
+            <name>Unpack</name>
+            <description>Gives access to deploy compressed bundles onto Nexus</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>content-compressed</privilege>
+            </privileges>
+        </role>
+    </roles>
+    <privileges>
+        <privilege>
+            <id>content-compressed</id>
+            <type>method</type>
+            <name>Unpack</name>
+            <description>Gives access to deploy compressed bundles onto Nexus</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>create,update,delete,read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:contentcompressed</value>
+                </property>
+            </properties>
+        </privilege>
+    </privileges>
+</security>
