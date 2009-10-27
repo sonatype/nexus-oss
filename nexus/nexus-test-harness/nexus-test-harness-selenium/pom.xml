@@ -361,7 +361,6 @@
               <execution>
                 <goals>
                   <goal>start-grid</goal>
-                  <goal>test-grid</goal>
                   <goal>stop-grid</goal>
                 </goals>
               </execution>
