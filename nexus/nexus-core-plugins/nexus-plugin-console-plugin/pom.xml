@@ -58,6 +58,21 @@
 			<artifactId>plexus-container-default</artifactId>
 			<scope>provided</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-test-harness-launcher</artifactId>
+			<scope>test</scope>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -116,7 +131,7 @@
 						<artifactId>app-lifecycle-nexus</artifactId>
 						<version>1.1-SNAPSHOT</version>
 					</dependency>
-				</dependencies>				
+				</dependencies>
 			</plugin>
 
 			<plugin>
@@ -164,6 +179,28 @@
 						</aggregation>
 					</aggregations>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-test-environment-maven-plugin</artifactId>
+				<version>1.2-SNAPSHOT</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>setup-nexus-plugin-environment</goal>
+							<goal>package</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<nexusVersion>${project.version}</nexusVersion>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>failsafe-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>
