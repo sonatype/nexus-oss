@@ -229,7 +229,9 @@ public class DefaultErrorReportingManager
     {
         getLogger().error( "Detected Error in Nexus", request.getThrowable() );
         
-        if ( isEnabled() && !shouldIgnore( request.getThrowable() ) )
+        if ( isEnabled()
+            && shouldHandleReport( request )
+            && !shouldIgnore( request.getThrowable() ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( request );
             
