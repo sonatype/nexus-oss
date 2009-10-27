@@ -23,6 +23,7 @@ Sonatype.repoServer.ArtifactContainer = function(config){
     height: 160,
     minHeight: 100,
     maxHeight: 400,
+    split: true,
     layoutOnTabChange: true
   });
   
