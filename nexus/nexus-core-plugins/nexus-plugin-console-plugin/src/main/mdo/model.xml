@@ -65,7 +65,14 @@
 					<description>The scm timestamp of the plugin.</description>
 					<type>String</type>
 					<required>false</required>				
-				</field>				
+				</field>		
+                <field>
+                    <name>site</name>
+                    <version>1.0.0+</version>
+                    <description>The site of the plugin.</description>
+                    <type>String</type>
+                    <required>false</required>
+                </field>		
 			</fields>
 		</class>
 	</classes>

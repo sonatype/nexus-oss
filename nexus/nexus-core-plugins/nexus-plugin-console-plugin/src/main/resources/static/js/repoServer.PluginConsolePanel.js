@@ -29,8 +29,8 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
       width: 100
     },
     { name: 'scmVersion' },
-    { name: 'scmTimestamp' },
-    { name: 'failureReason' }
+    { name: 'failureReason' },
+    { name: 'site'}
     ],
     rowClickEvent: 'pluginInfoInit'
   });
@@ -41,12 +41,15 @@ Ext.extend( Sonatype.repoServer.PluginConsolePanel, Sonatype.panels.GridViewer, 
 } );
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
-  nexusPanel.add( {
-    enabled: true,
-    sectionId: 'st-nexus-config',
-    title: 'Plugin Console',
-    tabId: 'plugin_console',
-    tabTitle: 'Plugin Console',
-    tabCode: Sonatype.repoServer.PluginConsolePanel
-  } );
+  var sp = Sonatype.lib.Permissions;
+  if ( sp.checkPermission( 'nexus:pluginconsoleplugininfos', sp.READ) ){
+    nexusPanel.add( {
+      enabled: true,
+      sectionId: 'st-nexus-config',
+      title: 'Plugin Console',
+      tabId: 'plugin_console',
+      tabTitle: 'Plugin Console',
+      tabCode: Sonatype.repoServer.PluginConsolePanel
+    } );
+  }
 } );

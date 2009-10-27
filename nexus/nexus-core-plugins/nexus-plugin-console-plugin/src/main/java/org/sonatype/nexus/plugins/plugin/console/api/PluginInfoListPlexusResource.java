@@ -85,14 +85,14 @@ public class PluginInfoListPlexusResource
         PluginInfoDTO result = new PluginInfoDTO();
 
         result.setName( pluginInfo.getName() );
-        result.setDescription( pluginInfo.getDescription() );
         result.setStatus( pluginInfo.getStatus() );
         result.setVersion( pluginInfo.getVersion() );
+        result
+            .setDescription( StringUtils.isEmpty( pluginInfo.getDescription() ) ? "N/A" : pluginInfo.getDescription() );
         result.setScmVersion( StringUtils.isEmpty( pluginInfo.getScmVersion() ) ? "N/A" : pluginInfo.getScmVersion() );
-        result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A" : pluginInfo
-            .getScmTimestamp() );
+        result.setSite( StringUtils.isEmpty( pluginInfo.getSite() ) ? "N/A" : pluginInfo.getSite() );
         result.setFailureReason( pluginInfo.getFailureReason() );
-
+        
         return result;
     }
 

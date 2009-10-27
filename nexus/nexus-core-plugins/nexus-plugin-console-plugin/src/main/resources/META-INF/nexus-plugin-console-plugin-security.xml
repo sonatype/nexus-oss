@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<security>
+
+  <version>2.0.3</version>
+  
+  <roles>
+    <role>
+      <id>ui-plugin-console</id>
+      <name>UI: Plugin Console</name>
+      <description>Gives access to the Plugin Console screen in Nexus UI.</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>plugin-infos-read</privilege>
+      </privileges>
+    </role>
+  </roles>
+  
+  <privileges>
+    <privilege>
+      <id>plugin-infos-read</id>
+      <type>method</type>
+      <name>Plugin Infos: Read</name>
+      <description>Give permission to read plugins' information.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:pluginconsoleplugininfos</value>
+        </property>
+      </properties>
+    </privilege>
+  </privileges>
+  
+</security>

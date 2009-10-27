@@ -16,8 +16,18 @@ public class PluginInfoDTO
     private String failureReason;
 
     private String scmVersion;
+    
+    private String site;
 
-    private String scmTimestamp;
+    public String getSite()
+    {
+        return site;
+    }
+
+    public void setSite( String site )
+    {
+        this.site = site;
+    }
 
     public String getFailureReason()
     {
@@ -78,15 +88,4 @@ public class PluginInfoDTO
     {
         this.scmVersion = scmVersion;
     }
-
-    public String getScmTimestamp()
-    {
-        return scmTimestamp;
-    }
-
-    public void setScmTimestamp( String scmTimestamp )
-    {
-        this.scmTimestamp = scmTimestamp;
-    }
-
 }
