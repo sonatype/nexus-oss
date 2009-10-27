@@ -35,7 +35,7 @@
 			[filters]
 			authcBasic = org.sonatype.nexus.security.filter.authc.NexusSecureHttpAuthenticationFilter
 			authcBasic.applicationName = Sonatype Nexus Repository Manager API
-			authcBasic.fakeAuthScheme = true
+			authcBasic.fakeAuthScheme = false
 
 			logout = org.sonatype.nexus.security.filter.authc.LogoutAuthenticationFilter
 
