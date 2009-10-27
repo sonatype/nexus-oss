@@ -80,7 +80,7 @@
           <systemProperties>
             <property>
               <name>seleniumPort</name>
-              <value>${seleniumPort}</value>
+              <value>${selenium.hubPort}</value>
             </property>
             <property>
               <name>seleniumServer</name>
