@@ -102,11 +102,6 @@
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
 
-            <!-- The following tests are executed on a forked process, check 'forked-ITs' profile  -->
-            <exclude>**/Nexus142UserPermissionTests.*</exclude>
-            <exclude>**/Nexus538SystemFeeds.*</exclude>
-            <exclude>**/Nexus2351DisableRedeployUploadTest.*</exclude>
-            <exclude>**/Nexus532*.*</exclude>
           </excludes>
         </configuration>
       </plugin>
@@ -312,105 +307,6 @@
             <configuration>
               <skip>true</skip>
             </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>forked-ITs</id>
-      <activation>
-        <property>
-          <name>!it.test</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>failsafe-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>nexus538</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <forkMode>always</forkMode>
-                  <includes>
-                    <include>Nexus538SystemFeedsIT</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**Suite*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>nexus142</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <forkMode>always</forkMode>
-                  <includes>
-                    <include>Nexus142UserPermissionIT</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**Suite*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>nexus2351</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <forkMode>always</forkMode>
-                  <includes>
-                    <include>Nexus2351DisableRedeployUploadIT</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**Suite*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>Nexus532GroupCrudPermissionIT</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <forkMode>always</forkMode>
-                  <includes>
-                    <include>Nexus532GroupCrudPermissionIT</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**Suite*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>Nexus532GroupsCrudXmlIT</id>
-                <goals>
-                  <goal>integration-test</goal>
-                </goals>
-                <configuration>
-                  <forkMode>always</forkMode>
-                  <includes>
-                    <include>Nexus532GroupsCrudXmlIT</include>
-                  </includes>
-                  <excludes>
-                    <exclude>**Suite*</exclude>
-                  </excludes>
-                </configuration>
-              </execution>
-              <execution>
-                <id>verify</id>
-                <goals>
-                  <goal>verify</goal>
-                </goals>
-              </execution>
-            </executions>
           </plugin>
         </plugins>
       </build>
