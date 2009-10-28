@@ -89,6 +89,7 @@
     </developer>
   </developers>
   <dependencies>
+    <!-- NOTE: These MUST BE at the top, or we get NoSuchFieldException in the Xerces bundled with the JDK during testing... -->
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-test-harness</artifactId>
@@ -101,6 +102,7 @@
       <version>1.0</version>
       <scope>test</scope>
     </dependency>
+    <!-- end of required ordering... -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
