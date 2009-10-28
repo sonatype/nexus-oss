@@ -28,10 +28,20 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
+import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
+import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
 public abstract class AbstractNexusMojo
     extends AbstractMojo
 {
+
+    /**
+     * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin. If missing, the mojo will
+     * prompt for this value.
+     * 
+     * @parameter expression="${nexusUrl}"
+     */
+    private String nexusUrl;
 
     /**
      * @component
@@ -80,6 +90,21 @@ public abstract class AbstractNexusMojo
 
     protected AbstractNexusMojo()
     {
+    }
+
+    protected String getNexusBaseUrl()
+    {
+        return nexusUrl;
+    }
+
+    public String getNexusUrl()
+    {
+        return nexusUrl;
+    }
+
+    public void setNexusUrl( final String nexusUrl )
+    {
+        this.nexusUrl = nexusUrl;
     }
 
     public Prompter getPrompter()
@@ -140,6 +165,24 @@ public abstract class AbstractNexusMojo
     public void setVerboseDebug( final boolean verboseDebug )
     {
         this.verboseDebug = verboseDebug;
+    }
+
+    protected abstract AbstractRESTLightClient connect()
+        throws RESTLightClientException, MojoExecutionException;
+
+    protected String formatUrl( final String url )
+    {
+        if ( url == null )
+        {
+            return null;
+        }
+
+        if ( url.length() < 1 )
+        {
+            return url;
+        }
+
+        return url.endsWith( "/" ) ? url.substring( 0, url.length() - 1 ) : url;
     }
 
     protected void initLog4j()

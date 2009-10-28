@@ -62,6 +62,14 @@ public class DownloadSettingsTemplateMojo
 {
 
     /**
+     * The ID of the template to download. For instance, a templateId of 'sonatype' will download from
+     * '${nexusUrl}/service/local/templates/settings/sonatype/content'.
+     * 
+     * @parameter expression="${settings.templateId}" default-value="default"
+     */
+    private String templateId;
+
+    /**
      * The full URL of a settings template available from a particular Nexus Professional instance. If missing, the mojo
      * will prompt for this value.
      * 
@@ -126,12 +134,23 @@ public class DownloadSettingsTemplateMojo
      */
     private File mavenUserConf;
 
+    private M2SettingsClient client;
+
     public void execute()
     throws MojoExecutionException
     {
         fillMissing();
 
         initLog4j();
+
+        try
+        {
+            connect();
+        }
+        catch ( RESTLightClientException e )
+        {
+            throw new MojoExecutionException( "Failed to start REST client.", e );
+        }
 
         Document settingsDoc = downloadSettings();
 
@@ -214,38 +233,63 @@ public class DownloadSettingsTemplateMojo
         getLog().info( "Settings saved to: " + f.getAbsolutePath() );
     }
 
-    private Document downloadSettings()
-    throws MojoExecutionException
+    @Override
+    protected synchronized M2SettingsClient connect()
+        throws RESTLightClientException, MojoExecutionException
     {
-        String baseUrl;
+        String url = formatUrl( getNexusBaseUrl() );
 
-        int svcIdx = url.indexOf( "/service" );
-        if ( svcIdx < 0 )
+        getLog().info( "Logging into Nexus: " + url );
+        getLog().info( "User: " + getUsername() );
+
+        client = new M2SettingsClient( url, getUsername(), getPassword() );
+        return client;
+    }
+
+    @Override
+    public String getNexusBaseUrl()
+    {
+        String nexusUrl = super.getNexusUrl();
+        if ( nexusUrl == null && url != null )
         {
-            throw new MojoExecutionException( "Cannot find Nexus base-URL from: " + url );
+            int svcIdx = url.indexOf( "/service" );
+            if ( svcIdx > -1 )
+            {
+                nexusUrl = url.substring( 0, svcIdx );
+            }
+
+            setNexusUrl( nexusUrl );
+        }
+
+        return nexusUrl;
+    }
+
+    private Document downloadSettings()
+        throws MojoExecutionException
+    {
+        if ( url != null )
+        {
+            try
+            {
+                return client.getSettingsTemplateAbsolute( url );
+            }
+            catch ( RESTLightClientException e )
+            {
+                throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from URL: " + url
+                    + "\n(Reason: " + e.getMessage() + ")", e );
+            }
         }
         else
         {
-            baseUrl = url.substring( 0, svcIdx );
-        }
-
-        M2SettingsClient client;
-        try
-        {
-            client = new M2SettingsClient( baseUrl, getUsername(), getPassword() );
-        }
-        catch ( RESTLightClientException e )
-        {
-            throw new MojoExecutionException( "Failed to start REST client: " + e.getMessage(), e );
-        }
-
-        try
-        {
-            return client.getSettingsTemplateAbsolute( url );
-        }
-        catch ( RESTLightClientException e )
-        {
-            throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from: " + url + "\n(Reason: " + e.getMessage() + ")" , e );
+            try
+            {
+                return client.getSettingsTemplate( templateId );
+            }
+            catch ( RESTLightClientException e )
+            {
+                throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from template: " + templateId
+                    + "\n(Reason: " + e.getMessage() + ")", e );
+            }
         }
     }
 

@@ -33,14 +33,6 @@ public abstract class AbstractStagingMojo
     extends AbstractNexusMojo
 {
 
-    /**
-     * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin. If missing, the mojo will
-     * prompt for this value.
-     * 
-     * @parameter expression="${nexusUrl}"
-     */
-    private String nexusUrl;
-
     private StageClient client;
 
     public AbstractStagingMojo()
@@ -48,46 +40,22 @@ public abstract class AbstractStagingMojo
         super();
     }
 
-    public String getNexusUrl()
-    {
-        return nexusUrl;
-    }
-
-    public void setNexusUrl( final String nexusUrl )
-    {
-        this.nexusUrl = nexusUrl;
-    }
-
-    protected synchronized void connect()
+    @Override
+    protected synchronized StageClient connect()
         throws RESTLightClientException
     {
-        String url = formatUrl( getNexusUrl() );
+        String url = formatUrl( getNexusBaseUrl() );
 
         getLog().info( "Logging into Nexus: " + url );
         getLog().info( "User: " + getUsername() );
 
         client = new StageClient( url, getUsername(), getPassword() );
-    }
-
-    protected String formatUrl( final String url )
-    {
-        if ( url == null )
-        {
-            return null;
-        }
-
-        if ( url.length() < 1 )
-        {
-            return url;
-        }
-
-        return url.endsWith( "/" ) ? url.substring( 0, url.length() - 1 ) : url;
+        return client;
     }
 
     protected StageClient getClient()
         throws MojoExecutionException
     {
-
         if ( client == null )
         {
             try
@@ -182,7 +150,7 @@ public abstract class AbstractStagingMojo
     {
         super.fillMissing();
 
-        if ( getNexusUrl() == null && getServerAuthId() != null && getSettings() != null )
+        if ( getNexusBaseUrl() == null && getServerAuthId() != null && getSettings() != null )
         {
             List<Mirror> mirrors = getSettings().getMirrors();
             if ( mirrors != null && !mirrors.isEmpty() )
