@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugins.plugin.console.ui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +19,24 @@ public class PluginConsoleNexusResourceBundle
     {
         List<StaticResource> result = new ArrayList<StaticResource>();
 
-        DefaultStaticResource resource = new DefaultStaticResource(
-            getClass().getResource( "/static/js/nexus-plugin-console-plugin-all.js" ),
-            "/js/repoServer/nexus-plugin-console-plugin-all.js",
-            "application/x-javascript" );
-        result.add( resource );
+        /*
+         * DefaultStaticResource resource = new DefaultStaticResource( getClass().getResource(
+         * "/static/js/nexus-plugin-console-plugin-all.js" ), "/js/repoServer/nexus-plugin-console-plugin-all.js",
+         * "application/x-javascript" ); result.add( resource );
+         */
+        DefaultStaticResource resource = null;
+
+        try
+        {
+            resource = new DefaultStaticResource( new File( "/home/juven/js/nexus-plugin-console-plugin-all.js" )
+                .toURL(), "/js/repoServer/nexus-plugin-console-plugin-all.js", "application/x-javascript" );
+
+            result.add( resource );
+        }
+        catch ( Exception e )
+        {
+            e.printStackTrace();
+        }
 
         return result;
     }

@@ -87,13 +87,13 @@ public class PluginInfoListPlexusResource
         result.setName( pluginInfo.getName() );
         result.setStatus( pluginInfo.getStatus() );
         result.setVersion( pluginInfo.getVersion() );
-        result
-            .setDescription( StringUtils.isEmpty( pluginInfo.getDescription() ) ? "N/A" : pluginInfo.getDescription() );
+        result.setDescription( pluginInfo.getDescription() );
+        result.setSite( pluginInfo.getSite() );
         result.setScmVersion( StringUtils.isEmpty( pluginInfo.getScmVersion() ) ? "N/A" : pluginInfo.getScmVersion() );
-        result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A" : pluginInfo.getScmTimestamp() );
-        result.setSite( StringUtils.isEmpty( pluginInfo.getSite() ) ? "N/A" : pluginInfo.getSite() );
+        result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A" : pluginInfo
+            .getScmTimestamp() );
         result.setFailureReason( pluginInfo.getFailureReason() );
-        
+
         return result;
     }
 
