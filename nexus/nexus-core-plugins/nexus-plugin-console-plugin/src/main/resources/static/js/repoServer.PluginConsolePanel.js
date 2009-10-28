@@ -29,6 +29,7 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
       width: 100
     },
     { name: 'scmVersion' },
+    { name: 'scmTimestamp' },
     { name: 'failureReason' },
     { name: 'site'}
     ],

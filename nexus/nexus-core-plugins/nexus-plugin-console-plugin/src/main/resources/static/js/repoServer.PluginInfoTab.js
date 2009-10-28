@@ -41,8 +41,15 @@ Sonatype.repoServer.PluginInfoTab = function( config ) {
       name: 'scmVersion',
       readOnly: true,
       width: '320',
-      helpText: 'The SCM version of the plugin.'
+      helpText: 'The SCM last changed version of the plugin.'
     },
+    { xtype: 'textfield',
+      fieldLabel: 'SCM Timestamp',
+      name: 'scmTimestamp',
+      readOnly: true,
+      width: '320',
+      helpText: 'The SCM last changed timestamp of the plugin.'
+    },    
     {
       xtype: 'textfield',
       fieldLabel: 'Site',
@@ -63,6 +70,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Sonatype.ext.FormPanel, {
       this.find('name', 'version')[0].setValue( this.payload.data.version );
       this.find('name', 'status')[0].setValue( this.payload.data.status );
       this.find('name', 'scmVersion')[0].setValue( this.payload.data.scmVersion );
+      this.find('name', 'scmTimestamp')[0].setValue( this.payload.data.scmTimestamp );
       this.find('name', 'site')[0].setValue( this.payload.data.site );
       
       var failureReason = this.payload.data.failureReason;

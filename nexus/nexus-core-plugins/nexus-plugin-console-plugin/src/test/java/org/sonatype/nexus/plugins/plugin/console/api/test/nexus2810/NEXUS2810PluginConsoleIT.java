@@ -47,6 +47,7 @@ public class NEXUS2810PluginConsoleIT
         assertPropertyValid( "Description", activatedPluginInfo.getDescription(), "Nexus Core Plugin :: Plugin Console" );
         assertPropertyValid( "Status", activatedPluginInfo.getStatus(), "ACTIVATED" );
         assertPropertyValid( "SCM Version", activatedPluginInfo.getScmVersion() );
+        assertPropertyValid( "SCM Timestamp", activatedPluginInfo.getScmTimestamp() );
         assertPropertyValid( "Site", activatedPluginInfo.getSite() );
         Assert.assertTrue( StringUtils.isEmpty( activatedPluginInfo.getFailureReason() ) );
 
@@ -57,6 +58,7 @@ public class NEXUS2810PluginConsoleIT
         assertPropertyValid( "Status", brokenPluginInfo.getStatus(), "BROKEN" );
         Assert.assertEquals( "N/A", brokenPluginInfo.getDescription() );
         Assert.assertEquals( "N/A", brokenPluginInfo.getScmVersion() );
+        Assert.assertEquals( "N/A", brokenPluginInfo.getScmTimestamp() );
         Assert.assertEquals( "N/A", brokenPluginInfo.getSite() );
         Assert.assertFalse( StringUtils.isEmpty( brokenPluginInfo.getFailureReason() ) );
     }

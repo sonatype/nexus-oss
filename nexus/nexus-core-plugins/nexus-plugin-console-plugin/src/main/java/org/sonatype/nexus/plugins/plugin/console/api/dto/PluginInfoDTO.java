@@ -17,6 +17,8 @@ public class PluginInfoDTO
 
     private String scmVersion;
     
+    private String scmTimestamp;
+    
     private String site;
 
     public String getSite()
@@ -87,5 +89,15 @@ public class PluginInfoDTO
     public void setScmVersion( String scmVersion )
     {
         this.scmVersion = scmVersion;
+    }
+
+    public String getScmTimestamp()
+    {
+        return scmTimestamp;
+    }
+
+    public void setScmTimestamp( String scmTimestamp )
+    {
+        this.scmTimestamp = scmTimestamp;
     }
 }

@@ -46,6 +46,7 @@ public class DefaultPluginConsoleManager
             result.setName( pluginResponse.getPluginDescriptor().getPluginMetadata().getName() );
             result.setDescription( pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription() );
             result.setScmVersion( pluginResponse.getPluginDescriptor().getPluginMetadata().getScmVersion() );
+            result.setScmTimestamp( pluginResponse.getPluginDescriptor().getPluginMetadata().getScmTimestamp() );
             result.setSite( pluginResponse.getPluginDescriptor().getPluginMetadata().getPluginSite() );
         }
         else
