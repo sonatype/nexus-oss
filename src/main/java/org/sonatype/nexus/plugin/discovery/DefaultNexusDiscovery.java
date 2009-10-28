@@ -24,24 +24,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 @Component( role = NexusInstanceDiscoverer.class )
 public final class DefaultNexusDiscovery
     implements NexusInstanceDiscoverer, LogEnabled
 {
 
-    private static final OptionGenerator<Map.Entry<String, String>> URL_OPTION_GENERATOR =
-        new OptionGenerator<Map.Entry<String, String>>()
+    private static final OptionGenerator<NexusConnectionInfo> URL_OPTION_GENERATOR =
+        new OptionGenerator<NexusConnectionInfo>()
         {
             @Override
-            public void render( final Entry<String, String> item, final StringBuilder sb )
+            public void render( final NexusConnectionInfo item, final StringBuilder sb )
             {
-                String name = item.getValue();
-                String url = item.getKey();
+                String name = item.getConnectionName();
+                String url = item.getNexusUrl();
 
                 if ( name != null )
                 {
@@ -95,6 +93,60 @@ public final class DefaultNexusDiscovery
         enableLogging( logger );
     }
 
+    public NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings, final MavenProject project,
+                                         final boolean fullyAutomatic )
+        throws NexusDiscoveryException
+    {
+        Map<String, Server> serversById = new HashMap<String, Server>();
+        List<ServerMapping> serverMap = new ArrayList<ServerMapping>();
+
+        if ( settings != null )
+        {
+            for ( Server server : settings.getServers() )
+            {
+                serversById.put( server.getId(), server );
+            }
+        }
+
+        List<NexusConnectionInfo> candidates = new ArrayList<NexusConnectionInfo>();
+
+        collectForDiscovery( settings, project, candidates, serverMap, serversById );
+
+        for ( NexusConnectionInfo info : candidates )
+        {
+            if ( info.isConnectable()
+                && ( info.getNexusUrl().equals( nexusUrl ) || info.getNexusUrl().startsWith( nexusUrl ) || nexusUrl.startsWith( info.getNexusUrl() ) ) )
+            {
+                if ( info.isConnectable() )
+                {
+                    if ( ( fullyAutomatic || promptForUserAcceptance( info.getNexusUrl(), info.getConnectionName(),
+                                                                      info.getUser() ) )
+                        && setAndValidateConnectionAuth( info, null ) )
+                    {
+                        return info;
+                    }
+                }
+            }
+        }
+
+        if ( fullyAutomatic )
+        {
+            return null;
+        }
+        else
+        {
+            NexusConnectionInfo info = new NexusConnectionInfo( nexusUrl );
+            if ( !booleanPrompt( "Are you sure you want to use the Nexus URL: " + nexusUrl + "? [Y/n] " ) )
+            {
+                info = new NexusConnectionInfo( urlPrompt() );
+            }
+
+            fillAuth( info, serversById );
+
+            return info;
+        }
+    }
+
     public NexusConnectionInfo discover( final Settings settings, final MavenProject project,
                                          final boolean fullyAutomatic )
         throws NexusDiscoveryException
@@ -110,18 +162,17 @@ public final class DefaultNexusDiscovery
             }
         }
 
-        List<NexusConnectionInfo> completeCandidates = new ArrayList<NexusConnectionInfo>();
-        LinkedHashMap<String, String> potentialUrls = new LinkedHashMap<String, String>();
+        List<NexusConnectionInfo> candidates = new ArrayList<NexusConnectionInfo>();
 
-        collectForDiscovery( settings, project, completeCandidates, potentialUrls, serverMap, serversById );
+        collectForDiscovery( settings, project, candidates, serverMap, serversById );
 
-        NexusConnectionInfo result = testCompleteCandidates( completeCandidates, fullyAutomatic );
-        if ( result == null )
+        NexusConnectionInfo result = testCompleteCandidates( candidates, fullyAutomatic );
+        if ( result == null && !fullyAutomatic )
         {
             // if no clear candidate is found, guide the user through menus for URL and server/auth selection.
             all: do
             {
-                String url = selectUrl( potentialUrls );
+                String url = selectUrl( candidates );
 
                 for ( ServerMapping serverMapping : serverMap )
                 {
@@ -135,14 +186,14 @@ public final class DefaultNexusDiscovery
                             {
                                 result =
                                     new NexusConnectionInfo( url, server.getUsername(), password,
-                                                             serverMapping.getName() );
+                                                             serverMapping.getName(), serverMapping.getServerId() );
                                 break all;
                             }
                         }
                     }
                 }
 
-                Server server = selectAuthentication( serversById );
+                Server server = selectAuthentication( url, serversById );
 
                 String password = server.getPassword();
                 if ( MANUAL_ENTRY_SERVER_ID.equals( server.getId() ) )
@@ -165,6 +216,57 @@ public final class DefaultNexusDiscovery
         return result;
     }
 
+    private boolean setAndValidateConnectionAuth( final NexusConnectionInfo info, final Server server )
+        throws NexusDiscoveryException
+    {
+        if ( server != null )
+        {
+            String password = decryptPassword( server.getPassword() );
+            info.setUser( server.getUsername() );
+            info.setPassword( password );
+        }
+
+        if ( testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword() ) )
+        {
+            return true;
+        }
+        else
+        {
+            logger.info( "Login failed for: " + info.getNexusUrl() + " (user: " + server.getUsername() + ")" );
+
+            return false;
+        }
+    }
+
+    private void fillAuth( final NexusConnectionInfo info, final Map<String, Server> serversById )
+    {
+        do
+        {
+            Server server = selectAuthentication( info.getNexusUrl(), serversById );
+
+            info.setUser( server.getUsername() );
+            info.setPassword( server.getPassword() );
+            if ( !MANUAL_ENTRY_SERVER_ID.equals( server.getId() ) )
+            {
+                info.setConnectionId( server.getId() );
+            }
+        }
+        while ( !testClientManager.testConnection( info.getNexusUrl(), info.getUser(), info.getPassword() ) );
+    }
+
+    private String decryptPassword( final String password )
+        throws NexusDiscoveryException
+    {
+        try
+        {
+            return securityDispatcher.decrypt( password );
+        }
+        catch ( SecDispatcherException e )
+        {
+            throw new NexusDiscoveryException( "Failed to decrypt server password: " + password, e );
+        }
+    }
+
     private boolean promptForAcceptance( final String url, final String name )
     {
         StringBuilder sb = new StringBuilder();
@@ -176,11 +278,71 @@ public final class DefaultNexusDiscovery
         }
 
         sb.append( "\n\nUse this connection? [Y/n] " );
+        return booleanPrompt( sb );
+    }
 
+    private boolean promptForUserAcceptance( final String url, final String name, final String user )
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( "\n\nLogin to Nexus connection: " ).append( url );
+        if ( name != null && name.length() > 0 )
+        {
+            sb.append( " (" ).append( name ).append( ")" );
+        }
+
+        sb.append( "\nwith username: " ).append( user ).append( "? [Y/n] " );
+        return booleanPrompt( sb );
+    }
+
+    private Server promptForUserAndPassword()
+    {
+        Server svr = new Server();
+
+        svr.setId( MANUAL_ENTRY_SERVER_ID );
+        svr.setUsername( stringPrompt( "Enter Username: " ) );
+        svr.setPassword( stringPrompt( "Enter Password: " ) );
+
+        return svr;
+    }
+
+    private String urlPrompt()
+    {
+        String result = null;
+        URL u = null;
+        do
+        {
+            userOutput.print( "Enter Nexus URL: " );
+            try
+            {
+                result = userInput.readLine();
+                if ( result != null )
+                {
+                    result = result.trim();
+                }
+
+                u = new URL( result );
+            }
+            catch ( MalformedURLException e )
+            {
+                u = null;
+                userOutput.println( "Invalid URL: " + result );
+            }
+            catch ( IOException e )
+            {
+                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+            }
+        }
+        while ( u == null );
+        return result;
+    }
+
+    private boolean booleanPrompt( final CharSequence prompt )
+    {
         Boolean result = null;
         do
         {
-            userOutput.print( sb.toString() );
+            userOutput.print( prompt.toString() );
             String txt = null;
             try
             {
@@ -217,20 +379,32 @@ public final class DefaultNexusDiscovery
         return result;
     }
 
-    private String decryptPassword( final String password )
-        throws NexusDiscoveryException
+    private String stringPrompt( final CharSequence prompt )
     {
-        try
+        String result = null;
+        do
         {
-            return securityDispatcher.decrypt( password );
+            userOutput.print( prompt.toString() );
+            try
+            {
+                result = userInput.readLine();
+            }
+            catch ( IOException e )
+            {
+                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+            }
+
+            if ( result != null )
+            {
+                result = result.trim();
+            }
         }
-        catch ( SecDispatcherException e )
-        {
-            throw new NexusDiscoveryException( "Failed to decrypt server password: " + password, e );
-        }
+        while ( result == null || result.length() < 1 );
+
+        return result;
     }
 
-    private Server selectAuthentication( final Map<String, Server> serversById )
+    private Server selectAuthentication( final String url, final Map<String, Server> serversById )
     {
         if ( serversById.isEmpty() )
         {
@@ -244,7 +418,7 @@ public final class DefaultNexusDiscovery
 
             sb.append( "\nX. Enter username / password manually." );
 
-            sb.append( "\n\nSelection: " );
+            sb.append( "\n\nSelect a login to use for Nexus connection '" ).append( url ).append( "': " );
 
             do
             {
@@ -283,133 +457,22 @@ public final class DefaultNexusDiscovery
         }
     }
 
-    private Server promptForUserAndPassword()
+    private String selectUrl( final List<NexusConnectionInfo> candidates )
     {
-        try
+        if ( candidates.isEmpty() )
         {
-            Server svr = new Server();
-            svr.setId( MANUAL_ENTRY_SERVER_ID );
-            do
-            {
-                userOutput.print( "Enter Username: " );
-                String result = userInput.readLine();
-                if ( result != null )
-                {
-                    result = result.trim();
-                }
-
-                svr.setUsername( result );
-            }
-            while ( svr.getUsername() == null || svr.getUsername().length() < 1 );
-
-            do
-            {
-                userOutput.print( "Enter Password: " );
-                String result = userInput.readLine();
-                if ( result != null )
-                {
-                    result = result.trim();
-                }
-
-                svr.setPassword( result );
-            }
-            while ( svr.getPassword() == null || svr.getPassword().length() < 1 );
-
-            return svr;
-        }
-        catch ( IOException e )
-        {
-            throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
-        }
-    }
-
-    private void collectForDiscovery( final Settings settings, final MavenProject project,
-                                      final List<NexusConnectionInfo> completeCandidates,
-                                      final LinkedHashMap<String, String> potentialUrls,
-                                      final List<ServerMapping> serverMap, final Map<String, Server> serversById )
-    {
-        if ( project != null && project.getDistributionManagement() != null && project.getArtifact() != null )
-        {
-            DistributionManagement distMgmt = project.getDistributionManagement();
-            DeploymentRepository repo = distMgmt.getRepository();
-            if ( project.getArtifact().isSnapshot() && distMgmt.getSnapshotRepository() != null )
-            {
-                repo = distMgmt.getSnapshotRepository();
-            }
-
-            if ( repo != null )
-            {
-                String id = repo.getId();
-                String url = repo.getUrl();
-                catalog( id, url, repo.getName(), serversById, completeCandidates, potentialUrls, serverMap );
-            }
-        }
-
-        if ( settings.getMirrors() != null )
-        {
-            for ( Mirror mirror : settings.getMirrors() )
-            {
-                catalog( mirror.getId(), mirror.getUrl(), mirror.getName(), serversById, completeCandidates,
-                         potentialUrls, serverMap );
-            }
-        }
-
-        if ( project != null )
-        {
-            if ( project.getModel().getRepositories() != null )
-            {
-                for ( Repository repo : project.getModel().getRepositories() )
-                {
-                    catalog( repo.getId(), repo.getUrl(), repo.getName(), serversById, completeCandidates,
-                             potentialUrls, serverMap );
-                }
-            }
-
-            if ( project.getModel().getProfiles() != null )
-            {
-                for ( Profile profile : project.getModel().getProfiles() )
-                {
-                    for ( Repository repo : profile.getRepositories() )
-                    {
-                        catalog( repo.getId(), repo.getUrl(), repo.getName(), serversById, completeCandidates,
-                                 potentialUrls, serverMap );
-                    }
-                }
-            }
-        }
-
-        if ( settings.getProfiles() != null )
-        {
-            for ( org.apache.maven.settings.Profile profile : settings.getProfiles() )
-            {
-                if ( profile != null && profile.getRepositories() != null )
-                {
-                    for ( org.apache.maven.settings.Repository repo : profile.getRepositories() )
-                    {
-                        catalog( repo.getId(), repo.getUrl(), repo.getName(), serversById, completeCandidates,
-                                 potentialUrls, serverMap );
-                    }
-                }
-            }
-        }
-    }
-
-    private String selectUrl( final LinkedHashMap<String, String> potentialUrls )
-    {
-        if ( potentialUrls.isEmpty() )
-        {
-            return promptForUrl();
+            return urlPrompt();
         }
 
         String url = null;
         List<String> urlEntries = new ArrayList<String>();
-        for ( String u : potentialUrls.keySet() )
+        for ( NexusConnectionInfo c : candidates )
         {
-            urlEntries.add( u );
+            urlEntries.add( c.getNexusUrl() );
         }
 
         StringBuilder sb = new StringBuilder();
-        URL_OPTION_GENERATOR.generate( potentialUrls.entrySet(), sb );
+        URL_OPTION_GENERATOR.generate( candidates, sb );
 
         sb.append( "\n\nX. Enter the Nexus URL manually." );
         sb.append( "\n\nSelection: " );
@@ -428,7 +491,7 @@ public final class DefaultNexusDiscovery
 
                 if ( "X".equalsIgnoreCase( result ) )
                 {
-                    return promptForUrl();
+                    return urlPrompt();
                 }
             }
             catch ( IOException e )
@@ -452,46 +515,20 @@ public final class DefaultNexusDiscovery
         return url;
     }
 
-    private String promptForUrl()
-    {
-        String result = null;
-        URL u = null;
-        do
-        {
-            userOutput.print( "Enter URL: " );
-            try
-            {
-                result = userInput.readLine();
-                if ( result != null )
-                {
-                    result = result.trim();
-                }
-
-                u = new URL( result );
-            }
-            catch ( MalformedURLException e )
-            {
-                u = null;
-                userOutput.println( "Invalid URL: " + result );
-            }
-            catch ( IOException e )
-            {
-                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
-            }
-        }
-        while ( u == null );
-        return result;
-    }
-
     private NexusConnectionInfo testCompleteCandidates( final List<NexusConnectionInfo> completeCandidates,
                                                         final boolean fullyAutomatic )
         throws NexusDiscoveryException
     {
         for ( NexusConnectionInfo candidate : completeCandidates )
         {
+            if ( !candidate.isConnectable() )
+            {
+                continue;
+            }
+
             String password = decryptPassword( candidate.getPassword() );
-            if ( testClientManager.testConnection( candidate.getNexusUrl(), candidate.getUser(), password )
-                && ( fullyAutomatic || promptForAcceptance( candidate.getNexusUrl(), candidate.getConnectionName() ) ) )
+            if ( ( fullyAutomatic || promptForAcceptance( candidate.getNexusUrl(), candidate.getConnectionName() ) )
+                && testClientManager.testConnection( candidate.getNexusUrl(), candidate.getUser(), password ) )
             {
                 candidate.setPassword( password );
                 return candidate;
@@ -501,9 +538,76 @@ public final class DefaultNexusDiscovery
         return null;
     }
 
-    private void catalog( final String id, String url, final String name, final Map<String, Server> serversById,
-                          final List<NexusConnectionInfo> completeCandidates,
-                          final LinkedHashMap<String, String> potentialUrls, final List<ServerMapping> serverMap )
+    private void collectForDiscovery( final Settings settings, final MavenProject project,
+                                      final List<NexusConnectionInfo> candidates, final List<ServerMapping> serverMap,
+                                      final Map<String, Server> serversById )
+        throws NexusDiscoveryException
+    {
+        if ( project != null && project.getDistributionManagement() != null && project.getArtifact() != null )
+        {
+            DistributionManagement distMgmt = project.getDistributionManagement();
+            DeploymentRepository repo = distMgmt.getRepository();
+            if ( project.getArtifact().isSnapshot() && distMgmt.getSnapshotRepository() != null )
+            {
+                repo = distMgmt.getSnapshotRepository();
+            }
+
+            if ( repo != null )
+            {
+                String id = repo.getId();
+                String url = repo.getUrl();
+                addCandidate( id, url, repo.getName(), serversById, candidates, serverMap );
+            }
+        }
+
+        if ( settings.getMirrors() != null )
+        {
+            for ( Mirror mirror : settings.getMirrors() )
+            {
+                addCandidate( mirror.getId(), mirror.getUrl(), mirror.getName(), serversById, candidates, serverMap );
+            }
+        }
+
+        if ( project != null )
+        {
+            if ( project.getModel().getRepositories() != null )
+            {
+                for ( Repository repo : project.getModel().getRepositories() )
+                {
+                    addCandidate( repo.getId(), repo.getUrl(), repo.getName(), serversById, candidates, serverMap );
+                }
+            }
+
+            if ( project.getModel().getProfiles() != null )
+            {
+                for ( Profile profile : project.getModel().getProfiles() )
+                {
+                    for ( Repository repo : profile.getRepositories() )
+                    {
+                        addCandidate( repo.getId(), repo.getUrl(), repo.getName(), serversById, candidates, serverMap );
+                    }
+                }
+            }
+        }
+
+        if ( settings.getProfiles() != null )
+        {
+            for ( org.apache.maven.settings.Profile profile : settings.getProfiles() )
+            {
+                if ( profile != null && profile.getRepositories() != null )
+                {
+                    for ( org.apache.maven.settings.Repository repo : profile.getRepositories() )
+                    {
+                        addCandidate( repo.getId(), repo.getUrl(), repo.getName(), serversById, candidates, serverMap );
+                    }
+                }
+            }
+        }
+    }
+
+    private void addCandidate( final String id, String url, final String name, final Map<String, Server> serversById,
+                               final List<NexusConnectionInfo> candidates, final List<ServerMapping> serverMap )
+        throws NexusDiscoveryException
     {
         if ( url.indexOf( "/service" ) > -1 )
         {
@@ -522,13 +626,58 @@ public final class DefaultNexusDiscovery
         Server server = serversById.get( id );
         if ( server != null && server.getUsername() != null && server.getPassword() != null )
         {
-            NexusConnectionInfo info = new NexusConnectionInfo( url, server.getUsername(), server.getPassword(), name );
-            completeCandidates.add( info );
+            String password = decryptPassword( server.getPassword() );
+            candidates.add( new NexusConnectionInfo( url, server.getUsername(), password, name, id ) );
         }
         else
         {
-            potentialUrls.put( url, name );
+            candidates.add( new NexusConnectionInfo( url ).setConnectionName( name ).setConnectionId( id ) );
         }
+    }
+
+    public void enableLogging( final Logger logger )
+    {
+        this.logger = logger;
+    }
+
+    public NexusTestClientManager getTestClientManager()
+    {
+        return testClientManager;
+    }
+
+    public void setTestClientManager( final NexusTestClientManager testClientManager )
+    {
+        this.testClientManager = testClientManager;
+    }
+
+    public Logger getLogger()
+    {
+        return logger;
+    }
+
+    public void setLogger( final Logger logger )
+    {
+        enableLogging( logger );
+    }
+
+    public BufferedReader getUserInput()
+    {
+        return userInput;
+    }
+
+    public void setUserInput( final BufferedReader userInput )
+    {
+        this.userInput = userInput;
+    }
+
+    public PrintStream getUserOutput()
+    {
+        return userOutput;
+    }
+
+    public void setUserOutput( final PrintStream userOutput )
+    {
+        this.userOutput = userOutput;
     }
 
     private static abstract class OptionGenerator<T>
@@ -577,48 +726,4 @@ public final class DefaultNexusDiscovery
         }
     }
 
-    public void enableLogging( final Logger logger )
-    {
-        this.logger = logger;
-    }
-
-    public NexusTestClientManager getTestClientManager()
-    {
-        return testClientManager;
-    }
-
-    public void setTestClientManager( final NexusTestClientManager testClientManager )
-    {
-        this.testClientManager = testClientManager;
-    }
-
-    public Logger getLogger()
-    {
-        return logger;
-    }
-
-    public void setLogger( final Logger logger )
-    {
-        enableLogging( logger );
-    }
-
-    public BufferedReader getUserInput()
-    {
-        return userInput;
-    }
-
-    public void setUserInput( final BufferedReader userInput )
-    {
-        this.userInput = userInput;
-    }
-
-    public PrintStream getUserOutput()
-    {
-        return userOutput;
-    }
-
-    public void setUserOutput( final PrintStream userOutput )
-    {
-        this.userOutput = userOutput;
-    }
 }

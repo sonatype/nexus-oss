@@ -9,4 +9,8 @@ public interface NexusInstanceDiscoverer
     NexusConnectionInfo discover( final Settings settings, final MavenProject project, final boolean fullyAutomatic )
         throws NexusDiscoveryException;
 
+    NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings,
+                                  final MavenProject project, final boolean fullyAutomatic )
+        throws NexusDiscoveryException;
+
 }

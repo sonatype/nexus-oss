@@ -1,10 +1,12 @@
 package org.sonatype.nexus.plugin.discovery;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 
+@Component( role = NexusTestClientManager.class )
 public class DefaultTestClientManager
     implements NexusTestClientManager, LogEnabled
 {

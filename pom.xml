@@ -237,6 +237,12 @@
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.4.3</version>
+          <configuration>
+            <excludes>
+              <exclude>**/Abstract*</exclude>
+              <exclude>**/fixture/*</exclude>
+            </excludes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
