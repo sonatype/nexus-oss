@@ -40,7 +40,7 @@ public class ErrorReportUtil
         
         Assert.assertTrue( files != null );
         Assert.assertEquals( 1, files.length );
-        Assert.assertTrue( files[0].getName().startsWith( "nexus-error-bundle-" ) );
+        Assert.assertTrue( files[0].getName().startsWith( "nexus-error-bundle" ) );
         Assert.assertTrue( files[0].getName().endsWith( ".zip" ) );
         
         validateZipContents( files[0] );
