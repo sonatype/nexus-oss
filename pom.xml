@@ -20,6 +20,7 @@
   	<module>security-realms</module>
   	<module>security-system</module>
   	<module>security-configuration</module>
+  	<module>security-legacy-adapter</module>
   </modules>
   
   <distributionManagement>
