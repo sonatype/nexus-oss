@@ -2,6 +2,7 @@ package org.sonatype.nexus.plugins.plugin.console.api.test.util;
 
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
+import org.sonatype.nexus.plugins.plugin.console.api.dto.RestInfoDTO;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 
 import com.thoughtworks.xstream.XStream;
@@ -26,9 +27,14 @@ public class XStreamFactory
     {
         xstream.processAnnotations( PluginInfoDTO.class );
         xstream.processAnnotations( PluginInfoListResponseDTO.class );
+        xstream.processAnnotations( RestInfoDTO.class );
 
         xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
             PluginInfoDTO.class,
             "pluginInfo" ) );
+
+        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter(
+            RestInfoDTO.class,
+            "restInfo" ) );
     }
 }

@@ -72,9 +72,33 @@
                     <description>The site of the plugin.</description>
                     <type>String</type>
                     <required>false</required>
-                </field>		
+                </field>	
+                <field>
+                  <name>restInfos</name>
+                  <version>1.0.0+</version>
+                  <description>The REST informations of this plugin.</description>
+                  <association>
+                    <type>RestInfo</type>
+                    <multiplicity>*</multiplicity>
+                  </association>
+                </field>	
 			</fields>
 		</class>
+    
+        <class>
+          <name>RestInfo</name>
+          <version>1.0.0+</version>
+          <description>REST resource information.</description>
+          <fields>
+            <field>
+              <name>uri</name>
+              <version>1.0.0+</version>
+              <description>The service uri of this REST resource.</description>
+              <type>String</type>
+              <resource>true</resource>
+            </field>
+          </fields>
+        </class>
 	</classes>
 	
 </model>

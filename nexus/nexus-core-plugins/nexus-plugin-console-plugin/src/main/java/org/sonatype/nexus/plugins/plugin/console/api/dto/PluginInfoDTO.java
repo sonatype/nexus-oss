@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugins.plugin.console.api.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "pluginInfo" )
@@ -16,10 +19,12 @@ public class PluginInfoDTO
     private String failureReason;
 
     private String scmVersion;
-    
+
     private String scmTimestamp;
-    
+
     private String site;
+
+    private List<RestInfoDTO> restInfos = new ArrayList<RestInfoDTO>();
 
     public String getSite()
     {
@@ -99,5 +104,20 @@ public class PluginInfoDTO
     public void setScmTimestamp( String scmTimestamp )
     {
         this.scmTimestamp = scmTimestamp;
+    }
+
+    public List<RestInfoDTO> getRestInfos()
+    {
+        return restInfos;
+    }
+
+    public void setRestInfos( List<RestInfoDTO> restInfos )
+    {
+        this.restInfos = restInfos;
+    }
+
+    public void addRestInfo( RestInfoDTO restInfo )
+    {
+        this.restInfos.add( restInfo );
     }
 }

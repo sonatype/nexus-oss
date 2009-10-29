@@ -4,11 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
+import org.sonatype.nexus.plugins.plugin.console.model.RestInfo;
+import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
 /**
@@ -16,10 +22,14 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
  */
 @Component( role = PluginConsoleManager.class )
 public class DefaultPluginConsoleManager
+    extends AbstractLogEnabled
     implements PluginConsoleManager
 {
     @Requirement
     private NexusPluginManager pluginManager;
+
+    @Requirement
+    private PlexusContainer plexusContainer;
 
     public List<PluginInfo> listPluginInfo()
     {
@@ -56,7 +66,37 @@ public class DefaultPluginConsoleManager
             result.setFailureReason( pluginResponse.formatAsString( false ) );
         }
 
+        // WARN
+        // dirty hack here, the logic here should be moved into PluginManger
+        if ( pluginResponse.isSuccessful() )
+        {
+            List<String> exportedClassnames = pluginResponse.getPluginDescriptor().getExportedClassnames();
+
+            for ( ComponentDescriptor<?> componentDescriptor : this.plexusContainer
+                .getComponentDescriptorList( PlexusResource.class.getName() ) )
+            {
+                if ( exportedClassnames.contains( componentDescriptor.getImplementation() ) )
+                {
+                    try
+                    {
+                        PlexusResource resource = plexusContainer.lookup( PlexusResource.class, componentDescriptor
+                            .getRoleHint() );
+
+                        RestInfo restInfo = new RestInfo();
+                        restInfo.setUri( resource.getResourceUri() );
+
+                        result.addRestInfo( restInfo );
+                    }
+                    catch ( ComponentLookupException e )
+                    {
+                        getLogger().warn(
+                            "Unable to find PlexusResource '" + componentDescriptor.getImplementation() + "'.",
+                            e );
+                    }
+                }
+            }
+        }
+
         return result;
     }
-
 }

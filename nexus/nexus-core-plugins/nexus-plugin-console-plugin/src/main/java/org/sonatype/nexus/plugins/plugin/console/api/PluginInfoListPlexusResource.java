@@ -11,7 +11,9 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.plugins.plugin.console.PluginConsoleManager;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
+import org.sonatype.nexus.plugins.plugin.console.api.dto.RestInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
+import org.sonatype.nexus.plugins.plugin.console.model.RestInfo;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -42,10 +44,15 @@ public class PluginInfoListPlexusResource
 
         xstream.processAnnotations( PluginInfoDTO.class );
         xstream.processAnnotations( PluginInfoListResponseDTO.class );
+        xstream.processAnnotations( RestInfoDTO.class );
 
         xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
             PluginInfoDTO.class,
             "pluginInfo" ) );
+
+        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter(
+            RestInfoDTO.class,
+            "restInfo" ) );
     }
 
     @Override
@@ -94,7 +101,13 @@ public class PluginInfoListPlexusResource
             .getScmTimestamp() );
         result.setFailureReason( pluginInfo.getFailureReason() );
 
+        for ( RestInfo restInfo : pluginInfo.getRestInfos() )
+        {
+            RestInfoDTO restInfoDTO = new RestInfoDTO();
+            restInfoDTO.setURI( restInfo.getUri() );
+            result.addRestInfo( restInfoDTO );
+        }
+
         return result;
     }
-
 }

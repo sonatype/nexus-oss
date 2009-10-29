@@ -50,17 +50,19 @@ public class NEXUS2810PluginConsoleIT
         assertPropertyValid( "SCM Timestamp", activatedPluginInfo.getScmTimestamp() );
         assertPropertyValid( "Site", activatedPluginInfo.getSite() );
         Assert.assertTrue( StringUtils.isEmpty( activatedPluginInfo.getFailureReason() ) );
+        Assert.assertTrue( !activatedPluginInfo.getRestInfos().isEmpty() );
 
         PluginInfoDTO brokenPluginInfo = pluginInfos.get( 1 );
 
         assertPropertyValid( "Name", brokenPluginInfo.getName() );
         assertPropertyValid( "Version", brokenPluginInfo.getVersion() );
         assertPropertyValid( "Status", brokenPluginInfo.getStatus(), "BROKEN" );
-        Assert.assertEquals( "N/A", brokenPluginInfo.getDescription() );
+        Assert.assertNull( brokenPluginInfo.getDescription() );
         Assert.assertEquals( "N/A", brokenPluginInfo.getScmVersion() );
         Assert.assertEquals( "N/A", brokenPluginInfo.getScmTimestamp() );
-        Assert.assertEquals( "N/A", brokenPluginInfo.getSite() );
+        Assert.assertNull( brokenPluginInfo.getSite() );
         Assert.assertFalse( StringUtils.isEmpty( brokenPluginInfo.getFailureReason() ) );
+        Assert.assertTrue( brokenPluginInfo.getRestInfos().isEmpty() );
     }
 
     private void assertPropertyValid( String name, String value, String... expectedValue )
