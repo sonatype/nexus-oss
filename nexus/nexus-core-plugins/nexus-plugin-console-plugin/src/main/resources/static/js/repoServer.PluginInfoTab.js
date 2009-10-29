@@ -150,49 +150,66 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
 
 
 Sonatype.Events.addListener( 'pluginInfoInit', function( cardPanel, rec, gridPanel ) {
-  var sp = Sonatype.lib.Permissions;
   cardPanel.add( new Sonatype.repoServer.PluginInfoTab( {
     name: 'info',
-    tabTitle: 'Info',
+    tabTitle: 'Information',
     payload: rec 
   } ) );
 } );
 
-/**
- * Simply leave this class here for future usage
- * @param {} config
- */
-Sonatype.ext.HelpIcon = function(config){
+Sonatype.repoServer.RestInfoTab = function( config ) {
   var config = config || {};
   var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
+  Ext.apply( this, config, defaultConfig );
   
-  Sonatype.ext.HelpIcon.superclass.constructor.call( this, {
-    style: 'padding: 0px 0px 0px 10px',
-    autoEl: {
-      tag: 'img',
-      src: Sonatype.config.resourcePath + '/images/icons/help.png',
-      width: 16,
-      height: 16
-    },
-    listeners: {
-      'beforerender': {
-        fn: this.beforerenderHandler,
-        scope: this
+  this.restInfoStore = new Ext.data.SimpleStore({
+    id: 0,
+    fields: [
+    { name: 'URI', sortType: Ext.data.SortTypes.asUCString },
+    { name: 'description'}
+    ]
+  });
+  
+  Sonatype.repoServer.PluginInfoTab.superclass.constructor.call( this, {
+    style: 'padding: 5px 0px 0px 5px;',
+    store: this.restInfoStore,
+    columns: [
+    { id: 'URI', header: 'URI', dataIndex: 'URI', width: 200,
+      renderer: function(value){
+        return '<a href="' + Sonatype.config.servicePath + value +'">' + value + "</a>";
       }
     }
+    // currently the server side is not able to return this field, I simply keep the cod here.
+    //{ header: 'Description', dataIndex: 'description', width: 400 }
+    ],
+    listeners: {
+       beforerender: {
+         fn: this.beforerenderHandler,
+         scope: this
+       }
+    }    
   });
-};
+}
 
-Ext.extend( Sonatype.ext.HelpIcon, Ext.BoxComponent, {
-  beforerenderHandler: function( box ){
-    if( this.helpText ){
-      Ext.QuickTips.register({
-          target:  box,
-          title: '',
-          text: this.helpText,
-          enabled: true
-      });      
+Ext.extend( Sonatype.repoServer.RestInfoTab, Ext.grid.GridPanel, {
+  beforerenderHandler: function(panel){
+    var restInfos = this.payload.data.restInfos;
+    if(restInfos && restInfos.length > 0){
+      this.restInfoStore.removeAll();
+      for (var i=0; i<restInfos.length; i++){
+        var restInfoRec = new Ext.data.Record( restInfos[i], restInfos[i].URI );
+        this.restInfoStore.addSorted( restInfoRec );
+      }
     }
+  }
+});
+
+Sonatype.Events.addListener( 'pluginInfoInit', function( cardPanel, rec, gridPanel ) {
+  if(rec.data.restInfos && rec.data.restInfos.length > 0){
+    cardPanel.add( new Sonatype.repoServer.RestInfoTab( {
+      name: 'rest',
+      tabTitle: 'REST Services',
+      payload: rec 
+    } ) );
   }
 } );
