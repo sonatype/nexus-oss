@@ -237,7 +237,7 @@ public class DownloadSettingsTemplateMojo
     protected synchronized M2SettingsClient connect()
         throws RESTLightClientException, MojoExecutionException
     {
-        String url = formatUrl( getNexusBaseUrl() );
+        String url = formatUrl( getNexusUrl() );
 
         getLog().info( "Logging into Nexus: " + url );
         getLog().info( "User: " + getUsername() );
@@ -247,15 +247,15 @@ public class DownloadSettingsTemplateMojo
     }
 
     @Override
-    public String getNexusBaseUrl()
+    public String getNexusUrl()
     {
         String nexusUrl = super.getNexusUrl();
-        if ( nexusUrl == null && url != null )
+        if ( nexusUrl == null && getUrl() != null )
         {
-            int svcIdx = url.indexOf( "/service" );
+            int svcIdx = getUrl().indexOf( "/service" );
             if ( svcIdx > -1 )
             {
-                nexusUrl = url.substring( 0, svcIdx );
+                nexusUrl = getUrl().substring( 0, svcIdx );
             }
 
             setNexusUrl( nexusUrl );
@@ -267,15 +267,15 @@ public class DownloadSettingsTemplateMojo
     private Document downloadSettings()
         throws MojoExecutionException
     {
-        if ( url != null )
+        if ( getUrl() != null )
         {
             try
             {
-                return client.getSettingsTemplateAbsolute( url );
+                return client.getSettingsTemplateAbsolute( getUrl() );
             }
             catch ( RESTLightClientException e )
             {
-                throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from URL: " + url
+                throw new MojoExecutionException( "Failed to retrieve Maven settings.xml from URL: " + getUrl()
                     + "\n(Reason: " + e.getMessage() + ")", e );
             }
         }
@@ -297,11 +297,11 @@ public class DownloadSettingsTemplateMojo
     protected void fillMissing()
         throws MojoExecutionException
     {
-        while ( url == null || url.trim().length() < 1 )
+        while ( templateId == null && ( getUrl() == null || getUrl().trim().length() < 1 ) )
         {
             try
             {
-                url = getPrompter().prompt( "Settings Template URL: " );
+                setUrl( getPrompter().prompt( "Settings Template URL: " ) );
             }
             catch ( PrompterException e )
             {

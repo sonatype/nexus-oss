@@ -22,23 +22,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.junit.After;
-import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
-import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
-import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
@@ -47,52 +42,23 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.ibm.icu.text.SimpleDateFormat;
 
 public class DownloadSettingsTemplateMojoTest
-    extends AbstractRESTTest
+    extends AbstractNexusMojoTest
 {
 
-    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
-
-    private final Set<File> toDelete = new HashSet<File>();
-
-    private Log log;
-
-    @Before
-    public void setupMojoLog()
+    private DownloadSettingsTemplateMojo newMojo()
     {
-        log = new SystemStreamLog()
-        {
-            @Override
-            public boolean isDebugEnabled()
-            {
-                return true;
-            }
-        };
-    }
+        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
 
-    @After
-    public void cleanupFiles()
-    {
-        if ( toDelete != null )
-        {
-            for ( File f : toDelete )
-            {
-                try
-                {
-                    FileUtils.forceDelete( f );
-                }
-                catch ( IOException e )
-                {
-                    System.out.println( "Failed to delete test file/dir: " + f + ". Reason: " + e.getMessage() );
-                }
-            }
-        }
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDispatcher( secDispatcher );
+
+        return mojo;
     }
 
     @Test
@@ -102,7 +68,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -151,18 +118,18 @@ public class DownloadSettingsTemplateMojoTest
     }
 
     @Test
+    @Ignore
+    // Disabled, since the main Nexus URL is discovered unless -Durl= is specified. Default templateId
+    // is used in this case, which is 'default'.
     public void getSettingsTemplatePromptForMissingURL()
         throws JDOMException, IOException, MojoExecutionException
     {
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
 
-        ExpectPrompter prompter = new ExpectPrompter();
         prompter.addExpectation( "URL", getTemplateURL( token ) );
-
-        mojo.setPrompter( prompter );
 
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -187,12 +154,11 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
 
-        ExpectPrompter prompter = new ExpectPrompter();
-        prompter.addExpectation( "Password", getExpectedPassword() );
-
-        mojo.setPrompter( prompter );
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL", "y" );
+        prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
+        prompter.addExpectation( "Enter Password", getExpectedPassword() );
 
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
@@ -217,7 +183,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         
         String serverId = "server";
@@ -250,7 +217,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -273,7 +241,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -303,7 +272,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -333,7 +303,8 @@ public class DownloadSettingsTemplateMojoTest
         printTestName();
         String token = "testToken";
 
-        DownloadSettingsTemplateMojo mojo = new DownloadSettingsTemplateMojo();
+        DownloadSettingsTemplateMojo mojo = newMojo();
+
         mojo.setUrl( getTemplateURL( token ) );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -380,20 +351,6 @@ public class DownloadSettingsTemplateMojoTest
 
         XMLOutputter outputter = new XMLOutputter( Format.getCompactFormat() );
         assertEquals( outputter.outputString( testDoc ), outputter.outputString( doc ) );
-    }
-
-    @Override
-    protected RESTTestFixture getTestFixture()
-    {
-        return fixture;
-    }
-
-    protected void printTestName()
-    {
-        StackTraceElement e = new Throwable().getStackTrace()[1];
-        System.out.println( "\n\nRunning: '"
-            + ( getClass().getName().substring( getClass().getPackage().getName().length() + 1 ) ) + "#"
-            + e.getMethodName() + "'\n\n" );
     }
 
     protected String getTemplateURL( final String token )

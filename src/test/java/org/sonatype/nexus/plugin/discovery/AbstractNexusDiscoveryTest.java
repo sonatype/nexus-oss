@@ -14,6 +14,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.sonatype.nexus.plugin.ExpectPrompter;
 import org.sonatype.nexus.plugin.discovery.fixture.ClientManagerFixture;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
@@ -25,8 +26,6 @@ import org.sonatype.plexus.components.sec.dispatcher.model.io.xpp3.SecurityConfi
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 import java.util.Properties;
 
 public class AbstractNexusDiscoveryTest
@@ -42,7 +41,7 @@ public class AbstractNexusDiscoveryTest
 
     protected ProjectArtifactFactory factory;
 
-    protected static PrintStream dummyOutput;
+    protected ExpectPrompter prompter;
 
     protected static File secFile;
 
@@ -80,15 +79,6 @@ public class AbstractNexusDiscoveryTest
         sysProps.setProperty( DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, secFile.getAbsolutePath() );
 
         System.setProperties( sysProps );
-
-        dummyOutput = new PrintStream( new OutputStream()
-        {
-            @Override
-            public void write( final int b )
-                throws IOException
-            {
-            }
-        } );
     }
 
     @AfterClass
@@ -126,7 +116,9 @@ public class AbstractNexusDiscoveryTest
         secDispatcher = (SecDispatcher) container.lookup( SecDispatcher.class.getName(), "maven" );
         factory = (ProjectArtifactFactory) container.lookup( ProjectArtifactFactory.class.getName() );
 
-        discovery = new DefaultNexusDiscovery( testClientManager, secDispatcher, logger );
+        prompter = new ExpectPrompter();
+
+        discovery = new DefaultNexusDiscovery( testClientManager, secDispatcher, prompter, logger );
     }
 
     @After

@@ -19,95 +19,44 @@
 package org.sonatype.nexus.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.FileUtils;
 import org.jdom.JDOMException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
-import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
-import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 
 public class CloseStageRepositoryMojoTest
-    extends AbstractRESTTest
+    extends AbstractNexusMojoTest
 {
-
-    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
-
-    private final Set<File> toDelete = new HashSet<File>();
-
-    private Log log;
-
-    @Before
-    public void setupMojoLog()
-    {
-        log = new SystemStreamLog()
-        {
-            @Override
-            public boolean isDebugEnabled()
-            {
-                return true;
-            }
-        };
-    }
-
-    @After
-    public void cleanupFiles()
-    {
-        if ( toDelete != null )
-        {
-            for ( File f : toDelete )
-            {
-                try
-                {
-                    FileUtils.forceDelete( f );
-                }
-                catch ( IOException e )
-                {
-                    System.out.println( "Failed to delete test file/dir: " + f + ". Reason: " + e.getMessage() );
-                }
-            }
-        }
-    }
 
     @Test
     public void simplestUseCase()
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
-        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
-        
-        ExpectPrompter prompter = new ExpectPrompter();
-        prompter.addExpectation( "1", "1" );
 
-        mojo.setPrompter( prompter );
-        
+        CloseStageRepositoryMojo mojo = newMojo();
+
+        prompter.addExpectation( "1", "" );
+
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
-        
+
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
         mojo.setDescription( "this is a description" );
-        
+
         runMojo( mojo );
     }
 
@@ -116,24 +65,22 @@ public class CloseStageRepositoryMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
-        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
-        
-        ExpectPrompter prompter = new ExpectPrompter();
-        
-        prompter.addExpectation( "Password", getExpectedPassword() );
-        prompter.addExpectation( "1", "1" );
-        
-        mojo.setPrompter( prompter );
-        
+
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL", "y" );
+        prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
+        prompter.addExpectation( "Enter Password", getExpectedPassword() );
+        prompter.addExpectation( "1", "" );
+
+        CloseStageRepositoryMojo mojo = newMojo();
+
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
         mojo.setDescription( "this is a description" );
-        
+
         mojo.setNexusUrl( getBaseUrl() );
         mojo.setUsername( getExpectedUser() );
-        
+
         runMojo( mojo );
     }
 
@@ -142,24 +89,22 @@ public class CloseStageRepositoryMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
-        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
-        
-        ExpectPrompter prompter = new ExpectPrompter();
-        
+
+        CloseStageRepositoryMojo mojo = newMojo();
+
         prompter.addExpectation( "Nexus URL", getBaseUrl() );
-        prompter.addExpectation( "1", "1" );
-        
-        mojo.setPrompter( prompter );
-        
+        prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
+        prompter.addExpectation( "Enter Password", getExpectedPassword() );
+        prompter.addExpectation( "1", "" );
+
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
         mojo.setDescription( "this is a description" );
-        
+
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
-        
+
         runMojo( mojo );
     }
 
@@ -168,42 +113,50 @@ public class CloseStageRepositoryMojoTest
         throws JDOMException, IOException, RESTLightClientException, MojoExecutionException
     {
         printTestName();
-        
-        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
-        
-        ExpectPrompter prompter = new ExpectPrompter();
-        prompter.addExpectation( "1", "1" );
 
-        mojo.setPrompter( prompter );
-        
+        prompter.addExpectation( "1", "" );
+
+        CloseStageRepositoryMojo mojo = newMojo();
+
         String serverId = "server";
-        
+
         Server server = new Server();
         server.setId( serverId );
         server.setUsername( getExpectedUser() );
         server.setPassword( getExpectedPassword() );
-        
+
         Settings settings = new Settings();
         settings.addServer( server );
-        
+
         mojo.setSettings( settings );
         mojo.setServerAuthId( serverId );
-        
+
         mojo.setArtifactId( "artifactId" );
         mojo.setGroupId( "group.id" );
         mojo.setVersion( "1" );
         mojo.setDescription( "this is a description" );
-        
+
         mojo.setNexusUrl( getBaseUrl() );
-        
+
         runMojo( mojo );
+    }
+
+    private CloseStageRepositoryMojo newMojo()
+    {
+        CloseStageRepositoryMojo mojo = new CloseStageRepositoryMojo();
+
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDispatcher( secDispatcher );
+
+        return mojo;
     }
 
     private void runMojo( final CloseStageRepositoryMojo mojo )
         throws JDOMException, IOException, MojoExecutionException
     {
         mojo.setLog( log );
-        
+
         List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
 
         conversation.add( getVersionCheckFixture() );
@@ -234,7 +187,7 @@ public class CloseStageRepositoryMojoTest
         }
 
         finishPost.setResponseStatus( 201 );
-        
+
         conversation.add( finishPost );
 
         repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
@@ -250,22 +203,8 @@ public class CloseStageRepositoryMojoTest
         conversation.add( reposGet );
 
         fixture.setConversation( conversation );
-        
+
         mojo.execute();
     }
 
-    @Override
-    protected RESTTestFixture getTestFixture()
-    {
-        return fixture;
-    }
-
-    protected void printTestName()
-    {
-        StackTraceElement e = new Throwable().getStackTrace()[1];
-        System.out.println( "\n\nRunning: '"
-            + ( getClass().getName().substring( getClass().getPackage().getName().length() + 1 ) ) + "#"
-            + e.getMethodName() + "'\n\n" );
-    }
-    
 }

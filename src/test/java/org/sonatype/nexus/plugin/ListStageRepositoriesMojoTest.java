@@ -21,70 +21,34 @@ package org.sonatype.nexus.plugin;
 import static junit.framework.Assert.fail;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
-import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
-import org.codehaus.plexus.util.FileUtils;
 import org.jdom.JDOMException;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
+import org.sonatype.nexus.plugin.discovery.fixture.DefaultDiscoveryFixture;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
-import org.sonatype.nexus.restlight.testharness.AbstractRESTTest;
-import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class ListStageRepositoriesMojoTest
-    extends AbstractRESTTest
+    extends AbstractNexusMojoTest
 {
 
-    private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
-
-    private final Set<File> toDelete = new HashSet<File>();
-
-    private Log log;
-
-    @Before
-    public void setupMojoLog()
+    private ListStageRepositoriesMojo newMojo()
     {
-        log = new SystemStreamLog()
-        {
-            @Override
-            public boolean isDebugEnabled()
-            {
-                return true;
-            }
-        };
-    }
+        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
 
-    @After
-    public void cleanupFiles()
-    {
-        if ( toDelete != null )
-        {
-            for ( File f : toDelete )
-            {
-                try
-                {
-                    FileUtils.forceDelete( f );
-                }
-                catch ( IOException e )
-                {
-                    System.out.println( "Failed to delete test file/dir: " + f + ". Reason: " + e.getMessage() );
-                }
-            }
-        }
+        mojo.setPrompter( prompter );
+        mojo.setDiscoverer( new DefaultDiscoveryFixture( secDispatcher, prompter, logger ) );
+        mojo.setDispatcher( secDispatcher );
+
+        return mojo;
     }
 
     @Test
@@ -93,7 +57,7 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
         
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+        ListStageRepositoriesMojo mojo = newMojo();
         
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -108,7 +72,7 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
 
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+        ListStageRepositoriesMojo mojo = newMojo();
 
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
@@ -126,7 +90,7 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
 
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+        ListStageRepositoriesMojo mojo = newMojo();
 
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( "wrong" );
@@ -149,13 +113,11 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
         
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+        ListStageRepositoriesMojo mojo = newMojo();
         
-        ExpectPrompter prompter = new ExpectPrompter();
-        
-        prompter.addExpectation( "Password", getExpectedPassword() );
-        
-        mojo.setPrompter( prompter );
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL", "" );
+        prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
+        prompter.addExpectation( "Enter Password", getExpectedPassword() );
         
         mojo.setUsername( getExpectedUser() );
         mojo.setNexusUrl( getBaseUrl() );
@@ -169,14 +131,12 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
         
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
-        
-        ExpectPrompter prompter = new ExpectPrompter();
+        ListStageRepositoriesMojo mojo = newMojo();
         
         prompter.addExpectation( "Nexus URL", getBaseUrl() );
+        prompter.addExpectation( "Enter Username [" + getExpectedUser() + "]", getExpectedUser() );
+        prompter.addExpectation( "Enter Password", getExpectedPassword() );
 
-        mojo.setPrompter( prompter );
-        
         mojo.setUsername( getExpectedUser() );
         mojo.setPassword( getExpectedPassword() );
         
@@ -189,7 +149,7 @@ public class ListStageRepositoriesMojoTest
     {
         printTestName();
         
-        ListStageRepositoriesMojo mojo = new ListStageRepositoriesMojo();
+        ListStageRepositoriesMojo mojo = newMojo();
         
         String serverId = "server";
         
@@ -245,20 +205,6 @@ public class ListStageRepositoriesMojoTest
         fixture.setConversation( conversation );
         
         mojo.execute();
-    }
-
-    @Override
-    protected RESTTestFixture getTestFixture()
-    {
-        return fixture;
-    }
-
-    protected void printTestName()
-    {
-        StackTraceElement e = new Throwable().getStackTrace()[1];
-        System.out.println( "\n\nRunning: '"
-            + ( getClass().getName().substring( getClass().getPackage().getName().length() + 1 ) ) + "#"
-            + e.getMethodName() + "'\n\n" );
     }
     
 }

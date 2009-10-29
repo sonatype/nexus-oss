@@ -19,7 +19,6 @@
 package org.sonatype.nexus.plugin;
 
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.settings.Mirror;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
@@ -44,7 +43,7 @@ public abstract class AbstractStagingMojo
     protected synchronized StageClient connect()
         throws RESTLightClientException
     {
-        String url = formatUrl( getNexusBaseUrl() );
+        String url = formatUrl( getNexusUrl() );
 
         getLog().info( "Logging into Nexus: " + url );
         getLog().info( "User: " + getUsername() );
@@ -141,77 +140,6 @@ public abstract class AbstractStagingMojo
         }
         
         return builder;
-    }
-
-    @SuppressWarnings( "unchecked" )
-    @Override
-    protected void fillMissing()
-        throws MojoExecutionException
-    {
-        super.fillMissing();
-
-        if ( getNexusBaseUrl() == null && getServerAuthId() != null && getSettings() != null )
-        {
-            List<Mirror> mirrors = getSettings().getMirrors();
-            if ( mirrors != null && !mirrors.isEmpty() )
-            {
-                for ( Mirror mirror : mirrors )
-                {
-                    if ( mirror.getId().equals( getServerAuthId() ) )
-                    {
-                        setNexusUrl( mirror.getUrl() );
-                        
-                        try
-                        {
-                            connect();
-                        }
-                        catch ( RESTLightClientException e )
-                        {
-                            if ( getLog().isDebugEnabled() )
-                            {
-                                getLog().debug( "Failed to connect using URL: " + getNexusUrl(), e );
-                            }
-                            else
-                            {
-                                getLog().info( "Failed to connect using URL: " + getNexusUrl() );
-                            }
-
-                            setNexusUrl( null );
-                        }
-                    }
-                }
-            }
-        }
-
-        while ( getNexusUrl() == null || getNexusUrl().trim().length() < 1 )
-        {
-            try
-            {
-                setNexusUrl( getPrompter().prompt( "Nexus URL" ) );
-            }
-            catch ( PrompterException e )
-            {
-                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
-            }
-
-            try
-            {
-                connect();
-            }
-            catch ( RESTLightClientException e )
-            {
-                if ( getLog().isDebugEnabled() )
-                {
-                    getLog().debug( "Failed to connect using URL: " + getNexusUrl(), e );
-                }
-                else
-                {
-                    getLog().info( "Failed to connect using URL: " + getNexusUrl() );
-                }
-
-                setNexusUrl( null );
-            }
-        }
     }
 
     protected StageRepository select( final List<StageRepository> stageRepos, final String basicPrompt )

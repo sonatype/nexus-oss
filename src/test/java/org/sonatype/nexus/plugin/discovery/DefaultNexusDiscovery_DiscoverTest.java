@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugin.discovery;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
@@ -9,9 +12,6 @@ import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.StringReader;
 
 public class DefaultNexusDiscovery_DiscoverTest
     extends AbstractNexusDiscoveryTest
@@ -51,11 +51,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -92,11 +88,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -133,11 +125,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -179,11 +167,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -226,11 +210,8 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "y\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, false );
+        prompter.addExpectation( "Use this connection?", "y" );
+        discovery.discover( settings, project, "blah", false );
     }
 
     @Test
@@ -273,11 +254,8 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "y\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, false );
+        prompter.addExpectation( "Use this connection?", "y" );
+        discovery.discover( settings, project, "blah", false );
     }
 
     @Test
@@ -316,11 +294,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -365,11 +339,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         project.setArtifact( factory.create( project ) );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -414,11 +384,7 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         project.setArtifact( factory.create( project ) );
 
-        String script = "X\n" + "http://nowhere.com/\n" + "X\n" + "bad-user\n" + "bad-password\n";
-        // discovery.setUserOutput( System.out );
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        discovery.discover( settings, project, "blah", true );
     }
 
     @Test
@@ -428,8 +394,12 @@ public class DefaultNexusDiscovery_DiscoverTest
         Settings settings = new Settings();
 
         String url = "http://nexus.somewhere.com/";
+        String user = "user";
+        String password = "password";
 
         testClientManager.testUrl = url;
+        testClientManager.testUser = user;
+        testClientManager.testPassword = password;
 
         Mirror mirror = new Mirror();
         mirror.setId( "some-mirror" );
@@ -446,10 +416,15 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "1\n" + "X\n" + "user\n" + "password\n";
-        discovery.setUserOutput( dummyOutput );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        prompter.addExpectation( "1", "http://nexus.somewhere.com/", "Selection:" );
+        prompter.addExpectation( "Enter Username", user );
+        prompter.addExpectation( "Enter Password", password );
+
+        NexusConnectionInfo info = discovery.discover( settings, project, "blah", false );
+        assertNotNull( info );
+        assertEquals( url, info.getNexusUrl() );
+        assertEquals( user, info.getUser() );
+        assertEquals( password, info.getPassword() );
     }
 
     @Test
@@ -459,8 +434,12 @@ public class DefaultNexusDiscovery_DiscoverTest
         Settings settings = new Settings();
 
         String url = "http://nexus.somewhere.com/";
+        String user = "user";
+        String password = "password";
 
         testClientManager.testUrl = url;
+        testClientManager.testUser = user;
+        testClientManager.testPassword = password;
 
         Mirror mirror = new Mirror();
         mirror.setId( "some-mirror" );
@@ -484,11 +463,15 @@ public class DefaultNexusDiscovery_DiscoverTest
 
         MavenProject project = new MavenProject( model );
 
-        String script = "1\n" + "X\n" + "user\n" + "password\n";
-        discovery.setUserOutput( dummyOutput );
-        // discovery.setUserOutput( System.out );
-        discovery.setUserInput( new BufferedReader( new StringReader( script ) ) );
-        discovery.discover( settings, project, true );
+        prompter.addExpectation( "1", "http://nexus.somewhere.com/", "Selection:" );
+        prompter.addExpectation( "Enter Username", user );
+        prompter.addExpectation( "Enter Password", password );
+
+        NexusConnectionInfo info = discovery.discover( settings, project, "blah", false );
+        assertNotNull( info );
+        assertEquals( url, info.getNexusUrl() );
+        assertEquals( user, info.getUser() );
+        assertEquals( password, info.getPassword() );
     }
 
 }

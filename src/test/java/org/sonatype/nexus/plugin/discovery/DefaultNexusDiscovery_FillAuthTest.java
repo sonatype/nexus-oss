@@ -10,9 +10,6 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.junit.Test;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
-
 public class DefaultNexusDiscovery_FillAuthTest
     extends AbstractNexusDiscoveryTest
 {
@@ -39,10 +36,11 @@ public class DefaultNexusDiscovery_FillAuthTest
 
         MavenProject project = new MavenProject( model );
 
-        discovery.setUserInput( new BufferedReader( new StringReader( "y\n" + user + "\n" + password + "\n" ) ) );
-        discovery.setUserOutput( dummyOutput );
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL: http://www.somewhere.com/?", "y" );
+        prompter.addExpectation( "Enter Username", user );
+        prompter.addExpectation( "Enter Password", password );
 
-        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, false );
+        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, "blah", false );
         assertNotNull( info );
         assertEquals( user, info.getUser() );
         assertEquals( password, info.getPassword() );
@@ -78,10 +76,10 @@ public class DefaultNexusDiscovery_FillAuthTest
 
         MavenProject project = new MavenProject( model );
 
-        discovery.setUserInput( new BufferedReader( new StringReader( "y\n1\n" ) ) );
-        discovery.setUserOutput( dummyOutput );
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL: http://www.somewhere.com/?", "y" );
+        prompter.addExpectation( "Select a login to use for Nexus connection 'http://www.somewhere.com/'", "1" );
 
-        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, false );
+        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, "blah", false );
         assertNotNull( info );
         assertEquals( user, info.getUser() );
         assertEquals( password, info.getPassword() );
@@ -117,10 +115,12 @@ public class DefaultNexusDiscovery_FillAuthTest
 
         MavenProject project = new MavenProject( model );
 
-        discovery.setUserInput( new BufferedReader( new StringReader( "y\nX\n" + user + "\n" + password + "\n" ) ) );
-        discovery.setUserOutput( dummyOutput );
+        prompter.addExpectation( "Are you sure you want to use the Nexus URL: http://www.somewhere.com/?", "y" );
+        prompter.addExpectation( "Select a login to use for Nexus connection 'http://www.somewhere.com/'", "X" );
+        prompter.addExpectation( "Enter Username", user );
+        prompter.addExpectation( "Enter Password", password );
 
-        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, false );
+        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, "blah", false );
         assertNotNull( info );
         assertEquals( user, info.getUser() );
         assertEquals( password, info.getPassword() );
@@ -162,7 +162,7 @@ public class DefaultNexusDiscovery_FillAuthTest
 
         MavenProject project = new MavenProject( model );
 
-        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, true );
+        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, "blah", true );
         assertNotNull( info );
         assertEquals( user, info.getUser() );
         assertEquals( password, info.getPassword() );

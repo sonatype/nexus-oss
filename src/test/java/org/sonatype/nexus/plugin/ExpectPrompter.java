@@ -34,12 +34,38 @@ public class ExpectPrompter
     implements Prompter
 {
     
-    private final Map<String, String> expectations = new LinkedHashMap<String, String>();
-    private final Set<String> used = new HashSet<String>();
+    private final Map<String[], String> expectations = new LinkedHashMap<String[], String>();
+
+    private final Set<String[]> used = new HashSet<String[]>();
     
+    private boolean output = false;
+
+    private boolean debug = false;
+
+    public void enableDebugging()
+    {
+        debug = true;
+        enableOutput();
+    }
+
+    public void enableOutput()
+    {
+        output = true;
+    }
+
+    public void disableOutput()
+    {
+        output = false;
+    }
+
     public void addExpectation( final String promptSubstr, final String response )
     {
-        expectations.put( promptSubstr, response );
+        expectations.put( new String[] { promptSubstr }, response );
+    }
+
+    public void addExpectation( final String response, final String... fragments )
+    {
+        expectations.put( fragments, response );
     }
 
     public String prompt( final String prompt )
@@ -51,7 +77,13 @@ public class ExpectPrompter
     public String prompt( final String prompt, final String defVal )
         throws PrompterException
     {
-        return expectationFor( prompt );
+        String result = expectationFor( prompt, defVal );
+        if ( result == null || result.length() < 1 )
+        {
+            result = defVal;
+        }
+
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -67,7 +99,14 @@ public class ExpectPrompter
         throws PrompterException
     {
         String wholePrompt = StringUtils.join( values.iterator(), "\n" ) + "\n\n" + prompt + " [" + defVal + "]: ";
-        return expectationFor( wholePrompt, defVal );
+
+        String result = expectationFor( wholePrompt, defVal );
+        if ( result == null || result.length() < 1 )
+        {
+            result = defVal;
+        }
+
+        return result;
     }
 
     public String promptForPassword( final String prompt )
@@ -89,28 +128,59 @@ public class ExpectPrompter
 
     private String expectationFor( final String prompt, final String defaultValue )
     {
-        System.out.print( prompt );
-        
-        String result = defaultValue == null ? "-NOT SUPPLIED-" : defaultValue;
-        for ( Map.Entry<String, String> entry : expectations.entrySet() )
+        if ( output )
         {
-            if ( prompt.indexOf( entry.getKey() ) > -1 )
-            {
-                used.add( entry.getKey() );
-                result = entry.getValue();
-                
-                break;
-            }
+            System.out.print( prompt );
         }
         
-        System.out.println( result );
+        String result = defaultValue == null ? "-NOT SUPPLIED-" : defaultValue;
+        String original = result;
+
+        promptMatching: for ( Map.Entry<String[], String> entry : expectations.entrySet() )
+        {
+            int idx = 0;
+            for ( String fragment : entry.getKey() )
+            {
+                int nxtIdx = prompt.toLowerCase().indexOf( fragment.toLowerCase(), idx );
+                if ( nxtIdx < 0 )
+                {
+                    continue promptMatching;
+                }
+                
+                idx = nxtIdx + fragment.length();
+            }
+
+            result = entry.getValue();
+            used.add( entry.getKey() );
+            break;
+        }
         
+        if ( output )
+        {
+            System.out.println( result );
+        }
+        
+        if ( debug && original.equals( result ) )
+        {
+            System.out.println( "Debug mode enabled; suspending for prompt examination." );
+            try
+            {
+                while ( true )
+                {
+                    Thread.sleep( 5000 );
+                }
+            }
+            catch ( InterruptedException e )
+            {
+            }
+        }
+
         return result;
     }
 
     public void verifyPromptsUsed()
     {
-        Map<String, String> remaining = new LinkedHashMap<String, String>( expectations );
+        Map<String[], String> remaining = new LinkedHashMap<String[], String>( expectations );
         remaining.keySet().removeAll( used );
         
         if ( !remaining.isEmpty() )
@@ -118,9 +188,12 @@ public class ExpectPrompter
             StringBuilder sb = new StringBuilder();
             
             sb.append( "The following prompt/answer pairs were never used:\n" );
-            for ( Map.Entry<String, String> entry : remaining.entrySet() )
+            for ( Map.Entry<String[], String> entry : remaining.entrySet() )
             {
-                sb.append( "\n-  " ).append( entry.getKey() ).append( " = " ).append( entry.getValue() );
+                sb.append( "\n-  " )
+                  .append( StringUtils.join( entry.getKey(), "*" ) )
+                  .append( " = " )
+                  .append( entry.getValue() );
             }
             sb.append( "\n\n" );
             

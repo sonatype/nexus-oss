@@ -6,11 +6,12 @@ import org.apache.maven.settings.Settings;
 public interface NexusInstanceDiscoverer
 {
 
-    NexusConnectionInfo discover( final Settings settings, final MavenProject project, final boolean fullyAutomatic )
+    NexusConnectionInfo discover( final Settings settings, final MavenProject project, final String defaultUser,
+                                  final boolean fullyAutomatic )
         throws NexusDiscoveryException;
 
-    NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings,
-                                  final MavenProject project, final boolean fullyAutomatic )
+    NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings, final MavenProject project,
+                                  final String defaultUser, final boolean fullyAutomatic )
         throws NexusDiscoveryException;
 
 }

@@ -10,15 +10,13 @@ import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.components.interactivity.Prompter;
+import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -28,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component( role = NexusInstanceDiscoverer.class )
-public final class DefaultNexusDiscovery
+public class DefaultNexusDiscovery
     implements NexusInstanceDiscoverer, LogEnabled
 {
 
@@ -75,9 +73,8 @@ public final class DefaultNexusDiscovery
     @Requirement( hint = "maven" )
     private SecDispatcher securityDispatcher;
 
-    private BufferedReader userInput = new BufferedReader( new InputStreamReader( System.in ) );
-
-    private PrintStream userOutput = System.out;
+    @Requirement
+    private Prompter prompter;
 
     private Logger logger;
 
@@ -86,15 +83,16 @@ public final class DefaultNexusDiscovery
     }
 
     public DefaultNexusDiscovery( final NexusTestClientManager clientManager, final SecDispatcher dispatcher,
-                                  final Logger logger )
+                                  final Prompter prompter, final Logger logger )
     {
         testClientManager = clientManager;
         securityDispatcher = dispatcher;
+        this.prompter = prompter;
         enableLogging( logger );
     }
 
     public NexusConnectionInfo fillAuth( final String nexusUrl, final Settings settings, final MavenProject project,
-                                         final boolean fullyAutomatic )
+                                         final String defaultUser, final boolean fullyAutomatic )
         throws NexusDiscoveryException
     {
         Map<String, Server> serversById = new HashMap<String, Server>();
@@ -136,18 +134,18 @@ public final class DefaultNexusDiscovery
         else
         {
             NexusConnectionInfo info = new NexusConnectionInfo( nexusUrl );
-            if ( !booleanPrompt( "Are you sure you want to use the Nexus URL: " + nexusUrl + "? [Y/n] " ) )
+            if ( !booleanPrompt( "Are you sure you want to use the Nexus URL: " + nexusUrl + "? [Y/n] ", Boolean.TRUE ) )
             {
                 info = new NexusConnectionInfo( urlPrompt() );
             }
 
-            fillAuth( info, serversById );
+            fillAuth( info, serversById, defaultUser );
 
             return info;
         }
     }
 
-    public NexusConnectionInfo discover( final Settings settings, final MavenProject project,
+    public NexusConnectionInfo discover( final Settings settings, final MavenProject project, final String defaultUser,
                                          final boolean fullyAutomatic )
         throws NexusDiscoveryException
     {
@@ -193,7 +191,7 @@ public final class DefaultNexusDiscovery
                     }
                 }
 
-                Server server = selectAuthentication( url, serversById );
+                Server server = selectAuthentication( url, serversById, defaultUser );
 
                 String password = server.getPassword();
                 if ( MANUAL_ENTRY_SERVER_ID.equals( server.getId() ) )
@@ -238,11 +236,12 @@ public final class DefaultNexusDiscovery
         }
     }
 
-    private void fillAuth( final NexusConnectionInfo info, final Map<String, Server> serversById )
+    private void fillAuth( final NexusConnectionInfo info, final Map<String, Server> serversById,
+                           final String defaultUser )
     {
         do
         {
-            Server server = selectAuthentication( info.getNexusUrl(), serversById );
+            Server server = selectAuthentication( info.getNexusUrl(), serversById, defaultUser );
 
             info.setUser( server.getUsername() );
             info.setPassword( server.getPassword() );
@@ -278,7 +277,7 @@ public final class DefaultNexusDiscovery
         }
 
         sb.append( "\n\nUse this connection? [Y/n] " );
-        return booleanPrompt( sb );
+        return booleanPrompt( sb, Boolean.TRUE );
     }
 
     private boolean promptForUserAcceptance( final String url, final String name, final String user )
@@ -292,15 +291,15 @@ public final class DefaultNexusDiscovery
         }
 
         sb.append( "\nwith username: " ).append( user ).append( "? [Y/n] " );
-        return booleanPrompt( sb );
+        return booleanPrompt( sb, Boolean.TRUE );
     }
 
-    private Server promptForUserAndPassword()
+    private Server promptForUserAndPassword( final String defaultUser )
     {
         Server svr = new Server();
 
         svr.setId( MANUAL_ENTRY_SERVER_ID );
-        svr.setUsername( stringPrompt( "Enter Username: " ) );
+        svr.setUsername( stringPrompt( "Enter Username [" + defaultUser + "]: ", defaultUser ) );
         svr.setPassword( stringPrompt( "Enter Password: " ) );
 
         return svr;
@@ -312,10 +311,9 @@ public final class DefaultNexusDiscovery
         URL u = null;
         do
         {
-            userOutput.print( "Enter Nexus URL: " );
             try
             {
-                result = userInput.readLine();
+                result = prompter.prompt( "Enter Nexus URL: " );
                 if ( result != null )
                 {
                     result = result.trim();
@@ -326,52 +324,47 @@ public final class DefaultNexusDiscovery
             catch ( MalformedURLException e )
             {
                 u = null;
-                userOutput.println( "Invalid URL: " + result );
+                logger.warn( "Invalid URL: " + result );
             }
-            catch ( IOException e )
+            catch ( PrompterException e )
             {
-                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+                throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
             }
         }
         while ( u == null );
         return result;
     }
 
-    private boolean booleanPrompt( final CharSequence prompt )
+    private boolean booleanPrompt( final CharSequence prompt, final Boolean defaultValue )
     {
-        Boolean result = null;
+        Boolean result = defaultValue;
         do
         {
-            userOutput.print( prompt.toString() );
             String txt = null;
             try
             {
-                txt = userInput.readLine();
-                if ( txt != null )
+                txt = prompter.prompt( prompt.toString() );
+                if ( txt != null && txt.trim().length() > 0 )
                 {
-                    if ( txt.trim().length() > 0 )
+                    txt = txt.trim().toLowerCase();
+                    if ( "y".equals( txt ) || "yes".equals( txt ) )
                     {
-                        txt = txt.trim().toLowerCase();
-                        if ( "y".equals( txt ) || "yes".equals( txt ) )
-                        {
-                            result = true;
-                        }
-                        else if ( "n".equals( txt ) || "no".equals( txt ) )
-                        {
-                            result = false;
-                        }
+                        result = true;
                     }
-
+                    else if ( "n".equals( txt ) || "no".equals( txt ) )
+                    {
+                        result = false;
+                    }
                 }
             }
-            catch ( IOException e )
+            catch ( PrompterException e )
             {
-                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+                throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
             }
 
             if ( result == null )
             {
-                userOutput.println( "\nInvalid input: " + txt );
+                logger.warn( "Invalid input: " + txt );
             }
         }
         while ( result == null );
@@ -381,17 +374,21 @@ public final class DefaultNexusDiscovery
 
     private String stringPrompt( final CharSequence prompt )
     {
-        String result = null;
+        return stringPrompt( prompt, null );
+    }
+
+    private String stringPrompt( final CharSequence prompt, final String defaultValue )
+    {
+        String result = defaultValue;
         do
         {
-            userOutput.print( prompt.toString() );
             try
             {
-                result = userInput.readLine();
+                result = prompter.prompt( prompt.toString() );
             }
-            catch ( IOException e )
+            catch ( PrompterException e )
             {
-                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+                throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
             }
 
             if ( result != null )
@@ -404,11 +401,12 @@ public final class DefaultNexusDiscovery
         return result;
     }
 
-    private Server selectAuthentication( final String url, final Map<String, Server> serversById )
+    private Server selectAuthentication( final String url, final Map<String, Server> serversById,
+                                         final String defaultUser )
     {
         if ( serversById.isEmpty() )
         {
-            return promptForUserAndPassword();
+            return promptForUserAndPassword( defaultUser );
         }
         else
         {
@@ -422,11 +420,10 @@ public final class DefaultNexusDiscovery
 
             do
             {
-                userOutput.print( sb.toString() );
                 String result;
                 try
                 {
-                    result = userInput.readLine();
+                    result = prompter.prompt( sb.toString() );
                     if ( result != null )
                     {
                         result = result.trim();
@@ -434,12 +431,12 @@ public final class DefaultNexusDiscovery
 
                     if ( "X".equalsIgnoreCase( result ) )
                     {
-                        return promptForUserAndPassword();
+                        return promptForUserAndPassword( defaultUser );
                     }
                 }
-                catch ( IOException e )
+                catch ( PrompterException e )
                 {
-                    throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+                    throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
                 }
 
                 try
@@ -450,7 +447,7 @@ public final class DefaultNexusDiscovery
                 }
                 catch ( NumberFormatException e )
                 {
-                    userOutput.println( "Invalid option: '" + result + "'" );
+                    logger.warn( "Invalid option: '" + result + "'" );
                 }
             }
             while ( true );
@@ -479,11 +476,10 @@ public final class DefaultNexusDiscovery
 
         do
         {
-            userOutput.print( sb.toString() );
             String result;
             try
             {
-                result = userInput.readLine();
+                result = prompter.prompt( sb.toString() );
                 if ( result != null )
                 {
                     result = result.trim();
@@ -494,9 +490,9 @@ public final class DefaultNexusDiscovery
                     return urlPrompt();
                 }
             }
-            catch ( IOException e )
+            catch ( PrompterException e )
             {
-                throw new IllegalStateException( "Cannot read from user input: " + e.getMessage(), e );
+                throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
             }
 
             try
@@ -507,7 +503,7 @@ public final class DefaultNexusDiscovery
             }
             catch ( NumberFormatException e )
             {
-                userOutput.println( "Invalid option: '" + result + "'" );
+                logger.warn( "Invalid option: '" + result + "'" );
             }
         }
         while ( url == null );
@@ -560,7 +556,7 @@ public final class DefaultNexusDiscovery
             }
         }
 
-        if ( settings.getMirrors() != null )
+        if ( settings != null && settings.getMirrors() != null )
         {
             for ( Mirror mirror : settings.getMirrors() )
             {
@@ -590,7 +586,7 @@ public final class DefaultNexusDiscovery
             }
         }
 
-        if ( settings.getProfiles() != null )
+        if ( settings != null && settings.getProfiles() != null )
         {
             for ( org.apache.maven.settings.Profile profile : settings.getProfiles() )
             {
@@ -660,24 +656,14 @@ public final class DefaultNexusDiscovery
         enableLogging( logger );
     }
 
-    public BufferedReader getUserInput()
+    public Prompter getPrompter()
     {
-        return userInput;
+        return prompter;
     }
 
-    public void setUserInput( final BufferedReader userInput )
+    public void setPrompter( final Prompter prompter )
     {
-        this.userInput = userInput;
-    }
-
-    public PrintStream getUserOutput()
-    {
-        return userOutput;
-    }
-
-    public void setUserOutput( final PrintStream userOutput )
-    {
-        this.userOutput = userOutput;
+        this.prompter = prompter;
     }
 
     private static abstract class OptionGenerator<T>
