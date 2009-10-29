@@ -46,5 +46,10 @@
       <artifactId>plexus-container-default</artifactId>
       <version>1.2.1.4</version>
     </dependency>
+    <dependency>
+    	<groupId>org.sonatype.plexus.appevents</groupId>
+    	<artifactId>simple-event-multicaster</artifactId>
+    	<version>1.0.0</version>
+    </dependency>
   </dependencies>
 </project>
