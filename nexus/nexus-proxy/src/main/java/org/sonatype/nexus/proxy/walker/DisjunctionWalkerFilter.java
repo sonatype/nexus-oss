@@ -81,7 +81,7 @@ public class DisjunctionWalkerFilter
         }
         for ( WalkerFilter filter : m_filters )
         {
-            if ( !filter.shouldProcessRecursively( context, coll ) )
+            if ( filter.shouldProcessRecursively( context, coll ) )
             {
                 return true;
             }
