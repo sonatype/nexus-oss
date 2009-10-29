@@ -174,7 +174,7 @@ Sonatype.repoServer.RestInfoTab = function( config ) {
     style: 'padding: 5px 0px 0px 5px;',
     store: this.restInfoStore,
     columns: [
-    { id: 'URI', header: 'URI', dataIndex: 'URI', width: 200,
+    { id: 'URI', header: 'URI', dataIndex: 'URI', width: 400,
       renderer: function(value){
         return '<a href="' + Sonatype.config.servicePath + value +'">' + value + "</a>";
       }
