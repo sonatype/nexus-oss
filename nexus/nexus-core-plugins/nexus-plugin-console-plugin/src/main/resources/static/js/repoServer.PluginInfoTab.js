@@ -1,11 +1,10 @@
 Sonatype.repoServer.PluginInfoTab = function( config ) {
   var config = config || {};
   var defaultConfig = {
-    readOnly: true
+    labelClass: 'font: bold 12px tahoma, arial, helvetica, sans-serif;',
+    textClass: 'font: normal 12px tahoma, arial, helvetica, sans-serif; padding: 0px 0px 0px 15px;'
   };
   Ext.apply( this, config, defaultConfig );
-  var labelClass = 'font: bold 12px tahoma, arial, helvetica, sans-serif;';
-  var textClass = 'font: normal 12px tahoma, arial, helvetica, sans-serif; padding: 0px 0px 0px 15px';
   
   Sonatype.repoServer.PluginInfoTab.superclass.constructor.call( this, {
     frame: true,
@@ -13,84 +12,84 @@ Sonatype.repoServer.PluginInfoTab = function( config ) {
         xtype: 'panel',
         style: 'padding: 10px 0px 0px 10px;',
         layout: 'table',
-      layoutConfig: {
-        columns: 2
-      },
-      items: [
-      { 
-        xtype: 'label',
-        html: 'Name',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'name',
-        style: textClass,
-        width: 320
-      },
-      {
-        xtype: 'label',
-        html: 'Version',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'version',
-        style: textClass,
-        width: 320
-      },
-      {
-        xtype: 'label',
-        html: 'Status',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'status',
-        style: textClass,
-        width: 320
-      },
-      {
-        xtype: 'label',
-        html: 'Description',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'description',
-        style: textClass,
-        width: 320
-      },
-      {
-        xtype: 'label',
-        html: 'SCM Version',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'scmVersion',
-        style: textClass,
-        width: 320
-      },
-      {
-        xtype: 'label',
-        html: 'SCM Timestamp',
-        style: labelClass,
-        width: 120
-      },
-      {
-        xtype: 'label',
-        name: 'scmTimestamp',
-        style: textClass,
-        width: 320
-      }
-      ]
-  }],
+	    layoutConfig: {
+	      columns: 2
+	    },
+	    items: [
+	    { 
+	      xtype: 'label',
+	      html: 'Name',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'name',
+	      style: this.textClass,
+	      width: 320
+	    },
+	    {
+	      xtype: 'label',
+	      html: 'Version',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'version',
+	      style: this.textClass,
+	      width: 320
+	    },
+	    {
+	      xtype: 'label',
+	      html: 'Status',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'status',
+	      style: this.textClass,
+	      width: 320
+	    },
+	    {
+	      xtype: 'label',
+	      html: 'Description',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'description',
+	      style: this.textClass,
+	      width: 320
+	    },
+	    {
+	      xtype: 'label',
+	      html: 'SCM Version',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'scmVersion',
+	      style: this.textClass,
+	      width: 320
+	    },
+	    {
+	      xtype: 'label',
+	      html: 'SCM Timestamp',
+	      style: this.labelClass,
+	      width: 120
+	    },
+	    {
+	      xtype: 'label',
+	      name: 'scmTimestamp',
+	      style: this.textClass,
+	      width: 320
+	    }
+	    ]
+	}],
     listeners: {
        beforerender: {
          fn: this.beforerenderHandler,
@@ -105,7 +104,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
     this.find('name', 'name')[0].setText( this.payload.data.name );
     this.find('name', 'version')[0].setText( this.payload.data.version );
     this.find('name', 'description')[0].setText( this.payload.data.description );
-    this.find('name', 'status')[0].setText( this.payload.data.status );
+    this.find('name', 'status')[0].setText( this.capitalizeHead(this.payload.data.status) );
     this.find('name', 'scmVersion')[0].setText( this.payload.data.scmVersion );
     this.find('name', 'scmTimestamp')[0].setText( this.payload.data.scmTimestamp );
     
@@ -115,7 +114,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
     pluginPropertiesPanel.add({
       xtype: 'label',
       html: 'Site',
-      style: 'font: bold 12px tahoma, arial, helvetica, sans-serif;',
+      style: this.labelClass,
       width: 120
       });    
     if ( site ) {
@@ -123,7 +122,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         xtype: 'label',
         name: 'site',
         html: '<a href="' + site + '">' + site + '</a>',
-        style: 'font: normal 12px tahoma, arial, helvetica, sans-serif; padding: 0px 0px 0px 15px'
+        style: this.textClass
       });
     }
     
@@ -139,6 +138,13 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         html: html
       } );
     }
+  },
+  
+  capitalizeHead: function( str ){
+    if ( Ext.isEmpty(str) ){
+      return str;
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
   }
 } );
 

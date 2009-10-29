@@ -26,7 +26,13 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
     },
     { name: 'status',
       header: 'Status',
-      width: 100
+      width: 100,
+      renderer: function( value ){
+        if ( Ext.isEmpty(value) ){
+          return value;
+        }
+        return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+      }
     },
     { name: 'scmVersion' },
     { name: 'scmTimestamp' },
@@ -38,7 +44,6 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.PluginConsolePanel, Sonatype.panels.GridViewer, {
-  doSomething: function(){}
 } );
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
