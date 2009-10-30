@@ -33,6 +33,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -46,8 +47,10 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.index.context.DefaultIndexingContext;
+import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
@@ -74,6 +77,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -980,7 +984,7 @@ public class DefaultIndexerManager
         {
             MavenRepository mrepository = (MavenRepository) repository;
 
-            updateRequest.setDocumentFilter( mrepository.getRepositoryPolicy().getFilter() );
+            updateRequest.setDocumentFilter( getFilterFor(mrepository.getRepositoryPolicy() ) );
         }
 
         updateRequest.setResourceFetcher( new ResourceFetcher()
@@ -1051,6 +1055,38 @@ public class DefaultIndexerManager
         Date contextTimestamp = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
         return contextTimestamp != null;
+    }
+
+    // TODO Toni Prior Snownexus, this was contained in RepositoryPolicy split to separate concerns (NEXUS-2872)
+    private DocumentFilter getFilterFor( final RepositoryPolicy repositoryPolicy )
+    {
+
+        return new DocumentFilter()
+        {
+            public boolean accept( Document doc )
+            {
+                String uinfo = doc.get( ArtifactInfo.UINFO );
+
+                if( uinfo == null )
+                {
+                    return true;
+                }
+
+                String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
+                if( repositoryPolicy == RepositoryPolicy.SNAPSHOT )
+                {
+                    return VersionUtils.isSnapshot( r[ 2 ] );
+                }
+                else if( repositoryPolicy == RepositoryPolicy.RELEASE )
+                {
+                    return !VersionUtils.isSnapshot( r[ 2 ] );
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        };
     }
 
     protected void mergeRepositoryGroupIndexWithMember( Repository repository )

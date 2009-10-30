@@ -13,72 +13,9 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.apache.lucene.document.Document;
-import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.DocumentFilter;
-
 public enum RepositoryPolicy
 {
-    RELEASE
-    {
-        public DocumentFilter getFilter()
-        {
-            return new DocumentFilter()
-            {
-                public boolean accept( Document doc )
-                {
-                    String uinfo = doc.get( ArtifactInfo.UINFO );
-
-                    if ( uinfo == null )
-                    {
-                        return true;
-                    }
-
-                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
-
-                    return !VersionUtils.isSnapshot( r[2] );
-                }
-            };
-        }
-    },
-
-    SNAPSHOT
-    {
-        public DocumentFilter getFilter()
-        {
-            return new DocumentFilter()
-            {
-                public boolean accept( Document doc )
-                {
-                    String uinfo = doc.get( ArtifactInfo.UINFO );
-
-                    if ( uinfo == null )
-                    {
-                        return true;
-                    }
-
-                    String[] r = ArtifactInfo.FS_PATTERN.split( uinfo );
-
-                    return VersionUtils.isSnapshot( r[2] );
-                }
-            };
-        }
-    },
-
+    RELEASE,
+    SNAPSHOT,
     MIXED
-    {
-        public DocumentFilter getFilter()
-        {
-            return new DocumentFilter()
-            {
-                public boolean accept( Document doc )
-                {
-                    return true;
-                }
-            };
-        }
-    };
-
-    public abstract DocumentFilter getFilter();
 }
