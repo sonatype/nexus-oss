@@ -8,5 +8,6 @@
   <componentDescriptors>
     <componentDescriptor>src/main/assembly/base-component.xml</componentDescriptor>
     <componentDescriptor>src/main/assembly/app-component.xml</componentDescriptor>
+    <componentDescriptor>src/main/assembly/plugin-component.xml</componentDescriptor>
   </componentDescriptors>
 </assembly>

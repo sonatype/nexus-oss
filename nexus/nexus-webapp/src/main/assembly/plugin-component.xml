@@ -1,0 +1,12 @@
+<component>
+  <dependencySets>
+    <dependencySet>
+      <unpack>true</unpack>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>${plugin-repository.directory}/</outputDirectory>
+      <includes>
+        <include>org.sonatype.nexus.plugins:nexus-plugin-console-plugin</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</component>

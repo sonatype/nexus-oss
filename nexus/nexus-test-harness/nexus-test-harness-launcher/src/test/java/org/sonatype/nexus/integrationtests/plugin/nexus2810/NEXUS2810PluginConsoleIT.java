@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins.plugin.console.api.test.nexus2810;
+package org.sonatype.nexus.integrationtests.plugin.nexus2810;
 
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +11,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.sonatype.nexus.plugins.plugin.console.api.test.util.PluginConsoleMessageUtil;
+import org.sonatype.nexus.test.utils.plugin.PluginConsoleMessageUtil;
 
 public class NEXUS2810PluginConsoleIT
     extends AbstractNexusIntegrationTest

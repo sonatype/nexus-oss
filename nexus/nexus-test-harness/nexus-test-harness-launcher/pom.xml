@@ -11,6 +11,10 @@
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>Nexus Test Harness Launcher</name>
 
+  <properties>
+  	<nexus-plugin-console-plugin.version>1.4.1-SNAPSHOT</nexus-plugin-console-plugin.version>
+  </properties>
+
   <build>
 
     <testResources>
@@ -294,6 +298,14 @@
       <artifactId>security-url-realm</artifactId>
       <version>${plexus-security.version}</version>
     </dependency>
+    
+    <!-- Nexus Core Plugins -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+      <version>${nexus-plugin-console-plugin.version}</version>
+    </dependency>
+    
   </dependencies>
 
   <profiles>

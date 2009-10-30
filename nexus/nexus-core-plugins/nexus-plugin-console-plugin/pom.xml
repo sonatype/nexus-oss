@@ -60,13 +60,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-test-harness-launcher</artifactId>
-			<scope>test</scope>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.5</version>
@@ -161,28 +154,6 @@
 						</aggregation>
 					</aggregations>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-test-environment-maven-plugin</artifactId>
-				<version>1.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>setup-nexus-plugin-environment</goal>
-							<goal>package</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<nexusVersion>${project.version}</nexusVersion>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>failsafe-maven-plugin</artifactId>
 			</plugin>
 
 		</plugins>

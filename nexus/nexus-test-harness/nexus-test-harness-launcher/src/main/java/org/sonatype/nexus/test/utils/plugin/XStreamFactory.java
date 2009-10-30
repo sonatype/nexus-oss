@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins.plugin.console.api.test.util;
+package org.sonatype.nexus.test.utils.plugin;
 
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
@@ -27,7 +27,6 @@ public class XStreamFactory
     {
         xstream.processAnnotations( PluginInfoDTO.class );
         xstream.processAnnotations( PluginInfoListResponseDTO.class );
-        xstream.processAnnotations( RestInfoDTO.class );
 
         xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
             PluginInfoDTO.class,

@@ -1,4 +1,4 @@
-package org.sonatype.nexus.plugins.plugin.console.api.test.util;
+package org.sonatype.nexus.test.utils.plugin;
 
 import java.io.IOException;
 import java.util.List;
