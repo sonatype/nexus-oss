@@ -23,6 +23,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
@@ -162,15 +163,16 @@ public class ReindexTest
      */
     protected void reindexRemoteRepositoryAndPublish( File repositoryRoot, String repositoryId,
                                                       boolean deleteIndexFiles, int shiftDays )
-        throws IOException
+        throws IOException, ComponentLookupException
     {
         File indexDirectory = getIndexFamilyDirectory( repositoryId );
 
         Directory directory = FSDirectory.getDirectory( indexDirectory );
 
+
         IndexingContext ctx =
             nexusIndexer.addIndexingContextForced( repositoryId + "-temp", repositoryId, repositoryRoot, directory,
-                                                   null, null, FULL_CREATORS );
+                                                   null, null, new IndexCreatorHelper( getContainer() ).getFullCreators() );
 
         // shifting if needed (very crude way to do it, but heh)
         shiftContextInTime( ctx, shiftDays );

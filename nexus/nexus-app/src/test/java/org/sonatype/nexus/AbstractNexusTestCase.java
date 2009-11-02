@@ -65,12 +65,6 @@ public abstract class AbstractNexusTestCase
 
     protected NexusConfiguration nexusConfiguration;
 
-    public List<IndexCreator> DEFAULT_CREATORS;
-
-    public List<IndexCreator> FULL_CREATORS;
-
-    public List<IndexCreator> MIN_CREATORS;
-
     @Override
     protected void customizeContext( Context ctx )
     {
@@ -170,20 +164,6 @@ public abstract class AbstractNexusTestCase
         CONF_HOME.mkdirs();
 
         super.setUp();
-
-        DEFAULT_CREATORS = new ArrayList<IndexCreator>();
-        FULL_CREATORS = new ArrayList<IndexCreator>();
-        MIN_CREATORS = new ArrayList<IndexCreator>();
-
-        IndexCreator min = lookup( IndexCreator.class, "min" );
-        IndexCreator jar = lookup( IndexCreator.class, "jarContent" );
-
-        MIN_CREATORS.add( min );
-
-        FULL_CREATORS.add( min );
-        FULL_CREATORS.add( jar );
-
-        DEFAULT_CREATORS.addAll( FULL_CREATORS );
 
         if ( loadConfigurationAtSetUp() )
         {
