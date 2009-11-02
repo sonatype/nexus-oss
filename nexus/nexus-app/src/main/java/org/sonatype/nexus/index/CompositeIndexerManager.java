@@ -31,7 +31,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * For non void methods will apply a strategy of first manager returning non null wins In case of search methods it will
  * acummulate teh results. If a manager does not implement a method it can throw {@link UnsupportedOperationException},
  * case when the manager is ignored.
- * 
+ *
  * @author Alin Dreghiciu
  */
 @Component( role = IndexerManager.class, hint = "composite" )
@@ -42,6 +42,7 @@ public class CompositeIndexerManager
 
     @Requirement( role = ComposableIndexerManager.class )
     private Map<String, IndexerManager> m_managers;
+
 
     /**
      * {@inheritDoc}
@@ -449,7 +450,7 @@ public class CompositeIndexerManager
                 if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
-                    results.addAll( results );
+                    results.addAll( result.getResults() );
                     hits += result.getTotalHits();
                 }
             }
@@ -484,7 +485,7 @@ public class CompositeIndexerManager
                 if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
-                    results.addAll( results );
+                    results.addAll( result.getResults() );
                     hits += result.getTotalHits();
                 }
             }
@@ -518,7 +519,7 @@ public class CompositeIndexerManager
                 if ( result != null )
                 {
                     results = new HashSet<ArtifactInfo>();
-                    results.addAll( results );
+                    results.addAll( result.getResults() );
                     hits += result.getTotalHits();
                 }
             }
