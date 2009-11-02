@@ -15,13 +15,7 @@ package org.sonatype.nexus.rest.repositories;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Request;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
-import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
+import org.sonatype.nexus.rest.indextreeview.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -48,26 +42,9 @@ public class RepositoryIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repositories/*/index_content/**", "authcBasic,tiperms" );
     }
 
-    protected IndexingContext getIndexingContext( Request request )
-        throws ResourceException
+    @Override
+    protected String getRepositoryId( Request request )
     {
-        String repositoryId = String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-        
-        try
-        {
-            // make sure the repo exists and we have access to it.
-            Repository repository = this.getRepositoryRegistry().getRepository( repositoryId );
-            return indexerManager.getRepositoryBestIndexContext( repository.getId() );
+        return String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
         }
-        catch ( NoSuchRepositoryAccessException e )
-        {
-            getLogger().warn( "Repository access denied, id=" + repositoryId );
-
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, "Access Denied to Repository" );
         }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
-        }
-    }
-}

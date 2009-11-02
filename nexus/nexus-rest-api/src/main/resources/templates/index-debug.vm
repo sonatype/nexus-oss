@@ -82,6 +82,8 @@
   <script src="js/repoServer/repoServer.AbstractRepoPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.FileUploadPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
   <script src="js/repoServer/repoServer.RepoMaintPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.IndexBrowserPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.RepositoryBrowserContainer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.RepoEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.GroupsEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.RepoServer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  

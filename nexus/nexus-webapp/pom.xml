@@ -215,6 +215,8 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.AbstractRepoPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.FileUploadPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoMaintPanel.js</include>
+                    <include>${compressed-dir}/js/repoServer/repoServer.IndexBrowserPanel.js</include>
+                    <include>${compressed-dir}/js/repoServer/repoServer.RepositoryBrowserContainer.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.GroupsEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoServer.js</include>

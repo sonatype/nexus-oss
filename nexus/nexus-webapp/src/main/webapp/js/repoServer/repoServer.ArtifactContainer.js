@@ -13,13 +13,15 @@
  */
 Sonatype.repoServer.ArtifactContainer = function(config){
   var config = config || {};
-  var defaultConfig = {};
+  var defaultConfig = {
+    collapsible: true,
+    collapsed: true,
+    region: 'south',
+    halfSize: false
+  };
   Ext.apply(this, config, defaultConfig);
   
   Sonatype.repoServer.ArtifactContainer.superclass.constructor.call(this, {
-    region: 'south',
-    collapsible: true,
-    collapsed: true,
     height: 160,
     minHeight: 100,
     maxHeight: 400,

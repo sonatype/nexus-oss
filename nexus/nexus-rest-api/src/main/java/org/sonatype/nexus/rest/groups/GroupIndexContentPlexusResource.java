@@ -14,21 +14,8 @@
 package org.sonatype.nexus.rest.groups;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.restlet.data.Reference;
 import org.restlet.data.Request;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
-import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
-import org.sonatype.nexus.rest.AbstractIndexContentPlexusResource;
-import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.rest.indextreeview.AbstractIndexContentPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -43,9 +30,6 @@ public class GroupIndexContentPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
 
-    @Requirement
-    private ArtifactPackagingMapper artifactPackagingMapper;
-
     @Override
     public String getResourceUri()
     {
@@ -58,85 +42,9 @@ public class GroupIndexContentPlexusResource
         return new PathProtectionDescriptor( "/repo_groups/*/index_content/**", "authcBasic,tgiperms" );
     }
 
-    protected IndexingContext getIndexingContext( Request request )
-        throws ResourceException
+    @Override
+    protected String getRepositoryId( Request request )
     {
-        try
-        {
-            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-
-            // just to test availability, this will throw NoSuchRepository if there is none found
-            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
-
-            return indexerManager.getRepositoryBestIndexContext( groupId );
+        return String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
         }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e );
         }
-    }
-
-    /**
-     * Convert from ArtifactInfo to a NexusArtifact. Limited functionality, just enough to make index browsing work.
-     */
-    protected NexusArtifact ai2Na( Request request, ArtifactInfo ai )
-    {
-        if ( ai == null )
-        {
-            return null;
-        }
-
-        NexusArtifact a = new NexusArtifact();
-
-        try
-        {
-            String groupId = String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-
-            // just to test availability, this will throw NoSuchRepository if there is none found
-            getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
-
-            IndexingContext indexingContext = indexerManager.getRepositoryBestIndexContext( groupId );
-
-            Gav gav = new Gav(
-                ai.groupId,
-                ai.artifactId,
-                ai.version,
-                ai.classifier,
-                artifactPackagingMapper.getExtensionForPackaging( ai.packaging ),
-                null,
-                null,
-                null,
-                VersionUtils.isSnapshot( ai.version ),
-                false,
-                null,
-                false,
-                null );
-
-            Reference repoRoot = createRepositoryGroupReference( request, groupId, indexingContext
-                .getGavCalculator().gavToPath( gav ) );
-
-            a.setResourceURI( repoRoot.toString() );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            return null;
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().warn( "Illegal artifact coordinate.", e );
-
-            return null;
-        }
-
-        a.setGroupId( ai.groupId );
-        a.setArtifactId( ai.artifactId );
-        a.setVersion( ai.version );
-        a.setClassifier( ai.classifier );
-        a.setPackaging( ai.packaging );
-        a.setRepoId( ai.repository );
-        a.setContextId( ai.context );
-
-        return a;
-    }
-
-}

@@ -47,6 +47,7 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
           autoScroll: false,
           frame: false,
           border: false,
+          layoutOnTabChange: true,
           items: [ first ]
         } );
   
@@ -700,6 +701,7 @@ Sonatype.panels.TreePanel = function( config ) {
     rootVisible: true,
     enableDD: false,
     loader : new Ext.tree.TreeLoader( {
+      nodeIconClass: this.nodeIconClass,
       requestMethod: 'GET',
       url: this.url,
       listeners: {
@@ -741,6 +743,14 @@ Sonatype.panels.TreePanel = function( config ) {
         }
         if ( ! attr.id ) {
           attr.id = ( this.url + attr.path ).replace( /\//g, '_' );
+        }
+
+        if ( ! attr.singleClickExpand ) {
+          attr.singleClickExpand = true;
+        }
+        
+        if ( this.nodeIconClass ) {
+          attr.iconCls = this.nodeIconClass;
         }
 
         if ( attr.nodeType ) {
@@ -815,7 +825,7 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
     if ( e.target.nodeName == 'A' ) return; // no menu on links
 
     if ( this.nodeClickEvent ) {
-      Sonatype.Events.fireEvent( this.nodeClickEvent, node );
+      Sonatype.Events.fireEvent( this.nodeClickEvent, node, this.nodeClickPassthru );
     }
   },
   

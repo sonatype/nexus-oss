@@ -17,11 +17,14 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.lucene.search.Query;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.treeview.TreeNode;
+import org.sonatype.nexus.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -624,4 +627,20 @@ public class CompositeIndexerManager
         }
     }
 
+    public TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path )
+    {
+        // not quite sure how this would get implemented here...for now
+        // will simply iterate through until 1 is not null
+        for ( IndexerManager manager : m_managers.values() )
+        {
+            TreeNode node = manager.listNodes( factory, repository, path );
+            
+            if ( node != null )
+            {
+                return node;
+}
+        }
+        
+        return null;
+    }
 }
