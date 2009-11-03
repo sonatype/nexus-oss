@@ -44,7 +44,7 @@ public class MavenDeployer
         new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
         verifier.setLogFileName( logname );
 
-        verifier.setLocalRepo( TestProperties.getFile( "maven-repository" ).getAbsolutePath() );
+        verifier.setLocalRepo( TestProperties.getFile( "maven.local.repo" ).getAbsolutePath() );
 
         verifier.setAutoclean( false );
         verifier.resetStreams();
@@ -111,6 +111,9 @@ public class MavenDeployer
         cli.createArg().setLine( "-DartifactId=\'" + gav.getArtifactId() + "\'" );
         cli.createArg().setLine( "-Dversion=\'" + gav.getVersion() + "\'" );
         cli.createArg().setLine( "-Dpackaging=\'" + gav.getExtension() + "\'" );
+        cli.createArg().setLine(
+                                 "-Dmaven.repo.local=\'"
+                                     + TestProperties.getFile( "maven.local.repo" ).getAbsolutePath() + "\'" );
 
         CommandLineRunner runner = new CommandLineRunner();
 
