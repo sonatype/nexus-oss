@@ -32,6 +32,13 @@ public abstract class AbstractStagingMojo
     extends AbstractNexusMojo
 {
 
+    /**
+     * If provided, and this repository is available for selection, use it.
+     * 
+     * @parameter expression="${nexus.repositoryId}"
+     */
+    private String repositoryId;
+
     private StageClient client;
 
     public AbstractStagingMojo()
@@ -142,14 +149,34 @@ public abstract class AbstractStagingMojo
         return builder;
     }
 
-    protected StageRepository select( final List<StageRepository> stageRepos, final String basicPrompt )
+    protected StageRepository select( final List<StageRepository> stageRepos, final String basicPrompt,
+                                      final boolean allowAutoSelect )
         throws MojoExecutionException
     {
         if ( stageRepos == null || stageRepos.isEmpty() )
         {
-            return null;
+            throw new MojoExecutionException( "No repositories available." );
         }
-        
+
+        if ( getRepositoryId() != null )
+        {
+            for ( StageRepository repo : stageRepos )
+            {
+                if ( getRepositoryId().equals( repo.getRepositoryId() ) )
+                {
+                    return repo;
+                }
+            }
+        }
+
+        if ( allowAutoSelect && isAutomatic() && stageRepos.size() == 1 )
+        {
+            StageRepository repo = stageRepos.get( 0 );
+            getLog().info( "Using the only staged repository available: " + repo.getRepositoryId() );
+            
+            return repo;
+        }
+
         LinkedHashMap<String, StageRepository> repoMap = new LinkedHashMap<String, StageRepository>();
         StringBuilder menu = new StringBuilder();
         List<String> choices = new ArrayList<String>();
@@ -168,21 +195,40 @@ public abstract class AbstractStagingMojo
         
         menu.append( "\n\n" );
 
-        String choice = null;
-        while ( choice == null || !repoMap.containsKey( choice ) )
+        if ( isAutomatic() )
         {
             getLog().info( menu.toString() );
-            try
-            {
-                choice = getPrompter().prompt( basicPrompt, choices, "1" );
-            }
-            catch ( PrompterException e )
-            {
-                throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
-            }
+            throw new MojoExecutionException(
+                                              "Cannot auto-select; multiple staging repositories are available, and none are specified for use." );
         }
+        else
+        {
+            String choice = null;
+            while ( choice == null || !repoMap.containsKey( choice ) )
+            {
+                getLog().info( menu.toString() );
+                try
+                {
+                    choice = getPrompter().prompt( basicPrompt, choices, "1" );
+                }
+                catch ( PrompterException e )
+                {
+                    throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
+                }
+            }
 
-        return repoMap.get( choice );
+            return repoMap.get( choice );
+        }
+    }
+
+    public String getRepositoryId()
+    {
+        return repositoryId;
+    }
+
+    public void setRepositoryId( final String repositoryId )
+    {
+        this.repositoryId = repositoryId;
     }
 
 }

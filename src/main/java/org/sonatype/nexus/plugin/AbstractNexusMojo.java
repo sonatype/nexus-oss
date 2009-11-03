@@ -55,13 +55,13 @@ public abstract class AbstractNexusMojo
      * 
      * @parameter expression="${nexus.automaticDiscovery}" default-value="false"
      */
-    private boolean automaticDiscovery;
+    private boolean automatic;
 
     /**
      * The base URL for a Nexus Professional instance that includes the nexus-staging-plugin. If missing, the mojo will
      * prompt for this value.
      * 
-     * @parameter expression="${nexusUrl}"
+     * @parameter expression="${nexus.url}"
      */
     private String nexusUrl;
 
@@ -73,21 +73,21 @@ public abstract class AbstractNexusMojo
     /**
      * The username that should be used to log into Nexus.
      * 
-     * @parameter expression="${username}" default-value="${user.name}"
+     * @parameter expression="${nexus.username}" default-value="${user.name}"
      */
     private String username;
 
     /**
      * If provided, lookup username/password from this server entry in the current Maven settings.
      * 
-     * @parameter expression="${serverAuthId}"
+     * @parameter expression="${nexus.serverAuthId}"
      */
     private String serverAuthId;
 
     /**
      * The password that should be used to log into Nexus. If missing, the mojo will prompt for this value.
      * 
-     * @parameter expression="${password}"
+     * @parameter expression="${nexus.password}"
      */
     private String password;
 
@@ -106,7 +106,7 @@ public abstract class AbstractNexusMojo
      * the build).
      * </p>
      * 
-     * @parameter expression="${verboseDebug}" default-value="false"
+     * @parameter expression="${nexus.verboseDebug}" default-value="false"
      */
     private boolean verboseDebug;
 
@@ -265,7 +265,7 @@ public abstract class AbstractNexusMojo
                 {
                     NexusConnectionInfo info =
                         discoverer.fillAuth( getNexusUrl(), getSettings(), getProject(), getUsername(),
-                                             isAutomaticDiscovery() );
+ isAutomatic() );
 
                     if ( info == null )
                     {
@@ -292,7 +292,7 @@ public abstract class AbstractNexusMojo
             try
             {
                 NexusConnectionInfo info =
-                    discoverer.discover( getSettings(), getProject(), getUsername(), isAutomaticDiscovery() );
+                    discoverer.discover( getSettings(), getProject(), getUsername(), isAutomatic() );
 
                 if ( info == null )
                 {
@@ -324,21 +324,21 @@ public abstract class AbstractNexusMojo
         this.project = project;
     }
 
-    public boolean isAutomaticDiscovery()
+    public boolean isAutomatic()
     {
         if ( getSettings() == null )
         {
-            return automaticDiscovery;
+            return automatic;
         }
         else
         {
-            return !getSettings().isInteractiveMode() || automaticDiscovery;
+            return !getSettings().isInteractiveMode() || automatic;
         }
     }
 
-    public void setAutomaticDiscovery( final boolean automaticDiscovery )
+    public void setAutomatic( final boolean automatic )
     {
-        this.automaticDiscovery = automaticDiscovery;
+        this.automatic = automatic;
     }
 
     public NexusInstanceDiscoverer getDiscoverer()

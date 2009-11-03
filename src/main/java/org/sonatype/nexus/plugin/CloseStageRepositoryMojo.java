@@ -41,28 +41,28 @@ public class CloseStageRepositoryMojo
     /**
      * The description for the newly closed staging repository. This will show up in the Nexus UI.
      * 
-     * @parameter expression="${description}"
+     * @parameter expression="${nexus.description}"
      */
     private String description;
 
     /**
      * The artifact groupId used to select which open staging repository should be closed.
      * 
-     * @parameter expression="${groupId}" default-value="${project.groupId}"
+     * @parameter expression="${nexus.groupId}" default-value="${project.groupId}"
      */
     private String groupId;
 
     /**
      * The artifact artifactId used to select which open staging repository should be closed.
      * 
-     * @parameter expression="${artifactId}" default-value="${project.artifactId}"
+     * @parameter expression="${nexus.artifactId}" default-value="${project.artifactId}"
      */
     private String artifactId;
 
     /**
      * The artifact version used to select which open staging repository should be closed.
      * 
-     * @parameter expression="${version}" default-value="${project.version}"
+     * @parameter expression="${nexus.version}" default-value="${project.version}"
      */
     private String version;
 
@@ -71,7 +71,9 @@ public class CloseStageRepositoryMojo
      * given groupId, artifactId, and version. Otherwise, the mojo will prompt the user for input.
      * 
      * @parameter expression="${auto}" default-value="false"
+     * @deprecated Use parameter 'automatic' instead.
      */
+    @Deprecated
     private boolean auto;
 
     public void execute()
@@ -95,15 +97,7 @@ public class CloseStageRepositoryMojo
         
         if ( repos != null && !repos.isEmpty() )
         {
-            StageRepository repo;
-            if ( auto )
-            {
-                repo = repos.get( 0 );
-            }
-            else
-            {
-                repo = select( repos, "Select a repository to close" );
-            }
+            StageRepository repo = select( repos, "Select a repository to close", true );
             
             StringBuilder builder = new StringBuilder();
             builder.append( "Closing staging repository for: '" )
@@ -201,9 +195,23 @@ public class CloseStageRepositoryMojo
     protected void fillMissing()
         throws MojoExecutionException
     {
+        if ( isAutomatic()
+            && ( getDescription() == null || getVersion() == null || getGroupId() == null || getArtifactId() == null ) )
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.append( "In automatic mode, you must specify the following parameters in your POM " )
+              .append( "configuration or on the command line:\n" )
+              .append( "\n- groupId (CLI expression: 'nexus.groupId', default value: ${project.groupId})" )
+              .append( "\n- artifactId (CLI expression: 'nexus.artifactId', default value: ${project.artifactId})" )
+              .append( "\n- version (CLI expression: 'nexus.version', default value: ${project.version})" )
+              .append( "\n- description (CLI expression: 'nexus.description')" );
+
+            throw new MojoExecutionException( sb.toString() );
+        }
+
         super.fillMissing();
 
-        while ( getGroupId() == null || "${project.groupId}".equals( getGroupId() ) )
+        while ( !isAutomatic() && ( getGroupId() == null || "${project.groupId}".equals( getGroupId() ) ) )
         {
             try
             {
@@ -215,7 +223,7 @@ public class CloseStageRepositoryMojo
             }
         }
 
-        while ( getArtifactId() == null || "${project.artifactId}".equals( getArtifactId() ) )
+        while ( !isAutomatic() && ( getArtifactId() == null || "${project.artifactId}".equals( getArtifactId() ) ) )
         {
             try
             {
@@ -227,7 +235,7 @@ public class CloseStageRepositoryMojo
             }
         }
 
-        while ( getVersion() == null || "${project.version}".equals( getVersion() ) )
+        while ( !isAutomatic() && ( getVersion() == null || "${project.version}".equals( getVersion() ) ) )
         {
             try
             {
@@ -238,6 +246,12 @@ public class CloseStageRepositoryMojo
                 throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
             }
         }
+    }
+
+    @Override
+    public boolean isAutomatic()
+    {
+        return super.isAutomatic() || auto;
     }
 
 }

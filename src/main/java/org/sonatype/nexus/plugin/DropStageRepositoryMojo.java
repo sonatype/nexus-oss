@@ -37,6 +37,15 @@ public class DropStageRepositoryMojo
     extends AbstractStagingMojo
 {
 
+    /**
+     * If set to <code>true</code>, allow auto-selection of the repository to drop in cases where no repositoryId has
+     * been specified during execution, and only one staged repository is available. <br/>
+     * <b>NOTE:</b> Use with care! This can be dangerous!
+     * 
+     * @parameter expression="${nexus.drop.autoSelectOverride}" default-value="false"
+     */
+    private boolean dropAutoSelectOverride;
+
     public void execute()
         throws MojoExecutionException
     {
@@ -58,7 +67,7 @@ public class DropStageRepositoryMojo
         
         if ( repos != null && !repos.isEmpty() )
         {
-            StageRepository repo = select( repos, "Select a repository to drop" );
+            StageRepository repo = select( repos, "Select a repository to drop", isDropAutoSelectOverride() );
             
             StringBuilder builder = new StringBuilder();
             builder.append( "Dropping staged repository: " );
@@ -85,6 +94,16 @@ public class DropStageRepositoryMojo
         }
 
         listRepos( null, null, null, "The following CLOSED staging repositories were found" );
+    }
+
+    public boolean isDropAutoSelectOverride()
+    {
+        return dropAutoSelectOverride;
+    }
+
+    public void setDropAutoSelectOverride( final boolean dropAutoSelectOverride )
+    {
+        this.dropAutoSelectOverride = dropAutoSelectOverride;
     }
 
 }

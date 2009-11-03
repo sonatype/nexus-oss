@@ -39,6 +39,15 @@ public class PromoteStageRepositoryMojo
 {
 
     /**
+     * If set to <code>true</code>, allow auto-selection of the repository to promote in cases where no repositoryId has
+     * been specified during execution, and only one staged repository is available. <br/>
+     * <b>NOTE:</b> Use with care! This can be dangerous!
+     * 
+     * @parameter expression="${nexus.promote.autoSelectOverride}" default-value="false"
+     */
+    private boolean promoteAutoSelectOverride;
+
+    /**
      * @parameter expression="${targetRepositoryId}"
      */
     private String targetRepositoryId;
@@ -64,7 +73,7 @@ public class PromoteStageRepositoryMojo
         
         if ( repos != null && !repos.isEmpty() )
         {
-            StageRepository repo = select( repos, "Select a repository to promote" );
+            StageRepository repo = select( repos, "Select a repository to promote", isPromoteAutoSelectOverride() );
             
             promptForPromoteInfo();
             
@@ -120,6 +129,16 @@ public class PromoteStageRepositoryMojo
     public void setTargetRepositoryId( final String targetRepositoryId )
     {
         this.targetRepositoryId = targetRepositoryId;
+    }
+
+    public boolean isPromoteAutoSelectOverride()
+    {
+        return promoteAutoSelectOverride;
+    }
+
+    public void setPromoteAutoSelectOverride( final boolean promoteAutoSelectOverride )
+    {
+        this.promoteAutoSelectOverride = promoteAutoSelectOverride;
     }
 
 }
