@@ -14,12 +14,11 @@
 package org.sonatype.nexus.integrationtests.nexus175;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.cli.CommandLineException;
+import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -59,16 +58,15 @@ public class Nexus175SnapshotDeployWrongPasswordIT
         {
             // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
             // this.getRelitiveArtifactPath( gav ));
-            String consoleOutput =
-                MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                      this.getOverridableFile( "settings.xml" ) );
-            Assert.fail( "File should NOT have been deployed " + consoleOutput );
+            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                this.getOverridableFile( "settings.xml" ) );
+            Assert.fail( "File should NOT have been deployed " );
         }
         // catch ( TransferFailedException e )
         // {
         // // expected 401
         // }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             // expected 401
             // MavenDeployer, either fails or not, we can't check the cause of the problem

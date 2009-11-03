@@ -14,12 +14,11 @@
 package org.sonatype.nexus.integrationtests.nexus174;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.cli.CommandLineException;
+import org.apache.maven.it.VerificationException;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -40,13 +39,14 @@ public class Nexus174ReleaseDeployWrongPasswordIT
     }
 
     @Test
-    public void deployWithMaven() throws Exception
+    public void deployWithMaven()
+        throws Exception
     {
 
         // GAV
         Gav gav =
-            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false,
-                     false, null, false, null );
+            new Gav( this.getTestId(), "artifact", "1.0.0", null, "xml", 0, new Date().getTime(), "", false, false,
+                     null, false, null );
 
         // file to deploy
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
@@ -58,21 +58,20 @@ public class Nexus174ReleaseDeployWrongPasswordIT
         {
             // DeployUtils.forkDeployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy,
             // this.getRelitiveArtifactPath( gav ));
-            MavenDeployer.deploy( gav, this.getNexusTestRepoUrl(), fileToDeploy,
-                                  this.getOverridableFile( "settings.xml" ) );
+            MavenDeployer.deployAndGetVerifier( gav, this.getNexusTestRepoUrl(), fileToDeploy,
+                                                this.getOverridableFile( "settings.xml" ) );
             Assert.fail( "File should NOT have been deployed" );
         }
         // catch ( TransferFailedException e )
         // {
         // // expected 401
         // }
-        catch ( CommandLineException e )
+        catch ( VerificationException e )
         {
             // expected 401
             // MavenDeployer, either fails or not, we can't check the cause of the problem
         }
 
     }
-
 
 }

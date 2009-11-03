@@ -56,7 +56,7 @@ public class Nexus635ExpireCacheTaskIT
         throws Exception
     {
         String repositoryUrl = "file://" + localStorageDir + "/tasks-snapshot-repo";
-        MavenDeployer.deploy( GAV, repositoryUrl, fileToDeploy, null );
+        MavenDeployer.deployAndGetVerifier( GAV, repositoryUrl, fileToDeploy, null );
     }
 
     @Test
