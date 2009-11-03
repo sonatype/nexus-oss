@@ -121,7 +121,7 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
       pluginPropertiesPanel.add({
         xtype: 'label',
         name: 'site',
-        html: '<a href="' + site + '">' + site + '</a>',
+        html: '<a href="' + site + '" target="_blank">' + site + '</a>',
         style: this.textClass
       });
     }
@@ -176,7 +176,7 @@ Sonatype.repoServer.RestInfoTab = function( config ) {
     columns: [
     { id: 'URI', header: 'URI', dataIndex: 'URI', width: 400,
       renderer: function(value){
-        return '<a href="' + Sonatype.config.servicePath + value +'">' + value + "</a>";
+        return '<a href="' + Sonatype.config.servicePath + value +'" target="_blank">' + value + "</a>";
       }
     }
     // currently the server side is not able to return this field, I simply keep the cod here.
