@@ -12,84 +12,84 @@ Sonatype.repoServer.PluginInfoTab = function( config ) {
         xtype: 'panel',
         style: 'padding: 10px 0px 0px 10px;',
         layout: 'table',
-	    layoutConfig: {
-	      columns: 2
-	    },
-	    items: [
-	    { 
-	      xtype: 'label',
-	      html: 'Name',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'name',
-	      style: this.textClass,
-	      width: 320
-	    },
-	    {
-	      xtype: 'label',
-	      html: 'Version',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'version',
-	      style: this.textClass,
-	      width: 320
-	    },
-	    {
-	      xtype: 'label',
-	      html: 'Status',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'status',
-	      style: this.textClass,
-	      width: 320
-	    },
-	    {
-	      xtype: 'label',
-	      html: 'Description',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'description',
-	      style: this.textClass,
-	      width: 320
-	    },
-	    {
-	      xtype: 'label',
-	      html: 'SCM Version',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'scmVersion',
-	      style: this.textClass,
-	      width: 320
-	    },
-	    {
-	      xtype: 'label',
-	      html: 'SCM Timestamp',
-	      style: this.labelClass,
-	      width: 120
-	    },
-	    {
-	      xtype: 'label',
-	      name: 'scmTimestamp',
-	      style: this.textClass,
-	      width: 320
-	    }
-	    ]
-	}],
+      layoutConfig: {
+        columns: 2
+      },
+      items: [
+      { 
+        xtype: 'label',
+        html: 'Name',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'name',
+        style: this.textClass,
+        width: 320
+      },
+      {
+        xtype: 'label',
+        html: 'Version',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'version',
+        style: this.textClass,
+        width: 320
+      },
+      {
+        xtype: 'label',
+        html: 'Status',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'status',
+        style: this.textClass,
+        width: 320
+      },
+      {
+        xtype: 'label',
+        html: 'Description',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'description',
+        style: this.textClass,
+        width: 320
+      },
+      {
+        xtype: 'label',
+        html: 'SCM Version',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'scmVersion',
+        style: this.textClass,
+        width: 320
+      },
+      {
+        xtype: 'label',
+        html: 'SCM Timestamp',
+        style: this.labelClass,
+        width: 120
+      },
+      {
+        xtype: 'label',
+        name: 'scmTimestamp',
+        style: this.textClass,
+        width: 320
+      }
+      ]
+  }],
     listeners: {
        beforerender: {
          fn: this.beforerenderHandler,
@@ -182,6 +182,7 @@ Sonatype.repoServer.RestInfoTab = function( config ) {
     // currently the server side is not able to return this field, I simply keep the cod here.
     //{ header: 'Description', dataIndex: 'description', width: 400 }
     ],
+    autoExpandColumn: 'URI',
     listeners: {
        beforerender: {
          fn: this.beforerenderHandler,

@@ -25,6 +25,7 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
       width: 300
     },
     { name: 'status',
+      id: 'status',
       header: 'Status',
       width: 100,
       renderer: function( value ){
@@ -40,6 +41,7 @@ Sonatype.repoServer.PluginConsolePanel = function( config ) {
     { name: 'site'},
     { name: 'restInfos'}
     ],
+    autoExpandColumn: 'status',
     rowClickEvent: 'pluginInfoInit'
   });
 };
