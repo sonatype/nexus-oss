@@ -483,6 +483,7 @@ public class AbstractEnvironmentMojo
             IOUtil.close( input );
 
             original.putAll( this.project.getProperties() );
+            original.putAll( this.session.getExecutionProperties() );
 
             output = new FileOutputStream( baseTestProperties );
 
