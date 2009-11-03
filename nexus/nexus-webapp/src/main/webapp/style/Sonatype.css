@@ -277,3 +277,8 @@ button.st-icon-refresh {
 .x-form-empty-field{color:darkblue;}
 
 .ext-ie ul.x-tree-node-ct{font-size:0;line-height:0;zoom:1;width:1px}
+
+/* disabled cell in a grid */
+.disable-cell {
+  background-color: lightgrey !important;
+}
