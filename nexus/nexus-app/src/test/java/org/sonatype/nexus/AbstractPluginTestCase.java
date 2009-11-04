@@ -28,6 +28,7 @@ import java.util.jar.JarFile;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.SelectorUtils;
+import org.sonatype.nexus.util.ClasspathUtils;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleaner;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerRequest;
 import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerResponse;
@@ -36,14 +37,13 @@ import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerResponse;
  * Base class to be extended by Nexus plugins tests. Beside the standard {@link AbstractNexusTestCase} functionality
  * will scan additional paths for components, such as "target/classes", "target/test-classes", or ant-like classpath
  * entries.
- *
+ * 
  * @author ...
  * @author Alin Dreghiciu
  */
 public abstract class AbstractPluginTestCase
     extends AbstractNexusTestCase
 {
-
     protected String[] sourceDirectories = { "target/classes", "target/test-classes" };
 
     protected void setupContainer()
@@ -56,26 +56,29 @@ public abstract class AbstractPluginTestCase
             PlexusComponentGleaner plexusComponentGleaner = new PlexusComponentGleaner();
             List<String> projectClassNames = this.buildProjectClassList();
 
-            for( String className : projectClassNames )
+            // resourceName : the "binary" name of resource/class
+            // className : the "canonical" name of class, or null
+            for ( String resourceName : projectClassNames )
             {
-                PlexusComponentGleanerRequest request = new PlexusComponentGleanerRequest( className, ClassLoader
-                    .getSystemClassLoader()
-                );
+                String className = ClasspathUtils.convertClassBinaryNameToCanonicalName( resourceName );
+
+                PlexusComponentGleanerRequest request =
+                    new PlexusComponentGleanerRequest( className, resourceName, ClassLoader.getSystemClassLoader() );
 
                 PlexusComponentGleanerResponse gleanerResponse = plexusComponentGleaner.glean( request );
 
-                if( gleanerResponse != null && gleanerResponse.getComponentDescriptor() != null )
+                if ( gleanerResponse != null && gleanerResponse.getComponentDescriptor() != null )
                 {
                     ComponentDescriptor<?> componentDescriptor = gleanerResponse.getComponentDescriptor();
-//                    System.out.println( "... ... adding component role=\"" + componentDescriptor.getRole()
-//                        + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
-//                    System.out.println( new XStream().toXML( componentDescriptor ) );
+                    // System.out.println( "... ... adding component role=\"" + componentDescriptor.getRole()
+                    // + "\", hint=\"" + componentDescriptor.getRoleHint() + "\"" );
+                    // System.out.println( new XStream().toXML( componentDescriptor ) );
 
                     this.getContainer().addComponentDescriptor( componentDescriptor );
                 }
             }
         }
-        catch( Exception e )
+        catch ( Exception e )
         {
             e.printStackTrace();
             fail( "Failed to glean classes" );
@@ -87,46 +90,45 @@ public abstract class AbstractPluginTestCase
         List<String> classNames = new ArrayList<String>();
 
         final String[] sourceDirectories = getSourceDirectories();
-        if( sourceDirectories != null )
+        if ( sourceDirectories != null )
         {
-            for( String sourceDir : sourceDirectories )
+            for ( String sourceDir : sourceDirectories )
             {
                 classNames.addAll( scanDirectory( new File( sourceDir ), "**/*.class" ) );
             }
         }
         final String[] classpathEntries = getClasspathEntries();
-        if( classpathEntries != null && classpathEntries.length > 0 )
+        if ( classpathEntries != null && classpathEntries.length > 0 )
         {
-            for( String classpathEntry : classpathEntries )
+            for ( String classpathEntry : classpathEntries )
             {
                 final String basePath = extractBasePattern( classpathEntry );
-                final String pattern = classpathEntry.equals( basePath )
-                                       ? "**/*.class"
-                                       : classpathEntry.substring( basePath.length() + 1 );
+                final String pattern =
+                    classpathEntry.equals( basePath ) ? "**/*.class" : classpathEntry.substring( basePath.length() + 1 );
 
                 try
                 {
                     final Enumeration<URL> urls = getClassLoader().getResources( basePath );
-                    while( urls.hasMoreElements() )
+                    while ( urls.hasMoreElements() )
                     {
                         final URL url = urls.nextElement();
-                        if( "file".equals( url.getProtocol() ) )
+                        if ( "file".equals( url.getProtocol() ) )
                         {
                             final String rootPath = new File( url.toURI() ).getAbsolutePath();
                             final String root = rootPath.substring( 0, rootPath.lastIndexOf( basePath ) );
                             classNames.addAll( scanDirectory( new File( root ), basePath + "/" + pattern ) );
                         }
-                        else if( "jar".equals( url.getProtocol() ) )
+                        else if ( "jar".equals( url.getProtocol() ) )
                         {
                             classNames.addAll( scanJar( url, pattern ) );
                         }
                     }
                 }
-                catch( IOException ignore )
+                catch ( IOException ignore )
                 {
                     // ignore
                 }
-                catch( URISyntaxException ignore )
+                catch ( URISyntaxException ignore )
                 {
                     // ignore
                 }
@@ -137,51 +139,43 @@ public abstract class AbstractPluginTestCase
 
     /**
      * Scans a file system directory for classes matching an ant-style path mapping.
-     *
-     * @param dir     directory to be scanned
+     * 
+     * @param dir directory to be scanned
      * @param pattern ant-style pattern
-     *
      * @return list of matching class names
      */
-    private static List<String> scanDirectory( final File dir,
-                                               final String pattern )
+    private static List<String> scanDirectory( final File dir, final String pattern )
     {
         final List<String> classNames = new ArrayList<String>();
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( dir );
         scanner.addDefaultExcludes();
-        scanner.setIncludes( new String[]{ pattern } );
+        scanner.setIncludes( new String[] { pattern } );
 
         scanner.scan();
 
-        for( String fileNameOfClass : scanner.getIncludedFiles() )
+        for ( String fileNameOfClass : scanner.getIncludedFiles() )
         {
-            String className =
-                fileNameOfClass.substring( 0, fileNameOfClass.lastIndexOf( ".class" ) )
-                    .replaceAll( "\\\\|/", "." );
-            classNames.add( className );
+            classNames.add( fileNameOfClass );
         }
         return classNames;
     }
 
     /**
      * Scans a jar file for classes matching an ant-style path mapping.
-     *
-     * @param jarUrl  url of the jar file to be scanned
+     * 
+     * @param jarUrl url of the jar file to be scanned
      * @param pattern ant-style pattern
-     *
      * @return list of matching class names
-     *
      * @throws IOException - If a serious problem appears while processing teh jar file
      */
     // TODO maybe extract thsi as a scanner?
-    private static List<String> scanJar( final URL jarUrl,
-                                         final String pattern )
+    private static List<String> scanJar( final URL jarUrl, final String pattern )
         throws IOException
     {
         final List<String> classNames = new ArrayList<String>();
         final URLConnection connection = jarUrl.openConnection();
-        if( !( connection instanceof JarURLConnection ) )
+        if ( !( connection instanceof JarURLConnection ) )
         {
             return classNames;
         }
@@ -190,18 +184,15 @@ public abstract class AbstractPluginTestCase
         final JarFile jarFile = jarConnection.getJarFile();
         final String roothPath = jarConnection.getJarEntry().getName();
 
-        for( Enumeration entries = jarFile.entries(); entries.hasMoreElements(); )
+        for ( Enumeration entries = jarFile.entries(); entries.hasMoreElements(); )
         {
             final JarEntry entry = (JarEntry) entries.nextElement();
             final String entryPath = entry.getName();
 
-            if( entryPath.startsWith( roothPath ) &&
-                entryPath.endsWith( ".class" ) &&
-                SelectorUtils.matchPath( pattern, entryPath.substring( roothPath.length() + 1 ), true ) )
+            if ( entryPath.startsWith( roothPath ) && entryPath.endsWith( ".class" )
+                && SelectorUtils.matchPath( pattern, entryPath.substring( roothPath.length() + 1 ), true ) )
             {
-                final String className = entryPath.substring( 0, entryPath.lastIndexOf( ".class" ) )
-                    .replaceAll( "\\\\|/", "." );
-                classNames.add( className );
+                classNames.add( entryPath );
             }
         }
         return classNames;
@@ -210,16 +201,15 @@ public abstract class AbstractPluginTestCase
     /**
      * Extract the starting substring from an ant-style pattern. This is teh part from start of pattern till last "/"
      * before the first "*" or "?".
-     *
+     * 
      * @param pattern ant-style pattern
-     *
      * @return base pattern
      */
     private String extractBasePattern( final String pattern )
     {
         final int asterisk = pattern.indexOf( '*' );
         final int questionMarkIndex = pattern.indexOf( '?' );
-        if( asterisk == -1 && questionMarkIndex == -1 )
+        if ( asterisk == -1 && questionMarkIndex == -1 )
         {
             return pattern;
         }
@@ -229,22 +219,22 @@ public abstract class AbstractPluginTestCase
     }
 
     /**
-     * Returns a list of source directories to be scanned for components.
-     * The list is composed from {@link #getDefaultSourceDirectories()}, {@link #getAdditionalSourceDirectories()} and
-     * the dependent plugins directories.
-     *
+     * Returns a list of source directories to be scanned for components. The list is composed from
+     * {@link #getDefaultSourceDirectories()}, {@link #getAdditionalSourceDirectories()} and the dependent plugins
+     * directories.
+     * 
      * @return list of source directories (should not be null)
      */
     protected String[] getSourceDirectories()
     {
         final List<String> directories = new ArrayList<String>();
         final String[] defaultDirs = getDefaultSourceDirectories();
-        if( defaultDirs != null && defaultDirs.length > 0 )
+        if ( defaultDirs != null && defaultDirs.length > 0 )
         {
             directories.addAll( Arrays.asList( defaultDirs ) );
         }
         final String[] additionalDirs = getAdditionalSourceDirectories();
-        if( additionalDirs != null && additionalDirs.length > 0 )
+        if ( additionalDirs != null && additionalDirs.length > 0 )
         {
             directories.addAll( Arrays.asList( additionalDirs ) );
         }
@@ -254,7 +244,7 @@ public abstract class AbstractPluginTestCase
 
     /**
      * Returns a list of default directories to be scanned for components.
-     *
+     * 
      * @return list of source directories (should not be null)
      */
     protected String[] getDefaultSourceDirectories()
@@ -263,9 +253,9 @@ public abstract class AbstractPluginTestCase
     }
 
     /**
-     * Returns a list of additional directories to be scanned for components beside default ones.
-     * By default the list is empty but can be overridden by tests in order to add additional directories.
-     *
+     * Returns a list of additional directories to be scanned for components beside default ones. By default the list is
+     * empty but can be overridden by tests in order to add additional directories.
+     * 
      * @return list of source directories (should not be null)
      */
     protected String[] getAdditionalSourceDirectories()
@@ -275,7 +265,7 @@ public abstract class AbstractPluginTestCase
 
     /**
      * Returns a list of claspath entry paths to be scanned.
-     *
+     * 
      * @return list of classpath entry paths (should not be null)
      */
     protected String[] getClasspathEntries()
