@@ -609,7 +609,7 @@ Sonatype.repoServer.DefaultUserEditor = function( config ) {
       disabled: ! this.isNew,
       allowBlank: false,
       width: this.COMBO_WIDTH,
-      validator: Sonatype.utils.validateNoSpaces
+      validator: Sonatype.utils.validateId
     },
     {
       xtype: 'textfield',
