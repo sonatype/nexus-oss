@@ -23,7 +23,7 @@
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
     
-    <plugin-repository.directory>${pom.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
+    <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
     <nexus-plugin-console-plugin.version>1.4.1-SNAPSHOT</nexus-plugin-console-plugin.version>
     
   </properties>
