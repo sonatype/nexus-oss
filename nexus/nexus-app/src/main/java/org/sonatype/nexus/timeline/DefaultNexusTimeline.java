@@ -1,11 +1,14 @@
 package org.sonatype.nexus.timeline;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -47,11 +50,63 @@ public class DefaultNexusTimeline
         {
             getLogger().info( "Initializing Nexus Timeline..." );
 
+            moveLegacyTimeline();
+
             updateConfiguration();
         }
         catch ( TimelineException e )
         {
             throw new InitializationException( "Unable to initialize Timeline!", e );
+        }
+    }
+    
+    private void moveLegacyTimeline()
+        throws TimelineException
+    {
+        File timelineDir = applicationConfiguration.getWorkingDirectory( dirName );
+
+        File legacyIndexDir = timelineDir;
+
+        File newIndexDir = new File( timelineDir, "index" );
+
+        File[] legacyIndexFiles = legacyIndexDir.listFiles( new FileFilter()
+        {
+            public boolean accept( File file )
+            {
+                return file.isFile();
+            }
+        } );
+
+        if ( legacyIndexFiles == null || legacyIndexFiles.length == 0 )
+        {
+            return;
+        }
+
+        if ( newIndexDir.exists() && newIndexDir.listFiles().length > 0 )
+        {
+            return;
+        }
+
+        getLogger().info(
+            "Moving legacy timeline index from '" + legacyIndexDir.getAbsolutePath() + "' to '"
+                + newIndexDir.getAbsolutePath() + "'." );
+
+        if ( !newIndexDir.exists() )
+        {
+            newIndexDir.mkdirs();
+        }
+
+        try
+        {
+
+            for ( File legacyIndexFile : legacyIndexFiles )
+            {
+                FileUtils.moveFileToDirectory( legacyIndexFile, newIndexDir, false );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new TimelineException( "Failed to move legacy timeline index!", e );
         }
     }
 
