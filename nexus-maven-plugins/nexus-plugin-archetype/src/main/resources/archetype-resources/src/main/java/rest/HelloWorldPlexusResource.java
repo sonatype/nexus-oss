@@ -17,9 +17,9 @@ import org.codehaus.plexus.component.annotations.Component;
  * A sample rest resoruce to get you started. By default this will automatically be mounted at:
  * http://localhost:8081/nexus/service/local/sample/hello
  */
-@Component( role = PlexusResource.class, hint = "HelloWorldPlexusResource" )
 public class HelloWorldPlexusResource
     extends AbstractPlexusResource
+    implements PlexusResource
 {
 
     @Override
