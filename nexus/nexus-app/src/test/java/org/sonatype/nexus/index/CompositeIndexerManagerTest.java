@@ -21,6 +21,8 @@ import java.util.Set;
 import junit.framework.TestCase;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.treeview.TreeNode;
+import org.sonatype.nexus.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -44,6 +46,7 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
 
+        // Composition strategy: all elements are being requested.
         man1.addRepositoryIndexContext( "foo" );
         man2.addRepositoryIndexContext( "foo" );
 
@@ -59,6 +62,7 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
 
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
         expect( man1.constructQuery( "foo", "bar" ) ).andReturn( getQueryDummy() );
 
         replay( man1, man2 );
@@ -73,6 +77,7 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
 
+        // Composition strategy: all elements are being requested.
         man1.downloadAllIndex();
         man2.downloadAllIndex();
 
@@ -87,6 +92,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.downloadRepositoryGroupIndex( "foo" );
         man2.downloadRepositoryGroupIndex( "foo" );
 
@@ -115,6 +122,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).        
         expect( man1.getNexusIndexer() ).andReturn( createMock( NexusIndexer.class ) );
 
         replay( man1, man2 );
@@ -128,6 +137,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
         expect( man1.getRepositoryBestIndexContext( "foo" ) ).andReturn( createMock( IndexingContext.class ) );
         replay( man1, man2 );
         composite.getRepositoryBestIndexContext( "foo" );
@@ -140,6 +151,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
         expect( man1.getRepositoryLocalIndexContext( "foo" ) ).andReturn( createMock( IndexingContext.class ) );
         replay( man1, man2 );
         composite.getRepositoryLocalIndexContext( "foo" );
@@ -152,6 +165,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
         expect( man1.getRepositoryRemoteIndexContext( "foo" ) ).andReturn( createMock( IndexingContext.class ) );
         replay( man1, man2 );
         composite.getRepositoryRemoteIndexContext( "foo" );
@@ -164,6 +179,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
         expect( man1.identifyArtifact( "foo", "bar" ) ).andReturn( getDummyArtifactInfo() );
         replay( man1, man2 );
         composite.identifyArtifact( "foo", "bar" );
@@ -176,6 +193,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.publishAllIndex();
         man2.publishAllIndex();
 
@@ -190,6 +209,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.publishRepositoryGroupIndex( "foo" );
         man2.publishRepositoryGroupIndex( "foo" );
 
@@ -204,6 +225,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.publishRepositoryIndex( "foo" );
         man2.publishRepositoryIndex( "foo" );
 
@@ -218,6 +241,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.reindexAllRepositories( "foo", true );
         man2.reindexAllRepositories( "foo", true );
 
@@ -232,6 +257,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.reindexRepository( "foo", "bar", true );
         man2.reindexRepository( "foo", "bar", true );
 
@@ -246,6 +273,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.reindexRepositoryGroup( "foo", "bar", true );
         man2.reindexRepositoryGroup( "foo", "bar", true );
 
@@ -264,6 +293,7 @@ public class CompositeIndexerManagerTest extends TestCase
         Repository repos = createMock( Repository.class );
         StorageItem storageItem = createMock( StorageItem.class );
 
+        // Composition strategy: all elements are being requested.
         man1.removeItemFromIndex( repos, storageItem );
         man2.removeItemFromIndex( repos, storageItem );
         replay( man1, man2 );
@@ -277,6 +307,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.resetConfiguration();
         man2.resetConfiguration();
 
@@ -291,6 +323,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.resetGroupIndex( "foo" );
         man2.resetGroupIndex( "foo" );
 
@@ -305,6 +339,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested. Results are being accumulated.
         expect( man1.searchArtifactClassFlat( "foo", "bar", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search1_", 10 ) );
         expect( man2.searchArtifactClassFlat( "foo", "bar", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search2_", 10 ) );
 
@@ -322,6 +358,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested. Results are being accumulated.
         expect( man1.searchArtifactFlat( "foo", "bar", "cheese", "cake", "bacon", "pasta", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search1_", 10 ) );
         expect( man2.searchArtifactFlat( "foo", "bar", "cheese", "cake", "bacon", "pasta", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search1_", 10 ) );
 
@@ -339,6 +377,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested. Results are being accumulated.
         expect( man1.searchArtifactFlat( "foo", "bar", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search1_", 10 ) );
         expect( man2.searchArtifactFlat( "foo", "bar", 0, 100, 100 ) ).andReturn( getFlatSearchResponseDummy( "search1_", 10 ) );
 
@@ -356,6 +396,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.setRepositoryIndexContextSearchable( "foo", true );
         man2.setRepositoryIndexContextSearchable( "foo", true );
 
@@ -370,6 +412,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.shutdown( true );
         man2.shutdown( true );
 
@@ -384,6 +428,8 @@ public class CompositeIndexerManagerTest extends TestCase
         IndexerManager man1 = createMock( IndexerManager.class );
         IndexerManager man2 = createMock( IndexerManager.class );
         IndexerManager composite = prepareComposite( man1, man2 );
+
+        // Composition strategy: all elements are being requested.
         man1.updateRepositoryIndexContext( "foo" );
         man2.updateRepositoryIndexContext( "foo" );
 
@@ -402,11 +448,30 @@ public class CompositeIndexerManagerTest extends TestCase
         Repository repos = createMock( Repository.class );
         StorageItem storageItem = createMock( StorageItem.class );
 
+        // Composition strategy: all elements are being requested.
         man1.addItemToIndex( repos, storageItem );
         man2.addItemToIndex( repos, storageItem );
 
         replay( man1, man2 );
         composite.addItemToIndex( repos, storageItem );
+        verify( man1, man2 );
+    }
+
+    public void testListNodes()
+        throws IOException, NoSuchRepositoryException
+    {
+        IndexerManager man1 = createMock( IndexerManager.class );
+        IndexerManager man2 = createMock( IndexerManager.class );
+        IndexerManager composite = prepareComposite( man1, man2 );
+
+        Repository repos = createMock( Repository.class );
+        TreeNodeFactory treeNodeFactory = createMock( TreeNodeFactory.class );
+
+        // Composition strategy: first come, first server (possibly not all elements are being requested in this case).
+        expect( man1.listNodes( treeNodeFactory, repos, "foo" ) ).andReturn( createMock( TreeNode.class ) );
+       
+        replay( man1, man2 );
+        composite.listNodes( treeNodeFactory, repos, "foo" );
         verify( man1, man2 );
     }
 
