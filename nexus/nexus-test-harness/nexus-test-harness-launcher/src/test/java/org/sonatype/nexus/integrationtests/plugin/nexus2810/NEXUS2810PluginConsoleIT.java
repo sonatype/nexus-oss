@@ -38,31 +38,42 @@ public class NEXUS2810PluginConsoleIT
     {
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-        Assert.assertEquals( 2, pluginInfos.size() );
+        Assert.assertEquals( 3, pluginInfos.size() );
 
-        PluginInfoDTO activatedPluginInfo = pluginInfos.get( 0 );
+        PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus Plugin Console Plugin" );
+        assertPropertyValid( "Name", pluginConsolePlugin.getName(), "Nexus Plugin Console Plugin" );
+        assertPropertyValid( "Version", pluginConsolePlugin.getVersion() );
+        assertPropertyValid( "Description", pluginConsolePlugin.getDescription(), "Nexus Core Plugin :: Plugin Console" );
+        assertPropertyValid( "Status", pluginConsolePlugin.getStatus(), "ACTIVATED" );
+        assertPropertyValid( "SCM Version", pluginConsolePlugin.getScmVersion() );
+        assertPropertyValid( "SCM Timestamp", pluginConsolePlugin.getScmTimestamp() );
+        assertPropertyValid( "Site", pluginConsolePlugin.getSite() );
+        Assert.assertTrue( StringUtils.isEmpty( pluginConsolePlugin.getFailureReason() ) );
+        Assert.assertTrue( !pluginConsolePlugin.getRestInfos().isEmpty() );
 
-        assertPropertyValid( "Name", activatedPluginInfo.getName(), "Nexus Plugin Console Plugin" );
-        assertPropertyValid( "Version", activatedPluginInfo.getVersion() );
-        assertPropertyValid( "Description", activatedPluginInfo.getDescription(), "Nexus Core Plugin :: Plugin Console" );
-        assertPropertyValid( "Status", activatedPluginInfo.getStatus(), "ACTIVATED" );
-        assertPropertyValid( "SCM Version", activatedPluginInfo.getScmVersion() );
-        assertPropertyValid( "SCM Timestamp", activatedPluginInfo.getScmTimestamp() );
-        assertPropertyValid( "Site", activatedPluginInfo.getSite() );
-        Assert.assertTrue( StringUtils.isEmpty( activatedPluginInfo.getFailureReason() ) );
-        Assert.assertTrue( !activatedPluginInfo.getRestInfos().isEmpty() );
+        PluginInfoDTO pgpPlugin = this.getPluginInfoByName( pluginInfos, "Nexus Enterprise Plugin :: PGP" );
+        assertPropertyValid( "Name", pgpPlugin.getName() );
+        assertPropertyValid( "Version", pgpPlugin.getVersion() );
+        assertPropertyValid( "Status", pgpPlugin.getStatus(), "BROKEN" );
+        Assert.assertNull( pgpPlugin.getDescription() );
+        Assert.assertEquals( "N/A", pgpPlugin.getScmVersion() );
+        Assert.assertEquals( "N/A", pgpPlugin.getScmTimestamp() );
+        assertPropertyValid( "Site", pgpPlugin.getSite() );
+        Assert.assertFalse( StringUtils.isEmpty( pgpPlugin.getFailureReason() ) );
+        Assert.assertTrue( pgpPlugin.getRestInfos().isEmpty() );
+    }
+    
+    private PluginInfoDTO getPluginInfoByName( List<PluginInfoDTO> pluginInfos, String name )
+    {
+        for ( PluginInfoDTO pluginInfo : pluginInfos )
+        {
+            if ( pluginInfo.getName().equals( name ) )
+            {
+                return pluginInfo;
+            }
+        }
 
-        PluginInfoDTO brokenPluginInfo = pluginInfos.get( 1 );
-
-        assertPropertyValid( "Name", brokenPluginInfo.getName() );
-        assertPropertyValid( "Version", brokenPluginInfo.getVersion() );
-        assertPropertyValid( "Status", brokenPluginInfo.getStatus(), "BROKEN" );
-        Assert.assertNull( brokenPluginInfo.getDescription() );
-        Assert.assertEquals( "N/A", brokenPluginInfo.getScmVersion() );
-        Assert.assertEquals( "N/A", brokenPluginInfo.getScmTimestamp() );
-        Assert.assertNull( brokenPluginInfo.getSite() );
-        Assert.assertFalse( StringUtils.isEmpty( brokenPluginInfo.getFailureReason() ) );
-        Assert.assertTrue( brokenPluginInfo.getRestInfos().isEmpty() );
+        return null;
     }
 
     private void assertPropertyValid( String name, String value, String... expectedValue )

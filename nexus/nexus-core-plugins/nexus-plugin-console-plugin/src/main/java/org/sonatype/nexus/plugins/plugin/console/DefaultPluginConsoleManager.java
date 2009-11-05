@@ -51,7 +51,7 @@ public class DefaultPluginConsoleManager
 
         result.setStatus( pluginResponse.getAchievedGoal().name() );
         result.setVersion( pluginResponse.getPluginCoordinates().getVersion() );
-        if ( pluginResponse.isSuccessful() )
+        if ( pluginResponse.getPluginDescriptor() != null )
         {
             result.setName( pluginResponse.getPluginDescriptor().getPluginMetadata().getName() );
             result.setDescription( pluginResponse.getPluginDescriptor().getPluginMetadata().getDescription() );
@@ -63,6 +63,10 @@ public class DefaultPluginConsoleManager
         {
             result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":"
                 + pluginResponse.getPluginCoordinates().getArtifactId() );
+        }
+
+        if ( !pluginResponse.isSuccessful() )
+        {
             result.setFailureReason( pluginResponse.formatAsString( false ) );
         }
 

@@ -334,6 +334,9 @@ public class DefaultNexusPluginManager
 
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
+            
+            // we will have pluginDescriptor even later the plugin is broken
+            result.setPluginDescriptor( pluginDescriptor );
 
             // create discovery context
             discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
