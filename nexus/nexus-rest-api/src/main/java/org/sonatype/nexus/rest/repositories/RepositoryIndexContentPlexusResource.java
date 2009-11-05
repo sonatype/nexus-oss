@@ -46,5 +46,5 @@ public class RepositoryIndexContentPlexusResource
     protected String getRepositoryId( Request request )
     {
         return String.valueOf( request.getAttributes().get( REPOSITORY_ID_KEY ) );
-        }
-        }
+    }
+}
