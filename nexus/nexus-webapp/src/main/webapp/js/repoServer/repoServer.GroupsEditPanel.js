@@ -209,6 +209,7 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
         receivedData.resourceURI =
           Sonatype.config.host + Sonatype.config.repos.urls.groups + '/' + receivedData.id;
       }
+      receivedData.userManaged = true ;
       return;
     }
     
@@ -217,7 +218,7 @@ Ext.extend( Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
     rec.set( 'name', action.output.data.name );
     rec.set( 'format', action.output.data.format );
     rec.set( 'exposed', action.output.data.exposed );
-    rec.set( 'displayStatus', Sonatype.utils.joinArrayObject( action.output.data.repositories, 'name' ) ); 
+    rec.set( 'displayStatus', Sonatype.utils.joinArrayObject( action.output.data.repositories, 'name' ) );
     rec.commit();
     rec.endEdit();
   },
