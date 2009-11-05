@@ -6,5 +6,7 @@ public enum PluginActivationResult
     
     DEACTIVATED,
     
+    MISSING,
+    
     BROKEN;
 }

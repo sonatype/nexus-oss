@@ -216,6 +216,8 @@ public class DefaultNexusPluginManager
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
             
+            result.setAchievedGoal( PluginActivationResult.MISSING );
+            
             this.pluginActions.put( pluginCoordinate, result );
 
             response.addPluginResponse( result );
@@ -270,6 +272,8 @@ public class DefaultNexusPluginManager
             else
             {
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
+                
+                result.setAchievedGoal( PluginActivationResult.MISSING);
             }
         }
         catch ( PlexusContainerException e )
@@ -302,6 +306,8 @@ public class DefaultNexusPluginManager
             {
                 // this is not a nexus plugin!
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
+                
+                result.setAchievedGoal( PluginActivationResult.MISSING );
 
                 response.addPluginResponse( result );
                 
@@ -333,27 +339,44 @@ public class DefaultNexusPluginManager
             discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
 
             // resolve inter-plugin deps and gather them
-            List<GAVCoordinate> dependencyPlugins =
-                new ArrayList<GAVCoordinate>( pluginDescriptor.getPluginMetadata().getPluginDependencies().size() );
+            List<GAVCoordinate> dependencyPlugins = new ArrayList<GAVCoordinate>( pluginDescriptor
+                .getPluginMetadata().getPluginDependencies().size() );
+
+            List<GAVCoordinate> brokenDependencyPlugins = new ArrayList<GAVCoordinate>();
 
             for ( PluginDependency dependency : pluginDescriptor.getPluginMetadata().getPluginDependencies() )
             {
                 // we use GAV here only, neglecting CT
-                GAVCoordinate depCoord =
-                    new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
+                GAVCoordinate depCoord = new GAVCoordinate(
+                    dependency.getGroupId(),
+                    dependency.getArtifactId(),
+                    dependency.getVersion() );
 
                 if ( !activatedPlugins.containsKey( depCoord ) )
                 {
                     // try to activate it in recursion
-                    response.addPluginManagerResponse( activatePlugin( depCoord ) );
+                    PluginManagerResponse dependencyResponse = activatePlugin( depCoord );
+
+                    response.addPluginManagerResponse( dependencyResponse );
+
+                    if ( !dependencyResponse.isSuccessful() )
+                    {
+                        brokenDependencyPlugins.add( depCoord );
+                    }
                 }
 
                 dependencyPlugins.add( depCoord );
             }
 
             // before going further, we must ensure that we resolved all the dependencies
-            if ( !response.isSuccessful() )
+            if ( !brokenDependencyPlugins.isEmpty() )
             {
+                result.setThrowable( new PluginDependencyUnavailableException( brokenDependencyPlugins ) );
+
+                response.addPluginResponse( result );
+                
+                this.pluginActions.put( pluginCoordinates, result );
+
                 return;
             }
 
