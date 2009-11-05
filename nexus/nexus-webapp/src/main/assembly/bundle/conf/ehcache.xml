@@ -22,7 +22,18 @@
             />
 
     <cache name="path-cache"
-           maxElementsInMemory="100000"
+            maxElementsInMemory="100000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <cache name="jsecurity-activeSessionCache"
+            maxElementsInMemory="10000"
             eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
