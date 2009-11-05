@@ -18,10 +18,10 @@ Sonatype.repoServer.SearchPanel = function(config){
 
   this.searchTypes = [];
   
-  //fire event for plugins to add their own search items
+  // fire event for plugins to add their own search items
   Sonatype.Events.fireEvent( 'searchTypeInit', this.searchTypes, this );
   
-  //no items, no page
+  // no items, no page
   if ( this.searchTypes.length < 1 ) {
     return;
   }
@@ -64,43 +64,44 @@ Sonatype.repoServer.SearchPanel = function(config){
 };
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
-  //search type switched on the drop down button
+  // search type switched on the drop down button
   switchSearchType: function( button, event ) {
-    //if event is null, this is called directly, and we
-    //we will reset regardless if already selected, otherwise
-    //no need to do anything if already set to same value
+    // if event is null, this is called directly, and we
+    // we will reset regardless if already selected, otherwise
+    // no need to do anything if already set to same value
     if ( event == null
         || this.searchTypeButton.value != button.value ) {
       this.searchTypeButton.value = button.value;
       this.searchTypeButton.setText( this.getSearchType( button.value ).text );
       this.clearWarningLabel();
       this.loadSearchPanel();
+      this.switchStore();
     }
   },
-  //load the dynamic panel
+  // load the dynamic panel
   loadSearchPanel: function() {
-    //first remove current items
+    // first remove current items
     while ( this.searchToolbar.items.length > 1 ) {
       var item = this.searchToolbar.items.last();
       this.searchToolbar.items.remove( item );
       item.destroy();
     }
     
-    //now add the other items
+    // now add the other items
     var searchType = this.getSearchType( this.searchTypeButton.value );
     
     if ( searchType != null ) {
       for ( var i = 0; i < searchType.panelItems.length; i++ ) {
-        //can't simply add object config to toolbar, need to create
-        //a real item
+        // can't simply add object config to toolbar, need to create
+        // a real item
         this.searchToolbar.add(
           this.convertToFieldObject( searchType.panelItems[i] ) 
-  );
+        );
       }
     }
   },  
-  //toolbar only supports adding certain types of items, so we
-  //need to do some special handling
+  // toolbar only supports adding certain types of items, so we
+  // need to do some special handling
   convertToFieldObject : function( config ) {
     if ( config.xtype == 'nexussearchfield' ) {
       return new Ext.app.SearchField( config );
@@ -112,7 +113,12 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       return config;
     }
   },  
-  //retrieve the specified search type object
+  // different search types may have different stores
+  switchStore : function() {
+    var searchType = this.getSearchType( this.searchTypeButton.value );
+    this.grid.switchStore( this.grid, searchType.store );
+  },
+  // retrieve the specified search type object
   getSearchType : function( value ) {
     for ( var i = 0 ; i < this.searchTypes.length ; i++ ) {
       if ( this.searchTypes[i].value == value ) {
@@ -122,40 +128,40 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   
     return null;
   },
-  //set the warning in the toolbar
+  // set the warning in the toolbar
   setWarningLabel : function( s ) {
     this.clearWarningLabel();
     this.warningLabel = this.searchToolbar.addText( '<span class="x-toolbar-warning">' + s + '</span>' );
   },
-  //clear the warning in the toolbar
+  // clear the warning in the toolbar
   clearWarningLabel : function() {
     if ( this.warningLabel ) {
       this.warningLabel.destroy();
       this.warningLabel = null;
     }
   },
-  //start the search
+  // start the search
   startSearch : function( panel ) {
-    //update history in address bar of browser
+    // update history in address bar of browser
     Sonatype.utils.updateHistory( panel );
     
     var searchType = this.getSearchType( this.searchTypeButton.value );
     
     searchType.searchHandler.call( this, panel );
   },
-  //get the records from the server using grid
+  // get the records from the server using grid
   fetchRecords : function( panel ) {
     panel.artifactContainer.collapsePanel();
     panel.grid.totalRecords = 0;
     panel.grid.store.load();
   },
-  //start the quick search, we will look at all search types
-  //and try to guess which type of search to use
+  // start the quick search, we will look at all search types
+  // and try to guess which type of search to use
   startQuickSearch: function( v ) {
     var defaultSearchType = null;
     var searchType = null;
     for ( var i = 0 ; i < this.searchTypes.length ; i++ ) {
-      //this default search will be used if no other searches match
+      // this default search will be used if no other searches match
       if ( this.searchTypes[i].defaultQuickSearch == true ) {
         defaultSearchType = this.searchTypes[i];
       }
@@ -165,7 +171,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       }
     }
     
-    //apply the default search
+    // apply the default search
     if ( searchType == null 
         && defaultSearchType != null ) {
       searchType = defaultSearchType;
@@ -183,12 +189,12 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       this.startSearch( this );
             }
           },
-  //apply the bookmark params to page
+  // apply the bookmark params to page
   applyBookmark : function( bookmark ) {
     if ( bookmark ) {
       var parts = bookmark.split( '~' );
       
-      //if type not specified, simply do a quick search and guess
+      // if type not specified, simply do a quick search and guess
       if ( parts.length == 1 ) {
         this.startQuickSearch( bookmark );
     }
@@ -206,7 +212,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       }
     }
   },
-  //get the params to build bookmark
+  // get the params to build bookmark
   getBookmark : function() {
     var searchType = this.getSearchType( this.searchTypeButton.value );
     
@@ -214,7 +220,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   });
 
-//Add the quick search
+// Add the quick search
 Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   searchTypes.push({
     value: 'quick',
@@ -222,6 +228,8 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
     scope: panel,
     handler: panel.switchSearchType,
     defaultQuickSearch: true,
+    // use the default store
+    store: null,
     quickSearchCheckHandler: function( panel, value ) {
       return true;
     },
@@ -259,12 +267,14 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   });
 });
 
-//Add the classname search
+// Add the classname search
 Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   searchTypes.push({
     value: 'classname',
     text: 'Classname Search',
     scope: panel,
+    // use the default store
+    store: null,
     handler: panel.switchSearchType,
     quickSearchCheckHandler: function( panel, value ) {
       return value.search(/^[a-z.]*[A-Z]/) == 0;
@@ -303,7 +313,7 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   });
 });
 
-//Add the gav search
+// Add the gav search
 Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   var enterHandler = function(f, e) {
     if(e.getKey() == e.ENTER){
@@ -312,23 +322,23 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   };
   
   var gavPopulator = function( panel, data ) {
-    //groupId
+    // groupId
     if ( data.length > 1 ) {
       panel.getTopToolbar().items.itemAt(2).setRawValue( data[1] );
     }
-    //artifactId
+    // artifactId
     if ( data.length > 2 ) {
       panel.getTopToolbar().items.itemAt(5).setRawValue( data[2] );
     }
-    //version
+    // version
     if ( data.length > 3 ) {
       panel.getTopToolbar().items.itemAt(8).setRawValue( data[3] );
     }
-    //packaging
+    // packaging
     if ( data.length > 4 ) {
       panel.getTopToolbar().items.itemAt(11).setRawValue( data[4] );
     }
-    //classifier
+    // classifier
     if ( data.length > 5 ) {
       panel.getTopToolbar().items.itemAt(14).setRawValue( data[5] );
     }
@@ -338,6 +348,8 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
     value: 'gav',
     text: 'GAV Search',
     scope: panel,
+    // use the default store
+    store: null,
     handler: panel.switchSearchType,
     quickSearchCheckHandler: function( panel, value ) {
       return value.indexOf( ':' ) > -1;
@@ -353,27 +365,27 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
     searchHandler: function( panel ) {
       this.grid.store.baseParams = {};
       
-      //groupId
+      // groupId
       var v = panel.getTopToolbar().items.itemAt(2).getRawValue();
       if ( v ) {
         panel.grid.store.baseParams['g'] = v;
       }
-      //artifactId
+      // artifactId
       v = panel.getTopToolbar().items.itemAt(5).getRawValue();
       if ( v ) {
         panel.grid.store.baseParams['a'] = v;
       }
-      //version
+      // version
       v = panel.getTopToolbar().items.itemAt(8).getRawValue();
       if ( v ) {
         panel.grid.store.baseParams['v'] = v;
       }
-      //packaging
+      // packaging
       v = panel.getTopToolbar().items.itemAt(11).getRawValue();
       if ( v ) {
         panel.grid.store.baseParams['p'] = v;
       }
-      //classifier
+      // classifier
       v = panel.getTopToolbar().items.itemAt(14).getRawValue();
       if ( v ) {
         panel.grid.store.baseParams['c'] = v;
@@ -396,31 +408,31 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
     },
     getBookmarkHandler: function( panel ) {
       var result = panel.searchTypeButton.value;
-      //groupId
+      // groupId
       result += '~';
       var v = panel.getTopToolbar().items.itemAt(2).getRawValue();
       if ( v ) {
         result += v;
       }
-      //artifactId
+      // artifactId
       result += '~';
       v = panel.getTopToolbar().items.itemAt(5).getRawValue();
       if ( v ) {
         result += v;
       }
-      //version
+      // version
       result += '~';
       v = panel.getTopToolbar().items.itemAt(8).getRawValue();
       if ( v ) {
         result += v;
       }
-      //packaging
+      // packaging
       result += '~';
       v = panel.getTopToolbar().items.itemAt(11).getRawValue();
       if ( v ) {
         result += v;
       }
-      //classifier
+      // classifier
       result += '~';
       v = panel.getTopToolbar().items.itemAt(14).getRawValue();
       if ( v ) {
@@ -506,13 +518,15 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   });
   });
   
-//Add the checksum search
+// Add the checksum search
 Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
   if ( Sonatype.lib.Permissions.checkPermission( 'nexus:identify', Sonatype.lib.Permissions.READ ) ) {
     searchTypes.push({
       value: 'checksum',
       text: 'Checksum Search',
       scope: panel,
+      // use the default store
+      store: null,
       handler: panel.switchSearchType,
       quickSearchCheckHandler: function( panel, value ) {
         return value.search(/^[0-9a-f]{40}$/) == 0;
@@ -541,71 +555,71 @@ Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
         return result;
       },
       panelItems: [
-      {
-        xtype: 'nexussearchfield',
-          name: 'single-search-field',
-          searchPanel: panel,
-        width: 300
-      },
-      {
-        xtype: Ext.isGecko3 ? 'button' : 'browsebutton',
-        text: 'Browse...',
-          searchPanel: panel,
-        tooltip: 'Click to select a file. It will not be uploaded to the ' +
-          'remote server, an SHA1 checksum is calculated locally and sent to ' +
-          'Nexus to find a match. This feature requires Java applet ' +
-          'support in your web browser.',
-        handler: function( b ) {
-          if ( ! document.digestApplet ) {
-            b.searchPanel.grid.fetchMoreBar.addText(
-              '<div id="checksumContainer" style="width:10px">' +
-                '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
-                  'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
-                  'width="1" height="1" name="digestApplet"></applet>' +
-                '</div>'
-            ); 
-          }
-
-          var filename = null;
-          
-          if ( Ext.isGecko3 ) {
-            filename = document.digestApplet.selectFile();
-          }
-          else {
-            var fileInput = b.detachInputFile();
-            filename = fileInput.getValue();
-          }
-
-          if ( ! filename ) {
-            return;
-          }
-          
-          b.disable();
-
-            var setFilenameLabel = function( panel, s ) {
-              if ( panel.filenameLabel ) {
-                panel.filenameLabel.destroy();
-              }
-              panel.filenameLabel = s ? panel.searchToolbar.addText( '<span style="color:#808080;">'+s+'</span>' ) : null;
-            };
-            
-            setFilenameLabel( b.searchPanel, 'Calculating checksum...' );
-        
-          var f = function( b, filename ) {
-            var sha1 = 'error calculating checksum';
-            if ( document.digestApplet ) {
-              sha1 = document.digestApplet.digest( filename );
+        {
+          xtype: 'nexussearchfield',
+            name: 'single-search-field',
+            searchPanel: panel,
+          width: 300
+        },
+        {
+          xtype: Ext.isGecko3 ? 'button' : 'browsebutton',
+          text: 'Browse...',
+            searchPanel: panel,
+          tooltip: 'Click to select a file. It will not be uploaded to the ' +
+            'remote server, an SHA1 checksum is calculated locally and sent to ' +
+            'Nexus to find a match. This feature requires Java applet ' +
+            'support in your web browser.',
+          handler: function( b ) {
+            if ( ! document.digestApplet ) {
+              b.searchPanel.grid.fetchMoreBar.addText(
+                '<div id="checksumContainer" style="width:10px">' +
+                  '<applet code="org/sonatype/nexus/applet/DigestApplet.class" ' +
+                    'archive="' + Sonatype.config.resourcePath + '/digestapplet.jar" ' +
+                    'width="1" height="1" name="digestApplet"></applet>' +
+                  '</div>'
+              ); 
             }
+  
+            var filename = null;
+            
+            if ( Ext.isGecko3 ) {
+              filename = document.digestApplet.selectFile();
+            }
+            else {
+              var fileInput = b.detachInputFile();
+              filename = fileInput.getValue();
+            }
+  
+            if ( ! filename ) {
+              return;
+            }
+            
+            b.disable();
+  
+              var setFilenameLabel = function( panel, s ) {
+                if ( panel.filenameLabel ) {
+                  panel.filenameLabel.destroy();
+                }
+                panel.filenameLabel = s ? panel.searchToolbar.addText( '<span style="color:#808080;">'+s+'</span>' ) : null;
+              };
               
-              b.searchPanel.getTopToolbar().items.itemAt(1).setRawValue( sha1 );
-              setFilenameLabel( b.searchPanel, filename );
-            b.enable();
-            b.searchPanel.startSearch( b.searchPanel );
+              setFilenameLabel( b.searchPanel, 'Calculating checksum...' );
+          
+            var f = function( b, filename ) {
+              var sha1 = 'error calculating checksum';
+              if ( document.digestApplet ) {
+                sha1 = document.digestApplet.digest( filename );
+              }
+                
+                b.searchPanel.getTopToolbar().items.itemAt(1).setRawValue( sha1 );
+                setFilenameLabel( b.searchPanel, filename );
+              b.enable();
+              b.searchPanel.startSearch( b.searchPanel );
+            }
+            f.defer( 200, b, [b, filename] );
           }
-          f.defer( 200, b, [b, filename] );
         }
-      }
-    ]
-  });
-    }
+      ]
     });
+  }
+});

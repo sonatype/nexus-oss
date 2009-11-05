@@ -51,7 +51,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
   
   //@todo: create stand alone data reader to read update/create responses as well
   //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
-  this.store = new Ext.data.Store({
+  this.defaultStore = new Ext.data.Store({
     proxy: requestProxy,
     reader: resultReader,
     listeners: {
@@ -85,87 +85,49 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
     }
   });
   
-  this.store.setDefaultSort('groupId', "ASC");
-
-  this.columns = [
-    {
-      id: 'source',
-      header: "Source Index",
-      dataIndex: 'contextId',
-      sortable:true
-    },{
-      id: 'group',
-      header: "Group",
-      dataIndex: 'groupId',
-      sortable:true
-    },{
-      id: 'artifact',
-      header: "Artifact",
-      dataIndex: 'artifactId',
-      sortable:true
-    },{
-      id: 'version',
-      header: "Version",
-      dataIndex: 'version',
-      sortable:true
-    },{
-      id: 'packaging',
-	  header: "Packaging",
-	  dataIndex: 'packaging',
-	  sortable:true
-    },{
-      id: 'classifier',
-      header: "Classifier",
-      dataIndex: 'classifier',
-      sortable:true
-    }
-  ];
-
-  this.fetchMoreButton = new Ext.SplitButton({
-    text: 'Fetch Next 50',
-    icon: Sonatype.config.resourcePath + '/images/icons/search.gif',
-    cls: 'x-btn-text-icon',
-    value: '50',
-    handler: this.fetchMoreRows,
-    disabled: true,
-    scope: this,
-    menu: {
-      items: [
-        {
-          text: 'Fetch Next 50',
-          value: '50',
-          scope: this,
-          checked: true,
-          group: 'fetch-more-records',
-          handler: this.fetchMoreRows
-        },
-        {
-          text: 'Fetch Next 100',
-          value: '100',
-          scope: this,
-          checked: false,
-          group: 'fetch-more-records',
-          handler: this.fetchMoreRows
-        },
-        {
-          text: 'Fetch Next 200',
-          value: '200',
-          scope: this,
-          checked: false,
-          group: 'fetch-more-records',
-         handler: this.fetchMoreRows
-        },
-        {
-          text: 'Fetch All',
-          value: '0',
-          scope: this,
-          checked: false,
-          group: 'fetch-more-records',
-          handler: this.fetchMoreRows
-        }
-      ]
-    }
-    
+  this.defaultStore.setDefaultSort('groupId', "ASC");
+  
+  this.store = this.defaultStore;
+  
+  this.colModel = new Ext.grid.ColumnModel({
+    columns: [
+      {
+        id: 'source',
+        header: "Source Index",
+        dataIndex: 'contextId',
+        sortable:true
+      },
+      {
+        id: 'group',
+        header: "Group",
+        dataIndex: 'groupId',
+        sortable:true
+      },
+      {
+        id: 'artifact',
+        header: "Artifact",
+        dataIndex: 'artifactId',
+        sortable:true
+      },
+      {
+        id: 'version',
+        header: "Version",
+        dataIndex: 'version',
+        sortable:true
+      },
+      {
+        id: 'packaging',
+        header: "Packaging",
+        dataIndex: 'packaging',
+        sortable:true
+      },
+      {
+        id: 'classifier',
+        header: "Classifier",
+        dataIndex: 'classifier',
+        sortable:true
+      }
+    ]
   });
 
   this.clearButton = new Ext.Button({
@@ -203,8 +165,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
           getRowClass : this.applyRowClass
       },
       
-      listeners: {
-        rowcontextmenu: this.rowContextMenuHandler, 
+      listeners: { 
         render: function(panel){
           panel.body.on(
             {
@@ -228,6 +189,13 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
+  switchStore : function( grid, store ) {
+    if ( store == null ) {
+      store = grid.defaultStore;
+    }
+    
+    grid.reconfigure( store, grid.colModel );
+  },
   toggleExtraInfo : function(rowIndex){
     var rowEl = new Ext.Element(this.getView().getRow(rowIndex));
     var input = rowEl.child('.copy-pom-dep', true);
@@ -243,26 +211,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     p.body = '<span>POM Dependency: </span><input class="copy-pom-dep" type="text" autocomplete="off" value="'+xmlDep+'"/>';
     return 'x-grid3-row-collapsed';
   },
-
-  fetchMoreRows: function( button, event ) {
-    if ( button.value != this.fetchMoreButton.value ) {
-      this.fetchMoreButton.value = button.value;
-      this.fetchMoreButton.setText( button.text );
-    }
-
-    var fetched = this.store.getCount();
-    var toFetch = this.fetchMoreButton.value;
-    if ( toFetch == 0 ) {
-      toFetch = this.totalRecords - fetched;
-    }
-    this.store.load({
-      params: {
-        from: fetched,
-        count: toFetch
-      },
-      add: true
-    });
-  },
   
   updateRowTotals: function( p ) {
     var count = p.store.getCount();
@@ -276,8 +224,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     p.fetchMoreBar.items.items[0].destroy();
     p.fetchMoreBar.items.removeAt( 0 );
     p.fetchMoreBar.insertButton( 0, new Ext.Toolbar.TextItem( 'Displaying ' + count + ' records' ) );
-
-    p.fetchMoreButton.setDisabled( count >= p.totalRecords );
   },
 
   setWarningLabel: function( s ) {
@@ -293,58 +239,5 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.store.removeAll();
     this.updateRowTotals( this );
     this.clearWarningLabel();
-  },
-  
-  makeDownloadItem: function(text, url, event){
-	var item = {   
-      text: text,
-      href: url,
-      scope: this,
-      handler: this.downloadHandler
-	};
-	item.targetUrl = url;
-	return item;
-  },
-  
-  downloadHandler: function( node, item, event) {
-	  event.stopEvent();
-	  Sonatype.utils.openWindow( item.targetUrl );
-  },  
-  
-  rowContextMenuHandler: function( grid, rowIndex, e ) {
-    var rec = this.store.getAt( rowIndex );
-    
-    var menu = new Sonatype.menu.Menu( {
-      id: 'search-result-context-menu',
-      payload: rec
-    } );
-
-    if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) ){
-      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.clearCache );
-    }
-
-    if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) ) {
-      menu.add( Sonatype.repoServer.DefaultRepoHandler.repoActions.rebuildMetadata );
-    }
-    
-    if ( this.sp.checkPermission( 'nexus:artifact', this.sp.READ) ) {
-	    if ( menu.items.first() ){
-	    	menu.add( '-' );
-	    }
-	    var pomLink = rec.get('pomLink');
-	    var artifactLink = rec.get('artifactLink');
-	    
-	    if ( pomLink ) {
-	    	menu.add( this.makeDownloadItem( 'Open POM', pomLink, e) );
-	    }
-	    if ( artifactLink ) {
-	    	menu.add( this.makeDownloadItem( 'Download Artifact', artifactLink, e) );
-	    }
-    }
-
-    e.stopEvent();
-    menu.showAt( e.getXY() );
   }
-  
-  
 });
