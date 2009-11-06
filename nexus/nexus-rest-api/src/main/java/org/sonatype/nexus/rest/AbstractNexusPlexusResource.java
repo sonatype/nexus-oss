@@ -418,7 +418,7 @@ public abstract class AbstractNexusPlexusResource
         }
 
         String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version
-            + "&p=pom";
+            + "&e=pom";
 
         return createRedirectBaseRef( request ).toString() + suffix;
     }
@@ -430,8 +430,8 @@ public abstract class AbstractNexusPlexusResource
             return "";
         }
 
-        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&p="
-            + ai.packaging;
+        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
+            + ai.fextension;
 
         if ( StringUtils.isNotBlank( ai.classifier ) )
         {
