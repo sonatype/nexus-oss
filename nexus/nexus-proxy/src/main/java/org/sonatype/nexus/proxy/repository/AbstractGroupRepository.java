@@ -74,8 +74,11 @@ public abstract class AbstractGroupRepository
         {
             RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
 
-            // remove it from members (will nothing happen if not amongs them)
-            removeMemberRepositoryId( revt.getRepository().getId() );
+            if ( this
+                .getExternalConfiguration( false ).getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
+            {
+                removeMemberRepositoryId( revt.getRepository().getId() );
+            }
         }
         else if ( evt instanceof ConfigurationPrepareForSaveEvent && membersChanged )
         {
