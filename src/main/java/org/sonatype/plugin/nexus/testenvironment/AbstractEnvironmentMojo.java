@@ -47,8 +47,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.plugins.portallocator.Port;
-import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
 public class AbstractEnvironmentMojo
     extends AbstractMojo
@@ -203,17 +201,9 @@ public class AbstractEnvironmentMojo
 
         init();
 
-        allocatePorts();
-
         project.getProperties().put( "jetty-application-host", "0.0.0.0" );
-        project.getProperties().put(
-                                     "nexus-base-url",
-                                     "http://localhost:"
-                                         + project.getProperties().getProperty( "nexus-application-port" ) + "/nexus/" );
-        project.getProperties().put(
-                                     "proxy-repo-base-url",
-                                     "http://localhost:" + project.getProperties().getProperty( "proxy-repo-port" )
-                                         + "/remote/" );
+        project.getProperties().put( "nexus-base-url", "http://localhost:${nexus-application-port}/nexus/" );
+        project.getProperties().put( "proxy-repo-base-url", "http://localhost:${proxy-repo-port}/remote/" );
         project.getProperties().put( "proxy-repo-base-dir", getPath( new File( destination, "proxy-repo" ) ) );
         project.getProperties().put( "proxy-repo-target-dir", getPath( new File( destination, "proxy-repo" ) ) );
 
@@ -500,25 +490,6 @@ public class AbstractEnvironmentMojo
             IOUtil.close( input );
             IOUtil.close( output );
         }
-    }
-
-    private void allocatePorts()
-        throws MojoExecutionException, MojoFailureException
-    {
-        List<Port> portsList = new ArrayList<Port>();
-        portsList.add( new Port( "proxy-repo-port" ) );
-        portsList.add( new Port( "proxy-repo-control-port" ) );
-        portsList.add( new Port( "nexus-application-port" ) );
-        portsList.add( new Port( "nexus-proxy-port" ) );
-        portsList.add( new Port( "nexus-control-port" ) );
-        portsList.add( new Port( "email-server-port" ) );
-        portsList.add( new Port( "webproxy-server-port" ) );
-
-        PortAllocatorMojo portAllocator = new PortAllocatorMojo();
-        portAllocator.setProject( project );
-        portAllocator.setLog( getLog() );
-        portAllocator.setPorts( portsList.toArray( new Port[0] ) );
-        portAllocator.execute();
     }
 
     private void copyExtraResources()
