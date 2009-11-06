@@ -286,7 +286,12 @@ public class DefaultFSLocalRepositoryStorage
     {
         if ( !target.getParentFile().exists() && !target.getParentFile().mkdirs() )
         {
-            throw new StorageException( "Could not create the directory hiearchy to write " + target.getAbsolutePath() );
+            // recheck is it really a "good" parent?
+            if ( !target.getParentFile().isDirectory() )
+            {
+                throw new StorageException( "Could not create the directory hiearchy to write "
+                    + target.getAbsolutePath() );
+            }
         }
     }
 

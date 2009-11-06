@@ -27,6 +27,7 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
+import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -197,7 +198,9 @@ public class CommonsHttpClientRemoteStorage
             {
                 method.releaseConnection();
 
-                throw new StorageException( "IO Error during response stream handling!", ex );
+                throw new StorageException( "IO Error during response stream handling [repositoryId=\""
+                    + repository.getId() + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\""
+                    + remoteURL.toString() + "\"]!", ex );
             }
             catch ( RuntimeException ex )
             {
@@ -216,7 +219,9 @@ public class CommonsHttpClientRemoteStorage
             }
             else
             {
-                throw new StorageException( "The method execution returned result code " + response );
+                throw new StorageException( "The method execution returned result code " + response
+                    + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]" );
             }
         }
     }
@@ -253,7 +258,9 @@ public class CommonsHttpClientRemoteStorage
         }
         catch ( IOException e )
         {
-            throw new StorageException( e );
+            throw new StorageException( e.getMessage() + " [repositoryId=\"" + repository.getId()
+                + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString() + "\"]",
+                e );
         }
         finally
         {
@@ -276,7 +283,9 @@ public class CommonsHttpClientRemoteStorage
                 && response != HttpStatus.SC_ACCEPTED )
             {
                 throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
-                    + response + " : " + HttpStatus.getStatusText( response ) );
+                    + response + " : " + HttpStatus.getStatusText( response ) + " [repositoryId=\""
+                    + repository.getId() + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\""
+                    + remoteURL.toString() + "\"]" );
             }
         }
         finally
@@ -313,20 +322,24 @@ public class CommonsHttpClientRemoteStorage
      * @return the int
      */
     protected int executeMethod( ProxyRepository repository, ResourceStoreRequest request, HttpMethod method,
-                                 URL remoteUrl )
+        URL remoteUrl )
         throws RemoteAccessException, StorageException
     {
+        URI methodURI = null;
+
+        try
+        {
+            methodURI = method.getURI();
+        }
+        catch ( URIException e )
+        {
+            getLogger().debug( "Could not format debug log message", e );
+        }
+
         if ( getLogger().isDebugEnabled() )
         {
-            try
-            {
-                getLogger().debug(
-                    "Invoking HTTP " + method.getName() + " method against remote location " + method.getURI() );
-            }
-            catch ( URIException e )
-            {
-                getLogger().debug( "Could not format debug log message", e );
-            }
+            getLogger().debug(
+                "Invoking HTTP " + method.getName() + " method against remote location " + methodURI );
         }
 
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
@@ -383,13 +396,17 @@ public class CommonsHttpClientRemoteStorage
         {
             method.releaseConnection();
 
-            throw new StorageException( "Protocol error while executing " + method.getName() + " method", ex );
+            throw new StorageException( "Protocol error while executing " + method.getName()
+                + " method. [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
         catch ( IOException ex )
         {
             method.releaseConnection();
 
-            throw new StorageException( "Tranport error while executing " + method.getName() + " method", ex );
+            throw new StorageException( "Tranport error while executing " + method.getName()
+                + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
 
         return resultCode;
@@ -451,7 +468,7 @@ public class CommonsHttpClientRemoteStorage
      * @throws StorageException
      */
     protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
-                                               ResourceStoreRequest request, boolean relaxedCheck )
+        ResourceStoreRequest request, boolean relaxedCheck )
         throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
@@ -472,7 +489,7 @@ public class CommonsHttpClientRemoteStorage
             // If HEAD failed, attempt a GET. Some repos may not support HEAD method
             doGet = true;
 
-            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage() );
+            getLogger().debug( "HEAD method failed, will attempt GET.  Exception: " + e.getMessage(), e );
         }
         finally
         {
