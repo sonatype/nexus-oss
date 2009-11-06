@@ -227,8 +227,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     var searchType = this.getSearchType( this.searchTypeButton.value );
     
     return searchType.getBookmarkHandler.call( this, this );
-  },
-  });
+  }
+});
 
 // Add the quick search
 Sonatype.Events.addListener( 'searchTypeInit', function( searchTypes, panel ) {
