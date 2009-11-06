@@ -204,6 +204,10 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       store = grid.defaultStore;
     }
     
+    if ( store ) {
+      this.clearResults();
+    }
+    
     grid.reconfigure( store, grid.colModel );
   },
   toggleExtraInfo : function(rowIndex){
