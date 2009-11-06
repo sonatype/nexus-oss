@@ -15,6 +15,10 @@ Sonatype.repoServer.SearchPanel = function(config){
   var config = config || {};
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
+  
+  this.grid = new Sonatype.repoServer.SearchResultGrid({
+    searchPanel: this
+  });
 
   this.searchTypes = [];
   
@@ -43,11 +47,7 @@ Sonatype.repoServer.SearchPanel = function(config){
       this.searchTypeButton,
       this.convertToFieldObject( this.searchTypes[0].panelItems[0] )
     ]
-  });
-  
-  this.grid = new Sonatype.repoServer.SearchResultGrid({
-    searchPanel: this
-  });
+  });  
   
   this.artifactContainer = new Sonatype.repoServer.ArtifactContainer({
   });
@@ -61,9 +61,19 @@ Sonatype.repoServer.SearchPanel = function(config){
       this.artifactContainer
     ]
   });
+  
+  this.grid.getSelectionModel().on( 'rowselect', this.displayArtifactInformation, this );
+  this.grid.clearButton.on( 'click', this.clearArtifactInformation, this );
 };
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
+  clearArtifactInformation: function( button, e ) {
+    this.artifactContainer.collapsePanel();
+  },
+  
+  displayArtifactInformation: function( selectionModel, index, rec ) {
+    this.artifactContainer.updateArtifact( rec.data );
+  },
   // search type switched on the drop down button
   switchSearchType: function( button, event ) {
     // if event is null, this is called directly, and we

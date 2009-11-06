@@ -15,59 +15,55 @@
 
 // config: feedUrl required
 
-Sonatype.repoServer.SearchResultGrid = function(config) {
-
-  Ext.apply(this, config);
+Sonatype.SearchStore = function(config) {
+  var config = config || {};
+  var defaultConfig = {
+    searchUrl: Sonatype.config.repos.urls.index,
+  };
+  Ext.apply(this, config, defaultConfig);
   
-  this.sp = Sonatype.lib.Permissions;
-
-  var resultRecordConstructor = Ext.data.Record.create([
-      {name:'groupId'},
-      {name:'artifactId'},
-      {name:'version'},
-      {name:'repoId'},
-      {name:'resourceURI'},
-      {name:'contextId'},
-      {name:'classifier'},
-      {name:'packaging'},
-      {name:'extension'},
-      {name:'pomLink'},
-      {name:'artifactLink'}
-  ]);
-
-  var resultReader = new Ext.data.JsonReader({
-      root: 'data',
-      totalProperty: 'totalCount'
+  Sonatype.SearchStore.superclass.constructor.call(this, {
+    sortInfo: {
+      field: 'groupId',
+      direction: 'ASC'
     },
-    resultRecordConstructor );
-
-  var requestProxy = new Ext.data.HttpProxy({
-    url: Sonatype.config.repos.urls.index,
-    method: 'GET'
-    //headers: {Accept: 'application/json'}
-  });
-  
-  this.totalRecords = 0;
-  
-  //@todo: create stand alone data reader to read update/create responses as well
-  //@ext: must use data.Store (not JsonStore) to pass in reader instead of using fields config array
-  this.defaultStore = new Ext.data.Store({
-    proxy: requestProxy,
-    reader: resultReader,
+    proxy: new Ext.data.HttpProxy({
+      url: this.searchUrl,
+      method: 'GET'
+    }),
+    reader: new Ext.data.JsonReader(
+      {
+        root: 'data',
+        totalProperty: 'totalCount'
+      },
+      Ext.data.Record.create([
+        {name:'groupId'},
+        {name:'artifactId'},
+        {name:'version'},
+        {name:'repoId'},
+        {name:'resourceURI'},
+        {name:'contextId'},
+        {name:'classifier'},
+        {name:'packaging'},
+        {name:'extension'},
+        {name:'pomLink'},
+        {name:'artifactLink'}
+      ])
+    ),
     listeners: {
       'beforeload': {
         fn: function( store, options ) {
-          requestProxy.getConnection().on( 'requestcomplete',
+          store.proxy.getConnection().on( 'requestcomplete',
             function( conn, response, options ) {
               if ( response.responseText ) {
                 var statusResp = Ext.decode(response.responseText);
                 if ( statusResp ) {
-                  this.totalRecords = statusResp.totalCount;
+                  this.grid.totalRecords = statusResp.totalCount;
                   if ( statusResp.tooManyResults ) {
-                    this.setWarningLabel( 'Too many results, please refine the search condition.' );
+                    this.grid.setWarningLabel( 'Too many results, please refine the search condition.' );
                   }
                   else {
-                    this.clearWarningLabel();
+                    this.grid.clearWarningLabel();
                   }
                 }
               }
@@ -78,14 +74,28 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       },
       'load': {
         fn: function( store, records, options ) {
-          this.updateRowTotals( this );
+          this.grid.updateRowTotals( this.grid );
         },
         scope: this
       }
     }
   });
+};
+
+Ext.extend(Sonatype.SearchStore, Ext.data.Store, {
+});
+
+Sonatype.repoServer.SearchResultGrid = function(config) {
+
+  Ext.apply(this, config);
   
-  this.defaultStore.setDefaultSort('groupId', "ASC");
+  this.sp = Sonatype.lib.Permissions;
+  
+  this.totalRecords = 0;
+  
+  this.defaultStore = new Sonatype.SearchStore({
+    grid: this
+  });
   
   this.store = this.defaultStore;
   
