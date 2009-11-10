@@ -42,7 +42,7 @@ public class Nexus1146RepositoryOverProxyIT
         File jarArtifact = this.downloadArtifact( getTestId(), "artifact", "1.0", "jar", null, "target/downloads" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
-        String artifactUrl = baseProxyURL + "release-proxy-repo-1/"+getTestId()+"/artifact/1.0/artifact-1.0.jar";
+        String artifactUrl = baseProxyURL + "release-proxy-repo-1/" + getTestId() + "/artifact/1.0/artifact-1.0.jar";
         Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
@@ -59,7 +59,9 @@ public class Nexus1146RepositoryOverProxyIT
         {
             String artifactUrl =
                 baseProxyURL
-                    + "release-proxy-repo-1/"+getTestId()+"/some-artifact-that-dont-exists/4.8.15.16.23.42/some-artifact-that-dont-exists-4.8.15.16.23.42.jar";
+                    + "release-proxy-repo-1/"
+                    + getTestId()
+                    + "/some-artifact-that-dont-exists/4.8.15.16.23.42/some-artifact-that-dont-exists-4.8.15.16.23.42.jar";
             Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
         }
     }
@@ -68,10 +70,10 @@ public class Nexus1146RepositoryOverProxyIT
     public void proxyWithMaven()
         throws Exception
     {
+        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
+
         File mavenProject = getTestFile( "pom.xml" ).getParentFile();
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
-
-        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
 
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
@@ -87,7 +89,8 @@ public class Nexus1146RepositoryOverProxyIT
         verifier.executeGoal( "dependency:resolve" );
         verifier.verifyErrorFreeLog();
 
-        String artifactUrl = baseProxyURL + "release-proxy-repo-1/"+getTestId()+"/maven-artifact/1.0/maven-artifact-1.0.jar";
+        String artifactUrl =
+            baseProxyURL + "release-proxy-repo-1/" + getTestId() + "/maven-artifact/1.0/maven-artifact-1.0.jar";
         Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
     }
 
