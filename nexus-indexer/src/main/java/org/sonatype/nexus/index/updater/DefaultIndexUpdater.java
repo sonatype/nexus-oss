@@ -64,11 +64,23 @@ public class DefaultIndexUpdater
     extends AbstractLogEnabled
     implements IndexUpdater
 {
+
     @Requirement( role = IncrementalHandler.class )
     IncrementalHandler incrementalHandler;
 
     @Requirement( role = IndexUpdateSideEffect.class )
     private List<IndexUpdateSideEffect> sideEffects;
+
+    public DefaultIndexUpdater( final IncrementalHandler handler, final List<IndexUpdateSideEffect> mySideeffects  )
+    {
+        incrementalHandler = handler;
+        sideEffects = mySideeffects;
+    }
+
+    public DefaultIndexUpdater(  )
+    {
+        
+    }
 
     public Date fetchAndUpdateIndex( final IndexUpdateRequest updateRequest )
         throws IOException
@@ -81,8 +93,8 @@ public class DefaultIndexUpdater
         {
             fetcher =
                 new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() )
-                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                                          .setProxyInfo( updateRequest.getProxyInfo() );
+                    .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
+                    .setProxyInfo( updateRequest.getProxyInfo() );
 
             updateRequest.setResourceFetcher( fetcher );
         }
@@ -171,7 +183,8 @@ public class DefaultIndexUpdater
         IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
         updateRequest.setResourceFetcher( new JettyResourceFetcher().addTransferListener( listener )
-                                                                    .setProxyInfo( proxyInfo ) );
+            .setProxyInfo( proxyInfo )
+        );
 
         return fetchAndUpdateIndex( updateRequest );
     }
@@ -199,7 +212,8 @@ public class DefaultIndexUpdater
         throws IOException
     {
         return fetchIndexProperties( context, new JettyResourceFetcher().addTransferListener( listener )
-                                                                        .setProxyInfo( proxyInfo ) );
+            .setProxyInfo( proxyInfo )
+        );
     }
 
     private Date loadIndexDirectory( final IndexUpdateRequest updateRequest, final boolean merge, final String remoteIndexFile )
@@ -291,6 +305,7 @@ public class DefaultIndexUpdater
      *
      * @param is        a <code>ZipInputStream</code> with index data
      * @param directory Lucene <code>Directory</code> to unpack index data to
+     *
      * @return {@link Date} of the index update or null if it can't be read
      */
     public static Date unpackIndexArchive( final InputStream is, final Directory directory, final IndexingContext context )
@@ -516,8 +531,8 @@ public class DefaultIndexUpdater
     /**
      * Unpack index data using specified Lucene Index writer
      *
-     * @param is      an input stream to unpack index data from
-     * @param w a writer to save index data
+     * @param is  an input stream to unpack index data from
+     * @param w   a writer to save index data
      * @param ics a collection of index creators for updating unpacked documents.
      */
     public static Date unpackIndexData( final InputStream is, final Directory d, final IndexingContext context )
@@ -544,6 +559,7 @@ public class DefaultIndexUpdater
     public static class WagonFetcher
         implements ResourceFetcher
     {
+
         private final WagonManager wagonManager;
 
         private final TransferListener listener;
