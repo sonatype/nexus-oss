@@ -17,7 +17,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -35,13 +34,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 public class Nexus538SystemFeedsIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     @Test
     public void bootEventTest()

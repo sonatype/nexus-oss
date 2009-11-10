@@ -18,7 +18,6 @@ import java.net.URL;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -33,13 +32,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus642SynchShadowTaskIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void cleanEnv()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     @Test
     public void synchShadowTest()

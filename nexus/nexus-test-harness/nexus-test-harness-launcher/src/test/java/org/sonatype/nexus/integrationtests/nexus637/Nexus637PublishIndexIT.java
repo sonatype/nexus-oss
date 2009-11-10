@@ -17,7 +17,6 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -32,13 +31,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus637PublishIndexIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     public Nexus637PublishIndexIT()
     {

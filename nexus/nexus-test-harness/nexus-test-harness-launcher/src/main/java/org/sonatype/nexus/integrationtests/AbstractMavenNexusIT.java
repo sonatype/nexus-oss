@@ -57,9 +57,9 @@ public class AbstractMavenNexusIT
     public Verifier createVerifier( File mavenProject, File settings )
         throws VerificationException, IOException
     {
-        Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
-
         System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
+        
+        Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
 
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );

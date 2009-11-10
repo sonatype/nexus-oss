@@ -17,7 +17,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -35,13 +34,6 @@ import com.sun.syndication.feed.synd.SyndFeed;
 public class Nexus639PurgeTaskIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void cleanEnv()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     @Test
     public void doPurgeTaskTest()

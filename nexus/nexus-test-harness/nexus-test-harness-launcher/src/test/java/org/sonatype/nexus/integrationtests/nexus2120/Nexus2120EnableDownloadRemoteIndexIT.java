@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
@@ -36,13 +35,6 @@ public class Nexus2120EnableDownloadRemoteIndexIT
     static
     {
         webProxyPort = TestProperties.getInteger( "webproxy-server-port" );
-    }
-
-    @BeforeClass
-    public static void init()
-        throws Exception
-    {
-        cleanWorkDir();
     }
 
     protected ControlledServer server;

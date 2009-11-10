@@ -7,7 +7,6 @@ import org.apache.maven.wagon.TransferFailedException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -328,13 +327,6 @@ public class Nexus2351DisableRedeployMaven1IT
         repo.setFormat( "maven1" );
 
         this.repoUtil.createRepository( repo );
-    }
-
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
     }
 
 }

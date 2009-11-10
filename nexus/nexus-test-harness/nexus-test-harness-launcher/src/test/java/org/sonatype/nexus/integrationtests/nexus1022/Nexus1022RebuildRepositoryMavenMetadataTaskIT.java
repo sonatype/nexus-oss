@@ -17,7 +17,6 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
@@ -53,11 +52,6 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
         File groupPluginMd = new File( nexusWorkDir, releaseRepoPath + "nexus1022/foo/bar/plugins/maven-metadata.xml" );
         Assert.assertTrue( "Maven metadata file should be generated after rebuild", groupPluginMd.exists() );
 
-    }
-
-    @BeforeClass
-    public static void cleanWorkFolder() throws Exception {
-        cleanWorkDir();
     }
 
 }

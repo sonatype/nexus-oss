@@ -61,7 +61,6 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 
@@ -178,14 +177,14 @@ public class AbstractNexusIntegrationTest
             {
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + this.getClass().getSimpleName() );
+                
+                // clean common work dir
+                this.beforeStartClean();
 
                 this.copyTestResources();
 
                 HashMap<String, String> variables = new HashMap<String, String>();
                 variables.put( "test-harness-id", this.getTestId() );
-
-                // clean common work dir
-                // this.cleanWorkDir();
 
                 this.copyConfigFiles();
 
@@ -212,6 +211,12 @@ public class AbstractNexusIntegrationTest
                 NEEDS_INIT = false;
             }
         }
+    }
+    
+    protected void beforeStartClean()
+        throws Exception
+    {
+        this.cleanWorkDir();
     }
 
     protected void copyTestResources()
@@ -249,9 +254,6 @@ public class AbstractNexusIntegrationTest
     protected static void cleanWorkDir()
         throws Exception
     {
-        // must wait for all tasks, some do file locking
-        TaskScheduleUtil.waitForAllTasksToStop();
-
         final File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         // to make sure I don't delete all my MP3's and pictures, or totally screw anyone.

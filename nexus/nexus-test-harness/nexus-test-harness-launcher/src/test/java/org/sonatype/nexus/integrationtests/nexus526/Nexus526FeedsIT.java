@@ -19,7 +19,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -36,13 +35,6 @@ public class Nexus526FeedsIT
 {
 
     private Gav gav;
-
-    @BeforeClass
-    public static void cleanEnv()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     public Nexus526FeedsIT()
         throws Exception

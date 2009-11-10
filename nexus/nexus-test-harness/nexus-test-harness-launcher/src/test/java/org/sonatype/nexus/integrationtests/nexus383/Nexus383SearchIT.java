@@ -23,7 +23,6 @@ import junit.framework.Assert;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.junit.After;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
@@ -279,13 +278,6 @@ public class Nexus383SearchIT
         List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
         Assert.assertEquals( 3, results.size() );
 
-    }
-
-    @BeforeClass
-    public static void cleanWorkFolder()
-        throws Exception
-    {
-        cleanWorkDir();
     }
 
 }

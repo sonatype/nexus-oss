@@ -67,7 +67,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
         throws Exception
     {
         SmtpSettingsResource smtpSettings = new SmtpSettingsResource();
-        smtpSettings.setHost( "someremote.localhost.com.zh" );
+        smtpSettings.setHost( "not:a:server:90854322" );
         smtpSettings.setPort( 1234 );
         smtpSettings.setUsername( EmailUtil.USER_USERNAME );
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );

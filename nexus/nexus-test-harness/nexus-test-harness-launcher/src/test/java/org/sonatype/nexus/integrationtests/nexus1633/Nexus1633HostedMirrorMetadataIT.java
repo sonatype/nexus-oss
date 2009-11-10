@@ -6,7 +6,6 @@ import java.io.IOException;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -21,13 +20,6 @@ import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 public class Nexus1633HostedMirrorMetadataIT
     extends AbstractNexusIntegrationTest
 {
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
-
     protected MirrorMessageUtils messageUtil;
 
     private String repositoryId = "nexus-test-harness-repo";

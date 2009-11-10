@@ -20,7 +20,6 @@ import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -31,13 +30,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public abstract class AbstractSnapshotRemoverIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void cleanEnv()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     @SuppressWarnings( "unchecked" )
     public static Collection<File> listFiles( File directory, String[] extensions, boolean recursive )

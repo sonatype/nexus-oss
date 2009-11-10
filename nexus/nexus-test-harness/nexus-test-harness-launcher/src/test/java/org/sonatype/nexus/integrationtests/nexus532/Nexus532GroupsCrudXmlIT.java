@@ -19,7 +19,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -39,13 +38,6 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 public class Nexus532GroupsCrudXmlIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     protected GroupMessageUtil messageUtil;
 

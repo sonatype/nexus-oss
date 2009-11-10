@@ -261,13 +261,14 @@ public class Nexus2351DisableRedeployUploadIT
         }
 
     }
-
-    @BeforeClass
-    public static void clean()
+    
+    @Override
+    protected void beforeStartClean()
         throws Exception
     {
-        cleanWorkDir();
-
+        // TODO Auto-generated method stub
+        super.beforeStartClean();
+        
         FileUtils.writeStringToFile( new File( nexusLogDir, "nexus.log" ), "" );
         FileUtils.writeStringToFile( new File( nexusLogDir, "tests.log" ), "" );
 

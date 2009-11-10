@@ -17,7 +17,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -29,12 +28,6 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public class Nexus384DotAndDashSearchIT
     extends AbstractNexusIntegrationTest
 {
-    @BeforeClass
-    public static void cleanWorkFolder()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     protected SearchMessageUtil messageUtil;
 

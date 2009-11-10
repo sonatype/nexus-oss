@@ -20,7 +20,6 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -38,14 +37,6 @@ import org.sonatype.security.usermanagement.PasswordGenerator;
 public class Nexus142UserCrudJsonIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void clean()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
-
     protected UserMessageUtil messageUtil;
 
     public Nexus142UserCrudJsonIT()

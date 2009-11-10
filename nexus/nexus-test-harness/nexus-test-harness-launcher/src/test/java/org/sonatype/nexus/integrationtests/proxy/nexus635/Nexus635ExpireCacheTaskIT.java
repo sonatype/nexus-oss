@@ -19,7 +19,6 @@ import java.io.File;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
@@ -38,13 +37,6 @@ public class Nexus635ExpireCacheTaskIT
 
     private Gav GAV =
         new Gav( "nexus635", "artifact", "1.0-SNAPSHOT", null, "jar", 0, 0L, null, true, false, null, false, null );
-
-    @BeforeClass
-    public static void cleanEnv()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     public Nexus635ExpireCacheTaskIT()
         throws Exception

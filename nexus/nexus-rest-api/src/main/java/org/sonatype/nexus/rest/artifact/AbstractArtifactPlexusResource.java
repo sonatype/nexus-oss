@@ -491,7 +491,7 @@ public abstract class AbstractArtifactPlexusResource
             }
         }
         catch ( Throwable t )
-        {            
+        {           
             return buildUploadFailedHtmlResponse( t, request, response );
         }
         finally
@@ -507,33 +507,36 @@ public abstract class AbstractArtifactPlexusResource
     
     protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
     {
-        getLogger().debug( "Got error while uploading artifact", t );
-        
-        StringBuffer resp = new StringBuffer();
-        resp.append( "<html>" );
-        resp.append( "<body>" );
-        resp.append( "<error>" + t.getMessage() + "</error>" );
-        resp.append( "</body>" );
-        resp.append( "</html>" );
-
-        String forceSuccess = request.getResourceRef().getQueryAsForm().getFirstValue( "forceSuccess" );
-        
-        if ( !"true".equals( forceSuccess ))
+        try
         {
-            if ( t instanceof ResourceException )
+            handleException( request, response, t );
+        }
+        catch ( ResourceException e )
+        {
+            getLogger().debug( "Got error while uploading artifact", t );
+            
+            StringBuffer resp = new StringBuffer();
+            resp.append( "<html>" );
+            resp.append( "<body>" );
+            resp.append( "<error>" + e.getMessage() + "</error>" );
+            resp.append( "</body>" );
+            resp.append( "</html>" );
+
+            String forceSuccess = request.getResourceRef().getQueryAsForm().getFirstValue( "forceSuccess" );
+            
+            if ( !"true".equals( forceSuccess ))
             {
-                response.setStatus( ( ( ResourceException ) t ).getStatus() );
+                response.setStatus( e.getStatus() );
             }
-            else
-            {
-                response.setStatus( Status.SERVER_ERROR_INTERNAL );
-            }
+            
+            return resp.toString();   
         }
         
-        return resp.toString();
+        //We have an error at this point, can't get here
+        return null;
     }
 
-    protected void handleException( Request request, Response res, Exception t )
+    protected void handleException( Request request, Response res, Throwable t )
         throws ResourceException
     {
         if ( t instanceof ResourceException )

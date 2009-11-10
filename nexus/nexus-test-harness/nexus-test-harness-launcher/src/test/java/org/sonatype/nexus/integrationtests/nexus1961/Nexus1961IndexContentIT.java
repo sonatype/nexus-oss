@@ -3,7 +3,6 @@ package org.sonatype.nexus.integrationtests.nexus1961;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
@@ -22,13 +21,6 @@ import com.thoughtworks.xstream.XStream;
 public class Nexus1961IndexContentIT
     extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void init()
-        throws Exception
-    {
-        cleanWorkDir();
-    }
 
     @Override
     protected void runOnce()
