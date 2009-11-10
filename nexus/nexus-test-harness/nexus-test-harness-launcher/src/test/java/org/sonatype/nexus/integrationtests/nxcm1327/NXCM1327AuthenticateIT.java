@@ -84,7 +84,8 @@ public class NXCM1327AuthenticateIT
         }
         catch ( FileNotFoundException e )
         {
-            Assert.assertTrue( e.getMessage(), e.getMessage().contains( NOT_AUTORIZED.toString() ) );
+            Assert.assertTrue( "The exception message should contain " + NOT_AUTORIZED.toString() + ", but was '"
+                + e.getMessage() + "'.", e.getMessage().contains( NOT_AUTORIZED.toString() ) );
         }
     }
 
