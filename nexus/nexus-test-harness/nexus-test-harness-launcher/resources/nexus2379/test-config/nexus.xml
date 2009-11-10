@@ -31,7 +31,6 @@
       <searchable>true</searchable>
       <localStorage>
         <provider>file</provider>
-        <url>C:\\Development\\Code\\nexus\\nexus\\nexus-test-harness\\nexus-test-harness-launcher\\target\\maven\\fake-repo</url>
       </localStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
