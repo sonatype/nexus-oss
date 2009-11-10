@@ -36,17 +36,18 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 public class LogConfigListener
     implements ServletContextListener
 {
-
     private static final String KEY_LOG_CONFIG_FILE = "plexus.log4j-prop-file";
 
     private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
 
     private static final String RELATIVE_PATH_LOG_CONF = "/conf/log4j.properties";
 
+    private Handler[] originalHandlers;
+
     public void contextInitialized( ServletContextEvent sce )
     {
-        redirectJUL();
-        
+        setUpJULHandlerSLF4J();
+
         String location = getLogConfigLocation();
 
         ensureLogConfigLocation( location );
@@ -56,21 +57,41 @@ public class LogConfigListener
 
     public void contextDestroyed( ServletContextEvent sce )
     {
-
+        setUpJULHandlerOriginal();
     }
-    
-    private void redirectJUL()
+
+    /**
+     * Remove the original JUL handlers, install SLF4J handler
+     */
+    private void setUpJULHandlerSLF4J()
     {
         Logger julLogger = LogManager.getLogManager().getLogger( "" );
-        
-        Handler[] handlers = julLogger.getHandlers();
-        
-        for ( Handler handler : handlers)
+
+        originalHandlers = julLogger.getHandlers();
+
+        for ( Handler handler : originalHandlers )
         {
             julLogger.removeHandler( handler );
         }
-        
+
         SLF4JBridgeHandler.install();
+    }
+
+    private void setUpJULHandlerOriginal()
+    {
+        Logger julLogger = LogManager.getLogManager().getLogger( "" );
+
+        Handler[] slf4jHandlers = julLogger.getHandlers();
+
+        for ( Handler handler : slf4jHandlers )
+        {
+            julLogger.removeHandler( handler );
+        }
+
+        for ( Handler handler : originalHandlers )
+        {
+            julLogger.addHandler( handler );
+        }
     }
 
     private String getLogConfigLocation()
@@ -115,4 +136,5 @@ public class LogConfigListener
     {
         PropertyConfigurator.configure( location );
     }
+
 }
