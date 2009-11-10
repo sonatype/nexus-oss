@@ -582,7 +582,7 @@ public abstract class AbstractArtifactPlexusResource
         }
         else if ( t instanceof AccessDeniedException )
         {
-            throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, t.getMessage() );
+            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
         }
         else if ( t instanceof XmlPullParserException )
         {
