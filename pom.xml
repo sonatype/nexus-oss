@@ -9,6 +9,7 @@
 
   <artifactId>nexus-unpack-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
+  <name>Nexus Enterprise Plugin :: Unpack</name>
 
   <properties>
     <nexus.version>1.4.1-SNAPSHOT</nexus.version>
