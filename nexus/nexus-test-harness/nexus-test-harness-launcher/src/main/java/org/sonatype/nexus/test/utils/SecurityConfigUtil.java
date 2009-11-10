@@ -21,13 +21,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
 import org.sonatype.security.model.CRole;
@@ -48,29 +46,63 @@ public class SecurityConfigUtil
     {
         List<RoleResource> roles = new ArrayList<RoleResource>();
         roles.add( role );
-        verifyRoles( roles );
+        verifyRolesExistInCore( roles );
     }
 
-    @SuppressWarnings( "unchecked" )
-    public static void verifyRoles( List<RoleResource> roles )
+    /**
+     * Verify the list of roles contains all roles configured in security.xml
+     * 
+     * @param roles
+     */
+    public static void verifyRolesComplete( List<RoleResource> roles )
         throws IOException
     {
-
-        for ( Iterator<RoleResource> outterIter = roles.iterator(); outterIter.hasNext(); )
+        for ( CRole cRole : getSecurityConfig().getRoles() )
         {
-            RoleResource roleResource = outterIter.next();
+            RoleResource roleResource = getRoleResource( cRole.getId(), roles );
 
+            Assert.assertNotNull( "Role '" + cRole.getId() + "' should be contained!", roleResource );
+
+            CRole role = RoleConverter.toCRole( roleResource );
+
+            assertRoleEquals( cRole, role );
+        }
+    }
+
+    public static void assertRoleEquals( CRole roleA, CRole roleB )
+    {
+        XStream xStream = new XStream();
+        String roleStringA = xStream.toXML( roleA );
+        String roleStringB = xStream.toXML( roleB );
+
+        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n" + roleStringA, new RoleComparator().compare(
+            roleA,
+            roleB ) == 0 );
+    }
+
+    private static RoleResource getRoleResource( String id, List<RoleResource> roles )
+    {
+        for ( RoleResource role : roles )
+        {
+            if ( id.equals( role.getId() ) )
+            {
+                return role;
+            }
+        }
+
+        return null;
+    }
+
+    public static void verifyRolesExistInCore( List<RoleResource> roles )
+        throws IOException
+    {
+        for ( RoleResource roleResource : roles )
+        {
             CRole secRole = getCRole( roleResource.getId() );
             Assert.assertNotNull( secRole );
             CRole role = RoleConverter.toCRole( roleResource );
 
-            XStream xStream = new XStream();
-            String secRoleDebugString = xStream.toXML( secRole );
-            String roleDebugString = xStream.toXML( role );
-            
-            
-            Assert.assertTrue("Role:\n"+ roleDebugString +"\nsecRole:\n"+ secRoleDebugString, new RoleComparator().compare( role, secRole ) == 0 );
-
+            assertRoleEquals( secRole, role );
         }
     }
 
@@ -82,7 +114,6 @@ public class SecurityConfigUtil
         verifyUsers( users );
     }
 
-    @SuppressWarnings( "unchecked" )
     public static void verifyUsers( List<UserResource> users )
         throws IOException
     {
@@ -90,10 +121,10 @@ public class SecurityConfigUtil
         for ( Iterator<UserResource> outterIter = users.iterator(); outterIter.hasNext(); )
         {
             UserResource userResource = outterIter.next();
-            
+
             CUser secUser = getCUser( userResource.getUserId() );
 
-            Assert.assertNotNull( "Cannot find user: "+ userResource.getUserId(), secUser );
+            Assert.assertNotNull( "Cannot find user: " + userResource.getUserId(), secUser );
 
             CUser user = UserConverter.toCUser( userResource );
 
@@ -115,7 +146,6 @@ public class SecurityConfigUtil
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     public static void verifyPrivileges( List<PrivilegeStatusResource> privs )
         throws IOException
     {
@@ -138,7 +168,6 @@ public class SecurityConfigUtil
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public static CRole getCRole( String roleId )
         throws IOException
     {
@@ -157,7 +186,6 @@ public class SecurityConfigUtil
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     public static CPrivilege getCPrivilege( String privilegeId )
         throws IOException
     {
@@ -176,7 +204,6 @@ public class SecurityConfigUtil
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     public static CPrivilege getCPrivilegeByName( String privilegeName )
         throws IOException
     {
@@ -195,7 +222,6 @@ public class SecurityConfigUtil
         return null;
     }
 
-    @SuppressWarnings( "unchecked" )
     public static CUser getCUser( String userId )
         throws IOException
     {

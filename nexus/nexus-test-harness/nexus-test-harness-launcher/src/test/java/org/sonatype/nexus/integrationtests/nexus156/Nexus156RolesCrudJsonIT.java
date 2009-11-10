@@ -94,7 +94,7 @@ public class Nexus156RolesCrudJsonIT
 
         // NEED to work around a GET problem with the REST client
         List<RoleResource> roles = this.messageUtil.getList();
-        SecurityConfigUtil.verifyRoles( roles );
+        SecurityConfigUtil.verifyRolesComplete( roles );
 
     }
 
