@@ -52,7 +52,9 @@ public class Nexus970DeleteRepositoryIT
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
         Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
 
-        TaskScheduleUtil.waitForAllTasksToStop( DeleteRepositoryFoldersTask.class );
+        //give a chance to wait for task to start
+        Thread.sleep( 500 );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         Assert.assertFalse( "Artifacts shouldn't exists on deleted repo", artifactFile.exists() );
         Assert.assertFalse( "Storage dir should be deleted", storageDir.exists() );
@@ -82,7 +84,9 @@ public class Nexus970DeleteRepositoryIT
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
         Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
 
-        Thread.sleep( 1000 );
+        //give a chance to wait for task to start
+        Thread.sleep( 500 );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         Assert.assertTrue( "Artifacts should exists on deleted repo", artifactFile.isFile() );
         Assert.assertTrue( "Storage dir shouldn't be deleted", storageDir.isDirectory() );
