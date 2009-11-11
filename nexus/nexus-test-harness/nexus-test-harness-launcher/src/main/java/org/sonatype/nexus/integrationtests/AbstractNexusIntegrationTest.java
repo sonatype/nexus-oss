@@ -198,7 +198,7 @@ public class AbstractNexusIntegrationTest
 
                 NexusConfigUtil.enableSecurity( TestContainer.getInstance().getTestContext().isSecureTest()
                     || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
-
+                
                 // start nexus
                 this.startNexus();
 
@@ -596,6 +596,9 @@ public class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
+        // turn off security, of the current IT with security on won't affect the next IT
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
+        
         // stop nexus
         stopNexus();
 

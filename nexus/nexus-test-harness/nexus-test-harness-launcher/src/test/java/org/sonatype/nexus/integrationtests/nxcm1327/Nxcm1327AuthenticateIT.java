@@ -16,7 +16,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
-public class NXCM1327AuthenticateIT
+public class Nxcm1327AuthenticateIT
     extends AbstractPrivilegeTest
 {
 

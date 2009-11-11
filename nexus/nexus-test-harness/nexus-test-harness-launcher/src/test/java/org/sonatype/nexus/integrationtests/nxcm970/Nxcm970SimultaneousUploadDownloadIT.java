@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
@@ -14,6 +15,13 @@ public class Nxcm970SimultaneousUploadDownloadIT
 {
     private Executor executor = Executors.newSingleThreadExecutor();
 
+    @BeforeClass
+    public static void cleanUp()
+        throws Exception
+    {
+        AbstractNexusIntegrationTest.cleanWorkDir();
+    }
+    
     @Test
     public void testSimultaneousUploadDownload()
         throws Exception
