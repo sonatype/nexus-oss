@@ -23,6 +23,7 @@ import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -134,7 +135,13 @@ public class IndexingRepositoryRegistryRepositoryEventInspector extends Abstract
                     nexusScheduler.submit( "Create initial index.", rt );
                 }
             }
-            else if( evt instanceof RepositoryConfigurationUpdatedEvent )
+            else if ( evt instanceof RepositoryRegistryEventRemove )
+            {
+                getIndexerManager().removeRepositoryIndexContext(
+                    ( (RepositoryRegistryEventRemove) evt ).getRepository().getId(),
+                    true );
+            }
+            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {
                 getIndexerManager().updateRepositoryIndexContext( repository.getId() );
             }
