@@ -47,6 +47,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
@@ -622,13 +623,15 @@ public class AbstractEnvironmentMojo
             destinationFile.createNewFile();
 
             File tempFile = File.createTempFile( name, extension );
-            FileUtils.copyURLToFile( getClass().getResource( sourceUrl ), tempFile );
+            FileUtils.copyStreamToFile( new RawInputStreamFacade( getClass().getResourceAsStream( sourceUrl ) ),
+                                        tempFile );
             mavenFileFilter.copyFile( tempFile, destinationFile, true, project, null, true, "UTF-8", session );
             tempFile.delete();
         }
         catch ( Exception e )
         {
-            throw new MojoExecutionException( "Unable to copy resouce " + sourceUrl + name + extension, e );
+            throw new MojoExecutionException( "Unable to copy resouce " + sourceUrl + " to " + name + "." + extension,
+                                              e );
         }
     }
 
