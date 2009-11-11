@@ -9,6 +9,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
@@ -42,7 +43,15 @@ public abstract class AbstractFileNexusPluginRepository
     protected abstract File getNexusPluginsDirectory();
 
     @Requirement
+    private Logger logger;
+
+    @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public Map<GAVCoordinate, PluginMetadata> findAvailablePlugins()
     {
@@ -106,7 +115,7 @@ public abstract class AbstractFileNexusPluginRepository
     }
 
     public PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant,
-                                                               GAVCoordinate coordinates )
+        GAVCoordinate coordinates )
         throws NoSuchPluginRepositoryArtifactException
     {
         File pluginFile =
@@ -159,21 +168,24 @@ public abstract class AbstractFileNexusPluginRepository
 
                 return md;
             }
-            catch ( XmlPullParserException e )
-            {
-                IOException ex = new IOException( e.getMessage() );
-
-                ex.initCause( e );
-
-                throw ex;
-            }
             finally
             {
                 IOUtil.close( reader );
             }
         }
+        catch ( XmlPullParserException e )
+        {
+            getLogger().error(
+                "Invalid plugin metadata, skipping plugin file \"" + pluginFile.getAbsolutePath() + "\"!", e );
+
+            return null;
+        }
         catch ( IOException e )
         {
+            getLogger().error(
+                "Got IOException while extracting the plugin metadata, skipping plugin file \""
+                    + pluginFile.getAbsolutePath() + "\"!", e );
+
             return null;
         }
         finally
