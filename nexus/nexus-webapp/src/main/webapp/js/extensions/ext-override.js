@@ -872,3 +872,87 @@ Ext.override(Ext.tree.TreeDropZone, {
   }
   
 });
+
+//Extension to the store to allow for multi field sorting
+//from http://www.extjs.com/forum/showthread.php?t=48324
+Ext.override(Ext.data.Store, {
+  /**
+   * Sort by multiple fields in the specified order.
+   * @param {Array} An Array of field sort specifications, or, if ascending
+   * sort is required on all columns, an Array of field names. A field specification
+   * looks like:
+      {
+        field: 'orderNumber',
+        direction: 'ASC'
+      }
+   */
+  sortByFields: function(fields) {
+    //Collect sort type functions,
+    //Convert string field names to field+direction spec objects.
+    var st = [];
+    for (var i = 0; i < fields.length; i++) {
+      if (typeof fields[i] == 'string') {
+        fields[i] = {
+          field: fields[i],
+          direction: 'ASC'
+        };
+      }
+      st.push(this.fields.get(fields[i].field).sortType);
+    }
+
+    var fn = function(r1, r2) {
+      var result;
+      for (var i = 0; !result && i < fields.length; i++) {
+        var v1 = st[i](r1.data[fields[i].field]);
+        var v2 = st[i](r2.data[fields[i].field]);
+        result = (v1 > v2) ? 1 : ((v1 < v2) ? -1 : 0);
+        if (fields[i].direction == 'DESC') result = -result;
+      }
+      return result;
+    };
+    this.data.sort('ASC', fn);
+    if(this.snapshot && this.snapshot != this.data){
+      this.snapshot.sort('ASC', fn);
+    }
+    this.fireEvent("datachanged", this);
+  }
+});
+
+//some special tooltip config to reuse same tooltip for whole grid
+Ext.override(Ext.ToolTip, {
+  onTargetOver : function(e){
+    if(this.disabled || e.within(this.target.dom, true)){
+      return;
+    }
+    var t = e.getTarget(this.delegate);
+    if (t) {
+      this.triggerElement = t;
+      this.clearTimer('hide');
+      this.targetXY = e.getXY();
+      this.delayShow();
+    }
+  },
+  onMouseMove : function(e){
+    var t = e.getTarget(this.delegate);
+    if (t) {
+      this.targetXY = e.getXY();
+      if (t === this.triggerElement) {
+        if(!this.hidden && this.trackMouse){
+          this.setPagePosition(this.getTargetXY());
+        }
+      } else {
+        this.hide();
+        this.lastActive = new Date(0);
+        this.onTargetOver(e);
+      }
+    } else if (!this.closable && this.isVisible()) {
+      this.hide();
+    }
+  },
+  hide: function(){
+    this.clearTimer('dismiss');
+    this.lastActive = new Date();
+    delete this.triggerElement;
+    Ext.ToolTip.superclass.hide.call(this);
+  }
+});
