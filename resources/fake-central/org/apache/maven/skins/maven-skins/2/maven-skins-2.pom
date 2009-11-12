@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>maven-parent</artifactId>
+    <groupId>org.apache.maven</groupId>
+    <version>1</version>
+    <relativePath>../pom/maven/pom.xml</relativePath>
+  </parent>
+  <groupId>org.apache.maven.skins</groupId>
+  <artifactId>maven-skins</artifactId>
+  <packaging>pom</packaging>
+  <version>2</version>
+  <name>Maven Skins</name>
+  <description>Maven Skins</description>
+  <url>http://maven.apache.org/skins/</url>
+  <!-- TODO: create a new JIRA project/component -->
+  <issueManagement>
+    <system>jira</system>
+    <url>http://jira.codehaus.org/browse/MNG</url>
+  </issueManagement>
+  <distributionManagement>
+    <site>
+      <id>website</id>
+      <url>scp://minotaur.apache.org/www/maven.apache.org/skins/</url>
+    </site>
+  </distributionManagement>
+  <modules>
+    <module>maven-default-skin</module>
+    <module>maven-classic-skin</module>
+    <module>maven-stylus-skin</module>
+  </modules>
+  <scm>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/maven/skins/trunk/</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/maven/skins/trunk/</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/maven/skins/trunk/</url>
+  </scm>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-release-plugin</artifactId>
+          <configuration>
+            <tagBase>https://svn.apache.org/repos/asf/maven/skins/tags</tagBase>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
+
