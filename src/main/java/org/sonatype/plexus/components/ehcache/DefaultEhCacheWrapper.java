@@ -98,7 +98,7 @@ public class DefaultEhCacheWrapper
 
             getLogger().info(
                               "Creating and configuring EHCache manager with classpath:/ehcache.xml, using disk store '"
-                                  + ehConfig.getDiskStoreConfiguration().getPath() + "'" );
+                                  + ( ehConfig.getDiskStoreConfiguration() == null ? "none" : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
 
             ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
         }
@@ -118,7 +118,7 @@ public class DefaultEhCacheWrapper
 
                 getLogger().info(
                                   "Creating and configuring EHCache manager with Nexus Default EHCache Configuration, using disk store '"
-                                      + ehConfig.getDiskStoreConfiguration().getPath() + "'" );
+                                      + ( ehConfig.getDiskStoreConfiguration() == null ? "none" : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
 
                 ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
             }
@@ -135,21 +135,26 @@ public class DefaultEhCacheWrapper
     private void configureDiskStore( Configuration ehConfig )
         throws InterpolationException
     {
-        // add plexus awareness with interpolation
-        String path = ehConfig.getDiskStoreConfiguration().getPath();
-
-        try
+        //if disk store isn't configured, don't muck with it
+        if ( ehConfig.getDiskStoreConfiguration() != null
+            && ehConfig.getDiskStoreConfiguration().getPath() != null )
         {
-            path = this.regexBasedInterpolator.interpolate( path, "" );
-
-            path = new File( path ).getCanonicalPath();
+            // add plexus awareness with interpolation
+            String path = ehConfig.getDiskStoreConfiguration().getPath();
+    
+            try
+            {
+                path = this.regexBasedInterpolator.interpolate( path, "" );
+    
+                path = new File( path ).getCanonicalPath();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Could not canonize the path '" + path + "'!", e );
+            }
+    
+            ehConfig.getDiskStoreConfiguration().setPath( path );
         }
-        catch ( IOException e )
-        {
-            getLogger().warn( "Could not canonize the path '" + path + "'!", e );
-        }
-
-        ehConfig.getDiskStoreConfiguration().setPath( path );
     }
 
     public void contextualize( Context context )
