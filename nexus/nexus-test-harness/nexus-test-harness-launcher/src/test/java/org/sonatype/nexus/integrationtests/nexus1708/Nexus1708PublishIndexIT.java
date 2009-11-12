@@ -17,6 +17,7 @@ import java.io.File;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -25,7 +26,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
  * Test task Publish Indexes is working.
- *
+ * 
  * @author marvin
  */
 public class Nexus1708PublishIndexIT
@@ -53,5 +54,12 @@ public class Nexus1708PublishIndexIT
         TaskScheduleUtil.runTask( PublishIndexesTaskDescriptor.ID, prop );
 
         Assert.assertTrue( ".index should exists after publish index task was run.", index.exists() );
+    }
+
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
     }
 }

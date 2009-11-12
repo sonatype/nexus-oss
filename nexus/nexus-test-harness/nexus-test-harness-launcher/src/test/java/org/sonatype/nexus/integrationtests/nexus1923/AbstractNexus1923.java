@@ -10,6 +10,7 @@ import java.util.Properties;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -606,5 +607,12 @@ public abstract class AbstractNexus1923
                 }
             }
         }
+    }
+
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
     }
 }

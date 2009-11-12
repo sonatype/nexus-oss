@@ -11,6 +11,7 @@ import java.util.TimeZone;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
@@ -23,6 +24,13 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public abstract class AbstractDeleteArtifactsIT
     extends AbstractNexusIntegrationTest
 {
+
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
+    }
 
     protected static final String REPO_TEST_HARNESS_PROXY = "nexus-test-harness-proxy";
 
@@ -45,7 +53,8 @@ public abstract class AbstractDeleteArtifactsIT
     }
 
     @Before
-    public void init() throws IllegalArtifactCoordinateException
+    public void init()
+        throws IllegalArtifactCoordinateException
     {
         artifact = getTestFile( "artifact.jar" );
         artifact1v1 = GavUtil.newGav( "nexus1954", "artifact1", "1.0" );
@@ -145,7 +154,8 @@ public abstract class AbstractDeleteArtifactsIT
         Assert.assertTrue( proxyLastMod < proxyLastMod2 );
     }
 
-    protected abstract void runUpdateIndex() throws Exception;
+    protected abstract void runUpdateIndex()
+        throws Exception;
 
     private long readLastMod( File indexProps )
         throws Exception

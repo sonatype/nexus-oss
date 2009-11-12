@@ -17,6 +17,7 @@ import java.io.File;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -35,6 +36,13 @@ public class Nexus637PublishIndexIT
     public Nexus637PublishIndexIT()
     {
         super( "nexus-test-harness-repo" );
+    }
+
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
     }
 
     @Test

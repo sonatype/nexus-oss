@@ -17,12 +17,12 @@ import java.io.File;
 
 import junit.framework.Assert;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -52,7 +52,7 @@ public class Nexus970DeleteRepositoryIT
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
         Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
 
-        //give a chance to wait for task to start
+        // give a chance to wait for task to start
         Thread.sleep( 500 );
         TaskScheduleUtil.waitForAllTasksToStop();
 
@@ -84,7 +84,7 @@ public class Nexus970DeleteRepositoryIT
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
         Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
 
-        //give a chance to wait for task to start
+        // give a chance to wait for task to start
         Thread.sleep( 500 );
         TaskScheduleUtil.waitForAllTasksToStop();
 
@@ -96,6 +96,13 @@ public class Nexus970DeleteRepositoryIT
 
         Assert.assertFalse( "Storage shouldn't be moved to trash", trashStorageDir.exists() );
         Assert.assertFalse( "Artifacts shouldn't be moved to trash", trashArtifactFile.exists() );
+    }
+
+    @BeforeClass
+    public static void clean()
+        throws Exception
+    {
+        cleanWorkDir();
     }
 
 }
