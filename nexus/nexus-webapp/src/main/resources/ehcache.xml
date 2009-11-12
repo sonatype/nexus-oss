@@ -1,7 +1,9 @@
 <ehcache>
 
     <!-- All ${...} is replaced by plexus if know to it! -->
+    <!-- NO MORE DISK CACHE !!!
     <diskStore path="${runtime-tmp}/ehcache"/>
+    -->
     
     <!-- all created caches shares these defaults 
 
