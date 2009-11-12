@@ -222,6 +222,12 @@ public class DefaultScheduler
     {
         return schedule( id, name, type, callable, schedule, false );
     }
+    
+    public <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable,
+        Schedule schedule, boolean enabled )
+    {
+        return schedule( id, name, type, callable, schedule, enabled, false );
+    }  
 
     public ScheduledTask<Object> submit( String name, Runnable runnable )
     {
@@ -252,17 +258,25 @@ public class DefaultScheduler
     {
         return schedule( generateId(), name, type, callable, schedule, true );
     }
-
+    
     protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
-        Schedule schedule, boolean store )
+        Schedule schedule, boolean enabled, boolean store )
     {
         DefaultScheduledTask<T> dct = new DefaultScheduledTask<T>( id, name, type, this, callable, schedule );
+
+        dct.setEnabled( enabled );
 
         addToTasksMap( dct, store );
 
         dct.start();
 
         return dct;
+    }
+
+    protected <T> ScheduledTask<T> schedule( String id, String name, String type, Callable<T> callable,
+        Schedule schedule, boolean store )
+    {
+        return schedule( id, name, type, callable, schedule, true, store );
     }
 
     public <T> ScheduledTask<T> updateSchedule( ScheduledTask<T> task )

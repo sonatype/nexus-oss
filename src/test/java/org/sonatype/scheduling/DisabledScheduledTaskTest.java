@@ -24,9 +24,10 @@ public class DisabledScheduledTaskTest
     public void testRunDisabledTaske()
         throws Exception
     {
-         ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 0 ) );
-       task.setEnabled( false );
-         
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this
+            .getTestSchedule( 0 ) );
+        task.setEnabled( false );
+
         // manually run the task
         task.runNow();
 
@@ -36,35 +37,55 @@ public class DisabledScheduledTaskTest
             Thread.sleep( 300 );
         }
 
-         assertEquals( TaskState.WAITING, task.getTaskState() ); // if task is disabled
+        assertEquals( TaskState.WAITING, task.getTaskState() ); // if task is disabled
 
         assertEquals( 1, task.getResults().get( 0 ).intValue() );
 
         assertNotNull( task.getNextRun() );
-        
+
         // make sure the task is still disabled
-        assertFalse(task.isEnabled());
-        
+        assertFalse( task.isEnabled() );
+
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
-    
+
     public void testDisabledTaskOnSchedule()
         throws Exception
     {
-        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this.getTestSchedule( 200 ) );
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this
+            .getTestSchedule( 200 ) );
         task.setEnabled( false );
-        
+
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
-        
+
         Thread.sleep( 300 );
-        
+
         assertNull( task.getLastRun() );
-        
+
         assertNotNull( task.getNextRun() );
-        
+
         assertEquals( 1, defaultScheduler.getAllTasks().size() );
     }
-    
+
+    public void testRestoreDisabledTask()
+        throws Exception
+    {
+        ScheduledTask<Integer> task = defaultScheduler.schedule( "Test Task", new TestIntegerCallable(), this
+            .getTestSchedule( 200 ) );
+
+        task.setEnabled( false );
+
+        task = defaultScheduler.initialize(
+            task.getId(),
+            task.getName(),
+            task.getType(),
+            new TestIntegerCallable(),
+            task.getSchedule(),
+            task.isEnabled() );
+
+        assertEquals( false, task.isEnabled() );
+    }
+
     private Schedule getTestSchedule( long waitTime )
     {
         Date startDate = new Date( System.currentTimeMillis() + waitTime );
@@ -72,28 +93,8 @@ public class DisabledScheduledTaskTest
         tempCalendar.setTime( startDate );
         tempCalendar.add( Calendar.DATE, 7 );
         Date endDate = tempCalendar.getTime();
-        
-        return  new DailySchedule(startDate, endDate);
-    }
-                                     
 
-    private ScheduledTask<Integer> getTask()
-    {
-        Date startDate = new Date();
-        Calendar tempCalendar = Calendar.getInstance();
-        tempCalendar.setTime( startDate );
-        tempCalendar.add( Calendar.DATE, 7 );
-        Date endDate = tempCalendar.getTime();
-        
-        DefaultScheduledTask<Integer> task = new DefaultScheduledTask<Integer>(
-            "TestTask",
-            "Test Task",
-            "Type",
-            defaultScheduler,
-            new TestIntegerCallable(),
-            new DailySchedule(startDate, endDate) );
-
-        return task;
+        return new DailySchedule( startDate, endDate );
     }
 
     public class TestIntegerCallable

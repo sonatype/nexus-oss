@@ -27,8 +27,7 @@ public interface Scheduler
     void initializeTasks();
 
     /**
-     * Initialize a task on bootup.
-     * 
+     * @deprecated Use {@link Scheduler#initialize(String, String, String, Callable, Schedule, boolean) initialize}
      * @param name
      * @param runnable
      * @param schedule
@@ -37,7 +36,26 @@ public interface Scheduler
      * @return
      */
     <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable, Schedule schedule )
-        throws RejectedExecutionException, NullPointerException;
+        throws RejectedExecutionException,
+            NullPointerException;
+
+    /**
+     * Initialize a task on bootup.
+     * 
+     * @param id
+     * @param name
+     * @param type
+     * @param callable
+     * @param schedule
+     * @param enabled
+     * @return
+     * @throws RejectedExecutionException
+     * @throws NullPointerException
+     */
+    <T> ScheduledTask<T> initialize( String id, String name, String type, Callable<T> callable, Schedule schedule,
+        boolean enabled )
+        throws RejectedExecutionException,
+            NullPointerException;
 
     /**
      * Issue a Runnable for immediate execution, but have a control over it.
