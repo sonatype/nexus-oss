@@ -144,7 +144,7 @@
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-task-scheduler.version>1.2</plexus-task-scheduler.version>
+    <plexus-task-scheduler.version>1.3-SNAPSHOT</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-interpolation.version>1.6</plexus-interpolation.version>

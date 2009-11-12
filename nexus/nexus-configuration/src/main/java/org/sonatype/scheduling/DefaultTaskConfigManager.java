@@ -153,29 +153,26 @@ public class DefaultTaskConfigManager
                 {
                     SchedulerTask<?> nexusTask = createTaskInstance( task.getType() );
 
-                    for ( Iterator iter = task.getProperties().iterator(); iter.hasNext(); )
+                    for ( CProps prop : task.getProperties() )
                     {
-                        CProps prop = (CProps) iter.next();
                         nexusTask.addParameter( prop.getKey(), prop.getValue() );
                     }
 
                     TaskUtils.setId( nexusTask, task.getId() );
                     TaskUtils.setName( nexusTask, task.getName() );
 
-                    
+                    DefaultScheduledTask<?> scheduledTask = (DefaultScheduledTask<?>) scheduler.initialize( task
+                        .getId(), task.getName(), task.getType(), nexusTask, translateFrom(
+                        task.getSchedule(),
+                        new Date( task.getNextRun() ) ), task.isEnabled() );
 
-                    DefaultScheduledTask<?> scheduledTask = ( DefaultScheduledTask<?> ) scheduler.initialize( task.getId(), task.getName(), task.getType(), nexusTask,
-                                          translateFrom( task.getSchedule(), new Date( task.getNextRun() ) ) );
-                    
-                    scheduledTask.setEnabled( task.isEnabled() );
-                    
                     // since the default schedules task appends 20 ms to the last run time, we don't want
                     // set the value if it is 0, otherwise will give appearance that task did run, since
                     // timestamp greater than 0
                     if ( task.getLastRun() > 0 )
                     {
-                    scheduledTask.setLastRun( new Date( task.getLastRun() ) );
-                }
+                        scheduledTask.setLastRun( new Date( task.getLastRun() ) );
+                    }
                 }
                 catch ( IllegalArgumentException e )
                 {
