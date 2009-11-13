@@ -177,7 +177,7 @@ public class AbstractNexusIntegrationTest
             {
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + this.getClass().getSimpleName() );
-                
+
                 // clean common work dir
                 this.beforeStartClean();
 
@@ -198,7 +198,7 @@ public class AbstractNexusIntegrationTest
 
                 NexusConfigUtil.enableSecurity( TestContainer.getInstance().getTestContext().isSecureTest()
                     || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
-                
+
                 // start nexus
                 this.startNexus();
 
@@ -212,7 +212,7 @@ public class AbstractNexusIntegrationTest
             }
         }
     }
-    
+
     protected void beforeStartClean()
         throws Exception
     {
@@ -287,6 +287,13 @@ public class AbstractNexusIntegrationTest
         }
     }
 
+    /**
+     * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
+     * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
+     * hint.
+     * 
+     * @throws Exception
+     */
     protected void deployArtifacts()
         throws Exception
     {
@@ -319,83 +326,131 @@ public class AbstractNexusIntegrationTest
                 if ( model.getDistributionManagement() == null
                     || model.getDistributionManagement().getRepository() == null )
                 {
-                    Assert.fail( "The test artifact is either missing or has an invalid Distribution Management section." );
+                    Assert
+                        .fail( "The test artifact is either missing or has an invalid Distribution Management section." );
                 }
+
+                // get the URL to deploy
                 String deployUrl = model.getDistributionManagement().getRepository().getUrl();
 
-                // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
-                String artifactFileName = model.getArtifactId() + "." + model.getPackaging();
-                File artifactFile = new File( project, artifactFileName );
+                // get the protocol
+                String deployUrlProtocol = deployUrl.substring( 0, deployUrl.indexOf( ":" ) );
 
-                log.debug( "wow, this is working: " + artifactFile.getName() );
+                // calculate the wagon hint
+                String wagonHint = getWagonHintForDeployProtocol( deployUrlProtocol );
 
-                Gav gav =
-                    new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(),
-                             0, new Date().getTime(), model.getName(), false, false, null, false, null );
-
-                // the Restlet Client does not support multipart forms:
-                // http://restlet.tigris.org/issues/show_bug.cgi?id=71
-
-                // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
-
-                if ( !artifactFile.isFile() )
-                {
-                    throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
-                }
-
-                File artifactSha1 = new File( artifactFile.getAbsolutePath() + ".sha1" );
-                File artifactMd5 = new File( artifactFile.getAbsolutePath() + ".md5" );
-                File artifactAsc = new File( artifactFile.getAbsolutePath() + ".asc" );
-
-                File pomSha1 = new File( pom.getAbsolutePath() + ".sha1" );
-                File pomMd5 = new File( pom.getAbsolutePath() + ".md5" );
-                File pomAsc = new File( pom.getAbsolutePath() + ".asc" );
-
-                try
-                {
-                    if ( artifactSha1.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactSha1,
-                                                     this.getRelitiveArtifactPath( gav ) + ".sha1" );
-                    }
-                    if ( artifactMd5.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactMd5,
-                                                     this.getRelitiveArtifactPath( gav ) + ".md5" );
-                    }
-                    if ( artifactAsc.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactAsc,
-                                                     this.getRelitiveArtifactPath( gav ) + ".asc" );
-                    }
-
-                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, artifactFile,
-                                                 this.getRelitiveArtifactPath( gav ) );
-
-                    if ( pomSha1.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomSha1,
-                                                     this.getRelitivePomPath( gav ) + ".sha1" );
-                    }
-                    if ( pomMd5.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomMd5,
-                                                     this.getRelitivePomPath( gav ) + ".md5" );
-                    }
-                    if ( pomAsc.exists() )
-                    {
-                        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomAsc,
-                                                     this.getRelitivePomPath( gav ) + ".asc" );
-                    }
-
-                    DeployUtils.deployWithWagon( this.container, "http", deployUrl, pom, this.getRelitivePomPath( gav ) );
-                }
-                catch ( Exception e )
-                {
-                    log.error( getTestId() + " Unable to deploy " + artifactFileName, e );
-                    throw e;
-                }
+                deployArtifacts( project, wagonHint, deployUrl, model );
             }
+        }
+    }
+
+    /**
+     * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
+     * override this.
+     * 
+     * @param deployProtocol
+     * @return
+     */
+    protected String getWagonHintForDeployProtocol( String deployProtocol )
+    {
+        return deployProtocol;
+    }
+
+    /**
+     * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie. deployUrl
+     * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
+     * 
+     * @param wagonHint
+     * @param deployUrl
+     * @param model
+     * @throws Exception
+     */
+    protected void deployArtifacts( File project, String wagonHint, String deployUrl, Model model )
+        throws Exception
+    {
+        log.info( "Deploying project \"" + project.getAbsolutePath() + "\" using Wagon:" + wagonHint + " to URL=\""
+            + deployUrl + "\"." );
+
+        // we already check if the pom.xml was in here.
+        File pom = new File( project, "pom.xml" );
+
+        // FIXME, this needs to be fluffed up a little, should add the classifier, etc.
+        String artifactFileName = model.getArtifactId() + "." + model.getPackaging();
+        File artifactFile = new File( project, artifactFileName );
+
+        log.debug( "wow, this is working: " + artifactFile.getName() );
+
+        Gav gav =
+            new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
+                new Date().getTime(), model.getName(), false, false, null, false, null );
+
+        // the Restlet Client does not support multipart forms:
+        // http://restlet.tigris.org/issues/show_bug.cgi?id=71
+
+        // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
+
+        if ( !artifactFile.isFile() )
+        {
+            throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
+        }
+
+        File artifactSha1 = new File( artifactFile.getAbsolutePath() + ".sha1" );
+        File artifactMd5 = new File( artifactFile.getAbsolutePath() + ".md5" );
+        File artifactAsc = new File( artifactFile.getAbsolutePath() + ".asc" );
+
+        File pomSha1 = new File( pom.getAbsolutePath() + ".sha1" );
+        File pomMd5 = new File( pom.getAbsolutePath() + ".md5" );
+        File pomAsc = new File( pom.getAbsolutePath() + ".asc" );
+
+        try
+        {
+            if ( artifactSha1.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactSha1, this
+                    .getRelitiveArtifactPath( gav )
+                    + ".sha1" );
+            }
+            if ( artifactMd5.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactMd5, this
+                    .getRelitiveArtifactPath( gav )
+                    + ".md5" );
+            }
+            if ( artifactAsc.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactAsc, this
+                    .getRelitiveArtifactPath( gav )
+                    + ".asc" );
+            }
+
+            DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactFile, this
+                .getRelitiveArtifactPath( gav ) );
+
+            if ( pomSha1.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomSha1, this
+                    .getRelitivePomPath( gav )
+                    + ".sha1" );
+            }
+            if ( pomMd5.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomMd5, this
+                    .getRelitivePomPath( gav )
+                    + ".md5" );
+            }
+            if ( pomAsc.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomAsc, this
+                    .getRelitivePomPath( gav )
+                    + ".asc" );
+            }
+
+            DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
+        }
+        catch ( Exception e )
+        {
+            log.error( getTestId() + " Unable to deploy " + artifactFileName, e );
+            throw e;
         }
     }
 
@@ -598,7 +653,7 @@ public class AbstractNexusIntegrationTest
     {
         // turn off security, of the current IT with security on won't affect the next IT
         TestContainer.getInstance().getTestContext().setSecureTest( false );
-        
+
         // stop nexus
         stopNexus();
 
@@ -698,10 +753,7 @@ public class AbstractNexusIntegrationTest
 
         ContainerConfiguration containerConfiguration =
             new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
-                                                                                                                   baseClass.getName().replace(
-                                                                                                                                                '.',
-                                                                                                                                                '/' )
-                                                                                                                       + ".xml" );
+                baseClass.getName().replace( '.', '/' ) + ".xml" );
 
         try
         {
@@ -764,7 +816,7 @@ public class AbstractNexusIntegrationTest
     }
 
     protected String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
-                                              String classifier )
+        String classifier )
         throws FileNotFoundException
     {
         return GavUtil.getRelitiveArtifactPath( groupId, artifactId, version, extension, classifier );
@@ -793,8 +845,8 @@ public class AbstractNexusIntegrationTest
             throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
         }
         Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
-                             status.getCode() );
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301, status
+            .getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
@@ -837,16 +889,16 @@ public class AbstractNexusIntegrationTest
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+        return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav
+            .getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
-                                     String targetDirectory )
+        String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
-                                      targetDirectory );
+            targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
@@ -854,19 +906,19 @@ public class AbstractNexusIntegrationTest
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
             + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-                                      targetDirectory );
+            targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
-            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav
+            .getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
-                                     String classifier, String targetDirectory )
+        String classifier, String targetDirectory )
         throws IOException
     {
         URL url = new URL( baseUrl + this.getRelitiveArtifactPath( groupId, artifact, version, type, classifier ) );
