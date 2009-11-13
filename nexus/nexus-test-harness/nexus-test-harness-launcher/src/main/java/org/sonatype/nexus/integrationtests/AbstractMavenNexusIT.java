@@ -47,7 +47,7 @@ public class AbstractMavenNexusIT
 
     /**
      * Create a nexus verifier instance
-     *
+     * 
      * @param mavenProject Maven Project folder
      * @param settings A settings.xml file
      * @return
@@ -58,8 +58,12 @@ public class AbstractMavenNexusIT
         throws VerificationException, IOException
     {
         System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
-        
+
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
+
+        String logname = "logs/maven-execution/" + getTestId() + "/" + mavenProject.getName() + ".log";
+        new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
+        verifier.setLogFileName( logname );
 
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
@@ -84,7 +88,7 @@ public class AbstractMavenNexusIT
 
     /**
      * Remove all artifacts on <code>testId</code> groupId
-     *
+     * 
      * @param verifier
      * @throws IOException
      */
@@ -99,7 +103,7 @@ public class AbstractMavenNexusIT
 
     /**
      * Workaround to get some decent logging when tests fail
-     *
+     * 
      * @throws IOException
      */
     protected void failTest( Verifier verifier )
