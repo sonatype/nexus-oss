@@ -31,7 +31,9 @@ public class ClasspathUtils
             }
 
             // class name without ".class"
-            return binaryName.substring( startIdx, binaryName.length() - 6 ).replace( "/", "." ); //.replace( "$", "." );
+            return binaryName.substring( startIdx, binaryName.length() - 6 ).
+            // replacing backslash to make windows happy
+            replace( '\\', '.' ).replace( "/", "." ); // .replace( "$", "." );
         }
         else
         {
