@@ -646,6 +646,11 @@ public class NexusApplication
     @Override
     protected void doCreateRoot( Router root, boolean isStarted )
     {
+        if ( !isStarted )
+        {
+            return;
+        }
+        
         // Add error manager to context
         getContext().getAttributes().put( ErrorReportingManager.class.getName(), errorManager );
 
@@ -654,11 +659,6 @@ public class NexusApplication
         attach( getApplicationRouter(), false, statusPlexusResource );
 
         attach( getApplicationRouter(), false, commandPlexusResource );
-
-        if ( !isStarted )
-        {
-            return;
-        }
 
         // ==========
         // INDEX.HTML and WAR contents

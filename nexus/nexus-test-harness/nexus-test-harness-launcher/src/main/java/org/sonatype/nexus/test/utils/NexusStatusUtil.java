@@ -36,8 +36,6 @@ public class NexusStatusUtil
 
     protected static Logger log = Logger.getLogger( NexusStatusUtil.class );
 
-    private static final String STATUS_STOPPED = "STOPPED";
-
     private static final String STATUS_STARTED = "STARTED";
 
     private static ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
@@ -256,7 +254,7 @@ public class NexusStatusUtil
     public static boolean isNexusStopped()
         throws NexusIllegalStateException
     {
-        return !isNexusAlive() || ( STATUS_STOPPED.equals( getNexusStatus().getData().getState() ) );
+        return !isNexusAlive();
     }
 
     public static boolean waitForStop()
@@ -283,11 +281,6 @@ public class NexusStatusUtil
             catch ( InterruptedException e )
             {
                 // no problem
-            }
-
-            if ( isNexusAlive() && !isNexusRunning() )
-            {
-                throw new NexusIllegalStateException( "Nexus is no longer running, but still using HTTP ports!" );
             }
         }
 
