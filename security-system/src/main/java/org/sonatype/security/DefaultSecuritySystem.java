@@ -24,7 +24,6 @@ import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.cache.Cache;
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.AuthorizingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.subject.DelegatingSubject;
@@ -74,8 +73,8 @@ public class DefaultSecuritySystem
     @Configuration( value = "default" )
     private String runAsSecurityManagerHint;
 
-    @Requirement( role = RealmSecurityManager.class )
-    private Map<String, RealmSecurityManager> securityManagerMap;
+    @Requirement( role = PlexusSecurityManager.class )
+    private Map<String, PlexusSecurityManager> securityManagerMap;
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
@@ -127,7 +126,7 @@ public class DefaultSecuritySystem
 
     public Subject runAs( PrincipalCollection principal )
     {
-        RealmSecurityManager securityManager = this.getRunAsSecurityManager();
+        PlexusSecurityManager securityManager = this.getRunAsSecurityManager();
         // TODO: we might need to bind this to the ThreadContext for this thread
         // however if we do this we would need to unbind it so it doesn't leak
         // ThreadContext.bind( securityManager );
@@ -797,7 +796,7 @@ public class DefaultSecuritySystem
         this.securityConfiguration.save();
 
         // update the realms in the security manager
-        for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
         {
             securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
@@ -841,8 +840,9 @@ public class DefaultSecuritySystem
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
 
-        for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
         {
+            securityManager.start();            
             securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
         }
     }
@@ -850,7 +850,11 @@ public class DefaultSecuritySystem
     public void stop()
         throws StoppingException
     {
-        // we don't have anything to do on stop
+        // we need to kill caches on stop
+        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
+        {
+            securityManager.stop();
+        }
     }
 
     private void clearRealmCaches()
@@ -888,7 +892,7 @@ public class DefaultSecuritySystem
             this.clearRealmCaches();
             this.securityConfiguration.clearCache();
 
-            for ( RealmSecurityManager securityManager : this.securityManagerMap.values() )
+            for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
             {
                 securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
             }
@@ -903,12 +907,12 @@ public class DefaultSecuritySystem
 
     }
 
-    private RealmSecurityManager getApplicationSecurityManager()
+    private PlexusSecurityManager getApplicationSecurityManager()
     {
         return this.securityManagerMap.get( this.applicationSecurityManagerHint );
     }
 
-    private RealmSecurityManager getRunAsSecurityManager()
+    private PlexusSecurityManager getRunAsSecurityManager()
     {
         return this.securityManagerMap.get( this.runAsSecurityManagerHint );
     }

@@ -39,6 +39,7 @@ import org.jsecurity.web.config.IniWebConfiguration;
 import org.jsecurity.web.filter.PathConfigProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.security.PlexusSecurityManager;
 import org.sonatype.security.SecuritySystem;
 
 @Component( role = PlexusWebConfiguration.class )
@@ -50,7 +51,7 @@ public class PlexusConfiguration
 
     public static final String SECURITY_MANAGER_ROLE = "securityManagerRole";
 
-    public static final String DEFAULT_SECURITY_SYSTEM_ROLE = RealmSecurityManager.class.getName();
+    public static final String DEFAULT_SECURITY_SYSTEM_ROLE = PlexusSecurityManager.class.getName();
 
     public static final String SECURITY_MANAGER_ROLE_HINT = "securityManagerRoleHint";
 
@@ -177,7 +178,7 @@ public class PlexusConfiguration
 
         try
         {
-            securityManager = (RealmSecurityManager) container.lookup(
+            securityManager = (PlexusSecurityManager) container.lookup(
                 getSecurityManagerRole(),
                 getSecurityManagerRoleHint() );
 
@@ -230,9 +231,9 @@ public class PlexusConfiguration
 
             if ( !realms.isEmpty() )
             {
-                if ( securityManager instanceof RealmSecurityManager )
+                if ( securityManager instanceof PlexusSecurityManager )
                 {
-                    RealmSecurityManager realmSM = (RealmSecurityManager) securityManager;
+                    PlexusSecurityManager realmSM = (PlexusSecurityManager) securityManager;
 
                     realmSM.setRealms( realms );
                 }
@@ -240,7 +241,7 @@ public class PlexusConfiguration
                 {
                     getLogger().warn(
                         "Attempted to set realms declared in Plexus Context on SecurityManager, but was not of "
-                            + "type RealmSecurityManager - instead was of type: "
+                            + "type PlexusSecurityManager - instead was of type: "
                             + securityManager.getClass().getName() );
                 }
             }

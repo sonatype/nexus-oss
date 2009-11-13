@@ -2,22 +2,20 @@ package org.sonatype.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
 import org.jsecurity.cache.CacheManager;
 import org.jsecurity.cache.ehcache.EhCacheManager;
 import org.jsecurity.mgt.DefaultSecurityManager;
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
-@Component( role = RealmSecurityManager.class )
+@Component( role = PlexusSecurityManager.class )
 public class DefaultPlexusSecurityManager
     extends DefaultSecurityManager
-    implements Initializable, Disposable
+    implements PlexusSecurityManager
 {
 
     @Requirement
@@ -30,10 +28,8 @@ public class DefaultPlexusSecurityManager
         return null;
     }
 
-    // Plexus Lifecycle
-
-    public void initialize()
-        throws InitializationException
+    public void start()
+        throws StartingException
     {
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
@@ -52,10 +48,16 @@ public class DefaultPlexusSecurityManager
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
+        
+        ensureCacheManager();
+        ensureAuthenticator();
+        ensureAuthorizer();
+        ensureSessionManager();
     }
-
-    public void dispose()
+    
+    public void stop()
+        throws StoppingException
     {
-        super.destroy();
+        destroy();
     }
 }

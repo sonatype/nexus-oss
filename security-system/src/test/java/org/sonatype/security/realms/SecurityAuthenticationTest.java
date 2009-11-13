@@ -46,6 +46,17 @@ public class SecurityAuthenticationTest
         security = (SecuritySystem) lookup( SecuritySystem.class );
         security.start();
     }
+    
+    public void testAuthcAndAuthzAfterRestart()
+        throws Exception
+    {
+        testSuccessfulAuthentication();
+        testAuthorization();
+        security.stop();
+        security.start();
+        testSuccessfulAuthentication();
+        testAuthorization();
+    }
 
     public void testSuccessfulAuthentication()
         throws Exception

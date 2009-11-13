@@ -60,7 +60,7 @@ public abstract class AbstractSecurityTest
         replay( mockSession );
         replay( mockRequest );
 
-        // we need to bind for the "web" impl of the RealmSecurityManager to work
+        // we need to bind for the "web" impl of the PlexusSecurityManager to work
         WebUtils.bind( mockRequest );
         WebUtils.bind( mockResponse );
     }

@@ -5,11 +5,8 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.mgt.RealmSecurityManager;
-import org.jsecurity.subject.DelegatingSubject;
 import org.jsecurity.subject.SimplePrincipalCollection;
 import org.jsecurity.subject.Subject;
-import org.jsecurity.util.ThreadContext;
 import org.jsecurity.web.WebUtils;
 import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
@@ -25,8 +22,6 @@ extends AbstractSecurityTest
         
         // need to bind to a request
         this.setupLoginContext( "testGetSubjectFromThread" );
-        
-        RealmSecurityManager realmSecurityManager = this.lookup( RealmSecurityManager.class, "web" );
         
         Assert.assertNotNull( securitySystem.login( new UsernamePasswordToken("jcoder", "jcoder") ) );
         

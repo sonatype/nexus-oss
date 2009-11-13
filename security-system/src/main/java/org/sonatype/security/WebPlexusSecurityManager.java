@@ -2,13 +2,11 @@ package org.sonatype.security;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
 import org.jsecurity.cache.CacheManager;
 import org.jsecurity.cache.ehcache.EhCacheManager;
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.web.DefaultWebSecurityManager;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
@@ -20,10 +18,10 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * configuration into the SecuritySystem. The downside to that is we would need to expose an accessor for it. ( This
  * component is loaded from a servelet ), but that might be cleaner then what we are doing now.
  */
-@Component( role = RealmSecurityManager.class, hint = "web" )
+@Component( role = PlexusSecurityManager.class, hint = "web" )
 public class WebPlexusSecurityManager
     extends DefaultWebSecurityManager
-    implements Initializable, Disposable
+    implements PlexusSecurityManager
 {
 
     @Requirement
@@ -37,9 +35,8 @@ public class WebPlexusSecurityManager
     }
 
     // Plexus Lifecycle
-
-    public void initialize()
-        throws InitializationException
+    public void start()
+        throws StartingException
     {
         // set the realm authenticator, that will automatically delegate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
@@ -58,10 +55,16 @@ public class WebPlexusSecurityManager
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
+        
+        ensureCacheManager();
+        ensureAuthenticator();
+        ensureAuthorizer();
+        ensureSessionManager();
     }
-
-    public void dispose()
+    
+    public void stop()
+        throws StoppingException
     {
-        super.destroy();
+        destroy();
     }
 }

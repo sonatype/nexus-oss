@@ -16,11 +16,11 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.realm.CachingRealm;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.realm.SimpleAccountRealm;
 import org.sonatype.security.AbstractSecurityTest;
+import org.sonatype.security.PlexusSecurityManager;
 import org.sonatype.security.SecuritySystem;
 
 public class WebPlexusSecurityTest
@@ -33,7 +33,7 @@ public class WebPlexusSecurityTest
         // Start up security
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         
-        RealmSecurityManager realmSecurityManager = this.lookup( RealmSecurityManager.class, "web" );
+        PlexusSecurityManager plexusSecurityManager = this.lookup( PlexusSecurityManager.class, "web" );
         
         List<String> realms = securitySystem.getRealms();
         realms.clear();
@@ -41,7 +41,7 @@ public class WebPlexusSecurityTest
         securitySystem.setRealms( realms );
 
         // now if we grab one of the realms from the Realm locator, it should have its cache set
-        CachingRealm cRealm1 = (CachingRealm) realmSecurityManager.getRealms().iterator().next();
+        CachingRealm cRealm1 = (CachingRealm) plexusSecurityManager.getRealms().iterator().next();
         Assert.assertNotNull( "Realm has null cacheManager", cRealm1.getCacheManager() );
 
         // // so far so good, the cacheManager should be set on all the child realms, but what if we add one after the
@@ -50,9 +50,9 @@ public class WebPlexusSecurityTest
         securitySystem.setRealms( realms );
         
         // this list should have exactly 2 elements
-        Assert.assertEquals( 2, realmSecurityManager.getRealms().size() );
+        Assert.assertEquals( 2, plexusSecurityManager.getRealms().size() );
         
-        for ( Realm realm : realmSecurityManager.getRealms() )
+        for ( Realm realm : plexusSecurityManager.getRealms() )
         {
             Assert.assertNotNull( "Realm has null cacheManager", ((CachingRealm) realm).getCacheManager() );
         }
