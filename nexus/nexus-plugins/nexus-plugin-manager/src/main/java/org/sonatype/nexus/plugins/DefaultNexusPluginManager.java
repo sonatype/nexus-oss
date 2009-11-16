@@ -379,19 +379,14 @@ public class DefaultNexusPluginManager
             {
                 PluginDescriptor importPlugin = getActivatedPlugins().get( coord );
 
-                List<String> exports = importPlugin.getExportedResources();
+                List<String> exports = importPlugin.getExportedClassnames();
 
                 for ( String export : exports )
                 {
-                    String canonicalName = ClasspathUtils.convertClassBinaryNameToCanonicalName( export );
-
                     // import ALL
                     try
                     {
-                        // add the canonical name as ClassRealm expects, but if there is none, add the export
-                        // (binary name)
-                        pluginDescriptor.getPluginRealm().importFrom( importPlugin.getPluginRealm().getId(),
-                            canonicalName != null ? canonicalName : export );
+                        pluginDescriptor.getPluginRealm().importFrom( importPlugin.getPluginRealm().getId(), export );
                     }
                     catch ( NoSuchRealmException e )
                     {
