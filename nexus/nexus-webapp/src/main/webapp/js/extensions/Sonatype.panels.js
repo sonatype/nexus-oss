@@ -673,7 +673,9 @@ Ext.extend( Sonatype.panels.GridViewer, Ext.Panel, {
 Sonatype.panels.TreePanel = function( config ) {
   var config = config || {};
   var defaultConfig = { 
-    titleColumn: 'name'
+    titleColumn: 'name',
+    nodeIconClass: null,
+    useNodeIconClassParam: null
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -702,6 +704,7 @@ Sonatype.panels.TreePanel = function( config ) {
     enableDD: false,
     loader : new Ext.tree.TreeLoader( {
       nodeIconClass: this.nodeIconClass,
+      useNodeIconClassParam: this.useNodeIconClassParam,
       requestMethod: 'GET',
       url: this.url,
       listeners: {
@@ -749,8 +752,11 @@ Sonatype.panels.TreePanel = function( config ) {
           attr.singleClickExpand = true;
         }
         
-        if ( this.nodeIconClass ) {
-          attr.iconCls = this.nodeIconClass;
+        if ( this.nodeIconClass != null ) {
+          if ( this.useNodeIconClassParam == null 
+              || attr[this.useNodeIconClassParam] ) {
+            attr.iconCls = this.nodeIconClass;
+          }
         }
 
         if ( attr.nodeType ) {

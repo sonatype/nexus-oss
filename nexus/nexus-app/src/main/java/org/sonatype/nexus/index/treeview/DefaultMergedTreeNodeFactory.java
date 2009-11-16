@@ -48,12 +48,39 @@ public class DefaultMergedTreeNodeFactory
     {
         return repository;
     }
-
+    
+    @Override
+    protected TreeNode decorateGNode( IndexTreeView tview, String path, String groupName, TreeNode node )
+    {
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateGNode( tview, path, groupName, node );
+        mnode.setLocallyAvailable( isPathAvailable( path ) );
+        
+        return mnode;
+    }
+    
+    @Override
+    protected TreeNode decorateANode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    {
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, ai, path, node );
+        mnode.setLocallyAvailable( isPathAvailable( path ) );
+        
+        return mnode;
+    }
+    
+    @Override
+    protected TreeNode decorateVNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    {
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, ai, path, node );
+        mnode.setLocallyAvailable( isPathAvailable( path ) );
+        
+        return mnode;
+    }
+    
     protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
     {
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateArtifactNode( tview, ai, path, node );
+        
         ResourceStoreRequest request = getResourceStoreRequest( path );
-
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) node;
 
         // default it to not available
         mnode.setLocallyAvailable( false );
@@ -117,6 +144,27 @@ public class DefaultMergedTreeNodeFactory
     protected ResourceStoreRequest getResourceStoreRequest( String path )
     {
         return new ResourceStoreRequest( path, true );
+    }
+    
+    protected boolean isPathAvailable( String path )
+    {
+        ResourceStoreRequest request = getResourceStoreRequest( path );
+        
+        try
+        {
+            getRepository().retrieveItem( request );
+            return true;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            // item really not cached locally
+        }
+        catch ( Exception e )
+        {
+            // for whatever reason, couldn't see item, so it's not cached locally we shall say
+        }
+        
+        return false;
     }
 
 }
