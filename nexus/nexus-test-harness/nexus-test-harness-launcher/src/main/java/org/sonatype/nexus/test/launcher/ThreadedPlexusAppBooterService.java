@@ -96,6 +96,15 @@ public class ThreadedPlexusAppBooterService
         this.shutdown();
     }
 
+    @SuppressWarnings( "deprecation" )
+    public void forceStop()
+    {
+        if ( this.launcherThread != null )
+        {
+            this.launcherThread.stop();
+        }
+    }
+
     class LauncherThread
         extends Thread
     {

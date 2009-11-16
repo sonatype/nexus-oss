@@ -195,7 +195,11 @@ public class NexusStatusUtil
 
         if ( !waitForStop() )
         {
-            throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
+            getAppBooterService().forceStop();
+            if ( isNexusAlive() )
+            {
+                throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
+            }
         }
 
     }
