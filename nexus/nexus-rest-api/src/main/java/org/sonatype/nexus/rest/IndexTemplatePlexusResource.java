@@ -177,7 +177,7 @@ public class IndexTemplatePlexusResource
 
             // post BODY
 
-            String postBodyTemplate = bundle.getPreBodyContribution( pluginContext );
+            String postBodyTemplate = bundle.getPostBodyContribution( pluginContext );
 
             evaluateIfNeeded(
                 templateRepresentation.getEngine(),
