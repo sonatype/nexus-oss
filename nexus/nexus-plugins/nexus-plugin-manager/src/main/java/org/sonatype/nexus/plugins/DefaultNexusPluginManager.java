@@ -198,7 +198,7 @@ public class DefaultNexusPluginManager
         if ( getActivatedPlugins().containsKey( pluginCoordinate ) )
         {
             // already is active, let's play dumb
-            
+
             return response;
         }
 
@@ -215,9 +215,9 @@ public class DefaultNexusPluginManager
             PluginResponse result = new PluginResponse( pluginCoordinate, PluginActivationRequest.ACTIVATE );
 
             result.setThrowable( new NoSuchPluginException( pluginCoordinate ) );
-            
+
             result.setAchievedGoal( PluginActivationResult.MISSING );
-            
+
             this.pluginActions.put( pluginCoordinate, result );
 
             response.addPluginResponse( result );
@@ -272,8 +272,8 @@ public class DefaultNexusPluginManager
             else
             {
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
-                
-                result.setAchievedGoal( PluginActivationResult.MISSING);
+
+                result.setAchievedGoal( PluginActivationResult.MISSING );
             }
         }
         catch ( PlexusContainerException e )
@@ -306,13 +306,13 @@ public class DefaultNexusPluginManager
             {
                 // this is not a nexus plugin!
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
-                
+
                 result.setAchievedGoal( PluginActivationResult.MISSING );
 
                 response.addPluginResponse( result );
-                
+
                 this.pluginActions.put( pluginCoordinates, result );
-                
+
                 return;
             }
 
@@ -321,20 +321,13 @@ public class DefaultNexusPluginManager
 
             // scan the jar
             pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
-            /*
-             * ClassRealm pluginRealm; try { // create plugin realm as container child pluginRealm =
-             * plexusContainer.getContainerRealm().getWorld().newRealm( pluginCoordinates.toCompositeForm() ); } catch (
-             * DuplicateRealmException e ) { result.setThrowable( new IllegalStateException(
-             * "Plugin is already loaded?", e ) ); response.addPluginResponse( result ); return; } // set core as plugin
-             * realm pluginRealm.setParentRealm( plexusContainer.getContainerRealm() ); pluginDescriptor.setPluginRealm(
-             * pluginRealm );
-             */
+
             // "old way", since the above way does not work
             pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.toCompositeForm() ) );
 
             // add plugin jar to it
             pluginDescriptor.getPluginRealm().addURL( toUrl( pluginFile ) );
-            
+
             // we will have pluginDescriptor even later the plugin is broken
             result.setPluginDescriptor( pluginDescriptor );
 
@@ -342,18 +335,16 @@ public class DefaultNexusPluginManager
             discoveryContext = new PluginDiscoveryContext( pluginDescriptor, validator );
 
             // resolve inter-plugin deps and gather them
-            List<GAVCoordinate> dependencyPlugins = new ArrayList<GAVCoordinate>( pluginDescriptor
-                .getPluginMetadata().getPluginDependencies().size() );
+            List<GAVCoordinate> dependencyPlugins =
+                new ArrayList<GAVCoordinate>( pluginDescriptor.getPluginMetadata().getPluginDependencies().size() );
 
             List<GAVCoordinate> brokenDependencyPlugins = new ArrayList<GAVCoordinate>();
 
             for ( PluginDependency dependency : pluginDescriptor.getPluginMetadata().getPluginDependencies() )
             {
                 // we use GAV here only, neglecting CT
-                GAVCoordinate depCoord = new GAVCoordinate(
-                    dependency.getGroupId(),
-                    dependency.getArtifactId(),
-                    dependency.getVersion() );
+                GAVCoordinate depCoord =
+                    new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion() );
 
                 if ( !activatedPlugins.containsKey( depCoord ) )
                 {
@@ -377,7 +368,7 @@ public class DefaultNexusPluginManager
                 result.setThrowable( new PluginDependencyUnavailableException( brokenDependencyPlugins ) );
 
                 response.addPluginResponse( result );
-                
+
                 this.pluginActions.put( pluginCoordinates, result );
 
                 return;
@@ -392,10 +383,15 @@ public class DefaultNexusPluginManager
 
                 for ( String export : exports )
                 {
+                    String canonicalName = ClasspathUtils.convertClassBinaryNameToCanonicalName( export );
+
                     // import ALL
                     try
                     {
-                        pluginDescriptor.getPluginRealm().importFrom( importPlugin.getPluginRealm().getId(), export );
+                        // add the canonical name as ClassRealm expects, but if there is none, add the export
+                        // (binary name)
+                        pluginDescriptor.getPluginRealm().importFrom( importPlugin.getPluginRealm().getId(),
+                            canonicalName != null ? canonicalName : export );
                     }
                     catch ( NoSuchRealmException e )
                     {
@@ -422,7 +418,7 @@ public class DefaultNexusPluginManager
                     .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
-                
+
                 this.pluginActions.put( pluginCoordinates, result );
             }
 
@@ -447,7 +443,7 @@ public class DefaultNexusPluginManager
                     .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
-                
+
                 this.pluginActions.put( pluginCoordinates, result );
             }
 
@@ -506,7 +502,7 @@ public class DefaultNexusPluginManager
         }
 
         response.addPluginResponse( result );
-        
+
         this.pluginActions.put( pluginCoordinates, result );
     }
 
@@ -530,7 +526,7 @@ public class DefaultNexusPluginManager
     }
 
     protected List<File> addClasspathDependencies( PluginRepositoryArtifact pluginArtifact,
-                                                   PluginDiscoveryContext context, boolean hasComponentsFilter )
+        PluginDiscoveryContext context, boolean hasComponentsFilter )
         throws NoSuchPluginRepositoryArtifactException
     {
         PluginDescriptor pluginDescriptor = context.getPluginDescriptor();
