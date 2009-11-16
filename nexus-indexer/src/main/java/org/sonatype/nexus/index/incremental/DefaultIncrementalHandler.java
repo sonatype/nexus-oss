@@ -118,7 +118,8 @@ public class DefaultIncrementalHandler
             properties.setProperty( IndexingContext.INDEX_CHUNK_COUNTER, "0" );
         }
     }
-    
+
+    // Note Toni: 
     private List<Integer> getIndexChunk( IndexPackingRequest request, Date timestamp )
         throws IOException
     {           
