@@ -819,7 +819,8 @@ Sonatype.utils = {
   },
   
   postWelcomePageAlert: function( msg ) {
-    Sonatype.view.welcomeTab.add( {
+    //we want to insert the toolbar first, rather than add to the page in random spot
+    Sonatype.view.welcomeTab.insert( 0, {
       xtype: 'panel',
       html: '<div class="x-toolbar-warning-box"><div class="x-form-invalid-msg" style="width: 95%;">' + msg + '</div></div>'
     } );

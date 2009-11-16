@@ -469,34 +469,39 @@ Sonatype.repoServer.RepoServer = function(){
         var welcomeTabConfig = {
           title: 'Welcome',
           id: 'welcome',
-          layout: 'column',
-          defaults: {
-            border: false,
-            style: 'padding-top: 30px;'
-          },
           items: [
-            { 
-              columnWidth: .5,
-              html: '&nbsp;' 
-            },
-            welcomePanelConfig,
-            { 
-              columnWidth: .5,
-              html: '&nbsp;' 
-            }
-          ],
-          listeners: {
-            render: {
-              fn: function() {
-                var c = Ext.getCmp( 'quick-search-welcome-field' );
-                if ( c ) {
-                  c.focus( true, 100 );
-                }
+            {
+              layout: 'column',
+              border: false,
+              defaults: {
+                border: false,
+                style: 'padding-top: 30px;'
               },
-              single: true,
-              delay: 300
+              items: [
+                { 
+                  columnWidth: .5,
+                  html: '&nbsp;' 
+                },
+                welcomePanelConfig,
+                { 
+                  columnWidth: .5,
+                  html: '&nbsp;' 
+                }
+              ],
+              listeners: {
+                render: {
+                  fn: function() {
+                    var c = Ext.getCmp( 'quick-search-welcome-field' );
+                    if ( c ) {
+                      c.focus( true, 100 );
+                    }
+                  },
+                  single: true,
+                  delay: 300
+                }
+              }
             }
-          }
+          ]
         };
 
         var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' +
