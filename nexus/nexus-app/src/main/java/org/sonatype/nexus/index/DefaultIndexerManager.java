@@ -511,6 +511,12 @@ public class DefaultIndexerManager
     {
         try
         {
+            if ( item.getPath().startsWith( "." ) )
+            {
+                getLogger().debug( "Will not index hidden file path: " + item.getPath() );
+                return;
+            }
+            
             // do the "cheaper" check 1st
             if ( !repository.isIndexable() )
             {
