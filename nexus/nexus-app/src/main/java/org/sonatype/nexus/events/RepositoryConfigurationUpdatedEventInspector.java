@@ -7,11 +7,9 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ExpireCacheTask;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.tasks.ResetGroupIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "RepositoryConfigurationUpdatedEventInspector" )

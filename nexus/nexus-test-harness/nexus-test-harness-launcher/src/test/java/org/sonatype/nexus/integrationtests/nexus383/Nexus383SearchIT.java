@@ -28,8 +28,6 @@ import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
-import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -61,23 +59,15 @@ public class Nexus383SearchIT
     }
 
     @Override
-    protected void runOnce()
+    protected void deployArtifacts()
         throws Exception
     {
-        super.runOnce();
-
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_RELEASE_REPO, NEXUS_TEST_HARNESS_REPO2,
             NEXUS_TEST_HARNESS_REPO );
 
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
 
-        // add the repo to public group
-        RepositoryGroupResource publicGroup = groupMessageUtil.getGroup( "public" );
-
-        RepositoryGroupMemberRepository member = new RepositoryGroupMemberRepository();
-        member.setId( NEXUS_TEST_HARNESS_REPO );
-
-        publicGroup.addRepository( member );
+        super.deployArtifacts();
     }
 
     @After
@@ -94,6 +84,8 @@ public class Nexus383SearchIT
     public void searchFor()
         throws Exception
     {
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         // groupId
         List<NexusArtifact> results = messageUtil.searchFor( "nexus383" );
         Assert.assertEquals( 2, results.size() );
@@ -120,9 +112,9 @@ public class Nexus383SearchIT
 
         // NEXUS-2724: the member changes should propagate to it's groups too
         // has it propagated to group?
-        results = messageUtil.searchFor( "nexus383", "know-artifact-1", "1.0.0", "public" );
+        results = SearchMessageUtil.searchFor( "nexus383", "know-artifact-1", "1.0.0", "public" );
         Assert.assertEquals( 1, results.size() );
-        results = messageUtil.searchFor( "nexus383", "know-artifact-2", "1.0.0", "public" );
+        results = SearchMessageUtil.searchFor( "nexus383", "know-artifact-2", "1.0.0", "public" );
         Assert.assertEquals( 1, results.size() );
     }
 
