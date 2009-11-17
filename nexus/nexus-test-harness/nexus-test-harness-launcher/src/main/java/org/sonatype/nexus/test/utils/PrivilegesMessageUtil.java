@@ -213,4 +213,10 @@ public class PrivilegesMessageUtil
         }
     }
 
+    public Response delete( String privId )
+        throws IOException
+    {
+        return RequestFacade.sendMessage( "service/local/privileges/" + privId, Method.DELETE );
+    }
+
 }
