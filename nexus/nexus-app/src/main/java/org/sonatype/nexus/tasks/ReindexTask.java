@@ -13,10 +13,10 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
@@ -31,8 +31,9 @@ import org.sonatype.scheduling.SchedulerTask;
 public class ReindexTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-    @Requirement
-    private IndexerManager indexerManager;
+
+    @Requirement( role = ReindexTaskHandler.class )
+    private List<ReindexTaskHandler> handlers;
 
     public boolean getFullReindex()
     {
@@ -49,17 +50,20 @@ public class ReindexTask
     public Object doRun()
         throws Exception
     {
-        if ( getRepositoryId() != null )
+        for( ReindexTaskHandler handler : handlers )
         {
-            indexerManager.reindexRepository( getResourceStorePath(), getRepositoryId(), getFullReindex() );
-        }
-        else if ( getRepositoryGroupId() != null )
-        {
-            indexerManager.reindexRepositoryGroup( getResourceStorePath(), getRepositoryGroupId(), getFullReindex() );
-        }
-        else
-        {
-            indexerManager.reindexAllRepositories( getResourceStorePath(), getFullReindex() );
+            if( getRepositoryId() != null )
+            {
+                handler.reindexRepository( getRepositoryId(), getResourceStorePath(), getFullReindex() );
+            }
+            else if( getRepositoryGroupId() != null )
+            {
+                handler.reindexRepositoryGroup( getRepositoryGroupId(), getResourceStorePath(), getFullReindex() );
+            }
+            else
+            {
+                handler.reindexAllRepositories( getResourceStorePath(), getFullReindex() );
+            }
         }
 
         return null;
@@ -74,15 +78,15 @@ public class ReindexTask
     @Override
     protected String getMessage()
     {
-        if ( getRepositoryGroupId() != null )
+        if( getRepositoryGroupId() != null )
         {
             return "Reindexing repository group " + getRepositoryGroupName() + " from path " + getResourceStorePath()
-                + " and below.";
+                   + " and below.";
         }
-        else if ( getRepositoryId() != null )
+        else if( getRepositoryId() != null )
         {
             return "Reindexing repository " + getRepositoryName() + " from path " + getResourceStorePath()
-                + " and below.";
+                   + " and below.";
         }
         else
         {
