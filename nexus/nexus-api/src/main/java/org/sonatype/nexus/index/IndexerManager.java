@@ -157,15 +157,15 @@ public interface IndexerManager
     // ----------------------------------------------------------------------------
 
     FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
-                                           Integer hitLimit )
+        Integer hitLimit )
         throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
-                                                Integer hitLimit )
+        Integer hitLimit )
         throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-                                           String repositoryId, Integer from, Integer count, Integer hitLimit )
+        String repositoryId, Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
@@ -173,6 +173,10 @@ public interface IndexerManager
     // ----------------------------------------------------------------------------
 
     Query constructQuery( String field, String query );
+
+    // ----------------------------------------------------------------------------
+    // Tree nodes
+    // ----------------------------------------------------------------------------
 
     TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path );
 

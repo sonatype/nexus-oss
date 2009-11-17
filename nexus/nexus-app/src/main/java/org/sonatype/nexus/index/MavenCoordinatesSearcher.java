@@ -15,6 +15,7 @@ package org.sonatype.nexus.index;
 
 import java.util.Collections;
 import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -55,7 +56,7 @@ public class MavenCoordinatesSearcher
      */
     public static final String TERM_CLASSIFIER = "c";
 
-    @Requirement( role = ComposableIndexerManager.class, hint = "lucene" )
+    @Requirement
     private IndexerManager m_lucene;
 
     /**

@@ -18,6 +18,11 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * Filters artifact info collection, based on user permissions.
+ * 
+ * @author cstamas
+ */
 @Component( role = IndexArtifactFilter.class )
 public class DefaultIndexArtifactFilter
     extends AbstractLogEnabled
@@ -59,20 +64,11 @@ public class DefaultIndexArtifactFilter
                 {
                     MavenRepository mr = (MavenRepository) repository;
 
-                    Gav gav = new Gav(
-                        artifactInfo.groupId,
-                        artifactInfo.artifactId,
-                        artifactInfo.version,
-                        artifactInfo.classifier,
-                        mr.getArtifactPackagingMapper().getExtensionForPackaging( artifactInfo.packaging ),
-                        null,
-                        null,
-                        null,
-                        VersionUtils.isSnapshot( artifactInfo.version ),
-                        false,
-                        null,
-                        false,
-                        null );
+                    Gav gav =
+                        new Gav( artifactInfo.groupId, artifactInfo.artifactId, artifactInfo.version,
+                            artifactInfo.classifier, mr.getArtifactPackagingMapper().getExtensionForPackaging(
+                                artifactInfo.packaging ), null, null, null, VersionUtils
+                                .isSnapshot( artifactInfo.version ), false, null, false, null );
 
                     ResourceStoreRequest req = new ResourceStoreRequest( mr.getGavCalculator().gavToPath( gav ) );
 
@@ -95,8 +91,7 @@ public class DefaultIndexArtifactFilter
         {
             this.getLogger().warn(
                 "Repository not found for artifact: " + artifactInfo.groupId + ":" + artifactInfo.artifactId + ":"
-                    + artifactInfo.version + " in repository: " + artifactInfo.repository,
-                e );
+                    + artifactInfo.version + " in repository: " + artifactInfo.repository, e );
 
             // artifact does not exist, filter it out
             return false;

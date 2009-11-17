@@ -17,7 +17,7 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
- * A searcher is able to perform artifact info searches based on key/value search terms. Note thts this is an
+ * A searcher is able to perform artifact info searches based on key/value search terms. Note that this is an
  * intermediate step towards future Nexus pluggable indexing and should not be considered public api.
  * 
  * @author Alin Dreghiciu
@@ -26,7 +26,7 @@ public interface Searcher
 {
 
     /**
-     * Ansers teh question: can this searcher be used to search for the available terms?
+     * Answers the question: can this searcher be used to search for the available terms?
      * 
      * @param terms available terms
      * @return true if searcher can be used to search for the available terms, false oterwise
@@ -34,7 +34,7 @@ public interface Searcher
     boolean canHandle( Map<String, String> terms );
 
     /**
-     * Searches for artifacts based on available terms.,
+     * Searches for artifacts based on available terms.
      * 
      * @param terms search terms
      * @param repositoryId repository id of the repository to be searched ir null if the search should be performed on
@@ -45,7 +45,7 @@ public interface Searcher
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
     FlatSearchResponse flatSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
-                                   Integer hitLimit )
+        Integer hitLimit )
         throws NoSuchRepositoryException;
 
 }

@@ -15,6 +15,7 @@ package org.sonatype.nexus.index;
 
 import java.util.Collections;
 import java.util.Map;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,7 +36,7 @@ public class ClassnameSearcher
      */
     public static final String TERM_CLASSNAME = "cn";
 
-    @Requirement( role = ComposableIndexerManager.class, hint = "lucene" )
+    @Requirement
     private IndexerManager m_lucene;
 
     /**
@@ -50,7 +51,7 @@ public class ClassnameSearcher
      * {@inheritDoc}
      */
     public FlatSearchResponse flatSearch( final Map<String, String> terms, final String repositoryId,
-                                          final Integer from, final Integer count, final Integer hitLimit )
+        final Integer from, final Integer count, final Integer hitLimit )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
