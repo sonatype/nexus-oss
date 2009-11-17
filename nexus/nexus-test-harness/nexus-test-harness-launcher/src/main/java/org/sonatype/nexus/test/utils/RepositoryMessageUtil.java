@@ -46,7 +46,7 @@ import com.thoughtworks.xstream.XStream;
 
 public class RepositoryMessageUtil
 {
-
+    public static final String ALL_SERVICE_PART = RequestFacade.SERVICE_LOCAL + "all_repositories";
     public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repositories";
 
     private XStream xstream;
@@ -256,6 +256,21 @@ public class RepositoryMessageUtil
 
         return resourceResponse.getData();
 
+    }
+    
+    public List<RepositoryListResource> getAllList()
+        throws IOException
+    {
+        String responseText = RequestFacade.doGetRequest( ALL_SERVICE_PART ).getEntity().getText();
+        LOG.debug( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        RepositoryListResourceResponse resourceResponse =
+            (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );
+
+        return resourceResponse.getData();        
     }
 
     public RepositoryResource getResourceFromResponse( Response response )
