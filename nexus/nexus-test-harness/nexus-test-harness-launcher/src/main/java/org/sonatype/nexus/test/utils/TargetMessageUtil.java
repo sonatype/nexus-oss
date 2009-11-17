@@ -177,7 +177,8 @@ public class TargetMessageUtil
                     Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
                     Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
                     // order doesn't matter
-                    Assert.assertEquals( new HashSet<String>(targetResource.getPatterns()), new HashSet<String>( repositoryTarget.getPatterns()) );
+                    Assert.assertEquals( new HashSet<String>( targetResource.getPatterns() ),
+                                         new HashSet<String>( repositoryTarget.getPatterns() ) );
 
                     break;
                 }
@@ -245,6 +246,43 @@ public class TargetMessageUtil
                 RequestFacade.sendMessage( "service/local/repo_targets/" + target.getId(), Method.DELETE ).getStatus();
             Assert.assertTrue( "Failt to delete: " + status.getDescription(), status.isSuccess() );
         }
+    }
+
+    public static RepositoryTargetResource getByName( String name )
+        throws IOException
+    {
+        List<RepositoryTargetListResource> targets = getList();
+        for ( RepositoryTargetListResource target : targets )
+        {
+            if ( name.equals( target.getName() ) )
+            {
+                return get( target.getId() );
+            }
+        }
+        Assert.fail( "Target not found name: " + name );
+        return null;
+    }
+
+    public static RepositoryTargetResource get( String targetId )
+        throws IOException
+    {
+        String responseText =
+            RequestFacade.doGetRequest( "service/local/repo_targets/" + targetId ).getEntity().getText();
+        LOG.debug( "responseText: \n" + responseText );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        RepositoryTargetResourceResponse resourceResponse =
+            (RepositoryTargetResourceResponse) representation.getPayload( new RepositoryTargetResourceResponse() );
+
+        return resourceResponse.getData();
+    }
+
+    public static Response delete( String targetId )
+        throws IOException
+    {
+        return RequestFacade.sendMessage( "service/local/repo_targets/" + targetId, Method.DELETE );
     }
 
 }

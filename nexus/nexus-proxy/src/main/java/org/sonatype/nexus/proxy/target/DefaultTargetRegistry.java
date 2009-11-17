@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -103,6 +104,7 @@ public class DefaultTargetRegistry
         }
     }
 
+    @Override
     public boolean commitChanges()
         throws ConfigurationException
     {
@@ -127,7 +129,7 @@ public class DefaultTargetRegistry
         if ( contentClass != null )
         {
             return new Target( target.getId(), target.getName(), contentClass, target.getPatterns() );
-    }
+        }
 
         return null;
     }
@@ -177,8 +179,8 @@ public class DefaultTargetRegistry
                 if ( target != null )
                 {
                     targets.add( target );
+                }
             }
-        }
         }
 
         // copy the list, since processing it may take longer
@@ -222,11 +224,15 @@ public class DefaultTargetRegistry
 
         for ( Iterator<CRepositoryTarget> ti = targets.iterator(); ti.hasNext(); )
         {
-            CRepositoryTarget target = ti.next();
+            CRepositoryTarget cTarget = ti.next();
 
-            if ( StringUtils.equals( id, target.getId() ) )
+            if ( StringUtils.equals( id, cTarget.getId() ) )
             {
+                Target target = getRepositoryTarget( id );
+
                 ti.remove();
+
+                getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target ) );
 
                 return true;
             }
@@ -262,7 +268,8 @@ public class DefaultTargetRegistry
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path + "'" );
+                               "Resolving targets for contentClass='" + contentClass.getId() + "' for path='" + path
+                                   + "'" );
         }
 
         for ( Target t : getRepositoryTargets() )

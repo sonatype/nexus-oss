@@ -24,6 +24,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -52,7 +53,8 @@ public class PrivilegesMessageUtil
         this.mediaType = mediaType;
     }
 
-    public List<PrivilegeStatusResource> createPrivileges( PrivilegeResource resource ) throws IOException
+    public List<PrivilegeStatusResource> createPrivileges( PrivilegeResource resource )
+        throws IOException
     {
         Response response = this.sendMessage( Method.POST, resource );
 
@@ -68,44 +70,49 @@ public class PrivilegesMessageUtil
         return statusResources;
     }
 
-    public PrivilegeStatusResource getPrivilegeResource( String id ) throws IOException
+    public PrivilegeStatusResource getPrivilegeResource( String id )
+        throws IOException
     {
         Response response = this.sendMessage( Method.GET, null, id );
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not get Privilege: " + response.getStatus() +"\n" + response.getEntity().getText());
+            Assert.fail( "Could not get Privilege: " + response.getStatus() + "\n" + response.getEntity().getText() );
         }
         return this.getResourceFromResponse( response );
     }
 
-    public List<PrivilegeStatusResource> getList(  ) throws IOException
+    public List<PrivilegeStatusResource> getList()
+        throws IOException
     {
         Response response = this.sendMessage( Method.GET, null );
         if ( !response.getStatus().isSuccess() )
         {
-            Assert.fail( "Could not get Privilege: " + response.getStatus() +"\n" + response.getEntity().getText());
+            Assert.fail( "Could not get Privilege: " + response.getStatus() + "\n" + response.getEntity().getText() );
         }
         return this.getResourceListFromResponse( response );
     }
 
-    public Response sendMessage( Method method, PrivilegeResource resource ) throws IOException
+    public Response sendMessage( Method method, PrivilegeResource resource )
+        throws IOException
     {
         return this.sendMessage( method, resource, "" );
     }
 
-    public Response sendMessage( Method method, PrivilegeResource resource, String id ) throws IOException
+    public Response sendMessage( Method method, PrivilegeResource resource, String id )
+        throws IOException
     {
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String privId = ( method == Method.POST ) ? "" : "/" + id;
         String serviceURI = "service/local/privileges" + privId;
-        
-        if( method == Method.POST )
+
+        if ( method == Method.POST )
         {
             serviceURI += "_target";
         }
 
-        if ( method == Method.POST || method == Method.PUT ) // adding put so we can check for the 405, without a resource you get a 400
+        if ( method == Method.POST || method == Method.PUT ) // adding put so we can check for the 405, without a
+        // resource you get a 400
         {
             PrivilegeResourceRequest requestResponse = new PrivilegeResourceRequest();
             requestResponse.setData( resource );
@@ -164,6 +171,46 @@ public class PrivilegesMessageUtil
 
         }
 
+    }
+
+    public void assertExists( String... ids )
+        throws IOException
+    {
+        StringBuilder result = new StringBuilder();
+        for ( String id : ids )
+        {
+            Response response = this.sendMessage( Method.GET, null, id );
+            if ( !response.getStatus().isSuccess() )
+            {
+                result.append( "Privilege not found '" ).append( id ).append( "': " );
+                result.append( response.getEntity().getText() ).append( '\n' );
+            }
+        }
+
+        if ( result.length() != 0 )
+        {
+            Assert.fail( result.toString() );
+        }
+    }
+
+    public void assertNotExists( String... ids )
+        throws IOException
+    {
+        StringBuilder result = new StringBuilder();
+        for ( String id : ids )
+        {
+            Response response = this.sendMessage( Method.GET, null, id );
+            if ( !Status.CLIENT_ERROR_NOT_FOUND.equals( response.getStatus() ) )
+            {
+                result.append( "Privilege shouldn't exist '" ).append( id ).append( "': " );
+                result.append( response.getEntity().getText() ).append( '\n' );
+            }
+        }
+
+        if ( result.length() != 0 )
+        {
+            Assert.fail( result.toString() );
+        }
     }
 
 }
