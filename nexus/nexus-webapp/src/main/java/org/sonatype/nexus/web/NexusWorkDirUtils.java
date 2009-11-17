@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This utils is used to initialize the nexus-work directory location. The order is plexus.properties > system property
@@ -26,6 +28,8 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class NexusWorkDirUtils
 {
+    private static Logger logger = LoggerFactory.getLogger( NexusWorkDirUtils.class );
+    
     public static final String NEXUS_DEFAULT_ROOT = "/sonatype-work/nexus";
 
     public static final String KEY_NEXUS_WORK = "nexus-work";
@@ -43,8 +47,10 @@ public class NexusWorkDirUtils
 
     public static final String KEY_APPLICATION_CONF = "application-conf";
     
+    public static final String KEY_BASEDIR = "basedir";
+    
     public static final String KEY_NEXUS_APP = "nexus-app";
-
+    
     public static final String RELATIVE_PATH_RUNTIME = "/runtime";
     
     public static final String RELATIVE_PATH_SECURITY_XML_FILE = "/conf/security.xml";
@@ -54,10 +60,12 @@ public class NexusWorkDirUtils
     public static final String RELATIVE_PATH_NEXUS_APP = RELATIVE_PATH_RUNTIME + "/apps/nexus";
 
     public static void setUpNexusWorkDir( Map<Object, Object> context )
-    {
+    {      
         String root = setUpRootDir( context );
 
         setUpMinorDirs( context, root );
+        
+        logger.debug( "Setting context: "+ context );
     }
 
     private static String setUpRootDir( Map<Object, Object> context )
@@ -119,7 +127,18 @@ public class NexusWorkDirUtils
         
         if ( StringUtils.isEmpty( ( String ) context.get( KEY_NEXUS_APP ) ) )
         {
-            context.put( KEY_NEXUS_APP, new File( root, RELATIVE_PATH_NEXUS_APP ).getAbsolutePath() );
+            String baseDirPath = root;
+            if ( context.containsKey( KEY_BASEDIR ) )
+            {
+                File baseDir = new File( (String) context.get( KEY_BASEDIR ));
+                // strip the /WEB-INF from the end
+                if( baseDir.getName().equals( "WEB-INF" ) )
+                {
+                    baseDirPath = baseDir.getParentFile().getAbsolutePath();
+                }
+            }
+            String nexusAppDir = new File( baseDirPath, RELATIVE_PATH_NEXUS_APP ).getAbsolutePath();
+            context.put( KEY_NEXUS_APP, nexusAppDir );
         }
     }
 

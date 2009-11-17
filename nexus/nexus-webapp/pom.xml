@@ -87,15 +87,6 @@
       <scope>test</scope>
     </dependency>
     
-    <!-- Nexus Core Plugins -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${nexus-plugin-console-plugin.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-    
   </dependencies>
   <build>
     <filters>
@@ -160,6 +151,27 @@
               <outputDirectory>${jsw-input}</outputDirectory>
             </configuration>
           </execution>
+          
+          <execution>
+            <id>unpack-plugins</id>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                  <artifactItem>
+                      <groupId>org.sonatype.nexus.plugins</groupId>
+                      <artifactId>nexus-plugin-console-plugin</artifactId>
+                      <version>${nexus-plugin-console-plugin.version}</version>
+                      <classifier>bundle</classifier>
+                      <type>zip</type>
+                      <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                  </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          
         </executions>
       </plugin>
       <plugin>
@@ -331,19 +343,19 @@
             <goals>
               <goal>single</goal>
             </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/bundle.xml</descriptor>
+            <configuration>
+                <descriptors>
+                  <descriptor>src/main/assembly/bundle.xml</descriptor>
             <!--base changed...no updates for this version-->
             <!--
                             <descriptor>src/main/assembly/base.xml</descriptor>
                             <descriptor>src/main/assembly/app.xml</descriptor>
                         -->
-          </descriptors>
-          <tarLongFileMode>gnu</tarLongFileMode>
-        </configuration>
+                </descriptors>
+                <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>         
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.mortbay.jetty</groupId>

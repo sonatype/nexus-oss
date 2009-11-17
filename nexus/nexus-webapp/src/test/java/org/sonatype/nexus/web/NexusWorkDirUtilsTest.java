@@ -14,6 +14,7 @@
 package org.sonatype.nexus.web;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,50 +24,70 @@ public class NexusWorkDirUtilsTest
     extends TestCase
 {
     public void testDefaultSetUp()
+        throws IOException
     {
         System.getProperties().remove( NexusWorkDirUtils.KEY_NEXUS_WORK_SYS_PROP );
-        if(System.getenv().containsKey( NexusWorkDirUtils.KEY_NEXUS_WORK_ENV_VAR )){
+        if ( System.getenv().containsKey( NexusWorkDirUtils.KEY_NEXUS_WORK_ENV_VAR ) )
+        {
             return;
         }
         Map<Object, Object> context = new HashMap<Object, Object>();
+        String baseDir = this.getFakeBaseDir( "testDefaultSetUp" );
+        context.put( "basedir", baseDir );
         NexusWorkDirUtils.setUpNexusWorkDir( context );
         String defaultRoot = new File( System.getProperty( "user.home" ), "/sonatype-work/nexus" ).getAbsolutePath();
-        assertDirectoryProperties(context, defaultRoot);
-        
+        assertDirectoryProperties( context, defaultRoot, baseDir );
+
     }
-    
-    public void testPlexusSetUp(){
-        String rootPath = new File("/src/test/resources/nexus").getAbsolutePath();
+
+    public void testPlexusSetUp()
+        throws IOException
+    {
+        String rootPath = new File( "/src/test/resources/nexus" ).getAbsolutePath();
         Map<Object, Object> context = new HashMap<Object, Object>();
-        context.put( "nexus-work",  rootPath);
+        String baseDir = this.getFakeBaseDir( "testPlexusSetUp" );
+        context.put( "basedir", baseDir );
+        context.put( "nexus-work", rootPath );
         NexusWorkDirUtils.setUpNexusWorkDir( context );
-        assertDirectoryProperties(context, rootPath);  
+        assertDirectoryProperties( context, rootPath, baseDir );
     }
-    
-    
-    public void testSystemPropertiesSetUp(){
-        String rootPath = new File("/src/test/resources/nexus").getAbsolutePath();
+
+    public void testSystemPropertiesSetUp()
+        throws IOException
+    {
+        String rootPath = new File( "/src/test/resources/nexus" ).getAbsolutePath();
         Map<Object, Object> context = new HashMap<Object, Object>();
+        String baseDir = this.getFakeBaseDir( "testSystemPropertiesSetUp" );
+        context.put( "basedir", baseDir );
         System.getProperties().put( "nexus-work", rootPath );
         NexusWorkDirUtils.setUpNexusWorkDir( context );
-        assertDirectoryProperties(context, rootPath);  
+        assertDirectoryProperties( context, rootPath, baseDir );
         System.getProperties().remove( "nexus-work" );
     }
-    
-    
-    
-    //after setting environment variable nexus-work in my local machine, this test passed
-/*    public void testEnvVarSetUp(){
-        String rootPath = new File("D:\\test").getAbsolutePath();
-        Map<Object, String> context = new HashMap<Object, String>();
-        NexusWorkDirUtils.setUpNexusWorkDir( context );
-        assertDirectoryProperties(context, rootPath);  
-    }*/
-    
-    private void assertDirectoryProperties(Map<Object, Object> context, String rootPath){
-        assertEquals(new File(rootPath).getAbsolutePath(), context.get( NexusWorkDirUtils.KEY_NEXUS_WORK ));
-        assertEquals(new File(rootPath, NexusWorkDirUtils.RELATIVE_PATH_RUNTIME).getAbsolutePath(), context.get(NexusWorkDirUtils.KEY_RUNTIME ));
-        assertEquals(new File(rootPath, NexusWorkDirUtils.RELATIVE_PATH_SECURITY_XML_FILE).getAbsolutePath(), context.get(NexusWorkDirUtils.KEY_SECURITY_XML_FILE ));
-  
+
+    private String getFakeBaseDir( String testName )
+    {
+        return new File( "target", testName + "/WEB-INF" ).getAbsolutePath();
+    }
+
+    // after setting environment variable nexus-work in my local machine, this test passed
+    /*
+     * public void testEnvVarSetUp(){ String rootPath = new File("D:\\test").getAbsolutePath(); Map<Object, String>
+     * context = new HashMap<Object, String>(); NexusWorkDirUtils.setUpNexusWorkDir( context );
+     * assertDirectoryProperties(context, rootPath); }
+     */
+
+    private void assertDirectoryProperties( Map<Object, Object> context, String rootPath, String basedir )
+        throws IOException
+    {
+        assertEquals( new File( rootPath ).getAbsolutePath(), context.get( NexusWorkDirUtils.KEY_NEXUS_WORK ) );
+        assertEquals( new File( rootPath, NexusWorkDirUtils.RELATIVE_PATH_RUNTIME ).getAbsolutePath(), context
+            .get( NexusWorkDirUtils.KEY_RUNTIME ) );
+        assertEquals(
+            new File( rootPath, NexusWorkDirUtils.RELATIVE_PATH_SECURITY_XML_FILE ).getAbsolutePath(),
+            context.get( NexusWorkDirUtils.KEY_SECURITY_XML_FILE ) );
+        assertEquals( new File( basedir, "../runtime/apps/nexus" ).getCanonicalPath(), context
+            .get( NexusWorkDirUtils.KEY_NEXUS_APP ) );
+
     }
 }
