@@ -18,15 +18,22 @@ import java.io.InputStream;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
+import org.sonatype.nexus.proxy.IllegalOperationException;
+import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.AbstractWebSiteRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
 import org.sonatype.nexus.proxy.repository.WebSiteRepository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 /**
  * The default Maven Site Repository.
@@ -84,4 +91,19 @@ public class DefaultMavenSiteRepository
     {
         return repositoryConfigurator;
     }
+    
+    @Override
+    public void storeItem( boolean fromTask, StorageItem item )
+    throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
+    {   
+        // strip the '.' from the path
+        if ( AbstractStorageItem.class.isAssignableFrom( item.getClass() ) )
+        {
+            String normalizedPath =  FileUtils.normalize( item.getPath() );
+            AbstractStorageItem fileItem = (AbstractStorageItem) item;
+            fileItem.setPath( normalizedPath );
+        }
+        
+        super.storeItem( fromTask, item );
+    }    
 }
