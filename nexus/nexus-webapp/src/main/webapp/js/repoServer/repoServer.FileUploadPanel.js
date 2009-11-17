@@ -488,6 +488,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
     Ext.form.Field.msgFx['normal'].show( tree.errorEl, tree );
   },
   resetFields : function() {
+    this.gavResponse = null;
     //reset the artifact panels
     var filenameField = this.find('name', 'filenameField')[0];
     var classifierField = this.find('name', 'classifier')[0];
@@ -806,6 +807,14 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
     repoId = repoId.substring( repoId.lastIndexOf( '/' ) + 1 );
     var pomMode = this.find( 'name', 'gavDefinition' )[0].getValue() == 'pom';
     
+    if ( this.gavResponse ) {
+      pomMode = false;
+      this.form.findField( 'g' ).setValue( this.gavResponse.groupId );
+      this.form.findField( 'a' ).setValue( this.gavResponse.artifactId );
+      this.form.findField( 'v' ).setValue( this.gavResponse.version );
+      this.form.findField( 'p' ).setValue( this.gavResponse.packaging );
+    }
+    
     var repoTag = {
       tag: 'input',
       type: 'hidden',
@@ -902,6 +911,9 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
         //This is a hack to get around the fact that upload submit always returns
         //success = true
         if ( response.responseText.toLowerCase().indexOf('<error>') == -1 ) {
+          //get the json response and set the gavResponse
+          this.gavResponse = Ext.decode( response.responseText );
+          
           if ( lastItem ) {
             Sonatype.MessageBox.show({
               title: 'Upload Complete',
@@ -924,6 +936,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
           }
         }
         else {
+          this.gavResponse = null;
           var s = 'Artifact upload failed.<br />';
           var r = response.responseText;
           var n1 = r.toLowerCase().indexOf( '<error>' ) + 7;

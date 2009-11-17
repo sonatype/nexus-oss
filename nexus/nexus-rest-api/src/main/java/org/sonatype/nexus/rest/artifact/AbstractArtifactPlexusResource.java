@@ -323,6 +323,8 @@ public abstract class AbstractArtifactPlexusResource
         String packaging = null;
 
         String extension = null;
+        
+        ArtifactCoordinate coords = null;
 
         PomArtifactManager pomManager = new PomArtifactManager( getNexus()
             .getNexusConfiguration().getTemporaryDirectory() );
@@ -366,13 +368,17 @@ public abstract class AbstractArtifactPlexusResource
                     {
                         hasPom = Boolean.parseBoolean( fi.getString() );
                     }
+                    
+                    coords = new ArtifactCoordinate();
+                    coords.setGroupId( groupId );
+                    coords.setArtifactId( artifactId );
+                    coords.setVersion( version );
+                    coords.setPackaging( packaging );
                 }
                 else
                 {
                     // a file
                     isPom = fi.getName().endsWith( ".pom" ) || fi.getName().endsWith( "pom.xml" );
-
-                    PomArtifactManager.ArtifactCoordinate coords = null;
 
                     ArtifactStoreRequest gavRequest = null;
 
@@ -502,7 +508,7 @@ public abstract class AbstractArtifactPlexusResource
             }
         }        
 
-        return null;
+        return coords;
     }
     
     protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
