@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-repository-metadata</artifactId>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Sonatype Nexus: Nexus Repository Metadata</name>
@@ -113,10 +113,4 @@
       <timezone>-6</timezone>
     </developer>
   </developers>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-repository-metadata-1.0.2</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-repository-metadata-1.0.2</developerConnection>
-    <url>http://svn.sonatype.org/nexus/tags/nexus-repository-metadata-1.0.2</url>
-  </scm>
 </project>
