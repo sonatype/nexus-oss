@@ -2,11 +2,11 @@
   <parent>
     <groupId>org.sonatype.security.realms</groupId>
     <artifactId>security-realms</artifactId>
-    <version>1.1.4</version>
+    <version>1.1.5-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>security-url-realm</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5-SNAPSHOT</version>
   <name>Plexus URL Realm</name>
   <description>A Realm that will access a remote URL to authenticate a user.</description>
 
