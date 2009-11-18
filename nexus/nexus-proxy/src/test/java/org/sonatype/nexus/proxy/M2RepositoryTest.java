@@ -15,11 +15,18 @@ package org.sonatype.nexus.proxy;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
+import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -35,6 +42,7 @@ import org.sonatype.plexus.appevents.EventListener;
 public class M2RepositoryTest
     extends M2ResourceStoreTest
 {
+    private static final long A_DAY = 24L * 60L * 60L * 1000L;
 
     protected static final String SPOOF_RELEASE = "/spoof/spoof/1.0/spoof-1.0.txt";
 
@@ -385,6 +393,55 @@ public class M2RepositoryTest
         assertTrue( "Should be the same!", changedUrl.equals( repository.getRemoteUrl() ) );
     }
 
+    public void testProxyLastRequestedAttribute() throws Exception
+    {
+        M2Repository repository = (M2Repository) this.getRepositoryRegistry().getRepository( "repo1" );
+        
+        String item = "/org/slf4j/slf4j-api/1.4.3/slf4j-api-1.4.3.pom";
+        ResourceStoreRequest request = new ResourceStoreRequest( item );
+        request.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
+        StorageItem storageItem = repository.retrieveItem( request );
+        long lastRequest =  System.currentTimeMillis() - 10 * A_DAY;
+        storageItem.setLastRequested( lastRequest );
+        repository.storeItem( false, storageItem );
+        
+        // now request the object, the lastRequested timestamp should be updated
+        StorageItem resultItem = repository.retrieveItem( request );
+        Assert.assertTrue( resultItem.getLastRequested() > lastRequest );
+        
+        // check the shadow attributes
+        AbstractStorageItem shadowStorageItem = repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+    }
+    
+    public void testHostedLastRequestedAttribute() throws Exception
+    {
+        String itemPath = "/org/test/foo.junk";
+        
+        M2Repository repository = (M2Repository) this.getRepositoryRegistry().getRepository( "inhouse" );
+        File inhouseLocalStorageDir = new File( new URL(((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration( false).getLocalStorage().getUrl() ).getFile());
+        
+        File artifactFile = new File( inhouseLocalStorageDir, itemPath );
+        artifactFile.getParentFile().mkdirs();
+        
+        FileUtils.fileWrite( artifactFile.getAbsolutePath(), "Some Text so the file is not empty" );
+        
+        ResourceStoreRequest request = new ResourceStoreRequest( itemPath );
+        request.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, "127.0.0.1" );
+        StorageItem storageItem = repository.retrieveItem( request );
+        long lastRequest =  System.currentTimeMillis() - 10 * A_DAY;
+        storageItem.setLastRequested( lastRequest );
+        repository.storeItem( false, storageItem );
+        
+        // now request the object, the lastRequested timestamp should be updated
+        StorageItem resultItem = repository.retrieveItem( request );
+        Assert.assertTrue( resultItem.getLastRequested() > lastRequest );
+        
+        // check the shadow attributes
+        AbstractStorageItem shadowStorageItem = repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
+    }
+    
     // ==
 
     protected class CounterListener

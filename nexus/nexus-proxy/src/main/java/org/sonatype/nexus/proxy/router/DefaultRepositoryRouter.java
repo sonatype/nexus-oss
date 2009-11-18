@@ -153,8 +153,9 @@ public class DefaultRepositoryRouter
         }
 
         ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath() );
-
         req.getRequestContext().putAll( link.getItemContext() );
+        // TODO: we should be setting the parent's context here too, not sure if there is any
+//        req.getRequestContext().setParentContext( link.getItemContext().getParentContext() );
 
         return link.getTarget().getRepository().retrieveItem( req );
     }

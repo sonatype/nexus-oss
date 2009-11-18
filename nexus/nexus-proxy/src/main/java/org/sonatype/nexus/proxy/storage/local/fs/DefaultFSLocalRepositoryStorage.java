@@ -227,7 +227,9 @@ public class DefaultFSLocalRepositoryStorage
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
                 try
-                {
+                {   
+                    long timestamp = System.currentTimeMillis();
+                    
                     DefaultStorageLinkItem link =
                         new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
                             getLinkTarget( target ) );
@@ -236,7 +238,25 @@ public class DefaultFSLocalRepositoryStorage
                     link.setCreated( target.lastModified() );
                     result = link;
 
-                    touchItemLastRequested( repository, request );
+                    this.touchItemLastRequested( timestamp, repository, request, link );
+                    
+                    try
+                    {
+                        request.pushRequestPath( link.getTarget().getPath() );
+                        DefaultStorageFileItem file =
+                            new DefaultStorageFileItem( link.getTarget().getRepository(), request, target.canRead(), target.canWrite(),
+                                new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
+                        getAttributesHandler().fetchAttributes( file );
+                        file.setModified( link.getModified() );
+                        file.setCreated( link.getCreated() );
+                        file.setLength( target.length() );
+                        
+                        this.touchItemLastRequested( timestamp, link.getTarget().getRepository(), request, file );
+                    }
+                    finally
+                    {
+                        request.popRequestPath();
+                    }
                 }
                 catch ( NoSuchRepositoryException e )
                 {
@@ -256,9 +276,10 @@ public class DefaultFSLocalRepositoryStorage
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
                 file.setLength( target.length() );
-                result = file;
 
-                touchItemLastRequested( repository, request );
+                this.touchItemLastRequested( System.currentTimeMillis(), repository, request, file );
+                
+                result = file;
             }
         }
         else
