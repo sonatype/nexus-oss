@@ -920,7 +920,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>failsafe-maven-plugin</artifactId>
-          <version>2.4.3-alpha-2-SNAPSHOT</version>
+          <version>2.4.3-alpha-2-SONATYPE-11146</version>
           <executions>
             <execution>
               <goals>
