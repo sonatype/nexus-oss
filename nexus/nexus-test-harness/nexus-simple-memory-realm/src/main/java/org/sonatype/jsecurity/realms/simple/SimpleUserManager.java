@@ -17,8 +17,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.util.CollectionUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -28,15 +26,15 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
 /**
- * This is a simple implementation that will expose a custom user store as Users. A UserLocator exposes
+ * This is a simple implementation that will expose a custom user store as Users. A UserManager exposes
  * users so they can be used for functions other then authentication and authorizing. Users email address, and
  * optionally Roles/Groups from an external source will be looked up this way. For example, user 'jcoder' from a JDBC
  * source might be associated with the group 'projectA-developer', when the user 'jcoder' is returned from this class
  * the association is contained in a User object.
  */
-// This class must have a role of 'UserLocator', and the hint, must match the result of getSource() and the hint
+// This class must have a role of 'UserManager', and the hint, must match the result of getSource() and the hint
 // of the corresponding Realm.
-@Component( role = UserManager.class, hint = "Simple", description = "Simple User Locator" )
+@Component( role = UserManager.class, hint = "Simple", description = "Simple User Manager" )
 public class SimpleUserManager extends AbstractReadOnlyUserManager
 {
 
@@ -47,19 +45,11 @@ public class SimpleUserManager extends AbstractReadOnlyUserManager
      */
     private UserStore userStore = new UserStore();
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.jsecurity.locators.users.UserLocator#getSource()
-     */
     public String getSource()
     {
         return SOURCE;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.jsecurity.locators.users.UserLocator#getUser(java.lang.String)
-     */
     public User getUser( String userId )
     {
         SimpleUser user = this.userStore.getUser( userId );
@@ -71,20 +61,6 @@ public class SimpleUserManager extends AbstractReadOnlyUserManager
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.jsecurity.locators.users.UserLocator#isPrimary()
-     */
-    public boolean isPrimary()
-    {
-        // Set this to true if this UserLocator should priority over other UserLocators
-        return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.jsecurity.locators.users.UserLocator#listUserIds()
-     */
     public Set<String> listUserIds()
     {
         // just return the userIds, if you can optimize for speed, do so
@@ -111,6 +87,8 @@ public class SimpleUserManager extends AbstractReadOnlyUserManager
 
     public Set<User> searchUsers( UserSearchCriteria criteria )
     {
+        // if your users are not all in memory, for performance reasons
+        //you would want to do the filtering yourself
         return this.filterListInMemeory( this.listUsers(), criteria );
     }
 
@@ -135,7 +113,7 @@ public class SimpleUserManager extends AbstractReadOnlyUserManager
 
     public String getAuthenticationRealmName()
     {
-        return "MemoryRealm";
+        return "Simple";
     }
 
 }

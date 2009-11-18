@@ -100,6 +100,9 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         {
             Assert.fail( "Response: "+ response.getEntity().getText() +"Role should have been created: " + response.getStatus() );
         }
+        
+        // make sure the get works too
+        Assert.assertEquals( "role With Space In Id", this.messageUtil.getRole( resource.getId() ).getId());
     }
 
     @Test

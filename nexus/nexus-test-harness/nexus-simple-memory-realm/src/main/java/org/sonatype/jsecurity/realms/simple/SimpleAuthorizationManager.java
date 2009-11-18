@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
@@ -13,13 +12,13 @@ import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
 /**
- * A RoleLocator is used if an external Realm wants to use its Group/Roles in Nexus. For example, your realm might
+ * A AuthorizationManager is used if an external Realm wants to use its Group/Roles in Nexus. For example, your realm might
  * already contain a group for all of your developers. Exposing these roles will allow Nexus to map your Realms roles to
  * Nexus roles more easily.
  */
-// This class must have a role of 'RoleLocator', and the hint, must match the result of getSource() and the hint
+// This class must have a role of 'AuthorizationManager', and the hint, must match the result of getSource() and the hint
 // of the corresponding Realm.
-@Component( role = AuthorizationManager.class, hint = "Simple", description = "Simple Role Locator" )
+@Component( role = AuthorizationManager.class, hint = "Simple", description = "Simple Authorization Manager" )
 public class SimpleAuthorizationManager
     extends AbstractReadOnlyAuthorizationManager
 {
@@ -31,7 +30,7 @@ public class SimpleAuthorizationManager
         return SOURCE;
     }
 
-    public Set<String> listRoleIds()
+    private Set<String> listRoleIds()
     {
         Set<String> roleIds = new HashSet<String>();
         roleIds.add( "role-xyz" );
@@ -58,6 +57,7 @@ public class SimpleAuthorizationManager
         role.setRoleId( roleId );
         role.setSource( this.getSource() );
         role.setName( "Role " + roleId );
+        role.setReadOnly( true );
 
         return role;
     }
