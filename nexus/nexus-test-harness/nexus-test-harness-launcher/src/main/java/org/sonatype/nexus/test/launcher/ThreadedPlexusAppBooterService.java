@@ -102,6 +102,7 @@ public class ThreadedPlexusAppBooterService
         if ( this.launcherThread != null )
         {
             this.launcherThread.stop();
+            this.launcherThread = null;
         }
     }
 
