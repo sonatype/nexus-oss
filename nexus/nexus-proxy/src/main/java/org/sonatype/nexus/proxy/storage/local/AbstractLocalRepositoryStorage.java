@@ -23,6 +23,7 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -123,7 +124,7 @@ public abstract class AbstractLocalRepositoryStorage
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
-        
+
         if ( item != null )
         {
             item.setResourceStoreRequest( request );
@@ -141,7 +142,13 @@ public abstract class AbstractLocalRepositoryStorage
     public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, StorageException
     {
-        touchItemLastRequested( System.currentTimeMillis(), repository, request );
+        // TODO: touch it only if this is user-originated request
+        // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
+        // a request from "internals" (ie. a running task).
+        if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
+        {
+            touchItemLastRequested( System.currentTimeMillis(), repository, request );
+        }
     }
 
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
@@ -150,7 +157,7 @@ public abstract class AbstractLocalRepositoryStorage
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
         AbstractStorageItem item = getAttributesHandler().getAttributeStorage().getAttributes( uid );
-        
+
         if ( item != null )
         {
             item.setResourceStoreRequest( request );

@@ -250,7 +250,8 @@ public abstract class AbstractProxyRepository
         }
         else
         {
-            throw new StorageException( "No remote storage set, hence cannot set remoteUrl!" );
+            throw new StorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\"" + getId()
+                + "\"), cannot set remoteUrl!" );
         }
     }
 
@@ -805,7 +806,7 @@ public abstract class AbstractProxyRepository
     }
 
     private void sendContentValidationEvents( ResourceStoreRequest request, List<NexusArtifactEvent> events,
-                                              boolean isContentValid )
+        boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
         {
@@ -833,7 +834,7 @@ public abstract class AbstractProxyRepository
      * </code>
      */
     protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
-                                                   List<NexusArtifactEvent> events )
+        List<NexusArtifactEvent> events )
         throws StorageException
     {
         boolean isValid = true;
@@ -1083,8 +1084,7 @@ public abstract class AbstractProxyRepository
     @Override
     protected boolean isActionAllowedReadOnly( Action action )
     {
-        return action.equals( Action.read )
-            || action.equals( Action.delete );
-}
+        return action.equals( Action.read ) || action.equals( Action.delete );
+    }
 
 }

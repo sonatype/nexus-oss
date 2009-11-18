@@ -91,7 +91,7 @@ public class CommonsHttpClientRemoteStorage
 
             if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
             {
-                throw new StorageException( "Unsupported protocol: " + u.getProtocol().toLowerCase() );
+                throw new StorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: " + u.getProtocol().toLowerCase() );
             }
         }
         catch ( MalformedURLException e )
@@ -252,7 +252,9 @@ public class CommonsHttpClientRemoteStorage
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_CREATED
                 && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
             {
-                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                throw new StorageException( "Unexpected response code while executing " + method.getName()
+                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]. Expected: \"any success (2xx)\". Received: "
                     + response + " : " + HttpStatus.getStatusText( response ) );
             }
         }
@@ -338,8 +340,7 @@ public class CommonsHttpClientRemoteStorage
 
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                "Invoking HTTP " + method.getName() + " method against remote location " + methodURI );
+            getLogger().debug( "Invoking HTTP " + method.getName() + " method against remote location " + methodURI );
         }
 
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
@@ -546,7 +547,9 @@ public class CommonsHttpClientRemoteStorage
             }
             else
             {
-                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                throw new StorageException( "Unexpected response code while executing " + method.getName()
+                    + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
+                    + "\", remoteUrl=\"" + remoteURL.toString() + "\"]. Expected: \"SUCCESS (200)\". Received: "
                     + response + " : " + HttpStatus.getStatusText( response ) );
             }
         }

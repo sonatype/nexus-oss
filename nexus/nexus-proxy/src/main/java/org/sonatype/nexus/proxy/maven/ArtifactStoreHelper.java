@@ -346,7 +346,7 @@ public class ArtifactStoreHelper
         }
         else
         {
-            throw new StorageException( "The Artifact retrieval returned non-file, path:" + gavRequest.getRequestPath() );
+            throw new StorageException( "The Artifact retrieval returned non-file, path:" + item.getRepositoryItemUid().toString() );
         }
     }
 
