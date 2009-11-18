@@ -115,12 +115,13 @@
 <!-- Plugin pre BODY contributions ends here -->
 
 <div id="header">
-  <div id="branding">
-  </div>
-  <div id="logo">
-    <span>
-      $formattedAppName
-    </span>
+  <div class="left-side">
+    <div id="branding"></div>
+    <div id="logo">
+      <span>
+        $formattedAppName
+      </span>
+    </div>
   </div>
   <div class="right-side">
     <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>

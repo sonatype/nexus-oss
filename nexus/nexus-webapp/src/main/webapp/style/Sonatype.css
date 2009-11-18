@@ -24,8 +24,6 @@ body {
 
 #logo {
   font-size: 16px;
-  float: left;
-  display: inline;
   padding-top: 3px;
   padding-bottom: 6px;
 }
@@ -37,6 +35,11 @@ body {
   display:block;
   text-align: right;
   background-color: #F0F0F0;
+}
+
+#header div.left-side {
+  float: left;
+  display: block;
 }
 
 #version { 
