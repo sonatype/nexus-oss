@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>11-SNAPSHOT</version>
+    <version>11</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -131,20 +131,20 @@
   </modules>
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <plexus.appbooter.version>2.1.0-SNAPSHOT</plexus.appbooter.version>
+    <plexus.appbooter.version>2.1.0</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.4-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>1.1.4</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
     <nexus.indexer.version>2.0.2-SNAPSHOT</nexus.indexer.version>
-    <nexus.repository.metadata.version>1.0.2-SNAPSHOT</nexus.repository.metadata.version>
+    <nexus.repository.metadata.version>1.0.2</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.12-SNAPSHOT</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.12</plexus.restlet.bridge.version>
     <micromailer.version>1.0.3</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
-    <plexus-task-scheduler.version>1.3-SNAPSHOT</plexus-task-scheduler.version>
+    <plexus-task-scheduler.version>1.3</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
@@ -153,7 +153,7 @@
     <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
-    <plexus-ehcache.version>1.3-SNAPSHOT</plexus-ehcache.version>
+    <plexus-ehcache.version>1.3</plexus-ehcache.version>
     <plexus-jetty-testsuite.version>1.3</plexus-jetty-testsuite.version>
     <plexus-app-events.version>1.0.0</plexus-app-events.version>
     <spice-timeline.version>1.0.1</spice-timeline.version>
