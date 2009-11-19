@@ -54,11 +54,9 @@ public class Nexus1375LogConfigIT
 
         Assert.assertEquals( "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n", resource.getFileAppenderPattern() );
 
-        File expectedLoggerLocation = new File( "target/logs/nexus.log" ).getCanonicalFile();
-
         File actualLoggerLocation = new File( resource.getFileAppenderLocation() ).getCanonicalFile();
 
-        Assert.assertEquals( expectedLoggerLocation.getAbsolutePath(), actualLoggerLocation.getAbsolutePath() );
+        Assert.assertEquals( nexusLog.getAbsolutePath(), actualLoggerLocation.getAbsolutePath() );
     }
 
     @Test
@@ -76,7 +74,7 @@ public class Nexus1375LogConfigIT
 
         Assert.assertEquals( "ERROR", resource.getRootLoggerLevel() );
 
-        resource.setRootLoggerLevel( "DEBUG");
+        resource.setRootLoggerLevel( "DEBUG" );
 
         messageUtil.updateLogConfig( resource );
 

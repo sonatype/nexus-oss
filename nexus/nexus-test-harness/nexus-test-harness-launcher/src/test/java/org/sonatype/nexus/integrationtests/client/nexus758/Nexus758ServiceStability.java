@@ -26,7 +26,7 @@ import org.sonatype.nexus.integrationtests.TestContext;
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
  */
-public class Nexus758ServiceStabilityIT
+public class Nexus758ServiceStability
 {
     private static NexusClient client;
 

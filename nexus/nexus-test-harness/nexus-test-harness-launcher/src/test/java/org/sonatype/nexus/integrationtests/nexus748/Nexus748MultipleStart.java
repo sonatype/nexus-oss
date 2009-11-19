@@ -28,10 +28,10 @@ import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
-public class Nexus748MultipleStartIT
+public class Nexus748MultipleStart
 {
 
-    protected static Logger logger = Logger.getLogger( Nexus748MultipleStartIT.class );
+    protected static Logger logger = Logger.getLogger( Nexus748MultipleStart.class );
 
     @Test
     public void multipleStartTest()
