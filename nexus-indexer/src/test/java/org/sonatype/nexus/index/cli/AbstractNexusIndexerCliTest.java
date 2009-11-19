@@ -126,7 +126,7 @@ public abstract class AbstractNexusIndexerCliTest
         assertEquals( output, 1, code );
         assertTrue( "Should print bad usage", output.contains( usage ) );
 
-        assertFalse( "No index file was generated", new File( INDEX_DIR ).exists() );
+        assertFalse( "Index file was generated", new File( INDEX_DIR ).exists() );
     }
 
     public void testAbrvsRequiredArgs()
@@ -191,11 +191,11 @@ public abstract class AbstractNexusIndexerCliTest
         throws Exception
     {
         IndexingContext context = null;
+        NexusIndexer indexer = lookup( NexusIndexer.class );
         try
         {
             List<IndexCreator> indexCreators = getContainer().lookupList( IndexCreator.class );
 
-            NexusIndexer indexer = lookup( NexusIndexer.class );
             context =
                 indexer.addIndexingContext( "index", "index", new File( TEST_REPO ), new File( indexDir ), null, null,
                                             indexCreators );
@@ -210,10 +210,7 @@ public abstract class AbstractNexusIndexerCliTest
         }
         finally
         {
-            if ( context != null )
-            {
-                context.close( false );
-            }
+            indexer.removeIndexingContext( context, true );
         }
     }
 

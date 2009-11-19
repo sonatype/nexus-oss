@@ -315,49 +315,57 @@ public class NexusIndexerCli
         }
 
         NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
-
-        long tstart = System.currentTimeMillis();
-
-        IndexingContext context = indexer.addIndexingContext( //
-            repositoryName, // context id
-            repositoryName, // repository id
-            repositoryFolder, // repository folder
-            indexFolder, // index folder
-            null, // repositoryUrl
-            null, // index update url
-            indexers );
-
-        IndexPacker packer = plexus.lookup( IndexPacker.class );
-
-        ArtifactScanningListener listener = new IndexerListener( context, debug, quiet );
-
-        indexer.scan( context, listener, true );
-
-        IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
-
-        request.setCreateChecksumFiles( createChecksums );
-
-        request.setCreateIncrementalChunks( createIncrementalChunks );
-
-        if ( createLegacyIndex )
+        IndexingContext context = null;
+        
+        try
         {
-            request.setFormats( Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 ) );
+            long tstart = System.currentTimeMillis();
+    
+            context = indexer.addIndexingContext( //
+                repositoryName, // context id
+                repositoryName, // repository id
+                repositoryFolder, // repository folder
+                indexFolder, // index folder
+                null, // repositoryUrl
+                null, // index update url
+                indexers );
+    
+            IndexPacker packer = plexus.lookup( IndexPacker.class );
+    
+            ArtifactScanningListener listener = new IndexerListener( context, debug, quiet );
+    
+            indexer.scan( context, listener, true );
+    
+            IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
+    
+            request.setCreateChecksumFiles( createChecksums );
+    
+            request.setCreateIncrementalChunks( createIncrementalChunks );
+    
+            if ( createLegacyIndex )
+            {
+                request.setFormats( Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 ) );
+            }
+            else
+            {
+                request.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
+            }
+    
+            if ( chunkCount != null )
+            {
+                request.setMaxIndexChunks( chunkCount.intValue() );
+            }
+    
+            packIndex( packer, request, debug, quiet );
+    
+            if( !quiet )
+            {
+                printStats( tstart );
+            }
         }
-        else
+        finally
         {
-            request.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
-        }
-
-        if ( chunkCount != null )
-        {
-            request.setMaxIndexChunks( chunkCount.intValue() );
-        }
-
-        packIndex( packer, request, debug, quiet );
-
-        if( !quiet )
-        {
-            printStats( tstart );
+            indexer.removeIndexingContext( context, false );
         }
     }
 
