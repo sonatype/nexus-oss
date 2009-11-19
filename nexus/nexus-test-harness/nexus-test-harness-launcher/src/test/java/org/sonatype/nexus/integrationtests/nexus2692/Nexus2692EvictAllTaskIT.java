@@ -1,17 +1,14 @@
 package org.sonatype.nexus.integrationtests.nexus2692;
 
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
 public class Nexus2692EvictAllTaskIT extends AbstractEvictTaskIt
 {
     
-    @SuppressWarnings( "unchecked" )
     @Test
     public void testEvictAllRepos()
         throws Exception
@@ -21,18 +18,8 @@ public class Nexus2692EvictAllTaskIT extends AbstractEvictTaskIt
         this.runTask( days, "all_repo" );
 
         // check files
-        SortedSet<String> resultStorageFiles = new TreeSet<String>( FileUtils.getFileNames(
-            this.getStorageWorkDir(),
-            null,
-            null,
-            false,
-            true ) );
-        SortedSet<String> resultAttributeFiles = new TreeSet<String>( FileUtils.getFileNames(
-            this.getAttributesWorkDir(),
-            null,
-            null,
-            false,
-            true ) );
+        SortedSet<String> resultStorageFiles = this.getFilePaths( this.getStorageWorkDir() );
+        SortedSet<String> resultAttributeFiles = this.getFilePaths( this.getAttributesWorkDir() );
 
         SortedSet<String> expectedResults = this.buildListOfExpectedFilesForAllRepos( days );
 

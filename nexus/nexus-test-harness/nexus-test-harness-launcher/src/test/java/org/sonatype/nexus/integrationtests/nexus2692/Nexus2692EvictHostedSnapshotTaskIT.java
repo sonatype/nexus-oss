@@ -5,7 +5,6 @@ import java.util.TreeSet;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
 public class Nexus2692EvictHostedSnapshotTaskIT
@@ -22,14 +21,8 @@ public class Nexus2692EvictHostedSnapshotTaskIT
         this.runTask( days, "repo_snapshots" );
 
         // check files
-        SortedSet<String> resultStorageFiles = new TreeSet<String>( FileUtils.getFileNames(
-            this.getStorageWorkDir(),
-            null,
-            null,
-            false,
-            true ) );
-        SortedSet<String> resultAttributeFiles = new TreeSet<String>( FileUtils.getFileNames( this
-            .getAttributesWorkDir(), null, null, false, true ) );
+        SortedSet<String> resultStorageFiles = this.getFilePaths(  this.getStorageWorkDir() );
+        SortedSet<String> resultAttributeFiles = this.getFilePaths( this.getAttributesWorkDir() );
 
         SortedSet<String> expectedResults = new TreeSet( this.getPathMap().keySet() );
 

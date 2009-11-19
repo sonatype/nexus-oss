@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 
@@ -207,8 +208,8 @@ public class AbstractEvictTaskIt
         // make sure we don't have any empty directories
         Set<String> emptyDirectories = new HashSet<String>();
 
-        SortedSet<String> resultDirectories = new TreeSet<String>( FileUtils.getDirectoryNames( this
-            .getStorageWorkDir(), null, null, false, true ) );
+        SortedSet<String> resultDirectories = this.getDirectoryPaths(  this
+            .getStorageWorkDir());
         for ( String itemPath : resultDirectories )
         {
             if ( itemPath.split( File.separator ).length != 1 )
@@ -233,6 +234,32 @@ public class AbstractEvictTaskIt
         }
 
         return buffer.toString();
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected SortedSet<String> getFilePaths( File basedir )
+        throws IOException
+    {
+        SortedSet<String> result = new TreeSet<String>();
+        List<String> paths = FileUtils.getFileNames( this.getStorageWorkDir(), null, null, false, true );
+        for ( String path : paths )
+        {
+            result.add( path.replaceAll( Pattern.quote( "\\" ), Pattern.quote( "/" ) ) );
+        }
+        return result;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected SortedSet<String> getDirectoryPaths( File basedir )
+        throws IOException
+    {
+        SortedSet<String> result = new TreeSet<String>();
+        List<String> paths = FileUtils.getDirectoryNames( this.getStorageWorkDir(), null, null, false, true );
+        for ( String path : paths )
+        {
+            result.add( path.replaceAll( Pattern.quote( "\\" ), Pattern.quote( "/" ) ) );
+        }
+        return result;
     }
 
     public File getStorageWorkDir()

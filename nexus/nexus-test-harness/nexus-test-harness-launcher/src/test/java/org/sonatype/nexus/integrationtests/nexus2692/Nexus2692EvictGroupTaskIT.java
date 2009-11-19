@@ -3,18 +3,15 @@ package org.sonatype.nexus.integrationtests.nexus2692;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 
 public class Nexus2692EvictGroupTaskIT
     extends AbstractEvictTaskIt
 {
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void testEvictPublicGroup()
         throws Exception
@@ -24,14 +21,8 @@ public class Nexus2692EvictGroupTaskIT
         this.runTask( days, "group_public" );
 
         // check files
-        SortedSet<String> resultStorageFiles = new TreeSet<String>( FileUtils.getFileNames(
-            this.getStorageWorkDir(),
-            null,
-            null,
-            false,
-            true ) );
-        SortedSet<String> resultAttributeFiles = new TreeSet<String>( FileUtils.getFileNames( this
-            .getAttributesWorkDir(), null, null, false, true ) );
+        SortedSet<String> resultStorageFiles = this.getFilePaths( this.getStorageWorkDir() );
+        SortedSet<String> resultAttributeFiles = this.getFilePaths( this.getAttributesWorkDir() );
 
         // list of repos NOT in the public group
         List<String> nonPublicGroupMembers = new ArrayList<String>();
@@ -41,21 +32,20 @@ public class Nexus2692EvictGroupTaskIT
 
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue(
-            "The following files where deleted and should not have been: " + this.prettyList( expectedResults ),
-            expectedResults.isEmpty() );
+        Assert.assertTrue( "The following files where deleted and should not have been: "
+            + this.prettyList( expectedResults ), expectedResults.isEmpty() );
 
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         expectedResults.removeAll( resultAttributeFiles );
-        Assert.assertTrue(
-            "The following attribute files where deleted and should not have been: " + this.prettyList( expectedResults ),
-            expectedResults.isEmpty() );
+        Assert.assertTrue( "The following attribute files where deleted and should not have been: "
+            + this.prettyList( expectedResults ), expectedResults.isEmpty() );
 
         // now the other way
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         resultStorageFiles.removeAll( expectedResults );
-        Assert.assertTrue( "The following files should have been deleted: " + this.prettyList( resultStorageFiles ), resultStorageFiles
-            .isEmpty() );
+        Assert.assertTrue(
+            "The following files should have been deleted: " + this.prettyList( resultStorageFiles ),
+            resultStorageFiles.isEmpty() );
 
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         resultAttributeFiles.removeAll( expectedResults );
