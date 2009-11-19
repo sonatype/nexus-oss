@@ -165,6 +165,9 @@ public class UnpackTestsMojo
 
         try
         {
+            plxXml.processResource( getClass().getResourceAsStream( "/default-config/components.xml" ) );
+            compXml.processResource( getClass().getResourceAsStream( "/default-config/components.xml" ) );
+
             FileUtils.copyFile( plxXml.getTransformedResource(), new File( testResourcesDirectory,
                                                                            "META-INF/plexus/components.xml" ) );
             FileUtils.copyFile( compXml.getTransformedResource(), new File( testResourcesDirectory, "components.xml" ) );
