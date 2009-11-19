@@ -87,12 +87,22 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
         File[] files = repositoryPath.listFiles();
 
-        if ( files.length != 0 )
+        if ( files != null && files.length != 0 )
         {
-            Assert.assertEquals( "All files should be delete from repository except the index:\n"
-                + Arrays.asList( files ), 1, files.length );
-            Assert.assertTrue( "The only file left should be the index.\n" + Arrays.asList( files ),
-                               files[0].getAbsolutePath().endsWith( ".index" ) );
+            // not true anymore, all "." (dot files) hidden files should be left in there
+            // Assert.assertEquals( "All files should be delete from repository except the index:\n"
+            // + Arrays.asList( files ), 1, files.length );
+            // Assert.assertTrue( "The only file left should be the index.\n" + Arrays.asList( files ),
+            // files[0].getAbsolutePath().endsWith( ".index" ) );
+
+            boolean isAllDotFiles = true;
+
+            for ( File file : files )
+            {
+                isAllDotFiles = isAllDotFiles && file.getName().startsWith( "." );
+            }
+
+            Assert.assertTrue( "The only files left should be \"dotted\" files! We have: " + files, isAllDotFiles );
         }
     }
 
