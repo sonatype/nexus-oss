@@ -21,6 +21,7 @@ import java.util.concurrent.RejectedExecutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
+import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -71,11 +73,30 @@ public class ScheduledServiceListPlexusResource
     {
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:tasks]" );
     }
+    
+    private boolean isAllTasks( Request request )
+    {
+        Form form = request.getResourceRef().getQueryAsForm();
+        
+        if ( form != null )
+        {
+            String result = form.getFirstValue( "allTasks" );
+            
+            if ( result != null )
+            {
+                return result.equalsIgnoreCase( "true" );
+            }
+        }
+        
+        return false;
+    }
 
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        boolean allTasks = isAllTasks( request );
+        
         Map<String, List<ScheduledTask<?>>> tasksMap = getNexusScheduler().getAllTasks();
 
         ScheduledServiceListResourceResponse result = new ScheduledServiceListResourceResponse();
@@ -86,7 +107,7 @@ public class ScheduledServiceListPlexusResource
 
             for ( ScheduledTask<?> task : tasks )
             {
-                if ( task.isExposed() )
+                if ( allTasks || task.isExposed() )
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
@@ -106,7 +127,11 @@ public class ScheduledServiceListPlexusResource
                     item.setName( task.getName() );
                     item.setStatus( StringUtils.capitalise( task.getTaskState().toString() ) );
                     item.setTypeId( task.getType() );
-                    item.setTypeName( getNexusConfiguration().getScheduledTaskDescriptor( task.getType() ).getName() );
+                    ScheduledTaskDescriptor descriptor = getNexusConfiguration().getScheduledTaskDescriptor( task.getType() );
+                    if ( descriptor != null ) 
+                    {
+                        item.setTypeName( descriptor.getName() );
+                    }
                     item.setCreated( task.getScheduledAt() == null ? "n/a" : task.getScheduledAt().toString() );
                     item.setLastRunTime( task.getLastRun() == null ? "n/a" : task.getLastRun().toString() );
                     item.setNextRunTime( getNextRunTime( task ) );

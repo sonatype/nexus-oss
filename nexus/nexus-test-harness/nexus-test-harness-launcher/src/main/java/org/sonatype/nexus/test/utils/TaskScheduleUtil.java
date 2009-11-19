@@ -81,29 +81,19 @@ public class TaskScheduleUtil
     public static List<ScheduledServiceListResource> getTasks()
         throws IOException
     {
-        String serviceURI = "service/local/schedules";
-        Response response = RequestFacade.doGetRequest( serviceURI );
-
-        if ( response.getStatus().isError() )
-        {
-            LOG.error( response.getStatus().toString() );
-            return Collections.emptyList();
-        }
-
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
-
-        ScheduledServiceListResourceResponse scheduleResponse =
-            (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
-
-        return scheduleResponse.getData();
+        return getTaskRequest( "service/local/schedules" );
     }
-
+    
     public static List<ScheduledServiceListResource> getAllTasks()
         throws IOException
+    {    
+        return getTaskRequest( "service/local/schedules?allTasks=true" );
+    }
+    
+    private static List<ScheduledServiceListResource> getTaskRequest( String uri )
+        throws IOException
     {
-        String serviceURI = "service/local/schedules_internal";
-        Response response = RequestFacade.doGetRequest( serviceURI );
+        Response response = RequestFacade.doGetRequest( uri );
 
         if ( response.getStatus().isError() )
         {
@@ -117,7 +107,7 @@ public class TaskScheduleUtil
         ScheduledServiceListResourceResponse scheduleResponse =
             (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
 
-        return scheduleResponse.getData();
+        return scheduleResponse.getData();        
     }
 
     public static String getStatus( String name )
