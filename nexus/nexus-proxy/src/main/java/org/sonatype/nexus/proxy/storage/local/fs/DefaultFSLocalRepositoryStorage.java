@@ -33,7 +33,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -227,9 +226,7 @@ public class DefaultFSLocalRepositoryStorage
             if ( checkBeginOfFile( LINK_PREFIX, target ) )
             {
                 try
-                {   
-                    long timestamp = System.currentTimeMillis();
-                    
+                {
                     DefaultStorageLinkItem link =
                         new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
                             getLinkTarget( target ) );
@@ -238,25 +235,7 @@ public class DefaultFSLocalRepositoryStorage
                     link.setCreated( target.lastModified() );
                     result = link;
 
-                    this.touchItemLastRequested( timestamp, repository, request, link );
-                    
-                    try
-                    {
-                        request.pushRequestPath( link.getTarget().getPath() );
-                        DefaultStorageFileItem file =
-                            new DefaultStorageFileItem( link.getTarget().getRepository(), request, target.canRead(), target.canWrite(),
-                                new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
-                        getAttributesHandler().fetchAttributes( file );
-                        file.setModified( link.getModified() );
-                        file.setCreated( link.getCreated() );
-                        file.setLength( target.length() );
-                        
-                        this.touchItemLastRequested( timestamp, link.getTarget().getRepository(), request, file );
-                    }
-                    finally
-                    {
-                        request.popRequestPath();
-                    }
+                    touchItemLastRequested( System.currentTimeMillis(), repository, request, link );
                 }
                 catch ( NoSuchRepositoryException e )
                 {
@@ -276,10 +255,9 @@ public class DefaultFSLocalRepositoryStorage
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
                 file.setLength( target.length() );
-
-                this.touchItemLastRequested( System.currentTimeMillis(), repository, request, file );
-                
                 result = file;
+
+                touchItemLastRequested( System.currentTimeMillis(), repository, request, file );
             }
         }
         else

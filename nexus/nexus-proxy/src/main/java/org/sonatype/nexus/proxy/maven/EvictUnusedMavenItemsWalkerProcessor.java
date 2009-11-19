@@ -23,7 +23,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
-import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 public class EvictUnusedMavenItemsWalkerProcessor
     extends EvictUnusedItemsWalkerProcessor
@@ -37,27 +36,19 @@ public class EvictUnusedMavenItemsWalkerProcessor
     // and all hash files, as they will be removed if main artifact
     // is removed
     public static class EvictUnusedMavenItemsWalkerFilter
-        implements WalkerFilter
+        extends EvictUnusedItemsWalkerFilter
     {
         public boolean shouldProcess( WalkerContext context, StorageItem item )
         {
-            return !item.getPath().startsWith( "/.index" ) && !item.getPath().endsWith( ".asc" )
-                && !item.getPath().endsWith( ".sha1" ) && !item.getPath().endsWith( ".md5" );
-        }
-
-        public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
-        {
-            // we are "cutting" the .index dir from processing
-            return shouldProcess( context, coll );
+            return super.shouldProcess( context, item ) && !item.getPath().startsWith( "/.index" )
+                && !item.getPath().endsWith( ".asc" ) && !item.getPath().endsWith( ".sha1" )
+                && !item.getPath().endsWith( ".md5" );
         }
     }
 
     @Override
     public void doDelete( WalkerContext ctx, StorageFileItem item )
-        throws StorageException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException
+        throws StorageException, UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException
     {
         MavenRepository repository = (MavenRepository) getRepository( ctx );
 

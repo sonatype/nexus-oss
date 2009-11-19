@@ -26,6 +26,7 @@ import org.sonatype.nexus.proxy.events.RepositoryItemEventStore;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
@@ -149,7 +150,7 @@ public abstract class AbstractShadowRepository
     protected abstract void deleteLink( StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException;
 
-    protected abstract void createLink( StorageItem item )
+    protected abstract StorageLinkItem createLink( StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 
     protected void synchronizeLink( StorageItem item )

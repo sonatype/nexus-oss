@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -465,35 +466,9 @@ public abstract class AbstractRepository
 
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
-        getLogger()
-            .info( "Evicting unused items from repository " + getId() + " from path " + request.getRequestPath() );
+        // this is noop at this "level"
 
-        request.setRequestLocalOnly( true );
-
-        EvictUnusedItemsWalkerProcessor walkerProcessor = new EvictUnusedItemsWalkerProcessor( timestamp );
-
-        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
-
-        ctx.getProcessors().add( walkerProcessor );
-
-        // and let it loose
-        try
-        {
-            getWalker().walk( ctx );
-        }
-        catch ( WalkerException e )
-        {
-            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
-            {
-                // everything that is not ItemNotFound should be reported,
-                // otherwise just neglect it
-                throw e;
-            }
-        }
-
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
-
-        return walkerProcessor.getFiles();
+        return Collections.emptyList();
     }
 
     public boolean recreateAttributes( ResourceStoreRequest request, final Map<String, String> initialData )

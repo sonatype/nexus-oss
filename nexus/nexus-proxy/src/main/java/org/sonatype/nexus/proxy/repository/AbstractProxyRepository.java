@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.repository;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -46,10 +48,14 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.mirror.DefaultDownloadMirrors;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrorSelector;
 import org.sonatype.nexus.proxy.mirror.DownloadMirrors;
+import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerException;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -128,6 +134,56 @@ public abstract class AbstractProxyRepository
         event.setRemoteUrlChanged( this.remoteUrlChanged );
 
         return event;
+    }
+
+    @Override
+    public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
+    {
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            Collection<String> result =
+                doEvictUnusedItems( request, timestamp, new EvictUnusedItemsWalkerProcessor( timestamp ),
+                    new EvictUnusedItemsWalkerFilter() );
+
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+
+            return result;
+        }
+        else
+        {
+            return super.evictUnusedItems( request, timestamp );
+        }
+    }
+
+    protected Collection<String> doEvictUnusedItems( ResourceStoreRequest request, final long timestamp,
+        EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter )
+    {
+        getLogger().info(
+            "Evicting unused items from proxy repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
+                + request.getRequestPath() );
+
+        request.setRequestLocalOnly( true );
+
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request, filter );
+
+        ctx.getProcessors().add( processor );
+
+        // and let it loose
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
+
+        return processor.getFiles();
     }
 
     public Map<String, ItemContentValidator> getItemContentValidators()

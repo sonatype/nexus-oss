@@ -37,6 +37,7 @@ import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -221,8 +222,8 @@ public abstract class AbstractProxyTestEnvironment
 
         getEnvironmentBuilder().buildEnvironment( this );
 
-        applicationEventMulticaster
-            .notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null, null ) );
+        applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( applicationConfiguration, null,
+            null ) );
 
         applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( null ) );
 

@@ -142,22 +142,9 @@ public abstract class AbstractLocalRepositoryStorage
     public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, StorageException
     {
-            touchItemLastRequested( System.currentTimeMillis(), repository, request );
+        touchItemLastRequested( System.currentTimeMillis(), repository, request );
     }
 
-    protected void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request, StorageItem storageItem )
-        throws ItemNotFoundException, StorageException
-    {        
-        // TODO: touch it only if this is user-originated request
-        // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
-        // a request from "internals" (ie. a running task).
-        if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
-        {
-            this.touchItemLastRequested( timestamp, repository, request );
-            storageItem.setLastRequested( timestamp );
-        }
-    }
-    
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, StorageException
     {
@@ -171,9 +158,22 @@ public abstract class AbstractLocalRepositoryStorage
 
             item.setRepositoryItemUid( uid );
 
-            item.setLastRequested( timestamp );
+            touchItemLastRequested( timestamp, repository, request, item );
+        }
+    }
 
-            getAttributesHandler().getAttributeStorage().putAttribute( item );
+    protected void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
+        StorageItem storageItem )
+        throws ItemNotFoundException, StorageException
+    {
+        // TODO: touch it only if this is user-originated request
+        // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
+        // a request from "internals" (ie. a running task).
+        if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
+        {
+            storageItem.setLastRequested( timestamp );
+
+            getAttributesHandler().getAttributeStorage().putAttribute( storageItem );
         }
     }
 

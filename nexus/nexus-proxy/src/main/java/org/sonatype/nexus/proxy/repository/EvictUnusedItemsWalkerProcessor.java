@@ -23,9 +23,11 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
 import org.sonatype.nexus.proxy.walker.WalkerContext;
+import org.sonatype.nexus.proxy.walker.WalkerFilter;
 
 public class EvictUnusedItemsWalkerProcessor
     extends AbstractFileWalkerProcessor
@@ -151,4 +153,23 @@ public class EvictUnusedItemsWalkerProcessor
             ctx.stop( e );
         }
     }
+
+    // ==
+
+    public static class EvictUnusedItemsWalkerFilter
+        implements WalkerFilter
+    {
+        public boolean shouldProcess( WalkerContext context, StorageItem item )
+        {
+            // skip "hidden" files
+            return !item.getPath().startsWith( "/." ) && !item.getPath().startsWith( "." );
+        }
+
+        public boolean shouldProcessRecursively( WalkerContext context, StorageCollectionItem coll )
+        {
+            // we are "cutting" the .index dir from processing
+            return shouldProcess( context, coll );
+        }
+    }
+
 }

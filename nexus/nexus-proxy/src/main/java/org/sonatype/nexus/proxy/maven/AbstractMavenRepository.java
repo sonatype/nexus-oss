@@ -36,10 +36,13 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.EvictUnusedMavenItemsWalkerProcessor.EvictUnusedMavenItemsWalkerFilter;
 import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
+import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.MutableProxyRepositoryKind;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.EvictUnusedItemsWalkerProcessor.EvictUnusedItemsWalkerFilter;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
@@ -52,7 +55,7 @@ import org.sonatype.nexus.proxy.walker.WalkerException;
 public abstract class AbstractMavenRepository
     extends AbstractProxyRepository
     implements MavenRepository, MavenHostedRepository, MavenProxyRepository
-{    
+{
     /**
      * Metadata manager.
      */
@@ -68,7 +71,7 @@ public abstract class AbstractMavenRepository
     private MutableProxyRepositoryKind repositoryKind;
 
     private ArtifactStoreHelper artifactStoreHelper;
-    
+
     /** if download remote index flag changed, need special handling after save */
     private boolean downloadRemoteIndexEnabled = false;
 
@@ -77,36 +80,36 @@ public abstract class AbstractMavenRepository
     {
         return (AbstractMavenRepositoryConfiguration) super.getExternalConfiguration( forModification );
     }
-    
+
     @Override
     public boolean commitChanges()
         throws ConfigurationException
     {
         boolean result = super.commitChanges();
-        
+
         if ( result )
         {
             this.downloadRemoteIndexEnabled = false;
         }
-        
+
         return result;
     }
-    
+
     @Override
     public boolean rollbackChanges()
     {
         this.downloadRemoteIndexEnabled = false;
-        
+
         return super.rollbackChanges();
     }
-    
+
     @Override
     protected RepositoryConfigurationUpdatedEvent getRepositoryConfigurationUpdatedEvent()
     {
         RepositoryConfigurationUpdatedEvent event = super.getRepositoryConfigurationUpdatedEvent();
-        
+
         event.setDownloadRemoteIndexEnabled( this.downloadRemoteIndexEnabled );
-        
+
         return event;
     }
 
@@ -134,8 +137,8 @@ public abstract class AbstractMavenRepository
         {
             repositoryKind =
                 new MutableProxyRepositoryKind( this, Arrays.asList( new Class<?>[] { MavenRepository.class } ),
-                                                new DefaultRepositoryKind( MavenHostedRepository.class, null ),
-                                                new DefaultRepositoryKind( MavenProxyRepository.class, null ) );
+                    new DefaultRepositoryKind( MavenHostedRepository.class, null ), new DefaultRepositoryKind(
+                        MavenProxyRepository.class, null ) );
         }
 
         return repositoryKind;
@@ -144,29 +147,20 @@ public abstract class AbstractMavenRepository
     @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
-        EvictUnusedMavenItemsWalkerProcessor walkerProcessor = new EvictUnusedMavenItemsWalkerProcessor( timestamp );
-
-        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request, new EvictUnusedMavenItemsWalkerFilter() );
-
-        ctx.getProcessors().add( walkerProcessor );
-
-        try
+        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            getWalker().walk( ctx );
+            Collection<String> result =
+                doEvictUnusedItems( request, timestamp, new EvictUnusedMavenItemsWalkerProcessor( timestamp ),
+                    new EvictUnusedMavenItemsWalkerFilter() );
+
+            getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+
+            return result;
         }
-        catch ( WalkerException e )
+        else
         {
-            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
-            {
-                // everything that is not ItemNotFound should be reported,
-                // otherwise just neglect it
-                throw e;
-            }
+            return super.evictUnusedItems( request, timestamp );
         }
-
-        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
-
-        return walkerProcessor.getFiles();
     }
 
     public boolean recreateMavenMetadata( ResourceStoreRequest request )
@@ -186,8 +180,8 @@ public abstract class AbstractMavenRepository
             if ( !this.getLocalStorage().containsItem( this, request ) )
             {
                 getLogger().info(
-                                  "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
-                                      + "' because it does not contain path='" + request.getRequestPath() + "'." );
+                    "Skip rebuilding Maven2 Metadata in repository ID='" + getId()
+                        + "' because it does not contain path='" + request.getRequestPath() + "'." );
 
                 return false;
             }
@@ -200,8 +194,8 @@ public abstract class AbstractMavenRepository
         }
 
         getLogger().info(
-                          "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='"
-                              + request.getRequestPath() + "'" );
+            "Recreating Maven2 metadata in repository ID='" + getId() + "' from path='" + request.getRequestPath()
+                + "'" );
 
         return doRecreateMavenMetadata( request );
     }
@@ -242,11 +236,10 @@ public abstract class AbstractMavenRepository
     {
         boolean oldValue = isDownloadRemoteIndexes();
         boolean newValue = downloadRemoteIndexes;
-        
+
         getExternalConfiguration( true ).setDownloadRemoteIndex( downloadRemoteIndexes );
-        
-        if ( oldValue == false 
-            && newValue == true )
+
+        if ( oldValue == false && newValue == true )
         {
             this.downloadRemoteIndexEnabled = true;
         }
@@ -366,8 +359,7 @@ public abstract class AbstractMavenRepository
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "The serving of item " + request.toString()
-                                       + " is forbidden by Maven repository policy." );
+                    "The serving of item " + request.toString() + " is forbidden by Maven repository policy." );
             }
 
             throw new ItemNotFoundException( request, this );

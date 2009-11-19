@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.AbstractShadowRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
@@ -79,8 +80,9 @@ public abstract class LayoutConverterShadowRepository
     /**
      * Repository kind.
      */
-    private RepositoryKind repositoryKind = new DefaultRepositoryKind( MavenShadowRepository.class, Arrays
-        .asList( new Class<?>[] { MavenRepository.class } ) );
+    private RepositoryKind repositoryKind =
+        new DefaultRepositoryKind( MavenShadowRepository.class, Arrays
+            .asList( new Class<?>[] { MavenRepository.class } ) );
 
     /**
      * ArtifactStoreHelper.
@@ -106,8 +108,7 @@ public abstract class LayoutConverterShadowRepository
         if ( !masterRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
             throw new IncompatibleMasterRepositoryException(
-                "This shadow repository needs master repository which implements MavenRepository interface!",
-                this,
+                "This shadow repository needs master repository which implements MavenRepository interface!", this,
                 masterRepository.getId() );
         }
 
@@ -150,10 +151,7 @@ public abstract class LayoutConverterShadowRepository
     }
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
         String originalPath = request.getRequestPath();
 
@@ -206,11 +204,8 @@ public abstract class LayoutConverterShadowRepository
     }
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -268,9 +263,7 @@ public abstract class LayoutConverterShadowRepository
     }
 
     public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -319,10 +312,7 @@ public abstract class LayoutConverterShadowRepository
     }
 
     public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( getLogger().isDebugEnabled() )
         {
@@ -439,10 +429,7 @@ public abstract class LayoutConverterShadowRepository
 
     @Override
     protected void deleteLink( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         String shadowPath = null;
 
@@ -466,10 +453,8 @@ public abstract class LayoutConverterShadowRepository
     }
 
     @Override
-    protected void createLink( StorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
+    protected StorageLinkItem createLink( StorageItem item )
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         String shadowPath = null;
 
@@ -488,10 +473,16 @@ public abstract class LayoutConverterShadowRepository
 
             req.getRequestContext().putAll( item.getItemContext() );
 
-            DefaultStorageLinkItem link = new DefaultStorageLinkItem( this, req, true, true, item
-                .getRepositoryItemUid() );
+            DefaultStorageLinkItem link =
+                new DefaultStorageLinkItem( this, req, true, true, item.getRepositoryItemUid() );
 
             storeItem( false, link );
+
+            return link;
+        }
+        else
+        {
+            return null;
         }
     }
 
@@ -506,9 +497,7 @@ public abstract class LayoutConverterShadowRepository
 
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         StorageItem result = null;
 
@@ -522,7 +511,7 @@ public abstract class LayoutConverterShadowRepository
         {
             // if it is thrown by super.doRetrieveItem()
             String transformedPath = null;
-            
+
             try
             {
                 transformedPath = transformShadow2Master( request.getRequestPath() );
@@ -549,7 +538,26 @@ public abstract class LayoutConverterShadowRepository
                 request.popRequestPath();
             }
 
-            return result;
+            // try to create link on the fly
+            try
+            {
+                StorageLinkItem link = createLink( result );
+
+                if ( link != null )
+                {
+                    return link;
+                }
+                else
+                {
+                    // fallback to result, but will not happen, see above
+                    return result;
+                }
+            }
+            catch ( Exception e1 )
+            {
+                // fallback to result, but will not happen, see above
+                return result;
+            }
         }
     }
 

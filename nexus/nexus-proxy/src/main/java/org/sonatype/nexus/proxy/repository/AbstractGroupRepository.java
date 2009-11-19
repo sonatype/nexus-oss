@@ -27,6 +27,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
@@ -74,8 +75,8 @@ public abstract class AbstractGroupRepository
         {
             RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
 
-            if ( this
-                .getExternalConfiguration( false ).getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
+            if ( this.getExternalConfiguration( false ).getMemberRepositoryIds()
+                .contains( revt.getRepository().getId() ) )
             {
                 removeMemberRepositoryId( revt.getRepository().getId() );
             }
@@ -85,7 +86,26 @@ public abstract class AbstractGroupRepository
             // fire another event
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryGroupMembersChangedEvent( this ) );
         }
+    }
 
+    @Override
+    public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
+    {
+        getLogger().info(
+            "Evicting unused items from group repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
+                + request.getRequestPath() );
+
+        HashSet<String> result = new HashSet<String>();
+
+        // here, we just iterate over members and call evict
+        for ( Repository repository : getMemberRepositories() )
+        {
+            result.addAll( repository.evictUnusedItems( request, timestamp ) );
+        }
+
+        getApplicationEventMulticaster().notifyEventListeners( new RepositoryEventEvictUnusedItems( this ) );
+
+        return result;
     }
 
     @Override
@@ -157,7 +177,7 @@ public abstract class AbstractGroupRepository
     }
 
     private static void addItems( HashSet<String> names, ArrayList<StorageItem> result,
-                                  Collection<StorageItem> listItems )
+        Collection<StorageItem> listItems )
     {
         for ( StorageItem item : listItems )
         {
