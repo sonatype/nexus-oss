@@ -1,0 +1,28 @@
+<file>
+  <generation>1</generation>
+  <path>/org/apache/chemistry/chemistry-api/0.1-SNAPSHOT/maven-metadata.xml.md5</path>
+  <readable>true</readable>
+  <writable>false</writable>
+  <repositoryId>public</repositoryId>
+  <created>1258577882504</created>
+  <modified>1258577882504</modified>
+  <storedLocally>1258577882504</storedLocally>
+  <lastTouched>1258577882504</lastTouched>
+  <lastRequested>1258577882508</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>f6d21af69166dbbe3a33fccf055aad5a0ef13cc7</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>1f77d51423c5fe2a6fadc356fb53f2ac</string>
+    </entry>
+  </attributes>
+  <length>33</length>
+</file>

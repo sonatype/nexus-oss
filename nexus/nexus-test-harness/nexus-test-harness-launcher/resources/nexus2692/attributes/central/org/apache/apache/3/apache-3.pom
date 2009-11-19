@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/apache/3/apache-3.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1153216091000</created>
+  <modified>1153216091000</modified>
+  <storedLocally>1258575822793</storedLocally>
+  <lastTouched>1258575822793</lastTouched>
+  <lastRequested>1258575822799</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/apache/3/apache-3.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>1bc0010136a890e2fd38d901a0b7ecdf0e3f9871</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>c857ebbb5f303f435495e40e6c9e45a2</string>
+    </entry>
+  </attributes>
+  <length>3430</length>
+</file>

@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/plugins/maven-compiler-plugin/2.0.2/maven-compiler-plugin-2.0.2.jar</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1171399252000</created>
+  <modified>1171399252000</modified>
+  <storedLocally>1258575831849</storedLocally>
+  <lastTouched>1258575831849</lastTouched>
+  <lastRequested>1258575831975</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/plugins/maven-compiler-plugin/2.0.2/maven-compiler-plugin-2.0.2.jar</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>9a1bd0bac3ca6aee3e3c8f9ba64f93b7a8647c5f</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>a2ba098b20787eeab93877f14adcc1c9</string>
+    </entry>
+  </attributes>
+  <length>18407</length>
+</file>

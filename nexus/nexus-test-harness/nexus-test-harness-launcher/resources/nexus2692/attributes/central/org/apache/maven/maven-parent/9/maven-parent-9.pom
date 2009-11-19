@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/maven-parent/9/maven-parent-9.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1221163466000</created>
+  <modified>1221163466000</modified>
+  <storedLocally>1258575830220</storedLocally>
+  <lastTouched>1258575830220</lastTouched>
+  <lastRequested>1258575830237</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/maven-parent/9/maven-parent-9.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>a7d098bde368f683c2b51475a903a1e74b61ba32</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>4f307c5a6158c3d546586d41dd3baa1f</string>
+    </entry>
+  </attributes>
+  <length>32837</length>
+</file>

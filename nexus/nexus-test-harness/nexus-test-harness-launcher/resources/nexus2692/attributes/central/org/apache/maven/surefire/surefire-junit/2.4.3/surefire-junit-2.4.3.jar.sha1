@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/surefire/surefire-junit/2.4.3/surefire-junit-2.4.3.jar.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1210701428000</created>
+  <modified>1210701428000</modified>
+  <storedLocally>1258575870285</storedLocally>
+  <lastTouched>1258575870285</lastTouched>
+  <lastRequested>1258575870310</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/surefire/surefire-junit/2.4.3/surefire-junit-2.4.3.jar.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>3736d9bfde3f4c1f229b5ca506b7d753e43602fd</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>08e99c12e6d245086b4e94ed1e2b1891</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

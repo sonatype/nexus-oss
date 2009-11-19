@@ -1,0 +1,29 @@
+<file>
+  <generation>9</generation>
+  <path>/org/apache/maven-metadata.xml.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>apache-snapshots</repositoryId>
+  <created>1258577152000</created>
+  <modified>1258577152000</modified>
+  <storedLocally>1258577153152</storedLocally>
+  <lastTouched>1258577153152</lastTouched>
+  <lastRequested>1258578577264</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repository.apache.org/snapshots/org/apache/maven-metadata.xml.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>e04ada2eda704ea8724fbfcf94bf672aa7ca4f01</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>0:0:0:0:0:0:0:1%0</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>959ce1d4bf52022fa92684af54f8494a</string>
+    </entry>
+  </attributes>
+  <length>41</length>
+</file>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repository-metadata>
+  <version>1.0.0</version>
+  <url>https://repository.apache.org/content/groups/snapshots-group</url>
+  <id>snapshots-group</id>
+  <name>Snapshots</name>
+  <layout>maven2</layout>
+  <policy>mixed</policy>
+  <memberRepositories>
+    <memberRepository>
+      <id>snapshots</id>
+      <name>Snapshots</name>
+      <policy>snapshot</policy>
+      <url>https://repository.apache.org/content/repositories/snapshots</url>
+    </memberRepository>
+    <memberRepository>
+      <id>apache-legacy-snapshots</id>
+      <name>Apache Legacy Snapshots (People)</name>
+      <policy>snapshot</policy>
+      <url>https://repository.apache.org/content/repositories/apache-legacy-snapshots</url>
+    </memberRepository>
+  </memberRepositories>
+</repository-metadata>

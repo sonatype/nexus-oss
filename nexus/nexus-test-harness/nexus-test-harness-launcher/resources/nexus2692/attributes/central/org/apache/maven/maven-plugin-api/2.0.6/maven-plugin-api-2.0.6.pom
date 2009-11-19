@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/maven-plugin-api/2.0.6/maven-plugin-api-2.0.6.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1175403248000</created>
+  <modified>1175403248000</modified>
+  <storedLocally>1258575821736</storedLocally>
+  <lastTouched>1258575821736</lastTouched>
+  <lastRequested>1258575821742</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/maven-plugin-api/2.0.6/maven-plugin-api-2.0.6.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>3af72b052dfefb73ecfae742613012b5396c8863</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>5d1db4c23baa9cf42ad8f1799a436b37</string>
+    </entry>
+  </attributes>
+  <length>1455</length>
+</file>

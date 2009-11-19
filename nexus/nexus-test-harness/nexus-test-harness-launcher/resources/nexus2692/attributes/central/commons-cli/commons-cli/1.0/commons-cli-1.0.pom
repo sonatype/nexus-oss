@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/commons-cli/commons-cli/1.0/commons-cli-1.0.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1131487912000</created>
+  <modified>1131487912000</modified>
+  <storedLocally>1258575848456</storedLocally>
+  <lastTouched>1258575848456</lastTouched>
+  <lastRequested>1258575848463</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//commons-cli/commons-cli/1.0/commons-cli-1.0.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>bc51fd74ed7c8ccf75b3abc84b3613d6ba60eb89</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>1fe3821604da834a45d9939f696a53e7</string>
+    </entry>
+  </attributes>
+  <length>2105</length>
+</file>

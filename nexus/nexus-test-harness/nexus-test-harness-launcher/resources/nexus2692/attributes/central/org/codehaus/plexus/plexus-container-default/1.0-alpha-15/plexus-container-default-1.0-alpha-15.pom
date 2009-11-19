@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/codehaus/plexus/plexus-container-default/1.0-alpha-15/plexus-container-default-1.0-alpha-15.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1167405230000</created>
+  <modified>1167405230000</modified>
+  <storedLocally>1258575876003</storedLocally>
+  <lastTouched>1258575876003</lastTouched>
+  <lastRequested>1258575876008</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/codehaus/plexus/plexus-container-default/1.0-alpha-15/plexus-container-default-1.0-alpha-15.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>2fa665c1dad46cf92be2a73a5a0fcab95e80c9c8</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>747b89fb1d04f055e40374e3fb026076</string>
+    </entry>
+  </attributes>
+  <length>1708</length>
+</file>

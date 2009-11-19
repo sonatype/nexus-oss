@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1196662832000</created>
+  <modified>1196662832000</modified>
+  <storedLocally>1258575811396</storedLocally>
+  <lastTouched>1258575811396</lastTouched>
+  <lastRequested>1258575811442</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/plugins/maven-clean-plugin/2.2/maven-clean-plugin-2.2.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>53b41f50fbeee5a200ecc5dad5941d272e41626a</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>ae747ea91e09a42e8296b51d465e6fb9</string>
+    </entry>
+  </attributes>
+  <length>40</length>
+</file>

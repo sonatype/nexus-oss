@@ -53,7 +53,7 @@ public class EvictUnusedProxiedItemsTask
         long olderThan = System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY );
 
         if ( getRepositoryGroupId() != null )
-        {
+        {   
             return getRepositoryRegistry()
                 .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).evictUnusedItems(
                     req,

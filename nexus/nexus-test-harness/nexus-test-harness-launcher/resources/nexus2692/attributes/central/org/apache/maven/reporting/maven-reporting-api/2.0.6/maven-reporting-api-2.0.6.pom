@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/reporting/maven-reporting-api/2.0.6/maven-reporting-api-2.0.6.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1175403248000</created>
+  <modified>1175403248000</modified>
+  <storedLocally>1258575846785</storedLocally>
+  <lastTouched>1258575846785</lastTouched>
+  <lastRequested>1258575846793</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/reporting/maven-reporting-api/2.0.6/maven-reporting-api-2.0.6.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>8d8037467cc092dbaf1ca8b513172e2a893b5b9b</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>3335c84577987471795f1765c0cbef08</string>
+    </entry>
+  </attributes>
+  <length>1752</length>
+</file>

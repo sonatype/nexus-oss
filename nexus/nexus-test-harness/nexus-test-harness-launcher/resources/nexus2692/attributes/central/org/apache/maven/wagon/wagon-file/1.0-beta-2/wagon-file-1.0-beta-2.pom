@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/wagon/wagon-file/1.0-beta-2/wagon-file-1.0-beta-2.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1165961121000</created>
+  <modified>1165961121000</modified>
+  <storedLocally>1258575844431</storedLocally>
+  <lastTouched>1258575844431</lastTouched>
+  <lastRequested>1258575844436</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/wagon/wagon-file/1.0-beta-2/wagon-file-1.0-beta-2.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>b746465d8086fa0ae2313ba3b56045ab1b90324f</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>68d49120060adb9208896b7ce1f963fb</string>
+    </entry>
+  </attributes>
+  <length>637</length>
+</file>

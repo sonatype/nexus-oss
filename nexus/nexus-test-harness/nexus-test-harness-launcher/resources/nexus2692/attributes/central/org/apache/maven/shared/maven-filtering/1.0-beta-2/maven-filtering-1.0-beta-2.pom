@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/shared/maven-filtering/1.0-beta-2/maven-filtering-1.0-beta-2.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1223453744000</created>
+  <modified>1223453744000</modified>
+  <storedLocally>1258575843418</storedLocally>
+  <lastTouched>1258575843418</lastTouched>
+  <lastRequested>1258575843424</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/shared/maven-filtering/1.0-beta-2/maven-filtering-1.0-beta-2.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>c4bbeb1f9e960134af0761a633fb37197ad97ec7</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>e974871c5a62faac1ce21d8c7ee3ed8d</string>
+    </entry>
+  </attributes>
+  <length>4028</length>
+</file>

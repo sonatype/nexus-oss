@@ -1,0 +1,29 @@
+<file>
+  <generation>8</generation>
+  <path>/.meta/repository-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>apache-snapshots</repositoryId>
+  <created>1258563473000</created>
+  <modified>1258563473000</modified>
+  <storedLocally>1258578573413</storedLocally>
+  <lastTouched>1258578573413</lastTouched>
+  <lastRequested>1258578573435</lastRequested>
+  <expired>false</expired>
+  <remoteUrl>http://repository.apache.org/snapshots/.meta/repository-metadata.xml</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>98957414b46dbd5f0ad85c151adc3ae60eee2b33</string>
+    </entry>
+    <entry>
+      <string>contentGenerator</string>
+      <string>NexusRepositoryMetadataContentGenerator</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>37dc5b46d14e52887f54e4487492096a</string>
+    </entry>
+  </attributes>
+  <length>348</length>
+</file>

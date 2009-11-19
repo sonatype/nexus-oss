@@ -1,0 +1,29 @@
+<file>
+  <generation>5</generation>
+  <path>/org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.pom.sha1</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1132234709000</created>
+  <modified>1132234709000</modified>
+  <storedLocally>1258575849690</storedLocally>
+  <lastTouched>1258575849690</lastTouched>
+  <lastRequested>1258575849713</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/codehaus/plexus/plexus-interactivity-api/1.0-alpha-4/plexus-interactivity-api-1.0-alpha-4.pom.sha1</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>82bd1b033bfc6beaad7491b5d459cbd4e004de61</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>5bcffa1a97f0bda4d4e567bdce70ed6d</string>
+    </entry>
+  </attributes>
+  <length>198</length>
+</file>

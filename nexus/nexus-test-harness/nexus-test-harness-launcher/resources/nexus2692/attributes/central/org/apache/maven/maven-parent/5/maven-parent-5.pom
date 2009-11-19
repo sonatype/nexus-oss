@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/org/apache/maven/maven-parent/5/maven-parent-5.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1170870974000</created>
+  <modified>1170870974000</modified>
+  <storedLocally>1258575822386</storedLocally>
+  <lastTouched>1258575822386</lastTouched>
+  <lastRequested>1258575822396</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//org/apache/maven/maven-parent/5/maven-parent-5.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>5c1ab38decaca1ccd08294aeab135047ebbae00d</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>4da85635ce64dbec5b00232d5bb26453</string>
+    </entry>
+  </attributes>
+  <length>15237</length>
+</file>

@@ -1,0 +1,28 @@
+<file>
+  <generation>4</generation>
+  <path>/.meta/repository-metadata.xml</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>releases</repositoryId>
+  <created>1258576673707</created>
+  <modified>1258576673707</modified>
+  <storedLocally>1258576673708</storedLocally>
+  <lastTouched>1258576673708</lastTouched>
+  <lastRequested>1258576673709</lastRequested>
+  <expired>false</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>f68865f51c1b75d74b672929a372acabfc072a04</string>
+    </entry>
+    <entry>
+      <string>contentGenerator</string>
+      <string>NexusRepositoryMetadataContentGenerator</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>0c25cd2bdb4d10666978e86c200076d9</string>
+    </entry>
+  </attributes>
+  <length>261</length>
+</file>

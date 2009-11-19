@@ -26,6 +26,7 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
@@ -449,6 +451,57 @@ public abstract class LayoutConverterShadowRepository
             request.getRequestContext().putAll( item.getItemContext() );
 
             deleteItem( false, request );
+
+            // we need to clean up empty shadow parent directories
+            String parentPath = request.getRequestPath().substring( 0, request.getRequestPath().lastIndexOf( item.getName() ) );
+            ResourceStoreRequest parentRequest = new ResourceStoreRequest( parentPath );
+            
+            while ( parentRequest != null )
+            {
+                StorageItem parentItem = null;
+                parentItem = this.retrieveItem( false, parentRequest );
+                
+                // this should be a collection Item
+                if ( StorageCollectionItem.class.isInstance( parentItem ) )
+                {
+                    StorageCollectionItem parentCollectionItem = (StorageCollectionItem) parentItem;
+                    try
+                    {
+                        if ( parentCollectionItem.list().size() == 0 )
+                        {
+                            deleteItem( false, parentRequest );
+                            parentRequest = new ResourceStoreRequest( parentCollectionItem.getParentPath() );
+                        }
+                        else
+                        {
+                            // exit loop
+                            parentRequest = null;
+                        }
+                    }
+                    catch ( AccessDeniedException e )
+                    {
+                        this.getLogger().debug(
+                            "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
+                                + " Access Denied",
+                            e );
+                        // exit loop
+                        parentRequest = null;
+                    }
+                    catch ( NoSuchResourceStoreException e )
+                    {
+                        this.getLogger().debug(
+                            "Failed to delete shadow parent: " + this.getId() + ":" + parentItem.getPath()
+                                + " does not exist",
+                            e );
+                        // exit loop
+                        parentRequest = null;
+                    }
+                }
+                else
+                {
+                    this.getLogger().debug( "ExpectedCollectionItem, found: " + parentItem.getClass() + ", ignoring." );
+                }
+            }
         }
     }
 

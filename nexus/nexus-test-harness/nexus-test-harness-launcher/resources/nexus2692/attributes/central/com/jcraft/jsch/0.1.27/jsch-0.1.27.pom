@@ -1,0 +1,29 @@
+<file>
+  <generation>4</generation>
+  <path>/com/jcraft/jsch/0.1.27/jsch-0.1.27.pom</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>central</repositoryId>
+  <created>1145651426000</created>
+  <modified>1145651426000</modified>
+  <storedLocally>1258575852238</storedLocally>
+  <lastTouched>1258575852238</lastTouched>
+  <lastRequested>1258575852255</lastRequested>
+  <expired>true</expired>
+  <remoteUrl>http://repo1.maven.org/maven2//com/jcraft/jsch/0.1.27/jsch-0.1.27.pom</remoteUrl>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>bd3e22fbac849d8b4b96a7d6a0dbb5e69fd083c1</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>93e2e058e4f279192d171d68054b199e</string>
+    </entry>
+  </attributes>
+  <length>965</length>
+</file>

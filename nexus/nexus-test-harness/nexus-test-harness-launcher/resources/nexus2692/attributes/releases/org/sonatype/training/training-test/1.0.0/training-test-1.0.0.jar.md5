@@ -1,0 +1,32 @@
+<file>
+  <generation>3</generation>
+  <path>/org/sonatype/training/training-test/1.0.0/training-test-1.0.0.jar.md5</path>
+  <readable>true</readable>
+  <writable>true</writable>
+  <repositoryId>releases</repositoryId>
+  <created>1258575237000</created>
+  <modified>1258575237000</modified>
+  <storedLocally>1258575237911</storedLocally>
+  <lastTouched>1258575237911</lastTouched>
+  <lastRequested>1258575237912</lastRequested>
+  <expired>true</expired>
+  <attributes>
+    <entry>
+      <string>digest.sha1</string>
+      <string>24938742d4d814c69300e68f3855ea069fbd5418</string>
+    </entry>
+    <entry>
+      <string>request.address</string>
+      <string>127.0.0.1</string>
+    </entry>
+    <entry>
+      <string>request.user</string>
+      <string>admin</string>
+    </entry>
+    <entry>
+      <string>digest.md5</string>
+      <string>f3e3a5010c0b1cac991587605e774068</string>
+    </entry>
+  </attributes>
+  <length>32</length>
+</file>
