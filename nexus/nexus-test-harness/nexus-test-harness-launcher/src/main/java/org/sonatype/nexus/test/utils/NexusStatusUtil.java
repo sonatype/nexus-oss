@@ -195,11 +195,10 @@ public class NexusStatusUtil
 
         if ( !waitForStop() )
         {
+            //just start over if we can't stop normally
+            System.out.println( "Forcing Stop of appbooter" );
             getAppBooterService().forceStop();
-            if ( isNexusAlive() )
-            {
-                throw new NexusIllegalStateException( "Unable to doHardStop(), nexus still running" );
-            }
+            APP_BOOTER_SERVICE = null;
         }
 
     }
