@@ -244,7 +244,7 @@ public class AbstractEvictTaskIt
         List<String> paths = FileUtils.getFileNames( this.getStorageWorkDir(), null, null, false, true );
         for ( String path : paths )
         {
-            result.add( path.replaceAll( Pattern.quote( "\\" ), Pattern.quote( "/" ) ) );
+            result.add( path.replaceAll( Pattern.quote( "\\" ), "/" ) );
         }
         return result;
     }
@@ -257,7 +257,7 @@ public class AbstractEvictTaskIt
         List<String> paths = FileUtils.getDirectoryNames( this.getStorageWorkDir(), null, null, false, true );
         for ( String path : paths )
         {
-            result.add( path.replaceAll( Pattern.quote( "\\" ), Pattern.quote( "/" ) ) );
+            result.add( path.replaceAll( Pattern.quote( "\\" ), "/" ) );
         }
         return result;
     }
