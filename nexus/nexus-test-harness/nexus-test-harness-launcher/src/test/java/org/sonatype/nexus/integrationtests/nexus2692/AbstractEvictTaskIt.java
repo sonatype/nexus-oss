@@ -201,7 +201,6 @@ public class AbstractEvictTaskIt
         return expectedFiles;
     }
 
-    @SuppressWarnings( "unchecked" )
     protected void checkForEmptyDirectories()
         throws IOException
     {
@@ -212,7 +211,7 @@ public class AbstractEvictTaskIt
             .getStorageWorkDir());
         for ( String itemPath : resultDirectories )
         {
-            if ( itemPath.split( File.separator ).length != 1 )
+            if ( itemPath.split( Pattern.quote( File.separator ) ).length != 1 )
             {
                 File directory = new File( this.getStorageWorkDir(), itemPath );
                 if ( directory.list().length == 0 )
