@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -61,6 +62,12 @@ public class DefaultFSLocalRepositoryStorage
     public static final String PROVIDER_STRING = "file";
 
     private static final String LINK_PREFIX = "LINK to ";
+    
+    @Configuration( value = "${rename.retry.count}" )
+    private String renameRetryCount;
+    
+    @Configuration( value = "${rename.retry.delay}" )
+    private String renameRetryDelay;
 
     /**
      * The UID factory.
@@ -346,22 +353,8 @@ public class DefaultFSLocalRepositoryStorage
 
                     IOUtil.close( os );
                 }
-
-                if ( !hiddenTarget.renameTo( target ) )
-                {
-                    // try to clean up, maybe is already exists
-                    if ( target.exists() )
-                    {
-                        target.delete();
-                    }
-
-                    // and try again the move
-                    if ( !hiddenTarget.renameTo( target ) )
-                    {
-                        throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                            + target.getAbsolutePath() + "\"!" );
-                    }
-                }
+                
+                handleRenameOperation( hiddenTarget, target );
 
                 target.setLastModified( item.getModified() );
 
@@ -432,6 +425,57 @@ public class DefaultFSLocalRepositoryStorage
                 throw new StorageException( "Got exception during storing on path "
                     + item.getRepositoryItemUid().toString(), ex );
             }
+        }
+    }
+    
+    protected void handleRenameOperation( File hiddenTarget, File target )
+        throws IOException
+    {
+        int retryCount;
+        int retryDelay;
+    
+        try
+        {
+            retryCount = Integer.parseInt( renameRetryCount );
+            retryDelay = Integer.parseInt( renameRetryDelay );
+        }
+        catch ( NumberFormatException e )
+        {
+            retryCount = 0;
+            retryDelay = 0;
+        }
+    
+        // delete the target, this is required on windows
+        if ( target.exists() )
+        {
+            target.delete();
+        }
+    
+        // first try
+        boolean success = hiddenTarget.renameTo( target );
+    
+        // if retries enabled go ahead and start the retry process
+        for ( int i = 1; success == false && i <= retryCount; i++ )
+        {
+            getLogger().debug(
+                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
+                    + target.getAbsolutePath() + " will wait " + retryDelay + " milliseconds and try again" );
+    
+            try
+            {
+                Thread.sleep( retryDelay );
+            }
+            catch ( InterruptedException e )
+            {
+            }
+            
+            success = hiddenTarget.renameTo( target );
+        }
+    
+        if ( !success )
+        {
+            throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
+                + target.getAbsolutePath() + "\"!" );
         }
     }
 
