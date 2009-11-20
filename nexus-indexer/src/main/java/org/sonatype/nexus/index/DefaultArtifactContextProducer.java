@@ -117,12 +117,12 @@ public class DefaultArtifactContextProducer
         
         String filename = file.getName();
         
-        if (   filename.startsWith( "maven-metadata" )
+        if (   filename.equals( "maven-metadata.xml" )
             // || filename.endsWith( "-javadoc.jar" )
             // || filename.endsWith( "-javadocs.jar" )
             // || filename.endsWith( "-sources.jar" )
             || filename.endsWith( ".properties" )
-            || filename.endsWith( ".xml" )
+//            || filename.endsWith( ".xml" ) // NEXUS-3029
             || filename.endsWith( ".asc" ) 
             || filename.endsWith( ".md5" )
             || filename.endsWith( ".sha1" ) )

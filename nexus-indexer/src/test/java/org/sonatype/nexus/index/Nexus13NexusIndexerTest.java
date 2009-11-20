@@ -135,11 +135,11 @@ public class Nexus13NexusIndexerTest
         FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q, newContext ) );
         Collection<ArtifactInfo> r = response.getResults(); 
 
-        assertEquals( 8, r.size() );
+        assertEquals( 10, r.size() );
 
         List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( r );
 
-        assertEquals( 8, list.size() );
+        assertEquals( 10, list.size() );
 
         ArtifactInfo ai = list.get( 0 );
 
@@ -160,7 +160,7 @@ public class Nexus13NexusIndexerTest
         Set<String> rootGroups = context.getRootGroups();
         assertEquals( rootGroups.toString(), 1, rootGroups.size() );
 
-        assertGroup( 8, "cisco", context );
+        assertGroup( 10, "cisco", context );
     }
 
     public void testSearchFlat()
@@ -170,11 +170,11 @@ public class Nexus13NexusIndexerTest
 
         FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( q ) );
         Collection<ArtifactInfo> r = response.getResults(); 
-        assertEquals( r.toString(), 8, r.size() );
+        assertEquals( r.toString(), 10, r.size() );
 
         List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( r );
 
-        assertEquals( 8, list.size() );
+        assertEquals( 10, list.size() );
 
         ArtifactInfo ai = list.get( 0 );
 
