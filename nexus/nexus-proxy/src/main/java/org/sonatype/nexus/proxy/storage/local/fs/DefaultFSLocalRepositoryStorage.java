@@ -27,8 +27,6 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,7 +58,6 @@ import org.sonatype.nexus.util.ItemPathUtils;
 @Component( role = LocalRepositoryStorage.class, hint = DefaultFSLocalRepositoryStorage.PROVIDER_STRING )
 public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
-        implements Initializable
 {
     public static final String PROVIDER_STRING = "file";
 
@@ -72,8 +69,8 @@ public class DefaultFSLocalRepositoryStorage
     @Configuration( value = "${rename.retry.delay}" )
     private String renameRetryDelayString;
     
-    private int renameRetryCount = 0;
-    private int renameRetryDelay = 0;
+    private int renameRetryCount = -1;
+    private int renameRetryDelay = -1;
 
     /**
      * The UID factory.
@@ -81,13 +78,32 @@ public class DefaultFSLocalRepositoryStorage
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
     
-    public void initialize()
-        throws InitializationException
+    protected int getRenameRetryCount()
+    {
+        if ( renameRetryCount == -1 )
+        {
+            initializeRenameRetryParams();
+        }
+        
+        return renameRetryCount;
+    }
+    
+    protected int getRenameRetryDelay()
+    {
+        if ( renameRetryDelay == -1 )
+        {
+            initializeRenameRetryParams();
+        }
+        
+        return renameRetryDelay;
+    }
+    
+    protected void initializeRenameRetryParams()
     {
         try
         {
             renameRetryCount = Integer.parseInt( renameRetryCountString );
-            renameRetryCount = Integer.parseInt( renameRetryDelayString );
+            renameRetryDelay = Integer.parseInt( renameRetryDelayString );
         }
         catch ( NumberFormatException e )
         {
@@ -457,7 +473,7 @@ public class DefaultFSLocalRepositoryStorage
     
     protected void handleRenameOperation( File hiddenTarget, File target )
         throws IOException
-    {    
+    {  
         // delete the target, this is required on windows
         if ( target.exists() )
         {
@@ -468,15 +484,15 @@ public class DefaultFSLocalRepositoryStorage
         boolean success = hiddenTarget.renameTo( target );
     
         // if retries enabled go ahead and start the retry process
-        for ( int i = 1; success == false && i <= renameRetryCount; i++ )
+        for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
             getLogger().debug(
                 "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
-                    + target.getAbsolutePath() + " will wait " + renameRetryDelay + " milliseconds and try again" );
+                    + target.getAbsolutePath() + " will wait " + getRenameRetryDelay() + " milliseconds and try again" );
     
             try
             {
-                Thread.sleep( renameRetryDelay );
+                Thread.sleep( getRenameRetryDelay() );
             }
             catch ( InterruptedException e )
             {
