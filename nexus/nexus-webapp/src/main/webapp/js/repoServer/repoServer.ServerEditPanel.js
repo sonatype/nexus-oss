@@ -736,7 +736,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
             {
               xtype: 'panel',
               style: 'padding-left: 70px; padding-bottom: 10px',
-              html: 'Please, inform an e-mail that will recieve the test message'
+              html: 'Please enter an email address which will receive the test email message.'
             },
             { 
               fieldLabel: 'E-mail', 
@@ -786,7 +786,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         if ( success ) {
           Sonatype.MessageBox.show( {
             title: 'SMTP configuration',
-            msg: 'SMTP configuration validated successfuly, check your inbox!',
+            msg: 'SMTP configuration validated successfully, check your inbox!',
             buttons: Sonatype.MessageBox.OK,
             icon: Sonatype.MessageBox.INFO
           } );
