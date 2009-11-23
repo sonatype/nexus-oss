@@ -47,6 +47,8 @@ public class WrapperHelper
     public static void setConfiguration( WrapperHelperConfiguration cfg )
     {
         wrapperHelperConfiguration = cfg;
+
+        basedir = null;
     }
 
     /**
@@ -162,8 +164,10 @@ public class WrapperHelper
      * high-level editing.
      * 
      * @return
+     * @throws IOException if the file that is to be load broken, not found, etc.
      */
     public static WrapperConfWrapper getWrapperConfWrapper()
+        throws IOException
     {
         return getWrapperConfWrapper( getWrapperConfFile() );
     }
@@ -173,8 +177,10 @@ public class WrapperHelper
      * some high-level editing.
      * 
      * @return
+     * @throws IOException if the file that is to be load broken, not found, etc.
      */
     public static WrapperConfWrapper getBackupWrapperConfWrapper()
+        throws IOException
     {
         return getWrapperConfWrapper( getBackupWrapperConfFile() );
     }
@@ -183,8 +189,10 @@ public class WrapperHelper
      * Returns WrapperConfWrapper for the provided file. It may be used with WrapperEditor for some high-level editing.
      * 
      * @return
+     * @throws IOException if the file that is to be load broken, not found, etc.
      */
     public static WrapperConfWrapper getWrapperConfWrapper( File fileToWrap )
+        throws IOException
     {
         // TODO: implement this
         return null;
