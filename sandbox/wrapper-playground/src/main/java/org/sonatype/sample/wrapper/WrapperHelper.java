@@ -15,9 +15,39 @@ import org.codehaus.plexus.util.FileUtils;
 public class WrapperHelper
 {
     /**
+     * The configuration to use. It is lazily instantiated, see getConfiguration() method.
+     */
+    private static WrapperHelperConfiguration wrapperHelperConfiguration;
+
+    /**
      * The File pointing to basedir. Lazily inited, see getBasedir() method.
      */
     private static File basedir;
+
+    /**
+     * Gets the configuration in use.
+     * 
+     * @return
+     */
+    public static WrapperHelperConfiguration getConfiguration()
+    {
+        if ( wrapperHelperConfiguration == null )
+        {
+            wrapperHelperConfiguration = new WrapperHelperConfiguration();
+        }
+
+        return wrapperHelperConfiguration;
+    }
+
+    /**
+     * Sets the configuration in use.
+     * 
+     * @param cfg
+     */
+    public static void setConfiguration( WrapperHelperConfiguration cfg )
+    {
+        wrapperHelperConfiguration = cfg;
+    }
 
     /**
      * Backups wrapper.conf if not backed up already.
@@ -39,7 +69,7 @@ public class WrapperHelper
     public static void backupWrapperConf( boolean overwrite )
         throws IOException
     {
-        File wrapperConfBackup = getConfFile( "wrapper.conf.bak" );
+        File wrapperConfBackup = getBackupWrapperConfFile();
 
         if ( overwrite || !wrapperConfBackup.isFile() )
         {
@@ -66,7 +96,17 @@ public class WrapperHelper
      */
     public static File getWrapperConfFile()
     {
-        return getConfFile( "wrapper.conf" );
+        return getConfFile( getConfiguration().getWrapperConfName() );
+    }
+
+    /**
+     * Returns a File that points to the backup wrapper.conf. This file <b>may not exist</b>, so check is needed.
+     * 
+     * @return
+     */
+    public static File getBackupWrapperConfFile()
+    {
+        return getConfFile( getConfiguration().getWrapperConfBackupName() );
     }
 
     /**
@@ -87,7 +127,7 @@ public class WrapperHelper
      */
     public static File getConfDir()
     {
-        return new File( getBasedir(), "conf" );
+        return new File( getBasedir(), getConfiguration().getConfDirPath() );
     }
 
     /**
@@ -103,7 +143,7 @@ public class WrapperHelper
             return basedir;
         }
 
-        String basedirPath = System.getProperty( "basedir" );
+        String basedirPath = System.getProperty( getConfiguration().getBasedirPropertyKey() );
 
         if ( basedirPath == null )
         {
@@ -117,4 +157,36 @@ public class WrapperHelper
         return basedir;
     }
 
+    /**
+     * Returns WrapperConfWrapper for the wrapper.conf of the bundle. It may be used with WrapperEditor for some
+     * high-level editing.
+     * 
+     * @return
+     */
+    public static WrapperConfWrapper getWrapperConfWrapper()
+    {
+        return getWrapperConfWrapper( getWrapperConfFile() );
+    }
+
+    /**
+     * Returns WrapperConfWrapper for the backed-up wrapper.conf of the bundle. It may be used with WrapperEditor for
+     * some high-level editing.
+     * 
+     * @return
+     */
+    public static WrapperConfWrapper getBackupWrapperConfWrapper()
+    {
+        return getWrapperConfWrapper( getBackupWrapperConfFile() );
+    }
+
+    /**
+     * Returns WrapperConfWrapper for the provided file. It may be used with WrapperEditor for some high-level editing.
+     * 
+     * @return
+     */
+    public static WrapperConfWrapper getWrapperConfWrapper( File fileToWrap )
+    {
+        // TODO: implement this
+        return null;
+    }
 }
