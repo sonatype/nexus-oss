@@ -62,14 +62,15 @@ public class DefaultFSLocalRepositoryStorage
     public static final String PROVIDER_STRING = "file";
 
     private static final String LINK_PREFIX = "LINK to ";
-    
+
     @Configuration( value = "${rename.retry.count}" )
     private String renameRetryCountString;
-    
+
     @Configuration( value = "${rename.retry.delay}" )
     private String renameRetryDelayString;
-    
+
     private int renameRetryCount = -1;
+
     private int renameRetryDelay = -1;
 
     /**
@@ -77,27 +78,27 @@ public class DefaultFSLocalRepositoryStorage
      */
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
-    
+
     protected int getRenameRetryCount()
     {
         if ( renameRetryCount == -1 )
         {
             initializeRenameRetryParams();
         }
-        
+
         return renameRetryCount;
     }
-    
+
     protected int getRenameRetryDelay()
     {
         if ( renameRetryDelay == -1 )
         {
             initializeRenameRetryParams();
         }
-        
+
         return renameRetryDelay;
     }
-    
+
     protected void initializeRenameRetryParams()
     {
         try
@@ -108,10 +109,9 @@ public class DefaultFSLocalRepositoryStorage
         catch ( NumberFormatException e )
         {
         }
-        
-        //initialize values, 0 isn't valid in either case
-        if ( renameRetryCount == 0
-            || renameRetryDelay == 0 )
+
+        // initialize values, 0 isn't valid in either case
+        if ( renameRetryCount == 0 || renameRetryDelay == 0 )
         {
             renameRetryCount = 0;
             renameRetryDelay = 0;
@@ -279,7 +279,7 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     DefaultStorageLinkItem link =
                         new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
-                            getLinkTarget( target ) );
+                                                    getLinkTarget( target ) );
                     getAttributesHandler().fetchAttributes( link );
                     link.setModified( target.lastModified() );
                     link.setCreated( target.lastModified() );
@@ -300,7 +300,7 @@ public class DefaultFSLocalRepositoryStorage
             {
                 DefaultStorageFileItem file =
                     new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                        new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
+                                                new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
@@ -396,7 +396,7 @@ public class DefaultFSLocalRepositoryStorage
 
                     IOUtil.close( os );
                 }
-                
+
                 handleRenameOperation( hiddenTarget, target );
 
                 target.setLastModified( item.getModified() );
@@ -450,8 +450,10 @@ public class DefaultFSLocalRepositoryStorage
 
                 FileOutputStream os = new FileOutputStream( target );
 
-                IOUtil.copy( new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() )
-                    .getBytes() ), os );
+                IOUtil.copy(
+                             new ByteArrayInputStream(
+                                                       ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() ).getBytes() ),
+                             os );
 
                 os.flush();
                 os.close();
@@ -470,26 +472,27 @@ public class DefaultFSLocalRepositoryStorage
             }
         }
     }
-    
+
     protected void handleRenameOperation( File hiddenTarget, File target )
         throws IOException
-    {  
+    {
         // delete the target, this is required on windows
         if ( target.exists() )
         {
-            target.delete();
+            FileUtils.forceDelete( target );
         }
-    
+
         // first try
         boolean success = hiddenTarget.renameTo( target );
-    
+
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
             getLogger().debug(
-                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
-                    + target.getAbsolutePath() + " will wait " + getRenameRetryDelay() + " milliseconds and try again" );
-    
+                               "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath()
+                                   + " --> " + target.getAbsolutePath() + " will wait " + getRenameRetryDelay()
+                                   + " milliseconds and try again" );
+
             try
             {
                 Thread.sleep( getRenameRetryDelay() );
@@ -497,14 +500,21 @@ public class DefaultFSLocalRepositoryStorage
             catch ( InterruptedException e )
             {
             }
-            
+
             success = hiddenTarget.renameTo( target );
         }
-    
+
         if ( !success )
         {
-            throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                + target.getAbsolutePath() + "\"!" );
+            try
+            {
+                FileUtils.rename( hiddenTarget, target );
+            }
+            catch ( IOException e )
+            {
+                throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
+                    + target.getAbsolutePath() + "\"! " + e.getMessage() );
+            }
         }
     }
 

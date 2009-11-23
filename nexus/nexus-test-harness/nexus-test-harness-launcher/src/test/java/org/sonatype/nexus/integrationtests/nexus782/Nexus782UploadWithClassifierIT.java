@@ -21,6 +21,7 @@ import java.util.Date;
 
 import org.apache.commons.httpclient.HttpException;
 import org.junit.Test;
+import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
@@ -29,36 +30,14 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 public class Nexus782UploadWithClassifierIT
     extends AbstractNexusIntegrationTest
 {
-    
-    private Gav artifactGav = new Gav(
-        this.getTestId(),
-        "same-pom",
-        "1.2.5",
-        null,
-        "jar",
-        0,
-        new Date().getTime(),
-        "same-pom",
-        false,
-        false,
-        null,
-        false,
-        null );
 
-    private Gav artifactClassifierGav = new Gav(
-        this.getTestId(),
-        "same-pom",
-        "1.2.5",
-        "CLASSIFIER",
-        "jar",
-        0,
-        new Date().getTime(),
-        "same-pom",
-        false,
-        false,
-        null,
-        false,
-        null );
+    private Gav artifactGav =
+        new Gav( this.getTestId(), "same-pom", "1.2.5", null, "jar", 0, new Date().getTime(), "same-pom", false, false,
+                 null, false, null );
+
+    private Gav artifactClassifierGav =
+        new Gav( this.getTestId(), "same-pom", "1.2.5", "CLASSIFIER", "jar", 0, new Date().getTime(), "same-pom",
+                 false, false, null, false, null );
 
     public Nexus782UploadWithClassifierIT()
         throws Exception
@@ -67,8 +46,7 @@ public class Nexus782UploadWithClassifierIT
 
     @Test
     public void withSamePomNoExtention()
-        throws HttpException,
-            IOException
+        throws HttpException, IOException
     {
 
         File artifactFile = this.getTestFile( "same-pom/same-pom.jar" );
@@ -76,24 +54,27 @@ public class Nexus782UploadWithClassifierIT
         File pomFile = this.getTestFile( "same-pom/pom.xml" );
 
         // upload jar artifact
-        DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, null );
+        int result = DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, null );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // make sure everything is cool so far
         this.checkUpload( this.artifactGav, artifactFile );
 
         // upload jar artifact with classifier
-        DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile, this.artifactClassifierGav.getClassifier(), null );
+        result =
+            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
+                                                this.artifactClassifierGav.getClassifier(), null );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // now check files again
         this.checkUpload( this.artifactGav, artifactFile );
         this.checkUpload( this.artifactClassifierGav, artifactClassifierFile );
-        
+
     }
-    
+
     @Test
     public void withSamePomExtention()
-        throws HttpException,
-            IOException
+        throws HttpException, IOException
     {
 
         File artifactFile = this.getTestFile( "same-pom/same-pom.jar" );
@@ -101,18 +82,25 @@ public class Nexus782UploadWithClassifierIT
         File pomFile = this.getTestFile( "same-pom/pom.xml" );
 
         // upload jar artifact
-        DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, this.artifactGav.getExtension() );
+        int result =
+            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null,
+                                                this.artifactGav.getExtension() );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // make sure everything is cool so far
         this.checkUpload( this.artifactGav, artifactFile );
 
         // upload jar artifact with classifier
-        DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile, this.artifactClassifierGav.getClassifier(), this.artifactClassifierGav.getExtension() );
+        result =
+            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
+                                                this.artifactClassifierGav.getClassifier(),
+                                                this.artifactClassifierGav.getExtension() );
+        assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // now check files again
         this.checkUpload( this.artifactGav, artifactFile );
         this.checkUpload( this.artifactClassifierGav, artifactClassifierFile );
-        
+
     }
 
     private void checkUpload( Gav gav, File originalFile )

@@ -44,6 +44,7 @@ public class DefaultRepositoryItemUid
     private static final ThreadLocal<Map<String, Stack<LockStep>>> threadCtx =
         new ThreadLocal<Map<String, Stack<LockStep>>>()
         {
+            @Override
             protected synchronized Map<String, Stack<LockStep>> initialValue()
             {
                 return new HashMap<String, Stack<LockStep>>();
@@ -115,6 +116,7 @@ public class DefaultRepositoryItemUid
     /**
      * toString() will return a "string representation" of this UID in form of repoId + ":" + path
      */
+    @Override
     public String toString()
     {
         return getRepository().getId() + ":" + getPath();
@@ -181,7 +183,15 @@ public class DefaultRepositoryItemUid
         if ( step != null && step.isReadLockLastLocked() && !action.isReadAction() )
         {
             // we need lock upgrade (r->w)
-            getActionLock( rwLock, true ).unlock();
+            try
+            {
+                getActionLock( rwLock, true ).unlock();
+            }
+            catch ( IllegalMonitorStateException e )
+            {
+                throw new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' caused by: "
+                    + e.getMessage() );
+            }
 
             getActionLock( rwLock, action.isReadAction() ).lock();
 
