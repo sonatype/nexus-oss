@@ -47,6 +47,7 @@ import com.thoughtworks.xstream.XStream;
 public class RepositoryMessageUtil
 {
     public static final String ALL_SERVICE_PART = RequestFacade.SERVICE_LOCAL + "all_repositories";
+
     public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repositories";
 
     private XStream xstream;
@@ -98,7 +99,7 @@ public class RepositoryMessageUtil
         // TODO: add check for this
 
         // format is not used anymore, removing the check
-//        Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
+        // Assert.assertEquals( repo.getFormat(), responseResource.getFormat() );
         Assert.assertEquals( repo.getRepoType(), responseResource.getRepoType() );
 
         if ( repo.getRepoType().equals( "virtual" ) )
@@ -200,8 +201,7 @@ public class RepositoryMessageUtil
     public Response sendMessage( Method method, RepositoryBaseResource resource, String id )
         throws IOException
     {
-        if ( resource != null 
-            && resource.getProviderRole() == null )
+        if ( resource != null && resource.getProviderRole() == null )
         {
             if ( "virtual".equals( resource.getRepoType() ) )
             {
@@ -212,7 +212,7 @@ public class RepositoryMessageUtil
                 resource.setProviderRole( Repository.class.getName() );
             }
         }
-        
+
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", mediaType );
 
         String idPart = ( method == Method.POST ) ? "" : "/" + id;
@@ -238,7 +238,7 @@ public class RepositoryMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
+     * 
      * @return
      * @throws IOException
      */
@@ -257,7 +257,7 @@ public class RepositoryMessageUtil
         return resourceResponse.getData();
 
     }
-    
+
     public List<RepositoryListResource> getAllList()
         throws IOException
     {
@@ -270,7 +270,7 @@ public class RepositoryMessageUtil
         RepositoryListResourceResponse resourceResponse =
             (RepositoryListResourceResponse) representation.getPayload( new RepositoryListResourceResponse() );
 
-        return resourceResponse.getData();        
+        return resourceResponse.getData();
     }
 
     public RepositoryResource getResourceFromResponse( Response response )
@@ -311,10 +311,9 @@ public class RepositoryMessageUtil
         {
             RepositoryResource expected = (RepositoryResource) repo;
             CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
-            
 
             Assert.assertEquals( expected.getId(), cRepo.getId() );
-            
+
             Assert.assertEquals( expected.getName(), cRepo.getName() );
 
             ContentClass expectedCc =
@@ -352,16 +351,16 @@ public class RepositoryMessageUtil
             }
 
             // check maven repo props (for not just check everything that is a Repository
-            if( expected.getProvider().matches( "maven[12]" ))
+            if ( expected.getProvider().matches( "maven[12]" ) )
             {
                 M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repo.getId() );
-                
+
                 if ( expected.getChecksumPolicy() != null )
                 {
                     Assert.assertEquals( expected.getChecksumPolicy(), cM2Repo.getChecksumPolicy().name() );
                 }
-                
-                Assert.assertEquals( expected.getRepoPolicy(), cM2Repo.getRepositoryPolicy().name() );    
+
+                Assert.assertEquals( expected.getRepoPolicy(), cM2Repo.getRepositoryPolicy().name() );
             }
         }
 
@@ -394,7 +393,7 @@ public class RepositoryMessageUtil
         }
 
         // let s w8 a few time for indexes
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     public static void updateIncrementalIndexes( String... repositories )

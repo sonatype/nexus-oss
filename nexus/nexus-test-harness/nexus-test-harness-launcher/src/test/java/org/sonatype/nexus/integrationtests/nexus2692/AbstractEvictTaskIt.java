@@ -7,8 +7,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +21,7 @@ import java.util.regex.Pattern;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.junit.Before;
@@ -137,12 +140,9 @@ public class AbstractEvictTaskIt
         age.setId( "evictOlderCacheItemsThen" );
         age.setValue( String.valueOf( days ) );
 
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask(
-            EvictUnusedItemsTaskDescriptor.ID,
-            EvictUnusedItemsTaskDescriptor.ID,
-            100,
-            prop,
-            age );
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, 100, prop,
+                                      age );
 
         Assert.assertNotNull( "Task did not finish.", task );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
@@ -207,8 +207,7 @@ public class AbstractEvictTaskIt
         // make sure we don't have any empty directories
         Set<String> emptyDirectories = new HashSet<String>();
 
-        SortedSet<String> resultDirectories = this.getDirectoryPaths(  this
-            .getStorageWorkDir());
+        SortedSet<String> resultDirectories = this.getDirectoryPaths( this.getStorageWorkDir() );
         for ( String itemPath : resultDirectories )
         {
             if ( itemPath.split( Pattern.quote( File.separator ) ).length != 1 )
@@ -276,9 +275,25 @@ public class AbstractEvictTaskIt
         return pathMap;
     }
 
-    public List<String> getNeverDeleteFiles()
+    public Collection<String> getNeverDeleteFiles()
     {
-        return neverDeleteFiles;
+        DirectoryScanner scan = new DirectoryScanner();
+        scan.setBasedir( new File( nexusWorkDir, "storage" ) );
+        scan.setIncludes( new String[] { "**/.index/*", "**/.meta/*" } );
+        scan.addDefaultExcludes();
+
+        scan.scan();
+
+        Collection<String> files = new LinkedHashSet<String>();
+        files.addAll( neverDeleteFiles );
+
+        String[] includes = scan.getIncludedFiles();
+        for ( String file : includes )
+        {
+            files.add( file.replace( '\\', '/' ) );
+        }
+
+        return files;
     }
 
 }

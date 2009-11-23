@@ -22,24 +22,18 @@ public class Nexus2692EvictHostedReleaseTaskIT
 
         // check files
         SortedSet<String> resultStorageFiles = this.getFilePaths( this.getStorageWorkDir() );
-        SortedSet<String> resultAttributeFiles = this.getFilePaths( this
-            .getAttributesWorkDir());
-
-        SortedSet<String> expectedResults = new TreeSet( this.getPathMap().keySet() );
-        // nothing should have been removed
+        SortedSet<String> resultAttributeFiles = this.getFilePaths( this.getAttributesWorkDir() );
 
         // unexpected deleted files
         SortedSet<String> storageDiff = new TreeSet( this.getPathMap().keySet() );
         storageDiff.removeAll( resultStorageFiles );
 
         SortedSet<String> attributeDiff = new TreeSet( this.getPathMap().keySet() );
-        attributeDiff.removeAll( resultStorageFiles );
+        attributeDiff.removeAll( resultAttributeFiles );
 
-        Assert.assertTrue(
-            "Files deleted that should not have been: " + this.prettyList( storageDiff ),
-            expectedResults.equals( resultStorageFiles ) );
-        Assert.assertTrue(
-            "Files deleted that should not have been: " + this.prettyList( attributeDiff ),
-            expectedResults.equals( resultAttributeFiles ) );
+        Assert.assertTrue( "Files deleted that should not have been: " + this.prettyList( storageDiff ),
+                           storageDiff.isEmpty() );
+        Assert.assertTrue( "Files deleted that should not have been: " + this.prettyList( attributeDiff ),
+                           attributeDiff.isEmpty() );
     }
 }
