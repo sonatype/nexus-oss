@@ -10,7 +10,7 @@
       <plugin>
         <groupId>com.sonatype.maven.plugins</groupId>
         <artifactId>maven-upload-plugin</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.a</version>
         <executions>
           <execution>
             <id>publish-site</id>

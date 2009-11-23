@@ -13,7 +13,6 @@
 
   <properties>
     <nexus.version>1.4.1-SNAPSHOT</nexus.version>
-    <tycho.version>0.4.0-DEV-3170</tycho.version>
     <nexus-licensing-plugin.version>1.4.1-SNAPSHOT</nexus-licensing-plugin.version>
   </properties>
 
@@ -45,13 +44,6 @@
         </executions>
         <configuration>
           <nexusVersion>${nexus.version}</nexusVersion>
-          <mavenArtifact>
-            <groupId>org.codehaus.tycho</groupId>
-            <artifactId>tycho-distribution</artifactId>
-            <classifier>bin</classifier>
-            <type>tar.gz</type>
-          </mavenArtifact>
-          <mavenBaseDir>tycho-distribution-${tycho.version}</mavenBaseDir>
           <nexusPluginsArtifacts>
             <license>
               <groupId>com.sonatype.nexus.plugin</groupId>
@@ -67,6 +59,23 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>failsafe-maven-plugin</artifactId>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assemble/repo.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -104,13 +113,20 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.tycho</groupId>
-      <artifactId>tycho-distribution</artifactId>
-      <version>${tycho.version}</version>
-      <classifier>bin</classifier>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>3.0-alpha-4</version>
       <type>tar.gz</type>
+      <classifier>bin</classifier>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
   </dependencies>
 
   <profiles>

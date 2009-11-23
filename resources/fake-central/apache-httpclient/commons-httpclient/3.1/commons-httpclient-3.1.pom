@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>apache-httpclient</groupId>
+  <artifactId>commons-httpclient</artifactId>
+  <name>HttpClient</name>
+  <version>3.1</version>
+  <description>The HttpClient  component supports the client-side of RFC 1945 (HTTP/1.0)  and RFC 2616 (HTTP/1.1) , several related specifications (RFC 2109 (Cookies) , RFC 2617 (HTTP Authentication) , etc.), and provides a framework by which new request types (methods) or HTTP extensions can be created easily.</description>
+  <url>http://jakarta.apache.org/httpcomponents/httpclient-3.x/</url>
+  <licenses>
+   <license>
+     <name>apache-2.0</name>
+     <url>http://apache.org/licenses/LICENSE-2.0.txt</url>
+   </license>
+  </licenses>    
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.2</version>
+    </dependency>
+  </dependencies>
+</project>
