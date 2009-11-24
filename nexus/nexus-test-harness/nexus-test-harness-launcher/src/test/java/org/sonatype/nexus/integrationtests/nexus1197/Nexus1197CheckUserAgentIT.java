@@ -15,11 +15,12 @@ package org.sonatype.nexus.integrationtests.nexus1197;
 
 import java.io.FileNotFoundException;
 
-import junit.framework.Assert;
-
+import org.hamcrest.CoreMatchers;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.internal.matchers.StringContains;
 import org.mortbay.jetty.Server;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -75,7 +76,8 @@ public class Nexus1197CheckUserAgentIT
 
         Assert.assertNotNull( userAgent );
         Assert.assertTrue( userAgent.startsWith( "Nexus/" ) );
-        Assert.assertTrue( userAgent.contains( "(OSS;" ) );
+        Assert.assertThat( userAgent, CoreMatchers.anyOf( StringContains.containsString( "(OSS" ),
+                                                          StringContains.containsString( "(PRO" ) ) );
 
     }
 
