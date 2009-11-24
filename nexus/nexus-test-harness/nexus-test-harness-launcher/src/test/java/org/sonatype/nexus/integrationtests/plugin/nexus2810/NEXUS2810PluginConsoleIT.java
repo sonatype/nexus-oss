@@ -2,13 +2,14 @@ package org.sonatype.nexus.integrationtests.plugin.nexus2810;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.internal.matchers.IsCollectionContaining;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.test.utils.plugin.PluginConsoleMessageUtil;
@@ -38,7 +39,8 @@ public class NEXUS2810PluginConsoleIT
     {
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-        Assert.assertEquals( 3, pluginInfos.size() );
+        Assert.assertThat( getPluginsNames( pluginInfos ),
+                           IsCollectionContaining.hasItems( "Nexus Plugin Console Plugin", "Nexus Broken Plugin" ) );
 
         PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus Plugin Console Plugin" );
         assertPropertyValid( "Name", pluginConsolePlugin.getName(), "Nexus Plugin Console Plugin" );
@@ -51,7 +53,7 @@ public class NEXUS2810PluginConsoleIT
         Assert.assertTrue( StringUtils.isEmpty( pluginConsolePlugin.getFailureReason() ) );
         Assert.assertTrue( !pluginConsolePlugin.getRestInfos().isEmpty() );
 
-        PluginInfoDTO pgpPlugin = this.getPluginInfoByName( pluginInfos, "Nexus Enterprise Plugin :: PGP" );
+        PluginInfoDTO pgpPlugin = this.getPluginInfoByName( pluginInfos, "Nexus Broken Plugin" );
         assertPropertyValid( "Name", pgpPlugin.getName() );
         assertPropertyValid( "Version", pgpPlugin.getVersion() );
         assertPropertyValid( "Status", pgpPlugin.getStatus(), "BROKEN" );
@@ -62,7 +64,22 @@ public class NEXUS2810PluginConsoleIT
         Assert.assertFalse( StringUtils.isEmpty( pgpPlugin.getFailureReason() ) );
         Assert.assertTrue( pgpPlugin.getRestInfos().isEmpty() );
     }
-    
+
+    private List<String> getPluginsNames( List<PluginInfoDTO> pluginInfos )
+    {
+        if ( pluginInfos == null )
+        {
+            return null;
+        }
+
+        List<String> names = new ArrayList<String>();
+        for ( PluginInfoDTO pluginInfoDTO : pluginInfos )
+        {
+            names.add( pluginInfoDTO.getName() );
+        }
+        return names;
+    }
+
     private PluginInfoDTO getPluginInfoByName( List<PluginInfoDTO> pluginInfos, String name )
     {
         for ( PluginInfoDTO pluginInfo : pluginInfos )
