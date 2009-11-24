@@ -14,11 +14,12 @@
 package org.sonatype.nexus.integrationtests.nexus930;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
+import org.junit.internal.matchers.IsCollectionContaining;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -53,19 +54,17 @@ public class Nexus930AutoDiscoverComponentIT
     {
         String role = "repo_content_classes";
         // do admin
-        List<PlexusComponentListResource> result1 = this.getResult(
-            role,
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML );
-        Assert.assertEquals( "Expected list should have size() equal 2.", 2, result1.size() );
+        List<PlexusComponentListResource> result1 =
+            this.getResult( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        Assert.assertThat( getHints( result1 ), IsCollectionContaining.hasItems( "maven1", "maven2" ) );
 
         // 403 test
         this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
-            .getStatus().isClientError() );
+        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(),
+                           response.getStatus().isClientError() );
         Assert.assertEquals( 403, response.getStatus().getCode() );
 
         // only content class priv
@@ -76,16 +75,29 @@ public class Nexus930AutoDiscoverComponentIT
         Assert.assertTrue( response.getStatus().isSuccess() );
     }
 
+    private List<String> getHints( List<PlexusComponentListResource> result1 )
+    {
+        if ( result1 == null )
+        {
+            return null;
+        }
+
+        List<String> hints = new ArrayList<String>();
+        for ( PlexusComponentListResource plexusComponentListResource : result1 )
+        {
+            hints.add( plexusComponentListResource.getRoleHint() );
+        }
+        return hints;
+    }
+
     @Test
     public void testScheduledTaskTypeComonentListPlexusResource()
         throws Exception
     {
         String role = "schedule_types";
         // do admin
-        List<PlexusComponentListResource> result1 = this.getResult(
-            role,
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML );
+        List<PlexusComponentListResource> result1 =
+            this.getResult( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
         Assert.assertTrue( "Expected list larger then 1.", result1.size() > 1 );
 
         // 403 test
@@ -93,8 +105,8 @@ public class Nexus930AutoDiscoverComponentIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(), response
-            .getStatus().isClientError() );
+        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(),
+                           response.getStatus().isClientError() );
         Assert.assertEquals( 403, response.getStatus().getCode() );
 
         // only content class priv
@@ -113,10 +125,10 @@ public class Nexus930AutoDiscoverComponentIT
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
-        PlexusComponentListResourceResponse resourceResponse = (PlexusComponentListResourceResponse) representation
-            .getPayload( new PlexusComponentListResourceResponse() );
+        PlexusComponentListResourceResponse resourceResponse =
+            (PlexusComponentListResourceResponse) representation.getPayload( new PlexusComponentListResourceResponse() );
 
-        return (List<PlexusComponentListResource>) resourceResponse.getData();
+        return resourceResponse.getData();
     }
 
     private Response sendMessage( String role, XStream xstream, MediaType mediaType )
