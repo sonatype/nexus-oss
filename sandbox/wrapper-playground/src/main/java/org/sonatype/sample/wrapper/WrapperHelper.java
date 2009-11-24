@@ -210,6 +210,18 @@ public class WrapperHelper
         return new DefaultWrapperConfWrapper( fileToWrap );
     }
 
+    /**
+     * Returns WrapperConfWrapper for the provided file. It may be used with WrapperEditor for some high-level editing.
+     * 
+     * @return
+     * @throws IOException if the file that is to be load broken, not found, etc.
+     */
+    public static WrapperEditor getWrapperEditor( File fileToWrap )
+        throws IOException
+    {
+        return new DefaultWrapperEditor( getWrapperConfWrapper( fileToWrap ) );
+    }
+
     // == private stuff
 
 }
