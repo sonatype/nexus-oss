@@ -1,8 +1,5 @@
 package org.sonatype.sample.wrapper;
 
-import java.io.File;
-import java.io.IOException;
-
 /**
  * The "low level" abstraction around wrapper.conf, or any other Java properties-like file that uses similar notation
  * for lists like wrapper.conf does (".1 .2 etc" suffixes to keys).
@@ -10,28 +7,8 @@ import java.io.IOException;
  * @author cstamas
  */
 public interface WrapperConfWrapper
+    extends PersistedConfiguration
 {
-    /**
-     * Resets the editor by reloading original wrapper.conf it is pointed to. Looses all changes made so fat not saved.
-     */
-    void reset();
-
-    /**
-     * Persists back the loaded wrapper.conf. reset() will not revert to original!
-     * 
-     * @throws IOException
-     */
-    void save()
-        throws IOException;
-
-    /**
-     * Persists the wrapper.conf to the supplied file, not overwriting the original. reset() will revert to original!
-     * 
-     * @throws IOException
-     */
-    void save( File target )
-        throws IOException;
-
     /**
      * Getter for "single-keyed" properties. Will not look for ".1 .2, etc" suffixes.
      * 
@@ -42,12 +19,47 @@ public interface WrapperConfWrapper
     String getProperty( String key, String defaultValue );
 
     /**
+     * Getter for "single-keyed" properties. Will not look for ".1 .2, etc" suffixes. As default value, returns null.
+     * 
+     * @param key
+     * @param defaultValue
+     * @return the found value, or null if key not found.
+     */
+    String getProperty( String key );
+
+    /**
+     * Getter for "single-keyed" properties as integer. Will not look for ".1 .2, etc" suffixes.
+     * 
+     * @param key
+     * @param defaultValue
+     * @return the found value, or null if key not found.
+     */
+    int getIntegerProperty( String key, int defaultValue );
+
+    /**
      * Setter for "single-keyed" properties. Will not try to figure out ".1 .2 etc suffixes.
      * 
      * @param key
      * @param value
      */
     void setProperty( String key, String value );
+
+    /**
+     * Setter for "single-keyed" properties as integer. Will not try to figure out ".1 .2 etc suffixes.
+     * 
+     * @param key
+     * @param value
+     */
+    void setIntegerProperty( String key, int value );
+
+    /**
+     * Setter for "single-keyed" properties. Will not try to figure out ".1 .2 etc suffixes. Removes the key=value pair
+     * from file.
+     * 
+     * @param key
+     * @return true if founf and removed
+     */
+    boolean removeProperty( String key );
 
     /**
      * Getter for "multi-keyed" properties. Here, the key is appended by ".1 .2 etc" suffixes to read the values, as
@@ -60,7 +72,7 @@ public interface WrapperConfWrapper
 
     /**
      * Setter for "multi-keyed" properties. Here, the key will be appended with ".1 .2 etc" suffixes when written, as
-     * needed. Supplying null as values, or empty array WILL DELETE the settings.
+     * needed in order as in supplied array. Supplying null as values, or empty array WILL DELETE the settings.
      * 
      * @param key
      * @param values the values to write to. If null or empty array, it will result in DELETION of params.

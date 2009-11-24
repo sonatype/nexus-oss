@@ -9,6 +9,7 @@ import java.util.List;
  * @author cstamas
  */
 public interface WrapperEditor
+    extends PersistedConfiguration
 {
     /**
      * Returns the wrapper startup timeout in seconds.
@@ -59,8 +60,7 @@ public interface WrapperEditor
     void setWrapperJavaMainclass( String cls );
 
     /**
-     * Returns the unchangeable list of wrapper.java.classpath settings. The order in list follows wrapper.conf
-     * "notation":
+     * Returns a changeable list of wrapper.java.classpath settings. The order in list follows wrapper.conf "notation":
      * 
      * <pre>
      * wrapper.java.classpath.1=../../../lib/*.jar
@@ -69,7 +69,7 @@ public interface WrapperEditor
      * 
      * Note: First index is 1, not 0, but in Java List implementation, we follow the Java-way, hence
      * wrapper.java.classpath.1 becomes 1st element of the returned list on index 0. Changes to this list are <b>not</b>
-     * persisted!
+     * persisted! Use setWrapperJavaClasspath() to persist it!
      * 
      * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-classpath-n.html.
      * @return
@@ -82,8 +82,9 @@ public interface WrapperEditor
      * 
      * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-classpath-n.html.
      * @param classpathElem
+     * @return true
      */
-    void addWrapperJavaClasspath( String classpathElem );
+    boolean addWrapperJavaClasspath( String classpathElem );
 
     /**
      * Removes 1st occurence of the provided parameter from wrapper.conf wrapper.java.classpath list, potentionally
@@ -91,16 +92,62 @@ public interface WrapperEditor
      * 
      * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-classpath-n.html.
      * @param classpathElem
+     * @return true if elem found and removed
      */
-    void removeWrapperJavaClasspath( String classpathElem );
+    boolean removeWrapperJavaClasspath( String classpathElem );
 
     /**
-     * Adds new element to wrapper.conf wrapper.java.classpath configuration, potentionally shifting down all elements
-     * after pos to pos+1. First index is 1, not 0!
+     * Replaces all elements in wrapper.conf wrapper.java.classpath configuration.
      * 
      * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-classpath-n.html.
      * @param pos
      * @param classpathElem
      */
-    void addWrapperJavaClasspath( int pos, String classpathElem );
+    void setWrapperJavaClasspath( List<String> classpathElems );
+
+    /**
+     * Returns a changeable list of wrapper.java.additional settings. The order in list follows wrapper.conf "notation":
+     * 
+     * <pre>
+     * wrapper.java.additional.1=-d32
+     * wrapper.java.additional.2=-Xmx512
+     * </pre>
+     * 
+     * Note: First index is 1, not 0, but in Java List implementation, we follow the Java-way, hence
+     * wrapper.java.additional.1 becomes 1st element of the returned list on index 0. Changes to this list are
+     * <b>not</b> persisted! Use setWrapperJavaAdditional() to persist it!
+     * 
+     * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-additional-n.html.
+     * @return
+     */
+    List<String> getWrapperJavaAdditional();
+
+    /**
+     * Adds a new element to wrapper.conf wrapper.java.classpath configuration, to the last position. First index is 1,
+     * not 0!
+     * 
+     * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-additional-n.html.
+     * @param additionalElem
+     * @return true
+     */
+    boolean addWrapperJavaAdditional( String additionalElem );
+
+    /**
+     * Removes 1st occurence of the provided parameter from wrapper.conf wrapper.java.classpath list, potentionally
+     * shiting up all elements after it from pos to pos-1. First index is 1, not 0!
+     * 
+     * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-additional-n.html.
+     * @param additionalElem
+     * @return true if elem found and removed
+     */
+    boolean removeWrapperJavaAdditional( String additionalElem );
+
+    /**
+     * Replaces all elements in wrapper.conf wrapper.java.classpath configuration.
+     * 
+     * @see http://wrapper.tanukisoftware.org/doc/english/prop-java-additional-n.html.
+     * @param pos
+     * @param additionalElems
+     */
+    void setWrapperJavaAdditional( List<String> additionalElems );
 }

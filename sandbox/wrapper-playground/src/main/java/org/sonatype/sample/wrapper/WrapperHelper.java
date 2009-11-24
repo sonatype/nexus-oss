@@ -2,6 +2,7 @@ package org.sonatype.sample.wrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 
 import org.codehaus.plexus.util.FileUtils;
 
@@ -89,6 +90,18 @@ public class WrapperHelper
         throws IOException
     {
         FileUtils.copyFile( file, getWrapperConfFile() );
+    }
+
+    /**
+     * Replaces the wrapper.conf file with the provided one. Nice to have if configuration file comes from classpath.
+     * 
+     * @param url
+     * @throws IOException
+     */
+    public static void swapInWrapperConf( URL url )
+        throws IOException
+    {
+        FileUtils.copyURLToFile( url, getWrapperConfFile() );
     }
 
     /**
@@ -194,7 +207,9 @@ public class WrapperHelper
     public static WrapperConfWrapper getWrapperConfWrapper( File fileToWrap )
         throws IOException
     {
-        // TODO: implement this
-        return null;
+        return new DefaultWrapperConfWrapper( fileToWrap );
     }
+
+    // == private stuff
+
 }

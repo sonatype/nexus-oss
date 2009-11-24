@@ -8,11 +8,12 @@
   <name>wrapper-playground</name>
   <url>http://maven.apache.org</url>
   <dependencies>
+    <!-- Minimize dependencies, uing p-u for tests only -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <version>1.5.5</version>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
