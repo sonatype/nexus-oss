@@ -81,6 +81,34 @@ public class GroupMetadataMergeTest
         assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
         assertEquals( "20090620231210", md.getVersioning().getLastUpdated() );
     }
+    
+    public void testGAMerge2()
+        throws Exception
+    {
+        String mdPath = "/md-merge/ga2/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( "org.distribution.core", md.getGroupId() );
+        assertEquals( "core", md.getArtifactId() );
+
+        assertEquals( "2.3.0.5-SNAPSHOT", md.getVersioning().getLatest() );
+        assertEquals( "2.3.0.4", md.getVersioning().getRelease() );
+        String[] versions = {
+            "2.3.0.2-SNAPSHOT",
+            "2.3.0.2",
+            "2.3.0.3-SNAPSHOT",
+            "2.3.0.3",
+            "2.3.0.4-SNAPSHOT",
+            "2.3.0.4",
+            "2.3.0.5-SNAPSHOT" };
+        assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
+        assertEquals( "20091124120836", md.getVersioning().getLastUpdated() );
+    }
+
 
     /**
      * Merge 3 GA maven-metadata.xml
