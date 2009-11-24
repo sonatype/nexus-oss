@@ -189,8 +189,12 @@ public class DefaultRepositoryItemUid
             }
             catch ( IllegalMonitorStateException e )
             {
-                throw new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' caused by: "
-                    + e.getMessage() );
+                // increasing the details level
+                IllegalMonitorStateException ie =
+                    new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' caused by: "
+                        + e.getMessage() );
+                ie.initCause( e );
+                throw ie;
             }
 
             getActionLock( rwLock, action.isReadAction() ).lock();
