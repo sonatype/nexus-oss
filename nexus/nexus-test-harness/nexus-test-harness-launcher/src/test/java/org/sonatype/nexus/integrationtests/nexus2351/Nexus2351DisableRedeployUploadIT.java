@@ -13,7 +13,6 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
@@ -261,14 +260,14 @@ public class Nexus2351DisableRedeployUploadIT
         }
 
     }
-    
+
     @Override
     protected void beforeStartClean()
         throws Exception
     {
         // TODO Auto-generated method stub
         super.beforeStartClean();
-        
+
         FileUtils.writeStringToFile( new File( nexusLogDir, "nexus.log" ), "" );
         FileUtils.writeStringToFile( new File( nexusLogDir, "tests.log" ), "" );
 

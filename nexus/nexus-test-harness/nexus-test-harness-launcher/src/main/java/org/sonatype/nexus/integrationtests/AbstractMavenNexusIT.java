@@ -109,7 +109,7 @@ public class AbstractMavenNexusIT
     protected void failTest( Verifier verifier )
         throws IOException
     {
-        File logFile = new File( verifier.getBasedir(), "log.txt" );
+        File logFile = new File( verifier.getBasedir(), verifier.getLogFileName() );
         String log = FileUtils.readFileToString( logFile );
         Assert.fail( log );
     }
