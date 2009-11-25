@@ -256,7 +256,7 @@ public class M2GavCalculator
     {
         StringBuffer path = new StringBuffer( "/" );
 
-        path.append( gav.getGroupId().replaceAll( "\\.", "/" ) );
+        path.append( gav.getGroupId().replaceAll( "(?m)(.)\\.", "$1/" ) ); // replace all '.' except the first char
 
         path.append( "/" );
 

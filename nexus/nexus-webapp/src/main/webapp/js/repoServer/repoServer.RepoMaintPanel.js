@@ -163,7 +163,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
       { 
         name: 'format',
         header: 'Format', 
-        width: 50 
+        width: 70 
       },
       { 
         name: 'repoPolicy',
