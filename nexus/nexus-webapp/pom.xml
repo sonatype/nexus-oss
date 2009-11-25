@@ -41,6 +41,16 @@
       <artifactId>nexus-lvo-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+	  <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+	  <version>${nexus-plugin-console-plugin.version}</version>
+	  <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>                  
+    
     <!-- The bundle -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
