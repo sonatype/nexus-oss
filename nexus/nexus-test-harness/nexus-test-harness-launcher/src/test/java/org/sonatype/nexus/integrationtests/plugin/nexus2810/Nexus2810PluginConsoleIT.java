@@ -14,7 +14,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.sonatype.nexus.test.utils.plugin.PluginConsoleMessageUtil;
 
-public class NEXUS2810PluginConsoleIT
+public class Nexus2810PluginConsoleIT
     extends AbstractNexusIntegrationTest
 {
 
