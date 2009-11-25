@@ -25,6 +25,7 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
@@ -75,19 +76,26 @@ public abstract class AbstractIndexContentPlexusResource
         {
             Repository repository = getRepositoryRegistry().getRepository( repositoryId );
             
-            TreeNodeFactory factory = new IndexBrowserTreeNodeFactory( 
-                indexerManager.getRepositoryBestIndexContext( repository.getId() ), 
-                repository, 
-                createRedirectBaseRef( request ).toString() );
-            
-            TreeNode node = indexerManager.listNodes( factory, repository, path );
-            
-            if ( node == null )
+            if( GroupRepository.class.isInstance( repository ) || repository.isSearchable() )
             {
-                throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Unable to retrieve index tree nodes" );
+                TreeNodeFactory factory = new IndexBrowserTreeNodeFactory( 
+                    indexerManager.getRepositoryBestIndexContext( repository.getId() ), 
+                    repository, 
+                    createRedirectBaseRef( request ).toString() );
+                
+                TreeNode node = indexerManager.listNodes( factory, repository, path );
+                
+                if ( node == null )
+                {
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Unable to retrieve index tree nodes" );
+                }
+                
+                return new IndexBrowserTreeViewResponseDTO( ( IndexBrowserTreeNode ) node );
             }
-            
-            return new IndexBrowserTreeViewResponseDTO( ( IndexBrowserTreeNode ) node );
+            else
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "The index is disabled for this repository." ); 
+            }
         }
         catch ( NoSuchRepositoryAccessException e )
         {
