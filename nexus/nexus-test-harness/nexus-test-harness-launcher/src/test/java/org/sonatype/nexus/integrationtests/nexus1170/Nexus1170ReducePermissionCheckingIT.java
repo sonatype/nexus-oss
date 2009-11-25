@@ -13,56 +13,31 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1170;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.configuration.source.FileConfigurationSource;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
-import org.sonatype.security.model.CProperty;
-import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
+import org.sonatype.security.rest.model.PrivilegeProperty;
+import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 public class Nexus1170ReducePermissionCheckingIT
     extends AbstractNexusIntegrationTest
 {
-
-    private int getExpectedPrivilegeCount() throws Exception
-    {
-        NexusConfiguration configuration = container.lookup( NexusConfiguration.class );
-        ( ( FileConfigurationSource )configuration.getConfigurationSource()).setConfigurationFile( new File( getBasedir(), "target/plexus-home/nexus-work/conf/nexus.xml" ) );
-        configuration.loadConfiguration();
-        ConfigurationManager configManager = container.lookup( ConfigurationManager.class, "resourceMerging");
-
-        Set<String> privIds = new HashSet<String>();
-        for ( SecurityPrivilege priv : configManager.listPrivileges() )
-        {
-            for ( CProperty prop : priv.getProperties() )
-            {
-                if ( prop.getKey().equals( "permission" ) )
-                {
-                    privIds.add( prop.getValue() );
-                }
-            }
-        }
-        return privIds.size();
-    }
 
     public Nexus1170ReducePermissionCheckingIT()
     {
@@ -114,8 +89,8 @@ public class Nexus1170ReducePermissionCheckingIT
         this.checkPermission( permissions, "security:users", 0 );
         this.checkPermission( permissions, "nexus:logs", 0 );
         this.checkPermission( permissions, "nexus:configuration", 0 );
-		// no longer available by default
-        //this.checkPermission( permissions, "nexus:feeds", 1 );
+        // no longer available by default
+        // this.checkPermission( permissions, "nexus:feeds", 1 );
         this.checkPermission( permissions, "nexus:targets", 0 );
 
         this.checkPermission( permissions, "nexus:wastebasket", 0 );
@@ -142,18 +117,17 @@ public class Nexus1170ReducePermissionCheckingIT
             int count = 0;
             for ( ClientPermission inPermission : permissions )
             {
-              if(outPermission.getId().equals( inPermission.getId() ))
-              {
-                  count++;
-              }
-              if(count > 1)
-              {
-                  Assert.fail( "Duplicate privilege: "+ outPermission.getId() +" found count: "+ count);
-              }
+                if ( outPermission.getId().equals( inPermission.getId() ) )
+                {
+                    count++;
+                }
+                if ( count > 1 )
+                {
+                    Assert.fail( "Duplicate privilege: " + outPermission.getId() + " found count: " + count );
+                }
             }
 
         }
-
 
     }
 
@@ -172,21 +146,49 @@ public class Nexus1170ReducePermissionCheckingIT
         Assert.fail( "Did not find permission: " + permissions );
     }
 
+    private int getExpectedPrivilegeCount()
+        throws Exception
+    {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+        Set<String> privIds = new HashSet<String>();
+        List<PrivilegeStatusResource> privs =
+            new PrivilegesMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML ).getList();
+        for ( PrivilegeStatusResource priv : privs )
+        {
+            if ( priv.getType().equals( "method" ) )
+            {
+                for ( PrivilegeProperty prop : priv.getProperties() )
+                {
+                    if ( prop.getKey().equals( "permission" ) )
+                    {
+                        privIds.add( prop.getValue() );
+                    }
+                }
+            }
+        }
+        return privIds.size();
+        // return getUserPrivs( TestContainer.getInstance().getTestContext().getUsername() ).size();
+    }
+
     private List<ClientPermission> getPermissions()
         throws IOException
     {
-        Response response = RequestFacade
-            .sendMessage( RequestFacade.SERVICE_LOCAL + "authentication/login", Method.GET );
+        Response response =
+            RequestFacade.sendMessage( RequestFacade.SERVICE_LOCAL + "authentication/login", Method.GET );
 
         String responseText = response.getEntity().getText();
 
-        XStreamRepresentation representation = new XStreamRepresentation(
-            XStreamFactory.getXmlXStream(),
-            responseText,
-            MediaType.APPLICATION_XML );
+        if ( response.getStatus().isError() )
+        {
+            org.junit.Assert.fail( response.getStatus() + "\n" + responseText );
+        }
 
-        AuthenticationLoginResourceResponse resourceResponse = (AuthenticationLoginResourceResponse) representation
-            .getPayload( new AuthenticationLoginResourceResponse() );
+        XStreamRepresentation representation =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        AuthenticationLoginResourceResponse resourceResponse =
+            (AuthenticationLoginResourceResponse) representation.getPayload( new AuthenticationLoginResourceResponse() );
 
         AuthenticationLoginResource resource = resourceResponse.getData();
 

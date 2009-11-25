@@ -123,6 +123,21 @@ public abstract class AbstractPrivilegeTest
     protected void printUserPrivs( String userId )
         throws IOException
     {
+        ArrayList<String> privs = getUserPrivs( userId );
+
+        LOG.info( "User: " + userId );
+        for ( Iterator iter = privs.iterator(); iter.hasNext(); )
+        {
+            String privName = (String) iter.next();
+            LOG.info( "\t" + privName );
+        }
+    }
+
+    protected ArrayList<String> getUserPrivs( String userId )
+        throws IOException
+    {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
         UserResource user = this.userUtil.getUser( userId );
         ArrayList<String> privs = new ArrayList<String>();
 
@@ -149,13 +164,7 @@ public abstract class AbstractPrivilegeTest
 
             }
         }
-
-        LOG.info( "User: " + userId );
-        for ( Iterator iter = privs.iterator(); iter.hasNext(); )
-        {
-            String privName = (String) iter.next();
-            LOG.info( "\t" + privName );
-        }
+        return privs;
     }
 
     protected void giveUserPrivilege( String userId, String priv )
@@ -198,12 +207,12 @@ public abstract class AbstractPrivilegeTest
         // add it
         this.giveUserRole( userId, role.getId() );
     }
-    
+
     protected void giveUserRoleByName( String userId, String roleName )
         throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
+
         for ( RoleResource roleResource : roleUtil.getList() )
         {
             if ( roleResource.getName().equals( roleName ) )
@@ -331,7 +340,8 @@ public abstract class AbstractPrivilegeTest
     }
 
     protected void addPriv( String userName, String privId, String type, String repoTargetId, String repositoryId,
-                          String repositoryGroupId, String... methods  ) throws IOException
+                            String repositoryGroupId, String... methods )
+        throws IOException
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
@@ -347,7 +357,8 @@ public abstract class AbstractPrivilegeTest
             priv.addMethod( method );
         }
 
-        List<PrivilegeStatusResource> stat= privUtil.createPrivileges( priv );
+        List<PrivilegeStatusResource> stat = privUtil.createPrivileges( priv );
         addPrivilege( userName, stat.get( 0 ).getId() );
     }
+
 }
