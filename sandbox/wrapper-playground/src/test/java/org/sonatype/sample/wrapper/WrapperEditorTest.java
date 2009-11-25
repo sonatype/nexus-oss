@@ -2,6 +2,7 @@ package org.sonatype.sample.wrapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -36,6 +37,10 @@ public class WrapperEditorTest
         WrapperEditor editor = prepareCase( "c01" );
 
         assertEquals( "The startup timeout does not match!", 90, editor.getWrapperStartupTimeout() );
+
+        Map<String, String> allKeyValuePairs = editor.getWrapperConfWrapper().getAllKeyValuePairs();
+
+        assertEquals( "Not all entries are read!", 20, allKeyValuePairs.size() );
 
         editor.setWrapperStartupTimeout( 130 );
 

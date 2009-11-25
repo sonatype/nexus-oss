@@ -53,6 +53,11 @@ public class DefaultWrapperEditor
         wrapperConfWrapper.save( target );
     }
 
+    public WrapperConfWrapper getWrapperConfWrapper()
+    {
+        return wrapperConfWrapper;
+    }
+
     public int getWrapperStartupTimeout()
     {
         return wrapperConfWrapper.getIntegerProperty( WRAPPER_STARTUP_TIMEOUT, WRAPPER_STARTUP_TIMEOUT_DEFAULT );

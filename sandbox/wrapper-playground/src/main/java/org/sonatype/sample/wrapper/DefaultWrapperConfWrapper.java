@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -150,6 +152,30 @@ public class DefaultWrapperConfWrapper
 
     }
 
+    public Map<String, String> getAllKeyValuePairs()
+    {
+        // TODO: this is wrong implementation, since if there are multiple lines of same key, those will not be
+        // represented in result Map. Either use Multimap or something else should be done here.
+
+        HashMap<String, String> result = new HashMap<String, String>();
+
+        LinkedList<String> lines = getLines();
+
+        for ( String line : lines )
+        {
+            String key = getKeyFromLine( line );
+
+            if ( key != null )
+            {
+                String value = getValueFromLine( line, null );
+
+                result.put( key, value );
+            }
+        }
+
+        return result;
+    }
+
     // ==
 
     protected LinkedList<String> getLines()
@@ -207,7 +233,7 @@ public class DefaultWrapperConfWrapper
     {
         String[] elems = explodeLine( line );
 
-        if ( elems.length == 2 )
+        if ( elems != null && elems.length == 2 )
         {
             return elems[0];
         }
@@ -219,7 +245,7 @@ public class DefaultWrapperConfWrapper
     {
         String[] elems = explodeLine( line );
 
-        if ( elems.length == 2 )
+        if ( elems != null && elems.length == 2 )
         {
             return elems[1];
         }
@@ -229,6 +255,16 @@ public class DefaultWrapperConfWrapper
 
     protected String[] explodeLine( String line )
     {
-        return line.split( "\\s=\\s|\\s=|=\\s|\\s" );
+        if ( isLineCommentedOut( line ) )
+        {
+            return null;
+        }
+
+        return line.split( "\\s=\\s|\\s=|=\\s|=|\\s" );
+    }
+
+    protected boolean isLineCommentedOut( String line )
+    {
+        return line.startsWith( "#" );
     }
 }

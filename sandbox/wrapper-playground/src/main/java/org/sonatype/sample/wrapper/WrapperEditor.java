@@ -12,6 +12,13 @@ public interface WrapperEditor
     extends PersistedConfiguration
 {
     /**
+     * Returns the WrapperConfWrapper instance that this Editor uses under the hud.
+     * 
+     * @return
+     */
+    WrapperConfWrapper getWrapperConfWrapper();
+
+    /**
      * Returns the wrapper startup timeout in seconds.
      * 
      * @see http://wrapper.tanukisoftware.org/doc/english/prop-startup-timeout.html.

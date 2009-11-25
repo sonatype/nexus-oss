@@ -1,5 +1,7 @@
 package org.sonatype.sample.wrapper;
 
+import java.util.Map;
+
 /**
  * The "low level" abstraction around wrapper.conf, or any other Java properties-like file that uses similar notation
  * for lists like wrapper.conf does (".1 .2 etc" suffixes to keys).
@@ -78,4 +80,12 @@ public interface WrapperConfWrapper
      * @param values the values to write to. If null or empty array, it will result in DELETION of params.
      */
     void setPropertyList( String key, String[] values );
+
+    /**
+     * Returns a Map of all properties found in this file, of form "key = value". This method may be used to enumerate
+     * all the existing keys or values in file.
+     * 
+     * @return
+     */
+    Map<String, String> getAllKeyValuePairs();
 }
