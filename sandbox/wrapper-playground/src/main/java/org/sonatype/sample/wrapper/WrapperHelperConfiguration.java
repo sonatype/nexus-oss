@@ -1,5 +1,6 @@
 package org.sonatype.sample.wrapper;
 
+
 /**
  * A WrapperHelper configuration providing all the defaults for Sonatype Application Bundles, but still making those
  * overridable.

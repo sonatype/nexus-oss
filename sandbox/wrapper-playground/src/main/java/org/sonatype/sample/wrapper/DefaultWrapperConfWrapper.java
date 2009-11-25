@@ -12,15 +12,37 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.StringUtils;
 
 public class DefaultWrapperConfWrapper
     implements WrapperConfWrapper
 {
+    /**
+     * The file from where we load the config.
+     */
     private final File wrapperConfFile;
 
+    /**
+     * Lines of the files beeing edited
+     */
     private LinkedList<String> lines;
+
+    /**
+     * The pattern used to detect commented out lines. The default is "starts with '#'" (but watch for blanklines).
+     */
+    private Pattern commentPattern = Pattern.compile( "^\\s*#\\s*.*" );
+
+    public Pattern getCommentPattern()
+    {
+        return commentPattern;
+    }
+
+    public void setCommentPattern( Pattern commentPattern )
+    {
+        this.commentPattern = commentPattern;
+    }
 
     public DefaultWrapperConfWrapper( File file )
         throws IOException
@@ -265,6 +287,16 @@ public class DefaultWrapperConfWrapper
 
     protected boolean isLineCommentedOut( String line )
     {
-        return line.startsWith( "#" );
+        Pattern pattern = getCommentPattern();
+
+        if ( pattern != null )
+        {
+            return getCommentPattern().matcher( line ).matches();
+        }
+        else
+        {
+            // no comment pattern, no comments
+            return false;
+        }
     }
 }
