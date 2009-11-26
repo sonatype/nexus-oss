@@ -27,7 +27,7 @@ public class AppContextFactory
     {
         this.appContextHelper = helper;
     }
-    
+
     public AppContextHelper getAppContextHelper()
     {
         return appContextHelper;
@@ -59,7 +59,7 @@ public class AppContextFactory
         return new DefaultAppContextRequest();
     }
 
-    public AppContextResponse getAppContext( AppContextRequest request )
+    public AppContext getAppContext( AppContextRequest request )
         throws AppContextException
     {
         // environment is a map of properties that comes from "environment": env vars and JVM system properties.
@@ -104,7 +104,7 @@ public class AppContextFactory
         // finally put basedir in
         rawContext.put( appContextHelper.getConfiguration().getBasedirPropertyKey(), getBasedir().getAbsolutePath() );
 
-        AppContextResponse result = new DefaultAppContextResponse( request.getName(), getBasedir(), context, rawContext );
+        AppContext result = new DefaultAppContext( this, request.getName(), getBasedir(), context, rawContext );
 
         // Now that we have containerContext with proper values, set them back into System properties and
         // dump them to System.out for reference.

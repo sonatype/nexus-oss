@@ -33,9 +33,9 @@ public class AppContextFactoryTest
         // add it to fillers as very 1st resource, and leaving others in
         request.getContextFillers().add( 0, plexusPropertiesFiller );
 
-        AppContextResponse appContext = ctxFactory.getAppContext( request );
+        AppContext appContext = ctxFactory.getAppContext( request );
 
-        assertEquals( 4, appContext.getContext().size() );
+        assertEquals( 5, appContext.size() );
     }
 
 }

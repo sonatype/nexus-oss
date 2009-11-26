@@ -10,9 +10,9 @@ import java.util.Map;
 public class AppContextContextFiller
     implements ContextFiller
 {
-    private AppContextResponse source;
+    private AppContext source;
 
-    public AppContextContextFiller( AppContextResponse source )
+    public AppContextContextFiller( AppContext source )
     {
         this.source = source;
     }
@@ -21,18 +21,18 @@ public class AppContextContextFiller
         throws AppContextException
     {
         // just dump it in
-        for ( Map.Entry<Object, Object> entry : source.getContext().entrySet() )
+        for ( Map.Entry<Object, Object> entry : source.entrySet() )
         {
             context.put( entry.getKey(), entry.getValue() );
         }
     }
 
-    public AppContextResponse getSource()
+    public AppContext getSource()
     {
         return source;
     }
 
-    public void setSource( AppContextResponse source )
+    public void setSource( AppContext source )
     {
         this.source = source;
     }

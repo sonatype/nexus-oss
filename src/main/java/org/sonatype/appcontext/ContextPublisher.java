@@ -7,6 +7,6 @@ package org.sonatype.appcontext;
  */
 public interface ContextPublisher
 {
-    void publishContext( AppContextFactory factory, AppContextRequest request, AppContextResponse context )
+    void publishContext( AppContextFactory factory, AppContextRequest request, AppContext context )
         throws AppContextException;
 }

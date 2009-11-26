@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 public class TerminalContextPublisher
     implements ContextPublisher
 {
-    public void publishContext( AppContextFactory factory, AppContextRequest request, AppContextResponse context )
+    public void publishContext( AppContextFactory factory, AppContextRequest request, AppContext context )
     {
-        for ( Entry<Object, Object> entry : context.getContext().entrySet() )
+        for ( Entry<Object, Object> entry : context.entrySet() )
         {
             // dump it to System.out
             System.out.println( "Property \"" + String.valueOf( entry.getKey() ) + "\"=\""

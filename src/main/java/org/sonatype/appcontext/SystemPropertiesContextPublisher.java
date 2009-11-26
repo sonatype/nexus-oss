@@ -16,9 +16,9 @@ public class SystemPropertiesContextPublisher
      */
     private String keyPrefix = null;
 
-    public void publishContext( AppContextFactory factory, AppContextRequest request, AppContextResponse context )
+    public void publishContext( AppContextFactory factory, AppContextRequest request, AppContext context )
     {
-        for ( Entry<Object, Object> entry : context.getContext().entrySet() )
+        for ( Entry<Object, Object> entry : context.entrySet() )
         {
             String key = (String) entry.getKey();
 
