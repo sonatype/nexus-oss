@@ -10,25 +10,28 @@ public class AppContextFactoryTest
     public void testC01()
         throws Exception
     {
+        // 1st, set up some default-like basedir discoverer, but "redirect" it from default to some testy
+        DefaultBasedirDiscoverer basedirDiscoverer = new DefaultBasedirDiscoverer();
+        basedirDiscoverer.setBasedirKey( "c01.basedir" );
+
         AppContextFactory ctxFactory = new AppContextFactory();
 
-        // redirect the default basedir key name, since maven uses the same!
-        ctxFactory.getAppContextHelper().getConfiguration().setBasedirPropertyKey( "c01.basedir" );
-
         // set this property (is a must!)
-        System.setProperty( ctxFactory.getAppContextHelper().getConfiguration().getBasedirPropertyKey(), new File(
-            "src/test/resources/c01" ).getAbsolutePath() );
+        System.setProperty( basedirDiscoverer.getBasedirKey(), new File( "src/test/resources/c01" ).getAbsolutePath() );
 
         // add some "other" (like user defined) system properties
         System.setProperty( "c01.blah", "tooMuchTalk!" );
 
         AppContextRequest request = ctxFactory.getDefaultAppContextRequest();
 
+        // customize request
         request.setName( "c01" );
+        request.setBasedirDiscoverer( basedirDiscoverer );
 
         // create a properties filler for plexus.properties, that will fail if props file not found
+        // note that the File passed in is relative, hence the basedir will be used to locate it!
         PropertiesFileContextFiller plexusPropertiesFiller =
-            new PropertiesFileContextFiller( new File( ctxFactory.getBasedir(), "plexus.properties" ), true );
+            new PropertiesFileContextFiller( new File( "plexus.properties" ), true );
 
         // add it to fillers as very 1st resource, and leaving others in
         request.getContextFillers().add( 0, plexusPropertiesFiller );

@@ -8,6 +8,10 @@ public interface AppContextRequest
 
     void setName( String name );
 
+    BasedirDiscoverer getBasedirDiscoverer();
+
+    void setBasedirDiscoverer( BasedirDiscoverer discoverer );
+
     List<ContextFiller> getContextFillers();
 
     void setContextFillers( List<ContextFiller> fillers );

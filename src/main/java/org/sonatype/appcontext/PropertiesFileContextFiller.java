@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * A context filler that uses Java properties file as context source. This filler should be set-up before using!
+ * A context filler that uses Java properties file as context source. This filler should be set-up before using! If the
+ * File set is absolute, it will used as is. If the file set is relative, the basedir will be used to resolve it.
  * 
  * @author cstamas
  */
@@ -38,26 +39,37 @@ public class PropertiesFileContextFiller
     public void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
         throws AppContextException
     {
+        File file = null;
+
+        if ( getPropertiesFile().isAbsolute() )
+        {
+            file = getPropertiesFile();
+        }
+        else
+        {
+            file = new File( request.getBasedirDiscoverer().discoverBasedir(), getPropertiesFile().getPath() );
+        }
+
         try
         {
-            if ( propertiesFile.exists() )
+            if ( file.exists() )
             {
                 Properties containerProperties = new Properties();
 
-                containerProperties.load( new FileInputStream( propertiesFile ) );
+                containerProperties.load( new FileInputStream( file ) );
 
                 context.putAll( containerProperties );
             }
             else if ( isFailIfNotFound() )
             {
-                throw new AppContextException( "Cannot load up plexus properties file from \""
-                    + propertiesFile.getAbsolutePath() + "\", it does not exists!" );
+                throw new AppContextException( "Cannot load up plexus properties file from \"" + file.getAbsolutePath()
+                    + "\", it does not exists!" );
             }
         }
         catch ( IOException e )
         {
-            throw new AppContextException( "Cannot load up plexus properties file from \""
-                + propertiesFile.getAbsolutePath() + "\"!", e );
+            throw new AppContextException( "Cannot load up plexus properties file from \"" + file.getAbsolutePath()
+                + "\"!", e );
         }
     }
 

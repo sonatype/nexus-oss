@@ -16,23 +16,6 @@ import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
  */
 public class AppContextFactory
 {
-    private final AppContextHelper appContextHelper;
-
-    public AppContextFactory()
-    {
-        this( new AppContextHelper() );
-    }
-
-    public AppContextFactory( AppContextHelper helper )
-    {
-        this.appContextHelper = helper;
-    }
-
-    public AppContextHelper getAppContextHelper()
-    {
-        return appContextHelper;
-    }
-
     public Interpolator getInterpolator( Map<Object, Object> ctx )
     {
         // interpolate what we have
@@ -42,16 +25,6 @@ public class AppContextFactory
         interpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
 
         return interpolator;
-    }
-
-    public File getBasedir()
-    {
-        return appContextHelper.getBasedir();
-    }
-
-    public void setBasedir( File basedir )
-    {
-        appContextHelper.setBasedir( basedir );
     }
 
     public AppContextRequest getDefaultAppContextRequest()
@@ -75,6 +48,8 @@ public class AppContextFactory
         // The interpolation sources used in interpolation are: plexusProperties, environment and
         // System.getProperties().
         // The final interpolated values are put into containerContext map and returned.
+        
+        File basedir = request.getBasedirDiscoverer().discoverBasedir();
 
         Map<Object, Object> rawContext = new HashMap<Object, Object>();
 
@@ -82,7 +57,7 @@ public class AppContextFactory
         {
             filler.fillContext( this, request, rawContext );
         }
-
+        
         // interpolate what we have
         Interpolator interpolator = getInterpolator( rawContext );
 
@@ -101,10 +76,7 @@ public class AppContextFactory
             throw new AppContextException( "Cannot interpolate the raw context!", e );
         }
 
-        // finally put basedir in
-        rawContext.put( appContextHelper.getConfiguration().getBasedirPropertyKey(), getBasedir().getAbsolutePath() );
-
-        AppContext result = new DefaultAppContext( this, request.getName(), getBasedir(), context, rawContext );
+        AppContext result = new DefaultAppContext( this, request.getName(), basedir, context, rawContext );
 
         // Now that we have containerContext with proper values, set them back into System properties and
         // dump them to System.out for reference.

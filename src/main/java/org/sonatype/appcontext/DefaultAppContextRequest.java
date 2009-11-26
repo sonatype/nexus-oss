@@ -8,6 +8,8 @@ public class DefaultAppContextRequest
 {
     private String name = "plexus";
 
+    private BasedirDiscoverer basedirDiscoverer;
+
     private List<ContextFiller> contextFillers;
 
     private List<ContextPublisher> contextPublishers;
@@ -20,6 +22,21 @@ public class DefaultAppContextRequest
     public void setName( String name )
     {
         this.name = name;
+    }
+
+    public BasedirDiscoverer getBasedirDiscoverer()
+    {
+        if ( basedirDiscoverer == null )
+        {
+            basedirDiscoverer = new DefaultBasedirDiscoverer();
+        }
+
+        return basedirDiscoverer;
+    }
+
+    public void setBasedirDiscoverer( BasedirDiscoverer basedirDiscoverer )
+    {
+        this.basedirDiscoverer = basedirDiscoverer;
     }
 
     public List<ContextFiller> getContextFillers()
