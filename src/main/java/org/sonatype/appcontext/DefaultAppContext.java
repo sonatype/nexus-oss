@@ -2,13 +2,13 @@ package org.sonatype.appcontext;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.interpolation.Interpolator;
 
 public class DefaultAppContext
-    extends HashMap<Object, Object>
+    extends ConcurrentHashMap<Object, Object>
     implements AppContext
 {
     private static final long serialVersionUID = -8789514933779543200L;
