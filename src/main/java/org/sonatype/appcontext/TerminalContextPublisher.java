@@ -15,8 +15,8 @@ public class TerminalContextPublisher
         for ( Entry<Object, Object> entry : context.getContext().entrySet() )
         {
             // dump it to System.out
-            System.out.println( "Property '" + String.valueOf( entry.getKey() ) + "'='"
-                + String.valueOf( entry.getValue() ) + "' inserted into AppContext." );
+            System.out.println( "Property \"" + String.valueOf( entry.getKey() ) + "\"=\""
+                + String.valueOf( entry.getValue() ) + "\" inserted into AppContext." );
         }
     }
 }

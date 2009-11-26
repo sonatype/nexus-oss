@@ -27,6 +27,11 @@ public class AppContextFactory
     {
         this.appContextHelper = helper;
     }
+    
+    public AppContextHelper getAppContextHelper()
+    {
+        return appContextHelper;
+    }
 
     public Interpolator getInterpolator( Map<Object, Object> ctx )
     {
@@ -99,7 +104,7 @@ public class AppContextFactory
         // finally put basedir in
         rawContext.put( appContextHelper.getConfiguration().getBasedirPropertyKey(), getBasedir().getAbsolutePath() );
 
-        AppContextResponse result = new DefaultAppContextResponse( request.getName(), context, rawContext );
+        AppContextResponse result = new DefaultAppContextResponse( request.getName(), getBasedir(), context, rawContext );
 
         // Now that we have containerContext with proper values, set them back into System properties and
         // dump them to System.out for reference.
