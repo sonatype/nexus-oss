@@ -11,26 +11,26 @@ import java.util.Properties;
  * 
  * @author cstamas
  */
-public class PropertiesContextFiller
+public class PropertiesFileContextFiller
     implements ContextFiller
 {
-    private File plexusPropertiesFile;
+    private File propertiesFile;
 
     private boolean failIfNotFound = false;
 
-    public PropertiesContextFiller()
+    public PropertiesFileContextFiller()
     {
         this( null );
     }
 
-    public PropertiesContextFiller( File plexusPropertiesFile )
+    public PropertiesFileContextFiller( File propertiesFile )
     {
-        this( plexusPropertiesFile, true );
+        this( propertiesFile, true );
     }
 
-    public PropertiesContextFiller( File plexusPropertiesFile, boolean failIfNotFound )
+    public PropertiesFileContextFiller( File propertiesFile, boolean failIfNotFound )
     {
-        this.plexusPropertiesFile = plexusPropertiesFile;
+        this.propertiesFile = propertiesFile;
 
         this.failIfNotFound = failIfNotFound;
     }
@@ -40,35 +40,35 @@ public class PropertiesContextFiller
     {
         try
         {
-            if ( plexusPropertiesFile.exists() )
+            if ( propertiesFile.exists() )
             {
                 Properties containerProperties = new Properties();
 
-                containerProperties.load( new FileInputStream( plexusPropertiesFile ) );
+                containerProperties.load( new FileInputStream( propertiesFile ) );
 
                 context.putAll( containerProperties );
             }
             else if ( isFailIfNotFound() )
             {
                 throw new AppContextException( "Cannot load up plexus properties file from \""
-                    + plexusPropertiesFile.getAbsolutePath() + "\", it does not exists!" );
+                    + propertiesFile.getAbsolutePath() + "\", it does not exists!" );
             }
         }
         catch ( IOException e )
         {
             throw new AppContextException( "Cannot load up plexus properties file from \""
-                + plexusPropertiesFile.getAbsolutePath() + "\"!", e );
+                + propertiesFile.getAbsolutePath() + "\"!", e );
         }
     }
 
-    public File getPlexusPropertiesFile()
+    public File getPropertiesFile()
     {
-        return plexusPropertiesFile;
+        return propertiesFile;
     }
 
-    public void setPlexusPropertiesFile( File plexusPropertiesFile )
+    public void setPropertiesFile( File plexusPropertiesFile )
     {
-        this.plexusPropertiesFile = plexusPropertiesFile;
+        this.propertiesFile = plexusPropertiesFile;
     }
 
     public boolean isFailIfNotFound()
