@@ -714,7 +714,7 @@ public abstract class AbstractRepository
 
         request.addProcessedRepository( this );
 
-        maintainNotFoundCache( request.getRequestPath() );
+        maintainNotFoundCache( request );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -785,7 +785,7 @@ public abstract class AbstractRepository
             // if not local/remote only, add it to NFC
             if ( !request.isRequestLocalOnly() && !request.isRequestRemoteOnly() )
             {
-                addToNotFoundCache( uid.getPath() );
+                addToNotFoundCache( request );
             }
 
             throw ex;
@@ -809,7 +809,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        maintainNotFoundCache( from.getRequestPath() );
+        maintainNotFoundCache( from );
 
         RepositoryItemUid fromUid = createUid( from.getRequestPath() );
 
@@ -836,7 +836,7 @@ public abstract class AbstractRepository
                     storeItem( fromTask, target );
 
                     // remove the "to" item from n-cache if there
-                    removeFromNotFoundCache( to.getRequestPath() );
+                    removeFromNotFoundCache( to );
                 }
                 catch ( IOException e )
                 {
@@ -883,7 +883,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        maintainNotFoundCache( request.getRequestPath() );
+        maintainNotFoundCache( request );
 
         RepositoryItemUid uid = createUid( request.getRequestPath() );
 
@@ -966,7 +966,7 @@ public abstract class AbstractRepository
         }
 
         // remove the "request" item from n-cache if there
-        removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+        removeFromNotFoundCache( item.getResourceStoreRequest() );
 
         getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventStore( this, item ) );
     }
@@ -1011,7 +1011,7 @@ public abstract class AbstractRepository
             throw new RepositoryNotAvailableException( this );
         }
 
-        maintainNotFoundCache( coll.getPath() );
+        maintainNotFoundCache( coll.getResourceStoreRequest() );
 
         Collection<StorageItem> items = doListItems( new ResourceStoreRequest( coll ) );
 
@@ -1036,33 +1036,47 @@ public abstract class AbstractRepository
      * @param path the path
      * @throws ItemNotFoundException the item not found exception
      */
-    public void maintainNotFoundCache( String path )
+    public void maintainNotFoundCache( ResourceStoreRequest request )
         throws ItemNotFoundException
     {
         if ( isNotFoundCacheActive() )
         {
-            if ( getNotFoundCache().contains( path ) )
+            if ( getNotFoundCache().contains( request.getRequestPath() ) )
             {
-                if ( getNotFoundCache().isExpired( path ) )
+                if ( getNotFoundCache().isExpired( request.getRequestPath() ) )
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger().debug( "The path " + path + " is in NFC but expired." );
+                        getLogger().debug( "The path " + request.getRequestPath() + " is in NFC but expired." );
                     }
-                    removeFromNotFoundCache( path );
+
+                    removeFromNotFoundCache( request );
                 }
                 else
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
                         getLogger().debug(
-                            "The path " + path + " is in NFC and still active, throwing ItemNotFoundException." );
+                            "The path " + request.getRequestPath()
+                                + " is in NFC and still active, throwing ItemNotFoundException." );
                     }
 
-                    throw new ItemNotFoundException( path );
+                    throw new ItemNotFoundException( request );
                 }
             }
         }
+    }
+
+    @Deprecated
+    public void addToNotFoundCache( String path )
+    {
+        addToNotFoundCache( new ResourceStoreRequest( path ) );
+    }
+
+    @Deprecated
+    public void removeFromNotFoundCache( String path )
+    {
+        removeFromNotFoundCache( new ResourceStoreRequest( path ) );
     }
 
     /**
@@ -1070,16 +1084,16 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    public void addToNotFoundCache( String path )
+    public void addToNotFoundCache( ResourceStoreRequest request )
     {
         if ( isNotFoundCacheActive() )
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Adding path " + path + " to NFC." );
+                getLogger().debug( "Adding path " + request.getRequestPath() + " to NFC." );
             }
 
-            getNotFoundCache().put( path, Boolean.TRUE, getNotFoundCacheTimeToLive() * 60 );
+            getNotFoundCache().put( request.getRequestPath(), Boolean.TRUE, getNotFoundCacheTimeToLive() * 60 );
         }
     }
 
@@ -1088,16 +1102,16 @@ public abstract class AbstractRepository
      * 
      * @param path the path
      */
-    public void removeFromNotFoundCache( String path )
+    public void removeFromNotFoundCache( ResourceStoreRequest request )
     {
         if ( isNotFoundCacheActive() )
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Removing path " + path + " from NFC." );
+                getLogger().debug( "Removing path " + request.getRequestPath() + " from NFC." );
             }
 
-            getNotFoundCache().removeWithParents( path );
+            getNotFoundCache().removeWithParents( request.getRequestPath() );
         }
     }
 
@@ -1223,9 +1237,9 @@ public abstract class AbstractRepository
 
         return localItem;
     }
-    
+
     protected boolean isActionAllowedReadOnly( Action action )
     {
         return action.isReadAction();
-}
+    }
 }

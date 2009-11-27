@@ -91,7 +91,8 @@ public class CommonsHttpClientRemoteStorage
 
             if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
             {
-                throw new StorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: " + u.getProtocol().toLowerCase() );
+                throw new StorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
+                    + u.getProtocol().toLowerCase() );
             }
         }
         catch ( MalformedURLException e )
@@ -147,7 +148,9 @@ public class CommonsHttpClientRemoteStorage
                 // give us URL with ending "/"
                 method.releaseConnection();
 
-                throw new ItemNotFoundException( remoteURL.toString() );
+                throw new ItemNotFoundException(
+                    "The remoteURL we got to looks like is a collection, and Nexus cannot fetch collections over plain HTTP (remoteUrl=\""
+                        + remoteURL.toString() + "\")", request, repository );
             }
 
             GetMethod get = (GetMethod) method;
@@ -215,7 +218,9 @@ public class CommonsHttpClientRemoteStorage
 
             if ( response == HttpStatus.SC_NOT_FOUND )
             {
-                throw new ItemNotFoundException( remoteURL.toString() );
+                throw new ItemNotFoundException(
+                    "The remoteURL we requested does not exists on remote server (remoteUrl=\"" + remoteURL.toString()
+                        + "\")", request, repository );
             }
             else
             {

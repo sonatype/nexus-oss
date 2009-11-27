@@ -328,7 +328,7 @@ public class ArtifactStoreHelper
             if ( gav == null )
             {
                 throw new ItemNotFoundException( "GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
-                    + " : " + gavRequest.getVersion() );
+                    + " : " + gavRequest.getVersion(), gavRequest, repository );
             }
 
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );

@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
+import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -194,22 +195,39 @@ public interface Repository
      * @param path
      * @throws ItemNotFoundException
      */
-    void maintainNotFoundCache( String path )
+    void maintainNotFoundCache( ResourceStoreRequest request )
         throws ItemNotFoundException;
-
+    
     /**
      * Adds path to NFC.
      * 
      * @param path
+     * @deprecated use the method with request parameter
      */
+    @Deprecated
     void addToNotFoundCache( String path );
 
     /**
      * Removes path from NFC.
      * 
      * @param path
+     * @deprecated use the method with request parameter
      */
+    @Deprecated
     void removeFromNotFoundCache( String path );
+    /**
+     * Adds path to NFC.
+     * 
+     * @param path
+     */
+    void addToNotFoundCache( ResourceStoreRequest request );
+
+    /**
+     * Removes path from NFC.
+     * 
+     * @param path
+     */
+    void removeFromNotFoundCache( ResourceStoreRequest request );
 
     /**
      * Is NFC active? (true by default)

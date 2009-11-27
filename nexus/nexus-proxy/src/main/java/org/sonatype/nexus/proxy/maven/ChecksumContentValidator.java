@@ -209,11 +209,11 @@ public class ChecksumContentValidator
         }
         catch ( RemoteAccessException e )
         {
-            throw new ItemNotFoundException( request.getRequestPath(), e );
+            throw new ItemNotFoundException( request, proxy, e );
         }
         catch ( StorageException e )
         {
-            throw new ItemNotFoundException( request.getRequestPath(), e );
+            throw new ItemNotFoundException( request, proxy, e );
         }
     }
 

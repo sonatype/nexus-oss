@@ -556,7 +556,7 @@ public abstract class AbstractProxyRepository
             {
                 getLocalStorage().storeItem( this, item );
 
-                removeFromNotFoundCache( item.getRepositoryItemUid().getPath() );
+                removeFromNotFoundCache( item.getResourceStoreRequest() );
 
                 result = getLocalStorage().retrieveItem( this, new ResourceStoreRequest( item ) );
 
@@ -1119,7 +1119,7 @@ public abstract class AbstractProxyRepository
                     }
                     else
                     {
-                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( "/" ) );
+                        setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request ) );
                     }
                 }
                 catch ( StorageException e )

@@ -153,9 +153,9 @@ public class DefaultRepositoryRouter
         }
 
         ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath() );
-        
+
         req.getRequestContext().putAll( link.getItemContext() );
-        
+
         req.getRequestContext().setParentContext( link.getItemContext().getParentContext() );
 
         return link.getTarget().getRepository().retrieveItem( req );
@@ -237,7 +237,7 @@ public class DefaultRepositoryRouter
                     try
                     {
                         toRoute.getTargetedRepository().storeItem( to, ( (StorageFileItem) item ).getInputStream(),
-                                                                   item.getAttributes() );
+                            item.getAttributes() );
                     }
                     catch ( IOException e )
                     {
@@ -466,15 +466,15 @@ public class DefaultRepositoryRouter
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                                      "RepositoryType with role='" + rtd.getRole()
-                                          + "' is registered, but not found on classpath, skipping it.", e );
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
 
             if ( kind == null )
             {
                 // unknown explodedPath[0]
-                throw new ItemNotFoundException( request.getRequestPath() );
+                throw new ItemNotFoundException( request );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0] ) );
@@ -494,13 +494,13 @@ public class DefaultRepositoryRouter
                 if ( !repository.isExposed() )
                 {
                     // this is not the main facet or the repo is not exposed
-                    throw new ItemNotFoundException( request.getRequestPath() );
+                    throw new ItemNotFoundException( request );
                 }
             }
             catch ( NoSuchRepositoryException e )
             {
                 // obviously, the repoId (explodedPath[1]) points to some nonexistent repoID
-                throw new ItemNotFoundException( request.getRequestPath() );
+                throw new ItemNotFoundException( request );
             }
 
             result.setStrippedPrefix( ItemPathUtils.concatPaths( explodedPath[0], explodedPath[1] ) );
@@ -605,8 +605,8 @@ public class DefaultRepositoryRouter
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                                      "RepositoryType with role='" + rtd.getRole()
-                                          + "' is registered, but not found on classpath, skipping it.", e );
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
 
@@ -635,8 +635,8 @@ public class DefaultRepositoryRouter
                 catch ( ClassNotFoundException e )
                 {
                     getLogger().info(
-                                      "RepositoryType with role='" + rtd.getRole()
-                                          + "' is registered, but not found on classpath, skipping it.", e );
+                        "RepositoryType with role='" + rtd.getRole()
+                            + "' is registered, but not found on classpath, skipping it.", e );
                 }
             }
 
@@ -645,7 +645,7 @@ public class DefaultRepositoryRouter
             // if no prefix matched, Item not found
             if ( repositories == null || repositories.isEmpty() )
             {
-                throw new ItemNotFoundException( request.getRequestPath() );
+                throw new ItemNotFoundException( request );
             }
 
             // filter access to the repositories
@@ -687,7 +687,7 @@ public class DefaultRepositoryRouter
         }
         else
         {
-            throw new ItemNotFoundException( request.getRequestPath() );
+            throw new ItemNotFoundException( request );
         }
     }
 

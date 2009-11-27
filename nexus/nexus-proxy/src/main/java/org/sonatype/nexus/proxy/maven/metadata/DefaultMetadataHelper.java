@@ -147,7 +147,7 @@ public class DefaultMetadataHelper
 
         repository.storeItem( false, mdFile );
 
-        repository.removeFromNotFoundCache( path );
+        repository.removeFromNotFoundCache( req );
     }
 
     @Override

@@ -380,14 +380,14 @@ public abstract class AbstractGroupRepository
     // Inner stuff
 
     @Override
-    public void maintainNotFoundCache( String path )
+    public void maintainNotFoundCache( ResourceStoreRequest request )
         throws ItemNotFoundException
     {
         // just maintain the cache (ie. expiration), but don't make NFC
         // affect call delegation to members
         try
         {
-            super.maintainNotFoundCache( path );
+            super.maintainNotFoundCache( request );
         }
         catch ( ItemNotFoundException e )
         {
