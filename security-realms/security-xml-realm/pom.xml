@@ -60,5 +60,11 @@
           <version>1.01</version>
           <scope>test</scope>
         </dependency>
+
+        <dependency>
+          <groupId>org.sonatype.plugin</groupId>
+          <artifactId>plugin-host-api</artifactId>
+          <version>1.0.2</version>
+        </dependency>
     </dependencies>
 </project>
