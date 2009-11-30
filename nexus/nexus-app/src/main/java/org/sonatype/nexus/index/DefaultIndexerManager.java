@@ -613,7 +613,7 @@ public class DefaultIndexerManager
         }
 
         // is this hidden path?
-        if ( item.getPath().startsWith( "." ) )
+        if ( item.getRepositoryItemUid().isHidden() )
         {
             getLogger().debug( "Will not index hidden file path: " + item.getPath() );
 

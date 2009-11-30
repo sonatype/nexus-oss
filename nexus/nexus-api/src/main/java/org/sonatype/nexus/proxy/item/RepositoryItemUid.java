@@ -71,4 +71,11 @@ public interface RepositoryItemUid
      * Unlocks attributes of item belonging to this UID.
      */
     void unlockAttributes();
+    
+    /**
+     * Checks if this item is a hidden item
+     * 
+     * @return
+     */
+    boolean isHidden();
 }
