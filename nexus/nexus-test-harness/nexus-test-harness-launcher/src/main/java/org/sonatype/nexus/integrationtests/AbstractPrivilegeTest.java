@@ -285,6 +285,37 @@ public abstract class AbstractPrivilegeTest
         this.userUtil.updateUser( testUser );
     }
 
+    protected void replaceUserRole( String userId, String roleId )
+        throws Exception
+    {
+        // use admin
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+        // now give create
+        RoleResource role = null;
+
+        // first try to retrieve
+        for ( RoleResource roleResource : roleUtil.getList() )
+        {
+            if ( roleResource.getId().equals( roleId ) )
+            {
+                role = roleResource;
+                break;
+            }
+        }
+
+        if ( role == null )
+        {
+            org.junit.Assert.fail( "Role not found: " + roleId );
+        }
+
+        // add it
+        UserResource testUser = this.userUtil.getUser( userId );
+        testUser.getRoles().clear();
+        testUser.addRole( role.getId() );
+        this.userUtil.updateUser( testUser );
+    }
+
     @Override
     @After
     public void afterTest()
