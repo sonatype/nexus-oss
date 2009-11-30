@@ -187,7 +187,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   // apply the bookmark params to page
   applyBookmark : function(bookmark) {
     if (bookmark) {
-      var parts = bookmark.split('~');
+      var parts = decodeURIComponent(bookmark).split('~');
 
       // if type not specified, simply do a quick search and guess
       if (parts.length == 1) {
