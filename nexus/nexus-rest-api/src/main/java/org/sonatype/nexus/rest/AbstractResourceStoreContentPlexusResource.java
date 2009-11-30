@@ -122,15 +122,29 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        ResourceStoreRequest req = getResourceStoreRequest( request );
+
         try
         {
             ResourceStore store = getResourceStore( request );
 
-            ResourceStoreRequest req = getResourceStoreRequest( request );
+            try
+            {
+                StorageItem item = store.retrieveItem( req );
 
-            StorageItem item = store.retrieveItem( req );
-
-            return renderItem( context, request, response, variant, item );
+                return renderItem( context, request, response, variant, item );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                if ( isDescribe( request ) )
+                {
+                    return renderDescribeItem( context, request, response, variant, req, null );
+                }
+                else
+                {
+                    throw e;
+                }
+            }
         }
         catch ( Exception e )
         {
@@ -297,7 +311,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         if ( isDescribe( req ) )
         {
-            return renderDescribeItem( context, req, res, variant, item );
+            return renderDescribeItem( context, req, res, variant, item.getResourceStoreRequest(), item );
         }
 
         Representation result = null;
@@ -449,7 +463,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return null;
     }
 
-    protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant, StorageItem item )
+    protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
+        ResourceStoreRequest request, StorageItem item )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
@@ -459,9 +474,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         resource.setRequestUrl( req.getOriginalRef().toString() );
 
-        if ( item.getItemContext().containsKey( REQUEST_RECEIVED_KEY ) )
+        if ( request.getRequestContext().containsKey( REQUEST_RECEIVED_KEY ) )
         {
-            long received = (Long) item.getItemContext().get( REQUEST_RECEIVED_KEY );
+            long received = (Long) request.getRequestContext().get( REQUEST_RECEIVED_KEY );
 
             resource.setProcessingTimeMillis( System.currentTimeMillis() - received );
         }
@@ -470,9 +485,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
             resource.setProcessingTimeMillis( -1 );
         }
 
-        resource.setRequest( describeRequest( context, req, res, variant, item ) );
+        resource.setRequest( describeRequest( context, req, res, variant, request ) );
 
-        resource.setResponse( describeResponse( context, req, res, variant, item ) );
+        resource.setResponse( describeResponse( context, req, res, variant, request, item ) );
 
         result.setData( resource );
 
@@ -480,15 +495,15 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected ContentListDescribeRequestResource describeRequest( Context context, Request req, Response res,
-                                                                  Variant variant, StorageItem item )
+        Variant variant, ResourceStoreRequest request )
     {
         ContentListDescribeRequestResource result = new ContentListDescribeRequestResource();
 
-        result.setRequestUrl( item.getResourceStoreRequest().getRequestUrl() );
+        result.setRequestUrl( request.getRequestUrl() );
 
-        result.setRequestPath( item.getResourceStoreRequest().getRequestPath() );
+        result.setRequestPath( request.getRequestPath() );
 
-        for ( Map.Entry<String, Object> entry : item.getResourceStoreRequest().getRequestContext().entrySet() )
+        for ( Map.Entry<String, Object> entry : request.getRequestContext().entrySet() )
         {
             result.addRequestContext( entry.toString() );
         }
@@ -497,9 +512,24 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected ContentListDescribeResponseResource describeResponse( Context context, Request req, Response res,
-                                                                    Variant variant, StorageItem item )
+        Variant variant, ResourceStoreRequest request, StorageItem item )
     {
         ContentListDescribeResponseResource result = new ContentListDescribeResponseResource();
+
+        result.getProcessedRepositoriesList().addAll( request.getProcessedRepositories() );
+
+        // applied mappings
+        for ( Map.Entry<String, List<String>> mappingEntry : request.getAppliedMappings().entrySet() )
+        {
+            result.addAppliedMapping( mappingEntry.getKey() + " repository applied " + mappingEntry.getValue() );
+        }
+
+        if ( item == null )
+        {
+            result.setResponseType( "NOT_FOUND" );
+
+            return result;
+        }
 
         if ( item instanceof StorageFileItem )
         {
@@ -538,15 +568,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         else
         {
             result.setResponseUid( "virtual" );
-        }
-
-        result.getProcessedRepositoriesList().addAll( item.getResourceStoreRequest().getProcessedRepositories() );
-
-        // applied mappings
-        for ( Map.Entry<String, List<String>> mappingEntry : item.getResourceStoreRequest().getAppliedMappings()
-            .entrySet() )
-        {
-            result.addAppliedMapping( mappingEntry.getKey() + " repository applied " + mappingEntry.getValue() );
         }
 
         // properties
