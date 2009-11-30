@@ -259,6 +259,16 @@ button.st-icon-refresh {
     vertical-align:top;
 }
 
+.x-statusbar-warning {
+  color:#EE0000;
+  font-weight: normal;
+  background:transparent url(../ext-2.2/resources/images/default/shared/warning.gif) no-repeat 3px 3px;
+}
+
+.x-statusbar .x-status-text {
+  padding:0 4px 0 25px;
+}
+
 .x-toolbar-warning {
   background:transparent url(../ext-2.2/resources/images/default/shared/warning.gif) no-repeat scroll 0 2px;
   color:#EE0000;
