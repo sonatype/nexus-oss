@@ -139,7 +139,7 @@
     <nexus.indexer.version>2.0.3-SNAPSHOT</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.2</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.12</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.13-SNAPSHOT</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0-SNAPSHOT</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
