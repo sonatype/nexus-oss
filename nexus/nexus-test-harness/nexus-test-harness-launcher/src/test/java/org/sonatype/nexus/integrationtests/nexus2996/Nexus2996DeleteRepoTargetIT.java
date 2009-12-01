@@ -10,7 +10,7 @@ import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.plugin.XStreamFactory;
 
-public class Nexus2996DeleteRepoTargetTest
+public class Nexus2996DeleteRepoTargetIT
     extends AbstractNexusIntegrationTest
 {
 

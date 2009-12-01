@@ -12,7 +12,7 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.plugin.XStreamFactory;
 import org.sonatype.security.rest.model.RoleResource;
 
-public class Nexus3011DeletePrivilegeTest
+public class Nexus3011DeletePrivilegeIT
     extends AbstractNexusIntegrationTest
 {
 

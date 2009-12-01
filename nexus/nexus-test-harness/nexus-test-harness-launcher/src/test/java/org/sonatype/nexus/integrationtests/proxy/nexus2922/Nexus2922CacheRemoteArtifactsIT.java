@@ -17,7 +17,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
-public class Nexus2922CacheRemoteArtifactsTest
+public class Nexus2922CacheRemoteArtifactsIT
     extends AbstractNexusProxyIntegrationTest
 {
 
@@ -53,7 +53,7 @@ public class Nexus2922CacheRemoteArtifactsTest
         SettingsMessageUtil.save( settings );
     }
 
-    public Nexus2922CacheRemoteArtifactsTest()
+    public Nexus2922CacheRemoteArtifactsIT()
     {
         super( "release-proxy-repo-1" );
     }
