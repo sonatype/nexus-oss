@@ -132,6 +132,8 @@ public class AbstractEvictTaskIt
     protected void runTask( int days, String repoId )
         throws Exception
     {
+        TaskScheduleUtil.waitForAllTasksToStop(); // be sure nothing else is locking tasks
+
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( repoId );

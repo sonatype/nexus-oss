@@ -14,6 +14,7 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -83,13 +84,13 @@ public class TaskScheduleUtil
     {
         return getTaskRequest( "service/local/schedules" );
     }
-    
+
     public static List<ScheduledServiceListResource> getAllTasks()
         throws IOException
-    {    
+    {
         return getTaskRequest( "service/local/schedules?allTasks=true" );
     }
-    
+
     private static List<ScheduledServiceListResource> getTaskRequest( String uri )
         throws IOException
     {
@@ -107,7 +108,7 @@ public class TaskScheduleUtil
         ScheduledServiceListResourceResponse scheduleResponse =
             (ScheduledServiceListResourceResponse) representation.getPayload( new ScheduledServiceListResourceResponse() );
 
-        return scheduleResponse.getData();        
+        return scheduleResponse.getData();
     }
 
     public static String getStatus( String name )
@@ -126,13 +127,13 @@ public class TaskScheduleUtil
     public static void waitForAllTasksToStop()
         throws Exception
     {
-        waitForAllTasksToStop( 40 );
+        waitForAllTasksToStop( 100 );
     }
 
     public static void waitForAllTasksToStop( String taskType )
         throws Exception
     {
-        waitForAllTasksToStop( 40, taskType );
+        waitForAllTasksToStop( 100, taskType );
     }
 
     public static void waitForAllTasksToStop( int maxAttempts )
@@ -178,6 +179,21 @@ public class TaskScheduleUtil
 
             Thread.sleep( sleep );
         }
+
+        List<String> runningTasks = new ArrayList<String>();
+        List<ScheduledServiceListResource> tasks = getAllTasks();
+
+        for ( ScheduledServiceListResource task : tasks )
+        {
+            if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals(
+                                                                                                   TaskState.SLEEPING.name() ) )
+                && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
+            {
+                runningTasks.add( task.getId() );
+            }
+        }
+
+        Assert.assertTrue( "Some tasks still running after w8 period " + runningTasks, runningTasks.isEmpty() );
     }
 
     public static void waitForTasks( int maxAttempts )

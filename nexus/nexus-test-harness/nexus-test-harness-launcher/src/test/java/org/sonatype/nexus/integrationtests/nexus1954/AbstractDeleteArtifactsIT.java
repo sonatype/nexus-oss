@@ -20,6 +20,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractDeleteArtifactsIT
     extends AbstractNexusIntegrationTest
@@ -144,6 +145,8 @@ public abstract class AbstractDeleteArtifactsIT
         {
             proxyLastMod = readLastMod( proxyIndexProps );
         }
+
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         runUpdateIndex();
 

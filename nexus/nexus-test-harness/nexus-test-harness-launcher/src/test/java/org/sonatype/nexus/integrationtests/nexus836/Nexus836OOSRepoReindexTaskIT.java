@@ -30,6 +30,8 @@ public class Nexus836OOSRepoReindexTaskIT
         prop.setId( "repositoryOrGroupId" );
         prop.setValue( "all_repo" );
 
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
 
         Assert.assertNotNull( task );
