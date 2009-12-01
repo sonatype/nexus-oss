@@ -477,6 +477,7 @@ Ext.extend( Sonatype.repoServer.ArtifactoryMigrationPanel, Ext.Panel, {
 
     Ext.Ajax.request( {
       method: 'POST',
+      timeout: 300000,
       url: Sonatype.config.servicePath + '/migration/artifactory/filelocation',
       jsonData: { data: { fileLocation: filename } },
       callback: function( options, success, response ) {
