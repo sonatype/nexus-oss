@@ -39,10 +39,12 @@ import org.sonatype.nexus.configuration.model.CRepositoryGroupingCoreConfigurati
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.mapping.RepositoryPathMapping.MappingType;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.utils.ResourceStoreUtils;
+import org.sonatype.plexus.appevents.Event;
 
 /**
  * The Class PathBasedRequestRepositoryMapper filters repositories to search using supplied list of filter expressions.
@@ -106,6 +108,7 @@ public class DefaultRequestRepositoryMapper
         }
     }
 
+    @Override
     protected ApplicationConfiguration getApplicationConfiguration()
     {
         return applicationConfiguration;
@@ -139,6 +142,7 @@ public class DefaultRequestRepositoryMapper
         }
     }
 
+    @Override
     public boolean commitChanges()
         throws ConfigurationException
     {
@@ -183,7 +187,8 @@ public class DefaultRequestRepositoryMapper
             if ( mapping.matches( repository, request ) )
             {
                 getLogger().info(
-                    "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString() );
+                                  "The request path [" + request.toString() + "] is blocked by rule "
+                                      + mapping.toString() );
 
                 return Collections.emptyList();
             }
@@ -259,12 +264,12 @@ public class DefaultRequestRepositoryMapper
 
         // store the applied mappings to request context
         ArrayList<String> appliedMappingsList = new ArrayList<String>( appliedMappings.size() );
-        
+
         for ( RepositoryPathMapping mapping : appliedMappings )
         {
             appliedMappingsList.add( mapping.toString() );
         }
-        
+
         request.addAppliedMappingsList( repository, appliedMappingsList );
 
         // log it if needed
@@ -292,13 +297,14 @@ public class DefaultRequestRepositoryMapper
                 if ( reposIdSet.size() == 0 )
                 {
                     getLogger().debug(
-                        "Mapping for path [" + request.toString()
-                            + "] excluded all storages from servicing the request." );
+                                       "Mapping for path [" + request.toString()
+                                           + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
                     getLogger().debug(
-                        "Request path for [" + request.toString() + "] is MAPPED to reposes: " + reposIdSet );
+                                       "Request path for [" + request.toString() + "] is MAPPED to reposes: "
+                                           + reposIdSet );
                 }
             }
         }
@@ -315,9 +321,9 @@ public class DefaultRequestRepositoryMapper
         catch ( NoSuchRepositoryException e )
         {
             getLogger().error(
-                "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
-                    + appliedMappingsList.toString() + "\"." );
-            
+                               "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
+                                   + appliedMappingsList.toString() + "\"." );
+
             throw e;
         }
 
@@ -401,8 +407,8 @@ public class DefaultRequestRepositoryMapper
             throw new IllegalArgumentException( "Unknown route type: " + item.getRouteType() );
         }
 
-        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(), item
-            .getRepositories() );
+        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(),
+                                          item.getRepositories() );
     }
 
     protected CPathMappingItem convert( RepositoryPathMapping item )
@@ -501,4 +507,30 @@ public class DefaultRequestRepositoryMapper
         return "Repository Grouping Configuration";
     }
 
+    @Override
+    public void onEvent( Event<?> evt )
+    {
+        super.onEvent( evt );
+
+        if ( evt instanceof RepositoryRegistryEventRemove )
+        {
+            String repoId = ( (RepositoryRegistryEventRemove) evt ).getRepository().getId();
+
+            List<CPathMappingItem> pathMappings = getCurrentConfiguration( false ).getPathMappings();
+
+            for ( Iterator<CPathMappingItem> iterator = pathMappings.iterator(); iterator.hasNext(); )
+            {
+                CPathMappingItem item = iterator.next();
+
+                if ( item.getGroupId().equals( repoId ) )
+                {
+                    iterator.remove();
+                }
+                else
+                {
+                    item.removeRepository( repoId );
+                }
+            }
+        }
+    }
 }

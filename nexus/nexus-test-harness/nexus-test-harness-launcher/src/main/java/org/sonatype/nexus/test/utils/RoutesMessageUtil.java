@@ -43,7 +43,7 @@ import com.thoughtworks.xstream.XStream;
 public class RoutesMessageUtil
 {
     public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repo_routes";
-    
+
     private XStream xstream;
 
     private MediaType mediaType;
@@ -56,13 +56,20 @@ public class RoutesMessageUtil
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-    
+
     public RepositoryRouteResource getRoute( String routeId )
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/repo_routes" + routeId );
+        Response response = getRouteResponse( routeId );
 
         return this.getResourceFromResponse( response );
+    }
+
+    public Response getRouteResponse( String routeId )
+        throws IOException
+    {
+        Response response = RequestFacade.doGetRequest( "service/local/repo_routes/" + routeId );
+        return response;
     }
 
     public Response sendMessage( Method method, RepositoryRouteResource resource )
@@ -92,6 +99,7 @@ public class RoutesMessageUtil
         LOG.debug( "responseText: " + responseString );
 
         Assert.assertFalse( "Response text was empty.", StringUtils.isEmpty( responseString ) );
+        Assert.assertTrue( response.getStatus() + "\n" + responseString, response.getStatus().isSuccess() );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
