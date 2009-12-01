@@ -44,14 +44,15 @@ public class SettingsMessageUtil
     {
         String serviceURI = "service/local/global_settings/current";
         Response response = RequestFacade.doGetRequest( serviceURI );
-        
-        String responseText = response.getEntity().getText(); 
-        
+
+        String responseText = response.getEntity().getText();
+
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
 
-        Assert.assertTrue( "Error getting Settings: "+ response.getStatus() +"\n"+ responseText, response.getStatus().isSuccess() );
-        
+        Assert.assertTrue( "Error getting Settings: " + response.getStatus() + "\n" + responseText,
+                           response.getStatus().isSuccess() );
+
         GlobalConfigurationResourceResponse configResponse =
             (GlobalConfigurationResourceResponse) representation.getPayload( new GlobalConfigurationResourceResponse() );
 
@@ -77,6 +78,14 @@ public class SettingsMessageUtil
     public static Status validateSmtp( SmtpSettingsResource smtpSettings )
         throws IOException
     {
+        Response response = validateSmtpResponse( smtpSettings );
+
+        return response.getStatus();
+    }
+
+    public static Response validateSmtpResponse( SmtpSettingsResource smtpSettings )
+        throws IOException
+    {
         String serviceURI = "service/local/check_smtp_settings/";
 
         SmtpSettingsResourceRequest configResponse = new SmtpSettingsResourceRequest();
@@ -86,8 +95,7 @@ public class SettingsMessageUtil
         representation.setPayload( configResponse );
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-
-        return response.getStatus();
+        return response;
     }
 
 }

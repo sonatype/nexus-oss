@@ -12,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
@@ -73,8 +74,11 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
-        Assert.assertEquals( "Unable to validate e-mail " + status, 400, status.getCode() );
+        Response response = SettingsMessageUtil.validateSmtpResponse( smtpSettings );
+
+        String text = response.getEntity().getText();
+        Status status = response.getStatus();
+        Assert.assertEquals( "Unable to validate e-mail " + status + "\n" + text, 400, status.getCode() );
     }
 
     @Test

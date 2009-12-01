@@ -47,7 +47,7 @@ public class DefaultSmtpSettingsValidator
         }
         catch ( ComponentLookupException e )
         {
-            throw new EmailerException("Unable to create EMailer", e);
+            throw new EmailerException( "Unable to create EMailer", e );
         }
         emailer.configure( config );
 
@@ -61,25 +61,7 @@ public class DefaultSmtpSettingsValidator
 
         request.getBodyContext().put( DefaultMailType.BODY_KEY, body.toString() );
 
-        MailRequestStatus status = emailer.sendMail( request );
-
-        for ( int i = 0; i < 3000; i++ )
-        {
-            Thread.yield();
-            try
-            {
-                Thread.sleep( 1 );
-            }
-            catch ( InterruptedException e )
-            {
-                // meanless
-            }
-
-            if ( status.isSent() || status.getErrorCause() != null )
-            {
-                break;
-            }
-        }
+        MailRequestStatus status = emailer.sendSyncedMail( request );
 
         if ( status.getErrorCause() != null )
         {
