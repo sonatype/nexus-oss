@@ -914,6 +914,15 @@ public class AbstractNexusIntegrationTest
     protected Metadata downloadMetadataFromRepository( Gav gav, String repoId )
         throws IOException, XmlPullParserException
     {
+        // File f =
+        // new File( nexusWorkDir, "storage/" + repoId + "/" + gav.getGroupId() + "/" + gav.getArtifactId()
+        // + "/maven-metadata.xml" );
+        //
+        // if ( !f.exists() )
+        // {
+        // throw new FileNotFoundException( "Metadata do not exist! " + f.getAbsolutePath() );
+        // }
+
         String url =
             this.getBaseNexusUrl() + REPOSITORY_RELATIVE_URL + repoId + "/" + gav.getGroupId() + "/"
                 + gav.getArtifactId() + "/maven-metadata.xml";
