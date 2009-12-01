@@ -53,6 +53,14 @@ public class JsonOrgHierarchicalStreamReaderTest
     {
         xstream.fromXML( o, root );
     }
+    
+    public void testStringBoolean()
+        throws IOException
+    {
+        OneValued one = new OneValued();
+        deserialize( "{ \"org.sonatype.plexus.rest.xstream.json.OneValued\" : { \"stringValue\" : \"true\" }}", one );
+        assertEquals( "true", one.stringValue );
+    }
 
     public void testSimple()
         throws IOException

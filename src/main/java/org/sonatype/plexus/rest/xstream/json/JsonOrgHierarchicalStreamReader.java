@@ -191,8 +191,7 @@ public class JsonOrgHierarchicalStreamReader
         {
             this.name = name;
             this.jsonObject = object;
-            if ( object.toString().equals( Boolean.TRUE.toString() )
-                 || object.toString().equals( Boolean.FALSE.toString() ) )
+            if ( object instanceof Boolean )
             {
                 nodeType = NodeType.BOOLEAN;
                 valueNull = false;
