@@ -516,7 +516,7 @@ public class DefaultRequestRepositoryMapper
         {
             String repoId = ( (RepositoryRegistryEventRemove) evt ).getRepository().getId();
 
-            List<CPathMappingItem> pathMappings = getCurrentConfiguration( false ).getPathMappings();
+            List<CPathMappingItem> pathMappings = getCurrentConfiguration( true ).getPathMappings();
 
             for ( Iterator<CPathMappingItem> iterator = pathMappings.iterator(); iterator.hasNext(); )
             {
