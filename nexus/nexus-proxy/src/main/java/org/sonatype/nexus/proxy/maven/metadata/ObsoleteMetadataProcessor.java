@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import org.apache.maven.mercury.repository.metadata.Metadata;
+
 /**
  * Used to remove metadata files
  * 
@@ -18,7 +20,7 @@ public class ObsoleteMetadataProcessor
      * always return false, so the metadata will be removed
      */
     @Override
-    protected boolean isMetadataCorrect( String path )
+    protected boolean isMetadataCorrect( Metadata oldMd, String path )
         throws Exception
     {
         return false;

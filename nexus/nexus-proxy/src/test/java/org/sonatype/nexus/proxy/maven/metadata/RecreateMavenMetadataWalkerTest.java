@@ -84,7 +84,10 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom1/1-proj/1.0/1-proj-1.0.pom",
         "/com/mycom1/1.0/mycom1-1.0.pom",
         "/com/mycom1/2-proj/1.0/2-proj-1.0.pom",
-        "/com/mycom1/2.0/mycom1-2.0.pom"
+        "/com/mycom1/2.0/mycom1-2.0.pom",
+        "/com/mycom2/proj-1/1.0/proj-1-1.0.pom",
+        "/com/mycom2/proj-1/2.0/proj-1-2.0.pom",
+        "/com/mycom2/proj-1/maven-metadata.xml"
     };
 
     private String[] snapshotArtifactFiles = {
@@ -691,5 +694,25 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( versions, md.getVersioning().getVersions() );
     }
     
+    public void testMetadata0Bytes()
+        throws Exception
+    {
+        rebuildMavenMetadata( inhouseRelease );
+
+        Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
+        expected.put( "/com/mycom2/proj-1/maven-metadata.xml", Boolean.TRUE );
+        validateResults( inhouseRelease, expected );
+
+        Metadata md = readMavenMetadata( retrieveFile( inhouseRelease, "/com/mycom2/proj-1/maven-metadata.xml" ) );
+        assertEquals( "com.mycom2", md.getGroupId() );
+        assertEquals( "proj-1", md.getArtifactId() );
+        assertEquals( "2.0", md.getVersioning().getLatest() );
+        assertEquals( "2.0", md.getVersioning().getRelease() );
+
+        List<String> versions = new ArrayList<String>( 2 );
+        versions.add( "1.0" );
+        versions.add( "2.0" );
+        assertEquals( versions, md.getVersioning().getVersions() );
+    }
 
 }

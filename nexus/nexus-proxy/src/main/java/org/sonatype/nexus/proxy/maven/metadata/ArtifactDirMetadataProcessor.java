@@ -99,11 +99,9 @@ public class ArtifactDirMetadataProcessor
     }
 
     @Override
-    protected boolean isMetadataCorrect( String path )
+    protected boolean isMetadataCorrect( Metadata oldMd, String path )
         throws Exception
     {
-        Metadata oldMd = readMetadata( path );
-
         Metadata md = createMetadata( path );
 
         if ( oldMd.getVersioning().getRelease() == null )

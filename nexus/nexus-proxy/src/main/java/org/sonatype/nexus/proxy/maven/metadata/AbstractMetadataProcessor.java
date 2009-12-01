@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
+import org.apache.maven.mercury.repository.metadata.MetadataException;
 
 /**
  * @author juven
@@ -34,7 +35,9 @@ public abstract class AbstractMetadataProcessor
 
         if ( isMetadataExisted( path ) )
         {
-            if ( isMetadataCorrect( path ) )
+            Metadata metadata = readMetadata( path );
+
+            if ( metadata != null && isMetadataCorrect( metadata, path ) )
             {
                 postProcessMetadata( path );
 
@@ -75,6 +78,12 @@ public abstract class AbstractMetadataProcessor
 
             return md;
         }
+        catch ( MetadataException e )
+        {
+            metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'", e );
+
+            return null;
+        }
         finally
         {
             try
@@ -102,7 +111,7 @@ public abstract class AbstractMetadataProcessor
         metadataHelper.rebuildChecksum( path + METADATA_SUFFIX );
     }
 
-    protected abstract boolean isMetadataCorrect( String path )
+    protected abstract boolean isMetadataCorrect( Metadata metadata, String path )
         throws Exception;
 
     protected abstract boolean shouldProcessMetadata( String path );

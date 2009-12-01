@@ -112,11 +112,9 @@ public class VersionDirMetadataProcessor
     }
 
     @Override
-    protected boolean isMetadataCorrect( String path )
+    protected boolean isMetadataCorrect( Metadata oldMd, String path )
         throws Exception
     {
-        Metadata oldMd = readMetadata( path );
-
         if ( oldMd.getArtifactId() == null || oldMd.getGroupId() == null || oldMd.getVersion() == null
             || oldMd.getVersioning() == null || oldMd.getVersioning().getSnapshot() == null
             || oldMd.getVersioning().getSnapshot().getTimestamp() == null )

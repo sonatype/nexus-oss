@@ -82,11 +82,9 @@ public class GroupDirMetadataProcessor
 
     @SuppressWarnings( "unchecked" )
     @Override
-    protected boolean isMetadataCorrect( String path )
+    protected boolean isMetadataCorrect( Metadata oldMd, String path )
         throws Exception
     {
-        Metadata oldMd = readMetadata( path );
-
         Metadata md = createMetadata( path );
 
         List<Plugin> oldPlugins = oldMd.getPlugins();
