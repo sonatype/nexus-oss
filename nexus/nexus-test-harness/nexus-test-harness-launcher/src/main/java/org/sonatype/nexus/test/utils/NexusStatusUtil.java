@@ -17,12 +17,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.restlet.data.Response;
-import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 
@@ -165,37 +165,27 @@ public class NexusStatusUtil
     public static void stop()
         throws Exception
     {
-        // NOTE: Until we can kill active tasks, we need to wait for them to stop
+        // NOTE: Until we can't kill active tasks, we need to wait for them to stop
         TaskScheduleUtil.waitForAllTasksToStop();
 
         try
         {
-            if ( !getAppBooterService().isStopped() )
-            {
-                getAppBooterService().stop();
-            }
+            getAppBooterService().stop();
         }
         catch ( Exception e )
         {
             System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "
                 + e.getMessage() );
-            e.printStackTrace();
+            Assert.fail( e.getMessage() );
         }
         // finally
         // {
         // APP_BOOTER_SERVICE = null;
         // }
 
-        PlexusAppBooter appBooter = TestContainer.getInstance().getPlexusAppBooter();
-        if ( appBooter.isStarted() )
-        {
-            appBooter.stopContainer();
-
-        }
-
         if ( !waitForStop() )
         {
-            //just start over if we can't stop normally
+            // just start over if we can't stop normally
             System.out.println( "Forcing Stop of appbooter" );
             getAppBooterService().forceStop();
             APP_BOOTER_SERVICE = null;
