@@ -53,27 +53,31 @@ public class ThreadedPlexusAppBooterService
         // throw new AppBooterServiceException( "Failed to connect to client", e );
         // }
         // this.launcherThread = null;
-
-        if ( this.launcherThread != null && this.launcherThread.isAlive() )
+        try
         {
-            synchronized ( launcherThread )
+            if ( this.launcherThread != null && this.launcherThread.isAlive() )
             {
-                this.launcherThread.interrupt();
+                synchronized ( launcherThread )
+                {
+                    this.launcherThread.interrupt();
 
-                try
-                {
-                    this.launcherThread.join( 2000 );
-                }
-                catch ( InterruptedException e )
-                {
-                    System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
-                    // pass it on.
-                    Thread.currentThread().interrupt();
+                    try
+                    {
+                        this.launcherThread.join( 2000 );
+                    }
+                    catch ( InterruptedException e )
+                    {
+                        System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
+                        // pass it on.
+                        Thread.currentThread().interrupt();
+                    }
                 }
             }
         }
-
-        this.launcherThread = null;
+        finally
+        {
+            this.launcherThread = null;
+        }
     }
 
     public void start()
