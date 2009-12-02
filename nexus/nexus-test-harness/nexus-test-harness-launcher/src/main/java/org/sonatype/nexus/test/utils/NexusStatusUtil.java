@@ -165,32 +165,44 @@ public class NexusStatusUtil
     public static void stop()
         throws Exception
     {
-        // NOTE: Until we can't kill active tasks, we need to wait for them to stop
-        TaskScheduleUtil.waitForAllTasksToStop();
+        if ( APP_BOOTER_SERVICE == null )
+        {
+            // app booter wasn't started, won't do it on stop
+            return;
+        }
 
+        final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
         try
         {
-            getAppBooterService().stop();
-        }
-        catch ( Exception e )
-        {
-            System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "
-                + e.getMessage() );
-            Assert.fail( e.getMessage() );
-        }
-        // finally
-        // {
-        // APP_BOOTER_SERVICE = null;
-        // }
+            // NOTE: We can't kill active tasks, we need to wait for them to stop
+            TaskScheduleUtil.waitForAllTasksToStop();
 
-        if ( !waitForStop() )
-        {
-            // just start over if we can't stop normally
-            System.out.println( "Forcing Stop of appbooter" );
-            getAppBooterService().forceStop();
-            APP_BOOTER_SERVICE = null;
-        }
+            try
+            {
+                appBooterService.stop();
+            }
+            catch ( Exception e )
+            {
+                System.err.println( "Failed to stop Nexus. The thread will most likely die with an error: "
+                    + e.getMessage() );
+                Assert.fail( e.getMessage() );
+            }
+            finally
+            {
+                APP_BOOTER_SERVICE = null;
+            }
 
+            if ( !waitForStop() )
+            {
+                // just start over if we can't stop normally
+                System.out.println( "Forcing Stop of appbooter" );
+                appBooterService.forceStop();
+            }
+        }
+        finally
+        {
+            appBooterService.clean();
+        }
     }
 
     public static boolean isNexusAlive()

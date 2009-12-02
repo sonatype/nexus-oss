@@ -16,6 +16,8 @@ public class ThreadedPlexusAppBooterService
 
     private int controlPort;
 
+    private LauncherThread stoppedLauncher;
+
     private static int THREAD_COUNT = 1;
 
     public ThreadedPlexusAppBooterService( File classworldsConf, int controlPort )
@@ -76,6 +78,7 @@ public class ThreadedPlexusAppBooterService
         }
         finally
         {
+            this.stoppedLauncher = launcherThread;
             this.launcherThread = null;
         }
     }
@@ -103,10 +106,10 @@ public class ThreadedPlexusAppBooterService
     @SuppressWarnings( "deprecation" )
     public void forceStop()
     {
-        if ( this.launcherThread != null )
+        if ( this.stoppedLauncher != null )
         {
-            this.launcherThread.stop();
-            this.launcherThread = null;
+            this.stoppedLauncher.stop();
+            this.stoppedLauncher = null;
         }
     }
 
@@ -137,6 +140,12 @@ public class ThreadedPlexusAppBooterService
                 e.printStackTrace();
             }
         }
+    }
+
+    public void clean()
+    {
+        this.stoppedLauncher = null;
+        this.launcherThread = null;
     }
 
 }
