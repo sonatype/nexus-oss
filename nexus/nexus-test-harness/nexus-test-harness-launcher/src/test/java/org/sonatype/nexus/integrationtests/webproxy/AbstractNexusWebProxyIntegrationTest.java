@@ -44,10 +44,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
     public void stopWebProxy()
         throws Exception
     {
-        if ( server != null )
-        {
-            server.stop();
-        }
+        server.stop();
     }
 
 }

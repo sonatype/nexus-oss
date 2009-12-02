@@ -105,8 +105,8 @@ public class SearchMessageUtil
     {
         Response response = doSearchFor( queryArgs, repositoryId );
         String responseText = response.getEntity().getText();
-
-        Assert.assertTrue( "Search failure:\n" + responseText, response.getStatus().isSuccess() );
+        
+        Assert.assertTrue( "Search failure:\n"+ responseText, response.getStatus().isSuccess() );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
@@ -156,14 +156,7 @@ public class SearchMessageUtil
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repositoryName;
-        final Response response = RequestFacade.doGetRequest( serviceURI );
-
-        if ( response.getStatus().isError() )
-        {
-            Assert.assertFalse( "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus(),
-                                response.getStatus().isError() );
-        }
-        String responseText = response.getEntity().getText();
+        String responseText = RequestFacade.doGetRequest( serviceURI ).getEntity().getText();
 
         RepositoryResourceResponse repository = (RepositoryResourceResponse) xstream.fromXML( responseText );
         return (RepositoryResource) repository.getData();
@@ -189,7 +182,7 @@ public class SearchMessageUtil
     {
         RepositoryResource repository = getRepository( repositoryName );
 
-        if ( allowDeploying )
+        if( allowDeploying)
         {
             repository.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
         }

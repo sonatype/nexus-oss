@@ -16,8 +16,6 @@ public class ThreadedPlexusAppBooterService
 
     private int controlPort;
 
-    private LauncherThread stoppedLauncher;
-
     private static int THREAD_COUNT = 1;
 
     public ThreadedPlexusAppBooterService( File classworldsConf, int controlPort )
@@ -55,32 +53,27 @@ public class ThreadedPlexusAppBooterService
         // throw new AppBooterServiceException( "Failed to connect to client", e );
         // }
         // this.launcherThread = null;
-        try
-        {
-            if ( this.launcherThread != null && this.launcherThread.isAlive() )
-            {
-                synchronized ( launcherThread )
-                {
-                    this.launcherThread.interrupt();
 
-                    try
-                    {
-                        this.launcherThread.join( 2000 );
-                    }
-                    catch ( InterruptedException e )
-                    {
-                        System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
-                        // pass it on.
-                        Thread.currentThread().interrupt();
-                    }
+        if ( this.launcherThread != null && this.launcherThread.isAlive() )
+        {
+            synchronized ( launcherThread )
+            {
+                this.launcherThread.interrupt();
+
+                try
+                {
+                    this.launcherThread.join( 2000 );
+                }
+                catch ( InterruptedException e )
+                {
+                    System.err.println( "Error waiting for launcher Thread to finish: " + e.getMessage() );
+                    // pass it on.
+                    Thread.currentThread().interrupt();
                 }
             }
         }
-        finally
-        {
-            this.stoppedLauncher = launcherThread;
-            this.launcherThread = null;
-        }
+
+        this.launcherThread = null;
     }
 
     public void start()
@@ -106,10 +99,10 @@ public class ThreadedPlexusAppBooterService
     @SuppressWarnings( "deprecation" )
     public void forceStop()
     {
-        if ( this.stoppedLauncher != null )
+        if ( this.launcherThread != null )
         {
-            this.stoppedLauncher.stop();
-            this.stoppedLauncher = null;
+            this.launcherThread.stop();
+            this.launcherThread = null;
         }
     }
 
@@ -140,12 +133,6 @@ public class ThreadedPlexusAppBooterService
                 e.printStackTrace();
             }
         }
-    }
-
-    public void clean()
-    {
-        this.stoppedLauncher = null;
-        this.launcherThread = null;
     }
 
 }
