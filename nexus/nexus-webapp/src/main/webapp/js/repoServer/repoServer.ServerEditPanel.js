@@ -248,14 +248,14 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             listeners: {
               'expand' : {
                 fn: function(panel) {
-                  panel.find('name', 'securityAnonymousAccessEnabled')[0].setValue('true');
+                  this.isSecurityAnonymousAccessEnabled = true;
                   this.optionalFieldsetExpandHandler(panel);
                 },
                 scope: this
               },
               'collapse' : {
                 fn: function(panel) {
-                  panel.find('name', 'securityAnonymousAccessEnabled')[0].setValue('false');
+                  this.isSecurityAnonymousAccessEnabled = false;
                   panel.find('name', 'securityAnonymousPassword')[0].setValue('');
                   this.optionalFieldsetCollapseHandler(panel);
                 },
@@ -265,10 +265,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             },
 
             items: [
-              {
-                xtype: 'hidden',
-                name: 'securityAnonymousAccessEnabled'
-              },
               {
                 xtype: 'panel',
                 layout: 'fit',
@@ -584,9 +580,6 @@ Sonatype.repoServer.ServerEditPanel = function(config){
   
   var securityConfigField = this.formPanel.find('name', 'securityEnabled')[0];
   securityConfigField.on('select', this.securitySelectHandler, securityConfigField);
-  
-//  var anonymousField = this.formPanel.find('name', 'securityAnonymousAccessEnabled')[0];
-//  anonymousField.on('check', this.anonymousCheckHandler, anonymousField);
 };
 
 Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
@@ -642,6 +635,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
         "securityRealms" : function(val, fpanel){
           return fpanel.find( 'name', 'securityRealms' )[0].getValue();
+        },
+        "securityAnonymousAccessEnabled" : function(val, fpanel){
+          return fpanel.isSecurityAnonymousAccessEnabled;
         }
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
@@ -696,6 +692,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         "securityRealms" : function(arr, srcObj, fpanel){
           fpanel.find( 'name', 'securityRealms' )[0].setValue( arr );
           return arr; //return arr, even if empty to comply with sonatypeLoad data modifier requirement
+        },
+        "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel){
+          fpanel.isSecurityAnonymousAccessEnabled = arr;
         }
       }
     });
@@ -817,7 +816,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       //@note: this is a work around to get proper use of the isDirty() function of this field
       //@todo: could/should extend sonatypeLoad to set the originalValue on all fields to the value it loads
       //        default behavior sets the original value to whatever is specified in the config.
-      if (action.options.fpanel.find('name', 'securityAnonymousAccessEnabled')[0].getValue() == "true") {
+      if (action.options.fpanel.isSecurityAnonymousAccessEnabled == true) {
         action.options.fpanel.find('id', (action.options.fpanel.id + '_' + 'anonymousAccessSettings'))[0].expand();
       }
     }
