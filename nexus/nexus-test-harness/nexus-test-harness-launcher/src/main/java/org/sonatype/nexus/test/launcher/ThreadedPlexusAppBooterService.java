@@ -53,7 +53,6 @@ public class ThreadedPlexusAppBooterService
         // throw new AppBooterServiceException( "Failed to connect to client", e );
         // }
         // this.launcherThread = null;
-
         if ( this.launcherThread != null && this.launcherThread.isAlive() )
         {
             synchronized ( launcherThread )
@@ -72,8 +71,6 @@ public class ThreadedPlexusAppBooterService
                 }
             }
         }
-
-        this.launcherThread = null;
     }
 
     public void start()
@@ -133,6 +130,11 @@ public class ThreadedPlexusAppBooterService
                 e.printStackTrace();
             }
         }
+    }
+
+    public void clean()
+    {
+        this.launcherThread = null;
     }
 
 }
