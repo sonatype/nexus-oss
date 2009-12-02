@@ -5,6 +5,7 @@ import java.io.InputStream;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
+import org.codehaus.plexus.util.IOUtil;
 
 /**
  * @author juven
@@ -86,16 +87,7 @@ public abstract class AbstractMetadataProcessor
         }
         finally
         {
-            try
-            {
-                if ( mdStream != null )
-                {
-                    mdStream.close();
-                }
-            }
-            catch ( Exception e )
-            {
-            }
+            IOUtil.close( mdStream );
         }
     }
 

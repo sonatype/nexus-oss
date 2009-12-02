@@ -32,7 +32,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
  * The Class DefaultAttributesHandler.
- *
+ * 
  * @author cstamas
  */
 @Component( role = AttributesHandler.class )
@@ -67,7 +67,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the attribute storage.
-     *
+     * 
      * @return the attribute storage
      */
     public AttributeStorage getAttributeStorage()
@@ -77,7 +77,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the attribute storage.
-     *
+     * 
      * @param attributeStorage the new attribute storage
      */
     public void setAttributeStorage( AttributeStorage attributeStorage )
@@ -87,7 +87,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the item inspector list.
-     *
+     * 
      * @return the item inspector list
      */
     public List<StorageItemInspector> getItemInspectorList()
@@ -97,7 +97,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the item inspector list.
-     *
+     * 
      * @param itemInspectorList the new item inspector list
      */
     public void setItemInspectorList( List<StorageItemInspector> itemInspectorList )
@@ -107,7 +107,7 @@ public class DefaultAttributesHandler
 
     /**
      * Gets the file item inspector list.
-     *
+     * 
      * @return the file item inspector list
      */
     public List<StorageFileItemInspector> getFileItemInspectorList()
@@ -117,7 +117,7 @@ public class DefaultAttributesHandler
 
     /**
      * Sets the file item inspector list.
-     *
+     * 
      * @param fileItemInspectorList the new file item inspector list
      */
     public void setFileItemInspectorList( List<StorageFileItemInspector> fileItemInspectorList )
@@ -195,41 +195,59 @@ public class DefaultAttributesHandler
 
     /**
      * Expand custom item attributes.
-     *
+     * 
      * @param item the item
      * @param inputStream the input stream
      */
     protected void expandCustomItemAttributes( StorageItem item, InputStream inputStream )
     {
         File tmpFile = null;
+
+        try
+        {
+            if ( inputStream != null )
+            {
+                OutputStream tmpFileStream = null;
+
+                try
+                {
+                    // unpack the file
+                    tmpFile =
+                        File.createTempFile( "px-" + item.getName(), ".tmp", applicationConfiguration
+                            .getTemporaryDirectory() );
+
+                    tmpFileStream = new FileOutputStream( tmpFile );
+
+                    IOUtils.copy( inputStream, tmpFileStream );
+
+                    tmpFileStream.flush();
+
+                    tmpFileStream.close();
+                }
+                finally
+                {
+                    IOUtil.close( inputStream );
+
+                    IOUtil.close( tmpFileStream );
+                }
+            }
+        }
+        catch ( IOException ex )
+        {
+            getLogger().warn( "Could not create file from " + item.getRepositoryItemUid(), ex );
+
+            tmpFile = null;
+        }
+
         if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
         {
             StorageFileItem fItem = (StorageFileItem) item;
 
-            if ( !fItem.isVirtual() && inputStream != null )
+            if ( !fItem.isVirtual() && tmpFile != null )
             {
-                // we should prepare a file for inspectors
                 try
                 {
-                    // unpack the file
-                    tmpFile = File.createTempFile( "px-" + item.getName(), ".tmp",  applicationConfiguration.getTemporaryDirectory());
-
-                    OutputStream tmpFileStream = new FileOutputStream( tmpFile );
-
-                    try
-                    {
-                        IOUtils.copy( inputStream, tmpFileStream );
-
-                        tmpFileStream.flush();
-
-                        tmpFileStream.close();
-                    }
-                    finally
-                    {
-                        IOUtil.close( inputStream );
-
-                        IOUtil.close( tmpFileStream );
-                    }
+                    // we should prepare a file for inspectors
                     for ( StorageFileItemInspector inspector : getFileItemInspectorList() )
                     {
                         if ( inspector.isHandled( item ) )
@@ -242,15 +260,10 @@ public class DefaultAttributesHandler
                             {
                                 getLogger().warn(
                                     "Inspector " + inspector.getClass() + " throw exception during inspection of "
-                                        + item.getRepositoryItemUid() + ", continuing...",
-                                    ex );
+                                        + item.getRepositoryItemUid() + ", continuing...", ex );
                             }
                         }
                     }
-                }
-                catch ( IOException ex )
-                {
-                    getLogger().warn( "Could not create file from " + item.getRepositoryItemUid() );
                 }
                 finally
                 {
@@ -258,6 +271,7 @@ public class DefaultAttributesHandler
                     {
                         tmpFile.delete();
                     }
+                    
                     tmpFile = null;
                 }
             }
@@ -276,8 +290,7 @@ public class DefaultAttributesHandler
                     {
                         getLogger().warn(
                             "Inspector " + inspector.getClass() + " throw exception during inspection of "
-                                + item.getRepositoryItemUid() + ", continuing...",
-                            ex );
+                                + item.getRepositoryItemUid() + ", continuing...", ex );
                     }
                 }
             }

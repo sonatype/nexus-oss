@@ -31,6 +31,7 @@ import org.apache.maven.mercury.repository.metadata.MetadataOperand;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
@@ -147,16 +148,7 @@ public class M2GroupRepository
         }
         finally
         {
-            try
-            {
-                if ( inputStream != null )
-                {
-                    inputStream.close();
-                }
-            }
-            catch ( Exception e )
-            {
-            }
+            IOUtil.close( inputStream );
         }
     }
 
@@ -298,7 +290,7 @@ public class M2GroupRepository
     }
 
     protected StorageCompositeFileItem createMergedMetadataItem( ResourceStoreRequest request, byte[] content,
-                                                                 List<StorageItem> sources )
+        List<StorageItem> sources )
     {
         // we are creating file maven-metadata.xml, and ask the MimeUtil for it's exact MIME type to honor potential
         // user configuration

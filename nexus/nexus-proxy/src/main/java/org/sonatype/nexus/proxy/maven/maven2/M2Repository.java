@@ -173,9 +173,15 @@ public class M2Repository
             {
                 // remote item is not reusable, and we usually cache remote stuff locally
                 ByteArrayOutputStream backup1 = new ByteArrayOutputStream();
-                orig = mdFile.getInputStream();
-                IOUtil.copy( orig, backup1 );
-                IOUtil.close( orig );
+                try
+                {
+                    orig = mdFile.getInputStream();
+                    IOUtil.copy( orig, backup1 );
+                }
+                finally
+                {
+                    IOUtil.close( orig );
+                }
                 backup = new ByteArrayInputStream( backup1.toByteArray() );
 
                 // Metadata is small, let's do it in memory
@@ -276,18 +282,18 @@ public class M2Repository
 
         return versions.get( versions.size() - 1 );
     }
-    
+
     @Override
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
         throws IllegalRequestException
     {
         // allow updating of metadata
         // we also need to allow updating snapshots
-        if( !M2ArtifactRecognizer.isMetadata( request.getRequestPath() ) && 
-            !M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
+        if ( !M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && !M2ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
         {
             super.enforceWritePolicy( request, action );
         }
-    } 
-    
+    }
+
 }

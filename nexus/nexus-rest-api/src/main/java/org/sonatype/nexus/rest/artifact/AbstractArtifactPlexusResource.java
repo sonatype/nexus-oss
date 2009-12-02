@@ -21,6 +21,7 @@ import java.util.List;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.Context;
@@ -71,8 +72,7 @@ public abstract class AbstractArtifactPlexusResource
         if ( StringUtils.isBlank( p ) && StringUtils.isBlank( e ) )
         {
             // if packaging and extension is both blank, it is a bad request
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                 "Deployment tried with both 'packaging' and/or 'extension' being empty! One of these values is mandatory!" );
         }
 
@@ -90,8 +90,8 @@ public abstract class AbstractArtifactPlexusResource
             c = null;
         }
 
-        Gav gav = null; 
-            
+        Gav gav = null;
+
         try
         {
             gav = new Gav( g, a, v, c, e, null, null, null, VersionUtils.isSnapshot( v ), false, null, false, null );
@@ -100,7 +100,7 @@ public abstract class AbstractArtifactPlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Illegal artifact coordinate.", ex );
         }
-            
+
         ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly );
 
         if ( getLogger().isDebugEnabled() )
@@ -157,16 +157,8 @@ public abstract class AbstractArtifactPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST );
         }
 
-        ArtifactStoreRequest gavRequest = getResourceStoreRequest(
-            request,
-            false,
-            repositoryId,
-            groupId,
-            artifactId,
-            version,
-            null,
-            null,
-            "pom" );
+        ArtifactStoreRequest gavRequest =
+            getResourceStoreRequest( request, false, repositoryId, groupId, artifactId, version, null, null, "pom" );
 
         try
         {
@@ -194,14 +186,9 @@ public abstract class AbstractArtifactPlexusResource
             }
             finally
             {
-                if ( ir != null )
-                {
-                    ir.close();
-                }
-                if ( pomContent != null )
-                {
-                    pomContent.close();
-                }
+                IOUtil.close( pomContent );
+
+                IOUtil.close( ir );
             }
 
             return pom;
@@ -245,16 +232,9 @@ public abstract class AbstractArtifactPlexusResource
             packaging = "jar";
         }
 
-        ArtifactStoreRequest gavRequest = getResourceStoreRequest(
-            request,
-            false,
-            repositoryId,
-            groupId,
-            artifactId,
-            version,
-            packaging,
-            classifier,
-            extension );
+        ArtifactStoreRequest gavRequest =
+            getResourceStoreRequest( request, false, repositoryId, groupId, artifactId, version, packaging, classifier,
+                extension );
 
         try
         {
@@ -266,15 +246,16 @@ public abstract class AbstractArtifactPlexusResource
 
             if ( redirectTo )
             {
-                Reference fileReference = createRepositoryReference( request, file
-                    .getRepositoryItemUid().getRepository().getId(), file.getRepositoryItemUid().getPath() );
+                Reference fileReference =
+                    createRepositoryReference( request, file.getRepositoryItemUid().getRepository().getId(), file
+                        .getRepositoryItemUid().getPath() );
 
                 response.setLocationRef( fileReference );
 
                 response.setStatus( Status.REDIRECTION_PERMANENT );
 
-                String redirectMessage = "If you are not automatically redirected use this url: "
-                    + fileReference.toString();
+                String redirectMessage =
+                    "If you are not automatically redirected use this url: " + fileReference.toString();
                 return redirectMessage;
             }
             else
@@ -323,11 +304,11 @@ public abstract class AbstractArtifactPlexusResource
         String packaging = null;
 
         String extension = null;
-        
+
         ArtifactCoordinate coords = null;
 
-        PomArtifactManager pomManager = new PomArtifactManager( getNexus()
-            .getNexusConfiguration().getTemporaryDirectory() );
+        PomArtifactManager pomManager =
+            new PomArtifactManager( getNexus().getNexusConfiguration().getTemporaryDirectory() );
 
         try
         {
@@ -368,7 +349,7 @@ public abstract class AbstractArtifactPlexusResource
                     {
                         hasPom = Boolean.parseBoolean( fi.getString() );
                     }
-                    
+
                     coords = new ArtifactCoordinate();
                     coords.setGroupId( groupId );
                     coords.setArtifactId( artifactId );
@@ -404,52 +385,30 @@ public abstract class AbstractArtifactPlexusResource
                         {
                             getLogger().info( e.getMessage() );
 
-                            throw new ResourceException(
-                                Status.CLIENT_ERROR_BAD_REQUEST,
+                            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                                 "Error occurred while reading the POM file. Malformed POM?" );
                         }
 
                         if ( isPom )
                         {
-                            gavRequest = getResourceStoreRequest(
-                                request,
-                                true,
-                                repositoryId,
-                                coords.getGroupId(),
-                                coords.getArtifactId(),
-                                coords.getVersion(),
-                                coords.getPackaging(),
-                                null,
-                                null );
+                            gavRequest =
+                                getResourceStoreRequest( request, true, repositoryId, coords.getGroupId(), coords
+                                    .getArtifactId(), coords.getVersion(), coords.getPackaging(), null, null );
                         }
                         else
                         {
-                            gavRequest = getResourceStoreRequest(
-                                request,
-                                true,
-                                repositoryId,
-                                coords.getGroupId(),
-                                coords.getArtifactId(),
-                                coords.getVersion(),
-                                coords.getPackaging(),
-                                classifier,
-                                extension );
+                            gavRequest =
+                                getResourceStoreRequest( request, true, repositoryId, coords.getGroupId(), coords
+                                    .getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier, extension );
                         }
                     }
                     else
                     {
                         is = fi.getInputStream();
 
-                        gavRequest = getResourceStoreRequest(
-                            request,
-                            true,
-                            repositoryId,
-                            groupId,
-                            artifactId,
-                            version,
-                            packaging,
-                            classifier,
-                            extension );
+                        gavRequest =
+                            getResourceStoreRequest( request, true, repositoryId, groupId, artifactId, version,
+                                packaging, classifier, extension );
                     }
 
                     MavenRepository mr = gavRequest.getMavenRepository();
@@ -460,18 +419,15 @@ public abstract class AbstractArtifactPlexusResource
                     // check is it a Snapshot repo
                     if ( RepositoryPolicy.SNAPSHOT.equals( mr.getRepositoryPolicy() ) )
                     {
-                        getLogger().info(
-                            "Upload to SNAPSHOT maven repository attempted, returning Bad Request." );
+                        getLogger().info( "Upload to SNAPSHOT maven repository attempted, returning Bad Request." );
 
-                        throw new ResourceException(
-                            Status.CLIENT_ERROR_BAD_REQUEST,
+                        throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                             "This is a Maven SNAPSHOT repository, and manual upload against it is forbidden!" );
                     }
 
                     if ( !versionMatchesPolicy( gavRequest.getVersion(), mr.getRepositoryPolicy() ) )
                     {
-                        getLogger().warn(
-                            "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
+                        getLogger().warn( "Version (" + gavRequest.getVersion() + ") and Repository Policy mismatch" );
                         throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "The version "
                             + gavRequest.getVersion() + " does not match the repository policy!" );
                     }
@@ -497,7 +453,7 @@ public abstract class AbstractArtifactPlexusResource
             }
         }
         catch ( Throwable t )
-        {           
+        {
             return buildUploadFailedHtmlResponse( t, request, response );
         }
         finally
@@ -506,11 +462,11 @@ public abstract class AbstractArtifactPlexusResource
             {
                 pomManager.removeTempPomFile();
             }
-        }        
+        }
 
         return coords;
     }
-    
+
     protected String buildUploadFailedHtmlResponse( Throwable t, Request request, Response response )
     {
         try
@@ -520,7 +476,7 @@ public abstract class AbstractArtifactPlexusResource
         catch ( ResourceException e )
         {
             getLogger().debug( "Got error while uploading artifact", t );
-            
+
             StringBuffer resp = new StringBuffer();
             resp.append( "<html>" );
             resp.append( "<body>" );
@@ -529,16 +485,16 @@ public abstract class AbstractArtifactPlexusResource
             resp.append( "</html>" );
 
             String forceSuccess = request.getResourceRef().getQueryAsForm().getFirstValue( "forceSuccess" );
-            
-            if ( !"true".equals( forceSuccess ))
+
+            if ( !"true".equals( forceSuccess ) )
             {
                 response.setStatus( e.getStatus() );
             }
-            
-            return resp.toString();   
+
+            return resp.toString();
         }
-        
-        //We have an error at this point, can't get here
+
+        // We have an error at this point, can't get here
         return null;
     }
 
@@ -643,5 +599,5 @@ public abstract class AbstractArtifactPlexusResource
 
         return result;
     }
-    
+
 }

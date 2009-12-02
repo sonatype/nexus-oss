@@ -62,13 +62,6 @@ public class StorageFileItemRepresentation
     }
 
     @Override
-    public InputStream getStream()
-        throws IOException
-    {
-        return getStorageFileItem().getInputStream();
-    }
-
-    @Override
     public void write( OutputStream outputStream )
         throws IOException
     {
