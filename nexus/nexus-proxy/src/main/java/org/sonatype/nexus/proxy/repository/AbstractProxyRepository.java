@@ -682,7 +682,7 @@ public abstract class AbstractProxyRepository
                         // check is the remote newer than the local one
                         try
                         {
-                            shouldGetRemote = getRemoteStorage().containsItem( localItem.getModified(), this, request );
+                            shouldGetRemote = doCheckRemoteItemExistence( localItem, request );
 
                             if ( !shouldGetRemote )
                             {
@@ -904,6 +904,28 @@ public abstract class AbstractProxyRepository
     }
 
     /**
+     * Checks for remote existence of local item.
+     * 
+     * @param localItem
+     * @param request
+     * @return
+     * @throws RemoteAccessException
+     * @throws StorageException
+     */
+    protected boolean doCheckRemoteItemExistence( StorageItem localItem, ResourceStoreRequest request )
+        throws RemoteAccessException, StorageException
+    {
+        if ( localItem != null )
+        {
+            return getRemoteStorage().containsItem( localItem.getModified(), this, request );
+        }
+        else
+        {
+            return getRemoteStorage().containsItem( this, request );
+        }
+    }
+
+    /**
      * Retrieves item with specified uid from remote storage according to the following retry-fallback-blacklist rules.
      * <li>Only retrieve item operation will use mirrors, other operations, like check availability and retrieve
      * checksum file, will always use repository canonical url.</li> <li>Only one mirror url will be considered before
@@ -1038,7 +1060,6 @@ public abstract class AbstractProxyRepository
 
         // validation failed, I guess.
         throw new ItemNotFoundException( request, this );
-
     }
 
     /**

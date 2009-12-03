@@ -66,17 +66,38 @@ public class DefaultRepositoryItemUidFactory
 
         RepositoryItemUid toBeReturned = itemUidMap.get( key ).get();
 
-        if ( toBeReturned == null )
+        if ( toBeReturned != null )
         {
-            itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
+            cleanUpItemUidMap( false );
 
-            toBeReturned = newGuy;
+            return toBeReturned;
         }
+        else
+        {
+            synchronized ( itemUidMap )
+            {
+                // try it again, since we were maybe sitting there waiting for someone who already did the job
+                itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
 
-        // do cleansing of the map if needed, this call might do nothing or clean up the itemUidMap for gc'ed UIDs
-        cleanUpItemUidMap( false );
+                toBeReturned = itemUidMap.get( key ).get();
 
-        return toBeReturned;
+                if ( toBeReturned != null )
+                {
+                    return toBeReturned;
+                }
+
+                // still no luck, do it
+                itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
+
+                toBeReturned = newGuy;
+
+                // do cleansing of the map if needed, this call might do nothing or clean up the itemUidMap for gc'ed
+                // UIDs
+                cleanUpItemUidMap( false );
+
+                return toBeReturned;
+            }
+        }
     }
 
     public RepositoryItemUid createUid( String uidStr )
@@ -110,10 +131,13 @@ public class DefaultRepositoryItemUidFactory
      * 
      * @return
      */
-    public int getUidCount()
+    public int getUidCount( boolean forceClean )
     {
-        cleanUpItemUidMap( true );
-
+        if ( forceClean )
+        {
+            cleanUpItemUidMap( true );
+        }
+        
         return itemUidMap.size();
     }
 

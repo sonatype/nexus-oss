@@ -122,6 +122,11 @@ public class DefaultRepositoryItemUid
         return getRepository().getId() + ":" + getPath();
     }
 
+    public String toDebugString()
+    {
+        return getRepository().getId() + ":" + getPath() + " (" + super.toString() + ")";
+    }
+
     // ==
 
     protected LockStep getLastStep( String lockKey )
@@ -238,6 +243,13 @@ public class DefaultRepositoryItemUid
     {
         LockStep step = getLastStep( lockKey );
 
+        if ( step == null )
+        {
+            // this is error here
+            throw new IllegalMonitorStateException( "UID \"" + toString()
+                + "\" was tried to be unlocked but had no step-history..." );
+        }
+
         if ( LockStep.READ.equals( step ) )
         {
             getActionLock( rwLock, true ).unlock();
@@ -282,22 +294,20 @@ public class DefaultRepositoryItemUid
     {
         return toString() + " : attrlock";
     }
-    
+
     public boolean isHidden()
     {
-        //paths that start with a . in any directory (or filename)
-        //are considered hidden.
-        //This check will catch (for example):
-        //  .metadata
-        //  /.meta/something.jar
-        //  /something/else/.hidden/something.jar
-        if ( getPath() != null 
-            && ( getPath().indexOf( "/." ) > -1 
-            || getPath().startsWith( "." ) ) )
+        // paths that start with a . in any directory (or filename)
+        // are considered hidden.
+        // This check will catch (for example):
+        // .metadata
+        // /.meta/something.jar
+        // /something/else/.hidden/something.jar
+        if ( getPath() != null && ( getPath().indexOf( "/." ) > -1 || getPath().startsWith( "." ) ) )
         {
             return true;
         }
-        
+
         return false;
     }
 }

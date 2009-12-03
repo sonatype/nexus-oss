@@ -55,32 +55,32 @@ public class RepositoryItemUidTest
         RepositoryItemUid uid3 = factory.createUid( repository, "/b.txt" );
 
         // Proof that create isn't putting anything in the internal maps
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid.lock( Action.create );
 
         // Proof that locking a uid adds it to internal maps
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid2.lock( Action.create );
 
         // Proof that locking 2 uids w/ the same item does not increase the internal map count
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid3.lock( Action.create );
 
         // Proof that using a different uid creates a new item in internal map
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid3.unlock();
 
         // Proof that removing an item updates internal maps
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid2.unlock();
 
         // Proof that removing an item that was added twice, doesn't remove the whole list
-        assertEquals( 2, factory.getUidCount() );
+        assertEquals( 2, factory.getUidCount( true ) );
 
         uid.unlock();
 
@@ -91,7 +91,7 @@ public class RepositoryItemUidTest
         System.gc();
 
         // Proof that removing the final item (if added more than once) removes whole list
-        assertEquals( 0, factory.getUidCount() );
+        assertEquals( 0, factory.getUidCount( true ) );
     }
 
     public void testConcurrentLocksOfSameUid()
@@ -115,7 +115,7 @@ public class RepositoryItemUidTest
         uidA = null;
         System.gc();
 
-        assertEquals( 0, ( (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory() ).getUidCount() );
+        assertEquals( 0, ( (DefaultRepositoryItemUidFactory) getRepositoryItemUidFactory() ).getUidCount( true ) );
     }
 
     private static final class RepositoryItemUidLockProcessLauncher
@@ -130,7 +130,7 @@ public class RepositoryItemUidTest
         private long timeout;
 
         public RepositoryItemUidLockProcessLauncher( RepositoryItemUidFactory repositoryItemUidFactory,
-                                                     RepositoryItemUid uid, int threadCount, long timeout )
+            RepositoryItemUid uid, int threadCount, long timeout )
         {
             this.uid = uid;
             this.threadCount = threadCount;
