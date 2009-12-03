@@ -479,12 +479,12 @@ public class DefaultFSLocalRepositoryStorage
         // delete the target, this is required on windows
         if ( target.exists() )
         {
-            FileUtils.forceDelete( target );
+            target.delete();
         }
-
+    
         // first try
         boolean success = hiddenTarget.renameTo( target );
-
+    
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
@@ -492,7 +492,7 @@ public class DefaultFSLocalRepositoryStorage
                                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath()
                                    + " --> " + target.getAbsolutePath() + " will wait " + getRenameRetryDelay()
                                    + " milliseconds and try again" );
-
+    
             try
             {
                 Thread.sleep( getRenameRetryDelay() );
@@ -500,10 +500,27 @@ public class DefaultFSLocalRepositoryStorage
             catch ( InterruptedException e )
             {
             }
-
+            
+            // try to delete again...
+            if ( target.exists() )
+            {
+                target.delete();
+            }
+    
+            // and rename again...
             success = hiddenTarget.renameTo( target );
+            
+            if ( success )
+            {
+                getLogger().info( "Rename operation succeeded after " 
+                    + i 
+                    + " retries on " 
+                    + hiddenTarget.getAbsolutePath()
+                    + " --> " 
+                    + target.getAbsolutePath() );
+            }
         }
-
+    
         if ( !success )
         {
             try
@@ -512,6 +529,15 @@ public class DefaultFSLocalRepositoryStorage
             }
             catch ( IOException e )
             {
+                getLogger().error( "Rename operation failed after " 
+                    + getRenameRetryCount() 
+                    + " retries in "
+                    + getRenameRetryDelay() 
+                    + " ms intervals"
+                    + hiddenTarget.getAbsolutePath()
+                    + " --> " 
+                    + target.getAbsolutePath() );
+                
                 throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
                     + target.getAbsolutePath() + "\"! " + e.getMessage() );
             }
