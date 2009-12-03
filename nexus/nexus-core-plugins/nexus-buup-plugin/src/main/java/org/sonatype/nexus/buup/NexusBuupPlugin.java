@@ -21,7 +21,9 @@ public interface NexusBuupPlugin
 
     /**
      * Initiates upgrade process. If isUpgradeReady() would return false, will do nothing, just return.
+     * 
+     * @return false is not all conditions met. NEVER returns true, since kills JVM
      */
-    void initiateUpgradeProcess()
+    boolean initiateUpgradeProcess()
         throws NexusBuupInvocationException;
 }

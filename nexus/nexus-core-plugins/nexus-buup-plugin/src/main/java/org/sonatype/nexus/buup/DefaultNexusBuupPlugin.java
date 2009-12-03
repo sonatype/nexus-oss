@@ -30,7 +30,7 @@ public class DefaultNexusBuupPlugin
     @Configuration( value = "${nexus-work}" )
     private File nexusWorkDir;
 
-    @Configuration( value = "${nexus-work}/buup" )
+    @Configuration( value = "${nexus-work}/upgrade-bundle" )
     private File upgradeBundleDir;
 
     public void initiateBundleDownload()
@@ -56,12 +56,12 @@ public class DefaultNexusBuupPlugin
         return true;
     }
 
-    public void initiateUpgradeProcess()
+    public boolean initiateUpgradeProcess()
         throws NexusBuupInvocationException
     {
         if ( !isUpgradeProcessReady() )
         {
-            return;
+            return false;
         }
 
         NexusBuupInvocationRequest request = new NexusBuupInvocationRequest( upgradeBundleDir );
@@ -72,6 +72,8 @@ public class DefaultNexusBuupPlugin
         request.setNexusBundleXmx( "512m" );
 
         invoker.invokeBuup( request );
+        
+        return true;
     }
 
 }
