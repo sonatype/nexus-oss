@@ -454,8 +454,23 @@ public class M2GavCalculatorTest
         assertEquals( null, gav.getHashType() );
         assertEquals( false, gav.isSignature() );
 
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus/nexus-webapp/1.4.0/nexus-webapp-1.4.0-bundle.tar.gz" );
+        assertEquals( "org.sonatype.nexus", gav.getGroupId() );
+        assertEquals( "nexus-webapp", gav.getArtifactId() );
+        assertEquals( "1.4.0", gav.getVersion() );
+        assertEquals( "1.4.0", gav.getBaseVersion() );
+        assertEquals( "bundle", gav.getClassifier() );
+        assertEquals( "tar.gz", gav.getExtension() );
+        assertEquals( null, gav.getSnapshotBuildNumber() );
+        assertEquals( null, gav.getSnapshotTimeStamp() );
+        assertEquals( "nexus-webapp-1.4.0-bundle.tar.gz", gav.getName() );
+        assertEquals( false, gav.isSnapshot() );
+        assertEquals( false, gav.isHash() );
+        assertEquals( null, gav.getHashType() );
+        assertEquals( false, gav.isSignature() );
+        
         path = gavCalculator.gavToPath( gav );
-        assertEquals( "/org/apache/maven/maven-core/2.0.9-SNAPSHOT/maven-core-2.0.9-20080302.032223-6-bin.tar.gz", path );
+        assertEquals( "/org/sonatype/nexus/nexus-webapp/1.4.0/nexus-webapp-1.4.0-bundle.tar.gz", path );
 
         gav = gavCalculator.pathToGav( "/foo/artifact/SNAPSHOT/artifact-SNAPSHOT.jar" );
         

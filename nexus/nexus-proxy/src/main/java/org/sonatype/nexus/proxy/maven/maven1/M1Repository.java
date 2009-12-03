@@ -158,7 +158,7 @@ public class M1Repository
 
         try
         {
-            gavCalculator.pathToGav( item.getPath() );
+            gav = gavCalculator.pathToGav( item.getPath() );
         }
         catch ( IllegalArtifactCoordinateException e )
         {

@@ -232,7 +232,7 @@ public class M2Repository
 
         try
         {
-            gavCalculator.pathToGav( item.getPath() );
+            gav = gavCalculator.pathToGav( item.getPath() );
         }
         catch ( IllegalArtifactCoordinateException e )
         {
