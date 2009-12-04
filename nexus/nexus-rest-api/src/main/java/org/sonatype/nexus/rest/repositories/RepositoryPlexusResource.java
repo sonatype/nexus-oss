@@ -30,6 +30,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
@@ -158,6 +159,58 @@ public class RepositoryPlexusResource
                         repository.setSearchable( model.isIndexable() );
 
                         repository.setNotFoundCacheTimeToLive( model.getNotFoundCacheTTL() );
+                        
+                        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                        {
+                            ProxyRepository proxyRepo = repository.adaptToFacet( ProxyRepository.class );
+                            
+                            proxyRepo.setRemoteUrl( model.getRemoteStorage().getRemoteStorageUrl() );
+                            String oldPasswordForRemoteStorage = null;
+                            if( proxyRepo.getRemoteAuthenticationSettings() != null &&
+                                UsernamePasswordRemoteAuthenticationSettings.class.isInstance( proxyRepo.getRemoteAuthenticationSettings() ))
+                            {
+                                oldPasswordForRemoteStorage = ((UsernamePasswordRemoteAuthenticationSettings) proxyRepo.getRemoteAuthenticationSettings() ).getPassword();
+                            }
+
+                            String oldPasswordForProxy = null;
+                            if( proxyRepo.getRemoteProxySettings() != null && proxyRepo.getRemoteProxySettings().isEnabled() &&
+                                proxyRepo.getRemoteProxySettings().getProxyAuthentication() != null &&
+                                UsernamePasswordRemoteAuthenticationSettings.class.isInstance( proxyRepo.getRemoteAuthenticationSettings() ))
+                            {
+                                oldPasswordForProxy = ((UsernamePasswordRemoteAuthenticationSettings) proxyRepo.getRemoteProxySettings().getProxyAuthentication() ).getPassword();
+                            }
+
+                            RemoteAuthenticationSettings remoteAuth = getAuthenticationInfoConverter().convertAndValidateFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
+                            RemoteConnectionSettings remoteConnSettings = getGlobalRemoteConnectionSettings().convertAndValidateFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
+                            RemoteProxySettings httpProxySettings = getGlobalHttpProxySettings().convertAndValidateFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
+
+                            if( remoteAuth != null )
+                            {
+                                proxyRepo.setRemoteAuthenticationSettings( remoteAuth );
+                            }
+                            else
+                            {
+                                proxyRepo.getRemoteStorageContext().removeRemoteAuthenticationSettings();
+                            }
+
+                            if( remoteConnSettings != null )
+                            {
+                                proxyRepo.setRemoteConnectionSettings( remoteConnSettings );
+                            }
+                            else
+                            {
+                                proxyRepo.getRemoteStorageContext().removeRemoteConnectionSettings();
+                            }
+
+                            if( httpProxySettings != null)
+                            {
+                                proxyRepo.setRemoteProxySettings( httpProxySettings );
+                            }
+                            else
+                            {
+                                proxyRepo.getRemoteStorageContext().removeRemoteProxySettings();
+                            }
+                        }
 
                         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                         {
@@ -175,8 +228,6 @@ public class RepositoryPlexusResource
 
                                 pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
 
-                                pRepository.setRemoteUrl( model.getRemoteStorage().getRemoteStorageUrl() );
-
                                 pRepository.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
 
                                 pRepository.setDownloadRemoteIndexes( model.isDownloadRemoteIndexes() );
@@ -185,53 +236,7 @@ public class RepositoryPlexusResource
 
                                 pRepository.setArtifactMaxAge( proxyModel.getArtifactMaxAge() );
 
-                                pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );
-
-                                String oldPasswordForRemoteStorage = null;
-                                if( pRepository.getRemoteAuthenticationSettings() != null &&
-                                    UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
-                                {
-                                    oldPasswordForRemoteStorage = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteAuthenticationSettings() ).getPassword();
-                                }
-
-                                String oldPasswordForProxy = null;
-                                if( pRepository.getRemoteProxySettings() != null && pRepository.getRemoteProxySettings().isEnabled() &&
-                                    pRepository.getRemoteProxySettings().getProxyAuthentication() != null &&
-                                    UsernamePasswordRemoteAuthenticationSettings.class.isInstance( pRepository.getRemoteAuthenticationSettings() ))
-                                {
-                                    oldPasswordForProxy = ((UsernamePasswordRemoteAuthenticationSettings) pRepository.getRemoteProxySettings().getProxyAuthentication() ).getPassword();
-                                }
-
-                                RemoteAuthenticationSettings remoteAuth = getAuthenticationInfoConverter().convertAndValidateFromModel( this.convertAuthentication(  model.getRemoteStorage().getAuthentication(), oldPasswordForRemoteStorage ));
-                                RemoteConnectionSettings remoteConnSettings = getGlobalRemoteConnectionSettings().convertAndValidateFromModel( this.convertRemoteConnectionSettings( model.getRemoteStorage().getConnectionSettings() ));
-                                RemoteProxySettings httpProxySettings = getGlobalHttpProxySettings().convertAndValidateFromModel( this.convertHttpProxySettings( model.getRemoteStorage().getHttpProxySettings(), oldPasswordForProxy ) );
-
-                                if( remoteAuth != null )
-                                {
-                                    pRepository.setRemoteAuthenticationSettings( remoteAuth );
-                                }
-                                else
-                                {
-                                    pRepository.getRemoteStorageContext().removeRemoteAuthenticationSettings();
-                                }
-
-                                if( remoteConnSettings != null )
-                                {
-                                    pRepository.setRemoteConnectionSettings( remoteConnSettings );
-                                }
-                                else
-                                {
-                                    pRepository.getRemoteStorageContext().removeRemoteConnectionSettings();
-                                }
-
-                                if( httpProxySettings != null)
-                                {
-                                    pRepository.setRemoteProxySettings( httpProxySettings );
-                                }
-                                else
-                                {
-                                    pRepository.getRemoteStorageContext().removeRemoteProxySettings();
-                                }
+                                pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );   
                             }
                         }
 

@@ -65,8 +65,14 @@ public class RepositoryMessageUtil
         this.mediaType = mediaType;
         this.repositoryTypeRegistry = registry;
     }
-
+    
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
+        throws IOException
+    {
+        return createRepository( repo, true );
+    }
+
+    public RepositoryBaseResource createRepository( RepositoryBaseResource repo, boolean validate )
         throws IOException
     {
         Response response = this.sendMessage( Method.POST, repo );
@@ -85,7 +91,10 @@ public class RepositoryMessageUtil
         RepositoryBaseResource responseResource = this.getRepository( repo.getId() ); // GET always uses XML, due to a
         // problem in the RESTlet client
 
-        this.validateResourceResponse( repo, responseResource );
+        if ( validate )
+        {
+            this.validateResourceResponse( repo, responseResource );
+        }
 
         return responseResource;
     }
@@ -174,8 +183,14 @@ public class RepositoryMessageUtil
 
         return resourceResponse.getData();
     }
-
+    
     public RepositoryBaseResource updateRepo( RepositoryBaseResource repo )
+        throws IOException
+    {
+        return updateRepo( repo, true );
+    }
+    
+    public RepositoryBaseResource updateRepo( RepositoryBaseResource repo, boolean validate )
         throws IOException
     {
         Response response = this.sendMessage( Method.PUT, repo );
@@ -193,7 +208,10 @@ public class RepositoryMessageUtil
         // for now call GET
         RepositoryBaseResource responseResource = this.getRepository( repo.getId() );
 
-        this.validateResourceResponse( repo, responseResource );
+        if ( validate )
+        {
+            this.validateResourceResponse( repo, responseResource );
+        }
 
         return responseResource;
     }
