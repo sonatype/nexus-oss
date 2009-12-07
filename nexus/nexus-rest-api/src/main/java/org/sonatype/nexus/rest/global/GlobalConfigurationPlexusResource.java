@@ -418,8 +418,30 @@ public class GlobalConfigurationPlexusResource
                     {
                         getGlobalRestApiSettings().disable();
                     }
-
+                    
+                    // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
+                    // repositories) about the change, but only if config is saved okay
+                    // TODO: this is wrong, the config framework should "tell" this changed, but we have some
+                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are 
+                    boolean remoteConnectionSettingsIsDirty = getGlobalRemoteConnectionSettings().isDirty();
+                    
+                    boolean remoteHttpProxySettingsIsDirty = getGlobalHttpProxySettings().isDirty();
+                    
                     getNexusConfiguration().saveConfiguration();
+                    
+                    // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
+                    // repositories) about the change, but only if config is saved okay
+                    // TODO: this is wrong, the config framework should "tell" this changed, but we have some
+                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are 
+                    if (remoteConnectionSettingsIsDirty)
+                    {
+                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteConnectionSettings( getGlobalRemoteConnectionSettings() );
+                    }
+                    
+                    if (remoteHttpProxySettingsIsDirty) 
+                    {
+                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteProxySettings( getGlobalHttpProxySettings() );
+                    }
                 }
                 catch ( IOException e )
                 {
