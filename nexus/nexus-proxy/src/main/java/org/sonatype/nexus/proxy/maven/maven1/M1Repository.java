@@ -158,7 +158,7 @@ public class M1Repository
 
         try
         {
-            gav = gavCalculator.pathToGav( item.getPath() );
+            gav = getGavCalculator().pathToGav( item.getPath() );
         }
         catch ( IllegalArtifactCoordinateException e )
         {
@@ -171,8 +171,8 @@ public class M1Repository
             return super.isOld( item );
         }
 
-        // it is a release
-        return isOld( getArtifactMaxAge(), item );
+        return super.isOld( getArtifactMaxAge(), item )
+            && ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) || !isEnforceReleaseRedownloadPolicy() );
     }
 
     // not available on maven1 repo
@@ -180,18 +180,18 @@ public class M1Repository
     {
         return false;
     }
-    
+
     @Override
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
         throws IllegalRequestException
     {
         // allow updating of metadata
         // we also need to allow updating snapshots
-        if( !M1ArtifactRecognizer.isMetadata( request.getRequestPath() ) && 
-            !M1ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
+        if ( !M1ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && !M1ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
         {
             super.enforceWritePolicy( request, action );
         }
-    } 
-    
+    }
+
 }

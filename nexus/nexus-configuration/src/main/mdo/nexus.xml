@@ -177,6 +177,12 @@
       </fields>
       <codeSegments>
         <codeSegment>
+          <version>1.4.1</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.4.1";
+]]></code>
+        </codeSegment>
+        <codeSegment>
           <version>1.4.0</version>
           <code><![CDATA[
     public static final String MODEL_VERSION = "1.4.0";

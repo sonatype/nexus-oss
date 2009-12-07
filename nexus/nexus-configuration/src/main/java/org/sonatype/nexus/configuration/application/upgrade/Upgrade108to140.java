@@ -29,24 +29,24 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.CErrorReporting;
-import org.sonatype.nexus.configuration.model.CHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CLocalStorage;
-import org.sonatype.nexus.configuration.model.CMirror;
-import org.sonatype.nexus.configuration.model.CPathMappingItem;
-import org.sonatype.nexus.configuration.model.CProps;
-import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
-import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
-import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
-import org.sonatype.nexus.configuration.model.CRemoteStorage;
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
-import org.sonatype.nexus.configuration.model.CRepositoryTarget;
-import org.sonatype.nexus.configuration.model.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.CRouting;
-import org.sonatype.nexus.configuration.model.CScheduleConfig;
-import org.sonatype.nexus.configuration.model.CScheduledTask;
-import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
+import org.sonatype.nexus.configuration.model.v1_4_0.CErrorReporting;
+import org.sonatype.nexus.configuration.model.v1_4_0.CHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_4_0.CLocalStorage;
+import org.sonatype.nexus.configuration.model.v1_4_0.CMirror;
+import org.sonatype.nexus.configuration.model.v1_4_0.CPathMappingItem;
+import org.sonatype.nexus.configuration.model.v1_4_0.CProps;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRemoteAuthentication;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRemoteConnectionSettings;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRemoteStorage;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRepository;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRepositoryGrouping;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRepositoryTarget;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRestApiSettings;
+import org.sonatype.nexus.configuration.model.v1_4_0.CRouting;
+import org.sonatype.nexus.configuration.model.v1_4_0.CScheduleConfig;
+import org.sonatype.nexus.configuration.model.v1_4_0.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v1_4_0.CSmtpConfiguration;
 import org.sonatype.nexus.configuration.model.v1_0_8.Configuration;
 import org.sonatype.nexus.configuration.model.v1_0_8.io.xpp3.NexusConfigurationXpp3Reader;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -147,8 +147,8 @@ public class Upgrade108to140
         throws ConfigurationIsCorruptedException
     {
         Configuration oldc = (Configuration) message.getConfiguration();
-        org.sonatype.nexus.configuration.model.Configuration newc =
-            new org.sonatype.nexus.configuration.model.Configuration();
+        org.sonatype.nexus.configuration.model.v1_4_0.Configuration newc =
+            new org.sonatype.nexus.configuration.model.v1_4_0.Configuration();
 
         // Security has been moved out of the Nexus.xml
         try
@@ -160,7 +160,7 @@ public class Upgrade108to140
             throw new ConfigurationIsCorruptedException( "nexus.xml", e );
         }
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.v1_4_0.Configuration.MODEL_VERSION );
         // SMTP info is the same
         newc.setSmtpConfiguration( copyCSmtpConfiguration1_0_8( oldc.getSmtpConfiguration() ) );
         // Security info is the same
@@ -256,7 +256,7 @@ public class Upgrade108to140
 
         newc.setErrorReporting( errorReporting );
 
-        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_4_0.Configuration.MODEL_VERSION  );
         message.setConfiguration( newc );
     }
 

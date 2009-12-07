@@ -31,6 +31,8 @@ public abstract class AbstractMavenRepositoryConfiguration
 
     public static final String CLEANSE_REPOSITORY_METADATA = "cleanseRepositoryMetadata";
 
+    public static final String ENFORCE_RELEASE_REDOWNLOAD_POLICY = "enforceReleaseRedownloadPolicy";
+
     public AbstractMavenRepositoryConfiguration( Xpp3Dom configuration )
     {
         super( configuration );
@@ -96,5 +98,16 @@ public abstract class AbstractMavenRepositoryConfiguration
     public void setCleanseRepositoryMetadata( boolean val )
     {
         setNodeValue( getRootNode(), CLEANSE_REPOSITORY_METADATA, Boolean.toString( val ) );
+    }
+
+    public boolean isEnforceReleaseRedownloadPolicy()
+    {
+        return Boolean
+            .parseBoolean( getNodeValue( getRootNode(), ENFORCE_RELEASE_REDOWNLOAD_POLICY, Boolean.TRUE.toString() ) );
+    }
+
+    public void setEnforceReleaseRedownloadPolicy( boolean val )
+    {
+        setNodeValue( getRootNode(), ENFORCE_RELEASE_REDOWNLOAD_POLICY, Boolean.toString( val ) );
     }
 }
