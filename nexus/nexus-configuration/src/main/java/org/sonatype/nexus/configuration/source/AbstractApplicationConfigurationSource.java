@@ -115,6 +115,8 @@ public abstract class AbstractApplicationConfigurationSource
         if ( configuration != null && !Configuration.MODEL_VERSION.equals( configuration.getVersion() ) )
         {
             rejectConfiguration( "Nexus configuration file was loaded but discarded, it has the wrong version number.", null );
+            
+            throw new ConfigurationException( "Nexus configuration file was loaded but discarded, it has the wrong version number." );
         }
 
         if ( getConfiguration() != null )
