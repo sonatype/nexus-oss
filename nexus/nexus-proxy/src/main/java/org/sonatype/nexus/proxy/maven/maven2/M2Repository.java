@@ -232,7 +232,7 @@ public class M2Repository
 
         try
         {
-            gav = getGavCalculator().pathToGav( item.getPath() );
+            gav = gavCalculator.pathToGav( item.getPath() );
         }
         catch ( IllegalArtifactCoordinateException e )
         {
@@ -244,9 +244,8 @@ public class M2Repository
             // this is not an artifact, it is just any "file"
             return super.isOld( item );
         }
-
-        return super.isOld( getArtifactMaxAge(), item )
-            && ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) || !isEnforceReleaseRedownloadPolicy() );
+        // it is a release
+        return isOld( getArtifactMaxAge(), item );
     }
 
     @SuppressWarnings( "unchecked" )

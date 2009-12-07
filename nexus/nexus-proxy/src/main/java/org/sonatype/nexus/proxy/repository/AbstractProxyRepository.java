@@ -137,39 +137,6 @@ public abstract class AbstractProxyRepository
     }
 
     @Override
-    public void expireCaches( ResourceStoreRequest request )
-    {
-        super.expireCaches( request );
-
-        if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            request.setRequestLocalOnly( true );
-
-            // 1st, expire all the files below path
-            DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
-
-            ctx.getProcessors().add( new ExpireCacheWalker( this ) );
-
-            try
-            {
-                getWalker().walk( ctx );
-            }
-            catch ( WalkerException e )
-            {
-                if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
-                {
-                    // everything that is not ItemNotFound should be reported,
-                    // otherwise just neglect it
-                    throw e;
-                }
-            }
-
-            // 2nd, remove the items from NFC
-            expireNotFoundCaches( request );
-        }
-    }
-
-    @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -1115,16 +1082,10 @@ public abstract class AbstractProxyRepository
      */
     protected boolean isOld( int maxAge, StorageItem item )
     {
-        if ( !isItemAgingActive() )
-        {
-            // simple say "is old" always
-            return true;
-        }
-
         return isOld( maxAge, item, isItemAgingActive() );
     }
 
-    private boolean isOld( int maxAge, StorageItem item, boolean shouldCalculate )
+    protected boolean isOld( int maxAge, StorageItem item, boolean shouldCalculate )
     {
         if ( !shouldCalculate )
         {

@@ -401,10 +401,31 @@ public abstract class AbstractRepository
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
+        request.setRequestLocalOnly( true );
+
         getLogger().info(
             "Expiring local cache in repository ID='" + getId() + "' from path='" + request.getRequestPath() + "'" );
 
-        // just call the other one
+        // 1st, expire all the files below path
+        DefaultWalkerContext ctx = new DefaultWalkerContext( this, request );
+
+        ctx.getProcessors().add( new ExpireCacheWalker( this ) );
+
+        try
+        {
+            getWalker().walk( ctx );
+        }
+        catch ( WalkerException e )
+        {
+            if ( !( e.getWalkerContext().getStopCause() instanceof ItemNotFoundException ) )
+            {
+                // everything that is not ItemNotFound should be reported,
+                // otherwise just neglect it
+                throw e;
+            }
+        }
+
+        // 2nd, remove the items from NFC
         expireNotFoundCaches( request );
     }
 

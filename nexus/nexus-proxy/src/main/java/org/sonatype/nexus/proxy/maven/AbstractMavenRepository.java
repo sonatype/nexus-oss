@@ -143,20 +143,6 @@ public abstract class AbstractMavenRepository
     }
 
     @Override
-    public void expireCaches( ResourceStoreRequest request )
-    {
-        if ( RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) )
-        {
-            // A release repository does not expire it's items!
-            expireNotFoundCaches( request );
-        }
-        else
-        {
-            super.expireCaches( request );
-        }
-    }
-
-    @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -255,16 +241,6 @@ public abstract class AbstractMavenRepository
         {
             this.downloadRemoteIndexEnabled = true;
         }
-    }
-
-    public boolean isEnforceReleaseRedownloadPolicy()
-    {
-        return getExternalConfiguration( false ).isEnforceReleaseRedownloadPolicy();
-    }
-
-    public void setEnforceReleaseRedownloadPolicy( boolean val )
-    {
-        getExternalConfiguration( true ).setEnforceReleaseRedownloadPolicy( val );
     }
 
     public RepositoryPolicy getRepositoryPolicy()

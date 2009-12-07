@@ -37,8 +37,4 @@ public interface MavenProxyRepository
     boolean isDownloadRemoteIndexes();
 
     void setDownloadRemoteIndexes( boolean download );
-
-    boolean isEnforceReleaseRedownloadPolicy();
-
-    void setEnforceReleaseRedownloadPolicy( boolean val );
 }
