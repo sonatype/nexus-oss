@@ -69,9 +69,14 @@ public class DefaultFSLocalRepositoryStorage
     @Configuration( value = "${rename.retry.delay}" )
     private String renameRetryDelayString;
 
+    @Configuration( value = "${upload.stream.bufferSize}" )
+    private String copyStreamBufferSizeString;
+    
     private int renameRetryCount = -1;
 
     private int renameRetryDelay = -1;
+    
+    private int copyStreamBufferSize = -1;
 
     /**
      * The UID factory.
@@ -97,6 +102,24 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         return renameRetryDelay;
+    }
+    
+    protected int getCopyStreamBufferSize()
+    {
+        if( this.copyStreamBufferSize == -1 )
+        {
+            try
+            {
+                // keeping this separate from initializeRenameRetryParams, parsing because hopefully that change will get backed out.
+                this.copyStreamBufferSize = Integer.parseInt( copyStreamBufferSizeString );
+            }
+            catch ( NumberFormatException e )
+            {
+                this.getLogger().debug( "Property upload.stream.bufferSize is not a valid integer, defaulting to 4096" );
+                this.copyStreamBufferSize = 4096;
+            }   
+        }
+        return this.copyStreamBufferSize;
     }
 
     protected void initializeRenameRetryParams()
@@ -385,8 +408,14 @@ public class DefaultFSLocalRepositoryStorage
                     is = ( (StorageFileItem) item ).getInputStream();
 
                     os = new FileOutputStream( hiddenTarget );
-
-                    IOUtil.copy( is, os );
+                    
+                    int bufferSize = this.getCopyStreamBufferSize();
+                    // log what the buffer size is so we can make sure we set it correctly.
+                    if( this.getLogger().isDebugEnabled())
+                    {
+                        this.getLogger().debug( "Copying stream with buffer size of: "+ bufferSize );
+                    }
+                    IOUtil.copy( is, os, bufferSize );
 
                     os.flush();
                 }
