@@ -248,9 +248,8 @@ public class DefaultErrorReportingManager
             
             try
             {
-                List<Issue> existingIssues = retrieveIssues( subRequest.getSummary() );
-    
-                if ( existingIssues == null )
+                // manual, no check for existing
+                if ( request.getTitle() != null )
                 {
                     IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
                     response.setCreated( true );
@@ -259,12 +258,25 @@ public class DefaultErrorReportingManager
                     getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
                 }
                 else
-                {   
-                    response.setJiraUrl( existingIssues.get( 0 ).getLink() );
-                    renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
-                    getLogger().info(
-                                      "Not reporting problem as it already exists in database: "
-                                          + existingIssues.iterator().next().getLink() );
+                {
+                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary() );
+        
+                    if ( existingIssues == null )
+                    {
+                        IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
+                        response.setCreated( true );
+                        response.setJiraUrl( result.getIssueUrl() );
+                        renameBundle( unencryptedFile, result.getKey() );
+                        getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
+                    }
+                    else
+                    {   
+                        response.setJiraUrl( existingIssues.get( 0 ).getLink() );
+                        renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
+                        getLogger().info(
+                                          "Not reporting problem as it already exists in database: "
+                                              + existingIssues.iterator().next().getLink() );
+                    }
                 }
                 response.setSuccess( true );
             }
