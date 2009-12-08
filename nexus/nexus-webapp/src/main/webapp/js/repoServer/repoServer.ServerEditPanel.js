@@ -806,10 +806,13 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
     } );
   },
   
-  createProblemReport : function( window, title, description ) {    
+  createProblemReport : function( window, title, description ) {
+    Sonatype.MessageBox.wait( 'Generating Report ...' );
     Ext.Ajax.request({
       method: 'PUT',
       url: Sonatype.config.servicePath + '/error_reporting',
+      // 10 minute timeout, upload may be large...
+      timeout: 600000,
       jsonData: {
         data: {
           title: title,

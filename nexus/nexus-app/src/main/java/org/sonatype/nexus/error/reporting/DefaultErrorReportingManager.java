@@ -313,7 +313,6 @@ public class DefaultErrorReportingManager
         }
         
         if ( request.getThrowable() != null 
-            && request.getThrowable().getMessage() != null
             && StringUtils.isNotEmpty( request.getThrowable().getMessage() ) )
         {
             String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
@@ -393,15 +392,15 @@ public class DefaultErrorReportingManager
     protected IssueSubmissionRequest buildRequest( ErrorReportRequest request )
         throws IOException
     {
-        String summary = "APR: ";
+        String summary = null;
         
         if ( request.getTitle() != null )
         {
-            summary += request.getTitle();
+            summary = "MPR: " + request.getTitle();
         }
         else
         {
-            summary += request.getThrowable().getMessage();
+            summary = "APR: " + request.getThrowable().getMessage();
         }
 
         if ( summary.length() > 255 )
@@ -613,12 +612,7 @@ public class DefaultErrorReportingManager
     private File getExceptionListing( Throwable t )
         throws IOException
     {
-        if ( t != null )
-        {
-            return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
-        }
-        
-        return null;
+        return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
     }
 
     private File getContextListing( Map<String, Object> context )
