@@ -36,7 +36,7 @@ public interface ErrorReportingManager
 
     // ==
 
-    void handleError( ErrorReportRequest request )
+    ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
     File assembleBundle( ErrorReportRequest request )

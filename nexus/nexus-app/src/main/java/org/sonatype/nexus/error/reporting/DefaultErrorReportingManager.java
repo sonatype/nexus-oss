@@ -224,14 +224,19 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    public void handleError( ErrorReportRequest request )
+    public ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
         getLogger().error( "Detected Error in Nexus", request.getThrowable() );
         
-        if ( isEnabled()
+        ErrorReportResponse response = new ErrorReportResponse();
+        
+        // if title is not null, this is a manual report, so we will generate regardless
+        // of other checks
+        if ( request.getTitle() != null
+            || ( isEnabled()
             && shouldHandleReport( request )
-            && !shouldIgnore( request.getThrowable() ) )
+            && !shouldIgnore( request.getThrowable() ) ) )
         {
             IssueSubmissionRequest subRequest = buildRequest( request );
             
@@ -248,16 +253,20 @@ public class DefaultErrorReportingManager
                 if ( existingIssues == null )
                 {
                     IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
+                    response.setCreated( true );
+                    response.setJiraUrl( result.getIssueUrl() );
                     renameBundle( unencryptedFile, result.getKey() );
                     getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
                 }
                 else
-                {
+                {   
+                    response.setJiraUrl( existingIssues.get( 0 ).getLink() );
                     renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
                     getLogger().info(
                                       "Not reporting problem as it already exists in database: "
                                           + existingIssues.iterator().next().getLink() );
                 }
+                response.setSuccess( true );
             }
             finally
             {
@@ -267,6 +276,12 @@ public class DefaultErrorReportingManager
                 }
             }
         }
+        else
+        {
+            response.setSuccess( true );
+        }
+        
+        return response;
     }
 
     private void encryptRequest( IssueSubmissionRequest subRequest )
@@ -291,6 +306,12 @@ public class DefaultErrorReportingManager
 
     protected boolean shouldHandleReport( ErrorReportRequest request )
     {
+        // if there is a title, we are talking about user generated, simply use it
+        if ( request.getTitle() != null )
+        {
+            return true;
+        }
+        
         if ( request.getThrowable() != null 
             && request.getThrowable().getMessage() != null
             && StringUtils.isNotEmpty( request.getThrowable().getMessage() ) )
@@ -372,7 +393,16 @@ public class DefaultErrorReportingManager
     protected IssueSubmissionRequest buildRequest( ErrorReportRequest request )
         throws IOException
     {
-        String summary = "APR: " + request.getThrowable().getMessage();
+        String summary = "APR: ";
+        
+        if ( request.getTitle() != null )
+        {
+            summary += request.getTitle();
+        }
+        else
+        {
+            summary += request.getThrowable().getMessage();
+        }
 
         if ( summary.length() > 255 )
         {
@@ -383,12 +413,22 @@ public class DefaultErrorReportingManager
 
         subRequest.setProjectId( getJIRAProject() );
         subRequest.setSummary( summary );
-        subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
-            + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
         subRequest.setReporter( getValidJIRAUsername() );
         subRequest.setComponent( COMPONENT );
         subRequest.setEnvironment( assembleEnvironment( request ) );
+        
+        // use description if set
+        if ( request.getDescription() != null )
+        {
+            subRequest.setDescription( request.getDescription() );    
+        }
+        // otherwise pull from throwable
+        else if ( request.getThrowable() != null)
+        {
+            subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
+                + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
+        }
 
         if ( isUseGlobalProxy() )
         {
@@ -573,7 +613,12 @@ public class DefaultErrorReportingManager
     private File getExceptionListing( Throwable t )
         throws IOException
     {
-        return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
+        if ( t != null )
+        {
+            return writeStringToTempFile( ExceptionUtils.getFullStackTrace( t ), "exceptionListing.txt" );
+        }
+        
+        return null;
     }
 
     private File getContextListing( Map<String, Object> context )

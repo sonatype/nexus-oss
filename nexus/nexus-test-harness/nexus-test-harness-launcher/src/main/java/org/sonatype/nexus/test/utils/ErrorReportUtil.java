@@ -6,13 +6,61 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-
 import junit.framework.Assert;
+
+import org.codehaus.plexus.util.FileUtils;
+import org.restlet.data.MediaType;
+import org.restlet.data.Method;
+import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.ErrorReportRequest;
+import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
+import org.sonatype.nexus.rest.model.ErrorReportResponse;
+import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+
+import com.thoughtworks.xstream.XStream;
 
 public class ErrorReportUtil
 {
+    private static XStream xstream = XStreamFactory.getXmlXStream();
+    
+    public static ErrorReportResponse generateProblemReport( String title, String description )
+        throws IOException
+    {
+        ErrorReportRequest request = new ErrorReportRequest();
+        request.setData( new ErrorReportRequestDTO() );
+        request.getData().setTitle( title );
+        request.getData().setDescription( description );
+        
+        XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
+        representation.setPayload( request );
+        
+        String serviceURI = "service/local/error_reporting";
+        Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
+        
+        Assert.assertNotNull( response );
+        
+        if ( title != null )
+        {
+            Assert.assertTrue( response.getStatus().isSuccess() );
+            
+            representation = new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            
+            ErrorReportResponse responseObj =
+                ( ErrorReportResponse ) representation.getPayload( new ErrorReportResponse() );
+
+            return responseObj;
+        }
+        else
+        {
+            Assert.assertFalse( response.getStatus().isSuccess() );
+            Assert.assertEquals( 400, response.getStatus().getCode() );
+        }
+        
+        return null;
+    }
+    
     public static void cleanErrorBundleDir( String directory )
         throws IOException
     {

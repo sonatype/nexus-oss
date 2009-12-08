@@ -2875,5 +2875,67 @@
 		</fields>
 	</class>
 	
+	<class>
+	  <name>ErrorReportRequestDTO</name>
+	  <version>1.0.0+</version>
+	  <fields>
+	    <field>
+	      <name>title</name>
+	      <version>1.0.0+</version>
+	      <type>String</type>
+	      <required>true</required>
+	    </field>
+	    <field>
+	      <name>description</name>
+	      <version>1.0.0+</version>
+	      <type>String</type>
+	      <required>false</required>
+	    </field>
+	  </fields>
+	</class>
+	
+	<class>
+	  <name>ErrorReportRequest</name>
+	  <version>1.0.0+</version>
+	  <fields>
+	    <field>
+	      <name>data</name>
+	      <version>1.0.0+</version>
+	      <association>
+            <type>ErrorReportRequestDTO</type>
+          </association>
+          <required>true</required>
+	    </field>
+	  </fields>
+	</class>
+	
+	<class>
+	  <name>ErrorReportResponseDTO</name>
+	  <version>1.0.0+</version>
+	  <fields>
+	    <field>
+	      <name>jiraUrl</name>
+	      <version>1.0.0+</version>
+	      <type>String</type>
+	      <required>true</required>
+	    </field>
+	  </fields>
+	</class>
+	
+	<class>
+	  <name>ErrorReportResponse</name>
+	  <version>1.0.0+</version>
+	  <fields>
+	    <field>
+	      <name>data</name>
+	      <version>1.0.0+</version>
+	      <association>
+            <type>ErrorReportResponseDTO</type>
+          </association>
+          <required>true</required>
+	    </field>
+	  </fields>
+	</class>
+	
   </classes>
 </model>

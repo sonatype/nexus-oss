@@ -33,6 +33,10 @@ import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
+import org.sonatype.nexus.rest.model.ErrorReportRequest;
+import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
+import org.sonatype.nexus.rest.model.ErrorReportResponse;
+import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
@@ -586,6 +590,14 @@ public class NexusApplication
         xstream.omitField( PlexusUserSearchCriteriaResourceRequest.class, "modelEncoding" );
         xstream.alias( "user-search", PlexusUserSearchCriteriaResourceRequest.class );
         xstream.omitField( PlexusUserSearchCriteriaResource.class, "modelEncoding" );
+        
+        xstream.omitField( ErrorReportRequest.class, "modelEncoding" );
+        xstream.omitField( ErrorReportRequestDTO.class, "modelEncoding" );
+        xstream.omitField( ErrorReportResponse.class, "modelEncoding" );
+        xstream.omitField( ErrorReportResponseDTO.class, "modelEncoding" );
+        
+        xstream.alias( "error-report-request", ErrorReportRequest.class );
+        xstream.alias( "error-report-response", ErrorReportResponse.class );
 
         xstream.omitField( MirrorResourceListRequest.class, "modelEncoding" );
         xstream.omitField( MirrorResourceListResponse.class, "modelEncoding" );
