@@ -67,12 +67,12 @@ public class DefaultNexusBuupPlugin
         NexusBuupInvocationRequest request = new NexusBuupInvocationRequest( upgradeBundleDir );
 
         // simulate we have params for now
-        request.setNexusBundleXms( "128m" );
+        request.setNexusBundleXms( 128 );
 
-        request.setNexusBundleXmx( "512m" );
+        request.setNexusBundleXmx( 512 );
 
         invoker.invokeBuup( request );
-        
+
         return true;
     }
 

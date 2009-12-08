@@ -5,7 +5,6 @@ import java.util.HashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.buup.BuupInvocationException;
 import org.sonatype.buup.BuupInvocationRequest;
 import org.sonatype.buup.BuupInvoker;
@@ -24,14 +23,14 @@ public class DefaultNexusBuupInvoker
     {
         HashMap<String, String> params = new HashMap<String, String>();
 
-        if ( StringUtils.isNotBlank( request.getNexusBundleXmx() ) )
+        if ( request.getNexusBundleXmx() != NexusBuupInvocationRequest.XM_UNCHANGED )
         {
-            params.put( "nexus.bundle.xmx", request.getNexusBundleXmx() );
+            params.put( "nexus.bundle.xmx", request.getNexusBundleXmx() + "MB" );
         }
 
-        if ( StringUtils.isNotBlank( request.getNexusBundleXms() ) )
+        if ( request.getNexusBundleXms() != NexusBuupInvocationRequest.XM_UNCHANGED )
         {
-            params.put( "nexus.bundle.xms", request.getNexusBundleXms() );
+            params.put( "nexus.bundle.xms", request.getNexusBundleXms() + "MB" );
         }
 
         BuupInvocationRequest br =
