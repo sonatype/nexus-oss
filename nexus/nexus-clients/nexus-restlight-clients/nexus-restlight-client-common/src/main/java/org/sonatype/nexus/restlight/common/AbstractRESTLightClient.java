@@ -26,6 +26,7 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.auth.BasicScheme;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -187,8 +188,10 @@ public abstract class AbstractRESTLightClient
 
         List<String> policies = new ArrayList<String>();
         policies.add( NxBasicScheme.POLICY_NAME );
+        policies.add( "BASIC" );
 
         AuthPolicy.registerAuthScheme( NxBasicScheme.POLICY_NAME, NxBasicScheme.class );
+        AuthPolicy.registerAuthScheme( "BASIC", BasicScheme.class );
 
         client.getParams().setParameter( AuthPolicy.AUTH_SCHEME_PRIORITY, policies );
 
