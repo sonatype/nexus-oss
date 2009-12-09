@@ -4,19 +4,22 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.1-SNAPSHOT</version>
+    <version>1.4.1</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
+  
+  <version>1.4.1-SNAPSHOT</version>
 
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
-  <description>Nexus Maven Site Plugin (Extras).</description>
+  
+  <description>Adds a repository type for deploying maven sites.</description>
 
   <properties>
-    <nexus.version>1.4.1-SNAPSHOT</nexus.version>
-    <nexus-licensing-plugin.version>1.4.1-SNAPSHOT</nexus-licensing-plugin.version>
+    <nexus.version>1.4.1</nexus.version>
+    <nexus-licensing-plugin.version>1.4.1</nexus-licensing-plugin.version>
   </properties>
 
   <dependencyManagement>
@@ -170,6 +173,20 @@
   </build>
 
   <profiles>
+    <profile>
+      <id>skip-test-harness-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>failsafe-maven-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>obfuscation</id>
       <activation>
