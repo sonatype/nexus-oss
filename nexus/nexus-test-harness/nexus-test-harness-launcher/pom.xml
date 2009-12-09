@@ -5,14 +5,14 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-test-harness</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>Nexus Test Harness Launcher</name>
 
   <properties>
-  	<nexus-plugin-console-plugin.version>1.4.1</nexus-plugin-console-plugin.version>
+  	<nexus-plugin-console-plugin.version>1.4.2-SNAPSHOT</nexus-plugin-console-plugin.version>
   </properties>
 
   <build>

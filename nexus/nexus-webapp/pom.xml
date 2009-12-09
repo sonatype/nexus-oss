@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.4.1</version>
+    <version>1.4.2-SNAPSHOT</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
@@ -24,7 +24,7 @@
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
     
     <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
-    <nexus-plugin-console-plugin.version>1.4.1</nexus-plugin-console-plugin.version>
+    <nexus-plugin-console-plugin.version>1.4.2-SNAPSHOT</nexus-plugin-console-plugin.version>
     
   </properties>
   <dependencies>
