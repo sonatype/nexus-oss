@@ -115,11 +115,6 @@ public abstract class AbstractNexusMojo
      */
     private NexusInstanceDiscoverer discoverer;
 
-    /**
-     * @component role-hint="maven"
-     */
-    private SecDispatcher dispatcher;
-
     protected AbstractNexusMojo()
     {
     }
@@ -274,7 +269,7 @@ public abstract class AbstractNexusMojo
                     }
 
                     setUsername( info.getUser() );
-                    setPassword( dispatcher.decrypt( info.getPassword() ) );
+                    setPassword( discoverer.getSecDispatcher().decrypt( info.getPassword() ) );
                 }
                 catch ( NexusDiscoveryException e )
                 {
@@ -301,7 +296,7 @@ public abstract class AbstractNexusMojo
 
                 setNexusUrl( info.getNexusUrl() );
                 setUsername( info.getUser() );
-                setPassword( dispatcher.decrypt( info.getPassword() ) );
+                setPassword( discoverer.getSecDispatcher().decrypt( info.getPassword() ) );
             }
             catch ( NexusDiscoveryException e )
             {
@@ -353,12 +348,12 @@ public abstract class AbstractNexusMojo
 
     public SecDispatcher getDispatcher()
     {
-        return dispatcher;
+        return discoverer.getSecDispatcher();
     }
 
     public void setDispatcher( final SecDispatcher dispatcher )
     {
-        this.dispatcher = dispatcher;
+        this.discoverer.setSecDispatcher( dispatcher );
     }
     
 }

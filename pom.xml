@@ -117,7 +117,31 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
+      <exclusions>
+      	<exclusion>
+      		<groupId>org.apache.maven.wagon</groupId>
+      		<artifactId>wagon-http</artifactId>
+      	</exclusion>
+      	<exclusion>
+      		<groupId>org.apache.maven.wagon</groupId>
+      		<artifactId>wagon-http-lightweight</artifactId>
+      	</exclusion>      	
+      	<exclusion>
+      		<groupId>org.apache.maven.wagon</groupId>
+      		<artifactId>wagon-webdav-jackrabbit</artifactId>
+      	</exclusion>      	
+      </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-model</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>    
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-artifact</artifactId>
+      <version>${mavenVersion}</version>
+    </dependency>    
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
@@ -133,6 +157,11 @@
       <artifactId>nexus-restlight-m2-settings-client</artifactId>
       <version>${restlight.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.restlight</groupId>
+      <artifactId>nexus-restlight-client-common</artifactId>
+      <version>${restlight.version}</version>
+    </dependency>    
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -185,6 +214,10 @@
           <artifactId>plexus-component-api</artifactId>
           <groupId>org.codehaus.plexus</groupId>
         </exclusion>
+        <exclusion>
+    	<groupId>org.sonatype.plexus</groupId>
+    	<artifactId>plexus-sec-dispatcher</artifactId>        
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -213,6 +246,31 @@
       <version>4.5</version>
       <scope>test</scope>
     </dependency>
+    
+	<dependency>
+    	<groupId>org.sonatype.plexus</groupId>
+    	<artifactId>plexus-cipher</artifactId>
+    	<version>1.4</version>
+    </dependency>
+
+	<dependency>
+    	<groupId>org.sonatype.plexus</groupId>
+    	<artifactId>plexus-sec-dispatcher</artifactId>
+    	<version>1.4-SNAPSHOT</version>
+    </dependency>
+
+        
+    <dependency>
+    	<groupId>com.ibm.icu</groupId>
+    	<artifactId>icu4j</artifactId>
+    	<version>2.6.1</version>
+    </dependency>
+    <dependency>
+    	<groupId>org.jdom</groupId>
+    	<artifactId>jdom</artifactId>
+    	<version>1.1</version>
+    </dependency>    
+    
   </dependencies>
   <build>
     <plugins>
@@ -222,10 +280,56 @@
         <version>1.2.1.3</version>
         <executions>
           <execution>
-            <id>metadata</id>
+            <id>generate</id>
             <goals>
               <goal>generate-metadata</goal>
             </goals>
+          </execution>
+          <execution>
+            <id>merge</id>
+            <goals>
+              <goal>merge-metadata</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>${project.build.directory}/components.xml</descriptor>
+                <descriptor>${basedir}/src/main/resources/META-INF/shaded-components.xml</descriptor>              
+              </descriptors>
+            </configuration>
+          </execution>          
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.2.2</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+	            <artifactSet>
+    	            <includes>
+    	              <include>org.sonatype.plexus:plexus-sec-dispatcher</include>
+    	              <include>org.sonatype.plexus:plexus-cipher</include>
+    	            </includes>
+              	</artifactSet>
+              <relocations>
+                <relocation>
+                  <pattern>org.sonatype.plexus.components.sec.dispatcher</pattern>
+                  <shadedPattern>org.sonatype.plexus.components.sec.dispatcher.shaded</shadedPattern>
+                  <excludes>
+                    <exclude>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</exclude>
+                  </excludes>                  
+                </relocation>
+                <relocation>
+                  <pattern>org.sonatype.plexus.components.cipher</pattern>
+                  <shadedPattern>org.sonatype.plexus.components.cipher.shaded</shadedPattern>                  
+                </relocation>                
+              </relocations>
+            </configuration>
           </execution>
         </executions>
       </plugin>

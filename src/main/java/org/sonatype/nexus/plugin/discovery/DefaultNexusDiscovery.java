@@ -1,5 +1,13 @@
 package org.sonatype.nexus.plugin.discovery;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.model.DeploymentRepository;
 import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Profile;
@@ -16,14 +24,6 @@ import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @Component( role = NexusInstanceDiscoverer.class )
 public class DefaultNexusDiscovery
@@ -70,8 +70,8 @@ public class DefaultNexusDiscovery
     @Requirement
     private NexusTestClientManager testClientManager;
 
-    @Requirement( hint = "maven" )
-    private SecDispatcher securityDispatcher;
+    @Requirement
+    private SecDispatcher secDispatcher;
 
     @Requirement
     private Prompter prompter;
@@ -86,7 +86,7 @@ public class DefaultNexusDiscovery
                                   final Prompter prompter, final Logger logger )
     {
         testClientManager = clientManager;
-        securityDispatcher = dispatcher;
+        secDispatcher = dispatcher;
         this.prompter = prompter;
         enableLogging( logger );
     }
@@ -258,7 +258,7 @@ public class DefaultNexusDiscovery
     {
         try
         {
-            return securityDispatcher.decrypt( password );
+            return secDispatcher.decrypt( password );
         }
         catch ( SecDispatcherException e )
         {
@@ -712,4 +712,13 @@ public class DefaultNexusDiscovery
         }
     }
 
+	public SecDispatcher getSecDispatcher() 
+	{
+		return secDispatcher;
+	}
+
+	public void setSecDispatcher( SecDispatcher secDispatcher )
+	{
+		this.secDispatcher = secDispatcher;
+	}
 }

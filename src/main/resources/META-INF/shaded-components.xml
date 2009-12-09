@@ -1,0 +1,34 @@
+<!--
+VERY VERY dirty hack here. Because maven-shade-plugin does not support components.xml relocate,
+I have manually write these and use plexus-maven-plugin to merge them.
+ -->
+
+<component-set>
+	<components>
+		<component>
+			<role>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</role>
+			<role-hint>default</role-hint>
+			<implementation>org.sonatype.plexus.components.sec.dispatcher.shaded.DefaultSecDispatcher</implementation>
+			<description></description>
+			<requirements>
+				<requirement>
+					<role>org.sonatype.plexus.components.cipher.shaded.PlexusCipher</role>
+					<field-name>_cipher</field-name>
+				</requirement>
+				<requirement>
+					<role>org.sonatype.plexus.components.sec.dispatcher.shaded.PasswordDecryptor</role>
+					<field-name>_decryptors</field-name>
+				</requirement>
+			</requirements>
+			<configuration>
+				<_configuration-file>~/.settings-security.xml</_configuration-file>
+			</configuration>
+		</component>
+		<component>
+			<role>org.sonatype.plexus.components.cipher.shaded.PlexusCipher</role>
+			<role-hint>default</role-hint>
+			<implementation>org.sonatype.plexus.components.cipher.shaded.DefaultPlexusCipher</implementation>
+			<description></description>
+		</component>		
+	</components>
+</component-set>
