@@ -10,6 +10,6 @@ import java.io.IOException;
  */
 public interface FSPermissionChecker
 {
-    void checkFSPermissions( File dir )
+    void checkFSPermissionsOnDirectory( File dir )
         throws IOException;
 }

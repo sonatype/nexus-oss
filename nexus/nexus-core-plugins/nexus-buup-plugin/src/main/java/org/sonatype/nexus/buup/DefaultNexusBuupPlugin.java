@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -48,7 +47,7 @@ public class DefaultNexusBuupPlugin
     public void initiateBundleDownload()
         throws NexusUpgradeException
     {
-        if ( downloadTask != null && !downloadTask.isFinished() )
+        if ( !getUpgradeProcessStatus().isStartingState() )
         {
             throw new NexusUpgradeException(
                 "The upgrade process is in wrong state, it is still downloading the bundle!" );
@@ -62,7 +61,7 @@ public class DefaultNexusBuupPlugin
             public void perform()
                 throws IOException
             {
-                permissionChecker.checkFSPermissions( basedir );
+                permissionChecker.checkFSPermissionsOnDirectory(  basedir );
             }
         } );
         performAndCollectIOException( failures, new KindaClosure()
@@ -70,7 +69,7 @@ public class DefaultNexusBuupPlugin
             public void perform()
                 throws IOException
             {
-                permissionChecker.checkFSPermissions( nexusAppDir );
+                permissionChecker.checkFSPermissionsOnDirectory( nexusAppDir );
             }
         } );
         performAndCollectIOException( failures, new KindaClosure()
@@ -78,7 +77,7 @@ public class DefaultNexusBuupPlugin
             public void perform()
                 throws IOException
             {
-                permissionChecker.checkFSPermissions( nexusWorkDir );
+                permissionChecker.checkFSPermissionsOnDirectory( nexusWorkDir );
             }
         } );
         performAndCollectIOException( failures, new KindaClosure()
