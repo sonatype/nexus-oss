@@ -81,7 +81,7 @@ public class InitiateBundleDownloadResource
      * Initiates checks and bundle upload, and sends form data along.
      */
     @Override
-    public Object put( Context context, Request request, Response response, Object payload )
+    public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
         try
