@@ -21,12 +21,16 @@ package org.sonatype.nexus.util;
  */
 public class StringDigester
 {
+    @Deprecated
+    public static String LINE_SEPERATOR = System.getProperty( "line.separator" );
+    
     /**
      * Calculates a SHA1 digest for a string.
      * 
      * @param content
      * @return
      */
+    @Deprecated
     public static String getSha1Digest( String content )
     {
         return DigesterUtils.getSha1Digest( content );
@@ -38,6 +42,7 @@ public class StringDigester
      * @param content
      * @return
      */
+    @Deprecated
     public static String getMd5Digest( String content )
     {
         return DigesterUtils.getMd5Digest( content );
