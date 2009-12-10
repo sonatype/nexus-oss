@@ -121,38 +121,22 @@
 			</plugin>
 
 			<plugin>
-				<groupId>net.sf.alchim</groupId>
+				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>yuicompressor-maven-plugin</artifactId>
-				<version>0.7.1</version>
 				<executions>
-					<execution>
-						<goals>
-							<goal>compress</goal>
-						</goals>
+				    <execution>
+				        <goals>
+				            <goal>aggregate</goal>
+				        </goals>
 						<configuration>
-							<aggregations>
-								<aggregation>
-									<output>${project.build.directory}/classes/static/js/nexus-plugin-console-plugin-all.js</output>
-									<includes>
-										<include>${project.build.directory}/classes/static/js/repoServer.PluginConsolePanel.js</include>
-										<include>${project.build.directory}/classes/static/js/repoServer.PluginInfoTab.js</include>
-									</includes>
-								</aggregation>
-							</aggregations>
-						</configuration>
-					</execution>
-				</executions>
-				<configuration>
-					<nosuffix>true</nosuffix>
-					<nomunge>true</nomunge>
-					<jswarn>false</jswarn>
-					<aggregations>
-						<aggregation>
-							<!-- insert new line after each concatenation (default: false) -->
+							<output>${project.build.directory}/classes/static/js/nexus-plugin-console-plugin-all.js</output>
+							<nosuffix>true</nosuffix>
+							<nomunge>true</nomunge>
+							<jswarn>false</jswarn>
 							<insertNewLine>true</insertNewLine>
-						</aggregation>
-					</aggregations>
-				</configuration>
+						</configuration>
+				    </execution>
+				</executions>
 			</plugin>
 
 		</plugins>

@@ -102,9 +102,11 @@
                 <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
                 <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
                 <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties"/>
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+                <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution>
               </mojoExecutions>
             </configuration>
           </plugin>
@@ -179,6 +181,11 @@
               <version>2.0.1</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>yuicompressor-maven-plugin</artifactId>
+          <version>0.0.1-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
