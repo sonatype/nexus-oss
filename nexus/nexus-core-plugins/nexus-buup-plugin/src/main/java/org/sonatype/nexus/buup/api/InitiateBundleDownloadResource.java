@@ -10,6 +10,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.buup.NexusBuupPlugin;
 import org.sonatype.nexus.buup.NexusUpgradeException;
+import org.sonatype.nexus.buup.api.dto.UpgradeFormRequest;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -24,7 +25,7 @@ public class InitiateBundleDownloadResource
     @Override
     public Object getPayloadInstance()
     {
-        return null;
+        return new UpgradeFormRequest();
     }
 
     public InitiateBundleDownloadResource()
@@ -85,11 +86,21 @@ public class InitiateBundleDownloadResource
     {
         try
         {
-            nexusBuupPlugin.initiateBundleDownload();
+            UpgradeFormRequest form = (UpgradeFormRequest) payload;
 
-            response.setStatus( Status.SUCCESS_ACCEPTED );
+            if ( form != null && form.isAcceptsTermsAndConditions() )
+            {
+                nexusBuupPlugin.initiateBundleDownload();
 
-            return null;
+                response.setStatus( Status.SUCCESS_ACCEPTED );
+
+                return null;
+            }
+            else
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_PRECONDITION_FAILED,
+                    "You have to agree to terms and conditions!" );
+            }
         }
         catch ( NexusUpgradeException e )
         {
