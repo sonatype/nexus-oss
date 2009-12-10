@@ -2,6 +2,10 @@ package org.sonatype.nexus.buup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
@@ -39,44 +43,116 @@ public class DefaultNexusBuupPlugin
 
     private BundleDownloadTask downloadTask;
 
-    public void initiateBundleDownload()
-        throws IOException
-    {
-        // check FS permissions
-        permissionChecker.checkFSPermissions( basedir );
-        permissionChecker.checkFSPermissions( nexusAppDir );
-        permissionChecker.checkFSPermissions( nexusWorkDir );
+    private Collection<IOException> failures;
 
-        if ( !upgradeBundleDir.exists() && !upgradeBundleDir.mkdirs() )
+    public void initiateBundleDownload()
+        throws NexusUpgradeException
+    {
+        if ( downloadTask != null && !downloadTask.isFinished() )
         {
-            throw new IOException( "Cannot create directory for bundle download!" );
+            throw new NexusUpgradeException(
+                "The upgrade process is in wrong state, it is still downloading the bundle!" );
         }
 
-        // start download thread
-        downloadTask = nexusScheduler.createTaskInstance( BundleDownloadTask.class );
-        downloadTask.setTargetDirectory( upgradeBundleDir );
-        nexusScheduler.submit( "Bundle Download", downloadTask );
-    }
+        ArrayList<IOException> failures = new ArrayList<IOException>();
 
-    public boolean isUpgradeProcessReady()
-    {
-        if ( downloadTask != null && downloadTask.isSuccessful() )
+        // check FS permissions
+        performAndCollectIOException( failures, new KindaClosure()
         {
-            // check for unziped files
-            return true;
+            public void perform()
+                throws IOException
+            {
+                permissionChecker.checkFSPermissions( basedir );
+            }
+        } );
+        performAndCollectIOException( failures, new KindaClosure()
+        {
+            public void perform()
+                throws IOException
+            {
+                permissionChecker.checkFSPermissions( nexusAppDir );
+            }
+        } );
+        performAndCollectIOException( failures, new KindaClosure()
+        {
+            public void perform()
+                throws IOException
+            {
+                permissionChecker.checkFSPermissions( nexusWorkDir );
+            }
+        } );
+        performAndCollectIOException( failures, new KindaClosure()
+        {
+            public void perform()
+                throws IOException
+            {
+                if ( !upgradeBundleDir.exists() && !upgradeBundleDir.mkdirs() )
+                {
+                    throw new IOException( "Cannot create directory \"" + upgradeBundleDir.getAbsolutePath()
+                        + "\" for unzipped bundle content!" );
+                }
+            }
+        } );
+
+        // check results
+        if ( failures.isEmpty() )
+        {
+            this.failures = null;
+
+            // start download thread
+            downloadTask = nexusScheduler.createTaskInstance( BundleDownloadTask.class );
+            downloadTask.setTargetDirectory( upgradeBundleDir );
+            nexusScheduler.submit( "Bundle Download", downloadTask );
         }
         else
         {
-            return false;
+            this.failures = failures;
+
+            throw new NexusUpgradeException( "Not all conditions are met to perform upgrade!" );
         }
     }
 
-    public boolean initiateUpgradeProcess()
-        throws NexusBuupInvocationException
+    public UpgradeProcessStatus getUpgradeProcessStatus()
     {
-        if ( !isUpgradeProcessReady() )
+        if ( downloadTask == null && failures == null )
         {
-            return false;
+            return UpgradeProcessStatus.UNUSED;
+        }
+        else if ( failures != null && failures.size() > 0 )
+        {
+            return UpgradeProcessStatus.FAILED;
+        }
+        else if ( downloadTask.isFinished() && downloadTask.isSuccessful() )
+        {
+            return UpgradeProcessStatus.READY_TO_RUN;
+        }
+        else if ( downloadTask.isFinished() && !downloadTask.isSuccessful() )
+        {
+            return UpgradeProcessStatus.FAILED;
+        }
+        else if ( !downloadTask.isFinished() )
+        {
+            return UpgradeProcessStatus.DOWNLOADING;
+        }
+        else
+        {
+            // ??
+            return UpgradeProcessStatus.FAILED;
+        }
+    }
+
+    public Collection<IOException> getFailureReasons()
+    {
+        return failures;
+    }
+
+    public void initiateUpgradeProcess()
+        throws NexusUpgradeException, NexusBuupInvocationException
+    {
+        if ( !UpgradeProcessStatus.READY_TO_RUN.equals( getUpgradeProcessStatus() ) )
+        {
+            throw new NexusUpgradeException(
+                "Upgrade process is not ready to be run yet. Please check the download status or logs!" );
         }
 
         NexusBuupInvocationRequest request = new NexusBuupInvocationRequest( upgradeBundleDir );
@@ -87,8 +163,26 @@ public class DefaultNexusBuupPlugin
         request.setNexusBundleXmx( 512 );
 
         invoker.invokeBuup( request );
+    }
 
-        return true;
+    // ==
+
+    public static interface KindaClosure
+    {
+        void perform()
+            throws IOException;
+    }
+
+    protected void performAndCollectIOException( List<IOException> failures, KindaClosure kinda )
+    {
+        try
+        {
+            kinda.perform();
+        }
+        catch ( IOException e )
+        {
+            failures.add( e );
+        }
     }
 
 }

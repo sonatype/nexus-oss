@@ -16,26 +16,35 @@ public class DefaultFSPermissionChecker
     public void checkFSPermissions( File directory )
         throws IOException
     {
-        if ( !directory.isDirectory() )
+        try
         {
-            throw new IOException( "The path \"" + directory.getAbsolutePath()
-                + "\" does not points to existing directory! " );
+            if ( !directory.isDirectory() )
+            {
+                throw new IOException( "The path \"" + directory.getAbsolutePath()
+                    + "\" does not points to existing directory! " );
+            }
+
+            // try to write
+            File tmpFile = new File( directory, "buup-write-test.txt" );
+
+            FileUtils.fileWrite( tmpFile.getAbsolutePath(), TEST_CONTENT );
+
+            // try to read
+            String content = FileUtils.fileRead( tmpFile );
+
+            if ( !StringUtils.equals( TEST_CONTENT, content ) )
+            {
+                throw new IOException( "Cannot read or read is incomplete of file \"" + tmpFile.getAbsolutePath()
+                    + "\"!" );
+            }
+
+            // clean up
+            FileUtils.forceDelete( tmpFile );
         }
-
-        // try to write
-        File tmpFile = new File( directory, "buup-write-test.txt" );
-
-        FileUtils.fileWrite( tmpFile.getAbsolutePath(), TEST_CONTENT );
-
-        // try to read
-        String content = FileUtils.fileRead( tmpFile );
-
-        if ( !StringUtils.equals( TEST_CONTENT, content ) )
+        catch ( IOException e )
         {
-            throw new IOException( "Cannot read or read is incomplete of file \"" + tmpFile.getAbsolutePath() + "\"!" );
+            throw new IOException( "Nexus cannot manage directory \"" + directory.getAbsolutePath()
+                + "\"! Please fix the FS permissions!" );
         }
-
-        // clean up
-        FileUtils.forceDelete( tmpFile );
     }
 }

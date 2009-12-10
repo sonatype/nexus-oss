@@ -37,27 +37,59 @@ public class BundleDownloadTask
     @Requirement
     private NexusConfiguration nexusConfiguration;
 
+    private boolean finished = false;
+
     private boolean successful = false;
 
     private File targetDirectory;
 
     private HttpClient httpClient;
 
+    /**
+     * True when task is done, unrelated is it success or not.
+     * 
+     * @return
+     */
+    public boolean isFinished()
+    {
+        return finished;
+    }
+
+    /**
+     * True if task finished successfully.
+     * 
+     * @return
+     */
     public boolean isSuccessful()
     {
         return successful;
     }
 
+    /**
+     * The bundle unzip target dir.
+     * 
+     * @return
+     */
     public File getTargetDirectory()
     {
         return targetDirectory;
     }
 
+    /**
+     * The bundle unzip target dir setter.
+     * 
+     * @param targetDirectory
+     */
     public void setTargetDirectory( File targetDirectory )
     {
         this.targetDirectory = targetDirectory;
     }
 
+    /**
+     * TODO: ???
+     * 
+     * @return
+     */
     public String getBaseUrl()
     {
         return "http://www.sonatype.com/buup-files/";
@@ -79,9 +111,14 @@ public class BundleDownloadTask
 
             successful = true;
         }
+        catch ( IOException e )
+        {
+            // store it and present as reason to user
+            throw e;
+        }
         finally
         {
-            // cleanup
+            finished = true;
         }
 
         return "OK";

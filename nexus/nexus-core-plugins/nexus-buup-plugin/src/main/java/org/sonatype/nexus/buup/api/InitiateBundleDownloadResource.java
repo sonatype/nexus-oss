@@ -7,17 +7,15 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
-import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.buup.NexusBuupPlugin;
 import org.sonatype.nexus.buup.NexusUpgradeException;
-import org.sonatype.nexus.buup.invoke.NexusBuupInvocationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "StartUpgradeProcessResource" )
-public class StartUpgradeProcessResource
+@Component( role = PlexusResource.class, hint = "InitiateBundleDownloadResource" )
+public class InitiateBundleDownloadResource
     extends AbstractNexusPlexusResource
 {
     @Requirement
@@ -29,10 +27,17 @@ public class StartUpgradeProcessResource
         return null;
     }
 
+    public InitiateBundleDownloadResource()
+    {
+        super();
+
+        setModifiable( true );
+    }
+
     @Override
     public String getResourceUri()
     {
-        return "/buup/initiateUpgrade";
+        return "/buup/initiateDownload";
     }
 
     @Override
@@ -42,31 +47,53 @@ public class StartUpgradeProcessResource
     }
 
     /**
-     * Getting this resource -- if all conditions are met -- will kill JVM, hence NO RESPONSE will be sent! If the
-     * process is unsuccesful, HTTP 400 is returned.
-     * 
-     * @TODO: detailed message why HTTP 400
+     * Returns information about download status. See the enum for value descriptions. Also, response code of 200 or 201
+     * shows is download in progress or not.
      */
     @Override
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
+        String result = null;
+
+        switch ( nexusBuupPlugin.getUpgradeProcessStatus() )
+        {
+            case READY_TO_RUN:
+                response.setStatus( Status.SUCCESS_ACCEPTED );
+
+                result = nexusBuupPlugin.getUpgradeProcessStatus().name();
+
+                break;
+
+            default:
+                response.setStatus( Status.SUCCESS_OK );
+
+                result = nexusBuupPlugin.getUpgradeProcessStatus().name();
+
+                break;
+        }
+
+        return result;
+    }
+
+    /**
+     * Initiates checks and bundle upload, and sends form data along.
+     */
+    @Override
+    public Object put( Context context, Request request, Response response, Object payload )
+        throws ResourceException
+    {
         try
         {
-            nexusBuupPlugin.initiateUpgradeProcess();
+            nexusBuupPlugin.initiateBundleDownload();
 
-            // not returned, since above this JVM is killed OR an exception is thrown
-            return new StringRepresentation( "BUUP INVOKED?" );
+            response.setStatus( Status.SUCCESS_ACCEPTED );
+
+            return null;
         }
         catch ( NexusUpgradeException e )
         {
-            // this is wrong user interaction (like some FS check failed or bundle is not downloaded)
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
-        }
-        catch ( NexusBuupInvocationException e )
-        {
-            // this is internal server error!
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Could not invoke BUUP!", e );
         }
     }
 }
