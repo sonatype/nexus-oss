@@ -10,6 +10,7 @@ import org.sonatype.nexus.buup.checks.FSPermissionChecker;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvocationException;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvocationRequest;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvoker;
+import org.sonatype.nexus.scheduling.NexusScheduler;
 
 @Component( role = NexusBuupPlugin.class )
 public class DefaultNexusBuupPlugin
@@ -17,6 +18,9 @@ public class DefaultNexusBuupPlugin
 {
     @Requirement
     private NexusBuupInvoker invoker;
+
+    @Requirement
+    private NexusScheduler nexusScheduler;
 
     @Requirement
     private FSPermissionChecker permissionChecker;
@@ -33,6 +37,8 @@ public class DefaultNexusBuupPlugin
     @Configuration( value = "${nexus-work}/upgrade-bundle" )
     private File upgradeBundleDir;
 
+    private BundleDownloadTask downloadTask;
+
     public void initiateBundleDownload()
         throws IOException
     {
@@ -47,13 +53,22 @@ public class DefaultNexusBuupPlugin
         }
 
         // start download thread
+        downloadTask = nexusScheduler.createTaskInstance( BundleDownloadTask.class );
+        downloadTask.setTargetDirectory( upgradeBundleDir );
+        nexusScheduler.submit( "Bundle Download", downloadTask );
     }
 
     public boolean isUpgradeProcessReady()
     {
-        // check download thread is done, and check for exploded bundle dir content
-        // TODO Auto-generated method stub
-        return true;
+        if ( downloadTask != null && downloadTask.isSuccessful() )
+        {
+            // check for unziped files
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public boolean initiateUpgradeProcess()
