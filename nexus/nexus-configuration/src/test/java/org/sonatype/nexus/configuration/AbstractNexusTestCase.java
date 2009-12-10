@@ -22,6 +22,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.io.RawInputStreamFacade;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
@@ -34,7 +35,7 @@ public abstract class AbstractNexusTestCase
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
 
     public static final String APPS_CONFIGURATION_KEY = "apps";
-    
+
     public static final String CONF_DIR_KEY = "application-conf";
 
     protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
@@ -61,18 +62,19 @@ public abstract class AbstractNexusTestCase
     }
 
     protected void copyDefaultConfigToPlace()
-    throws IOException
+        throws IOException
     {
         this.copyResource( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
     }
-    
+
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
         this.copyResource( "/META-INF/nexus/security.xml", getSecurityConfiguration() );
     }
-    
-    protected void copyResource(String resource, String dest ) throws IOException
+
+    protected void copyResource( String resource, String dest )
+        throws IOException
     {
         InputStream stream = null;
         FileOutputStream ostream = null;
@@ -116,7 +118,7 @@ public abstract class AbstractNexusTestCase
     protected void copyFromClasspathToFile( String path, File output )
         throws IOException
     {
-        org.sonatype.nexus.util.IOUtil.copyFromStreamToFile( getClass().getResourceAsStream( path ), output );
+        FileUtils.copyStreamToFile( new RawInputStreamFacade( getClass().getResourceAsStream( path ) ), output );
     }
 
 }
