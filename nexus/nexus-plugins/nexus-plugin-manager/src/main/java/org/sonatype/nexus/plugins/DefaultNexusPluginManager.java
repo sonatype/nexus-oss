@@ -2,7 +2,6 @@ package org.sonatype.nexus.plugins;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.PlexusContainer;
@@ -28,13 +28,9 @@ import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.configuration.PlexusConfigurationException;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.context.ContextException;
-import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.codehaus.plexus.util.IOUtil;
-import org.codehaus.plexus.util.InterpolationFilterReader;
-import org.codehaus.plexus.util.ReaderFactory;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.plugins.events.PluginActivatedEvent;
 import org.sonatype.nexus.plugins.events.PluginDeactivatedEvent;
@@ -59,7 +55,6 @@ import org.sonatype.plugin.metadata.plexus.PlexusComponentGleanerResponse;
 import org.sonatype.plugins.model.ClasspathDependency;
 import org.sonatype.plugins.model.PluginDependency;
 import org.sonatype.plugins.model.PluginMetadata;
-import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 
 /**
  * Plugin Manager implementation.
@@ -70,8 +65,6 @@ import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 public class DefaultNexusPluginManager
     implements NexusPluginManager, Initializable
 {
-    private static final String DESCRIPTOR_PATH = "META-INF/nexus/plugin.xml";
-
     @Requirement
     private PlexusContainer plexusContainer;
 
@@ -302,7 +295,7 @@ public class DefaultNexusPluginManager
         {
             File pluginFile = pluginArtifact.getFile();
 
-            if ( pluginFile == null || !pluginFile.isFile() )
+            if ( pluginFile == null || !pluginFile.exists() )
             {
                 // this is not a nexus plugin!
                 result.setThrowable( new NoSuchPluginException( pluginCoordinates ) );
@@ -320,7 +313,7 @@ public class DefaultNexusPluginManager
             NexusPluginValidator validator = new DefaultNexusPluginValidator();
 
             // scan the jar
-            pluginDescriptor = scanPluginJar( pluginCoordinates, pluginFile );
+            pluginDescriptor = scanPluginJar( pluginCoordinates, pluginArtifact );
 
             // "old way", since the above way does not work
             pluginDescriptor.setPluginRealm( plexusContainer.createChildRealm( pluginCoordinates.toCompositeForm() ) );
@@ -559,14 +552,24 @@ public class DefaultNexusPluginManager
     // Plugin JAR mungling
     // ==
 
-    protected PluginDescriptor scanPluginJar( GAVCoordinate pluginCoordinates, File pluginJar )
+    protected PluginDescriptor scanPluginJar( GAVCoordinate pluginCoordinates, PluginRepositoryArtifact pluginArtifact )
         throws InvalidPluginException, IOException
     {
+        File pluginJar = pluginArtifact.getFile();
+
         PluginDescriptor pluginDescriptor = new PluginDescriptor();
 
         pluginDescriptor.setPluginCoordinates( pluginCoordinates );
 
-        PluginMetadata pluginMetadata = extractPluginMetadata( pluginJar );
+        PluginMetadata pluginMetadata;
+        try
+        {
+            pluginMetadata = pluginArtifact.getNexusPluginRepository().getPluginMetadata( pluginCoordinates );
+        }
+        catch ( NoSuchPluginRepositoryArtifactException e )
+        {
+            throw new InvalidPluginException( pluginCoordinates, e );
+        }
 
         if ( pluginMetadata != null )
         {
@@ -600,63 +603,36 @@ public class DefaultNexusPluginManager
         return pluginDescriptor;
     }
 
-    protected PluginMetadata extractPluginMetadata( File pluginJar )
+    protected List<String> extractContents( File pluginJar )
         throws IOException
     {
-        ZipFile jar = null;
-
-        try
+        if ( pluginJar.isDirectory() )
         {
-            jar = new ZipFile( pluginJar );
-
-            ZipEntry entry = jar.getEntry( DESCRIPTOR_PATH );
-
-            Reader reader = null;
-
-            try
-            {
-                if ( entry == null )
-                {
-                    return null;
-                }
-
-                reader = ReaderFactory.newXmlReader( jar.getInputStream( entry ) );
-
-                InterpolationFilterReader interpolationFilterReader =
-                    new InterpolationFilterReader( reader, new ContextMapAdapter( plexusContainer.getContext() ) );
-
-                PluginModelXpp3Reader pdreader = new PluginModelXpp3Reader();
-
-                PluginMetadata md = pdreader.read( interpolationFilterReader );
-
-                md.sourceUrl = pluginJar.toURI().toURL();
-
-                return md;
-            }
-            catch ( XmlPullParserException e )
-            {
-                IOException ex = new IOException( e.getMessage() );
-
-                ex.initCause( e );
-
-                throw ex;
-            }
-            finally
-            {
-                IOUtil.close( reader );
-            }
+            return extractDirContents( pluginJar );
         }
-        finally
+        else
         {
-            if ( jar != null )
-            {
-                jar.close();
-            }
+            return extractJarContents( pluginJar );
         }
     }
 
-    protected List<String> extractContents( File pluginJar )
-        throws IOException
+    private List<String> extractDirContents( File pluginDir )
+    {
+        DirectoryScanner ds = new DirectoryScanner();
+        ds.setBasedir( pluginDir );
+        ds.addDefaultExcludes();
+        ds.scan();
+
+        ArrayList<String> result = new ArrayList<String>();
+        for ( String entry : ds.getIncludedFiles() )
+        {
+            result.add(entry);
+        }
+        return result;
+    }
+
+    private List<String> extractJarContents( File pluginJar )
+        throws ZipException, IOException
     {
         ZipFile jar = null;
 

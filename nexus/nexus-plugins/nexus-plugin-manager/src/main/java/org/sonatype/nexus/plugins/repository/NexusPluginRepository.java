@@ -29,7 +29,7 @@ public interface NexusPluginRepository
     Map<GAVCoordinate, PluginMetadata> findAvailablePlugins();
 
     /**
-     * Returns the artifaft for the given coordinates.
+     * Returns the artifact for the given coordinates.
      * 
      * @param coordinates
      * @return
@@ -38,11 +38,16 @@ public interface NexusPluginRepository
         throws NoSuchPluginRepositoryArtifactException;
 
     /**
-     * Returns the artifaft for the given coordinates.
+     * Returns the artifact for the given coordinates.
      * 
      * @param coordinates
      * @return
      */
     PluginRepositoryArtifact resolveDependencyArtifact( PluginRepositoryArtifact dependant, GAVCoordinate coordinates )
         throws NoSuchPluginRepositoryArtifactException;
+
+    /**
+     * Returns plugin metadata for the given coordinates.
+     */
+    PluginMetadata getPluginMetadata( GAVCoordinate coordinates ) throws NoSuchPluginRepositoryArtifactException;
 }

@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.context.ContextMapAdapter;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -40,6 +43,8 @@ import org.sonatype.plugins.model.io.xpp3.PluginModelXpp3Reader;
 public abstract class AbstractFileNexusPluginRepository
     implements NexusPluginRepository
 {
+    public static final String DESCRIPTOR_PATH = "META-INF/nexus/plugin.xml";
+
     protected abstract File getNexusPluginsDirectory();
 
     @Requirement
@@ -47,6 +52,9 @@ public abstract class AbstractFileNexusPluginRepository
 
     @Requirement
     private ArtifactPackagingMapper artifactPackagingMapper;
+
+    @Requirement
+    private PlexusContainer plexusContainer;
 
     protected Logger getLogger()
     {
@@ -164,7 +172,12 @@ public abstract class AbstractFileNexusPluginRepository
 
                 PluginModelXpp3Reader pdreader = new PluginModelXpp3Reader();
 
-                PluginMetadata md = pdreader.read( reader );
+                InterpolationFilterReader interpolationFilterReader =
+                    new InterpolationFilterReader( reader, new ContextMapAdapter( plexusContainer.getContext() ) );
+
+                PluginMetadata md = pdreader.read( interpolationFilterReader );
+
+                md.sourceUrl = pluginFile.toURI().toURL();
 
                 return md;
             }
@@ -230,5 +243,11 @@ public abstract class AbstractFileNexusPluginRepository
         sb.append( "." ).append( artifactPackagingMapper.getExtensionForPackaging( coordinates.getType() ) );
 
         return sb.toString();
+    }
+
+    public PluginMetadata getPluginMetadata( GAVCoordinate coordinates ) throws NoSuchPluginRepositoryArtifactException
+    {
+        PluginRepositoryArtifact pluginArtifact = resolveArtifact( coordinates );
+        return getMetadataFromFile( pluginArtifact.getFile() );
     }
 }
