@@ -47,6 +47,8 @@ public class DefaultNexusBuupPlugin
     private BundleDownloadTask downloadTask;
 
     private Collection<IOException> failures;
+    
+    private UpgradeFormRequest form;
 
     public void initiateBundleDownload( UpgradeFormRequest form )
         throws NexusUpgradeException
@@ -56,6 +58,8 @@ public class DefaultNexusBuupPlugin
             throw new NexusUpgradeException(
                 "The upgrade process is in wrong state, it is still downloading the bundle!" );
         }
+        
+        this.form = null;
 
         if ( !upgradeFormProcessor.processForm( form ) )
         {
@@ -106,6 +110,7 @@ public class DefaultNexusBuupPlugin
         if ( failures.isEmpty() )
         {
             this.failures = null;
+            this.form = form;
 
             // start download thread
             downloadTask = nexusScheduler.createTaskInstance( BundleDownloadTask.class );
@@ -115,6 +120,7 @@ public class DefaultNexusBuupPlugin
         else
         {
             this.failures = failures;
+            this.form = null;
 
             throw new NexusUpgradeException( "Not all conditions are met to perform upgrade!" );
         }
@@ -130,7 +136,7 @@ public class DefaultNexusBuupPlugin
         {
             return UpgradeProcessStatus.FAILED;
         }
-        else if ( downloadTask.isFinished() && downloadTask.isSuccessful() )
+        else if ( downloadTask.isFinished() && downloadTask.isSuccessful() && form != null )
         {
             return UpgradeProcessStatus.READY_TO_RUN;
         }
@@ -166,9 +172,9 @@ public class DefaultNexusBuupPlugin
         NexusBuupInvocationRequest request = new NexusBuupInvocationRequest( upgradeBundleDir );
 
         // simulate we have params for now
-        request.setNexusBundleXms( 128 );
+        request.setNexusBundleXms( form.getXmsInMbs() );
 
-        request.setNexusBundleXmx( 512 );
+        request.setNexusBundleXmx( form.getXmxInMbs() );
 
         invoker.invokeBuup( request );
     }

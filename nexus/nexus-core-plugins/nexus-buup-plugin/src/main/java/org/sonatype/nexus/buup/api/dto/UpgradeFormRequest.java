@@ -1,5 +1,7 @@
 package org.sonatype.nexus.buup.api.dto;
 
+import org.sonatype.nexus.buup.invoke.NexusBuupInvocationRequest;
+
 /**
  * This is the DTO that carries the form data that user filled in as very first step of upgrade.
  * 
@@ -15,9 +17,9 @@ public class UpgradeFormRequest
 
     // BUUP options
 
-    private int xmxInMbs;
+    private int xmxInMbs = NexusBuupInvocationRequest.XM_UNCHANGED;
 
-    private int xmsInMbs;
+    private int xmsInMbs = NexusBuupInvocationRequest.XM_UNCHANGED;
 
     public boolean isAcceptsTermsAndConditions()
     {
