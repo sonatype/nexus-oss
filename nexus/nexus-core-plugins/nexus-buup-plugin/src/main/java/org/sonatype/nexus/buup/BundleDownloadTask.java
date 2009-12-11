@@ -99,12 +99,13 @@ public class BundleDownloadTask
     protected Object doRun()
         throws Exception
     {
+        File bundle = null;
+
         try
         {
             // downloads bundle from somewhere (from where?)
             // checks it's checksum (similar is applied as to maven artifacts)
-            File bundle =
-                retrieveAndCheckBuupFile( "nexus-pro-upgrade-" + nexus.getSystemStatus().getVersion() + ".zip" );
+            bundle = retrieveAndCheckBuupFile( "nexus-pro-upgrade-" + nexus.getSystemStatus().getVersion() + ".zip" );
 
             // unzip it to targetDirectory
             unzipUpgradeBundle( bundle );
@@ -118,6 +119,11 @@ public class BundleDownloadTask
         }
         finally
         {
+            if ( bundle != null )
+            {
+                FileUtils.forceDelete( bundle );
+            }
+
             finished = true;
         }
 
@@ -172,6 +178,11 @@ public class BundleDownloadTask
 
         if ( StringUtils.equals( downloadedChecksum, calculatedChecksum ) )
         {
+            if ( checksumFile != null )
+            {
+                FileUtils.forceDelete( checksumFile );
+            }
+
             return targetFile;
         }
         else
