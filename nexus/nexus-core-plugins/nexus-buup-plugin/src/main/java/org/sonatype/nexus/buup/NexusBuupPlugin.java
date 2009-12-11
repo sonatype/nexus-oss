@@ -3,6 +3,7 @@ package org.sonatype.nexus.buup;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.sonatype.nexus.buup.api.dto.UpgradeFormRequest;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvocationException;
 
 public interface NexusBuupPlugin
@@ -10,7 +11,7 @@ public interface NexusBuupPlugin
     /**
      * Performs needed checks (like FS perms), and starts downloading the bundle and finally unzip it to a known place.
      */
-    void initiateBundleDownload()
+    void initiateBundleDownload( UpgradeFormRequest form )
         throws NexusUpgradeException;
 
     /**

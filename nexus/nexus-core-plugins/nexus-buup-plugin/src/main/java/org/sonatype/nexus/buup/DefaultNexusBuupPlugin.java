@@ -9,6 +9,7 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.buup.api.dto.UpgradeFormRequest;
 import org.sonatype.nexus.buup.checks.FSPermissionChecker;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvocationException;
 import org.sonatype.nexus.buup.invoke.NexusBuupInvocationRequest;
@@ -28,6 +29,9 @@ public class DefaultNexusBuupPlugin
     @Requirement
     private FSPermissionChecker permissionChecker;
 
+    @Requirement
+    private UpgradeFormProcessor upgradeFormProcessor;
+
     @Configuration( value = "${basedir}" )
     private File basedir;
 
@@ -44,13 +48,18 @@ public class DefaultNexusBuupPlugin
 
     private Collection<IOException> failures;
 
-    public void initiateBundleDownload()
+    public void initiateBundleDownload( UpgradeFormRequest form )
         throws NexusUpgradeException
     {
         if ( !getUpgradeProcessStatus().isStartingState() )
         {
             throw new NexusUpgradeException(
                 "The upgrade process is in wrong state, it is still downloading the bundle!" );
+        }
+
+        if ( !upgradeFormProcessor.processForm( form ) )
+        {
+            throw new NexusUpgradeException( "The upgrade process is not started, form is not filled in properly!" );
         }
 
         ArrayList<IOException> failures = new ArrayList<IOException>();
@@ -61,7 +70,7 @@ public class DefaultNexusBuupPlugin
             public void perform()
                 throws IOException
             {
-                permissionChecker.checkFSPermissionsOnDirectory(  basedir );
+                permissionChecker.checkFSPermissionsOnDirectory( basedir );
             }
         } );
         performAndCollectIOException( failures, new KindaClosure()

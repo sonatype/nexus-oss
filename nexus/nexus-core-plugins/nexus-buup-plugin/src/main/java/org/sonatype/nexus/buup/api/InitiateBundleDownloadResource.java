@@ -88,9 +88,9 @@ public class InitiateBundleDownloadResource
         {
             UpgradeFormRequest form = (UpgradeFormRequest) payload;
 
-            if ( form != null && form.isAcceptsTermsAndConditions() )
+            if ( form != null )
             {
-                nexusBuupPlugin.initiateBundleDownload();
+                nexusBuupPlugin.initiateBundleDownload( form );
 
                 response.setStatus( Status.SUCCESS_ACCEPTED );
 
