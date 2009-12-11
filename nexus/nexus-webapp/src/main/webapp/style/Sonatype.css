@@ -23,14 +23,13 @@ body {
 }
 
 #logo {
-  font-size: 16px;
-  padding-top: 3px;
-  padding-bottom: 6px;
+  color: black;
+  font-size: 10px;
+  padding-top: 1px;
+  text-align: right;
 }
 
 #header div.right-side {
-  right: 0;
-  position: absolute;
   font-size: 14px;
   display:block;
   text-align: right;
@@ -40,13 +39,6 @@ body {
 #header div.left-side {
   float: left;
   display: block;
-}
-
-#version { 
-  color: black;
-  font-size: 10px;
-  padding-top: 1px;
-  text-align: right;
 }
 
 #config-text, #log-text {

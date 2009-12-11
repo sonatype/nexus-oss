@@ -60,19 +60,18 @@
 <!-- Plugin pre BODY contributions ends here -->
 
 <div id="header">
-  <div class="left-side">
-    <div id="branding"></div>
+  <div id="branding" class="left-side">
+    <image src="images/branding.png"/>
+  </div>
+  <div class="right-side">
+    <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
     <div id="logo">
       <span>
         $formattedAppName
       </span>
     </div>
   </div>
-  <div class="right-side">
-    <div><span id="head-link-l"></span><span id="head-link-m"></span><span id="head-link-r"></span></div>
-    <div id="version"></div>
   </div>
-</div>
 
 <div id="welcome-tab" class="little-padding">
   <p>Welcome to the <a href="http://nexus.sonatype.org" target="new">$appName</a>.</p>

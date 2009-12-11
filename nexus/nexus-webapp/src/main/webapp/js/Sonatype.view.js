@@ -35,9 +35,6 @@ Sonatype.view = {
     Ext.get('header').show();
     Ext.get('welcome-tab').show();
     
-    //set version in view
-    Ext.get('version').update(Sonatype.utils.version);
-    
     Sonatype.view.welcomeTab = new Ext.Panel({
       contentEl:'welcome-tab',
       title: 'Welcome',
@@ -183,3 +180,7 @@ Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
     return tab;
   }
 });
+
+Sonatype.Events.addListener( 'nexusNavigationInit', function( panel ) {
+  Sonatype.view.viewport.doLayout();
+} );

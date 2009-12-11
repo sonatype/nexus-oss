@@ -28,6 +28,7 @@ public class OSSApplicationStatusSource
     extends AbstractLogEnabled
     implements ApplicationStatusSource
 {
+    private static final String FORMATTED_APP_NAME_BASE = "Sonatype Nexus&trade;";
     /**
      * System status.
      */
@@ -60,6 +61,8 @@ public class OSSApplicationStatusSource
         }
 
         systemStatus.setApiVersion( systemStatus.getVersion() );
+        
+        systemStatus.setFormattedAppName( FORMATTED_APP_NAME_BASE + " " + systemStatus.getEditionLong() + " Edition, Version: " + systemStatus.getVersion() );
     }
 
     public SystemStatus getSystemStatus()
