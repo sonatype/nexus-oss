@@ -626,7 +626,8 @@ public class DefaultNexusPluginManager
         ArrayList<String> result = new ArrayList<String>();
         for ( String entry : ds.getIncludedFiles() )
         {
-            result.add(entry);
+        	// dump those darn backslashes, only applies to win
+            result.add( entry.replace('\\', '/') );
         }
         return result;
     }
