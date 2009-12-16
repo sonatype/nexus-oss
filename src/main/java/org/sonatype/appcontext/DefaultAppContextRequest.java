@@ -50,6 +50,9 @@ public class DefaultAppContextRequest
 
             // the order is important! 2nd sysprops (to override env vars)
             contextFillers.add( new SystemPropertiesContextFiller() );
+
+            // and last, the basedir
+            contextFillers.add( new BasedirContextFiller() );
         }
 
         return contextFillers;
@@ -69,8 +72,8 @@ public class DefaultAppContextRequest
             // the order is important! 1st system properties
             contextPublishers.add( new SystemPropertiesContextPublisher() );
 
-            // 2nd the terminal
-            contextPublishers.add( new TerminalContextPublisher() );
+            // 2nd the logger (since Slf4j is the standard for Sonatype apps now)
+            contextPublishers.add( new Slf4jLoggerContextPublisher() );
         }
 
         return contextPublishers;

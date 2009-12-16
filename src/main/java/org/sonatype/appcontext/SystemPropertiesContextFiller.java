@@ -13,7 +13,7 @@ public class SystemPropertiesContextFiller
 {
     private String keyPrefix = null;
 
-    public void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
+    public void fillContext( AppContextRequest request, Map<Object, Object> context )
     {
         /*
          * Iterate through system properties, insert all items into a map (making sure to do the translation needed,

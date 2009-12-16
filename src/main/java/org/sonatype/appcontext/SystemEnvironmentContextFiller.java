@@ -14,7 +14,7 @@ public class SystemEnvironmentContextFiller
 {
     private String keyPrefix = null;
 
-    public void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
+    public void fillContext( AppContextRequest request, Map<Object, Object> context )
     {
         /*
          * Iterate through environment variables, insert all items into a map (making sure to do translation needed,

@@ -36,7 +36,7 @@ public class PropertiesFileContextFiller
         this.failIfNotFound = failIfNotFound;
     }
 
-    public void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
+    public void fillContext( AppContextRequest request, Map<Object, Object> context )
         throws AppContextException
     {
         File file = null;

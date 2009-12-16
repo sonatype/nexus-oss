@@ -55,7 +55,7 @@ public class AppContextFactory
 
         for ( ContextFiller filler : request.getContextFillers() )
         {
-            filler.fillContext( this, request, rawContext );
+            filler.fillContext( request, rawContext );
         }
         
         // interpolate what we have
@@ -82,7 +82,7 @@ public class AppContextFactory
         // dump them to System.out for reference.
         for ( ContextPublisher publisher : request.getContextPublishers() )
         {
-            publisher.publishContext( this, request, result );
+            publisher.publishContext( request, result );
         }
 
         return result;

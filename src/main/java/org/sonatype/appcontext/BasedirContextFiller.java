@@ -7,7 +7,7 @@ public class BasedirContextFiller
 {
     public static final String BASEDIR_CONTEXT_KEY = "basedir";
 
-    public void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
+    public void fillContext( AppContextRequest request, Map<Object, Object> context )
         throws AppContextException
     {
         context.put( BASEDIR_CONTEXT_KEY, request.getBasedirDiscoverer().discoverBasedir().getAbsolutePath() );

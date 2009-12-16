@@ -9,6 +9,6 @@ import java.util.Map;
  */
 public interface ContextFiller
 {
-    void fillContext( AppContextFactory factory, AppContextRequest request, Map<Object, Object> context )
+    void fillContext( AppContextRequest request, Map<Object, Object> context )
         throws AppContextException;
 }
