@@ -30,7 +30,7 @@
 	</description>
   <properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
-    <restlight.version>1.4.1-SNAPSHOT</restlight.version>
+    <restlight.version>1.4.1</restlight.version>
     <mavenVersion>2.2.1</mavenVersion>
   </properties>
   <scm>
@@ -256,7 +256,7 @@
 	<dependency>
     	<groupId>org.sonatype.plexus</groupId>
     	<artifactId>plexus-sec-dispatcher</artifactId>
-    	<version>1.4-SNAPSHOT</version>
+    	<version>1.4</version>
     </dependency>
 
         
