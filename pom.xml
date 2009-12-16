@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.sonatype.plugins</groupId>
   <artifactId>nexus-maven-plugin</artifactId>
-  <version>1.3.2.1</version>
+  <version>1.3.2.2-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Nexus Plugin for Maven</name>
   <licenses>
@@ -34,9 +34,9 @@
     <mavenVersion>2.2.1</mavenVersion>
   </properties>
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/plugins/tags/nexus-maven-plugin-1.3.2.1</connection>
-    <url>http://svn.sonatype.org/plugins/tags/nexus-maven-plugin-1.3.2.1</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/plugins/tags/nexus-maven-plugin-1.3.2.1</developerConnection>
+    <connection>scm:svn:http://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</connection>
+    <url>http://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/plugins/trunk/nexus-maven-plugin</developerConnection>
   </scm>
   <mailingLists>
     <mailingList>
