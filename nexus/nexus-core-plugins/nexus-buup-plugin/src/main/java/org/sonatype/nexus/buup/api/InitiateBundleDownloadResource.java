@@ -1,5 +1,7 @@
 package org.sonatype.nexus.buup.api;
 
+import java.io.IOException;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -10,7 +12,9 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.buup.NexusBuupPlugin;
 import org.sonatype.nexus.buup.NexusUpgradeException;
+import org.sonatype.nexus.buup.UpgradeProcessStatus;
 import org.sonatype.nexus.buup.api.dto.UpgradeFormRequest;
+import org.sonatype.nexus.buup.api.dto.UpgradeFormResponse;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -55,26 +59,7 @@ public class InitiateBundleDownloadResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        String result = null;
-
-        switch ( nexusBuupPlugin.getUpgradeProcessStatus() )
-        {
-            case READY_TO_RUN:
-                response.setStatus( Status.SUCCESS_ACCEPTED );
-
-                result = nexusBuupPlugin.getUpgradeProcessStatus().name();
-
-                break;
-
-            default:
-                response.setStatus( Status.SUCCESS_OK );
-
-                result = nexusBuupPlugin.getUpgradeProcessStatus().name();
-
-                break;
-        }
-
-        return result;
+        return getUpgradeFormResponse( context, request, response );
     }
 
     /**
@@ -94,7 +79,7 @@ public class InitiateBundleDownloadResource
 
                 response.setStatus( Status.SUCCESS_ACCEPTED );
 
-                return null;
+                return getUpgradeFormResponse( context, request, response );
             }
             else
             {
@@ -106,5 +91,30 @@ public class InitiateBundleDownloadResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
         }
+    }
+
+    // ==
+
+    protected UpgradeFormResponse getUpgradeFormResponse( Context context, Request request, Response response )
+    {
+        UpgradeFormResponse result = new UpgradeFormResponse();
+
+        UpgradeProcessStatus status = nexusBuupPlugin.getUpgradeProcessStatus();
+
+        result.setUpgradeProcessStatus( status.name() );
+
+        switch ( status )
+        {
+            case FAILED:
+                for ( IOException e : nexusBuupPlugin.getFailureReasons() )
+                {
+                    result.getErrors().add( e.getMessage() );
+                }
+
+                break;
+        }
+
+        return result;
+
     }
 }
