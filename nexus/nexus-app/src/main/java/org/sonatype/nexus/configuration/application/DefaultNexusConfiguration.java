@@ -225,7 +225,7 @@ public class DefaultNexusConfiguration
         }
     }
 
-    public void saveConfiguration()
+    public synchronized void saveConfiguration()
         throws IOException
     {
         if ( applyConfiguration() )
