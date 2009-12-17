@@ -37,6 +37,13 @@
     </dependency>
     
     <dependency>
+    	<groupId>xml-apis</groupId>
+    	<artifactId>xml-apis</artifactId>
+    	<version>1.0.b2</version>
+    	<scope>provided</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
       <version>${project.version}</version>
