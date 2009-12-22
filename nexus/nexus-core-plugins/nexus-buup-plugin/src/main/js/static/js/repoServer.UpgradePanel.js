@@ -11,55 +11,149 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   this.countryStore = new Ext.data.SimpleStore({
     fields: ['value', 'display'],
     data: [
-['United States', 'United States'],
-['Canada', 'Canada'],
-['Australia', 'Australia'],
-['Austria', 'Austria'],
-['Belgium', 'Belgium'],
-['Brazil', 'Brazil'],
-['Bulgaria', 'Bulgaria'],
-['China', 'China'],
-['Croatia', 'Croatia'],
-['Cyprus', 'Cyprus'],
-['Czech Republic', 'Czech Republic'],
-['Denmark', 'Denmark'],
-['Estonia', 'Estonia'],
-['Finland', 'Finland'],
-['France', 'France'],
-['Germany', 'Germany'],
-['Greece', 'Greece'],
-['Hungary', 'Hungary'],
-['Iceland', 'Iceland'],
-['India', 'India'],
-['Indonesia', 'Indonesia'],
-['Ireland', 'Ireland'],
-['Israel', 'Israel'],
-['Italy', 'Italy'],
-['Japan', 'Japan'],
-['Latvia', 'Latvia'],
-['Lithuania', 'Lithuania'],
-['Luxembourg', 'Luxembourg'],
-['Malaysia', 'Malaysia'],
-['Malta', 'Malta'],
-['Mexico', 'Mexico'],      
-['Netherlands', 'Netherlands'],
-['New Zealand', 'New Zealand'],
-['Norway', 'Norway'],
-['Phillipines', 'Phillipines'],
-['Poland', 'Poland'],                   
-['Portugal', 'Portugal'],      
-['Romania', 'Romania'],
-['Singapore', 'Singapore'],
-['Slovakia', 'Slovakia'],
-['Slovenia', 'Slovenia'],
-['South Korea', 'South Korea'],
-['Spain', 'Spain'],             
-['Sweden', 'Sweden'],
-['Switzerland', 'Switzerland'],
-['Taiwan', 'Taiwan'],
-['Thailand', 'Thailand'],
-['UK', 'UK'],
-['Vietnam', 'Vietnam']
+      ['United States', 'United States'],
+      ['Canada', 'Canada'],
+      ['Australia', 'Australia'],
+      ['Austria', 'Austria'],
+      ['Belgium', 'Belgium'],
+      ['Brazil', 'Brazil'],
+      ['Bulgaria', 'Bulgaria'],
+      ['China', 'China'],
+      ['Croatia', 'Croatia'],
+      ['Cyprus', 'Cyprus'],
+      ['Czech Republic', 'Czech Republic'],
+      ['Denmark', 'Denmark'],
+      ['Estonia', 'Estonia'],
+      ['Finland', 'Finland'],
+      ['France', 'France'],
+      ['Germany', 'Germany'],
+      ['Greece', 'Greece'],
+      ['Hungary', 'Hungary'],
+      ['Iceland', 'Iceland'],
+      ['India', 'India'],
+      ['Indonesia', 'Indonesia'],
+      ['Ireland', 'Ireland'],
+      ['Israel', 'Israel'],
+      ['Italy', 'Italy'],
+      ['Japan', 'Japan'],
+      ['Latvia', 'Latvia'],
+      ['Lithuania', 'Lithuania'],
+      ['Luxembourg', 'Luxembourg'],
+      ['Malaysia', 'Malaysia'],
+      ['Malta', 'Malta'],
+      ['Mexico', 'Mexico'],      
+      ['Netherlands', 'Netherlands'],
+      ['New Zealand', 'New Zealand'],
+      ['Norway', 'Norway'],
+      ['Phillipines', 'Phillipines'],
+      ['Poland', 'Poland'],                   
+      ['Portugal', 'Portugal'],      
+      ['Romania', 'Romania'],
+      ['Singapore', 'Singapore'],
+      ['Slovakia', 'Slovakia'],
+      ['Slovenia', 'Slovenia'],
+      ['South Korea', 'South Korea'],
+      ['Spain', 'Spain'],             
+      ['Sweden', 'Sweden'],
+      ['Switzerland', 'Switzerland'],
+      ['Taiwan', 'Taiwan'],
+      ['Thailand', 'Thailand'],
+      ['UK', 'UK'],
+      ['Vietnam', 'Vietnam']
+    ]
+  });
+
+  this.stateStore = new Ext.data.GroupingStore({
+    reader: new Ext.data.ArrayReader({}, [
+      {name: 'value'},
+      {name: 'display'},
+      {name: 'country'}
+    ]),
+    data: [
+      ['AL', 'AL', 'US'],
+      ['AK', 'AK', 'US'],
+      ['AS', 'AS', 'US'],
+      ['AZ', 'AZ', 'US'],
+      ['AR', 'AR', 'US'],
+      ['CA', 'CA', 'US'],
+      ['CO', 'CO', 'US'],
+      ['CT', 'CT', 'US'],
+      ['DE', 'DE', 'US'],
+      ['DC', 'DC', 'US'],
+      ['FM', 'FM', 'US'],
+      ['FL', 'FL', 'US'],
+      ['GA', 'GA', 'US'],
+      ['GU', 'GU', 'US'],
+      ['HI', 'HI', 'US'],
+      ['ID', 'ID', 'US'],
+      ['IL', 'IL', 'US'],
+      ['IN', 'IN', 'US'],
+      ['IA', 'IA', 'US'],
+      ['KS', 'KS', 'US'],
+      ['KY', 'KY', 'US'],
+      ['LA', 'LA', 'US'],
+      ['ME', 'ME', 'US'],
+      ['MH', 'MH', 'US'],
+      ['MD', 'MD', 'US'],
+      ['MA', 'MA', 'US'],
+      ['MI', 'MI', 'US'],
+      ['MN', 'MN', 'US'],
+      ['MS', 'MS', 'US'],
+      ['MO', 'MO', 'US'],
+      ['MT', 'MT', 'US'],
+      ['NE', 'NE', 'US'],
+      ['NV', 'NV', 'US'],
+      ['NH', 'NH', 'US'],
+      ['NJ', 'NJ', 'US'],
+      ['NM', 'NM', 'US'],
+      ['NY', 'NY', 'US'],
+      ['NC', 'NC', 'US'],
+      ['ND', 'ND', 'US'],
+      ['MP', 'MP', 'US'],
+      ['OH', 'OH', 'US'],
+      ['OK', 'OK', 'US'],
+      ['OR', 'OR', 'US'],
+      ['PW', 'PW', 'US'],
+      ['PA', 'PA', 'US'],
+      ['PR', 'PR', 'US'],
+      ['RI', 'RI', 'US'],
+      ['SC', 'SC', 'US'],
+      ['SD', 'SD', 'US'],
+      ['TN', 'TN', 'US'],
+      ['TX', 'TX', 'US'],
+      ['UT', 'UT', 'US'],
+      ['VT', 'VT', 'US'],
+      ['VI', 'VI', 'US'],
+      ['VA', 'VA', 'US'],
+      ['WA', 'WA', 'US'],
+      ['WV', 'WV', 'US'],
+      ['WI', 'WI', 'US'],
+      ['WY', 'WY', 'US'],
+      ['AB', 'AB', 'Canada'],
+      ['BC', 'BC', 'Canada'],
+      ['MB', 'MB', 'Canada'],
+      ['NB', 'NB', 'Canada'],
+      ['NL', 'NL', 'Canada'],
+      ['NS', 'NS', 'Canada'],
+      ['ON', 'ON', 'Canada'],
+      ['PE', 'PE', 'Canada'],
+      ['SK', 'SK', 'Canada'],
+      ['QC', 'QC', 'Canada']
+    ],
+    groupField: 'country',
+    sortInfo:{field: 'display', direction: "ASC"}
+  });
+
+  this.memoryStore = new Ext.data.SimpleStore({
+    fields: ['value', 'display'],
+    data: [
+      ['128m', '128m'],
+      ['256m', '256m'],
+      ['512m', '512m'],
+      ['768m', '768m'],
+      ['1024m', '1024m'],
+      ['1536m', '1536m'],
+      ['2048m', '2048m']
     ]
   });
   
@@ -82,6 +176,10 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         style: 'margin: 10px 0px 0px 15px',
         items: [
         {
+          html: 'I have read and agree to all terms in the above EULA',
+          style: 'margin: 3px 8px 0px 0px'
+        },
+        {
           xtype: 'checkbox',
           name: 'acceptLicense',
           listeners: {
@@ -95,11 +193,8 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
                }
             }
           }
-        },
-        {
-          html: 'I have read and agree to all terms in the above EULA',
-          style: 'margin: 3px 0px 0px 6px'
         }
+
         ]
       }
       ],
@@ -148,31 +243,43 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         xtype: 'textfield',
         width: 160,
         fieldLabel: 'First Name',
-        name: 'firstName'
+        name: 'firstName',
+        allowBlank: false,
+        itemCls: 'required-field',
+        helpText: 'Your first name.'
       },
       {
         xtype: 'textfield',
         width: 160,
         fieldLabel: 'Last Name',
-        name: 'lastName'
+        name: 'lastName',
+        allowBlank: false,
+        itemCls: 'required-field',
+        helpText: 'Your last name.'
       },
       {
         xtype: 'textfield',
         width: 160,
         fieldLabel: 'Title',
-        name: 'title'
+        name: 'title',
+        helpText: 'Your title.'
       },
       {
         xtype: 'textfield',
         width: 160,
         fieldLabel: 'Email',
-        name: 'email'
+        name: 'email',
+        allowBlank: false,
+        itemCls: 'required-field',
+        regex: /^.+@.+/,
+        helpText: 'Your email address.'
       },
       {
         xtype: 'textfield',
         width: 160,
         fieldLabel: 'Phone',
-        name: 'phone'
+        name: 'phone',
+        helpText: 'Your phone number.'
       }
       ]
     },
@@ -189,34 +296,47 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       items: [
       {
         xtype: 'textfield',
-        width: 168,
+        width: 185,
         fieldLabel: 'Organization',
-        name: 'organization'
+        name: 'organization',
+        helpText: 'Your organization name.'
+
       },
       {
         xtype: 'textfield',
-        width: 168,
+        width: 185,
         fieldLabel: 'Street Address',
-        name: 'streetAddress'
+        name: 'streetAddress',
+        helpText: 'Your street address.'
       }, 
       {
         xtype: 'textfield',
-        width: 168,
+        width: 185,
         fieldLabel: 'City',
-        name: 'city'
+        name: 'city',
+        helpText: 'Your city.'
       }, 
       {
-        xtype: 'combo',
+        xtype: 'uxgroupcombo',
         width: 185,
         fieldLabel: 'State/Province',
         name: 'state',
-        emptyText: 'Selete One(US/Canada Only)'
+        emptyText: 'Selete One(US/Canada Only)',
+        displayField: 'display',
+        valueField: 'value',
+        store: this.stateStore,
+        showGroupName: false,
+        triggerAction: 'all',
+        mode: 'local',
+        editable: false,
+        helpText: 'Your state/province.'
       },
       {
         xtype: 'textfield',
         fieldLabel: 'Zip Code',
-        width: 168,
-        name: 'zipCode'
+        width: 185,
+        name: 'zipCode',
+        helpText: 'The zip code of your address.'
       }, 
       {
         xtype: 'combo',
@@ -229,7 +349,8 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         triggerAction: 'all',
         mode: 'local',
         width: 185,
-        editable: false
+        editable: false,
+        helpText: 'Your country.'
       }
       ]
     } 
@@ -246,12 +367,91 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   
   this.stepJVM = new Ext.Panel({
     id: 'step-2',
-    html: 'JVM'
+    hideMode: 'offsets',
+    bodyStyle: 'margin: 10px',
+    items: [
+    {
+      xtype: 'fieldset',
+      title: 'JVM Memory Configuration',
+      collapsible: false,
+      autoHeight: true,
+      width: 300,
+      bodyStyle: 'margin: 10px',
+      items: [
+        {
+          xtype: 'panel',
+          html: 'Some description, bababababababa, hahahhahha!</br>asdfasdfasdfasdf',
+          bodyStyle: 'margin-bottom: 20px'
+        },
+        {
+          xtype: 'combo',
+          name: 'xms',
+          fieldLabel: '-Xms',
+          store: this.memoryStore,
+          displayField: 'display',
+          valueField: 'value',
+          regex: /^\d+m$/,
+          triggerAction: 'all',
+          mode: 'local',
+          itemCls: 'required-field',
+          allowBlank: false,
+          width: 120,
+          helpText: 'The minimum heap size of the JVM which will be used by Nexus.',
+          validator: function ( value ){
+            var xmxCombo = this.ownerCt.find('name', 'xmx')[0];
+            xmxCombo.clearInvalid();
+            var xmxValue = xmxCombo.getValue();
+            if ( parseInt( value.split('m')[0] ) > parseInt( xmxValue.split('m')[0] ) ) {
+              return 'The -Xms value must not be larger than the -Xmx value.';
+            }
+            return true;
+          }
+        },
+        {
+          xtype: 'combo',
+          name: 'xmx',
+          fieldLabel: '-Xmx',
+          store: this.memoryStore,
+          displayField: 'display',
+          valueField: 'value',
+          regex: /^\d+m$/,
+          triggerAction: 'all',
+          mode: 'local',
+          itemCls: 'required-field',
+          allowBlank: false,
+          width: 120,
+          helpText: 'The maximum heap size of the JVM which will be used by Nexus.',
+          validator: function ( value ){
+            var xmsCombo = this.ownerCt.find('name', 'xms')[0];
+            xmsCombo.clearInvalid();
+            var xmsValue = xmsCombo.getValue();
+            if ( parseInt( value.split('m')[0] ) < parseInt( xmsValue.split('m')[0] ) ) {
+              return 'The -Xmx value must not be smaller than the -Xms value.';
+            }
+            return true;
+          }
+        }
+    ],
+    listeners: {
+      'beforeshow' : function( cmpt ){
+          var stepBackBtn = Ext.getCmp('wizardBtnBack');
+          stepBackBtn.enable();
+          var stepNextBtn = Ext.getCmp('wizardBtnNext');
+          stepNextBtn.enable();
+      },
+      'afterlayout': function( cmpt ){
+          this.find('name', 'xms')[0].setValue('256m');
+          this.find('name', 'xmx')[0].setValue('512m');
+      }
+    }       
+    }
+    ]
   });
 
   Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
     frame: true,
     autoScroll: true,
+    buttonAlign: 'center',
     items: [
       this.wizard,
       {
@@ -264,11 +464,9 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         layout: 'card',
         activeItem: 0,
         items: [ this.stepLicense, this.stepUser, this.stepJVM ]
-      },
-      {
-        xtype: 'panel',
-        buttonAlign: 'center',
-        buttons: [
+      }
+    ],
+    buttons: [
         {
           id: 'wizardBtnBack',
           text: '< Back',
@@ -280,11 +478,11 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
           text: 'Next >',
           handler: this.stepNext,
           scope: this
-        }
-        ]
-      }
+        }      
     ]
   } );
+
+
 };
 
 Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
