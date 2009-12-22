@@ -11,7 +11,7 @@
   
   <requiredProperties>
     <requiredProperty key="nexusVersion">
-      <defaultValue>1.4.0</defaultValue>
+      <defaultValue>1.4.1</defaultValue>
     </requiredProperty>
   </requiredProperties>
   
