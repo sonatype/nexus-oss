@@ -159,15 +159,23 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   
   this.stepLicense = new Ext.Panel({
       id: 'step-0',
+      autoScroll: true,
       items: [
       {
         id: 'eula-content',
+        anchor: '100%, 90%',
         xtype: 'panel',
         title: 'Sonatype Nexus Professional End User License Agreement (EULA)',
-        width: 'auto',
         height: 290,
+        width: 'auto',
         autoScroll: true,
-        style: 'margin: 15px 0px 0px 15px; background-color: white; border-width: 0px 1px 1px 1px',
+        autoLoad: {
+          url: Sonatype.config.resourcePath + '/html/license.html',
+          headers: {
+            accept: 'text/html' 
+          }
+        },
+        style: 'margin: 15px 15px 0px 15px; background-color: white; border-width: 0px 1px 1px 1px',
         bodyStyle: 'padding: 0px 10px 0px 10px'
       },
       {
@@ -214,17 +222,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       }
   });
 
-  Ext.Ajax.request({
-    method: 'GET',
-    url: Sonatype.config.resourcePath + '/html/license.html',
-    headers: {
-      accept: 'text/html' 
-    },
-    success: function ( response, options ) {
-      var licenseHtml = response.responseText;
-      Ext.getCmp('eula-content').body.dom.innerHTML = licenseHtml;
-    }
-  }); 
+ 
   
   this.stepUser = new Ext.Panel({
     id: 'step-1',
@@ -486,8 +484,25 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
 };
 
 Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
+  isPanelValid : function( panel ) {
+    var items = panel.items.getRange();
+    for ( var i = 0 ; i < items.length ; i++ ) {
+      if ( items[i].xtype == 'fieldset' 
+        && !this.isPanelValid( items[i] ) ) {
+         return false;
+      }
+      else if ( items[i].isValid 
+          && !items[i].isValid() ) {
+        return false;
+      }
+    }
+    return true;
+  },
   stepNext: function( btn ) {
     var layout = Ext.getCmp('cardWizard').getLayout();
+    if ( !this.isPanelValid( layout.activeItem ) ){
+      return;
+    }
     var activeStepIndex = layout.activeItem.id.split('step-')[1];
     var next = parseInt(activeStepIndex) + 1;
     if ( next < Ext.getCmp('cardWizard').items.length ) {
