@@ -1,0 +1,108 @@
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.4.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-distribution-archives</artifactId>
+  <packaging>pom</packaging>
+
+  <name>Nexus (Distribution Archives)</name>
+
+  <modules>
+    <module>car-nexus-oss</module>
+    <module>itar-nexus-oss</module>
+    <module>itar-nexus-plugin-console-plugin</module>
+  </modules>
+
+  <properties>
+    <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+    <metadata.directory>${assembly.directory}/metadata</metadata.directory>
+    <data.directory>${assembly.directory}/data</data.directory>
+    <templates.directory>${assembly.directory}/templates</templates.directory>
+  </properties>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>metadata</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${metadata.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/assembly/metadata</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>data</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${data.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/assembly/data</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+          <execution>
+            <id>templates</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${templates.directory}</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/assembly/templates</directory>
+                </resource>
+              </resources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assembly/assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+  </build>  
+  
+</project>

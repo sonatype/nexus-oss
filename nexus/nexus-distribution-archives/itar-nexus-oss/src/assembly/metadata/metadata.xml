@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<metadata>
+
+  <description>Nexus OSS ITAR</description>
+
+  <requires>
+    <property>
+      <name>appName</name>
+    </property>
+    <property>
+      <name>runtimeDir</name>
+    </property>
+    <property>
+      <name>confDir</name>
+      <default>${runtimeDir}/conf</default>
+      <optional>true</optional>
+    </property>
+  </requires>
+
+  <provides>
+    <property>
+      <name>jswMainClass</name>
+      <value>org.codehaus.plexus.classworlds.launcher.Launcher</value>
+      <mergePolicy>error</mergePolicy>
+    </property>
+    <property>
+      <name>bootLibraries</name>
+      <values>
+        <value>${runtimeDir}/runtime/apps/${appName}/lib/plexus-classworlds-*.jar</value>
+        <value>${confDir}/</value>
+      </values>
+    </property>
+  </provides>
+
+</metadata>

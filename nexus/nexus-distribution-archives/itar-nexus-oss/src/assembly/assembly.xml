@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<assembly>
+  <id></id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>./target/assembly</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>    
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/lib</directory>
+      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory>
+      <excludes>
+        <exclude>plexus-app-booter-*</exclude>
+        <exclude>plexus-container-default-*</exclude>
+        <exclude>plexus-jsw-app-booter-*</exclude>
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/conf</directory>
+      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/conf</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</directory>
+      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/webapp</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

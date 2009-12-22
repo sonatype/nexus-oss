@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<metadata>
+
+  <description>Nexus OSS Plugin Console ITAR</description>
+
+  <requires>
+    <property>
+      <name>runtimeDir</name>
+    </property>
+    <property>
+      <name>appName</name>
+    </property>
+  </requires>
+
+</metadata>

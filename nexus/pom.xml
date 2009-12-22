@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -14,7 +15,7 @@
   <version>1.4.2-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
   <inceptionYear>2007</inceptionYear>
-  <mailingLists />
+  <mailingLists/>
   <licenses>
     <license>
       <name>GNU General Public License</name>
@@ -81,6 +82,16 @@
         <role>Developer</role>
       </roles>
       <timezone>-3</timezone>
+    </developer>
+    <developer>
+      <id>adreghiciu</id>
+      <name>Alin Dreghiciu</name>
+      <email>alin@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>+3</timezone>
     </developer>
   </developers>
   <contributors>
@@ -160,6 +171,7 @@
     <spice-timeline.version>1.0.1</spice-timeline.version>
     <plexus-swizzle.version>1.2-SNAPSHOT</plexus-swizzle.version>
     <spice-utils.version>1.0.0</spice-utils.version>
+    <runtime-assembler.version>1.0-SNAPSHOT</runtime-assembler.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -809,24 +821,27 @@
                     <exclude>velocity:velocity:jar:1.4</exclude>
                     <exclude>velocity:velocity-dep:jar:1.4</exclude>
                   </excludes>
-                  <message> Velocity 1.4 is banned, Velocity 1.5 should be used! You probably added a dependency that is
+                  <message>Velocity 1.4 is banned, Velocity 1.5 should be used! You probably added a dependency that is
                     missing
-                    the exclusions. </message>
+                    the exclusions.
+                  </message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
                     <exclude>commons-logging:*</exclude>
                   </excludes>
-                  <message> commons-logging conflicts with slf4j. You probably added a dependency that is missing the
-                    exclusions. </message>
+                  <message>commons-logging conflicts with slf4j. You probably added a dependency that is missing the
+                    exclusions.
+                  </message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
                     <exclude>*:plexus-component-api</exclude>
                   </excludes>
-                  <message> plexus-component-api conflicts with newer plexus-container-default. You probably added a
+                  <message>plexus-component-api conflicts with newer plexus-container-default. You probably added a
                     dependency
-                    that is plexus component made with older plexus container. </message>
+                    that is plexus component made with older plexus container.
+                  </message>
                 </bannedDependencies>
                 <!--  <requirePluginVersions>
 									<banSnapshots>false</banSnapshots>
@@ -930,6 +945,10 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <artifactId>maven-runtime-assembler-plugin</artifactId>
+          <version>${runtime-assembler.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>
@@ -983,6 +1002,13 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <id>distribution</id>
+      <modules>
+        <module>nexus-distribution-archives</module>        
+        <module>nexus-distribution</module>
+      </modules>
     </profile>
   </profiles>
 </project>

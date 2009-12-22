@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<metadata>
+
+  <description>Nexus OSS CAR</description>
+
+  <requires>
+    <property>
+      <name>appName</name>
+    </property>
+    <property>
+      <name>runtimeDir</name>
+    </property>
+    <property>
+      <name>confDir</name>
+      <default>${runtimeDir}/conf</default>
+      <optional>true</optional>
+    </property>
+  </requires>
+
+  <provides>
+    <property>
+      <name>jvmParameters</name>
+      <values>
+        <value>-Dbasedir=${runtimeDir}</value>
+      </values>
+      <mergePolicy>append</mergePolicy>
+    </property>
+  </provides>
+
+</metadata>
