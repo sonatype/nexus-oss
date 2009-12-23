@@ -373,12 +373,15 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       title: 'JVM Memory Configuration',
       collapsible: false,
       autoHeight: true,
-      width: 300,
+      width: 350,
       bodyStyle: 'margin: 10px',
       items: [
         {
           xtype: 'panel',
-          html: 'Some description, bababababababa, hahahhahha!</br>asdfasdfasdfasdf',
+          html: 'These 2 values will be passed to Java Virtual Machine when the new Nexus is beging started.<br/>' +
+	        '<ul><li><em>-Xms</em> sets the initial heap size of the JVM.</li>' +
+		'<li><em>-Xmx</em> sets the maximal heap size of the JVM.</li></ul>' +
+		'Note that the value of -Xms must be less than or equal to the -Xmx value.',
           bodyStyle: 'margin-bottom: 20px'
         },
         {
@@ -394,7 +397,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
           itemCls: 'required-field',
           allowBlank: false,
           width: 120,
-          helpText: 'The minimum heap size of the JVM which will be used by Nexus.',
+          helpText: 'The initial heap size of the JVM which will be used by Nexus.',
           validator: function ( value ){
             var xmxCombo = this.ownerCt.find('name', 'xmx')[0];
             xmxCombo.clearInvalid();
@@ -588,3 +591,4 @@ Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
     } );
   }
 } );
+
