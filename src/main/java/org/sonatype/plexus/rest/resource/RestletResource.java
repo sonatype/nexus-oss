@@ -255,6 +255,15 @@ public class RestletResource
             return serialize( variant, payload );
         }
     }
+    
+    // == mkcol
+    
+    public boolean allowMkcol()
+    {
+        return false; 
+    }
+    
+    // == mkcol
 
     @Override
     public Representation represent( Variant variant )
