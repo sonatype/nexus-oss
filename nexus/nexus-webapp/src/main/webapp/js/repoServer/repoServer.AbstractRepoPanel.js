@@ -426,7 +426,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
   deleteRepoItemCallback: function( options, isSuccess, response ) {
     //@todo: stop updating messaging here
     if ( isSuccess ) {
-      options.contentNode.getOwnerTree().root.reload();
+      options.contentNode.parentNode.removeChild( options.contentNode );
     }
     else {
       Sonatype.MessageBox.alert( 'Error', response.status == 401 ?
