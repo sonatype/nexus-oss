@@ -159,15 +159,16 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   
   this.stepLicense = new Ext.Panel({
       id: 'step-0',
+      autoWidth: true,
+      autoHeight: true,
       autoScroll: true,
       items: [
       {
         id: 'eula-content',
-        anchor: '100%, 90%',
         xtype: 'panel',
         title: 'Sonatype Nexus Professional End User License Agreement (EULA)',
         height: 290,
-        width: 'auto',
+        autoWidth: true,
         autoScroll: true,
         autoLoad: {
           url: Sonatype.config.resourcePath + '/html/license.html',
@@ -185,11 +186,13 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         items: [
         {
           html: 'I have read and agree to all terms in the above EULA',
-          style: 'margin: 3px 8px 0px 0px'
+          style: 'margin: 3px 8px 0px 0px',
+	  width: 260
         },
         {
           xtype: 'checkbox',
           name: 'acceptLicense',
+	  width: 30,
           listeners: {
             'check': function ( cmpt, checked ) {
                var stepNextBtn = Ext.getCmp('wizardBtnNext');
@@ -227,6 +230,8 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   this.stepUser = new Ext.Panel({
     id: 'step-1',
     layout: 'column',
+    autoWidth: true,
+    autoScroll: true,
     bodyStyle: 'margin: 10px',
     hideMode: 'offsets',
     items: [
@@ -235,11 +240,12 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       title: 'Contact Information',
       collapsible: false,
       autoHeight: true,
+      width: 340,
       bodyStyle: 'margin: 10px',
       items: [
       {
         xtype: 'textfield',
-        width: 160,
+        width: 140,
         fieldLabel: 'First Name',
         name: 'firstName',
         allowBlank: false,
@@ -248,7 +254,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       },
       {
         xtype: 'textfield',
-        width: 160,
+        width: 140,
         fieldLabel: 'Last Name',
         name: 'lastName',
         allowBlank: false,
@@ -257,14 +263,14 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       },
       {
         xtype: 'textfield',
-        width: 160,
+        width: 140,
         fieldLabel: 'Title',
         name: 'title',
         helpText: 'Your title.'
       },
       {
         xtype: 'textfield',
-        width: 160,
+        width: 140,
         fieldLabel: 'Email',
         name: 'email',
         allowBlank: false,
@@ -274,7 +280,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       },
       {
         xtype: 'textfield',
-        width: 160,
+        width: 140,
         fieldLabel: 'Phone',
         name: 'phone',
         helpText: 'Your phone number.'
@@ -283,13 +289,15 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     },
     {
       html: '&nbsp',
-      width: 50
+      width: 20,
+      autoHeight: true
     },
     {
       xtype: 'fieldset',
       title: 'Address Information',
       collapsible: false,
       autoHeight: true,
+      width: 400,
       bodyStyle: 'margin: 10px',
       items: [
       {
