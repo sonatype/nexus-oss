@@ -43,6 +43,8 @@
   <script src="js/extensions/ext-override.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
   <script src="js/filetree/js/Ext.ux.form.BrowseButton.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/groupcombo/groupcombo.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/groupcombo/groupdataview.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/Sonatype.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   

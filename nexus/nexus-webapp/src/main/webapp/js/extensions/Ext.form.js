@@ -67,6 +67,7 @@ Ext.override(Ext.form.Field, {
     var helpClass = null;
     var wrapDiv = null;
     if (this.getXType() == 'combo'
+    ||  this.getXType() == 'uxgroupcombo'
     ||  this.getXType() == 'datefield'
     ||  this.getXType() == 'timefield') {
       wrapDiv = this.getEl().up('div.x-form-field-wrap');

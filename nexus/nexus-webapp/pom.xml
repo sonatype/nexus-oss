@@ -214,6 +214,8 @@
                     <include>${basedir}/src/main/webapp/ext-2.2/ext-all.js</include>
                     <include>${compressed-dir}/js/extensions/ext-override.js</include>
                     <include>${compressed-dir}/js/filetree/js/Ext.ux.form.BrowseButton.js</include>
+                    <include>${compressed-dir}/js/groupcombo/groupcombo.js</include>
+                    <include>${compressed-dir}/js/groupcombo/groupdataview.js</include>
                     <include>${compressed-dir}/js/Sonatype.js</include>
                     <include>${compressed-dir}/js/extensions/Ext.messagebox.js</include>
                     <include>${compressed-dir}/js/extensions/Ext.form.js</include>

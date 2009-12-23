@@ -38,6 +38,7 @@
         <include>js/*</include>
         <include>js/extensions/*</include>
         <include>js/filetree/js/Ext.ux.form.BrowseButton.js</include>
+        <include>js/groupcombo/*</include>
         <include>js/repoServer/*</include>
         <include>style/Sonatype.css</include>
         <include>style/Sonatype-content.css</include>
