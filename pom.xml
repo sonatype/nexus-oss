@@ -184,6 +184,13 @@
               <skip>true</skip>
             </configuration>
           </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <configuration>
+              <testSkip>true</testSkip>
+            </configuration>
+          </plugin>  
         </plugins>
       </build>
     </profile>
