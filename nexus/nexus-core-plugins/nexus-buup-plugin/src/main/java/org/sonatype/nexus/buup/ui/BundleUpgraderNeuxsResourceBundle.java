@@ -1,6 +1,5 @@
 package org.sonatype.nexus.buup.ui;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,21 +18,15 @@ public class BundleUpgraderNeuxsResourceBundle
     {
         List<StaticResource> result = new ArrayList<StaticResource>();
 
-        DefaultStaticResource resource = null;
+        result.add( new DefaultStaticResource(
+            getClass().getResource( "/static/js/nexus-buup-plugin-all.js" ),
+            "/js/repoServer/nexus-buup-plugin-all.js",
+            "application/x-javascript" ) );
 
-        try
-        {
-            resource = new DefaultStaticResource(
-                new File( "/home/juven/js/nexus-buup-plugin-all.js" ).toURL(),
-                "/js/repoServer/nexus-buup-plugin-all.js",
-                "application/x-javascript" );
-
-            result.add( resource );
-        }
-        catch ( Exception e )
-        {
-            e.printStackTrace();
-        }
+        result.add( new DefaultStaticResource(
+            getClass().getResource( "/static/html/license.html" ),
+            "/html/license.html",
+            "text/html" ) );
 
         return result;
     }
