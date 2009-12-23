@@ -457,6 +457,58 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     ]
   });
 
+  this.stepEmail = new Ext.Panel({
+    id: 'step-3',
+    hideMode: 'offsets',
+    bodyStyle: 'margin: 10px; font-size: 13px',
+    html: 'An download activation email has been sent to juven@sonatype.com.</br>' + 
+          'Please check the email box and click the activation link.</br>' +
+	  '<br/>' +
+          'To start the download, press the <em>Next</em> button. Note that the download process may take a while.<br/>' +
+	  'You can also <a href="">restart</a> the upgrade process if you want to use another email address.'
+
+  });
+
+  this.stepDownload = new Ext.Panel({
+    id: 'step-4',
+    bodyStyle: 'margin: 20px 10px 20px 10px; font-size: 13px',
+    hideMode: 'offsets',
+    items: [
+    {
+      xtype: 'panel',
+      html: 'Nexus is downloading the Professional Bundle. This may take a while, it dependes on the speed of your connection to Internet.' 
+    },
+    {
+      xtype: 'panel',
+      style: 'margin-top: 40px',
+      items: [
+      {
+        xtype: 'progress',
+	id: 'pBar',
+	width: 600
+      }
+      ]
+    }
+    ],
+    listeners: {
+      'beforeshow' : function( cmpt ){
+          var stepBackBtn = Ext.getCmp('wizardBtnBack');
+          stepBackBtn.enable();
+          var stepNextBtn = Ext.getCmp('wizardBtnNext');
+          stepNextBtn.enable();
+	  var progressBar = Ext.getCmp('pBar');
+          progressBar.wait({
+	    text: 'Downloading...',
+	    fn: function() {
+	      //do something simple
+	    }
+	  });
+      },
+      'afterlayout': function( cmpt ){
+      }
+    }
+  });
+
   Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
     frame: true,
     autoScroll: true,
@@ -472,7 +524,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         id: 'cardWizard',
         layout: 'card',
         activeItem: 0,
-        items: [ this.stepLicense, this.stepUser, this.stepJVM ]
+        items: [  this.stepLicense, this.stepUser, this.stepJVM, this.stepEmail, this.stepDownload ]
       }
     ],
     buttons: [
@@ -496,6 +548,9 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
 
 Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
   isPanelValid : function( panel ) {
+    if (!panel.items){
+      return true;
+    }
     var items = panel.items.getRange();
     for ( var i = 0 ; i < items.length ; i++ ) {
       if ( items[i].xtype == 'fieldset' 
