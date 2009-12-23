@@ -16,7 +16,7 @@ public class MavenSiteNexusIndexHtmlCustomizer
         String version =
             getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-maven-site-plugin/pom.properties" );
 
-        return "<script src=\"js/repoServer/nexus-maven-site-plugin-all.js" + ( version == null ? "" : "?" + version )
+        return "<script src=\"static/js/nexus-maven-site-plugin-all.js" + ( version == null ? "" : "?" + version )
             + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 }
