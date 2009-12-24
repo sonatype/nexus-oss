@@ -65,31 +65,26 @@ public abstract class AbstractFileNexusPluginRepository
     {
         HashMap<GAVCoordinate, PluginMetadata> result = new HashMap<GAVCoordinate, PluginMetadata>();
 
-        File root = getNexusPluginsDirectory();
+        File[] pluginFolders = getPluginFolders();
 
-        if ( root.isDirectory() )
+        if ( pluginFolders != null )
         {
-            File[] pluginFolders = root.listFiles();
-
-            if ( pluginFolders != null )
+            for ( File pluginFolder : pluginFolders )
             {
-                for ( File pluginFolder : pluginFolders )
+                if ( pluginFolder.isDirectory() )
                 {
-                    if ( pluginFolder.isDirectory() )
+                    File pluginFile = new File( pluginFolder, pluginFolder.getName() + ".jar" );
+
+                    if ( pluginFile.isFile() )
                     {
-                        File pluginFile = new File( pluginFolder, pluginFolder.getName() + ".jar" );
+                        PluginMetadata md = getMetadataFromFile( pluginFile );
 
-                        if ( pluginFile.isFile() )
+                        if ( md != null )
                         {
-                            PluginMetadata md = getMetadataFromFile( pluginFile );
+                            GAVCoordinate coord =
+                                new GAVCoordinate( md.getGroupId(), md.getArtifactId(), md.getVersion() );
 
-                            if ( md != null )
-                            {
-                                GAVCoordinate coord =
-                                    new GAVCoordinate( md.getGroupId(), md.getArtifactId(), md.getVersion() );
-
-                                result.put( coord, md );
-                            }
+                            result.put( coord, md );
                         }
                     }
                 }
@@ -98,6 +93,18 @@ public abstract class AbstractFileNexusPluginRepository
 
         return result;
     }
+
+	protected File[] getPluginFolders() 
+	{
+		File root = getNexusPluginsDirectory();
+
+        if ( root.isDirectory() )
+        {
+        	return root.listFiles();
+        }
+
+		return null;
+	}
 
     public PluginRepositoryArtifact resolveArtifact( GAVCoordinate coordinates )
         throws NoSuchPluginRepositoryArtifactException
@@ -217,12 +224,14 @@ public abstract class AbstractFileNexusPluginRepository
         }
     }
 
-    protected File getPluginFolder( GAVCoordinate coordinates )
+    protected File getPluginFolder( GAVCoordinate coordinates ) 
+        throws NoSuchPluginRepositoryArtifactException
     {
         return new File( getNexusPluginsDirectory(), coordinates.getArtifactId() + "-" + coordinates.getVersion() );
     }
 
-    protected File getPluginDependenciesFolder( GAVCoordinate coordinates )
+    protected File getPluginDependenciesFolder( GAVCoordinate coordinates ) 
+        throws NoSuchPluginRepositoryArtifactException
     {
         File depsFolder = new File( getPluginFolder( coordinates ), "dependencies" );
 

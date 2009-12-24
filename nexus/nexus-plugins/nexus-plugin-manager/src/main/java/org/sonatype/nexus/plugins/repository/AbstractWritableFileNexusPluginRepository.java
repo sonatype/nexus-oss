@@ -66,13 +66,19 @@ public abstract class AbstractWritableFileNexusPluginRepository
     public boolean deletePluginBundle( GAVCoordinate coordinates )
         throws IOException
     {
-        File pluginFolder = getPluginFolder( coordinates );
-
-        if ( pluginFolder.isDirectory() )
+        try
         {
-            FileUtils.deleteDirectory( pluginFolder );
+            File pluginFolder = getPluginFolder( coordinates );
+            if ( pluginFolder.isDirectory() )
+            {
+                FileUtils.deleteDirectory( pluginFolder );
 
-            return true;
+                return true;
+            }
+        }
+        catch ( NoSuchPluginRepositoryArtifactException e )
+        {
+            // nothing to delete
         }
 
         return false;
