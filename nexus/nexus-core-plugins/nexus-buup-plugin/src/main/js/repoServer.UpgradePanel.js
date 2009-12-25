@@ -476,7 +476,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     items: [
     {
       xtype: 'panel',
-      html: 'Nexus is downloading the Professional Bundle. This may take a while, it dependes on the speed of your connection to Internet.' 
+      html: 'Nexus is downloading the Professional Bundle. This may take a while, it depends on the speed of your connection to the Internet.' 
     },
     {
       xtype: 'panel',
@@ -508,6 +508,15 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       }
     }
   });
+  
+  this.upgradeStep = new Ext.Panel({
+    id: 'step-5',
+    bodyStyle: 'margin: 20px 10px 20px 10px; font-size: 13px',
+    hideMode: 'offsets',
+    html: 'The Profesional Bundle has been downloaded.<br/><br/>' +
+          'To compelete the upgrade, press the <em>Next</em> button below.<br/><br/>' +
+	  'Note that Nexus will be shutdown for a while and restarted.<br/>'
+  });
 
   Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
     frame: true,
@@ -524,7 +533,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
         id: 'cardWizard',
         layout: 'card',
         activeItem: 0,
-        items: [  this.stepLicense, this.stepUser, this.stepJVM, this.stepEmail, this.stepDownload ]
+        items: [  this.stepLicense, this.stepUser, this.stepJVM, this.stepEmail, this.stepDownload, this.upgradeStep ]
       }
     ],
     buttons: [
