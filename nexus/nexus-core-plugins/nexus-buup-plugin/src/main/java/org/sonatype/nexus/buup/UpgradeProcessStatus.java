@@ -8,9 +8,19 @@ public enum UpgradeProcessStatus
     UNUSED,
 
     /**
+     * Waiting for activation.
+     */
+    WAIT_FOR_ACTIVATION,
+
+    /**
      * Download is in progress.
      */
     DOWNLOADING,
+
+    /**
+     * Download failed, user may try to redownload without doing _all_ from beginning.
+     */
+    DOWNLOAD_FAILED,
 
     /**
      * Downloaded successfully, all conditions are met to invoke BUUP, ready to run.
