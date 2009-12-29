@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.composition.CompositionResolver;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
@@ -20,6 +21,7 @@ import org.codehaus.plexus.component.composition.DefaultCompositionResolver;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRepository;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginDescriptor;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -224,7 +226,39 @@ public class NexusPluginsComponentRepository
 
     public <T> ComponentDescriptor<T> getComponentDescriptor( Class<T> type, String role, String roleHint )
     {
-        for ( ComponentDescriptor<?> descriptor : getComponentDescriptors( role ).get( roleHint ) )
+        Multimap<String, ComponentDescriptor<?>> roleHintIndex = getComponentDescriptors( role );
+
+        Collection<ComponentDescriptor<?>> descriptors;
+
+        if ( StringUtils.isNotEmpty( roleHint ) )
+        {
+            // specific role hint -> get only those
+            descriptors = roleHintIndex.get( roleHint );
+        }
+        else
+        {
+            // missing role hint -> get all (wildcard)
+            Collection<ComponentDescriptor<?>> allDescriptors = new ArrayList<ComponentDescriptor<?>>();
+
+            descriptors = roleHintIndex.get( PlexusConstants.PLEXUS_DEFAULT_HINT );
+            if ( descriptors != null )
+            {
+                allDescriptors.addAll( descriptors );
+            }
+
+            for ( String hint : roleHintIndex.keySet() )
+            {
+                descriptors = roleHintIndex.get( hint );
+                if ( descriptors != null )
+                {
+                    allDescriptors.addAll( descriptors );
+                }
+            }
+
+            descriptors = allDescriptors;
+        }
+
+        for ( ComponentDescriptor<?> descriptor : descriptors )
         {
             Class<?> implClass = descriptor.getImplementationClass();
             if ( isAssignableFrom( type, implClass ) )
@@ -236,7 +270,7 @@ public class NexusPluginsComponentRepository
                 return (ComponentDescriptor<T>) descriptor;
             }
         }
-
+                
         return null;
     }
 
