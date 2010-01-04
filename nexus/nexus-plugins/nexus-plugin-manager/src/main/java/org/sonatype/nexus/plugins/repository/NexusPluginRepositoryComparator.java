@@ -21,11 +21,21 @@ public class NexusPluginRepositoryComparator
     {
         if ( reverse )
         {
-            return o2.getPriority() - o1.getPriority();
+            return doCompare( o2, o1 );
         }
         else
         {
-            return o1.getPriority() - o2.getPriority();
+            return doCompare( o1, o2 );
         }
+    }
+
+    private int doCompare( NexusPluginRepository o1, NexusPluginRepository o2 )
+    {
+        int i = o1.getPriority() - o2.getPriority();
+        if ( i != 0 )
+        {
+            return i;
+        }
+        return o1.getId().compareTo( o2.getId() );
     }
 }
