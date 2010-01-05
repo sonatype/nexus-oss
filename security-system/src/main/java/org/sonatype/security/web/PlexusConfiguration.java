@@ -20,7 +20,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.Filter;
+import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
@@ -31,12 +35,12 @@ import org.codehaus.plexus.context.ContextException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
 import org.jsecurity.JSecurityException;
 import org.jsecurity.config.ConfigurationException;
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.jsecurity.mgt.SecurityManager;
 import org.jsecurity.realm.Realm;
 import org.jsecurity.util.LifecycleUtils;
 import org.jsecurity.web.config.IniWebConfiguration;
 import org.jsecurity.web.filter.PathConfigProcessor;
+import org.jsecurity.web.servlet.FilterChainWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.PlexusSecurityManager;
@@ -66,6 +70,8 @@ public class PlexusConfiguration
     protected String securityManagerRoleHint;
 
     protected Map<String, Filter> filters;
+    
+    protected Map<String, String> pseudoChains = new LinkedHashMap<String, String>();
 
     protected Logger getLogger()
     {
@@ -383,6 +389,12 @@ public class PlexusConfiguration
         return pathFilters;
     }
 
+    /**
+     * Only save the pathPattern and filterExpression in the pseudoChains, does not put real filters into the real
+     * chain. <br/>
+     * We can not get the real filters because this method is invoked on Nexus starting, when JSecurityListener might
+     * not be located.
+     */
     public void addProtectedResource( String pathPattern, String filterExpression )
         throws SecurityConfigurationException
     {
@@ -395,15 +407,7 @@ public class PlexusConfiguration
                         + filterExpression + "'" );
             }
 
-            if ( chains == null )
-            {
-                // create a map if not
-                chains = new LinkedHashMap<String, List<Filter>>();
-            }
-
-            chains.remove( pathPattern );
-
-            chains.put( pathPattern, getPathFilters( pathPattern, filterExpression ) );
+            pseudoChains.put( pathPattern, filterExpression );
         }
         catch ( Exception e )
         {
@@ -411,8 +415,83 @@ public class PlexusConfiguration
         }
     }
 
+    /**
+     * Lazy Initialization here, get the filters based on pseudoChain and put them into the real chain if needed. <br/>
+     * The method is invoked when JSecurityFilter is applied, so we can get the real filters.
+     */
+    @Override
+    public FilterChain getChain( ServletRequest request, ServletResponse response, FilterChain originalChain )
+    {
+        if ( pseudoChains.isEmpty() )
+        {
+            return null;
+        }
+
+        if ( this.chains == null )
+        {
+            this.chains = new LinkedHashMap<String, List<Filter>>();
+        }
+
+        String requestURI = getPathWithinApplication( request );
+
+        for ( String path : this.chains.keySet() )
+        {
+            if ( pathMatches( path, requestURI ) )
+            {
+                return getChain( path, requestURI, originalChain );
+            }
+        }
+
+        for ( String path : this.pseudoChains.keySet() )
+        {
+            if ( pathMatches( path, requestURI ) )
+            {
+                List<Filter> filters = getPathFilters( path, pseudoChains.get( path ) );
+
+                for ( Filter filter : filters )
+                {
+                    try
+                    {
+                        filter.init( getFilterConfig() );
+                    }
+                    catch ( ServletException e )
+                    {
+                        getLogger().error( "Unable to initialize filter for path '" + path + "'", e );
+
+                        return null;
+                    }
+                }
+
+                this.chains.put( path, filters );
+
+                return getChain( path, requestURI, originalChain );
+            }
+        }
+
+        return null;
+    }
+
+    private FilterChain getChain( String path, String requestURI, FilterChain originalChain )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug(
+                "Matched path [" + path + "] for requestURI [" + requestURI + "].  "
+                    + "Utilizing corresponding filter chain..." );
+        }
+
+        List<Filter> pathFilters = this.chains.get( path );
+
+        if ( pathFilters != null && !pathFilters.isEmpty() )
+        {
+            return new FilterChainWrapper( originalChain, pathFilters );
+        }
+
+        return null;
+    }
+
     public void protectedResourcesAdded()
     {
-        initFilters( chains );
+
     }
 }
