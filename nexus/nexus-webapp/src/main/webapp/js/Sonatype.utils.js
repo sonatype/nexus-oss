@@ -128,19 +128,27 @@ Sonatype.utils = {
     var serverMessage = ''; 
     var r = response.responseText;
     if ( r ) {
-      var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
-      var n2 = r.toLowerCase().indexOf( '</h3>' );
-      if ( n2 > n1 ) {
-        serverMessage = r.substring( n1, n2 );
+      if ( options 
+          && options.decodeErrorResponse 
+          && r.toLowerCase().indexOf( '"errors"') > -1 ) {
+        var errorResponse = Ext.decode( response.responseText );
+        
+        for ( var i = 0 ; i < errorResponse.errors.length ; i++ ) {
+          serverMessage += '<br /><br />'; 
+          serverMessage += Ext.decode( response.responseText ).errors[i].msg;
+        }
+      }
+      else {
+        var n1 = r.toLowerCase().indexOf( '<h3>' ) + 4;
+        var n2 = r.toLowerCase().indexOf( '</h3>' );
+        if ( n2 > n1 ) {
+          serverMessage += '<br /><br />'
+          serverMessage += r.substring( n1, n2 );
+        }
       }
     }
 
-    if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() && (response.status == 403 || response.status == 401 )) {
-      
-      if ( serverMessage ) {
-        serverMessage = '<br /><br />' + serverMessage;
-      }
-      
+    if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() && (response.status == 403 || response.status == 401 )) {      
       if ( Sonatype.repoServer.RepoServer.loginWindow.isVisible() ) {
         var nexusReason = response.getResponseHeader['X-Nexus-Reason']; 
         if ( nexusReason && nexusReason.substring(0,7) == 'expired' ) {
@@ -164,22 +172,19 @@ Sonatype.utils = {
         message = '';
       }
       if ( serverMessage ) {
-        if ( message ) {
-          message += '<br /><br />';
-        }
         message += serverMessage;
       }
       Sonatype.MessageBox.show( {
         title: "Error",
         msg: (
-          ( message ? message + '<br /><br />' : '' ) +
+          ( message ? message : '' ) +
           ( response.status == 400 && showResponseText ? 
-              response.responseText
+              ( '<br /><br />' + response.responseText )
               : ( options && options.hideErrorStatus ? '' :
                 ( response.status ?
-                  'Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
+                  '<br /><br />Nexus returned an error: ERROR ' + response.status + ': ' + response.statusText
                   :
-                  'There was an error communicating with the Nexus server: ' + response.statusText + '<br />' +
+                  '<br /><br />There was an error communicating with the Nexus server: ' + response.statusText + '<br />' +
                   'Check the status of the server, and log in to the application again.' ) ) ) +
           ( offerRestart ?
               '<br /><br />Click OK to reload the console or ' +
