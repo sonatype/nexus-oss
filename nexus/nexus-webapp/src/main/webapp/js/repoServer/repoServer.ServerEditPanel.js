@@ -248,14 +248,14 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             listeners: {
               'expand' : {
                 fn: function(panel) {
-                  this.isSecurityAnonymousAccessEnabled = true;
+                  this.formPanel.isSecurityAnonymousAccessEnabled = true;
                   this.optionalFieldsetExpandHandler(panel);
                 },
                 scope: this
               },
               'collapse' : {
                 fn: function(panel) {
-                  this.isSecurityAnonymousAccessEnabled = false;
+                  this.formPanel.isSecurityAnonymousAccessEnabled = false;
                   panel.find('name', 'securityAnonymousPassword')[0].setValue('');
                   this.optionalFieldsetCollapseHandler(panel);
                 },
