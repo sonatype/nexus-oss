@@ -15,9 +15,11 @@ package org.sonatype.security.web;
 import static org.jsecurity.util.StringUtils.split;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -72,6 +74,11 @@ public class PlexusConfiguration
     protected Map<String, Filter> filters;
     
     protected Map<String, String> pseudoChains = new LinkedHashMap<String, String>();
+    
+    /**
+     * store the filter names which are filled with ordered path pattern
+     */
+    protected Set<String> preparedFilterNames = new HashSet<String>();
 
     protected Logger getLogger()
     {
@@ -278,6 +285,7 @@ public class PlexusConfiguration
         this.chains = createChains( section, filters );
 
         initFilters( this.chains );
+
     }
 
     @Override
@@ -375,11 +383,23 @@ public class PlexusConfiguration
             }
             if ( filter instanceof PathConfigProcessor )
             {
+                // the path patterns of the filter must be ordered
+                if ( !preparedFilterNames.contains( name ) )
+                {
+                    for ( String pathPattern : this.pseudoChains.keySet() )
+                    {
+                        ( (PathConfigProcessor) filter ).processPathConfig( pathPattern, null );
+                    }
+                    
+                    preparedFilterNames.add( name );
+                }
+
                 if ( this.getLogger().isDebugEnabled() )
                 {
                     this.getLogger().debug(
                         "Applying path [" + path + "] to filter [" + name + "] " + "with config [" + config + "]" );
                 }
+
                 ( (PathConfigProcessor) filter ).processPathConfig( path, config );
             }
 
@@ -408,6 +428,14 @@ public class PlexusConfiguration
             }
 
             pseudoChains.put( pathPattern, filterExpression );
+            
+            if ( this.chains == null )
+            {
+                this.chains = new LinkedHashMap<String, List<Filter>>();
+            }
+            
+            // fill in the chain with null value first, so the order will be kept
+            chains.put( pathPattern, null );
         }
         catch ( Exception e )
         {
@@ -427,60 +455,59 @@ public class PlexusConfiguration
             return null;
         }
 
-        if ( this.chains == null )
-        {
-            this.chains = new LinkedHashMap<String, List<Filter>>();
-        }
-
         String requestURI = getPathWithinApplication( request );
 
-        for ( String path : this.chains.keySet() )
+        for ( String pathPattern : this.chains.keySet() )
         {
-            if ( pathMatches( path, requestURI ) )
+            if ( pathMatches( pathPattern, requestURI ) )
             {
-                return getChain( path, requestURI, originalChain );
-            }
-        }
-
-        for ( String path : this.pseudoChains.keySet() )
-        {
-            if ( pathMatches( path, requestURI ) )
-            {
-                List<Filter> filters = getPathFilters( path, pseudoChains.get( path ) );
-
-                for ( Filter filter : filters )
+                if ( this.chains.get( pathPattern ) == null )
                 {
-                    try
-                    {
-                        filter.init( getFilterConfig() );
-                    }
-                    catch ( ServletException e )
-                    {
-                        getLogger().error( "Unable to initialize filter for path '" + path + "'", e );
+                    final String filterExpression = pseudoChains.get( pathPattern );
 
-                        return null;
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug(
+                            "Lazy initializing filters for pathPattern [" + pathPattern + "] and filterExpression ["
+                                + filterExpression + "]" );
                     }
+
+                    List<Filter> filters = getPathFilters( pathPattern, filterExpression );
+
+                    for ( Filter filter : filters )
+                    {
+                        try
+                        {
+                            filter.init( getFilterConfig() );
+                        }
+                        catch ( ServletException e )
+                        {
+                            getLogger().error( "Unable to initialize filter for pathPattern '" + pathPattern + "'", e );
+
+                            return null;
+                        }
+                    }
+
+                    this.chains.put( pathPattern, filters );
                 }
 
-                this.chains.put( path, filters );
-
-                return getChain( path, requestURI, originalChain );
+                return getChain( pathPattern, requestURI, originalChain );
             }
         }
 
         return null;
     }
 
-    private FilterChain getChain( String path, String requestURI, FilterChain originalChain )
+    private FilterChain getChain( String pathPattern, String requestURI, FilterChain originalChain )
     {
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Matched path [" + path + "] for requestURI [" + requestURI + "].  "
+                "Matched pathPattern [" + pathPattern + "] for requestURI [" + requestURI + "].  "
                     + "Utilizing corresponding filter chain..." );
         }
 
-        List<Filter> pathFilters = this.chains.get( path );
+        List<Filter> pathFilters = this.chains.get( pathPattern );
 
         if ( pathFilters != null && !pathFilters.isEmpty() )
         {
