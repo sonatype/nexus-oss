@@ -115,39 +115,6 @@ public class Nexus531RepositoryCrudValidationIT
     }
 
     @Test
-    public void createNoFormatTest()
-        throws IOException
-    {
-
-        RepositoryResource resource = new RepositoryResource();
-
-        resource.setId( "createNoFormatTest" );
-        resource.setRepoType( "hosted" ); // [hosted, proxy, virtual]
-        resource.setName( "Create Test Repo" );
-        // resource.setFormat( "maven2" ); // Repository Format, maven1, maven2, maven-site, eclipse-update-site
-        // resource.setAllowWrite( true );
-        // resource.setBrowseable( true );
-        // resource.setIndexable( true );
-        // resource.setNotFoundCacheTTL( 1440 );
-        resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() ); // [snapshot, release] Note: needs param name change
-        // resource.setRealmnId(?)
-        // resource.setOverrideLocalStorageUrl( "" ); //file://repos/internal
-        // resource.setDefaultLocalStorageUrl( "" ); //file://repos/internal
-        // resource.setDownloadRemoteIndexes( true );
-        resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        String responseText = response.getEntity().getText();
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
-        }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
-    }
-
-    @Test
     public void createNoRepoTypeTest()
         throws IOException
     {
