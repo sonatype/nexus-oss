@@ -30,6 +30,7 @@
 		<!-- remove maven deps from core 1st!
 		<module>nexus-maven-plugin</module>
 		-->
+		<module>nexus-ldap-plugin-parent</module>
 	</modules>
 
 </project>

@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <parent>
+    <groupId>org.sonatype.nexus.plugins</groupId>
+    <artifactId>nexus-core-plugins</artifactId>
+    <version>1.4.2-SNAPSHOT</version>
+  </parent>
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+  <artifactId>nexus-ldap-plugin-parent</artifactId>
+  <version>1.4.2-SNAPSHOT</version>
+  <name>Nexus LDAP Plugin :: LDAP Parent</name>
+  <description>Nexus LDAP Parent</description>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>nexus-ldap-realm-plugin</module>
+    <module>ldap-common</module>
+    <module>nexus-ldap-plugin-it</module>
+  </modules>
+  
+  <properties>
+    <commons-collections.version>3.2</commons-collections.version>
+    <plexus-digest.version>1.1</plexus-digest.version>
+    <plexus-ldap-testsuite.version>1.1</plexus-ldap-testsuite.version>
+    <plexus.version>1.2.1.3</plexus.version>
+    <plexus-security.version>1.1.3</plexus-security.version>
+    <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
+    <commons-lang.version>2.3</commons-lang.version>
+  </properties>
+
+</project>

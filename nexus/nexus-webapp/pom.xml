@@ -24,7 +24,9 @@
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
     
     <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
+    <optional-plugins.directory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
     <nexus-plugin-console-plugin.version>1.4.2-SNAPSHOT</nexus-plugin-console-plugin.version>
+    <nexus-ldap-realm-plugin.version>1.4.2-SNAPSHOT</nexus-ldap-realm-plugin.version>
     
   </properties>
   <dependencies>
@@ -54,6 +56,15 @@
       <artifactId>nexus-plugin-console-plugin</artifactId>
 	  <version>${nexus-plugin-console-plugin.version}</version>
 	  <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency> 
+    
+    <dependency>
+    <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${nexus-ldap-realm-plugin.version}</version>
+      <classifier>bundle</classifier>
       <type>zip</type>
       <scope>provided</scope>
     </dependency>                  
@@ -188,6 +199,14 @@
                       <classifier>bundle</classifier>
                       <type>zip</type>
                       <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+                      <artifactId>nexus-ldap-realm-plugin</artifactId>
+                      <version>${nexus-ldap-realm-plugin.version}</version>
+                      <classifier>bundle</classifier>
+                      <type>zip</type>
+                      <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
                   </artifactItem>
               </artifactItems>
             </configuration>

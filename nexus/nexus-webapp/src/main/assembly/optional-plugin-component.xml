@@ -1,0 +1,8 @@
+<component>
+  <fileSets>
+    <fileSet>
+      <directory>target/${optional-plugins.directory}</directory>
+      <outputDirectory>${optional-plugins.directory}/</outputDirectory>
+    </fileSet>
+  </fileSets>
+</component>
