@@ -27,6 +27,9 @@
 	<modules>
 		<module>nexus-lvo-plugin</module>
 		<module>nexus-plugin-console-plugin</module>
+		<!-- remove maven deps from core 1st!
+		<module>nexus-maven-plugin</module>
+		-->
 	</modules>
 
 </project>
