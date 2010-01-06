@@ -1,0 +1,60 @@
+<plexus>
+	<components>
+		<component>
+			<role>org.sonatype.ldaptestsuite.LdapServer</role>
+			<implementation>
+				org.sonatype.ldaptestsuite.LdapServer
+			</implementation>
+			<configuration>
+				<workingDirectory>
+					${basedir}/target/apache-ds/
+				</workingDirectory>
+				<doDelete>true</doDelete>
+				<port>12345</port>
+				<partitions>
+					<partition>
+						<name>sonatype</name>
+						<suffix>o=sonatype</suffix>
+						<indexedAttributes>
+							<indexedAttribute>
+								objectClass
+							</indexedAttribute>
+							<indexedAttribute>o</indexedAttribute>
+						</indexedAttributes>
+						<rootEntryClasses>
+							<rootEntryClass>top</rootEntryClass>
+							<rootEntryClass>organization</rootEntryClass>
+						</rootEntryClasses>
+						<ldifFile>${test-path}.ldif</ldifFile>
+					</partition>
+				</partitions>
+			</configuration>
+		</component>
+		
+		<component>
+	      <role>org.sonatype.security.ldap.realms.persist.LdapConfiguration</role>
+	      <role-hint>default</role-hint>
+	      <implementation>org.sonatype.security.ldap.realms.persist.DefaultLdapConfiguration</implementation>
+	      <isolated-realm>false</isolated-realm>
+	      <requirements>
+	        <requirement>
+	          <role>org.sonatype.security.ldap.realms.persist.ConfigurationValidator</role>
+	          <role-hint>default</role-hint>
+	          <field-name>validator</field-name>
+	        </requirement>
+	        
+	        <requirement>
+	          <role>org.sonatype.security.ldap.realms.persist.PasswordHelper</role>
+	          <role-hint>default</role-hint>
+	          <field-name>passwordHelper</field-name>
+	        </requirement>
+	        
+	      </requirements>
+	      <configuration>
+	        <configuration-file>${test-path}-ldap.xml</configuration-file>
+	      </configuration>
+	    </component>
+
+		
+	</components>
+</plexus>
