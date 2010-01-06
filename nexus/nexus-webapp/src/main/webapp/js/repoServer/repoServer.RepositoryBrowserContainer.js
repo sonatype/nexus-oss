@@ -36,10 +36,26 @@ Sonatype.repoServer.RepositoryBrowserContainer = function( config ) {
       payload: this.payload,
       tabTitle: this.tabTitle,
       browseIndex: false,
-      region: 'center'
+      region: 'center',
+      nodeClickEvent: 'fileNodeClickedEvent',
+      nodeClickPassthru: {
+        container: this
+      }
+    });
+    
+    this.artifactContainer = new Sonatype.repoServer.ArtifactContainer({
+      collapsible: true,
+      collapsed: true,
+      region: 'east',
+      split: true,
+      width: 500,
+      halfSize: true,
+      initEventName: 'fileContainerInit',
+      updateEventName: 'fileContainerUpdate'
     });
     
     items.push(this.repositoryBrowser);
+    items.push(this.artifactContainer);
   }
   
   Sonatype.repoServer.RepositoryBrowserContainer.superclass.constructor.call( this, {
@@ -88,6 +104,24 @@ Sonatype.Events.addListener( 'indexNodeClickedEvent', function( node, passthru )
         extension: node.attributes.extension,
         artifactLink: node.attributes.artifactUri,
         pomLink: node.attributes.pomUri
+      });
+    }
+    else {
+      passthru.container.artifactContainer.collapse();
+    }
+  }
+});
+
+Sonatype.Events.addListener( 'fileNodeClickedEvent', function( node, passthru ) {
+  if ( passthru 
+      && passthru.container
+      && passthru.container.artifactContainer.items.getCount() > 0 ) {
+    if ( node 
+        && node.isLeaf() ) {
+      passthru.container.artifactContainer.updateArtifact({
+        text: node.attributes.text,
+        leaf: node.attributes.leaf,
+        resourceURI: node.attributes.resourceURI
       });
     }
     else {

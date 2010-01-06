@@ -17,7 +17,9 @@ Sonatype.repoServer.ArtifactContainer = function(config){
     collapsible: true,
     collapsed: true,
     region: 'south',
-    halfSize: false
+    halfSize: false,
+    initEventName: 'artifactContainerInit',
+    updateEventName: 'artifactContainerUpdate'
   };
   Ext.apply(this, config, defaultConfig);
   
@@ -29,7 +31,7 @@ Sonatype.repoServer.ArtifactContainer = function(config){
     layoutOnTabChange: true
   });
   
-  Sonatype.Events.fireEvent( 'artifactContainerInit', this, null );
+  Sonatype.Events.fireEvent( this.initEventName, this, null );
 };
 
 Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, {
@@ -37,10 +39,10 @@ Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, 
     if ( !this.collapsed ){
       this.collapse();
     }
-    Sonatype.Events.fireEvent( 'artifactContainerUpdate', this, null );
+    Sonatype.Events.fireEvent( this.updateEventName, this, null );
   },
   updateArtifact : function( data ) {
-    Sonatype.Events.fireEvent( 'artifactContainerUpdate', this, data );
+    Sonatype.Events.fireEvent( this.updateEventName, this, data );
     if ( this.collapsed ) {
       this.expand();
     }
