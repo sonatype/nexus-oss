@@ -1,0 +1,33 @@
+<component-set>
+	<components>
+		
+		<component>
+	      <role>org.jsecurity.realm.ldap.LdapContextFactory</role>
+	      <role-hint>ConnectionTestLdapContextFactory</role-hint>
+	      <implementation>org.sonatype.security.ldap.realms.PlexusLdapContextFactory</implementation>
+	      <isolated-realm>false</isolated-realm>
+	      <instantiation-strategy>per-lookup</instantiation-strategy>
+	      <requirements>
+	        <requirement>
+	          <role>org.codehaus.plexus.logging.Logger</role>
+	          <role-hint>default</role-hint>
+	          <field-name>logger</field-name>
+	        </requirement>
+	      </requirements>
+	    </component>
+	    <component>
+	      <role>com.sonatype.nexus.security.ldap.realms.test.api.LdapConnectionTester</role>
+	      <role-hint>default</role-hint>
+	      <implementation>com.sonatype.nexus.security.ldap.realms.test.api.LdapConnectionTester</implementation>
+	      <isolated-realm>false</isolated-realm>
+	      <instantiation-strategy>per-lookup</instantiation-strategy>
+	      <requirements>
+	        <requirement>
+	          <role>org.codehaus.plexus.logging.Logger</role>
+	          <role-hint>default</role-hint>
+	          <field-name>logger</field-name>
+	        </requirement>
+	      </requirements>
+	    </component>
+	</components>
+</component-set>

@@ -1,0 +1,162 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>nexus-ldap-plugin-parent</artifactId>
+    <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+    <version>1.4.2-SNAPSHOT</version>
+  </parent>
+  <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+  <artifactId>nexus-ldap-plugin-it</artifactId>
+  <name>Nexus OSS LDAP Plugin ITs</name>
+  <description>Nexus LDAP Realm Plugin ITs</description>
+  
+  <dependencies>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-rest-api</artifactId>
+      <version>${plexus-security.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-rest-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>tests</classifier>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${project.version}</version>
+      <type>jar</type>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-ldap-testsuite</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>1.2.1.3</version>
+        <goals>
+          <goal>generate-test-metadata</goal>
+        </goals>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.3</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-nexus-plugin-environment</goal>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusVersion>${project.version}</nexusVersion>
+          <nexusPluginsArtifacts>
+            <ldap-plugin>
+              <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+              <artifactId>nexus-ldap-realm-plugin</artifactId>
+              <version>${project.version}</version>
+              <classifier>bundle</classifier>
+              <type>zip</type>
+            </ldap-plugin>
+          </nexusPluginsArtifacts>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <configuration>
+          <!--
+            workaround for a bug in apache LDAP server which leaks ~1M
+            of heap during each restart
+          -->
+          <argLine>-Xmx256M</argLine>
+        </configuration>
+      </plugin>
+
+
+    </plugins>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>skip-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <configuration>
+              <testSkip>true</testSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+</project>
