@@ -111,6 +111,14 @@ public class AbstractEnvironmentMojo
     protected MavenArtifact nexusBundleArtifact;
 
     /**
+     * Name of teh directory created out of nexus artifact bundle.
+     * Default is ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
+     *
+     * @parameter
+     */
+    protected String nexusBundleName;    
+
+    /**
      * Emma used on ITs
      * 
      * @parameter
@@ -227,6 +235,10 @@ public class AbstractEnvironmentMojo
         }
 
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
+        if( nexusBundleName != null )
+        {
+            nexusBaseDir = new File( destination, nexusBundleName );
+        }
         File nexusWorkDir = new File( destination, "nexus-work-dir" );
         project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( nexusWorkDir ) );
