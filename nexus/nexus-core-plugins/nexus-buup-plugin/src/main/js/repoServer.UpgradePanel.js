@@ -49,6 +49,18 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     ]
   } );
 
+  //TODO refine this method !!
+  Ext.Ajax.request({
+    url: Sonatype.config.servicePath + '/buup/upgradeStatus',
+    success: function( response, options ){
+      var resp = Ext.decode( response.responseText );
+      var upgradeStatus = resp.data.upgradeStatus;
+      var cardPanel = Ext.getCmp('cardWizard');
+      if ( upgradeStatus == 'UNUSED' ) {
+        cardPanel.getLayout().setActiveItem(3); 
+      }
+    }
+  });
 
 };
 
@@ -719,12 +731,6 @@ Ext.extend( Sonatype.utils.WizardPanel, Ext.Panel, {
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
   var sp = Sonatype.lib.Permissions;
-  Ext.Ajax.request({
-    url: Sonatype.config.servicePath + '/buup/upgradeStatus',
-    success: function( response, options ){
-    
-    }
-  });
   if ( true ){
     nexusPanel.add( {
       enabled: true,
