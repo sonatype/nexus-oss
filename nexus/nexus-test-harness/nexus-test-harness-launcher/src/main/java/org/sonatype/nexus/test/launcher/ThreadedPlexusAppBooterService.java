@@ -3,6 +3,7 @@ package org.sonatype.nexus.test.launcher;
 import java.io.File;
 import java.io.FileInputStream;
 
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.appbooter.ctl.Service;
@@ -10,6 +11,8 @@ import org.sonatype.appbooter.ctl.Service;
 public class ThreadedPlexusAppBooterService
     implements Service
 {
+    private static Logger LOG = Logger.getLogger( ThreadedPlexusAppBooterService.class );
+
     private LauncherThread launcherThread;
 
     private Launcher launcher = new Launcher();
@@ -78,11 +81,24 @@ public class ThreadedPlexusAppBooterService
     {
         if ( this.launcherThread == null )
         {
+            LOG.info( "Creating LauncherThread (" + launcher + ", " + controlPort + ")" );
             this.launcherThread = new LauncherThread( launcher, controlPort );
+        }
+        else
+        {
+            LOG.info( "Existing LauncherThread (" + launcher + ", " + controlPort + ")" );
         }
 
         if ( !this.launcherThread.isAlive() )
         {
+            LOG.info( "Starting LauncherThread (" + launcher + ", " + controlPort + ")" );
+            LOG.info( "LauncherThread state: " + launcherThread.getState() );
+            Exception launcherThreadException = launcherThread.getException();
+            if ( launcherThreadException != null )
+            {
+                throw new AppBooterServiceException( "LauncherThread cannot be started: "
+                    + launcherThreadException.getMessage(), launcherThreadException );
+            }
             this.launcherThread.start();
         }
     }
@@ -110,6 +126,8 @@ public class ThreadedPlexusAppBooterService
 
         private int controlPort;
 
+        private Exception exception;
+
         public LauncherThread( Launcher launcher, int controlPort )
         {
             this.launcher = launcher;
@@ -126,9 +144,14 @@ public class ThreadedPlexusAppBooterService
             }
             catch ( Exception e )
             {
-                // TODO Auto-generated catch block
+                exception = e;
                 e.printStackTrace();
             }
+        }
+
+        public Exception getException()
+        {
+            return exception;
         }
     }
 
