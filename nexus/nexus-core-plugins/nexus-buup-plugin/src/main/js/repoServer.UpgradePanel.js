@@ -8,6 +8,178 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     activeStep: 0
   });
 
+  this.stepLicense = new Sonatype.repoServer.UpgradeLicensePanel();
+  this.stepUser = new Sonatype.repoServer.UpgradeUserPanel(); 
+  this.stepJVM = new Sonatype.repoServer.UpgradeJVMPanel();
+  this.stepEmail = new Sonatype.repoServer.UpgradeEmailPanel();
+  this.stepDownload = new Sonatype.repoServer.UpgradeDownloadPanel();
+  this.stepUpgrade = new Sonatype.repoServer.UpgradeUpgradePanel();
+
+  Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
+    frame: true,
+    autoScroll: true,
+    buttonAlign: 'center',
+    items: [
+      this.wizard,
+      {
+        xtype: 'panel',
+        html: '<hr width="98%"/>'
+      },
+      {
+        xtype: 'panel',
+        id: 'cardWizard',
+        layout: 'card',
+        activeItem: 0,
+        items: [  this.stepLicense, this.stepUser, this.stepJVM, this.stepEmail, this.stepDownload, this.stepUpgrade ]
+      }
+    ],
+    buttons: [
+        {
+          id: 'wizardBtnBack',
+          text: '< Back',
+          handler: this.stepBack,
+          scope: this
+        },
+        {
+          id: 'wizardBtnNext',
+          text: 'Next >',
+          handler: this.stepNext,
+          scope: this
+        }      
+    ]
+  } );
+
+
+};
+
+Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
+  isPanelValid : function( panel ) {
+    if (!panel.items){
+      return true;
+    }
+    var items = panel.items.getRange();
+    for ( var i = 0 ; i < items.length ; i++ ) {
+      if ( items[i].xtype == 'fieldset' 
+        && !this.isPanelValid( items[i] ) ) {
+         return false;
+      }
+      else if ( items[i].isValid 
+          && !items[i].isValid() ) {
+        return false;
+      }
+    }
+    return true;
+  },
+  stepNext: function( btn ) {
+    var layout = Ext.getCmp('cardWizard').getLayout();
+    if ( !this.isPanelValid( layout.activeItem ) ){
+      return;
+    }
+    if ( layout.activeItem.onNextHandler ) {
+      layout.activeItem.onNextHandler();
+    }
+    var activeStepIndex = layout.activeItem.id.split('step-')[1];
+    var next = parseInt(activeStepIndex) + 1;
+    if ( next < Ext.getCmp('cardWizard').items.length ) {
+      layout.setActiveItem(next); 
+      this.wizard.setActiveStep(next);
+    }
+  },
+  stepBack: function( btn ) {
+    var layout = Ext.getCmp('cardWizard').getLayout();
+    var activeStepIndex = layout.activeItem.id.split('step-')[1];
+    var back = parseInt(activeStepIndex) - 1;
+    if ( back >= 0 ) {
+      layout.setActiveItem(back); 
+      this.wizard.setActiveStep(back);
+    }
+  }
+});
+
+Sonatype.repoServer.UpgradeLicensePanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  Sonatype.repoServer.UpgradeLicensePanel.superclass.constructor.call( this, {
+      id: 'step-0',
+      autoWidth: true,
+      autoHeight: true,
+      autoScroll: true,
+      items: [
+      {
+        id: 'eula-content',
+        xtype: 'panel',
+        title: 'Sonatype Nexus Professional End User License Agreement (EULA)',
+        height: 290,
+        autoWidth: true,
+        autoScroll: true,
+        autoLoad: {
+          url: Sonatype.config.resourcePath + '/html/license.html',
+          headers: {
+            accept: 'text/html' 
+          }
+        },
+        style: 'margin: 15px 15px 0px 15px; background-color: white; border-width: 0px 1px 1px 1px',
+        bodyStyle: 'padding: 0px 10px 0px 10px'
+      },
+      {
+        xtype: 'panel',
+        layout: 'column',
+        style: 'margin: 10px 0px 0px 15px',
+        items: [
+        {
+          html: 'I have read and agree to all terms in the above EULA',
+          style: 'margin: 3px 8px 0px 0px',
+	  width: 260
+        },
+        {
+          xtype: 'checkbox',
+          name: 'acceptLicense',
+	  width: 30,
+          listeners: {
+            'check': function ( cmpt, checked ) {
+               var stepNextBtn = Ext.getCmp('wizardBtnNext');
+               if ( checked ) {
+                 stepNextBtn.enable();
+               }
+               else {
+                 stepNextBtn.disable();
+               }
+            }
+          }
+        }
+        ]
+      }
+      ],
+      listeners: {
+        beforeshow: { 
+          fn: this.beforeShowHandler,
+          scope: this
+        }
+      }  
+  });
+};
+
+Ext.extend( Sonatype.repoServer.UpgradeLicensePanel, Ext.Panel, {
+  beforeShowHandler: function(){
+           var stepBackBtn = Ext.getCmp('wizardBtnBack');
+           stepBackBtn.disable();
+           var licenseCheckbox = this.find('name', 'acceptLicense')[0];
+           var stepNextBtn = Ext.getCmp('wizardBtnNext');
+           if ( licenseCheckbox.getValue() ) {
+             stepNextBtn.enable();
+           }
+           else {
+             stepNextBtn.disable();
+           }
+  }
+});
+
+Sonatype.repoServer.UpgradeUserPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+ 
   this.countryStore = new Ext.data.SimpleStore({
     fields: ['value', 'display'],
     data: [
@@ -61,7 +233,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       ['UK', 'UK'],
       ['Vietnam', 'Vietnam']
     ]
-  });
+  }); 
 
   this.stateStore = new Ext.data.GroupingStore({
     reader: new Ext.data.ArrayReader({}, [
@@ -144,90 +316,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     sortInfo:{field: 'display', direction: "ASC"}
   });
 
-  this.memoryStore = new Ext.data.SimpleStore({
-    fields: ['value', 'display'],
-    data: [
-      ['128m', '128m'],
-      ['256m', '256m'],
-      ['512m', '512m'],
-      ['768m', '768m'],
-      ['1024m', '1024m'],
-      ['1536m', '1536m'],
-      ['2048m', '2048m']
-    ]
-  });
-  
-  this.stepLicense = new Ext.Panel({
-      id: 'step-0',
-      autoWidth: true,
-      autoHeight: true,
-      autoScroll: true,
-      items: [
-      {
-        id: 'eula-content',
-        xtype: 'panel',
-        title: 'Sonatype Nexus Professional End User License Agreement (EULA)',
-        height: 290,
-        autoWidth: true,
-        autoScroll: true,
-        autoLoad: {
-          url: Sonatype.config.resourcePath + '/html/license.html',
-          headers: {
-            accept: 'text/html' 
-          }
-        },
-        style: 'margin: 15px 15px 0px 15px; background-color: white; border-width: 0px 1px 1px 1px',
-        bodyStyle: 'padding: 0px 10px 0px 10px'
-      },
-      {
-        xtype: 'panel',
-        layout: 'column',
-        style: 'margin: 10px 0px 0px 15px',
-        items: [
-        {
-          html: 'I have read and agree to all terms in the above EULA',
-          style: 'margin: 3px 8px 0px 0px',
-	  width: 260
-        },
-        {
-          xtype: 'checkbox',
-          name: 'acceptLicense',
-	  width: 30,
-          listeners: {
-            'check': function ( cmpt, checked ) {
-               var stepNextBtn = Ext.getCmp('wizardBtnNext');
-               if ( checked ) {
-                 stepNextBtn.enable();
-               }
-               else {
-                 stepNextBtn.disable();
-               }
-            }
-          }
-        }
-
-        ]
-      }
-      ],
-      listeners: {
-        'beforeshow' : function( cmpt ){
-          var stepBackBtn = Ext.getCmp('wizardBtnBack');
-          stepBackBtn.disable();
-          var licenseCheckbox = this.find('name', 'acceptLicense')[0];
-          var stepNextBtn = Ext.getCmp('wizardBtnNext');
-          if ( licenseCheckbox.getValue() ) {
-            stepNextBtn.enable();
-          }
-          else {
-            stepNextBtn.disable();
-          }
-        }
-      }
-  });
-
- 
-  
-  this.stepUser = new Ext.Panel({
+  Sonatype.repoServer.UpgradeLicensePanel.superclass.constructor.call( this, {
     id: 'step-1',
     layout: 'column',
     autoWidth: true,
@@ -362,16 +451,42 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     } 
     ],
     listeners: {
-      'beforeshow' : function( cmpt ){
-          var stepBackBtn = Ext.getCmp('wizardBtnBack');
-          stepBackBtn.enable();
-          var stepNextBtn = Ext.getCmp('wizardBtnNext');
-          stepNextBtn.enable();
-      }
+      'beforeshow' : {
+        fn: this.beforeshowHandler,
+	scope: this
+      } 
     }
   });
-  
-  this.stepJVM = new Ext.Panel({
+};
+
+Ext.extend( Sonatype.repoServer.UpgradeUserPanel, Ext.Panel, {
+  beforeshowHandler: function ( cmpt ) {
+    var stepBackBtn = Ext.getCmp('wizardBtnBack');
+    stepBackBtn.enable();
+    var stepNextBtn = Ext.getCmp('wizardBtnNext');
+    stepNextBtn.enable();
+  }
+});
+
+Sonatype.repoServer.UpgradeJVMPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+
+  this.memoryStore = new Ext.data.SimpleStore({
+    fields: ['value', 'display'],
+    data: [
+      ['128m', '128m'],
+      ['256m', '256m'],
+      ['512m', '512m'],
+      ['768m', '768m'],
+      ['1024m', '1024m'],
+      ['1536m', '1536m'],
+      ['2048m', '2048m']
+    ]
+  });
+
+  Sonatype.repoServer.UpgradeJVMPanel.superclass.constructor.call( this, {
     id: 'step-2',
     hideMode: 'offsets',
     bodyStyle: 'margin: 10px',
@@ -440,24 +555,38 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
             return true;
           }
         }
-    ],
-    listeners: {
-      'beforeshow' : function( cmpt ){
-          var stepBackBtn = Ext.getCmp('wizardBtnBack');
-          stepBackBtn.enable();
-          var stepNextBtn = Ext.getCmp('wizardBtnNext');
-          stepNextBtn.enable();
-      },
-      'afterlayout': function( cmpt ){
+      ],
+      listeners: {
+        'afterlayout': function( cmpt ){
           this.find('name', 'xms')[0].setValue('256m');
           this.find('name', 'xmx')[0].setValue('512m');
+        }      
       }
-    }       
     }
-    ]
+    ],
+    listeners: {
+      'beforeshow' : {
+        fn: this.beforeshowHandler,
+	scope: this
+      }
+    }     
   });
+};
 
-  this.stepEmail = new Ext.Panel({
+Ext.extend( Sonatype.repoServer.UpgradeJVMPanel, Ext.Panel, {
+  beforeshowHandler: function ( cmpt ) {
+    var stepBackBtn = Ext.getCmp('wizardBtnBack');
+    stepBackBtn.enable();
+    var stepNextBtn = Ext.getCmp('wizardBtnNext');
+    stepNextBtn.enable();
+  }
+});
+
+Sonatype.repoServer.UpgradeEmailPanel = function( config ) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  Sonatype.repoServer.UpgradeEmailPanel.superclass.constructor.call( this, {
     id: 'step-3',
     hideMode: 'offsets',
     bodyStyle: 'margin: 10px; font-size: 13px',
@@ -466,10 +595,18 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
 	  '<br/>' +
           'To start the download, press the <em>Next</em> button. Note that the download process may take a while.<br/>' +
 	  'You can also <a href="">restart</a> the upgrade process if you want to use another email address.'
-
   });
+}  
 
-  this.stepDownload = new Ext.Panel({
+Ext.extend( Sonatype.repoServer.UpgradeEmailPanel, Ext.Panel, {
+});
+
+
+Sonatype.repoServer.UpgradeDownloadPanel = function(config) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  Sonatype.repoServer.UpgradeDownloadPanel.superclass.constructor.call( this, {
     id: 'step-4',
     bodyStyle: 'margin: 20px 10px 20px 10px; font-size: 13px',
     hideMode: 'offsets',
@@ -508,8 +645,16 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
       }
     }
   });
-  
-  this.upgradeStep = new Ext.Panel({
+};
+
+Ext.extend( Sonatype.repoServer.UpgradeDownloadPanel, Ext.Panel, {
+});
+
+Sonatype.repoServer.UpgradeUpgradePanel = function(config) {
+  var config = config || {};
+  var defaultConfig = {};
+  Ext.apply( this, config, defaultConfig );
+  Sonatype.repoServer.UpgradeUpgradePanel.superclass.constructor.call( this, {
     id: 'step-5',
     bodyStyle: 'margin: 20px 10px 20px 10px; font-size: 13px',
     hideMode: 'offsets',
@@ -517,83 +662,9 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
           'To compelete the upgrade, press the <em>Next</em> button below.<br/><br/>' +
 	  'Note that Nexus will be shutdown for a while and restarted.<br/>'
   });
-
-  Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
-    frame: true,
-    autoScroll: true,
-    buttonAlign: 'center',
-    items: [
-      this.wizard,
-      {
-        xtype: 'panel',
-        html: '<hr width="98%"/>'
-      },
-      {
-        xtype: 'panel',
-        id: 'cardWizard',
-        layout: 'card',
-        activeItem: 0,
-        items: [  this.stepLicense, this.stepUser, this.stepJVM, this.stepEmail, this.stepDownload, this.upgradeStep ]
-      }
-    ],
-    buttons: [
-        {
-          id: 'wizardBtnBack',
-          text: '< Back',
-          handler: this.stepBack,
-          scope: this
-        },
-        {
-          id: 'wizardBtnNext',
-          text: 'Next >',
-          handler: this.stepNext,
-          scope: this
-        }      
-    ]
-  } );
-
-
 };
 
-Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
-  isPanelValid : function( panel ) {
-    if (!panel.items){
-      return true;
-    }
-    var items = panel.items.getRange();
-    for ( var i = 0 ; i < items.length ; i++ ) {
-      if ( items[i].xtype == 'fieldset' 
-        && !this.isPanelValid( items[i] ) ) {
-         return false;
-      }
-      else if ( items[i].isValid 
-          && !items[i].isValid() ) {
-        return false;
-      }
-    }
-    return true;
-  },
-  stepNext: function( btn ) {
-    var layout = Ext.getCmp('cardWizard').getLayout();
-    if ( !this.isPanelValid( layout.activeItem ) ){
-      return;
-    }
-    var activeStepIndex = layout.activeItem.id.split('step-')[1];
-    var next = parseInt(activeStepIndex) + 1;
-    if ( next < Ext.getCmp('cardWizard').items.length ) {
-      layout.setActiveItem(next); 
-      this.wizard.setActiveStep(next);
-    }
-  },
-  stepBack: function( btn ) {
-    var layout = Ext.getCmp('cardWizard').getLayout();
-    var activeStepIndex = layout.activeItem.id.split('step-')[1];
-    var back = parseInt(activeStepIndex) - 1;
-    if ( back >= 0 ) {
-      layout.setActiveItem(back); 
-      this.wizard.setActiveStep(back);
-    }
-  }
+Ext.extend( Sonatype.repoServer.UpgradeUpgradePanel, Ext.Panel, {
 });
 
 Sonatype.utils.WizardPanel = function( config ) {
@@ -612,15 +683,11 @@ Sonatype.utils.WizardPanel = function( config ) {
 
   Sonatype.utils.WizardPanel.superclass.constructor.call( this, {
     listeners: {
-  //    'beforerender': { 
-  //      fn: this.onBeforerender,
-  //      scope: this 
-  //    }
     }
   });
  
   this.initSteps(this);
-}
+};
 
 Ext.extend( Sonatype.utils.WizardPanel, Ext.Panel, {
   initSteps: function( component ) {
@@ -652,6 +719,12 @@ Ext.extend( Sonatype.utils.WizardPanel, Ext.Panel, {
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
   var sp = Sonatype.lib.Permissions;
+  Ext.Ajax.request({
+    url: Sonatype.config.servicePath + '/buup/upgradeStatus',
+    success: function( response, options ){
+    
+    }
+  });
   if ( true ){
     nexusPanel.add( {
       enabled: true,
