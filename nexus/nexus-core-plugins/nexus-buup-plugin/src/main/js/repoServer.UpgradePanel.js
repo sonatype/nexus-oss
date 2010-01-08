@@ -16,6 +16,7 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
   this.stepUpgrade = new Sonatype.repoServer.UpgradeUpgradePanel();
 
   Sonatype.repoServer.UpgradePanel.superclass.constructor.call( this, {
+    id: 'upgradePanel',
     frame: true,
     autoScroll: true,
     buttonAlign: 'center',
@@ -49,15 +50,19 @@ Sonatype.repoServer.UpgradePanel = function( config ) {
     ]
   } );
 
+  
+  Ext.getCmp('cardWizard').hide();
+
   //TODO refine this method !!
   Ext.Ajax.request({
     url: Sonatype.config.servicePath + '/buup/upgradeStatus',
     success: function( response, options ){
       var resp = Ext.decode( response.responseText );
       var upgradeStatus = resp.data.upgradeStatus;
-      var cardPanel = Ext.getCmp('cardWizard');
+      var upgradePanel = Ext.getCmp('upgradePanel');
       if ( upgradeStatus == 'UNUSED' ) {
-        cardPanel.getLayout().setActiveItem(3); 
+        upgradePanel.goToStep(0);
+        Ext.getCmp('cardWizard').show();
       }
     }
   });
@@ -88,8 +93,14 @@ Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
       return;
     }
     if ( layout.activeItem.onNextHandler ) {
-      layout.activeItem.onNextHandler();
+      layout.activeItem.onNextHandler( this );
     }
+    else {
+      this.doStepNext();
+    }
+  },
+  doStepNext: function(){
+    var layout = Ext.getCmp('cardWizard').getLayout();
     var activeStepIndex = layout.activeItem.id.split('step-')[1];
     var next = parseInt(activeStepIndex) + 1;
     if ( next < Ext.getCmp('cardWizard').items.length ) {
@@ -105,6 +116,11 @@ Ext.extend( Sonatype.repoServer.UpgradePanel, Ext.Panel, {
       layout.setActiveItem(back); 
       this.wizard.setActiveStep(back);
     }
+  },
+  goToStep: function( index ) {
+    var layout = Ext.getCmp('cardWizard').getLayout();
+    layout.setActiveItem(index);
+    this.wizard.setActiveStep(index);
   }
 });
 
@@ -591,6 +607,35 @@ Ext.extend( Sonatype.repoServer.UpgradeJVMPanel, Ext.Panel, {
     stepBackBtn.enable();
     var stepNextBtn = Ext.getCmp('wizardBtnNext');
     stepNextBtn.enable();
+  },
+  onNextHandler : function( upgradePanel ) {
+    var licensePanel = Ext.getCmp('step-0');
+    var userPanel = Ext.getCmp('step-1');
+    var jvmPanel = Ext.getCmp('step-2');
+    var json = { data : {} };
+    json.data.agreeLicenseAgreement = licensePanel.find('name', 'acceptLicense')[0].getValue();
+    json.data.firstName = userPanel.find('name', 'firstName')[0].getValue();
+    json.data.lastName = userPanel.find('name', 'lastName')[0].getValue();
+    json.data.title = userPanel.find('name', 'title')[0].getValue();
+    json.data.email = userPanel.find('name', 'email')[0].getValue();
+    json.data.phone = userPanel.find('name', 'phone')[0].getValue();
+    json.data.organization = userPanel.find('name', 'organization')[0].getValue();
+    json.data.streetAddress = userPanel.find('name', 'streetAddress')[0].getValue();
+    json.data.city = userPanel.find('name', 'city')[0].getValue();
+    json.data.state = userPanel.find('name', 'state')[0].getValue();
+    json.data.zipCode = userPanel.find('name', 'zipCode')[0].getValue();
+    json.data.country = userPanel.find('name', 'country')[0].getValue();
+    json.data.xmxInMbs = parseInt(jvmPanel.find('name', 'xmx')[0].getValue());
+    json.data.xmsInMbs = parseInt(jvmPanel.find('name', 'xmx')[0].getValue());
+    
+    Ext.Ajax.request({
+      url: Sonatype.config.servicePath + '/buup/prepareUpgrade',
+      method: 'POST',
+      jsonData: json,
+      success: function( response, options ){
+        upgradePanel.doStepNext();
+      }
+    });
   }
 });
 
@@ -612,7 +657,6 @@ Sonatype.repoServer.UpgradeEmailPanel = function( config ) {
 
 Ext.extend( Sonatype.repoServer.UpgradeEmailPanel, Ext.Panel, {
 });
-
 
 Sonatype.repoServer.UpgradeDownloadPanel = function(config) {
   var config = config || {};

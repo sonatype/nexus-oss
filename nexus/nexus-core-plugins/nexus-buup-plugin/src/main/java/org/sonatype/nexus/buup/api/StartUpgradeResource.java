@@ -16,8 +16,8 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "StartUpgradeProcessResource" )
-public class StartUpgradeProcessResource
+@Component( role = PlexusResource.class, hint = "StartUpgradeResource" )
+public class StartUpgradeResource
     extends AbstractNexusPlexusResource
 {
     @Requirement
@@ -32,7 +32,7 @@ public class StartUpgradeProcessResource
     @Override
     public String getResourceUri()
     {
-        return "/buup/initiateUpgrade";
+        return "/buup/startUpgrade";
     }
 
     @Override

@@ -19,8 +19,8 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-@Component( role = PlexusResource.class, hint = "InitiateBundleDownloadResource" )
-public class InitiateBundleDownloadResource
+@Component( role = PlexusResource.class, hint = "InitiateDownloadResource" )
+public class InitiateDownloadResource
     extends AbstractNexusPlexusResource
 {
     @Requirement
@@ -32,7 +32,7 @@ public class InitiateBundleDownloadResource
         return new UpgradeFormRequest();
     }
 
-    public InitiateBundleDownloadResource()
+    public InitiateDownloadResource()
     {
         super();
 
@@ -48,7 +48,7 @@ public class InitiateBundleDownloadResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:status]" );
+        return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:buup]" );
     }
 
     /**
