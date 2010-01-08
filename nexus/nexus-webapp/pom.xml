@@ -206,7 +206,7 @@
                       <version>${nexus-ldap-realm-plugin.version}</version>
                       <classifier>bundle</classifier>
                       <type>zip</type>
-                      <outputDirectory>target/${optional-plugins.directory}</outputDirectory>
+                      <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                   </artifactItem>
               </artifactItems>
             </configuration>

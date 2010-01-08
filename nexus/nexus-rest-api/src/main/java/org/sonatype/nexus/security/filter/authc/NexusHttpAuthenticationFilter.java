@@ -281,9 +281,7 @@ public class NexusHttpAuthenticationFilter
             return;
         }
 
-        getLogger().info( msg );
-
-        getLogger().info( msg );
+        getLogger().debug( msg );
 
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
         

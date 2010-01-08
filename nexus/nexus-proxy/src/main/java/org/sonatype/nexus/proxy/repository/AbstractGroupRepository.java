@@ -297,20 +297,21 @@ public abstract class AbstractGroupRepository
     {
         ArrayList<Repository> result = new ArrayList<Repository>();
 
-        try
-        {
+        
             for ( String repoId : getMemberRepositoryIds() )
             {
-                Repository repo = repoRegistry.getRepository( repoId );
-
-                result.add( repo );
+                try
+                {
+                    Repository repo = repoRegistry.getRepository( repoId );
+                    result.add( repo );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    this.getLogger().warn( "Could not find repository: " + repoId, e );
+                    // XXX throw new StorageException( e );
+                }
             }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // XXX throw new StorageException( e );
-        }
-
+            
         return result;
     }
 

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -14,6 +16,7 @@ import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Read
 import org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Writer;
 import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 public class Nexus2216GroupValidationTest
     extends AbstractNexusTestCase
@@ -41,8 +44,15 @@ public class Nexus2216GroupValidationTest
 
             MavenGroupRepository publicGroup =
                 repositoryRegistry.getRepositoryWithFacet( "public", MavenGroupRepository.class );
-
-            assertEquals( "The config should be correct", 4, publicGroup.getMemberRepositories().size() );
+            
+            List<String> memberIds = new ArrayList<String>();
+            for ( Repository repo : publicGroup.getMemberRepositories() )
+            {
+                memberIds.add(  repo.getId() );
+            }
+            assertEquals( "Repo object list returned a different set of repos", publicGroup.getMemberRepositoryIds(), memberIds );
+            
+            assertEquals( "The config should be correct, ids found are: "+ publicGroup.getMemberRepositoryIds(), 7, publicGroup.getMemberRepositories().size() );
         }
         catch ( Exception e )
         {
