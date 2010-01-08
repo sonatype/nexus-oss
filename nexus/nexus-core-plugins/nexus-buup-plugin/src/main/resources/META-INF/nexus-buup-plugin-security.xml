@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<security>
+
+  <version>2.0.3</version>
+  
+  <roles>
+    <role>
+      <id>ui-bundle-upgrade</id>
+      <name>UI: Bundle Upgrade</name>
+      <description>Gives access to perform Bundle Upgrade.</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>buup-read</privilege>
+        <privilege>buup-create</privilege>
+      </privileges>
+    </role>
+  </roles>
+  
+  <privileges>
+    <privilege>
+      <id>buup-read</id>
+      <type>method</type>
+      <name>Bundle Upgrade: Read</name>
+      <description>Give permission to read bundle upgrade information.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>read</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:buup</value>
+        </property>
+      </properties>
+    </privilege>
+    <privilege>
+      <id>buup-create</id>
+      <type>method</type>
+      <name>Bundle Upgrade: Create</name>
+      <description>Give permission to create bundle upgrade information.</description>
+      <properties>
+        <property>
+          <key>method</key>
+          <value>create</value>
+        </property>
+        <property>
+          <key>permission</key>
+          <value>nexus:buup</value>
+        </property>
+      </properties>
+    </privilege>    
+  </privileges>
+  
+</security>

@@ -775,7 +775,7 @@ Ext.extend( Sonatype.utils.WizardPanel, Ext.Panel, {
 
 Sonatype.Events.addListener( 'nexusNavigationInit', function( nexusPanel ) {
   var sp = Sonatype.lib.Permissions;
-  if ( true ){
+  if ( sp.checkPermission('nexus:buup', sp.READ) && sp.checkPermission('nexus:buup', sp.CREATE) ){
     nexusPanel.add( {
       enabled: true,
       sectionId: 'st-nexus-config',
