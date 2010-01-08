@@ -11,34 +11,20 @@ import org.sonatype.nexus.buup.api.dto.UpgradeFormDTO;
 import org.sonatype.nexus.buup.api.dto.UpgradeFormRequestDTO;
 import org.sonatype.nexus.buup.api.dto.UpgradeStatusDTO;
 import org.sonatype.nexus.buup.api.dto.UpgradeStatusResponseDTO;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * @author juven
  */
 @Component( role = PlexusResource.class, hint = "PrepareUpgradeResource" )
 public class PrepareUpgradeResource
-    extends AbstractNexusPlexusResource
+    extends AbstractBuupPlexusResource
 {
     public PrepareUpgradeResource()
     {
         this.setReadable( false );
         this.setModifiable( true );
-    }
-
-    @Override
-    public void configureXStream( XStream xstream )
-    {
-        super.configureXStream( xstream );
-
-        xstream.processAnnotations( UpgradeFormRequestDTO.class );
-        xstream.processAnnotations( UpgradeFormDTO.class );
-        xstream.processAnnotations( UpgradeStatusResponseDTO.class );
-        xstream.processAnnotations( UpgradeStatusDTO.class );
     }
 
     @Override
@@ -79,11 +65,13 @@ public class PrepareUpgradeResource
                     + "." );
         }
 
-        // TODO process the form
+        //TODO process the form
+        nexusBuupPlugin.setUpgradeProcessStatus( UpgradeProcessStatus.WAIT_FOR_ACTIVATION );
+        //
 
         UpgradeStatusResponseDTO result = new UpgradeStatusResponseDTO();
 
-        UpgradeStatusDTO status = new UpgradeStatusDTO( UpgradeProcessStatus.WAIT_FOR_ACTIVATION.name() );
+        UpgradeStatusDTO status = new UpgradeStatusDTO( nexusBuupPlugin.getUpgradeProcessStatus().name() );
 
         result.setData( status );
 

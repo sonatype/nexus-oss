@@ -21,6 +21,8 @@ public interface NexusBuupPlugin
      */
     UpgradeProcessStatus getUpgradeProcessStatus();
 
+    void setUpgradeProcessStatus( UpgradeProcessStatus status );
+
     /**
      * Returns the list of failure reasons. This list is only populated if the getUpgradeProcessStatus() method returns
      * FAIL.
@@ -35,5 +37,6 @@ public interface NexusBuupPlugin
      * @return false is not all conditions met. NEVER returns true, since kills JVM
      */
     void initiateUpgradeProcess()
-        throws NexusUpgradeException, NexusBuupInvocationException;
+        throws NexusUpgradeException,
+            NexusBuupInvocationException;
 }

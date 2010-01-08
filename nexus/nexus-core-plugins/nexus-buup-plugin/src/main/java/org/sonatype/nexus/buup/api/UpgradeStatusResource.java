@@ -1,51 +1,28 @@
 package org.sonatype.nexus.buup.api;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.buup.NexusBuupPlugin;
 import org.sonatype.nexus.buup.api.dto.UpgradeStatusDTO;
 import org.sonatype.nexus.buup.api.dto.UpgradeStatusResponseDTO;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-
-import com.thoughtworks.xstream.XStream;
 
 /**
  * @author juven
  */
 @Component( role = PlexusResource.class, hint = "UpgradeStatusResource" )
 public class UpgradeStatusResource
-    extends AbstractNexusPlexusResource
+    extends AbstractBuupPlexusResource
 {
-    @Requirement
-    private NexusBuupPlugin nexusBuupPlugin;
-
     public UpgradeStatusResource()
     {
         this.setReadable( true );
 
         this.setModifiable( false );
-    }
-
-    @Override
-    public void configureXStream( XStream xstream )
-    {
-        super.configureXStream( xstream );
-
-        xstream.processAnnotations( UpgradeStatusDTO.class );
-        xstream.processAnnotations( UpgradeStatusResponseDTO.class );
-    }
-
-    @Override
-    public Object getPayloadInstance()
-    {
-        return null;
     }
 
     @Override

@@ -49,6 +49,8 @@ public class DefaultNexusBuupPlugin
     private Collection<IOException> failures;
     
     private UpgradeFormRequest form;
+    
+    private UpgradeProcessStatus status = UpgradeProcessStatus.UNUSED;
 
     public void initiateBundleDownload( UpgradeFormRequest form )
         throws NexusUpgradeException
@@ -128,7 +130,8 @@ public class DefaultNexusBuupPlugin
 
     public UpgradeProcessStatus getUpgradeProcessStatus()
     {
-        if ( downloadTask == null && failures == null )
+        return status;
+/*        if ( downloadTask == null && failures == null )
         {
             return UpgradeProcessStatus.UNUSED;
         }
@@ -152,7 +155,12 @@ public class DefaultNexusBuupPlugin
         {
             // ??
             return UpgradeProcessStatus.FAILED;
-        }
+        }*/
+    }
+    
+    public void setUpgradeProcessStatus( UpgradeProcessStatus status )
+    {
+        this.status = status;
     }
 
     public Collection<IOException> getFailureReasons()
@@ -198,5 +206,4 @@ public class DefaultNexusBuupPlugin
             failures.add( e );
         }
     }
-
 }

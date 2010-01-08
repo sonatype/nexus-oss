@@ -3,40 +3,32 @@ package org.sonatype.nexus.buup.api;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.buup.NexusBuupPlugin;
-import org.sonatype.nexus.buup.NexusUpgradeException;
 import org.sonatype.nexus.buup.UpgradeProcessStatus;
-import org.sonatype.nexus.buup.api.dto.UpgradeFormRequest;
+import org.sonatype.nexus.buup.api.dto.FakeDTO;
 import org.sonatype.nexus.buup.api.dto.UpgradeFormResponse;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.buup.api.dto.UpgradeStatusDTO;
+import org.sonatype.nexus.buup.api.dto.UpgradeStatusResponseDTO;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "InitiateDownloadResource" )
 public class InitiateDownloadResource
-    extends AbstractNexusPlexusResource
+    extends AbstractBuupPlexusResource
 {
-    @Requirement
-    private NexusBuupPlugin nexusBuupPlugin;
+    public InitiateDownloadResource()
+    {
+        setModifiable( true );
+    }
 
     @Override
     public Object getPayloadInstance()
     {
-        return new UpgradeFormRequest();
-    }
-
-    public InitiateDownloadResource()
-    {
-        super();
-
-        setModifiable( true );
+        return new FakeDTO();
     }
 
     @Override
@@ -69,31 +61,18 @@ public class InitiateDownloadResource
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        try
-        {
-            UpgradeFormRequest form = (UpgradeFormRequest) payload;
+        // TODO check email activation, start downloading
 
-            if ( form != null )
-            {
-                nexusBuupPlugin.initiateBundleDownload( form );
+        nexusBuupPlugin.setUpgradeProcessStatus( UpgradeProcessStatus.DOWNLOADING );
 
-                response.setStatus( Status.SUCCESS_ACCEPTED );
+        UpgradeStatusResponseDTO result = new UpgradeStatusResponseDTO();
 
-                return getUpgradeFormResponse( context, request, response );
-            }
-            else
-            {
-                throw new ResourceException( Status.CLIENT_ERROR_PRECONDITION_FAILED,
-                    "You have to agree to terms and conditions!" );
-            }
-        }
-        catch ( NexusUpgradeException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, e.getMessage(), e );
-        }
+        UpgradeStatusDTO status = new UpgradeStatusDTO( nexusBuupPlugin.getUpgradeProcessStatus().name() );
+
+        result.setData( status );
+
+        return result;
     }
-
-    // ==
 
     protected UpgradeFormResponse getUpgradeFormResponse( Context context, Request request, Response response )
     {
