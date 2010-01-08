@@ -107,7 +107,8 @@
         </executions>
         <configuration>
           <nexusVersion>${project.version}</nexusVersion>
-          <nexusPluginsArtifacts>
+          <!-- Included by default in the bundle now -->
+          <!-- <nexusPluginsArtifacts>
             <ldap-plugin>
               <groupId>org.sonatype.nexus.plugins.ldap</groupId>
               <artifactId>nexus-ldap-realm-plugin</artifactId>
@@ -115,7 +116,7 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </ldap-plugin>
-          </nexusPluginsArtifacts>
+          </nexusPluginsArtifacts>  -->
         </configuration>
       </plugin>
 

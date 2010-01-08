@@ -83,9 +83,10 @@ public class DefaultLdapConnector
     public SortedSet<LdapUser> getUsers( int count )
         throws LdapDAOException
     {
+        LdapContext context = null;
         try
         {
-            LdapContext context = this.getLdapContextFactory().getSystemLdapContext();
+            context = this.getLdapContextFactory().getSystemLdapContext();
             LdapAuthConfiguration conf = this.getLdapAuthConfiguration();
 
             SortedSet<LdapUser> users = this.ldapUserManager.getUsers( context, conf, count );
@@ -111,15 +112,20 @@ public class DefaultLdapConnector
             String message = "Failed to retrieve ldap information for users.";
             throw new LdapDAOException( message, e );
         }
+        finally
+        {
+            this.closeContext( context );
+        }
     }
 
     public LdapUser getUser( String username )
         throws NoSuchLdapUserException,
             LdapDAOException
     {
+        LdapContext context = null;
         try
         {
-            LdapContext context = this.getLdapContextFactory().getSystemLdapContext();
+            context = this.getLdapContextFactory().getSystemLdapContext();    
             LdapAuthConfiguration conf = this.getLdapAuthConfiguration();
 
             LdapUser ldapUser = this.ldapUserManager.getUser( username, context, conf );
@@ -143,14 +149,19 @@ public class DefaultLdapConnector
             String message = "Failed to retrieve ldap information for users.";
             throw new LdapDAOException( message, e );
         }
+        finally
+        {
+            this.closeContext( context );
+        }
     }
 
     public SortedSet<LdapUser> searchUsers( String username )
         throws LdapDAOException
     {
+        LdapContext context = null;
         try
         {
-            LdapContext context = this.getLdapContextFactory().getSystemLdapContext();
+            context = this.getLdapContextFactory().getSystemLdapContext();
             LdapAuthConfiguration conf = this.getLdapAuthConfiguration();
 
             // make sure the username is at least an empty string
@@ -182,6 +193,10 @@ public class DefaultLdapConnector
             String message = "Failed to retrieve ldap information for users.";
             throw new LdapDAOException( message, e );
         }
+        finally
+        {
+            this.closeContext( context );
+        }
     }
 
     private Set<String> getGroupMembership( String username, LdapContext context, LdapAuthConfiguration conf )
@@ -193,11 +208,13 @@ public class DefaultLdapConnector
     public SortedSet<String> getAllGroups()
         throws LdapDAOException
     {
+        LdapContext context = null;
+        
         try
         {
             SortedSet<String> results = new TreeSet<String>();
 
-            LdapContext context = this.getLdapContextFactory().getSystemLdapContext();
+            context = this.getLdapContextFactory().getSystemLdapContext();
             LdapAuthConfiguration conf = this.getLdapAuthConfiguration();
 
             results.addAll( this.ldapGroupManager.getAllGroups( context, conf ) );
@@ -209,15 +226,21 @@ public class DefaultLdapConnector
             String message = "Failed to retrieve ldap information for users.";
             throw new LdapDAOException( message, e );
         }
+        finally
+        {
+            this.closeContext( context );
+        }
     }
 
     public String getGroupName( String groupId )
         throws LdapDAOException,
             NoSuchLdapGroupException
     {
+        LdapContext context = null;
+        
         try
         {
-            LdapContext context = this.getLdapContextFactory().getSystemLdapContext();
+            context = this.getLdapContextFactory().getSystemLdapContext();
             LdapAuthConfiguration conf = this.getLdapAuthConfiguration();
 
             return this.ldapGroupManager.getGroupName( groupId, context, conf );
@@ -227,8 +250,12 @@ public class DefaultLdapConnector
             String message = "Failed to retrieve ldap information for users.";
             throw new LdapDAOException( message, e );
         }
+        finally
+        {
+            this.closeContext( context );
+        }
     }
-
+    
     public LdapContextFactory getLdapContextFactory()
     {
         return ldapContextFactory;
@@ -242,5 +269,20 @@ public class DefaultLdapConnector
     public String getIdentifier()
     {
         return this.identifier;
+    }
+    
+    private void closeContext( LdapContext context )
+    {
+        try
+        {
+            if( context != null)
+            {
+                context.close();
+            }
+        }
+        catch ( NamingException e )
+        {
+            this.logger.debug( "Error closing connection: "+ e.getMessage(), e );
+        }
     }
 }
