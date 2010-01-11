@@ -675,7 +675,10 @@ Sonatype.panels.TreePanel = function( config ) {
   var defaultConfig = { 
     titleColumn: 'name',
     nodeIconClass: null,
-    useNodeIconClassParam: null
+    useNodeIconClassParam: null,
+    nodePathPrepend: '',
+    appendPathToRoot: true,
+    leafClickEvent: null
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -703,6 +706,8 @@ Sonatype.panels.TreePanel = function( config ) {
     rootVisible: true,
     enableDD: false,
     loader : new Ext.tree.TreeLoader( {
+      nodePathPrepend: this.nodePathPrepend,
+      appendPathToRoot: this.appendPathToRoot,
       nodeIconClass: this.nodeIconClass,
       useNodeIconClassParam: this.useNodeIconClassParam,
       requestMethod: 'GET',
@@ -716,7 +721,7 @@ Sonatype.panels.TreePanel = function( config ) {
           this.transId = Ext.Ajax.request({
             method: this.requestMethod,
             // Sonatype: nodes contain a relative request path
-            url: this.url + node.attributes.path,
+            url: this.url + ( ( this.appendPathToRoot || node.attributes.path != '/' ) ? ( this.nodePathPrepend + node.attributes.path ) : '' ),
             success: this.handleResponse,
             failure: this.handleFailure,
             scope: this,
@@ -758,6 +763,8 @@ Sonatype.panels.TreePanel = function( config ) {
             attr.iconCls = this.nodeIconClass;
           }
         }
+        
+        attr.rootUrl = this.url;
 
         if ( attr.nodeType ) {
           return new Ext.tree.TreePanel.nodeTypes[attr.nodeType](attr);
@@ -820,7 +827,7 @@ Sonatype.panels.TreePanel = function( config ) {
     text: this.payload ? this.payload.get( this.titleColumn ) : '/',
     path: '/',
     singleClickExpand: true,
-    expanded: true
+    expanded: false
   } );
   
   this.setRootNode( root );
@@ -832,6 +839,9 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
 
     if ( this.nodeClickEvent ) {
       Sonatype.Events.fireEvent( this.nodeClickEvent, node, this.nodeClickPassthru );
+    }
+    else if ( this.leafClickEvent ) {
+      Sonatype.Events.fireEvent( this.leafClickEvent, node, this.leafClickPassthru );
     }
   },
   
