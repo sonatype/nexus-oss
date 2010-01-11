@@ -66,7 +66,7 @@ public class DefaultRepositoryTypeRegistry
 
     public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors()
     {
-        return Collections.unmodifiableSet( getRepositoryTypeDescriptors() );
+        return Collections.unmodifiableSet( new HashSet<RepositoryTypeDescriptor>( getRepositoryTypeDescriptors() ) );
     }
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
