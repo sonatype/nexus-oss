@@ -45,7 +45,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>maven-runtime-assembler-plugin</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.1.0</version>
         <executions>
           <execution>
             <id>plexus-jsw</id>
