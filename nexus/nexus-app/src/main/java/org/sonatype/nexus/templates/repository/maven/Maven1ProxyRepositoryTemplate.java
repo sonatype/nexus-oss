@@ -59,7 +59,15 @@ public class Maven1ProxyRepositoryTemplate
 
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         repo.setNotFoundCacheTTL( 1440 );
-        exConf.setArtifactMaxAge( -1 );
+        
+        if ( exConf.getRepositoryPolicy() != null && exConf.getRepositoryPolicy() == RepositoryPolicy.SNAPSHOT )
+        {
+            exConf.setArtifactMaxAge( 1440 );
+        }
+        else
+        {
+            exConf.setArtifactMaxAge( -1 );
+        }
 
         CRepositoryCoreConfiguration result =
             new CRepositoryCoreConfiguration(
