@@ -78,7 +78,7 @@ public abstract class AbstractRepositoryConfigurator
 
         try
         {
-            repo.defaultLocalStorageUrl = defaultStorageFile.toURL().toString();
+            repo.defaultLocalStorageUrl = defaultStorageFile.toURI().toURL().toString();
         }
         catch ( MalformedURLException e )
         {
