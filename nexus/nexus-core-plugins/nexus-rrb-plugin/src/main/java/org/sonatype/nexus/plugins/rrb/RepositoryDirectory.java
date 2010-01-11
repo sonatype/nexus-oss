@@ -5,7 +5,15 @@ import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.model.JSONValue;
 
 public class RepositoryDirectory {
-    private String resourceURI;
+    @Override
+	public String toString() {
+		return "RepositoryDirectory [lastModified=" + lastModified + ", leaf="
+				+ leaf + ", relativePath=" + relativePath + ", resourceURI="
+				+ resourceURI + ", sizeOnDisk=" + sizeOnDisk + ", text=" + text
+				+ "]";
+	}
+
+	private String resourceURI;
     private String relativePath;
     private String text;
     private boolean leaf;
