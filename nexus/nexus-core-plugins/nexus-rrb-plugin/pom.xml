@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.sonatype.nexus.plugins</groupId>
+		<artifactId>nexus-core-plugins</artifactId>
+		<version>1.4.2-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>nexus-rrb-plugin</artifactId>
+	<packaging>nexus-plugin</packaging>
+	<name>Nexus RRB Plugin</name>
+	<description>Nexus Remote Repository Browsing Plugin</description>
+
+	<developers>
+		<developer>
+			<id>anders.hammar</id>
+			<name>Anders Hammar</name>
+			<email>anders.hammar@devoteam.com</email>
+			<organization>Devoteam Sweden</organization>
+			<organizationUrl>http://www.devoteam.se</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>bjorn.eiderback</id>
+			<name>Björn Eiderbäck</name>
+			<email>bjorn.eiderback@devoteam.com</email>
+			<organization>Devoteam Sweden</organization>
+			<organizationUrl>http://www.devoteam.se</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>torbjorn.ekmark</id>
+			<name>Torbjörn Ekmark</name>
+			<email>torbjorn.ekmark@devoteam.com</email>
+			<organization>Devoteam Sweden</organization>
+			<organizationUrl>http://www.devoteam.se</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.sonatype.nexus</groupId>
+			<artifactId>nexus-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.sonatype.plexus</groupId>
+			<artifactId>plexus-restlet-bridge</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-httpclient</groupId>
+			<artifactId>commons-httpclient</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.restlet</groupId>
+			<artifactId>org.restlet</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sdicons.jsontools</groupId>
+			<artifactId>jsontools-core</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>app-lifecycle-maven-plugin</artifactId>
+				<version>1.1</version>
+				<extensions>true</extensions>
+				<dependencies>
+					<dependency>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>app-lifecycle-nexus</artifactId>
+						<version>1.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			<plugin>
+				<groupId>net.sf.alchim</groupId>
+				<artifactId>yuicompressor-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compress</goal>
+						</goals>
+						<configuration>
+							<aggregations>
+								<aggregation>
+									<output>${project.build.directory}/classes/static/js/nexus-rrb-plugin-all.js
+									</output>
+									<!--
+										files to include, path relative to output's directory or absolute path
+									-->
+									<includes>
+										<include>${project.build.directory}/classes/static/js/repoServer.RemoteRepoBrowsePanel.js
+										</include>
+									</includes>
+								</aggregation>
+							</aggregations>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<nosuffix>true</nosuffix>
+					<nomunge>true</nomunge>
+					<jswarn>false</jswarn>
+					<aggregations>
+						<aggregation>
+							<!-- insert new line after each concatenation (default: false) -->
+							<insertNewLine>true</insertNewLine>
+						</aggregation>
+					</aggregations>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.codehaus.plexus</groupId>
+						<artifactId>plexus-utils</artifactId>
+						<version>1.1</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
+</project>
