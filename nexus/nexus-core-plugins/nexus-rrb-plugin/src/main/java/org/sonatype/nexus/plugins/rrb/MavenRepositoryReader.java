@@ -23,7 +23,7 @@ import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
  */
 public class MavenRepositoryReader {
 
-	final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
+	private final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
     private HttpClient client = new HttpClient();
     private String remoteUrl;
     private String localUrl;
@@ -39,7 +39,9 @@ public class MavenRepositoryReader {
     	this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
         StringBuilder html = getContent();
-        logger.debug(html.toString());
+        if (logger.isDebugEnabled()) {
+            logger.debug(html.toString());
+        }
         return parseResult(html);
     }
 
@@ -52,13 +54,13 @@ public class MavenRepositoryReader {
         if (indata.indexOf("xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"") != -1 || indata.indexOf("<?xml") != -1) {
         	logger.debug("is S3 repository");
             if (responseContainsError(indata)) {
-            	logger.debug("response from S3 repository contains error need to find rootUrl");
+            	logger.debug("response from S3 repository contains error, need to find rootUrl");
                 remoteUrl = findRootUrl(indata);
                 indata = getContent();
             }
             parser = new S3RemoteRepositoryParser(remoteUrl, localUrl);
         } else {
-        	logger.info("Found no matching parser using default html parser");
+        	logger.info("Found no matching parser, using default html parser");
             parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
         }
         return parser.extractLinks(indata);

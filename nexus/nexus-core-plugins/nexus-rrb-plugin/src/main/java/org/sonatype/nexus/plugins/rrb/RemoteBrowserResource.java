@@ -23,7 +23,7 @@ import com.sdicons.json.model.JSONValue;
  */
 public class RemoteBrowserResource extends AbstractPlexusResource implements PlexusResource {
 
-	final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
+	private final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
 	
     @Override
     public Object getPayloadInstance() {
@@ -54,7 +54,6 @@ public class RemoteBrowserResource extends AbstractPlexusResource implements Ple
             JSONValue value = JSONMapper.toJSON(data);
             returnValue = value.render(true);
         } catch (MapperException e) {
-            // TODO Auto-generated catch block
         	logger.error(e.getMessage(), e);
             returnValue = "fail";
         }
@@ -80,7 +79,7 @@ public class RemoteBrowserResource extends AbstractPlexusResource implements Ple
         if (!result.endsWith("/")) {
             result += "/";
         }
-        logger.debug("remoter url is {}", result);
+        logger.debug("remote url is {}", result);
         return result;
     }
 }

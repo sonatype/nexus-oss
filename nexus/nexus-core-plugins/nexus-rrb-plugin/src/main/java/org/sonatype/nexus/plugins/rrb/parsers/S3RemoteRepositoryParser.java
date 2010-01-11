@@ -8,8 +8,9 @@ import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
 
-	final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
     private static final String[] EXCLUDES = { "Parent Directory", "?", "..", "index", "robots" };
+
+    private final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
     private String localUrl;
     private String remoteUrl;
     private ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
@@ -37,7 +38,9 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
                 rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + getKeyName(temp));
                 rp.setRelativePath("/" + getKeyName(temp));
                 if (!remoteUrl.endsWith(rp.getRelativePath().substring(1))) {
-                	logger.debug("addning {} to result", rp.toString());
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("adding {} to result", rp.toString());
+                    }
                     result.add(rp);
                 }
             }

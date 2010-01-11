@@ -8,8 +8,9 @@ import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 
-	final Logger logger = LoggerFactory.getLogger(HtmlRemoteRepositoryParser.class);
     private static final String[] EXCLUDES = { "Parent Directory", "?", ".." };
+
+    private final Logger logger = LoggerFactory.getLogger(HtmlRemoteRepositoryParser.class);
     private String localUrl;
     private String remoteUrl;
 
@@ -46,7 +47,9 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
                 rp.setRelativePath("/" + getLinkUrl(temp));
 
                 result.add(rp);
-                logger.debug("addning {} to result", rp.toString());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("adding {} to result", rp.toString());
+                }
             }
             start = end + 1;
         } while (start > 0);
