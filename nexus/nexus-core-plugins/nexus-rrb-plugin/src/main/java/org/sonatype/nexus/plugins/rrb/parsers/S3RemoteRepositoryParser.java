@@ -2,10 +2,13 @@ package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
 
+	final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
     private static final String[] EXCLUDES = { "Parent Directory", "?", "..", "index", "robots" };
     private String localUrl;
     private String remoteUrl;
@@ -34,6 +37,7 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
                 rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + getKeyName(temp));
                 rp.setRelativePath("/" + getKeyName(temp));
                 if (!remoteUrl.endsWith(rp.getRelativePath().substring(1))) {
+                	logger.debug("addning {} to result", rp.toString());
                     result.add(rp);
                 }
             }
@@ -89,6 +93,7 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
     private boolean exclude(StringBuilder value) {
         for (String s : EXCLUDES) {
             if (value.indexOf(s) > 0) {
+            	logger.debug("{} is in EXCLUDES array", value);
                 return true;
             }
         }
