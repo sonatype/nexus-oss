@@ -324,7 +324,7 @@ public class DefaultSnapshotRemover
                 getLogger().debug( "onCollectionExit() :: " + coll.getRepositoryItemUid().toString() );
             }
 
-            shouldProcessCollection = coll.getPath().endsWith( "-SNAPSHOT" );
+            shouldProcessCollection = coll.getPath().endsWith( "SNAPSHOT" );
 
             if ( !shouldProcessCollection )
             {

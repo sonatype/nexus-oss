@@ -571,6 +571,27 @@ public class DefaultSnapshotRemoverTest
                       "org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar" );
         assertTrue( illegalArtifact.exists() );
     }
+    
+    /**
+     * @see <a href='https://issues.sonatype.org/browse/NEXUS-3148'>NEXUS-3148</a>
+     */
+    public void testEndWithSNAPSHOT()
+        throws Exception
+    {
+        fillInRepo();
+
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( snapshots.getId(), null, 0, -1, false );
+
+        assertTrue( defaultNexus.removeSnapshots( request ).isSuccessful() );
+
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
+        expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.064938-1.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.064938-1.jar", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.065026-2.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.065026-2.jar", Boolean.FALSE );
+
+        validateResults( snapshots, expecting );
+    }
 
     private Metadata readMavenMetadata( File mdFle )
         throws FileNotFoundException, MetadataException
