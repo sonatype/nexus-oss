@@ -11,7 +11,7 @@ public class RrbIndexHtmlCustomizer extends AbstractNexusIndexHtmlCustomizer imp
     public String getPostHeadContribution(Map<String, Object> ctx) {
         String version = getVersionFromJarFile("/META-INF/maven/org.sonatype.nexus.plugins/nexus-rrb-plugin/pom.properties");
 
-        return "<script src=\"js/repoServer/nexus-rrb-plugin-all.js\"" + (version == null ? "" : "?" + version)
-                + " type=\"text/javascript\" charset=\"utf-8\"></script>";
+        return "<script src=\"js/repoServer/nexus-rrb-plugin-all.js" + (version == null ? "" : "?" + version)
+                + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
     }
 }
