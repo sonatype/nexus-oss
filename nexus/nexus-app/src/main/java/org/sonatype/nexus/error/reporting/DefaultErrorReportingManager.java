@@ -506,7 +506,7 @@ public class DefaultErrorReportingManager
         File securityXml = new SecurityXmlHandler().getFile( securityXmlSource, nexusConfig );
         File securityConfigurationXml =
             new SecurityConfigurationXmlHandler().getFile( securityConfigurationXmlSource, nexusConfig );
-        File fileListing = getFileListing();
+//        File fileListing = getFileListing(); //TODO: replace with FileUtil call
         File contextListing = getContextListing( request.getContext() );
         File exceptionListing = getExceptionListing( request.getThrowable() );
 
@@ -522,7 +522,7 @@ public class DefaultErrorReportingManager
             addFileToZip( nexusXml, zStream, "nexus.xml" );
             addFileToZip( securityXml, zStream, "security.xml" );
             addFileToZip( securityConfigurationXml, zStream, "security-configuration.xml" );
-            addFileToZip( fileListing, zStream, "fileListing.txt" );
+//            addFileToZip( fileListing, zStream, "fileListing.txt" );
             addFileToZip( contextListing, zStream, "contextListing.txt" );
             addFileToZip( exceptionListing, zStream, "exception.txt" );
 
@@ -541,7 +541,7 @@ public class DefaultErrorReportingManager
             deleteFile( nexusXml );
             deleteFile( securityXml );
             deleteFile( securityConfigurationXml );
-            deleteFile( fileListing );
+//            deleteFile( fileListing );
             deleteFile( contextListing );
             deleteFile( exceptionListing );
 
@@ -614,12 +614,13 @@ public class DefaultErrorReportingManager
         return files;
     }
 
-    private File getFileListing()
-        throws IOException
-    {
-        return writeStringToTempFile( FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
-                                      "fileListing.txt" );
-    }
+//  TODO: this should be replaced with a call to FileUtil, but first we need to make sure that will not eat memory too
+//    private File getFileListing()
+//        throws IOException
+//    {
+//        return writeStringToTempFile( FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
+//                                      "fileListing.txt" );
+//    }
 
     private File getExceptionListing( Throwable t )
         throws IOException

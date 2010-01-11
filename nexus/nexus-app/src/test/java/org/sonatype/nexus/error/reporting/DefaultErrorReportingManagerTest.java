@@ -151,7 +151,7 @@ public class DefaultErrorReportingManagerTest
         File[] files = unzipDir.listFiles();
 
         assertNotNull( files );
-        assertEquals( 5, files.length );
+        assertEquals( 4, files.length ); // TODO: was five with the directory listing, but that was removed, as it OOM'd
     }
 
     private void addBackupFiles( File dir )

@@ -98,7 +98,7 @@ public class ErrorReportUtil
         throws IOException
     {
         boolean foundException = false;
-        boolean foundFileList = false;
+//        boolean foundFileList = false;
         boolean foundContextList = false;
         boolean foundLog4j = false;
         boolean foundNexusXml = false;
@@ -118,10 +118,11 @@ public class ErrorReportUtil
             {
                 foundException = true;
             }
-            else if ( entry.getName().equals( "fileListing.txt" ) )
-            {
-                foundFileList = true;
-            }
+            //TODO: removed because the listing of the files OOM'd
+//            else if ( entry.getName().equals( "fileListing.txt" ) )
+//            {
+//                foundFileList = true;
+//            }
             else if ( entry.getName().equals( "contextListing.txt" ) )
             {
                 foundContextList = true;
@@ -155,7 +156,7 @@ public class ErrorReportUtil
         }
 
         Assert.assertTrue( foundException );
-        Assert.assertTrue( foundFileList );
+//        Assert.assertTrue( foundFileList );
         Assert.assertTrue( foundContextList );
         Assert.assertTrue( foundLog4j );
         Assert.assertTrue( foundNexusXml );
