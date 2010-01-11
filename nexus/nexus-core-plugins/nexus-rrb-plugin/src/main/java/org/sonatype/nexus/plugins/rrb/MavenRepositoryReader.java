@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HttpClient;
@@ -21,6 +23,7 @@ import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
  */
 public class MavenRepositoryReader {
 
+	final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
     private HttpClient client = new HttpClient();
     private String remoteUrl;
     private String localUrl;
@@ -32,31 +35,37 @@ public class MavenRepositoryReader {
      * @return a json array containing the remote data
      */
     public List<RepositoryDirectory> extract(String remoteUrl, String localUrl) {
-        this.remoteUrl = remoteUrl;
+    	logger.debug("remoteUrl={}",remoteUrl);
+    	this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
         StringBuilder html = getContent();
-
+        logger.debug(html.toString());
         return parseResult(html);
     }
 
     private ArrayList<RepositoryDirectory> parseResult(StringBuilder indata) {
         RemoteRepositoryParser parser = null;
         if (indata.indexOf("<html>") != -1) {
+        	logger.debug("is html repository");
             parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
         }
         if (indata.indexOf("xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"") != -1 || indata.indexOf("<?xml") != -1) {
+        	logger.debug("is S3 repository");
             if (responseContainsError(indata)) {
+            	logger.debug("response from S3 repository contains error need to find rootUrl");
                 remoteUrl = findRootUrl(indata);
                 indata = getContent();
             }
             parser = new S3RemoteRepositoryParser(remoteUrl, localUrl);
         } else {
+        	logger.info("Found no matching parser using default html parser");
             parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
         }
         return parser.extractLinks(indata);
     }
 
     private String findRootUrl(StringBuilder indata) {
+    	logger.debug("indata={}", indata.toString());
         String key = "";
         String newUrl = "";
         int start = indata.indexOf("<Key>");
@@ -66,6 +75,7 @@ public class MavenRepositoryReader {
             newUrl = remoteUrl.substring(0, remoteUrl.indexOf(key));
             newUrl += "?prefix=" + key;
         }
+        logger.debug("newUrl={}", newUrl);
         return newUrl;
     }
 
@@ -89,7 +99,8 @@ public class MavenRepositoryReader {
         StringBuilder result = new StringBuilder();
 
         try {
-            client.executeMethod(method);
+            int responseCode = client.executeMethod(method);
+            logger.debug("responseCode={}",responseCode);
             BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream()));
 
             String line = null;
@@ -97,11 +108,9 @@ public class MavenRepositoryReader {
                 result.append(line + "\n");
             }
         } catch (HttpException e) {
-            System.err.println("Fatal protocol violation: " + e.getMessage());
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         } catch (IOException e) {
-            System.err.println("Fatal transport error: " + e.getMessage());
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         } finally {
             // Release the connection.
             method.releaseConnection();
