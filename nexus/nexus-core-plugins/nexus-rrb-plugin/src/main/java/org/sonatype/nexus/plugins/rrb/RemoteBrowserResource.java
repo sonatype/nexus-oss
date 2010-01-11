@@ -5,7 +5,10 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.MavenRepositoryReader.Data;
+import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.plexus.rest.resource.AbstractPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -21,6 +24,8 @@ import com.sdicons.json.model.JSONValue;
  */
 public class RemoteBrowserResource extends AbstractPlexusResource implements PlexusResource {
 
+	final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
+	
     @Override
     public Object getPayloadInstance() {
         // if you allow PUT or POST you would need to return your object.
@@ -51,9 +56,10 @@ public class RemoteBrowserResource extends AbstractPlexusResource implements Ple
             returnValue = value.render(true);
         } catch (MapperException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
             returnValue = "fail";
         }
+        logger.debug("return value is {}", returnValue);
         return returnValue;
     }
 
@@ -75,6 +81,7 @@ public class RemoteBrowserResource extends AbstractPlexusResource implements Ple
         if (!result.endsWith("/")) {
             result += "/";
         }
+        logger.debug("remoter url is {}", result);
         return result;
     }
 }
