@@ -120,12 +120,13 @@ public class Gav
                 // BUT this is not the proper scheme, we will simply loosen up here if requested
                 else
                 {
+                    // trim the part of 'YYYYMMDD.HHMMSS-BN
                     String tempBaseVersion = version.substring( 0, version.lastIndexOf( '-' ) );
-                    int baseVersionEndPos = tempBaseVersion.lastIndexOf( "-" );
+                    tempBaseVersion = tempBaseVersion.substring( 0, tempBaseVersion.length() - 15 );
 
-                    if ( baseVersionEndPos >= 0 )
+                    if ( tempBaseVersion.length() > 0 )
                     {
-                        this.baseVersion = tempBaseVersion.substring( 0, baseVersionEndPos ) + "-SNAPSHOT";
+                        this.baseVersion = tempBaseVersion + "SNAPSHOT";
                     }
                     else
                     {

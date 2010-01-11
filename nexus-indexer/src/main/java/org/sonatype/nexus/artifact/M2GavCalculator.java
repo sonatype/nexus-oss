@@ -83,7 +83,7 @@ public class M2GavCalculator
                 return null;
             }
 
-            boolean snapshot = version.endsWith( "-SNAPSHOT" ) || !getEnforcer().isStrict() && version.equals( "SNAPSHOT" );
+            boolean snapshot = version.endsWith( "-SNAPSHOT" ) || !getEnforcer().isStrict() && version.endsWith( "SNAPSHOT" );
 
             if ( snapshot )
             {

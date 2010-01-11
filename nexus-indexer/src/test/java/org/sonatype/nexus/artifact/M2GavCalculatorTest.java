@@ -668,4 +668,16 @@ public class M2GavCalculatorTest
         assertEquals( "1.0.0-beta-5-SNAPSHOT-1234", gav.getVersion() );
         assertFalse( gav.isSnapshot() );
     }
+    
+    public void testGavLooseStrictedSnapshot()
+        throws Exception
+    {
+        Gav gav;
+
+        gav = gavCalculator.pathToGav( "/org/sonatype/nexus-3148/1.0.SNAPSHOT/nexus-3148-1.0.20100111.064938-1.pom" );
+        assertNotNull( gav );
+        assertEquals( "pom", gav.getExtension() );
+        assertEquals( "1.0.20100111.064938-1", gav.getVersion() );
+        assertEquals( "1.0.SNAPSHOT", gav.getBaseVersion() );
+    }
 }

@@ -21,7 +21,7 @@ public class VersionUtils
     // i.e. the proper way 1.0-20080707.124343
     // i.e. the newly supported way 20080707.124343 (no base version, i.e. 1.0)
     private static final Pattern VERSION_FILE_PATTERN = 
-        Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$|^([0-9]{8}.[0-9]{6})-([0-9]+)$" );
+        Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$|^([0-9]{8}.[0-9]{6})-([0-9]+)$|^(.*)([0-9]{8}.[0-9]{6})-([0-9]+)$" );
     
     private static final Pattern STRICT_VERSION_FILE_PATTERN = 
         Pattern.compile( "^(.*)-([0-9]{8}.[0-9]{6})-([0-9]+)$" );
