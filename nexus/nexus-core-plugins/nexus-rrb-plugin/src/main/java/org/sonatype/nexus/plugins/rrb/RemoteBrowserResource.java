@@ -57,7 +57,7 @@ public class RemoteBrowserResource extends AbstractPlexusResource implements Ple
         	logger.error(e.getMessage(), e);
             returnValue = "fail";
         }
-        logger.debug("return value is {}", returnValue);
+        logger.trace("return value is {}", returnValue);
         return returnValue;
     }
 
