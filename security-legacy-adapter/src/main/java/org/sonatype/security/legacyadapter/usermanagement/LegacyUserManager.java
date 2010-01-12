@@ -51,7 +51,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             return ROLE;
         }
 
@@ -63,7 +63,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             return ROLE;
         }
         return this.getUserLocator().getSource();
@@ -74,7 +74,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             throw new UserNotFoundException( userId, "LegacyUserManager is not configured, it should be removed." );
         }
 
@@ -91,7 +91,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             return Collections.emptySet();
         }
 
@@ -102,7 +102,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             return Collections.emptySet();
         }
 
@@ -120,7 +120,7 @@ public class LegacyUserManager
     {
         if ( this.getUserLocator() == null )
         {
-            this.logger.warn( "LegacyUserManager is not configured, it should be removed." );
+            this.logger.debug( "LegacyUserManager is not configured." );
             return Collections.emptySet();
         }
 
