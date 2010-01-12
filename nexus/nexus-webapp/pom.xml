@@ -27,6 +27,7 @@
     <optional-plugins.directory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
     <nexus-plugin-console-plugin.version>1.4.2-SNAPSHOT</nexus-plugin-console-plugin.version>
     <nexus-ldap-realm-plugin.version>1.4.2-SNAPSHOT</nexus-ldap-realm-plugin.version>
+    <nexus-rrb-plugin.version>1.4.2-SNAPSHOT</nexus-rrb-plugin.version>
     
   </properties>
   <dependencies>
@@ -51,6 +52,35 @@
       <version>${project.version}</version>
     </dependency>
     
+    <!-- There are problems with the Maven reactor that would require these modules 
+         However if we include them then end up as provided and cause problems with other plugins -->
+    <!-- <dependency>
+	  <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+	  <version>${nexus-plugin-console-plugin.version}</version>
+	  <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${nexus-ldap-realm-plugin.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-rrb-plugin</artifactId>
+      <version>${nexus-rrb-plugin.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>runtime</scope>
+    </dependency> -->
+    
     <!-- The bundle -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
@@ -71,6 +101,11 @@
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
       <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-legacy-adapter</artifactId>
+      <version>${plexus-security.version}</version>
     </dependency>
 
     <dependency>
@@ -189,6 +224,14 @@
                       <classifier>bundle</classifier>
                       <type>zip</type>
                       <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                  </artifactItem>
+                  <artifactItem>
+                    <groupId>org.sonatype.nexus.plugins</groupId>
+                    <artifactId>nexus-rrb-plugin</artifactId>
+                    <version>${nexus-rrb-plugin.version}</version>
+                    <classifier>bundle</classifier>
+                    <type>zip</type>
+                    <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                   </artifactItem>
               </artifactItems>
             </configuration>
