@@ -20,17 +20,11 @@ public class LdapNexusIndexHtmlCustomizer
     public String getPostHeadContribution( Map<String, Object> ctx )
     {
         String version =
-            getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/nexus-ldap-realm-plugin/pom.properties" );
+            getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins.ldap/nexus-ldap-realm-plugin/pom.properties" );
 
-         return "<script src=\"js/repoServer/nexus-ldap-realm-plugin-all.js"
+         return "<script src=\"static/js/nexus-ldap-realm-plugin-all.js"
          + ( version == null ? "" : "?" + version )
          + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
-
-//        return "<script src=\"js/repoServer/repoServer.LdapConfigPanel.js" + ( version == null ? "" : "?" + version )
-//            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>" +
-//
-//            "<script src=\"js/repoServer/repoServer.LdapUserEditor.js" + ( version == null ? "" : "?" + version )
-//            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
 
     }
 }
