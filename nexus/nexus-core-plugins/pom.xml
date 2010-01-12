@@ -31,6 +31,7 @@
 		<module>nexus-maven-plugin</module>
 		-->
 		<module>nexus-ldap-plugin-parent</module>
+		<module>nexus-rrb-plugin</module>
 	</modules>
 
 </project>
