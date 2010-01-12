@@ -489,9 +489,12 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
                 hideParent: true
               },
               {
-                xtype: 'hidden',
+                xtype: 'checkbox',
+                hidden: true,
+                hideLabel: true,
+                height: 0,
                 name: 'ldapGroupsAsRoles',
-                value: 'false'
+                checked: false
               }
             ]
           }
@@ -630,7 +633,7 @@ Ext.extend(Sonatype.repoServer.LdapConfigPanel, Ext.Panel, {
     if ( action.type == 'sonatypeSubmit' ) {
       if ( action.options.url == this.servicePath.testUserAndGroupConfig ) {
         var title = 'User Mapping Test Results';
-        if ( action.output.data.ldapGroupsAsRoles =='true' && action.result.data != null ) {
+        if ( action.output.data.ldapGroupsAsRoles == true && action.result.data != null ) {
           var r = action.result.data;
           var n = 0;
           for ( var i = 0; i < r.length; i++ ) {
@@ -679,7 +682,7 @@ Ext.extend(Sonatype.repoServer.LdapConfigPanel, Ext.Panel, {
       }
       
       var ldapGroupsAsRoles = this.find( 'name', 'ldapGroupsAsRoles' )[0];
-      if ( ldapGroupsAsRoles.getRawValue() != "true" ) {
+      if ( ldapGroupsAsRoles.getValue() != true ) {
         ldapGroupsAsRoles.ownerCt.collapse();
       }
     }
