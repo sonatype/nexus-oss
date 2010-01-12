@@ -678,7 +678,8 @@ Sonatype.panels.TreePanel = function( config ) {
     useNodeIconClassParam: null,
     nodePathPrepend: '',
     appendPathToRoot: true,
-    leafClickEvent: null
+    leafClickEvent: null,
+    resetRootNodeText: true
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -866,7 +867,9 @@ Ext.extend( Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
   },
 
   refreshHandler: function( button, e ) {
-    this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
+    if ( this.resetRootNodeText ) {
+      this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
+    }
     this.root.attributes.localStorageUpdated = false;
     this.root.reload();
   },
