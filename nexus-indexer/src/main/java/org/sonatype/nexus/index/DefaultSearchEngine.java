@@ -92,11 +92,21 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                totalHits +=
-                    searchFlat( request, result, ctx, request.getQuery(), request.getStart(), request.getCount() );
+                int hitCount = searchFlat( request, result, ctx, request.getQuery(), request.getStart(), request.getCount() );
+                
+                if ( hitCount == AbstractSearchResponse.LIMIT_EXCEEDED )
+                {
+                    totalHits = hitCount;
+                }
+                else
+                {
+                    totalHits += hitCount;
+                }
             }
 
-            if ( request.isHitLimited() && totalHits > request.getResultHitLimit() )
+            if ( request.isHitLimited() 
+                && ( totalHits > request.getResultHitLimit() ) 
+                || totalHits == AbstractSearchResponse.LIMIT_EXCEEDED )
             {
                 totalHits = AbstractSearchResponse.LIMIT_EXCEEDED;
                 result = new TreeSet<ArtifactInfo>( request.getArtifactInfoComparator() );
@@ -134,7 +144,25 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                totalHits += searchGrouped( request, result, request.getGrouping(), ctx, request.getQuery() );
+                int hitCount = searchGrouped( request, result, request.getGrouping(), ctx, request.getQuery() );
+                
+                if ( hitCount == AbstractSearchResponse.LIMIT_EXCEEDED )
+                {
+                    totalHits = hitCount;
+                }
+                else
+                {
+                    totalHits += hitCount;
+                }
+            }
+            
+            if ( request.isHitLimited() 
+                && ( totalHits > request.getResultHitLimit() ) 
+                || totalHits == AbstractSearchResponse.LIMIT_EXCEEDED )
+            {
+                totalHits = AbstractSearchResponse.LIMIT_EXCEEDED;
+                result = new TreeMap<String, ArtifactInfoGroup>( request.getGroupKeyComparator() );
+                break;
             }
         }
 
@@ -163,8 +191,6 @@ public class DefaultSearchEngine
 
         int start = 0; // from == FlatSearchRequest.UNDEFINED ? 0 : from;
 
-        int found = 0;
-
         // we have to pack the results as long: a) we have found aiCount ones b) we depleted hits
         for ( int i = start; i < hits.length(); i++ )
         {
@@ -178,16 +204,12 @@ public class DefaultSearchEngine
 
                 artifactInfo.context = context.getId();
 
-                if ( result.add( artifactInfo ) )
-                {
-                    // increase the founds
-                    found++;
-                }
+                result.add( artifactInfo );
 
-                if ( req.isHitLimited() && found >= req.getResultHitLimit() )
+                if ( req.isHitLimited() && result.size() > req.getResultHitLimit() )
                 {
-                    // escape then
-                    break;
+                    // we hit limit, back out now !!
+                    return AbstractSearchResponse.LIMIT_EXCEEDED;
                 }
             }
         }
@@ -224,6 +246,12 @@ public class DefaultSearchEngine
                     }
                 }
             }
+            
+            if ( req.isHitLimited() && hits.length() > req.getResultHitLimit() )
+            {
+                return AbstractSearchResponse.LIMIT_EXCEEDED;
+            }
+            
             return hitCount;
         }
         else
