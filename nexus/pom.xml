@@ -125,22 +125,7 @@
       </releases>
     </pluginRepository>
   </pluginRepositories>
-  <modules>
-    <module>nexus-plugins</module>
-    <module>nexus-mock</module>
-    <module>nexus-utils</module>
-    <module>nexus-api</module>
-    <module>nexus-oss-edition</module>
-    <module>nexus-configuration</module>
-    <module>nexus-proxy</module>
-    <module>nexus-app</module>
-    <module>nexus-rest-api</module>
-    <module>nexus-migration-tool</module>
-    <module>nexus-core-plugins</module>
-    <module>nexus-webapp</module>
-    <module>nexus-clients</module>
-    <module>nexus-test-harness</module>
-  </modules>
+
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
     <plexus.appbooter.version>2.1.0</plexus.appbooter.version>
@@ -989,6 +974,28 @@
 
   <profiles>
     <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>nexus-plugins</module>
+        <module>nexus-mock</module>
+        <module>nexus-utils</module>
+        <module>nexus-api</module>
+        <module>nexus-oss-edition</module>
+        <module>nexus-configuration</module>
+        <module>nexus-proxy</module>
+        <module>nexus-app</module>
+        <module>nexus-rest-api</module>
+        <module>nexus-migration-tool</module>
+        <module>nexus-core-plugins</module>
+        <module>nexus-webapp</module>
+        <module>nexus-clients</module>
+        <module>nexus-test-harness</module>
+      </modules>
+    </profile>
+    <profile>
       <id>skipTests</id>
       <build>
         <pluginManagement>
@@ -1006,7 +1013,7 @@
     <profile>
       <id>distribution</id>
       <modules>
-        <module>nexus-distribution-archives</module>        
+        <module>nexus-distribution-archives</module>
         <module>nexus-distribution</module>
       </modules>
     </profile>
