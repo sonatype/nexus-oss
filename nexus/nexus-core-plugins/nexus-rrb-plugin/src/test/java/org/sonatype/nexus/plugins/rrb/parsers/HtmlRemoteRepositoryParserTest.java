@@ -15,7 +15,7 @@ public class HtmlRemoteRepositoryParserTest extends RemoteRepositoryParserTestAb
     public void setUp() {
         String remoteUrl = "http://www.xxx.com"; // The exact names of the urls
         String localUrl = "http://local"; // doesn't matter in the tests
-        parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
+        parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl,"test");
     }
 
     @Test
