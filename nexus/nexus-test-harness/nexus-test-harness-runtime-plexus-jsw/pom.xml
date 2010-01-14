@@ -1,0 +1,188 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-test-harness</artifactId>
+    <version>1.4.2-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>nexus-test-harness-runtime-plexus-jsw</artifactId>
+
+  <name>Nexus Test Harness :: Plexus/JSW</name>
+
+  <build>
+
+    <plugins>
+
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>port-allocator-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>allocate-ports</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <ports>
+            <port>
+              <name>pgp-key-server</name>
+            </port>
+          </ports>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
+        <version>2.4.3-alpha-1</version>
+        <configuration>
+          <argLine>-Xmx512M</argLine>
+          <excludes>
+            <exclude>**Suite*</exclude>
+            <!-- START This are start/stop tests, shouldn't be runned -->
+            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
+            <exclude>**/Nexus758StatusService.*</exclude>
+            <exclude>**/Nexus748MultipleStartTest.*</exclude>
+            <!-- END This are start/stop tests, shouldn't be runned -->
+
+            <!-- inner classes -->
+            <exclude>**/*$*.*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <version>1.4-SNAPSHOT</version>
+
+        <executions>
+          <execution>
+            <goals>
+              <goal>setup-environment</goal>
+              <goal>unpackage</goal>
+            </goals>
+          </execution>
+        </executions>
+
+        <configuration>
+
+          <testResourcesDirectory>${project.build.directory}/environment/test-resources</testResourcesDirectory>
+          <resourcesSourceLocation>${project.build.directory}/environment/resources</resourcesSourceLocation>
+
+          <nexusBundleArtifact>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-distribution</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>runtime-guice-jsw</classifier>
+          </nexusBundleArtifact>
+
+          <nexusBundleName>nexus-oss-${project.version}</nexusBundleName>
+
+          <nexusPluginsArtifacts>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-simple-memory-realm</artifactId>
+            </plugin>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-exception-plugin</artifactId>
+            </plugin>
+            <plugin>
+              <groupId>org.sonatype.security.realms</groupId>
+              <artifactId>security-url-realm</artifactId>
+            </plugin>
+          </nexusPluginsArtifacts>
+
+          <extraTestSuites>
+            <extraTestSuite>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-test-harness-launcher</artifactId>
+              <version>${project.version}</version>
+            </extraTestSuite>
+          </extraTestSuites>
+
+          <extraResourcesArtifacts>
+            <resource>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-test-harness-launcher</artifactId>
+              <classifier>repo</classifier>
+              <type>zip</type>
+              <outputProperty>maven-repository</outputProperty>
+            </resource>
+          </extraResourcesArtifacts>
+
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>emma</groupId>
+      <artifactId>emma</artifactId>
+      <version>2.1.5320</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>apache-maven</artifactId>
+      <version>2.0.9</version>
+      <type>tar.gz</type>
+      <classifier>bin</classifier>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <classifier>repo</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <version>1.6-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-ldap-testsuite</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+  </dependencies>
+
+</project>
