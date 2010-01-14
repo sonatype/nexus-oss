@@ -8,7 +8,7 @@ import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
 
-	final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
+	private final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
     private static final String[] EXCLUDES = { "VolumeIcon","Parent Directory", "?", "..", "index", "robots" };
     private String localUrl;
     private String remoteUrl;
