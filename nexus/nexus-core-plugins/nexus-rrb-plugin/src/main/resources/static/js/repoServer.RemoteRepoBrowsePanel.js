@@ -95,7 +95,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 
 	  var root = new Ext.tree.AsyncTreeNode( {
 	    text: this.payload.data[this.titleColumn],
-	    id: this.getBrowsePath( this.payload.data.resourceURI,this.payload.data.remoteUri ),
+	    id: this.getBrowsePath( this.payload.data.resourceURI,this.payload.data.remoteUri,this.payload.data.id ),
 	    singleClickExpand: true,
 	    expanded: true
 	  } );
@@ -105,9 +105,9 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 
 	Ext.extend( Sonatype.repoServer.RemoteRepositoryBrowsePanel, Ext.tree.TreePanel, {
 		
-		getBrowsePath: function( baseUrl, remoteUrl ) {
+		getBrowsePath: function( baseUrl, remoteUrl, id ) {
 		var modUrl=baseUrl.substring(0,baseUrl.lastIndexOf("local/repositories")+6);
-		modUrl=modUrl+"remotebrowser?remoteurl="+remoteUrl;
+		modUrl=modUrl+"remotebrowser?remoteurl="+remoteUrl+"&id="+id;
 		return modUrl;
 	  },
 
@@ -196,7 +196,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	  refreshHandler: function( button, e ) {
 	    this.root.setText( this.payload ? this.payload.get( this.titleColumn ) : '/' );
 	    this.root.attributes.localStorageUpdated = false;
-	    this.root.id = this.getBrowsePath( this.payload.data.resourceURI,this.payload.data.remoteUri );
+	    this.root.id = this.getBrowsePath( this.payload.data.resourceURI,this.payload.data.remoteUri,this.payload.data.id );
 	    this.root.reload();
 	  },
 
