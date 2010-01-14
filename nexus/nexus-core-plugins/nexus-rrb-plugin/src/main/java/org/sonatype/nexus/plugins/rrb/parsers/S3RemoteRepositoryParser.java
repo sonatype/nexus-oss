@@ -8,16 +8,17 @@ import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
 
-    private static final String[] EXCLUDES = { "Parent Directory", "?", "..", "index", "robots" };
-
-    private final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
+	final Logger logger = LoggerFactory.getLogger(S3RemoteRepositoryParser.class);
+    private static final String[] EXCLUDES = { "VolumeIcon","Parent Directory", "?", "..", "index", "robots" };
     private String localUrl;
     private String remoteUrl;
     private ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
+	private String id;
 
-    public S3RemoteRepositoryParser(String remoteUrl, String localUrl) {
+    public S3RemoteRepositoryParser(String remoteUrl, String localUrl,String id) {
         this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
+        this.id=id;
     }
 
     private void extractContent(StringBuilder indata) {
@@ -35,12 +36,10 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
             if (!exclude(temp)) {
                 rp.setLeaf(true);
                 rp.setText(getText(getKeyName(temp)));
-                rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + getKeyName(temp));
+                rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + getKeyName(temp)+"?id="+id);
                 rp.setRelativePath("/" + getKeyName(temp));
                 if (!remoteUrl.endsWith(rp.getRelativePath().substring(1))) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("adding {} to result", rp.toString());
-                    }
+                	logger.debug("addning {} to result", rp.toString());
                     result.add(rp);
                 }
             }
@@ -66,9 +65,9 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
                 rp.setText(getText(getPrefix(temp)));
                 if (remoteUrl.indexOf('?') != -1) {
                     rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl.substring(0, remoteUrl.indexOf('?'))
-                            + "?prefix=" + getPrefix(temp));
+                            + "?prefix=" + getPrefix(temp)+"?id="+id);
                 } else {
-                    rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + "?prefix=" + getPrefix(temp));
+                    rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl + "?prefix=" + getPrefix(temp)+"?id="+id);
                 }
 
                 rp.setRelativePath("/" + getPrefix(temp));
