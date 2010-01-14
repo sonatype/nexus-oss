@@ -15,7 +15,7 @@ public class S3RemoteRepositoryParserTest extends RemoteRepositoryParserTestAbst
     public void setUp() {
         String remoteUrl = "http://www.xxx.com"; // The exact names of the urls
         String localUrl = "http://local"; // doesn't matter in the tests
-        parser = new S3RemoteRepositoryParser(remoteUrl, localUrl);
+        parser = new S3RemoteRepositoryParser(remoteUrl, localUrl,"test");
     }
 
     @Test
