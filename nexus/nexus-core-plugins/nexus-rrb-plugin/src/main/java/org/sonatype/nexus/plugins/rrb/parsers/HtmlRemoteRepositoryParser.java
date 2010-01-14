@@ -8,7 +8,7 @@ import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 
-	final Logger logger = LoggerFactory
+	private final Logger logger = LoggerFactory
 			.getLogger(HtmlRemoteRepositoryParser.class);
 	private static final String[] EXCLUDES = { ">Skip to content<", ">Log in<",
 			">Products<", "Parent Directory", "?", "..", "-logo.png",">Community<",
