@@ -100,11 +100,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-app</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-rest-api</artifactId>
 			<scope>provided</scope>
 		</dependency>
@@ -112,7 +107,6 @@
 			<groupId>org.apache.geronimo.modules</groupId>
 			<artifactId>geronimo-jetty7</artifactId>
 			<version>2.2</version>
-			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
