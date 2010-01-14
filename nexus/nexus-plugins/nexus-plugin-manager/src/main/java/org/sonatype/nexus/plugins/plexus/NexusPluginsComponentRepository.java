@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.codehaus.plexus.ClassRealmUtil;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.composition.CompositionResolver;
@@ -95,7 +96,7 @@ public class NexusPluginsComponentRepository
 
                 for ( ClassRealm aRealm : allRealms )
                 {
-                    if ( aRealm.getParent() != null && aRealm.getParent().equals( realm ) )
+                    if ( aRealm.getParentRealm() != null && aRealm.getParentRealm().equals( realm ) )
                     {
                         realms.add( aRealm );
                     }
