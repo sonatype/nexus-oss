@@ -16,28 +16,41 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
-
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
+import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
+import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 /**
  * Class for retrieving directory data from remote repository. This class is not
  * thread-safe!
  */
-public class MavenRepositoryReader {
+public class MavenRepositoryReader extends AbstractNexusPlexusResource{
 
 	private final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
-    private HttpClient client = new HttpClient();
+    
     private String remoteUrl;
     private String localUrl;
+    private ProxyRepository proxyRepository;
 
+	private String id;
+    
+//    @Requirement
+//    private NexusConfiguration nexusConfig;
+
+    
     /**
      * 
      * @param remoteUrl url to the remote repository
      * @param localUrl url to the local resource service
      * @return a json array containing the remote data
      */
-    public List<RepositoryDirectory> extract(String remoteUrl, String localUrl) {
+    public List<RepositoryDirectory> extract(String remoteUrl, String localUrl,ProxyRepository proxyRepository,String id) {
     	logger.debug("remoteUrl={}",remoteUrl);
     	this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
+        this.proxyRepository=proxyRepository;
+        this.id=id;
         StringBuilder html = getContent();
         if (logger.isDebugEnabled()) {
             logger.trace(html.toString());
@@ -47,21 +60,21 @@ public class MavenRepositoryReader {
 
     private ArrayList<RepositoryDirectory> parseResult(StringBuilder indata) {
         RemoteRepositoryParser parser = null;
-        if (indata.indexOf("<html>") != -1) {
+        if (indata.indexOf("<html ") != -1) {
         	logger.debug("is html repository");
-            parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
+            parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl,id);
         }
-        if (indata.indexOf("xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"") != -1 || indata.indexOf("<?xml") != -1) {
+        if (indata.indexOf("xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"") != -1 || (indata.indexOf("<?xml") != -1&& responseContainsError(indata))) {
         	logger.debug("is S3 repository");
             if (responseContainsError(indata)) {
             	logger.debug("response from S3 repository contains error, need to find rootUrl");
                 remoteUrl = findRootUrl(indata);
                 indata = getContent();
             }
-            parser = new S3RemoteRepositoryParser(remoteUrl, localUrl);
+            parser = new S3RemoteRepositoryParser(remoteUrl, localUrl, id);
         } else {
         	logger.info("Found no matching parser, using default html parser");
-            parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl);
+            parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl, id);
         }
         return parser.extractLinks(indata);
     }
@@ -90,6 +103,14 @@ public class MavenRepositoryReader {
 
     private StringBuilder getContent() {
         GetMethod method = null;
+        
+        HttpClient client = new HttpClient();
+        
+        if(proxyRepository!=null){
+			RemoteStorageContext rctx = proxyRepository.getRemoteStorageContext();
+			HttpClientProxyUtil.applyProxyToHttpClient( client, rctx, getLogger() );
+        }
+        
         if (remoteUrl.indexOf("?prefix") != -1) {
             method = new GetMethod(remoteUrl + "&delimiter=/");
         } else {
@@ -140,4 +161,22 @@ public class MavenRepositoryReader {
             this.data = data;
         }
     }
+
+	@Override
+	public Object getPayloadInstance() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PathProtectionDescriptor getResourceProtection() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getResourceUri() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
