@@ -104,6 +104,12 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>6.1.19</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.geronimo.modules</groupId>
 			<artifactId>geronimo-jetty7</artifactId>
 			<version>2.2</version>
