@@ -36,7 +36,7 @@
     </profile>
 
     <profile>
-      <id>rutime-its</id>
+      <id>runtime-its</id>
       <modules>
         <module>nexus-test-harness-runtime-plexus-jsw</module>
       </modules>
