@@ -58,7 +58,10 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 				if (!getLinkName(temp).endsWith("/")) {
 					rp.setLeaf(true);
 				}
-				rp.setText(getLinkName(temp).replace("/", ""));
+				rp.setText(getLinkName(temp).replace("/", "").trim());
+				if(!remoteUrl.endsWith("/")){
+					remoteUrl+="/";
+				}
 				rp.setResourceURI(localUrl + "?remoteurl=" + remoteUrl
 						+ getLinkUrl(temp)+"?id="+id);
 				rp.setRelativePath("/" + getLinkUrl(temp));

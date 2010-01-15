@@ -110,9 +110,9 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
         if (islocal > 0) {
             result = result.substring(0, islocal);
         }
-        if (!result.endsWith("/")) {
-            result += "/";
-        }
+//        if (!result.endsWith("/")) {
+//            result += "/";
+//        }
         if(prefix!=""){
         	result=result+"?prefix="+prefix;
         }
