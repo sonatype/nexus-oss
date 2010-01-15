@@ -66,7 +66,9 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 						+ getLinkUrl(temp)+"?id="+id);
 				rp.setRelativePath("/" + getLinkUrl(temp));
 
-				result.add(rp);
+				if(!rp.getText().isEmpty()){
+					result.add(rp);
+				}
 				logger.debug("addning {} to result", rp.toString());
 			}
 			start = end + 1;

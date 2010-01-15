@@ -112,10 +112,10 @@ public class MavenRepositoryReader extends AbstractLogEnabled {
         
         if (remoteUrl.indexOf("?prefix") != -1) {
             method = new GetMethod(remoteUrl + "&delimiter=/");
-            method.setFollowRedirects(true);
+            method.setFollowRedirects(false);
         } else {
             method = new GetMethod(remoteUrl + "?delimiter=/");
-            method.setFollowRedirects(true);
+            method.setFollowRedirects(false);
         }
 
         method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false));
