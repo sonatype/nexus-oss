@@ -681,7 +681,8 @@ Sonatype.panels.TreePanel = function( config ) {
     nodePathPrepend: '',
     appendPathToRoot: true,
     leafClickEvent: null,
-    resetRootNodeText: true
+    resetRootNodeText: true,
+    autoExpandRoot: true
   };
   Ext.apply( this, config, defaultConfig );
   
@@ -772,7 +773,7 @@ Sonatype.panels.TreePanel = function( config ) {
         if ( this.nodeClass != null ) {
           if ( this.useNodeClassParam == null
               || attr[this.useNodeClassParam] ) {
-            attr.cls = this.NodeClass;
+            attr.cls = this.nodeClass;
           }
         }
         
@@ -839,7 +840,7 @@ Sonatype.panels.TreePanel = function( config ) {
     text: this.payload ? this.payload.get( this.titleColumn ) : '/',
     path: '/',
     singleClickExpand: true,
-    expanded: false
+    expanded: this.autoExpandRoot
   } );
   
   this.setRootNode( root );

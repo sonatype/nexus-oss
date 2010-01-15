@@ -103,7 +103,8 @@ Sonatype.Events.addListener( 'indexNodeClickedEvent', function( node, passthru )
         classifier: node.attributes.classifier,
         extension: node.attributes.extension,
         artifactLink: node.attributes.artifactUri,
-        pomLink: node.attributes.pomUri
+        pomLink: node.attributes.pomUri,
+        nodeName: node.attributes.nodeName
       });
     }
     else {
