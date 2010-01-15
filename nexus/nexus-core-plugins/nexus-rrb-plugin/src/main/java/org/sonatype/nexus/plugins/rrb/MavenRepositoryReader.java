@@ -11,6 +11,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
+import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
@@ -19,13 +20,11 @@ import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
-import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 /**
  * Class for retrieving directory data from remote repository. This class is not
  * thread-safe!
  */
-public class MavenRepositoryReader extends AbstractNexusPlexusResource{
+public class MavenRepositoryReader extends AbstractLogEnabled {
 
 	private final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
     
@@ -161,22 +160,4 @@ public class MavenRepositoryReader extends AbstractNexusPlexusResource{
             this.data = data;
         }
     }
-
-	@Override
-	public Object getPayloadInstance() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public PathProtectionDescriptor getResourceProtection() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getResourceUri() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }
