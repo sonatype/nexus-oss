@@ -21,7 +21,8 @@
   <properties>
     <jetty.version>6.1.19</jetty.version>
     <plexus-utils.version>1.5.5</plexus-utils.version>
-    <plexus-container.version>1.5.2</plexus-container.version>
+    <plexus-container.version>1.2.1.4</plexus-container.version>
+    <plexus.version>1.2.1</plexus.version>
   </properties>
 
   <dependencyManagement>
@@ -44,12 +45,12 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-classworlds</artifactId>
-        <version>2.2.2</version>
+        <version>1.4</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
-        <version>${plexus-container.version}</version>
+        <version>${plexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -120,7 +121,7 @@
         <plugin>
           <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-metadata</artifactId>
-          <version>${plexus-container.version}</version>
+          <version>${plexus.version}</version>
           <executions>
             <execution>
               <id>process-classes</id>

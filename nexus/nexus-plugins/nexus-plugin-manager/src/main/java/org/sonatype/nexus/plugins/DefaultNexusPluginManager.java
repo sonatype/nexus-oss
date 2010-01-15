@@ -783,7 +783,7 @@ public class DefaultNexusPluginManager
         {
             String className = ClasspathUtils.convertClassBinaryNameToCanonicalName( resourceName );
 
-            if ( className != null && pd.getPluginRealm().loadResourceFromSelf( resourceName ) != null )
+            if ( className != null && pd.getPluginRealm().getRealmResource( resourceName ) != null )
             {
                 PlexusComponentGleanerRequest request =
                     new PlexusComponentGleanerRequest( className, resourceName, pd.getPluginRealm() );
