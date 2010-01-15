@@ -51,6 +51,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
@@ -447,18 +448,29 @@ public class DefaultNexusConfiguration
         dropRepositories();
     }
 
-    protected void createRepositories()
-        throws ConfigurationException
-    {
-        List<CRepository> reposes = getConfigurationModel().getRepositories();
+	protected void createRepositories() throws ConfigurationException 
+	{
+		List<CRepository> reposes = getConfigurationModel().getRepositories();
 
-        for ( CRepository repo : reposes )
-        {
-            Repository repository = createRepositoryFromModel( repo );
+		for (CRepository repo : reposes) 
+		{
 
-            repositoryRegistry.addRepository( repository );
-        }
-    }
+			if (!repo.getProviderRole().equals(GroupRepository.class.getName())) 
+			{
+				Repository repository = createRepositoryFromModel(repo);
+				repositoryRegistry.addRepository(repository);
+			}
+		}
+
+		for (CRepository repo : reposes) 
+		{
+			if (repo.getProviderRole().equals(GroupRepository.class.getName())) 
+			{
+				Repository repository = createRepositoryFromModel(repo);
+				repositoryRegistry.addRepository(repository);
+			}
+		}
+	}
 
     protected void dropRepositories()
     {
