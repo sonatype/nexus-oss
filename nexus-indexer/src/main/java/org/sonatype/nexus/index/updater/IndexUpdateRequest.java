@@ -6,11 +6,14 @@
  */
 package org.sonatype.nexus.index.updater;
 
+import java.io.File;
+
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.fs.Locker;
 
 /**
  * @author Eugene Kuleshov
@@ -30,6 +33,10 @@ public class IndexUpdateRequest
     private TransferListener transferListener;
     
     private boolean forceFullUpdate;
+
+    private File localIndexCacheDir;
+
+    private Locker locker;
 
     public IndexUpdateRequest( IndexingContext context )
     {
@@ -118,5 +125,25 @@ public class IndexUpdateRequest
     public void setAuthenticationInfo( AuthenticationInfo authenticationInfo )
     {
         this.authenticationInfo = authenticationInfo;
+    }
+
+    public File getLocalIndexCacheDir()
+    {
+        return localIndexCacheDir;
+    }
+
+    public void setLocalIndexCacheDir( File dir )
+    {
+        this.localIndexCacheDir = dir;
+    }
+
+    public Locker getLocker()
+    {
+        return locker;
+    }
+
+    public void setLocker( Locker locker )
+    {
+        this.locker = locker;
     }
 }

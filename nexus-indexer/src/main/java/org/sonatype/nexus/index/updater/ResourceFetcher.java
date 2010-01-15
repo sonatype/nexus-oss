@@ -9,6 +9,7 @@ package org.sonatype.nexus.index.updater;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * An interface defining resource downloading contract
@@ -28,10 +29,17 @@ public interface ResourceFetcher
     void disconnect() throws IOException;
     
     /**
-     * Retrieve file
+     * Retrieves file
      * 
      * @param name a name of resource to retrieve
      * @param targetFile a target file to save retrieved resource to 
      */
-    void retrieve( String name, File targetFile ) throws IOException, FileNotFoundException ;
+    void retrieve( String name, File targetFile ) throws IOException, FileNotFoundException;
+
+    /**
+     * Retrieves resource as InputStream
+     * 
+     * @param name a name of resource to retrieve
+     */
+    InputStream retrieve( String name ) throws IOException, FileNotFoundException;
 }

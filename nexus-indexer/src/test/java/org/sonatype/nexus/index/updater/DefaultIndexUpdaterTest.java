@@ -6,7 +6,10 @@
  */
 package org.sonatype.nexus.index.updater;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -19,21 +22,15 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.jmock.api.Invocation;
 import org.jmock.lib.action.ReturnValueAction;
 import org.jmock.lib.action.VoidAction;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
-import org.sonatype.nexus.index.AbstractIndexCreatorHelper;
-import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
-import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 
@@ -41,55 +38,10 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * @author Eugene Kuleshov
  */
 public class DefaultIndexUpdaterTest
-    extends AbstractIndexCreatorHelper
+    extends AbstractIndexUpdaterTest
 {
-    private File testBasedir ;
-
-    String repositoryId = "test";
-
-    String repositoryUrl = "http://repo1.maven.org/maven2/";
-
-    NexusIndexer indexer;
-
-    IndexUpdater updater;
-
-    IndexingContext context;
 
     SimpleDateFormat df = new SimpleDateFormat( "yyyyMMddHHmmss.SSS Z" );
-
-    @Override
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        testBasedir = new File( getBasedir() , "/target/indexUpdater" );
-        testBasedir.mkdirs();
-
-        indexer = lookup( NexusIndexer.class );
-
-        updater = lookup( IndexUpdater.class );
-
-        Directory indexDirectory = new RAMDirectory();
-
-        context = indexer.addIndexingContext(
-            repositoryId,
-            repositoryId,
-            null,
-            indexDirectory,
-            repositoryUrl,
-            null,
-            MIN_CREATORS );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-
-        FileUtils.forceDelete( testBasedir );
-    }
 
     public void testReplaceIndex()
         throws Exception
@@ -422,9 +374,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
-
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -485,8 +435,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -502,8 +451,8 @@ public class DefaultIndexUpdaterTest
             allowing( tempContext ).getIndexDirectoryFile();
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".gz" ) );
+            will( returnValue( new FileInputStream( "src/test/resources/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
 
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
 
@@ -553,9 +502,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
-
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -579,11 +526,11 @@ public class DefaultIndexUpdaterTest
                 testBasedir ) );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".2.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".2.gz" ) );
+            will( returnValue( new FileInputStream( "src/test/resources/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".3.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".3.gz" ) );
+            will( returnValue( new FileInputStream( "src/test/resources/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
             // could create index archive there and verify that it is merged correctly
 
             oneOf( tempContext ).merge( with( any( Directory.class ) ) );
@@ -636,9 +583,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
-
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -657,15 +602,14 @@ public class DefaultIndexUpdaterTest
             });
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".gz" ) );
+            will( returnValue( new FileInputStream( "src/test/resources/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
             // could create index archive there and verify that it is merged correctly
 
             oneOf( tempContext ).replace( with( any( Directory.class ) ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".2.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".2.gz" ) );
 
             never( tempContext ).merge( with( any( Directory.class ) ) );
 
@@ -715,9 +659,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
             oneOf( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
-
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -741,21 +683,17 @@ public class DefaultIndexUpdaterTest
                 testBasedir ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".gz" ) );
             // could create index archive there and verify that it is merged correctly
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".1.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".1.gz" ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".2.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".2.gz" ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".3.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".3.gz" ) );
 
             never( tempContext ).merge( with( any( Directory.class ) ) );
 
@@ -806,10 +744,8 @@ public class DefaultIndexUpdaterTest
 
             oneOf( mockFetcher ).connect( repositoryId, indexUrl );
 
-            never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".properties" ), //
-                with( any( File.class ) ) );
-
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
             will(new PropertiesAction()
             {
                 @Override
@@ -830,20 +766,18 @@ public class DefaultIndexUpdaterTest
             never( tempContext ).getIndexDirectoryFile();
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".1.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".1.gz" ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".2.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".2.gz" ) );
 
             never( mockFetcher ).retrieve( //
-                with( IndexingContext.INDEX_FILE + ".3.gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".3.gz" ) );
 
             oneOf( mockFetcher ).retrieve(
-                with( IndexingContext.INDEX_FILE + ".gz" ), //
-                with( Expectations.<File>anything() ) );
+                with( IndexingContext.INDEX_FILE + ".gz" ) );
+            will( returnValue( new FileInputStream( "src/test/resources/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
+            
 
             never( tempContext ).merge( with( any( Directory.class ) ) );
 
@@ -867,60 +801,25 @@ public class DefaultIndexUpdaterTest
         mockery.assertIsSatisfied();
     }
 
-    private ArtifactContext createArtifactContext( String repositoryId, String groupId, String artifactId,
-        String version, String classifier ) throws IllegalArtifactCoordinateException
-    {
-        String path = createPath( groupId, artifactId, version, classifier );
-        File pomFile = new File( path + ".pom" );
-        File artifact = new File( path + ".jar" );
-        File metadata = null;
-        ArtifactInfo artifactInfo = new ArtifactInfo( repositoryId, groupId, artifactId, version, classifier );
-        Gav gav = new Gav(
-            groupId,
-            artifactId,
-            version,
-            classifier,
-            "jar",
-            null,
-            null,
-            artifact.getName(),
-            false,
-            false,
-            null,
-            false,
-            null );
-        return new ArtifactContext( pomFile, artifact, metadata, artifactInfo, gav );
-    }
-
-    private String createPath( String groupId, String artifactId, String version, String classifier )
-    {
-        return "/" + groupId + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version
-            + ( classifier == null ? "" : "-" + classifier );
-    }
-
-
     abstract static class PropertiesAction extends VoidAction
     {
         @Override
         public Object invoke(Invocation invocation) throws Throwable
         {
-            File file = (File) invocation.getParameter( 1 );
-
             Properties properties = getProperties();
 
-            FileOutputStream is = null;
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
             try
             {
-                is = new FileOutputStream(file);
-                properties.store(is, null);
-                is.flush();
+                properties.store(buf, null);
+                buf.flush();
             }
             finally
             {
-                IOUtil.close(is);
+                IOUtil.close(buf);
             }
 
-            return null;
+            return new ByteArrayInputStream( buf.toByteArray() );
         }
 
         abstract Properties getProperties();

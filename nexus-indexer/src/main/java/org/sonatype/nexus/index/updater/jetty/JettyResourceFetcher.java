@@ -6,6 +6,11 @@
  */
 package org.sonatype.nexus.index.updater.jetty;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
+
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.apache.maven.wagon.events.TransferListener;
@@ -17,14 +22,11 @@ import org.eclipse.jetty.client.security.ProxyAuthorization;
 import org.eclipse.jetty.client.security.Realm;
 import org.eclipse.jetty.client.security.RealmResolver;
 import org.eclipse.jetty.http.HttpFields;
+import org.sonatype.nexus.index.updater.AbstractResourceFetcher;
 import org.sonatype.nexus.index.updater.ResourceFetcher;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URL;
-
 public class JettyResourceFetcher
+    extends AbstractResourceFetcher
     implements ResourceFetcher
 {
 
