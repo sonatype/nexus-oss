@@ -112,26 +112,32 @@ public class MavenRepositoryReader extends AbstractLogEnabled {
         
         if (remoteUrl.indexOf("?prefix") != -1) {
             method = new GetMethod(remoteUrl + "&delimiter=/");
-            method.setFollowRedirects(false);
+            method.setFollowRedirects(true);
         } else {
             method = new GetMethod(remoteUrl + "?delimiter=/");
-            method.setFollowRedirects(false);
+            method.setFollowRedirects(true);
         }
 
-        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false));
+        method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false) );
+        method.getParams().setParameter("http.protocol.max-redirects", new Integer(1));
 
         StringBuilder result = new StringBuilder();
 
         try {
-            int responseCode = client.executeMethod(method);
-            logger.debug("responseCode={}",responseCode);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream()));
-
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                result.append(line + "\n");
-            }
+        	doCall(method, client, result);
         } catch (HttpException e) {
+        	method.setPath(method.getPath()+"/");
+
+        	try {
+				doCall(method, client, result);
+			} catch (HttpException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+        	
         	logger.error(e.getMessage(), e);
         } catch (IOException e) {
         	logger.error(e.getMessage(), e);
@@ -142,6 +148,20 @@ public class MavenRepositoryReader extends AbstractLogEnabled {
 
         return result;
     }
+
+	private void doCall(GetMethod method, HttpClient client,
+			StringBuilder result) throws IOException, HttpException {
+		int responseCode;
+		responseCode = client.executeMethod(method);
+
+		logger.debug("responseCode={}",responseCode);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(method.getResponseBodyAsStream()));
+
+		String line = null;
+		while ((line = reader.readLine()) != null) {
+			result.append(line + "\n");
+		}
+	}
 
     /**
      * Inner class used to imitate the for Nexus expected structure for the json
