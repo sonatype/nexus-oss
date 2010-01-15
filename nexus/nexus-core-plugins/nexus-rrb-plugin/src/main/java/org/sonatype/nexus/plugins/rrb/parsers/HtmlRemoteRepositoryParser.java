@@ -11,7 +11,7 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 	private final Logger logger = LoggerFactory
 			.getLogger(HtmlRemoteRepositoryParser.class);
 	private static final String[] EXCLUDES = { ">Skip to content<", ">Log in<",
-			">Products<", "Parent Directory", "?", "..", "-logo.png",">Community<",
+			">Products<", "Parent Directory", "?", ">..<", "-logo.png",">Community<",
 			">Support<",">Resources<",">About us<",">Downloads<",">Documentation<",">Resources<",
 			">About This Site<",">Contact Us<",">Legal Terms and Privacy Policy<",">Log out<",
 			">IONA Technologies<",">Site Index<",">Skip to content<"};
