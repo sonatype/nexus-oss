@@ -39,6 +39,7 @@
       <id>runtime-its</id>
       <modules>
         <module>nexus-test-harness-runtime-plexus-jsw</module>
+        <module>nexus-test-harness-runtime-guice-jsw</module>
       </modules>
     </profile>
   </profiles>
