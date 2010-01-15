@@ -676,6 +676,8 @@ Sonatype.panels.TreePanel = function( config ) {
     titleColumn: 'name',
     nodeIconClass: null,
     useNodeIconClassParam: null,
+    nodeClass: null,
+    useNodeClassParam: null,
     nodePathPrepend: '',
     appendPathToRoot: true,
     leafClickEvent: null,
@@ -711,6 +713,8 @@ Sonatype.panels.TreePanel = function( config ) {
       appendPathToRoot: this.appendPathToRoot,
       nodeIconClass: this.nodeIconClass,
       useNodeIconClassParam: this.useNodeIconClassParam,
+      nodeClass: this.nodeClass,
+      useNodeClassParam: this.useNodeClassParam,
       requestMethod: 'GET',
       url: this.url,
       listeners: {
@@ -762,6 +766,13 @@ Sonatype.panels.TreePanel = function( config ) {
           if ( this.useNodeIconClassParam == null 
               || attr[this.useNodeIconClassParam] ) {
             attr.iconCls = this.nodeIconClass;
+          }
+        }
+        
+        if ( this.nodeClass != null ) {
+          if ( this.useNodeClassParam == null
+              || attr[this.useNodeClassParam] ) {
+            attr.cls = this.NodeClass;
           }
         }
         
