@@ -53,14 +53,14 @@
     </dependency>
     
     <!-- There are problems with the Maven reactor that would require these modules 
-         However if we include them then end up as provided and cause problems with other plugins -->
-    <!-- <dependency>
+         However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
+    <dependency>
 	  <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
 	  <version>${nexus-plugin-console-plugin.version}</version>
 	  <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
@@ -69,7 +69,7 @@
       <version>${nexus-ldap-realm-plugin.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     
     <dependency>
@@ -78,8 +78,8 @@
       <version>${nexus-rrb-plugin.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
-      <scope>runtime</scope>
-    </dependency> -->
+      <scope>test</scope>
+    </dependency>
     
     <!-- The bundle -->
     <dependency>
@@ -456,7 +456,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.2</version>
         <executions>
           <execution>
             <goals>
