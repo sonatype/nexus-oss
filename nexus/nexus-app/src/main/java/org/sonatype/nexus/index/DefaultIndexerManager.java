@@ -64,9 +64,9 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.sonatype.nexus.index.updater.AbstractResourceFetcher;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 import org.sonatype.nexus.index.updater.IndexUpdater;
-import org.sonatype.nexus.index.updater.ResourceFetcher;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -1166,7 +1166,7 @@ public class DefaultIndexerManager
             updateRequest.setDocumentFilter( getFilterFor( mrepository.getRepositoryPolicy() ) );
         }
 
-        updateRequest.setResourceFetcher( new ResourceFetcher()
+        updateRequest.setResourceFetcher( new AbstractResourceFetcher()
         {
             public void connect( String id, String url )
                 throws IOException
