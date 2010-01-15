@@ -43,8 +43,11 @@ Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, 
   },
   updateArtifact : function( data ) {
     Sonatype.Events.fireEvent( this.updateEventName, this, data );
-    if ( this.collapsed ) {
-      this.expand();
+    
+    if ( !( data.dontExpand == true ) ){
+      if ( this.collapsed ) {
+        this.expand();
+      }
     }
   }
 } );
