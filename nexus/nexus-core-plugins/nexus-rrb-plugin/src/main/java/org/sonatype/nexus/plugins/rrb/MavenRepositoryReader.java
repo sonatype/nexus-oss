@@ -72,7 +72,7 @@ public class MavenRepositoryReader extends AbstractLogEnabled {
             }
             parser = new S3RemoteRepositoryParser(remoteUrl, localUrl, id);
         } else {
-        	logger.info("Found no matching parser, using default html parser");
+        	logger.debug("Found no matching parser, using default html parser");
             parser = new HtmlRemoteRepositoryParser(remoteUrl, localUrl, id);
         }
         return parser.extractLinks(indata);
