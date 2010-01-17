@@ -607,7 +607,9 @@ Ext.extend(Sonatype.repoServer.LdapConfigPanel, Ext.Panel, {
     else if ( combo.getValue() == 'none' ){
       this.find('name', 'realm' )[0].disable();
       this.find('name', 'systemUsername' )[0].disable();
+      this.find('name', 'systemUsername' )[0].setValue( '' );
       this.find('name', 'systemPassword' )[0].disable();
+      this.find('name', 'systemPassword' )[0].setValue( '' );
     }
     else if ( combo.getValue() == 'DIGEST-MD5' ){
       this.find('name', 'realm' )[0].enable();
