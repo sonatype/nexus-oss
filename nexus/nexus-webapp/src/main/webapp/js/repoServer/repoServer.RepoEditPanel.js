@@ -136,6 +136,9 @@ Ext.extend( Sonatype.repoServer.AbstractRepositoryEditor, Sonatype.ext.FormPanel
   repoPolicySubmitDataModifier: function() {
   	
   },
+  updateWritePolicy: function() {
+    
+  },
 
   submitHandler: function( form, action, receivedData ) {
     if ( this.isNew ) {
@@ -507,6 +510,8 @@ Ext.extend( Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abst
       else
       {
         writePolicyField.store.clearFilter();
+        
+        writePolicyField.setValue('ALLOW_WRITE_ONCE');
       }
   }
 } );
