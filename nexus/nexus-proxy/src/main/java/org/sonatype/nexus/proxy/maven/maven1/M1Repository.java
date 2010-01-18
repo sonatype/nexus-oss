@@ -172,7 +172,7 @@ public class M1Repository
         }
 
         // it is a release
-        return isOld( getArtifactMaxAge(), item );
+        return ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) ) && isOld( getArtifactMaxAge(), item );
     }
 
     // not available on maven1 repo

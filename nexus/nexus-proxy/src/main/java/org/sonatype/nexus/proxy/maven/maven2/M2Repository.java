@@ -245,7 +245,7 @@ public class M2Repository
             return super.isOld( item );
         }
         // it is a release
-        return isOld( getArtifactMaxAge(), item );
+        return ( !RepositoryPolicy.RELEASE.equals( getRepositoryPolicy() ) ) && isOld( getArtifactMaxAge(), item );
     }
 
     @SuppressWarnings( "unchecked" )

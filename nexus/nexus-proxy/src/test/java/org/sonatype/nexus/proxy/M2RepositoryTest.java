@@ -129,8 +129,8 @@ public class M2RepositoryTest
         try
         {
             item =
-                new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
-                    SPOOF_SNAPSHOT ) );
+                new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
+                                            new StringContentLocator( SPOOF_SNAPSHOT ) );
 
             repository.storeItem( false, item );
 
@@ -149,16 +149,16 @@ public class M2RepositoryTest
         repository.getCurrentCoreConfiguration().commitChanges();
 
         item =
-            new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true, new StringContentLocator(
-                SPOOF_SNAPSHOT ) );
+            new DefaultStorageFileItem( repository, SPOOF_SNAPSHOT, true, true,
+                                        new StringContentLocator( SPOOF_SNAPSHOT ) );
 
         repository.storeItem( false, item );
 
         try
         {
             item =
-                new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true, new StringContentLocator(
-                    SPOOF_RELEASE ) );
+                new DefaultStorageFileItem( repository, SPOOF_RELEASE, true, true,
+                                            new StringContentLocator( SPOOF_RELEASE ) );
 
             repository.storeItem( false, item );
 
@@ -280,16 +280,25 @@ public class M2RepositoryTest
     public void testExpiration_NEXUS1675()
         throws Exception
     {
-        doTestExpiration_NEXUS1675( "/spoof/maven-metadata.xml" );
+        doTestExpiration( "/spoof/maven-metadata.xml", true, 0, 3, 5, 1 );
     }
 
     public void testExpiration_NEXUS3065()
         throws Exception
     {
-        doTestExpiration_NEXUS1675( "/spoof/spoof/1.0/spoof-1.0.txt" );
+        // "defaults"
+        // enforce = true, hence even if 1stround age = 0 (always), enforce will prevent redownload, so 1st round will
+        // have 1 remote hits
+        doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", true, 0, 1, -1, 1 );
+
+        // "overrides"
+        // enforce = false, hence since 1stround age = 0 (always), 1st round will
+        // have 3 remote hits
+        // doTestExpiration( "/spoof/spoof/1.0/spoof-1.0.txt", false, 0, 3, -1, 1 );
     }
 
-    public void doTestExpiration_NEXUS1675( String path )
+    public void doTestExpiration( String path, boolean enforceReleaseRedownloadPolicy, int age1stround,
+                                  int remoteHitsExpected1stround, int age2ndround, int remoteHitsExpected2ndround )
         throws Exception
     {
         CounterListener ch = new CounterListener();
@@ -313,8 +322,10 @@ public class M2RepositoryTest
             // ignore
         }
 
-        repository.setMetadataMaxAge( 0 );
-        repository.setArtifactMaxAge( 0 );
+        repository.setMetadataMaxAge( age1stround );
+        repository.setArtifactMaxAge( age1stround );
+        // not configurable
+        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() - ( 3L * 24L * 60L * 60L * 1000L ) );
@@ -335,7 +346,7 @@ public class M2RepositoryTest
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        assertEquals( "Every request should end up in server.", 3, ch.getRequestCount() );
+        assertEquals( "Remote hits cound fail (1st round)!", remoteHitsExpected1stround, ch.getRequestCount() );
 
         // ==
 
@@ -350,8 +361,10 @@ public class M2RepositoryTest
             // ignore
         }
 
-        repository.setMetadataMaxAge( 5 );
-        repository.setArtifactMaxAge( -1 );
+        repository.setMetadataMaxAge( age2ndround );
+        repository.setArtifactMaxAge( age2ndround );
+        // not configurable
+        // repository.setEnforceReleaseRedownloadPolicy( enforceReleaseRedownloadPolicy );
         repository.getCurrentCoreConfiguration().commitChanges();
 
         mdFile.setLastModified( System.currentTimeMillis() );
@@ -372,7 +385,7 @@ public class M2RepositoryTest
 
         repository.retrieveItem( new ResourceStoreRequest( path, false ) );
 
-        assertEquals( "Only one (1st) of the request should end up in server.", 1, ch.getRequestCount() );
+        assertEquals( "Remote hits cound fail (2nd round)!", remoteHitsExpected2ndround, ch.getRequestCount() );
     }
 
     public void testLocalStorageChanges()
@@ -427,7 +440,7 @@ public class M2RepositoryTest
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
             repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
-                repository.createUid( request.getRequestPath() ) );
+                                                                                                     repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -438,8 +451,10 @@ public class M2RepositoryTest
 
         M2Repository repository = (M2Repository) this.getRepositoryRegistry().getRepository( "inhouse" );
         File inhouseLocalStorageDir =
-            new File( new URL( ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() )
-                .getConfiguration( false ).getLocalStorage().getUrl() ).getFile() );
+            new File(
+                      new URL(
+                               ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration(
+                                                                                                                             false ).getLocalStorage().getUrl() ).getFile() );
 
         File artifactFile = new File( inhouseLocalStorageDir, itemPath );
         artifactFile.getParentFile().mkdirs();
@@ -460,7 +475,7 @@ public class M2RepositoryTest
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
             repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
-                repository.createUid( request.getRequestPath() ) );
+                                                                                                     repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -484,8 +499,8 @@ public class M2RepositoryTest
         public void onEvent( Event<?> evt )
         {
             if ( evt instanceof RepositoryItemEventCache
-                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt )
-                    .getItem().getPath().endsWith( "spoof-1.0.txt" ) ) )
+                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith(
+                                                                                                                                                                                 "spoof-1.0.txt" ) ) )
             {
                 requestCount = requestCount + 1;
             }
