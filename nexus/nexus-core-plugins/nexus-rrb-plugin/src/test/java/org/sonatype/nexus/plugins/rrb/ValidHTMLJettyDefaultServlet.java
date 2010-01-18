@@ -9,7 +9,7 @@ import org.mortbay.jetty.servlet.DefaultServlet;
 import org.mortbay.resource.Resource;
 import org.mortbay.util.URIUtil;
 
-public class ValidHTMLJettyDefaulServlet extends DefaultServlet
+public class ValidHTMLJettyDefaultServlet extends DefaultServlet
 {
 
     

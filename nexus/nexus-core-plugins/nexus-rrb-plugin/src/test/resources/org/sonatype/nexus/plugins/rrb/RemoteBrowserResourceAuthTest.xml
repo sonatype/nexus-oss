@@ -19,7 +19,7 @@
 						<servletInfos>
 							<servletInfo>
 								<mapping>/*</mapping>
-								<servletClass>org.sonatype.nexus.plugins.rrb.ValidHTMLJettyDefaulServlet</servletClass>
+								<servletClass>org.sonatype.nexus.plugins.rrb.ValidHTMLJettyDefaultServlet</servletClass>
 								<parameters>
 									<property>
 										<name>resourceBase</name>
