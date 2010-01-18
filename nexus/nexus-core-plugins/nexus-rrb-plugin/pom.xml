@@ -49,7 +49,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<nexus.version>1.4.2-SNAPSHOT</nexus.version>
 	</properties>
 
 	<dependencies>
@@ -105,15 +104,20 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-	      <groupId>org.sonatype.plexus</groupId>
-	      <artifactId>plexus-jetty-testsuite</artifactId>
-	      <version>1.3</version>
-		  <scope>test</scope>
-	    </dependency>
-	    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-jetty-testsuite</artifactId>
+      <version>1.3</version>
+	    <scope>test</scope>
+    </dependency>
+    <dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+			<version>6.1.19</version>
+		</dependency>
+    <dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-plugin-test-api</artifactId>
-			<version>${nexus.version}</version>
+			<version>${project.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
