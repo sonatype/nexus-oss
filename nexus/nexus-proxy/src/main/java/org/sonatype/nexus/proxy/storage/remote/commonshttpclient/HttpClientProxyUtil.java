@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.storage.remote.commonshttpclient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -23,6 +24,8 @@ public class HttpClientProxyUtil
 {
     public static final String CONNECTION_POOL_SIZE_KEY = "httpClient.connectionPoolSize";
 
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger( HttpClientProxyUtil.class );
+    
     public static void applyProxyToHttpClient( HttpClient httpClient, RemoteStorageContext ctx, Logger logger )
     {
         // getting the timeout from RemoteStorageContext. The value we get depends on per-repo and global settings.
@@ -72,7 +75,7 @@ public class HttpClientProxyUtil
                 // Using NTLM auth, adding it as first in policies
                 authPrefs.add( 0, AuthPolicy.NTLM );
 
-                logger.info( "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"" );
+                log( Level.INFO, "... authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
 
                 httpConfiguration.setHost( nras.getNtlmHost() );
 
@@ -87,8 +90,7 @@ public class HttpClientProxyUtil
                 UsernamePasswordRemoteAuthenticationSettings uras = (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                 // Using Username/Pwd auth, will not add NTLM
-                logger
-                    .info( "... authentication setup for remote storage with username \"" + uras.getUsername() + "\"" );
+                log( Level.INFO, "... authentication setup for remote storage with username \"" + uras.getUsername() + "\"", logger );
 
                 httpClient.getState().setCredentials( AuthScope.ANY,
                     new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
@@ -101,7 +103,7 @@ public class HttpClientProxyUtil
 
         if ( rps.isEnabled() )
         {
-            logger.info( "... proxy setup with host \"" + rps.getHostname() + "\"" );
+            log( Level.INFO, "... proxy setup with host \"" + rps.getHostname() + "\"", logger );
 
             httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
 
@@ -129,14 +131,14 @@ public class HttpClientProxyUtil
                     if ( ctx.getRemoteAuthenticationSettings() != null
                         && ( ctx.getRemoteAuthenticationSettings() instanceof NtlmRemoteAuthenticationSettings ) )
                     {
-                        logger.warn( "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
+                        log( Level.WARNING, "... Apache Commons HttpClient 3.x is unable to use NTLM auth scheme\n"
                             + " for BOTH server side and proxy side authentication!\n"
                             + " You MUST reconfigure server side auth and use BASIC/DIGEST scheme\n"
                             + " if you have to use NTLM proxy, otherwise it will not work!\n"
-                            + " *** SERVER SIDE AUTH OVERRIDDEN" );
+                            + " *** SERVER SIDE AUTH OVERRIDDEN", logger );
                     }
 
-                    logger.info( "... proxy authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"" );
+                    log( Level.WARNING, "... proxy authentication setup for NTLM domain \"" + nras.getNtlmDomain() + "\"", logger );
 
                     httpConfiguration.setHost( nras.getNtlmHost() );
 
@@ -151,8 +153,8 @@ public class HttpClientProxyUtil
                         (UsernamePasswordRemoteAuthenticationSettings) ras;
 
                     // Using Username/Pwd auth, will not add NTLM
-                    logger.info( "... proxy authentication setup for remote storage with username \""
-                        + uras.getUsername() + "\"" );
+                    log( Level.INFO, "... proxy authentication setup for remote storage with username \""
+                        + uras.getUsername() + "\"", logger );
 
                     httpClient.getState().setProxyCredentials( AuthScope.ANY,
                         new UsernamePasswordCredentials( uras.getUsername(), uras.getPassword() ) );
@@ -162,4 +164,55 @@ public class HttpClientProxyUtil
             }
         }
     }
+
+    /**
+     * Coding around plexus logger as this class is NOT a component and should not be using this type of logging.
+     * 
+     * @param level
+     * @param message
+     * @param logger
+     */
+    private static void log( Level level, String message, Logger logger )
+    {
+        if ( logger != null )
+        {
+            if ( level.equals( Level.SEVERE ) )
+            {
+                logger.error( message );
+            }
+            else if ( level.equals( Level.WARNING ) )
+            {
+                logger.warn( message );
+            }
+            else if ( level.equals( Level.INFO ) )
+            {
+                logger.info( message );
+            }
+            else
+            {
+                logger.debug( message );
+            }
+        }
+        else
+        {
+            if ( level.equals( Level.SEVERE ) )
+            {
+                LOG.error( message );
+            }
+            else if ( level.equals( Level.WARNING ) )
+            {
+                LOG.warn( message );
+            }
+            else if ( level.equals( Level.INFO ) )
+            {
+                LOG.info( message );
+            }
+            else
+            {
+                LOG.debug( message );
+            }
+        }
+
+    }
+
 }

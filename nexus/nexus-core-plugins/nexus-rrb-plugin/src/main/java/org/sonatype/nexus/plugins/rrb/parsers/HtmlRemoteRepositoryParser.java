@@ -53,6 +53,7 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 			if (start < 0) {
 				break;
 			}
+			
 			end = indata.indexOf(linkEnd, start) + linkEnd.length();
 			temp.append(indata.subSequence(start, end));
 			if (!exclude(temp)) {

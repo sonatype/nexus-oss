@@ -24,7 +24,7 @@ import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxy
  * Class for retrieving directory data from remote repository. This class is not
  * thread-safe!
  */
-public class MavenRepositoryReader extends AbstractLogEnabled {
+public class MavenRepositoryReader {
 
 	private final Logger logger = LoggerFactory.getLogger(MavenRepositoryReader.class);
     
@@ -107,7 +107,7 @@ public class MavenRepositoryReader extends AbstractLogEnabled {
         
         if(proxyRepository!=null){
 			RemoteStorageContext rctx = proxyRepository.getRemoteStorageContext();
-			HttpClientProxyUtil.applyProxyToHttpClient( client, rctx, getLogger() );
+			HttpClientProxyUtil.applyProxyToHttpClient( client, rctx, null ); // no logger to pass in
         }
         
         if (remoteUrl.indexOf("?prefix") != -1) {

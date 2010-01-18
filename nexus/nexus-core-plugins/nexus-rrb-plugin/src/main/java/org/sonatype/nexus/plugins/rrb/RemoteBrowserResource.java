@@ -1,8 +1,12 @@
 package org.sonatype.nexus.plugins.rrb;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
@@ -25,6 +29,7 @@ import com.sdicons.json.model.JSONValue;
  */
 //@Component( role = PlexusResource.class, hint = "protected" )
 public class RemoteBrowserResource extends AbstractNexusPlexusResource implements PlexusResource {
+//    TODO: consider extending AbstractResourceStoreContentPlexusResource 
 
 	private final Logger logger = LoggerFactory.getLogger(RemoteBrowserResource.class);
 	
@@ -38,26 +43,34 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
     public PathProtectionDescriptor getResourceProtection() {
         // Allow anonymous access
         return new PathProtectionDescriptor(this.getResourceUri(), "anon");
+        // should be:
+        // return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "authcBasic,perms[nexus:remotebrowser]" );
     }
 
     @Override
     public String getResourceUri() {
         return "/remotebrowser";
+        // should be:
+        // return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser/";
+        // Changing this would require JavaScript changes
     }
 
     @Override
     public Object get(Context context, Request request, Response response, Variant variant) throws ResourceException{
     	
+        // vvvvvvvvvv
+        // this logic will be removed when URL is fixed
     	String query = request.getResourceRef().getQuery();
     	String id = getId(query);
-        String remoteUrl = getRemoteUrl(query);
+        String remoteUrl = getRemoteUrl(query); // 
+        // ^^^^^^^^^^
         ProxyRepository proxyRepository=null;
         try {
 //			proxyRepository = getRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
         	proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
 		} catch (NoSuchRepositoryException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			this.logger.warn( "Could not find repository: "+ id, e1 );
+			throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: "+ id, e1 );
 		}
         MavenRepositoryReader mr = new MavenRepositoryReader();
         Data data = mr.new Data();
@@ -67,13 +80,52 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
             JSONValue value = JSONMapper.toJSON(data);
             returnValue = value.render(true);
         } catch (MapperException e) {
-            // TODO Auto-generated catch block
         	logger.error(e.getMessage(), e);
-            returnValue = "fail";
+        	throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Failure serializing data", e);
         }
         logger.debug("return value is {}", returnValue);
         return returnValue;
     }
+    
+// TODO: if/when xxx is implemented the renderItem method might look something like:
+//    
+//    @Inject
+//    private NexusItemAuthorizer authorizer;
+//    
+//    @Override
+//    protected Object renderItem( Context context, Request request, Response response, Variant variant,
+//        StorageItem storageItem )
+//        throws IOException,
+//            AccessDeniedException,
+//            NoSuchResourceStoreException,
+//            IllegalOperationException,
+//            ItemNotFoundException,
+//            StorageException,
+//            ResourceException
+//    {
+//    
+//        // I think this is triggered automaticly when you try to get the stream from a fileStorageItem, 
+//        //but we are not going to call that method. so do the check programaticly 
+//        if ( !authorizer.authorizePath( 
+//               getRepositoryRegistry().getRepository( storageItem.getRepositoryId() ), 
+//               storageItem.getResourceStoreRequest(), 
+//               Action.read ) )
+//           {
+//               logger.debug( "No access to: " + storageItem.getResourceStoreRequest().getRequestPath() );
+//               throw new AccessDeniedException( 
+//                   storageItem.getResourceStoreRequest(), 
+//                   "No access to file!" );
+//           }
+//        
+//        // you should be able to get the path from storageItem.getRemoteUrl()
+//        // NOTE: we should not use any of the stream methods on the FileStorageItem as that 
+//        // would cache the remote file( and we are after the directory listings 
+//        // so I am not even sure how that would work out)
+//        
+//        // now you have the remote url so you could feed that into the same thing you are using now
+//        
+//    }
+
 
     private String getId(String query) {
     	 String result = "";
@@ -116,6 +168,17 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
         if(prefix!=""){
         	result=result+"?prefix="+prefix;
         }
+        
+        // decode the param
+        try
+        {
+            result = URLDecoder.decode( result, "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new RuntimeException("This system does not support the default UTF-8 encoding");
+        }
+        
         logger.debug("remoter url is {}", result);
         return result;
     }
