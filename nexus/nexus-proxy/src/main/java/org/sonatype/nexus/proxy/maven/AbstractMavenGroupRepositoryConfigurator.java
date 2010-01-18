@@ -17,7 +17,6 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepositoryConfigurator;
-import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public abstract class AbstractMavenGroupRepositoryConfigurator
@@ -29,12 +28,6 @@ public abstract class AbstractMavenGroupRepositoryConfigurator
     {
         super.doApplyConfiguration( repository, configuration, coreConfiguration );
         
-        // now check the content type of these repos
-        GroupRepository groupRepo = (GroupRepository) repository;
-        
-        for ( Repository memberRepo : groupRepo.getMemberRepositories() )
-        {
-            
-        }
+        // potentially check things here in the future
     }
 }
