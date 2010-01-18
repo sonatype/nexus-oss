@@ -2,6 +2,7 @@ package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.util.ArrayList;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
@@ -66,7 +67,7 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 						+ getLinkUrl(temp)+"?id="+id);
 				rp.setRelativePath("/" + getLinkUrl(temp));
 
-				if(!rp.getText().isEmpty()){
+				if(StringUtils.isNotEmpty( rp.getText())){
 					result.add(rp);
 				}
 				logger.debug("addning {} to result", rp.toString());
