@@ -97,7 +97,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	    text: this.payload.data[this.titleColumn],
 	    id: this.getBrowsePath( this.payload.data.resourceURI,this.payload.data.remoteUri,this.payload.data.id ),
 	    singleClickExpand: true,
-	    expanded: true
+	    expanded: false
 	  } );
 	  
 	  this.setRootNode( root );

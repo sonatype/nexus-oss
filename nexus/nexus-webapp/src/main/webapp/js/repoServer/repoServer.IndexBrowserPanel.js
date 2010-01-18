@@ -6,6 +6,7 @@ Sonatype.repoServer.IndexBrowserPanel = function( config ) {
   Sonatype.repoServer.IndexBrowserPanel.superclass.constructor.call( this, {
     nodeIconClass: 'x-tree-node-nexus-icon',
     useNodeIconClassParam: 'locallyAvailable',
+    autoExpandRoot: false,
     url: this.payload.data.resourceURI +
       Sonatype.config.browseIndexPathSnippet
   } );
