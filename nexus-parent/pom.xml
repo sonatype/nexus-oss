@@ -185,7 +185,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>yuicompressor-maven-plugin</artifactId>
-          <version>0.0.1-SNAPSHOT</version>
+          <version>0.0.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
