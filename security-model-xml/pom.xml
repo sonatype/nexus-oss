@@ -2,14 +2,14 @@
   <parent>
     <artifactId>security-parent</artifactId>
     <groupId>org.sonatype.security</groupId>
-    <version>7-SNAPSHOT</version>
+    <version>7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-model-xml</artifactId>
   <name>Security: XML Model</name>
   <description>Contains an xml implementation of the security-model.</description>
-  <version>1.1.6-SNAPSHOT</version>
+  <version>1.1.6</version>
 
   <build>
     <plugins>
