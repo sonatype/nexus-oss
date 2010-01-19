@@ -2,14 +2,14 @@
   <parent>
     <artifactId>security-parent</artifactId>
     <groupId>org.sonatype.security</groupId>
-    <version>7</version>
+    <version>8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-model</artifactId>
   <name>Security: Model</name>
   <description>The modello model for the storage of users, roles, privileges, and the mapping of users to roles. (and a bit of legacy code, not yet refactored out.)</description>
-  <version>1.1.6</version>
+  <version>1.1.7-SNAPSHOT</version>
 
   <dependencies>
 
