@@ -22,6 +22,7 @@ import java.net.URLDecoder;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -34,6 +35,7 @@ import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettin
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
+import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -340,47 +342,19 @@ public abstract class AbstractRepositoryPlexusResource
         // so we can figure it out again, I think the default local Storage should be removed from the REST message
         // which is part of the reason for not exposing it. The other part is it is not used anywhere except to set
         // the localUrl if not already set.
-
-        File defaultStorageFile =
-            new File( new File( this.applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
-        
-        try
-        {
-            resource.setDefaultLocalStorageUrl( URLDecoder.decode( defaultStorageFile.toURI().toString(), "UTF-8" ) );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            getLogger().debug( "Unable to properly determine the default storage folder, using File based string." );
-            resource.setDefaultLocalStorageUrl( defaultStorageFile.getAbsolutePath() );
-        }
         
         //apples to apples here, man i hate this section of code!!!!
-        try
-        {
-            
-            URI defaultURI = defaultStorageFile.toURI();
-            URI overrideURI = new URI( repository.getLocalUrl() );
+        // always set to default (see AbstractRepositoryConfigurator)
+        String defaultLocalStorageUrl =
+            ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false ).defaultLocalStorageUrl;
+        resource.setDefaultLocalStorageUrl( defaultLocalStorageUrl );
 
-            // now if the currentLocalStorage is different from the override local storage set it.
-            if ( !defaultURI.equals( overrideURI ) )
-            {
-                resource.setOverrideLocalStorageUrl( URLDecoder.decode( overrideURI.toURL().toString(), "UTF-8" ) );
-            }
-        }
-        catch ( URISyntaxException e )
+        // if not user set (but using default), this is null, otherwise it contains user-set value
+        String overrideLocalStorageUrl =
+            ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false ).getLocalStorage().getUrl();
+        if ( StringUtils.isNotBlank( overrideLocalStorageUrl ) )
         {
-            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
-            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
-        }
-        catch ( MalformedURLException e )
-        {
-            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
-            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
-            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
+            resource.setOverrideLocalStorageUrl( overrideLocalStorageUrl );
         }
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
