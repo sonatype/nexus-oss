@@ -9,7 +9,7 @@
 
   <groupId>org.sonatype.configuration</groupId>
   <artifactId>base-configuration</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <name>Base Configuration</name>
   
   <build>
@@ -31,4 +31,10 @@
   		<version>1.5.6</version>
   	</dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/tags/base-configuration-1.1</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/base-configuration-1.1</developerConnection>
+    <url>http://svn.sonatype.org/spice/tags/base-configuration-1.1</url>
+  </scm>
 </project>
