@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.5.0</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-mock</artifactId>
