@@ -2936,6 +2936,101 @@
 	    </field>
 	  </fields>
 	</class>
+
+    <!-- /artifact/maven/resolve -->
+    <class>
+      <name>ArtifactResolveResource</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>baseVersion</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>classifier</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>extension</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>snapshot</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>snapshotBuildNumber</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>snapshotTimeStamp</name>
+          <version>1.0.0+</version>
+          <type>long</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>fileName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>sha1</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+        <field>
+          <name>repositoryPath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ArtifactResolveResourceResponse</name>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>ArtifactResolveResource</type>
+          </association>
+          <required>true</required>
+        </field>
+      </fields>
+    </class>
 	
   </classes>
 </model>

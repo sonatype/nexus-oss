@@ -28,6 +28,7 @@ import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
+import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
 import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
@@ -266,6 +267,9 @@ public class NexusApplication
 
         // Maven POM
         xstream.alias( "project", Model.class );
+        
+        // artifact
+        xstream.alias( "artifact-resolution", ArtifactResolveResourceResponse.class );
 
         // omitting modelEncoding
         xstream.omitField( ErrorResponse.class, "modelEncoding" );
