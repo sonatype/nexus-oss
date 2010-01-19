@@ -14,7 +14,11 @@
 package org.sonatype.nexus.rest.repositories;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URLDecoder;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -339,28 +343,44 @@ public abstract class AbstractRepositoryPlexusResource
 
         File defaultStorageFile =
             new File( new File( this.applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
-        // make sure both URLs either end with '/' or do not end with '/'
-        String defaultLocalStorage = "";
+        
         try
         {
-            defaultLocalStorage = defaultStorageFile.toURL().toString();
-            defaultLocalStorage =
-                ( defaultLocalStorage.endsWith( "/" ) ) ? defaultLocalStorage : defaultLocalStorage + "/";
+            resource.setDefaultLocalStorageUrl( URLDecoder.decode( defaultStorageFile.toURI().toString(), "UTF-8" ) );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            getLogger().debug( "Unable to properly determine the default storage folder, using File based string." );
+            resource.setDefaultLocalStorageUrl( defaultStorageFile.getAbsolutePath() );
+        }
+        
+        //apples to apples here, man i hate this section of code!!!!
+        try
+        {
+            
+            URI defaultURI = defaultStorageFile.toURI();
+            URI overrideURI = new URI( repository.getLocalUrl() );
+
+            // now if the currentLocalStorage is different from the override local storage set it.
+            if ( !defaultURI.equals( overrideURI ) )
+            {
+                resource.setOverrideLocalStorageUrl( URLDecoder.decode( overrideURI.toURL().toString(), "UTF-8" ) );
+            }
+        }
+        catch ( URISyntaxException e )
+        {
+            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
+            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
         }
         catch ( MalformedURLException e )
         {
-            this.getLogger().warn( "Could not figure out the default storage URL for repository: " + repository.getId() );
+            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
+            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
         }
-
-        String currentLocalStorage = repository.getLocalUrl();
-        currentLocalStorage = ( currentLocalStorage.endsWith( "/" ) ) ? currentLocalStorage : currentLocalStorage + "/";
-
-        resource.setDefaultLocalStorageUrl( defaultLocalStorage );
-
-        // now if the currentLocalStorage is different from the override local storage set it.
-        if ( !defaultLocalStorage.equals( currentLocalStorage ) )
+        catch ( UnsupportedEncodingException e )
         {
-            resource.setOverrideLocalStorageUrl( currentLocalStorage );
+            getLogger().debug( "Unable to properly determine the override storage folder, assuming non-default value is set." );
+            resource.setOverrideLocalStorageUrl( repository.getLocalUrl() );
         }
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
