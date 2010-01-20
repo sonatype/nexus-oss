@@ -3,21 +3,6 @@
     <version>2.0.0</version>
     <privileges>      
       <privilege>
-        <id>3-test</id>
-        <name>3-test</name>
-        <type>method</type>
-        <properties>
-          <property>
-            <key>method</key>
-            <value>read</value>
-          </property>
-          <property>
-            <key>permission</key>
-            <value>/some/path/</value>
-          </property>
-        </properties>
-      </privilege>
-      <privilege>
         <id>4-test</id>
         <name>4-test</name>
         <type>method</type>
@@ -28,9 +13,57 @@
           </property>
           <property>
             <key>permission</key>
-            <value>/some/path/</value>
+            <value>/some/path4/</value>
+          </property>
+        </properties>
+      </privilege>
+      <privilege>
+        <id>5-test</id>
+        <name>5-test</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path5/</value>
+          </property>
+        </properties>
+      </privilege>
+      <privilege>
+        <id>6-test</id>
+        <name>6-test</name>
+        <type>method</type>
+        <properties>
+          <property>
+            <key>method</key>
+            <value>read</value>
+          </property>
+          <property>
+            <key>permission</key>
+            <value>/some/path6/</value>
           </property>
         </properties>
       </privilege>      
     </privileges>
+    <roles>
+       <role>
+            <id>anon</id>
+            <roles>
+              <role>other</role>
+            </roles>
+            <privileges>
+                <privilege>4-test</privilege>
+            </privileges>
+        </role>
+        <role>
+            <id>other</id>
+            <privileges>
+                <privilege>6-test</privilege>
+            </privileges>
+            <roles />
+        </role>
+    </roles>
 </security>

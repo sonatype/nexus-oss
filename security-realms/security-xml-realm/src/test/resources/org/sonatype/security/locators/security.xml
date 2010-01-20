@@ -79,7 +79,7 @@
           </property>
           <property>
             <key>permission</key>
-            <value>/some/path/</value>
+            <value>/some/path1/</value>
           </property>
         </properties>
       </privilege>
@@ -94,7 +94,7 @@
           </property>
           <property>
             <key>permission</key>
-            <value>/some/path/</value>
+            <value>/some/path2/</value>
           </property>
         </properties>
       </privilege>

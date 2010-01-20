@@ -12,18 +12,16 @@
  */
 package org.sonatype.security.realms.tools;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -31,7 +29,6 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -222,10 +219,55 @@ public class ResourceMergingConfigurationManager
 
         for ( CRole item : (List<CRole>) getConfiguration().getRoles() )
         {
-            list.add( new SecurityRole( item, true ) );
+            // check if this role is in the original source
+            boolean found = false;
+            for ( SecurityRole toRole : manager.listRoles() )
+            {
+                if( toRole.getId().equals( item.getId() ))
+                {
+                    found = true;
+                    this.mergeRolesContents( toRole, item );
+                }
+            }
+            
+            if( !found)
+            {
+                list.add( new SecurityRole( item, true ) );
+            }
         }
 
         return list;
+    }
+    
+    private void mergeRolesContents( SecurityRole toRole, CRole fromRole)
+    {
+        // ROLES
+        Set<String> roles = new HashSet<String>();
+        // make sure they are not empty
+        if( toRole.getRoles() != null )
+        {
+            roles.addAll( toRole.getRoles() );
+        }
+        if( fromRole.getRoles() != null )
+        {
+            roles.addAll( fromRole.getRoles() );
+        }
+        
+        // PRIVS
+        Set<String> privs = new HashSet<String>();
+        // make sure they are not empty
+        if( toRole.getPrivileges() != null )
+        {
+            privs.addAll( toRole.getPrivileges() );
+        }
+        if( fromRole.getPrivileges() != null )
+        {
+            privs.addAll( fromRole.getPrivileges() );
+        }
+        
+        // now set them in the original
+        toRole.setRoles( new ArrayList<String>( roles ) );
+        toRole.setPrivileges( new ArrayList<String>( privs ) );
     }
 
     public List<SecurityUser> listUsers()
@@ -261,10 +303,24 @@ public class ResourceMergingConfigurationManager
         {
             if ( role.getId().equals( id ) )
             {
+                // look in original to see if the roleId match, if so merge the role
+                // use loop to avoid catching and dealing with another NoSuchRoleException
+                for ( SecurityRole securityRole : this.manager.listRoles() )
+                {
+                    // found match, merge and return
+                    if( securityRole.getId().equals( role.getId() ) )
+                    {
+                        this.mergeRolesContents( securityRole, role );
+                        return securityRole;
+                    }
+                }
+                
+                // no match just return the static resource
                 return new SecurityRole( role, true );
             }
         }
 
+        // nothing found in static, try the original source, will throw if nothing is found
         return manager.readRole( id );
     }
 
