@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -103,17 +104,17 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-jetty-testsuite</artifactId>
-      <version>1.3</version>
-	    <scope>test</scope>
-    </dependency>
-    <dependency>
+			<groupId>org.sonatype.plexus</groupId>
+			<artifactId>plexus-jetty-testsuite</artifactId>
+			<version>1.3</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<version>6.1.19</version>
 		</dependency>
-    <dependency>
+		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-plugin-test-api</artifactId>
 			<version>${project.version}</version>
