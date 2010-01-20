@@ -11,7 +11,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
@@ -119,7 +118,7 @@ public class MavenRepositoryReader {
         }
 
         method.getParams().setParameter(HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler(3, false) );
-        method.getParams().setParameter("http.protocol.max-redirects", new Integer(1));
+        client.getParams().setParameter("http.protocol.max-redirects", new Integer(1));
 
         StringBuilder result = new StringBuilder();
 
@@ -131,14 +130,10 @@ public class MavenRepositoryReader {
         	try {
 				doCall(method, client, result);
 			} catch (HttpException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			    logger.error(e.getMessage(), e);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			    logger.error(e.getMessage(), e);
 			}
-        	
-        	logger.error(e.getMessage(), e);
         } catch (IOException e) {
         	logger.error(e.getMessage(), e);
         } finally {
