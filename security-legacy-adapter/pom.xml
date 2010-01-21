@@ -7,7 +7,7 @@
   </parent>
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-legacy-adapter</artifactId>
-  <version>1.1.7</version>
+  <version>1.1.8-SNAPSHOT</version>
   <name>Security Legacy Adapter</name>
   <description>A bridge between the legacy security model and the new.</description>
 
@@ -51,10 +51,4 @@
     	<version>1.0.0</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</url>
-  </scm>
 </project>

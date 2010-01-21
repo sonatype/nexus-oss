@@ -10,7 +10,7 @@
   <name>Security: Configuration</name>
   <description>Defines how the security system is configured, which realms are used, the anonymous username/password, and if security is enabled or not.</description>
   
-  <version>1.1.7</version>
+  <version>1.1.8-SNAPSHOT</version>
   
   <dependencies>
 
@@ -75,10 +75,4 @@
 
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</url>
-  </scm>
 </project>
