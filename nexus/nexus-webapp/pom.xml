@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5.0</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
@@ -25,9 +25,9 @@
     
     <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
-    <nexus-plugin-console-plugin.version>1.5.1-SNAPSHOT</nexus-plugin-console-plugin.version>
-    <nexus-ldap-realm-plugin.version>1.5.1-SNAPSHOT</nexus-ldap-realm-plugin.version>
-    <nexus-rrb-plugin.version>1.5.1-SNAPSHOT</nexus-rrb-plugin.version>
+    <nexus-plugin-console-plugin.version>1.5.0</nexus-plugin-console-plugin.version>
+    <nexus-ldap-realm-plugin.version>1.5.0</nexus-ldap-realm-plugin.version>
+    <nexus-rrb-plugin.version>1.5.0</nexus-rrb-plugin.version>
     
   </properties>
   <dependencies>
