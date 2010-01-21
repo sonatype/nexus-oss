@@ -9,7 +9,7 @@
   <artifactId>security-model</artifactId>
   <name>Security: Model</name>
   <description>The modello model for the storage of users, roles, privileges, and the mapping of users to roles. (and a bit of legacy code, not yet refactored out.)</description>
-  <version>1.1.7-SNAPSHOT</version>
+  <version>1.1.7</version>
 
   <dependencies>
 
@@ -130,4 +130,10 @@
     </plugins>
   </build>
 
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</developerConnection>
+    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.7</url>
+  </scm>
 </project>
