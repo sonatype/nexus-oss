@@ -70,7 +70,7 @@ public class RemoteBrowserResourceAuthTest extends AbstractPluginTestCase
 
     public void testSiteWithAuth() throws Exception
     {
-        String remoteUrl = server.getUrl( "auth-test" );
+        String remoteUrl = server.getUrl( "auth-test/" );
         
         String repoId = "testSiteWithAuth";
         RepositoryRegistry repoRegistry = this.lookup( RepositoryRegistry.class );

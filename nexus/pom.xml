@@ -43,6 +43,16 @@
       <timezone>-6</timezone>
     </developer>
     <developer>
+      <id>bdemers</id>
+      <name>Brian Demers</name>
+      <email>bdemers@sonatype.com</email>
+      <organization>Sonatype</organization>
+      <roles>
+        <role>Developer</role>
+      </roles>
+      <timezone>-6</timezone>
+    </developer>
+    <developer>
       <id>eu</id>
       <name>Eugene Kuleshov</name>
       <email>eugene@sonatype.com</email>
