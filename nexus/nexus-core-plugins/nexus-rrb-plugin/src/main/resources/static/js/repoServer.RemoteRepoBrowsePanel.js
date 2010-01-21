@@ -8,8 +8,9 @@ function printallmembers( obj ) {
 
 Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   //only add panel if there is a remoteUri
-	if ( rec.data.remoteUri ) {
-
+  //and it is valid uri (to rule out special proxy repo types, such as procurement)
+	if ( rec.data.remoteUri
+	    && rec.data.remoteUri.match( /^(?:http|https|ftp):\/\//i ) ) {
 //	  alert(printallmembers(rec.data));
 
     cardPanel.add( new Sonatype.repoServer.RemoteRepositoryBrowsePanel( { 
