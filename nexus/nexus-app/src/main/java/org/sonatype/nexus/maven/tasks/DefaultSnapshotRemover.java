@@ -595,11 +595,27 @@ public class DefaultSnapshotRemover
                     {
                         try
                         {
-                            String releaseVersion =
-                                snapshotGav.getBaseVersion().substring(
-                                                                        0,
-                                                                        snapshotGav.getBaseVersion().length()
-                                                                            - "-SNAPSHOT".length() );
+                            String releaseVersion = null;
+
+                            // NEXUS-3148
+                            if ( snapshotGav.getBaseVersion().endsWith( "-SNAPSHOT" ) )
+                            {
+                                // "-SNAPSHOT" :== 9 chars
+                                releaseVersion =
+                                    snapshotGav.getBaseVersion().substring(
+                                                                            0,
+                                                                            snapshotGav.getBaseVersion().length()
+                                                                                - 9 );
+                            }
+                            else
+                            {
+                                // "SNAPSHOT" :== 8 chars
+                                releaseVersion =
+                                    snapshotGav.getBaseVersion().substring(
+                                                                            0,
+                                                                            snapshotGav.getBaseVersion().length()
+                                                                                - 8 );
+                            }
 
                             Gav releaseGav =
                                 new Gav( snapshotGav.getGroupId(), snapshotGav.getArtifactId(), releaseVersion,

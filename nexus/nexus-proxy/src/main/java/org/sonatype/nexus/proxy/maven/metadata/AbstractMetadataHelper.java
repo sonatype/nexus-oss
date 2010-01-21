@@ -217,7 +217,7 @@ abstract public class AbstractMetadataHelper
         gaData.get( gaPath ).add( v );
 
         // GAV
-        if ( v.endsWith( "-SNAPSHOT" ) )
+        if ( v.endsWith( "SNAPSHOT" ) )
         {
             String gavPath = "/" + g.replace( '.', '/' ) + "/" + a + "/" + v;
 

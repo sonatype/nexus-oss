@@ -103,6 +103,8 @@ public class RecreateMavenMetadataWalkerTest
         "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.pom",
         "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.jar",
         "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom",
+        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar",
+        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom",
         "/com/mycom/proj2/maven-metadata.xml",
         "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.jar",
         "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.pom",
@@ -392,6 +394,12 @@ public class RecreateMavenMetadataWalkerTest
         expected.put( "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom", Boolean.TRUE );
         expected.put( "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar.sha1", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom.md5", Boolean.TRUE );
+        expected.put( "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom.sha1", Boolean.TRUE );
         expected.put( "/com/mycom/proj2/maven-metadata.xml", Boolean.TRUE );
         expected.put( "/com/mycom/proj2/maven-metadata.xml.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj2/maven-metadata.xml.sha1", Boolean.TRUE );
@@ -400,8 +408,10 @@ public class RecreateMavenMetadataWalkerTest
 
         Metadata md = readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj2/maven-metadata.xml" ) );
 
-        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
-
+        // NEXUS-3148
+        // the MD has to be updated, the 2.0SNAPSHOT was added
+        Assert.assertFalse( "20090226060812".equals(  md.getVersioning().getLastUpdated() ) );
+        Assert.assertEquals( "2.0SNAPSHOT",  md.getVersioning().getLatest()  );
     }
 
     public void testArtifactDirMdIncorrect()
