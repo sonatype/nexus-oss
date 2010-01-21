@@ -60,6 +60,9 @@
         </role>
         <role>
             <id>other</id>
+            <name>Other Role</name>
+            <description>Other Role Description</description>
+            <sessionTimeout>60</sessionTimeout>
             <privileges>
                 <privilege>6-test</privilege>
             </privileges>

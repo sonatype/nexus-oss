@@ -137,11 +137,7 @@ public class DefaultRoleResolverTest
         Assert.assertTrue( result.contains( "priv4-FOUR:read" ) );
         Assert.assertTrue( result.contains( "priv5-FIVE:read" ) );
 
-        // these are from the original security.xml
-        Assert.assertTrue( result.contains( "/some/path1/:read" ) );
-        Assert.assertTrue( result.contains( "/some/path4/:read" ) );
-
-        Assert.assertEquals( "permssions: " + result, 7, result.size() );
+        Assert.assertEquals( 5, result.size() );
 
     }
 

@@ -13,7 +13,7 @@
           </property>
           <property>
             <key>permission</key>
-            <value>/some/path1/</value>
+            <value>/some/path/</value>
           </property>
         </properties>
       </privilege>
@@ -28,46 +28,19 @@
           </property>
           <property>
             <key>permission</key>
-            <value>/some/path2/</value>
+            <value>/some/path/</value>
           </property>
         </properties>
-      </privilege>
-      <privilege>
-        <id>3-test</id>
-        <name>3-test</name>
-        <type>method</type>
-        <properties>
-          <property>
-            <key>method</key>
-            <value>read</value>
-          </property>
-          <property>
-            <key>permission</key>
-            <value>/some/path3/</value>
-          </property>
-        </properties>
-      </privilege>
+      </privilege>      
     </privileges>
     <roles>
-       <role>
-            <id>anon</id>
-            <name>Test Anon Role</name>
-            <description>Anon role for Test</description>
-            <sessionTimeout>30</sessionTimeout>
+      <role>
+            <id>test</id>
+            <name>test Role</name>
+            <description>Test Role Description</description>
+            <sessionTimeout>60</sessionTimeout>
             <privileges>
-                <privilege>1-test</privilege>
                 <privilege>2-test</privilege>
-            </privileges>
-            <roles>
-              <role>foo</role>
-            </roles>
-        </role>
-        <role>
-            <id>foo</id>
-            <name>Foo Role</name>
-            <description>Foo role for Test</description>
-            <privileges>
-                <privilege>3-test</privilege>
             </privileges>
             <roles />
         </role>

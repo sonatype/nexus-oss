@@ -15,6 +15,7 @@ package org.sonatype.security.realms.tools;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,6 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
@@ -219,57 +221,76 @@ public class ResourceMergingConfigurationManager
 
         for ( CRole item : (List<CRole>) getConfiguration().getRoles() )
         {
-            // check if this role is in the original source
-            boolean found = false;
-            for ( SecurityRole toRole : manager.listRoles() )
-            {
-                if( toRole.getId().equals( item.getId() ))
-                {
-                    found = true;
-                    this.mergeRolesContents( toRole, item );
-                }
-            }
-            
-            if( !found)
-            {
-                list.add( new SecurityRole( item, true ) );
-            }
+            list.add( new SecurityRole( item, true ) );
         }
 
         return list;
     }
     
-    private void mergeRolesContents( SecurityRole toRole, CRole fromRole)
+
+    private CRole mergeRolesContents( CRole roleA, CRole roleB )
     {
-        // ROLES
+     // ROLES
         Set<String> roles = new HashSet<String>();
         // make sure they are not empty
-        if( toRole.getRoles() != null )
+        if( roleA.getRoles() != null )
         {
-            roles.addAll( toRole.getRoles() );
+            roles.addAll( roleA.getRoles() );
         }
-        if( fromRole.getRoles() != null )
+        if( roleB.getRoles() != null )
         {
-            roles.addAll( fromRole.getRoles() );
+            roles.addAll( roleB.getRoles() );
         }
         
         // PRIVS
         Set<String> privs = new HashSet<String>();
         // make sure they are not empty
-        if( toRole.getPrivileges() != null )
+        if( roleA.getPrivileges() != null )
         {
-            privs.addAll( toRole.getPrivileges() );
+            privs.addAll( roleA.getPrivileges() );
         }
-        if( fromRole.getPrivileges() != null )
+        if( roleB.getPrivileges() != null )
         {
-            privs.addAll( fromRole.getPrivileges() );
+            privs.addAll( roleB.getPrivileges() );
         }
         
-        // now set them in the original
-        toRole.setRoles( new ArrayList<String>( roles ) );
-        toRole.setPrivileges( new ArrayList<String>( privs ) );
+        CRole newRole = new CRole();
+        newRole.setId( roleA.getId() );
+        newRole.setRoles( new ArrayList<String>( roles ) );
+        newRole.setPrivileges( new ArrayList<String>( privs ) );
+        
+        // now for the name and description
+        if( StringUtils.isNotEmpty( roleA.getName() ) )
+        {
+            newRole.setName( roleA.getName() );
+        }
+        else
+        {
+            newRole.setName( roleB.getName() );
+        }
+        
+        if( StringUtils.isNotEmpty( roleA.getDescription() ) )
+        {
+            newRole.setDescription( roleA.getDescription() );
+        }
+        else
+        {
+            newRole.setDescription( roleB.getDescription() );
+        }
+        
+        // and session timeout (which we don't use)
+        if( roleA.getSessionTimeout() > roleB.getSessionTimeout() )
+        {
+            newRole.setSessionTimeout( roleA.getSessionTimeout() );
+        }
+        else
+        {
+            newRole.setSessionTimeout( roleB.getSessionTimeout() );
+        }
+        
+        return newRole;
     }
-
+    
     public List<SecurityUser> listUsers()
     {
         List<SecurityUser> list = manager.listUsers();
@@ -303,19 +324,6 @@ public class ResourceMergingConfigurationManager
         {
             if ( role.getId().equals( id ) )
             {
-                // look in original to see if the roleId match, if so merge the role
-                // use loop to avoid catching and dealing with another NoSuchRoleException
-                for ( SecurityRole securityRole : this.manager.listRoles() )
-                {
-                    // found match, merge and return
-                    if( securityRole.getId().equals( role.getId() ) )
-                    {
-                        this.mergeRolesContents( securityRole, role );
-                        return securityRole;
-                    }
-                }
-                
-                // no match just return the static resource
                 return new SecurityRole( role, true );
             }
         }
@@ -432,8 +440,21 @@ public class ResourceMergingConfigurationManager
             configuration.addPrivilege( privilege );
         }
 
-        for ( CRole role : (List<CRole>) config.getRoles() )
+        for ( Iterator<CRole> iterator = config.getRoles().iterator(); iterator.hasNext(); )
         {
+            CRole role = iterator.next();
+            
+            // need to check if we need to merge the static config
+            for ( CRole eachRole : this.configuration.getRoles() )
+            {
+                if( eachRole.getId().equals( role.getId() ))
+                {
+                    role = this.mergeRolesContents( role, eachRole );
+                    configuration.removeRole( eachRole );
+                    break;
+                }
+            }
+            
             configuration.addRole( role );
         }
 

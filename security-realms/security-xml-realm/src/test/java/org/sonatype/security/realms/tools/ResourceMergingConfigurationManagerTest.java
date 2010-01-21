@@ -13,13 +13,10 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
@@ -46,40 +43,43 @@ public class ResourceMergingConfigurationManagerTest
         manager = ( ConfigurationManager ) lookup( ConfigurationManager.class, "resourceMerging" );
     }
     
-    public void testRoleMerging() throws Exception
+    public void testRoleMerging()
+    throws Exception
     {
         List<SecurityRole> roles = manager.listRoles();
         
         SecurityRole anon = manager.readRole( "anon" );
-        assertNotNull( anon );
+        assertTrue( "roles: " + anon.getRoles(),  anon.getRoles().contains( "other" ));
+        assertTrue( "roles: " + anon.getRoles(), anon.getRoles().contains( "role2" ));
+        assertEquals("roles: " + anon.getRoles(), 2, anon.getRoles().size() );
+        
+        assertTrue( anon.getPrivileges().contains( "priv1" ));
+        assertTrue( anon.getPrivileges().contains( "4-test" ));
+        assertEquals("privs: " + anon.getPrivileges(), 2, anon.getPrivileges().size() );
+        
+        assertEquals( "Test Anon Role", anon.getName() );
+        assertEquals( "Test Anon Role Description", anon.getDescription() );
+        assertEquals( 60, anon.getSessionTimeout() );
+        
         SecurityRole other = manager.readRole( "other" );
-        assertNotNull( other );
-        assertNotNull( manager.readRole( "foo" ) );
-        assertEquals( 3, roles.size() );
+        assertTrue( other.getRoles().contains( "role2" ));
+        assertEquals("roles: " + other.getRoles(), 1, other.getRoles().size() );
         
-        // now lets check the contents
-        assertEquals("Privs found: "+ anon.getPrivileges(), 3, anon.getPrivileges().size() ); //1,2,4
-        assertTrue( anon.getPrivileges().contains( "1-test" ) );
-        assertTrue( anon.getPrivileges().contains( "2-test" ) );
-        assertTrue( anon.getPrivileges().contains( "4-test" ) );
+        assertTrue( other.getPrivileges().contains( "6-test" ));
+        assertTrue( other.getPrivileges().contains( "priv2" ));
+        assertEquals("privs: " + other.getPrivileges(), 2, other.getPrivileges().size() );
         
-        assertEquals( 2, anon.getRoles().size() );
-        assertTrue( anon.getRoles().contains( "other" ) );
-        assertTrue( anon.getRoles().contains( "foo" ) );
+        assertEquals( "Other Role", other.getName() );
+        assertEquals( "Other Role Description", other.getDescription() );
+        assertEquals( 60, other.getSessionTimeout() );
         
-        Set<String> flatPrivs = flatPrivilegeList( "anon" );
-        assertTrue( flatPrivs.contains( "1-test" ) );
-        assertTrue( flatPrivs.contains( "2-test" ) );
-        assertTrue( flatPrivs.contains( "3-test" ) );
-        assertTrue( flatPrivs.contains( "4-test" ) );
-        assertTrue( flatPrivs.contains( "6-test" ) );
-        
-        assertEquals( 1, other.getPrivileges().size() ); //6
-        assertTrue( other.getPrivileges().contains( "6-test" ) );
+        // all roles
+        assertEquals( 8, roles.size() );
         
     }
     
-    public void testPrivilegeMerging()
+    
+    public void testPrivsMerging()
         throws Exception
     {
         List<SecurityPrivilege> privs = manager.listPrivileges();
@@ -88,9 +88,6 @@ public class ResourceMergingConfigurationManagerTest
         assertTrue( priv != null );
         
         priv = manager.readPrivilege( "2-test" );
-        assertTrue( priv != null );
-        
-        priv = manager.readPrivilege( "3-test" );
         assertTrue( priv != null );
         
         priv = manager.readPrivilege( "4-test" );
@@ -102,7 +99,13 @@ public class ResourceMergingConfigurationManagerTest
         priv = manager.readPrivilege( "6-test" );
         assertTrue( priv != null );
         
-        assertEquals( "privs: "+ this.privilegeListToStringList( privs ), 6, privs.size() );
+        assertNotNull( manager.readPrivilege( "priv1" ) );
+        assertNotNull( manager.readPrivilege( "priv2" ) );
+        assertNotNull( manager.readPrivilege( "priv3" ) );
+        assertNotNull( manager.readPrivilege( "priv4" ) );
+        assertNotNull( manager.readPrivilege( "priv5" ) );
+        
+        assertEquals( "privs: "+ this.privilegeListToStringList( privs ), 10, privs.size() );
     }
     
     private List<String> privilegeListToStringList( List<SecurityPrivilege> privs )
@@ -115,19 +118,5 @@ public class ResourceMergingConfigurationManagerTest
         }
         
         return ids;
-    }
-    
-    private Set<String> flatPrivilegeList( String roleId ) throws NoSuchRoleException
-    {
-        Set<String> privIds = new HashSet<String>();
-        
-        SecurityRole role = this.manager.readRole( roleId );
-        privIds.addAll( role.getPrivileges() );
-        for ( String eachRoleId : role.getRoles() )
-        {
-            privIds.addAll( this.flatPrivilegeList( eachRoleId ) );
-        }
-        
-        return privIds;
     }
 }

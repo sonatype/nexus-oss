@@ -3,6 +3,30 @@
 	<version>2.0.0</version>
 
 	<roles>
+	
+	  <role>
+      <id>anon</id>
+      <name>Test Anon Role</name>
+      <description>Test Anon Role Description</description>
+      <sessionTimeout>60</sessionTimeout>
+      <privileges>
+        <privilege>priv1</privilege>
+      </privileges>
+      <roles>
+        <role>role2</role>
+      </roles>
+    </role>
+    <role>
+      <id>other</id>
+      <privileges>
+        <privilege>priv2</privilege>
+      </privileges>
+      <roles>
+        <role>role2</role>
+      </roles>
+    </role>
+    
+	
 		<role>
 			<id>role1</id>
 			<name>role1</name>

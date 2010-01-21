@@ -14,5 +14,21 @@
         </requirement>
       </requirements>
     </component>
+    
+    <component>
+      <role>org.sonatype.security.realms.tools.StaticSecurityResource</role>
+      <role-hint>mock</role-hint>
+      <implementation>org.sonatype.security.locators.MockStaticSecurityResource</implementation>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.codehaus.plexus.logging.Logger</role>
+          <role-hint>default</role-hint>
+          <field-name>logger</field-name>
+        </requirement>
+      </requirements>
+    </component>
+    
   </components>
 </component-set>
+
