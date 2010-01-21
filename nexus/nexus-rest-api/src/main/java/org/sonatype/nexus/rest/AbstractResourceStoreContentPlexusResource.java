@@ -736,7 +736,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
 
-            res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+            if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
+            {
+                res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+            }
+            else
+            {
+                res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
+            }
 
             res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
 
