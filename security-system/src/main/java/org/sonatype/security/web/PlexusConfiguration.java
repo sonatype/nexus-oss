@@ -279,13 +279,6 @@ public class PlexusConfiguration
 
         // changed: we need the prepped filters for later
         filters = getFilters( section );
-
-        // urls section:
-        section = sections.get( URLS );
-        this.chains = createChains( section, filters );
-
-        initFilters( this.chains );
-
     }
 
     @Override
