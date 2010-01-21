@@ -721,7 +721,8 @@ public class M2GavCalculatorTest
         assertEquals( null, gav.getClassifier() );
         assertEquals( "pom", gav.getExtension() );
         assertEquals( new Integer(1), gav.getSnapshotBuildNumber() );
-        assertEquals( new Long(1263210578000l), gav.getSnapshotTimeStamp() );
+        // the timestamp is UTC, not EST timezoned!
+        assertEquals( new Long(1263188978000L), gav.getSnapshotTimeStamp() );
         assertEquals( "nexus-3148-1.0.20100111.064938-1.pom", gav.getName() );
         assertEquals( true, gav.isSnapshot() );
         assertEquals( false, gav.isHash() );
