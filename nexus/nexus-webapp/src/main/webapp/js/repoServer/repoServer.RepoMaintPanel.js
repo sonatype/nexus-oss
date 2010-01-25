@@ -195,7 +195,7 @@ Sonatype.repoServer.RepositoryPanel = function( config ) {
     Sonatype.Events.removeListener( 'nexusRepositoryStatus', this.statusStart, this );
   }, this );
   this.dataStore.addListener( 'load', this.onRepoStoreLoad, this );
-  this.dataStore.addListener( 'loadexception', this.onRepoStoreLoad, this );
+  this.dataStore.addListener( 'loadexception', this.onRepoStoreLoadException, this );
   this.dataStore.load();
 };
 
@@ -241,16 +241,28 @@ Ext.extend( Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
     } );
   },
   
+  onRepoStoreLoadException: function() {
+    this.onRepoStoreLoad( null, null, null );
+  },
+  
   onRepoStoreLoad: function( store, records, options ) {
     switch ( this.browseTypeButton.value ) {
       case 'nexus':
-        for ( var i = 0; i < records.length; i++ ) {
-          if ( records[i].data.userManaged ) {
-            store.remove( records[i] );
+        if ( records == null ) {
+          this.dataStore.removeAll();
+        }
+        else {
+          for ( var i = 0; i < records.length; i++ ) {
+            if ( records[i].data.userManaged ) {
+              store.remove( records[i] );
+            }
           }
         }
         break;
       case 'user':
+        if ( records == null ) {
+          this.dataStore.removeAll();
+        }
         this.groupStore.reload();
         break;
     }
