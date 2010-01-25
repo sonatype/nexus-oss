@@ -14,10 +14,16 @@ import java.util.SortedSet;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.realm.ldap.LdapContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
+import org.sonatype.plexus.appevents.Event;
+import org.sonatype.plexus.appevents.EventListener;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.ldap.LdapAuthenticator;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
@@ -32,13 +38,14 @@ import org.sonatype.security.ldap.realms.DefaultLdapContextFactory;
 import org.sonatype.security.ldap.realms.LdapManager;
 import org.sonatype.security.ldap.realms.connector.DefaultLdapConnector;
 import org.sonatype.security.ldap.realms.connector.LdapConnector;
+import org.sonatype.security.ldap.realms.persist.LdapClearCacheEvent;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
 
 @Component( role = LdapManager.class )
 public class DefaultLdapManager
-    implements LdapManager
+    implements LdapManager, EventListener, Initializable, Disposable
 {
 
     private Logger logger = LoggerFactory.getLogger( getClass() );
@@ -55,66 +62,69 @@ public class DefaultLdapManager
     @Requirement
     private LdapConfiguration ldapConfiguration;
 
-    private LdapConnector ldapManagerStrategy;
+    @Requirement
+    private ApplicationEventMulticaster applicationEventMulticaster;
+
+    private LdapConnector ldapConnector;
 
     public SortedSet<String> getAllGroups()
         throws LdapDAOException
     {
-        return this.getLdapManagerConnector().getAllGroups();
+        return this.getLdapConnector().getAllGroups();
     }
 
     public SortedSet<LdapUser> getAllUsers()
         throws LdapDAOException
     {
-        return this.getLdapManagerConnector().getAllUsers();
+        return this.getLdapConnector().getAllUsers();
     }
 
     public String getGroupName( String groupId )
         throws LdapDAOException,
             NoSuchLdapGroupException
     {
-        return this.getLdapManagerConnector().getGroupName( groupId );
+        return this.getLdapConnector().getGroupName( groupId );
     }
 
     public LdapUser getUser( String username )
         throws NoSuchLdapUserException,
             LdapDAOException
     {
-        return this.getLdapManagerConnector().getUser( username );
+        return this.getLdapConnector().getUser( username );
     }
 
     public Set<String> getUserRoles( String userId )
         throws LdapDAOException,
             NoLdapUserRolesFoundException
     {
-        return this.getLdapManagerConnector().getUserRoles( userId );
+        return this.getLdapConnector().getUserRoles( userId );
     }
 
     public SortedSet<LdapUser> getUsers( int userCount )
         throws LdapDAOException
     {
-        return this.getLdapManagerConnector().getUsers( userCount );
+        return this.getLdapConnector().getUsers( userCount );
     }
 
     public SortedSet<LdapUser> searchUsers( String username )
         throws LdapDAOException
     {
-        return this.getLdapManagerConnector().searchUsers( username );
+        return this.getLdapConnector().searchUsers( username );
     }
 
-    private LdapConnector getLdapManagerConnector()
+    private LdapConnector getLdapConnector()
         throws LdapDAOException
     {
-        if ( this.ldapManagerStrategy == null )
+        if ( this.ldapConnector == null )
         {
-            this.ldapManagerStrategy = new DefaultLdapConnector(
+            this.ldapConnector = new DefaultLdapConnector(
                 "default",
                 this.ldapUserManager,
                 this.ldapGroupManager,
                 this.getLdapContextFactory(),
                 this.getLdapAuthConfiguration() );
         }
-        return this.ldapManagerStrategy;
+        return this.ldapConnector;
     }
 
     protected LdapConfiguration getLdapConfiguration()
@@ -206,6 +216,26 @@ public class DefaultLdapManager
             }
         }
         throw new AuthenticationException( "User: " + userId + " could not be authenticated." );
+    }
+    
+    public void onEvent( Event<?> evt )
+    {
+        if ( evt instanceof LdapClearCacheEvent )
+        {
+            // clear the connectors
+            this.ldapConnector = null;
+        }
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        this.applicationEventMulticaster.addEventListener( this );
+    }
+
+    public void dispose()
+    {
+        this.applicationEventMulticaster.removeEventListener( this );
     }
 
 }
