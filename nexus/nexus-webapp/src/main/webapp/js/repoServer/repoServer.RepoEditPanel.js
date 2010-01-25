@@ -1059,8 +1059,6 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
       }
     }
   } );
-  
-  this.on( 'show', this.showHandler, this );
 };
 
 Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.AbstractRepositoryEditor, {
@@ -1078,19 +1076,17 @@ Ext.extend( Sonatype.repoServer.ProxyRepositoryEditor, Sonatype.repoServer.Abstr
       // until we find a better solution for procurement repos
       this.buttons[0].disable();
     }
-  },
-  
-  afterProviderSelectHandler: function( combo, rec, index ) {
-    this.updateDownloadRemoteIndexCombo(rec.data.format);
-    this.updateIndexableCombo(rec.data.format);
-  },
-  
-  showHandler: function ( panel ) {
+    
     var formatField = this.form.findField('format');
     if ( formatField ){
       this.updateDownloadRemoteIndexCombo( formatField.getValue() );
       this.updateIndexableCombo( formatField.getValue() );
     }
+  },
+  
+  afterProviderSelectHandler: function( combo, rec, index ) {
+    this.updateDownloadRemoteIndexCombo(rec.data.format);
+    this.updateIndexableCombo(rec.data.format);
   },
   
   updateDownloadRemoteIndexCombo: function( repoFormat ){
