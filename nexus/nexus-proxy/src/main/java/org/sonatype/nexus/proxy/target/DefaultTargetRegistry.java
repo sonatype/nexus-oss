@@ -211,14 +211,19 @@ public class DefaultTargetRegistry
 
         this.validate( cnf );
 
-        removeRepositoryTarget( cnf.getId() );
+        removeRepositoryTarget( cnf.getId(), true );
 
         getCurrentConfiguration( true ).add( cnf );
 
         return true;
     }
-
+    
     public boolean removeRepositoryTarget( String id )
+    {
+        return removeRepositoryTarget( id, false );
+    }
+
+    public boolean removeRepositoryTarget( String id, boolean forUpdate )
     {
         List<CRepositoryTarget> targets = getCurrentConfiguration( true );
 
@@ -232,7 +237,7 @@ public class DefaultTargetRegistry
 
                 ti.remove();
 
-                getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target ) );
+                getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target, forUpdate ) );
 
                 return true;
             }

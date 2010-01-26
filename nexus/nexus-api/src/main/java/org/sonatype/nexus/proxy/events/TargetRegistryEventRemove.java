@@ -24,10 +24,17 @@ import org.sonatype.nexus.proxy.target.TargetRegistry;
 public class TargetRegistryEventRemove
     extends TargetRegistryEvent
 {
-
-    public TargetRegistryEventRemove( final TargetRegistry targetRegistry, final Target target )
+    private final boolean forUpdate;
+    
+    public TargetRegistryEventRemove( final TargetRegistry targetRegistry, final Target target, final boolean forUpdate )
     {
         super( targetRegistry, target );
+        
+        this.forUpdate = forUpdate;
     }
-
+    
+    public boolean isForUpdate()
+    {
+        return forUpdate;
+    }
 }

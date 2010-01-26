@@ -53,14 +53,20 @@ public class TargetMessageUtil
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-
+    
     public RepositoryTargetResource createTarget( RepositoryTargetResource target )
+        throws IOException 
+    {
+        return saveTarget( target, false );
+    }
+
+    public RepositoryTargetResource saveTarget( RepositoryTargetResource target, boolean update )
         throws IOException
     {
-        Response response = this.sendMessage( Method.POST, target );
+        Response response = this.sendMessage( update ? Method.PUT : Method.POST, target );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Could not create Repository Target: " + response.getStatus() + "\nResponse Text:\n"
+        Assert.assertTrue( "Could not save Repository Target: " + response.getStatus() + "\nResponse Text:\n"
             + responseText + "\n" + xstream.toXML( target ), response.getStatus().isSuccess() );
 
         // get the Resource object
@@ -69,6 +75,10 @@ public class TargetMessageUtil
         // validate
         // make sure the id != null
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
+        if ( update )
+        {
+            Assert.assertEquals( target.getId(), responseResource.getId() );    
+        }
 
         Assert.assertEquals( target.getContentClass(), responseResource.getContentClass() );
         Assert.assertEquals( target.getName(), responseResource.getName() );
