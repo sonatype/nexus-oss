@@ -64,22 +64,19 @@ public class SecurityCleanupEventInspector
         {
             TargetRegistryEventRemove rEvt = (TargetRegistryEventRemove) evt;
             
-            if ( !rEvt.isForUpdate() )
+            String targetId = rEvt.getTarget().getId();
+
+            try
             {
-                String targetId = rEvt.getTarget().getId();
-    
-                try
-                {
-                    cleanupPrivileges( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId );
-                }
-                catch ( NoSuchPrivilegeException e )
-                {
-                    getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
-                }
-                catch ( NoSuchAuthorizationManager e )
-                {
-                    getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
-                }
+                cleanupPrivileges( TargetPrivilegeRepositoryTargetPropertyDescriptor.ID, targetId );
+            }
+            catch ( NoSuchPrivilegeException e )
+            {
+                getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
+            }
+            catch ( NoSuchAuthorizationManager e )
+            {
+                getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
             }
         }
     }

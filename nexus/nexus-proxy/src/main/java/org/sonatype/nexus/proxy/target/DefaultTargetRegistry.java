@@ -223,7 +223,7 @@ public class DefaultTargetRegistry
         return removeRepositoryTarget( id, false );
     }
 
-    public boolean removeRepositoryTarget( String id, boolean forUpdate )
+    protected boolean removeRepositoryTarget( String id, boolean forUpdate )
     {
         List<CRepositoryTarget> targets = getCurrentConfiguration( true );
 
@@ -237,7 +237,10 @@ public class DefaultTargetRegistry
 
                 ti.remove();
 
-                getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target, forUpdate ) );
+                if ( !forUpdate )
+                {
+                    getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventRemove( this, target ) );
+                }
 
                 return true;
             }
