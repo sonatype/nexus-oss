@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins.ldap</groupId>
     <artifactId>nexus-ldap-plugin-parent</artifactId>
-    <version>1.5.1-SNAPSHOT</version>
+    <version>1.5.0</version>
   </parent>
 
   <groupId>org.sonatype.security.realms.ldap</groupId>
