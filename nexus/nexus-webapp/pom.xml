@@ -25,9 +25,6 @@
     
     <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
-    <nexus-plugin-console-plugin.version>${project.version}</nexus-plugin-console-plugin.version>
-    <nexus-ldap-realm-plugin.version>${project.version}</nexus-ldap-realm-plugin.version>
-    <nexus-rrb-plugin.version>${project.version}</nexus-rrb-plugin.version>
     
   </properties>
   <dependencies>
@@ -57,7 +54,7 @@
     <dependency>
 	  <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-	  <version>${nexus-plugin-console-plugin.version}</version>
+	  <version>${project.version}</version>
 	  <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -66,7 +63,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${nexus-ldap-realm-plugin.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -75,7 +72,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
-      <version>${nexus-rrb-plugin.version}</version>
+      <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
@@ -212,7 +209,7 @@
                   <artifactItem>
                       <groupId>org.sonatype.nexus.plugins</groupId>
                       <artifactId>nexus-plugin-console-plugin</artifactId>
-                      <version>${nexus-plugin-console-plugin.version}</version>
+                      <version>${project.version}</version>
                       <classifier>bundle</classifier>
                       <type>zip</type>
                       <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -220,7 +217,7 @@
                   <artifactItem>
                       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
                       <artifactId>nexus-ldap-realm-plugin</artifactId>
-                      <version>${nexus-ldap-realm-plugin.version}</version>
+                      <version>${project.version}</version>
                       <classifier>bundle</classifier>
                       <type>zip</type>
                       <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
@@ -228,7 +225,7 @@
                   <artifactItem>
                     <groupId>org.sonatype.nexus.plugins</groupId>
                     <artifactId>nexus-rrb-plugin</artifactId>
-                    <version>${nexus-rrb-plugin.version}</version>
+                    <version>${project.version}</version>
                     <classifier>bundle</classifier>
                     <type>zip</type>
                     <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
