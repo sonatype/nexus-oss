@@ -27,7 +27,8 @@ Sonatype.panels.AutoTabPanel = function( config ) {
     autoScroll: false,
     frame: false,
     border: false,
-    activeTab: 0
+    activeTab: 0,
+    hideMode: 'offsets'
   };
   Ext.apply( this, config, defaultConfig );
   Sonatype.panels.AutoTabPanel.superclass.constructor.call( this, {} );
@@ -48,7 +49,8 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
           frame: false,
           border: false,
           layoutOnTabChange: true,
-          items: [ first ]
+          items: [ first ],
+          hideMode: 'offsets'
         } );
   
         Sonatype.panels.AutoTabPanel.superclass.add.call( this, this.tabPanel );
