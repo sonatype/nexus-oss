@@ -167,6 +167,7 @@ public class RepositoriesConfigurationForm
     public RepositoriesConfigurationForm populateProxy( String repoId, String name, String remoteStorageUrl )
     {
         this.remoteStorageUrl.type( remoteStorageUrl );
+        this.downloadRemoteIndexes.setValue( "false" );
         this.checksumPolicy.setValue( "IGNORE" );
         return populate( repoId, name );
     }
