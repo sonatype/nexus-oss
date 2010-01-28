@@ -537,6 +537,9 @@ Sonatype.repoServer.ProxyRepositoryEditor = function( config ) {
         checksumPolicy: Sonatype.utils.uppercase
       }
     },
+    validationModifiers: {
+      remoteStorageUrl: 'remoteStorage.remoteStorageUrl'
+    },
     referenceData: Sonatype.repoServer.referenceData.repositoryState.proxy
   };
   Ext.apply( this, config, defaultConfig );

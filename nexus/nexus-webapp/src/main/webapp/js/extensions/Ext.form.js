@@ -184,7 +184,6 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
         if (response.status == 400
             && this.options.autoValidation){ //validation error
           this.success(response);
-          Sonatype.MessageBox.hide();
           return;
         }
         
@@ -224,9 +223,15 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
         }
           
         this.form.markInvalid(result.errors);
+        
         this.failureType = Ext.form.Action.SERVER_INVALID;
       }
       this.form.afterAction(this, false);
+      
+      // if we came in here on 400 error, and we properly marked field as error, hide dialog 
+      if ( result.errors != null ) {
+        Sonatype.MessageBox.hide();
+      }
     },
 
     // private
