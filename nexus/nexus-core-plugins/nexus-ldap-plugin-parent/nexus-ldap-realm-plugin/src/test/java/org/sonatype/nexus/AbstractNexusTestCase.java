@@ -9,6 +9,8 @@ package org.sonatype.nexus;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import junit.framework.Assert;
 
@@ -76,22 +78,36 @@ public abstract class AbstractNexusTestCase
     protected void copyDefaultConfigToPlace()
         throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security-configuration.xml" ), new FileOutputStream(
+        this.copyStream( getClass().getResourceAsStream( "/test-conf/security-configuration.xml" ), new FileOutputStream(
             getSecurityConfiguration() ) );
     }
 
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/security.xml" ), new FileOutputStream(
+        this.copyStream( getClass().getResourceAsStream( "/test-conf/security.xml" ), new FileOutputStream(
             getNexusSecurityConfiguration() ) );
     }
 
     protected void copyDefaultLdapConfigToPlace()
     throws IOException
     {
-        IOUtil.copy( getClass().getResourceAsStream( "/test-conf/ldap.xml" ), new FileOutputStream(
+        this.copyStream( getClass().getResourceAsStream( "/test-conf/ldap.xml" ), new FileOutputStream(
             getNexusLdapConfiguration() ) );
+    }
+    
+    private void copyStream( InputStream is, OutputStream out )
+        throws IOException
+    {
+        try
+        {
+            IOUtil.copy( is, out );
+        }
+        finally
+        {
+            IOUtil.close( is );
+            IOUtil.close( out );
+        }
     }
 
     protected boolean loadConfigurationAtSetUp()
