@@ -40,6 +40,8 @@ public abstract class AbstractNexusProxyIntegrationTest
     protected String localStorageDir = null;
 
     protected Integer proxyPort;
+    
+    private ServletServer proxyServer = null;
 
     protected AbstractNexusProxyIntegrationTest()
     {
@@ -59,16 +61,18 @@ public abstract class AbstractNexusProxyIntegrationTest
     public void startProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
-        server.start();
+        this.proxyServer = (ServletServer) this.lookup( ServletServer.ROLE );
+        this.proxyServer.start();
     }
 
     @After
     public void stopProxy()
         throws Exception
     {
-        ServletServer server = (ServletServer) this.lookup( ServletServer.ROLE );
-        server.stop();
+        if( this.proxyServer != null )
+        {
+            this.proxyServer.stop();
+        }
     }
 
     public File getLocalFile( String repositoryId, Gav gav )
