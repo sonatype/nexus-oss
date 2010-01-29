@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
@@ -19,6 +20,7 @@ import org.sonatype.nexus.mock.models.User;
 import org.sonatype.nexus.mock.pages.MainPage;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
+import org.sonatype.nexus.mock.util.ThreadUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.testng.PlexusObjectFactory;
 import org.sonatype.spice.jscoverage.JsonReportHandler;
@@ -191,6 +193,15 @@ public abstract class SeleniumTest
     protected void doLogin( String username, String password )
     {
         selenium.runScript( "window.Sonatype.utils.doLogin( null, '" + username + "', '" + password + "');" );
+        
+        // wait for the login-link to change
+        ThreadUtils.waitFor( new ThreadUtils.WaitCondition()
+        {
+            public boolean checkCondition( long elapsedTimeInMs )
+            {
+                return !main.loginLinkAvailable();
+            }
+        }, TimeUnit.SECONDS, 15 );
     }
 
     @AfterClass
