@@ -18,6 +18,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.artifact.M1ArtifactRecognizer;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -93,4 +94,10 @@ public class M1LayoutedM2ShadowRepository
     {
         return transformM1toM2( path );
     }
+    
+    public boolean isMavenMetadataPath( String path )
+    {
+        return M1ArtifactRecognizer.isMetadata( path );
+    }
+
 }

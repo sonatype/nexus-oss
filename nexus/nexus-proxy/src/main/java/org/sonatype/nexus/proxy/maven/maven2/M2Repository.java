@@ -107,6 +107,11 @@ public class M2Repository
         return m2RepositoryConfigurator;
     }
 
+    public boolean isMavenMetadataPath( String path )
+    {
+        return M2ArtifactRecognizer.isMetadata( path );
+    }
+    
     /**
      * Should serve by policies.
      * 

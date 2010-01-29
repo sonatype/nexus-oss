@@ -5,12 +5,14 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.AbstractGroupRepository;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -49,8 +51,8 @@ public abstract class AbstractMavenGroupRepository
         if ( repositoryKind == null )
         {
             repositoryKind =
-                new DefaultRepositoryKind( GroupRepository.class, Arrays
-                    .asList( new Class<?>[] { MavenGroupRepository.class } ) );
+                new DefaultRepositoryKind( GroupRepository.class,
+                                           Arrays.asList( new Class<?>[] { MavenGroupRepository.class } ) );
         }
         return repositoryKind;
     }
@@ -110,6 +112,32 @@ public abstract class AbstractMavenGroupRepository
         throw new UnsupportedOperationException(
                                                  "Setting repository policy on a Maven group repository is not possible!" );
     }
+    
+    public boolean isMavenArtifact( StorageItem item )
+    {
+        return isMavenArtifactPath( item.getPath() );
+    }
+    
+    public boolean isMavenMetadata( StorageItem item )
+    {
+        return isMavenMetadataPath( item.getPath() );
+    }
+
+    public boolean isMavenArtifactPath( String path )
+    {
+        try
+        {
+            return getGavCalculator().pathToGav( path ) != null;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // ignore it
+        }
+
+        return false;
+    }
+
+    public abstract boolean isMavenMetadataPath( String path );
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
         throws UnsupportedStorageOperationException, ItemNotFoundException, IllegalOperationException,

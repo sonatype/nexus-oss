@@ -87,6 +87,11 @@ public class M1Repository
     {
         return m1RepositoryConfigurator;
     }
+    
+    public boolean isMavenMetadataPath( String path )
+    {
+        return M1ArtifactRecognizer.isMetadata( path );
+    }
 
     /**
      * Should serve by policies.

@@ -21,6 +21,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -292,6 +293,32 @@ public abstract class AbstractMavenRepository
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
+    
+    public boolean isMavenArtifact( StorageItem item )
+    {
+        return isMavenArtifactPath( item.getPath() );
+    }
+    
+    public boolean isMavenMetadata( StorageItem item )
+    {
+        return isMavenMetadataPath( item.getPath() );
+    }
+    
+    public boolean isMavenArtifactPath( String path )
+    {
+        try
+        {
+            return getGavCalculator().pathToGav( path ) != null;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // ignore it
+        }
+        
+        return false;
+    }
+
+    public abstract boolean isMavenMetadataPath( String path );
 
     public abstract boolean shouldServeByPolicies( ResourceStoreRequest request );
 

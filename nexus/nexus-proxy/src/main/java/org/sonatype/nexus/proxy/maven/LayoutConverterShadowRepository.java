@@ -142,6 +142,32 @@ public abstract class LayoutConverterShadowRepository
         throw new UnsupportedOperationException( "This method is not supported on Repository of type SHADOW" );
     }
 
+    public boolean isMavenArtifact( StorageItem item )
+    {
+        return isMavenArtifactPath( item.getPath() );
+    }
+    
+    public boolean isMavenMetadata( StorageItem item )
+    {
+        return isMavenMetadataPath( item.getPath() );
+    }
+    
+    public boolean isMavenArtifactPath( String path )
+    {
+        try
+        {
+            return getGavCalculator().pathToGav( path ) != null;
+        }
+        catch ( IllegalArtifactCoordinateException e )
+        {
+            // ignore it
+        }
+        
+        return false;
+    }
+
+    public abstract boolean isMavenMetadataPath( String path );
+
     public MetadataManager getMetadataManager()
     {
         return metadataManager;

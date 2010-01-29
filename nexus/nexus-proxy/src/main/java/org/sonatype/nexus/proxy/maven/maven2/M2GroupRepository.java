@@ -109,6 +109,11 @@ public class M2GroupRepository
         return m2GroupRepositoryConfigurator;
     }
 
+    public boolean isMavenMetadataPath( String path )
+    {
+        return M2ArtifactRecognizer.isMetadata( path );
+    }
+
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
