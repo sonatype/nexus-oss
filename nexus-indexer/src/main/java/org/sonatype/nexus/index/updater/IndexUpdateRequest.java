@@ -38,6 +38,10 @@ public class IndexUpdateRequest
 
     private Locker locker;
 
+    private boolean offline;
+
+    private boolean cacheOnly;
+
     public IndexUpdateRequest( IndexingContext context )
     {
         this.context = context;
@@ -145,5 +149,25 @@ public class IndexUpdateRequest
     public void setLocker( Locker locker )
     {
         this.locker = locker;
+    }
+
+    public void setOffline( boolean offline )
+    {
+        this.offline = offline;
+    }
+
+    public boolean isOffline()
+    {
+        return offline;
+    }
+
+    public void setCacheOnly( boolean cacheOnly )
+    {
+        this.cacheOnly = cacheOnly;
+    }
+
+    public boolean isCacheOnly()
+    {
+        return cacheOnly;
     }
 }

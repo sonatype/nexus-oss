@@ -7,15 +7,20 @@ package org.sonatype.nexus.index.updater;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -88,26 +93,33 @@ public class DefaultIndexUpdater
         
     }
 
-    public Date fetchAndUpdateIndex( final IndexUpdateRequest updateRequest )
+    public IndexUpdateResult fetchAndUpdateIndex( final IndexUpdateRequest updateRequest )
         throws IOException
     {
-        ResourceFetcher fetcher = updateRequest.getResourceFetcher();
+        IndexUpdateResult result = new IndexUpdateResult();
+        
+        IndexingContext context = updateRequest.getIndexingContext();
 
-        // If no resource fetcher passed in, use the wagon fetcher by default
-        // and put back in request for future use
-        if( fetcher == null )
+        ResourceFetcher fetcher = null;
+
+        if ( !updateRequest.isOffline() )
         {
-            fetcher =
-                new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() )
-                    .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                    .setProxyInfo( updateRequest.getProxyInfo() );
+            fetcher = updateRequest.getResourceFetcher();
 
-            updateRequest.setResourceFetcher( fetcher );
+            // If no resource fetcher passed in, use the wagon fetcher by default
+            // and put back in request for future use
+            if( fetcher == null )
+            {
+                fetcher =
+                    new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() )
+                        .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
+                        .setProxyInfo( updateRequest.getProxyInfo() );
+    
+                updateRequest.setResourceFetcher( fetcher );
+            }
+            fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
         }
 
-        IndexingContext context = updateRequest.getIndexingContext();
-        fetcher.connect( context.getId(), context.getIndexUpdateUrl() );
-        
         File cacheDir = updateRequest.getLocalIndexCacheDir();
         Locker locker = updateRequest.getLocker();
         Lock lock = locker != null && cacheDir != null ? locker.lock( cacheDir ) : null;
@@ -115,28 +127,38 @@ public class DefaultIndexUpdater
         {
             if ( cacheDir != null )
             {
-                cacheDir.mkdirs();
-    
-                try
+                LocalCacheIndexAdaptor cache = new LocalCacheIndexAdaptor( cacheDir, result );
+
+                if ( !updateRequest.isOffline() )
                 {
-                    LocalCacheIndexAdaptor target = new LocalCacheIndexAdaptor( cacheDir );
-                    fetchAndUpdateIndex( updateRequest, fetcher, target );
-                    target.commit();
+                    cacheDir.mkdirs();
+        
+                    try
+                    {
+                        fetchAndUpdateIndex( updateRequest, fetcher, cache );
+                        cache.commit();
+                    }
+                    finally
+                    {
+                        fetcher.disconnect();
+                    }
                 }
-                finally
-                {
-                    fetcher.disconnect();
-                }
-                
-                fetcher = new FileFetcher( cacheDir );
+
+                fetcher = cache.getFetcher();
+            }
+            else if ( updateRequest.isOffline() )
+            {
+                throw new IllegalArgumentException( "LocalIndexCacheDir can not be null in offline mode" );
             }
     
             try
             {
-                LuceneIndexAdaptor target = new LuceneIndexAdaptor(updateRequest);
-                Date timestamp = fetchAndUpdateIndex( updateRequest, fetcher, target );
-                target.commit();
-                return timestamp;
+                if ( !updateRequest.isCacheOnly() )
+                {
+                    LuceneIndexAdaptor target = new LuceneIndexAdaptor( updateRequest );
+                    result.setTimestamp( fetchAndUpdateIndex( updateRequest, fetcher, target ) );
+                    target.commit();
+                }
             }
             finally
             {
@@ -150,6 +172,8 @@ public class DefaultIndexUpdater
                 lock.release();
             }
         }
+        
+        return result;
     }
 
     /**
@@ -175,7 +199,7 @@ public class DefaultIndexUpdater
             .setProxyInfo( proxyInfo )
         );
 
-        return fetchAndUpdateIndex( updateRequest );
+        return fetchAndUpdateIndex( updateRequest ).getTimestamp();
     }
 
     public Properties fetchIndexProperties( final IndexingContext context, final ResourceFetcher fetcher )
@@ -794,9 +818,17 @@ public class DefaultIndexUpdater
 
     private class LocalCacheIndexAdaptor extends IndexAdaptor
     {
-        public LocalCacheIndexAdaptor( File dir )
+        private static final String CHUNKS_FILENAME = "chunks.lst";
+        private static final String CHUNKS_FILE_ENCODING = "UTF-8";
+        
+        private final IndexUpdateResult result;
+        
+        private final ArrayList<String> newChunks = new ArrayList<String>();
+
+        public LocalCacheIndexAdaptor( File dir, IndexUpdateResult result )
         {
             super( dir );
+            this.result = result;
         }
 
         public Date getTimestamp()
@@ -820,20 +852,92 @@ public class DefaultIndexUpdater
         public void addIndexChunk( ResourceFetcher source, String filename )
             throws IOException
         {
-            File target = new File( dir, filename );
-            FileUtils.copyStreamToFile( new RawInputStreamFacade( source.retrieve( filename ) ), target );
+            File chunk = new File( dir, filename );
+            FileUtils.copyStreamToFile( new RawInputStreamFacade( source.retrieve( filename ) ), chunk );
+            newChunks.add( filename );
         }
 
         public Date setIndexFile( ResourceFetcher source, String filename )
             throws IOException
         {
-            // TODO clean the cache
+            cleanCacheDirectory( dir );
+
+            result.setFullUpdate( true );
 
             File target = new File( dir, filename );
             FileUtils.copyStreamToFile( new RawInputStreamFacade( source.retrieve( filename ) ), target );
 
             return null;
         }
+
+        @Override
+        public void commit()
+            throws IOException
+        {
+            File chunksFile = new File( dir, CHUNKS_FILENAME );
+            BufferedOutputStream os = new BufferedOutputStream( new FileOutputStream( chunksFile, true ) );
+            try
+            {
+                Writer w = new OutputStreamWriter( os, CHUNKS_FILE_ENCODING );
+                for ( String filename : newChunks )
+                {
+                    w.write( filename + "\n" );
+                }
+                w.flush();
+            }
+            finally
+            {
+                IOUtil.close( os );
+            }
+            super.commit();
+        }
+        
+        public List<String> getChunks()
+            throws IOException
+        {
+            ArrayList<String> chunks = new ArrayList<String>();
+            
+            File chunksFile = new File( dir, CHUNKS_FILENAME );
+            BufferedReader r =
+                new BufferedReader( new InputStreamReader( new FileInputStream( chunksFile ), CHUNKS_FILE_ENCODING ) );
+            try
+            {
+                String str;
+                while ( (str = r.readLine()) != null )
+                {
+                    chunks.add( str );
+                }
+            }
+            finally
+            {
+                IOUtil.close( r );
+            }
+            return chunks;
+        }
+
+        public ResourceFetcher getFetcher()
+        {
+            return new LocalIndexCacheFetcher( dir )
+            {
+                @Override
+                public List<String> getChunks() throws IOException
+                {
+                    return LocalCacheIndexAdaptor.this.getChunks();
+                }
+            };
+        }
+    }
+
+    static abstract class LocalIndexCacheFetcher
+        extends FileFetcher
+    {
+        public LocalIndexCacheFetcher( File basedir )
+        {
+            super( basedir );
+        }
+
+        public abstract List<String> getChunks()
+            throws IOException;
     }
 
     private Date fetchAndUpdateIndex( final IndexUpdateRequest updateRequest, ResourceFetcher source, IndexAdaptor target )
@@ -888,7 +992,17 @@ public class DefaultIndexUpdater
 
         try
         {
-            return target.setIndexFile( source, IndexingContext.INDEX_FILE + ".gz" );
+            Date timestamp = target.setIndexFile( source, IndexingContext.INDEX_FILE + ".gz" );
+            if ( source instanceof LocalIndexCacheFetcher )
+            {
+                // local cache has inverse organization compared to remote indexes,
+                // i.e. initial index file and delta chunks to apply on top of it
+                for ( String filename : ((LocalIndexCacheFetcher) source).getChunks() )
+                {
+                    target.addIndexChunk( source, filename );
+                }
+            }
+            return timestamp;
         }
         catch( FileNotFoundException ex )
         {
@@ -896,5 +1010,27 @@ public class DefaultIndexUpdater
             return target.setIndexFile( source, IndexingContext.INDEX_FILE + ".zip" );
         }
     }
-    
+
+    /**
+     * Cleans specified cache directory. If present, Locker.LOCK_FILE will not
+     * be deleted.
+     */
+    protected void cleanCacheDirectory( File dir )
+        throws IOException
+    {
+        File[] members = dir.listFiles();
+        if ( members == null )
+        {
+            return;
+        }
+
+        for ( File member : members )
+        {
+            if ( !Locker.LOCK_FILE.equals( member.getName() ) )
+            {
+                FileUtils.forceDelete( member );
+            }
+        }
+    }
+
 }

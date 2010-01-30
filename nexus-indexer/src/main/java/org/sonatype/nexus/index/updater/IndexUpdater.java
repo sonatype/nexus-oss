@@ -49,9 +49,9 @@ public interface IndexUpdater
         throws IOException;
     
     /**
-     * @return timestamp for updated index
+     * @return IndexUpdateResult
      */
-    Date fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
+    IndexUpdateResult fetchAndUpdateIndex( IndexUpdateRequest updateRequest )
         throws IOException; 
 
     /**
