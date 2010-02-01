@@ -57,7 +57,7 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 			end = indata.indexOf(linkEnd, start) + linkEnd.length();
 			temp.append(indata.subSequence(start, end));
 			if (!exclude(temp)) {
-				if (!getLinkName(temp).endsWith("/")) {
+				if (!getLinkName(temp).trim().endsWith("/")) {
 					rp.setLeaf(true);
 				}
 				rp.setText(getLinkName(temp).replace("/", "").trim());
@@ -82,13 +82,13 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 	/**
 	 * Extracts the link name.
 	 */
-	private String getLinkName(StringBuilder temp) {
+	 String getLinkName(StringBuilder temp) {
 		int start = temp.indexOf(">") + 1;
 		int end = temp.indexOf("</");
 		return cleanup(temp.substring(start, end));
 	}
 
-	private String cleanup(String value) {
+	 String cleanup(String value) {
 		int start=value.indexOf('<');
 		int end= value.indexOf('>');
 		if(start!=-1&&start<end){
@@ -96,13 +96,13 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 			value=value.replace(seq, "");
 			cleanup(value);
 		}
-		return value;
+		return value.trim();
 	}
 
 	/**
 	 * Extracts the link url.
 	 */
-	private String getLinkUrl(StringBuilder temp) {
+	 String getLinkUrl(StringBuilder temp) {
 		int start = temp.indexOf(href) + href.length();
 		int end = temp.indexOf("\"", start + 1);
 		return temp.substring(start, end);
@@ -111,7 +111,7 @@ public class HtmlRemoteRepositoryParser implements RemoteRepositoryParser {
 	/**
 	 * Excludes links that are not relevant for the listing.
 	 */
-	private boolean exclude(StringBuilder value) {
+	 boolean exclude(StringBuilder value) {
 		for (String s : EXCLUDES) {
 			if (value.indexOf(s) > 0) {
 				logger.debug("{} is in EXCLUDES array", value);

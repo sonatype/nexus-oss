@@ -94,7 +94,7 @@ public class MavenRepositoryReaderTest {
 		List<RepositoryDirectory> result = reader.extract(
 				getURLForTestRepoResource("htmlExample"), localUrl, null,
 				"test");
-		assertEquals(3, result.size());
+		assertEquals(7, result.size());
 	}
 
 	@Test(timeout = 5000)
