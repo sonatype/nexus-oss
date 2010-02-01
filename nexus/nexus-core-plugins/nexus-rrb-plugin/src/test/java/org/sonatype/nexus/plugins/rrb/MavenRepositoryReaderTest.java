@@ -40,7 +40,7 @@ public class MavenRepositoryReaderTest {
 	public void setUp() throws Exception {
 		reader = new MavenRepositoryReader();
 
-		// Create a Jetty server with handler that returns the content of the
+		// Create a Jetty server with a handler that returns the content of the
 		// given target (i.e. an emulated html, S3Repo, etc, file from the test
 		// resources)
 		Handler handler = new AbstractHandler() {

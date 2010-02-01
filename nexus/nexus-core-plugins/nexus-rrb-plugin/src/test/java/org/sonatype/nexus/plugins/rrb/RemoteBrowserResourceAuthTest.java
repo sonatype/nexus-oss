@@ -112,7 +112,7 @@ public class RemoteBrowserResourceAuthTest extends AbstractPluginTestCase
 
         if( this.server != null)
         {
-            this.server.stop();
+        	this.server.stop();
         }
         
         super.tearDown();

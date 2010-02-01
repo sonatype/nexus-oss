@@ -12,7 +12,7 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
     private static final String[] EXCLUDES = { "VolumeIcon","Parent Directory", "?", "..", "index", "robots" };
     private String localUrl;
     private String remoteUrl;
-    private ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
+    ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
 	private String id;
 
     public S3RemoteRepositoryParser(String remoteUrl, String localUrl,String id) {
@@ -21,7 +21,7 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
         this.id=id;
     }
 
-    private void extractContent(StringBuilder indata) {
+    void extractContent(StringBuilder indata) {
         int start = 0;
         int end = 0;
         do {
@@ -48,7 +48,7 @@ public class S3RemoteRepositoryParser implements RemoteRepositoryParser {
 
     }
 
-    private void extractCommonPrefix(StringBuilder indata) {
+    void extractCommonPrefix(StringBuilder indata) {
         int start = 0;
         int end = 0;
         do {
