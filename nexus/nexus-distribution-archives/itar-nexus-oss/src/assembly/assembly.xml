@@ -18,6 +18,9 @@
         <exclude>plexus-app-booter-*</exclude>
         <exclude>plexus-container-default-*</exclude>
         <exclude>plexus-jsw-app-booter-*</exclude>
+        <exclude>nexus-plugin-manager-*</exclude>
+        <exclude>reflect-class-descriptor-*</exclude>
+        <exclude>plugin-gleaner-*</exclude>
       </excludes>
     </fileSet>
     <fileSet>
