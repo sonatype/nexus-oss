@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<assembly>
+  <id></id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <directory>./target/assembly</directory>
+      <outputDirectory>/</outputDirectory>
+    </fileSet>    
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/lib</directory>
+      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory>
+    </fileSet>
+  </fileSets>
+</assembly>

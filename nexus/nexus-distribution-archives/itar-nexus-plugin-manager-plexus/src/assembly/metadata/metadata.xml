@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<metadata>
+
+  <description>Nexus Plugin Manager (Plexus) ITAR</description>
+
+  <requires>
+    <property>
+      <name>appName</name>
+    </property>
+    <property>
+      <name>runtimeDir</name>
+    </property>
+  </requires>
+
+</metadata>
