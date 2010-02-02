@@ -39,6 +39,12 @@
         <type>zip</type>
       </itar>
       <itar>
+        <groupId>org.sonatype.runtime.itars</groupId>
+        <artifactId>itar-nexus-plugin-manager-guice</artifactId>
+        <version>0.1.0-v0001-SNAPSHOT</version>
+        <type>zip</type>
+      </itar>
+      <itar>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>itar-nexus-plugin-console-plugin</artifactId>
         <version>${project.version}</version>
@@ -59,7 +65,7 @@
       <itar>
         <groupId>org.sonatype.runtime.itars</groupId>
         <artifactId>itar-plexus-container-guice</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.1.0-v0001-SNAPSHOT</version>
         <type>zip</type>
       </itar>
       <itar>
