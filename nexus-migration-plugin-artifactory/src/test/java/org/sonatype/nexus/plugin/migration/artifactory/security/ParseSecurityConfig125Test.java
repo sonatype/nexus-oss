@@ -58,11 +58,14 @@ public class ParseSecurityConfig125Test
     @Test
     public void assertPermissionTarget()
     {
-        ArtifactoryPermissionTarget target1 = new ArtifactoryPermissionTarget( "ANY" );
+        ArtifactoryPermissionTarget target1 = new ArtifactoryPermissionTarget();
+        target1.addRepoKey( "ANY" );
         target1.addInclude( ".*" );
-        ArtifactoryPermissionTarget target2 = new ArtifactoryPermissionTarget( "libs-releases" );
+        ArtifactoryPermissionTarget target2 = new ArtifactoryPermissionTarget();
+        target2.addRepoKey( "libs-releases" );
         target2.addInclude( "org/apache/.*" );
-        ArtifactoryPermissionTarget target3 = new ArtifactoryPermissionTarget( "java.net-cache" );
+        ArtifactoryPermissionTarget target3 = new ArtifactoryPermissionTarget();
+        target3.addRepoKey( "java.net-cache" );
         target3.addInclude( ".*" );
 
         assertPermissionTargetContent( target1, securityConfig.getPermissionTargets().get( 0 ) );
@@ -97,7 +100,7 @@ public class ParseSecurityConfig125Test
 
     private void assertPermissionTargetContent( ArtifactoryPermissionTarget expected, ArtifactoryPermissionTarget actual )
     {
-        Assert.assertEquals( expected.getRepoKey(), actual.getRepoKey() );
+        Assert.assertEquals( expected.getRepoKeys(), actual.getRepoKeys() );
         Assert.assertEquals( expected.getIncludes(), actual.getIncludes() );
         Assert.assertEquals( expected.getExcludes(), actual.getExcludes() );
     }

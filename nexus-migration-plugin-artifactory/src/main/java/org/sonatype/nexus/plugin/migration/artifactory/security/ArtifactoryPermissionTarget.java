@@ -21,36 +21,52 @@ public class ArtifactoryPermissionTarget
 
     private String id;
 
-    private String repoKey;
+    private List<String> repoKeys = new ArrayList<String>();
 
     private List<String> includes = new ArrayList<String>();
 
     private List<String> excludes = new ArrayList<String>();
 
-    public ArtifactoryPermissionTarget( String repoKey )
+    public ArtifactoryPermissionTarget()
     {
         this.id = "arti-perm-target-" + defaultIdCount;
 
         defaultIdCount++;
-
-        this.repoKey = repoKey;
     }
-    
+
+    public ArtifactoryPermissionTarget( String id )
+    {
+        this.id = id;
+    }
+
     public ArtifactoryPermissionTarget( String id, String repoKey )
     {
         this.id = id;
 
-        this.repoKey = repoKey;
+        this.repoKeys.add( repoKey );
+    }
+
+    public List<String> getRepoKeys()
+    {
+        return repoKeys;
+    }
+
+    public void setRepoKeys( List<String> repoKeys )
+    {
+        this.repoKeys = repoKeys;
+    }
+
+    public void addRepoKey( String repoKey )
+    {
+        if ( !this.repoKeys.contains( repoKey ) )
+        {
+            repoKeys.add( repoKey );
+        }
     }
 
     public String getId()
     {
         return id;
-    }
-
-    public String getRepoKey()
-    {
-        return repoKey;
     }
 
     public List<String> getIncludes()
@@ -88,7 +104,7 @@ public class ArtifactoryPermissionTarget
 
         ArtifactoryPermissionTarget repoTarget = (ArtifactoryPermissionTarget) obj;
 
-        return id.equals( repoTarget.id ) && repoKey.equals( repoTarget.repoKey )
+        return id.equals( repoTarget.id ) && repoKeys.equals( repoTarget.repoKeys )
             && includes.equals( repoTarget.includes ) && excludes.equals( repoTarget.excludes );
     }
 

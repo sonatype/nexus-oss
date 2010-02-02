@@ -107,8 +107,9 @@ public class ArtifactorySecurityConfig
     {
         for ( ArtifactoryPermissionTarget target : permissionTargets )
         {
-            if ( target.getRepoKey().equals( repoKey ) && target.getIncludes().size() == 1
-                && target.getExcludes().isEmpty() && target.getIncludes().get( 0 ).equals( path ) )
+            if ( target.getRepoKeys().size() == 1 && target.getRepoKeys().contains( repoKey )
+                && target.getIncludes().size() == 1 && target.getExcludes().isEmpty()
+                && target.getIncludes().get( 0 ).equals( path ) )
             {
                 return target;
             }

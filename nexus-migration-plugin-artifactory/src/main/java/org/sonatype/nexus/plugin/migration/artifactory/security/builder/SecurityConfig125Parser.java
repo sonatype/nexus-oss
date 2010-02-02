@@ -90,7 +90,9 @@ public class SecurityConfig125Parser
 
             String pathValue = repoPathDom.getChild( "path" ).getValue();
 
-            ArtifactoryPermissionTarget repoTarget = new ArtifactoryPermissionTarget( repoKeyValue );
+            ArtifactoryPermissionTarget repoTarget = new ArtifactoryPermissionTarget(  );
+            
+            repoTarget.addRepoKey( repoKeyValue );
 
             repoTarget.addInclude( PatternConvertor.convert125Pattern( pathValue ) );
 

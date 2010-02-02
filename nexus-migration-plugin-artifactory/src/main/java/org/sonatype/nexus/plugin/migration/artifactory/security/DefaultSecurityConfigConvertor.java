@@ -191,22 +191,27 @@ public class DefaultSecurityConfigConvertor
         prop.setValue( repoTarget.getId() );
         privilege.addProperty( prop );
 
-        // for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
-        if ( permissionTarget.getRepoKey().equals( "ANY" ) )
+        for ( String repoKey : permissionTarget.getRepoKeys() )
         {
-            prop = new SecurityProperty();
-            prop.setKey( "repositoryGroupId" );
-            prop.setValue( "" );
-            privilege.addProperty( prop );
+            // for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
+            if ( repoKey.equals( "ANY" ) )
+            {
+                prop = new SecurityProperty();
+                prop.setKey( "repositoryGroupId" );
+                prop.setValue( "" );
+                privilege.addProperty( prop );
 
-            prop = new SecurityProperty();
-            prop.setKey( "repositoryId" );
-            prop.setValue( "" );
-            privilege.addProperty( prop );
-        }
-        else
-        {
-            privilege.addProperty( buildRepoIdGroupIdProperty( request, permissionTarget.getRepoKey() ) );
+                prop = new SecurityProperty();
+                prop.setKey( "repositoryId" );
+                prop.setValue( "" );
+                privilege.addProperty( prop );
+            }
+            // TODO do we really need to ANY REMOTE and ANY LOCAL in Artifactory 2.1.x ?
+            else
+            {
+                privilege.addProperty( buildRepoIdGroupIdProperty( request, repoKey ) );
+            }
+
         }
 
         request.getPersistor().receiveSecurityPrivilege( privilege );
@@ -401,7 +406,7 @@ public class DefaultSecurityConfigConvertor
 
     /**
      * One permission target will be converted a one TargetSuite
-     *
+     * 
      * @author Juven Xu
      */
     public class TargetSuite

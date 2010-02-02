@@ -79,7 +79,7 @@ public class SecurityConfigConvertorTest
         // repoPaths
         ArtifactoryPermissionTarget apache = new ArtifactoryPermissionTarget( "apachePermTarget", "apache" );
         apache.addInclude( "org/apache/.*" );
-        ArtifactoryPermissionTarget jvnet = new ArtifactoryPermissionTarget( "jvnet" );
+        ArtifactoryPermissionTarget jvnet = new ArtifactoryPermissionTarget( "jvnetPermTarget", "jvnet" );
         jvnet.addInclude( ".*" );
         config.addPermissionTarget( apache );
         config.addPermissionTarget( jvnet );

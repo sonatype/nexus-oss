@@ -113,9 +113,23 @@ public class SecurityConfig130Parser
 
             String name = targetDom.getChild( "name" ).getValue();
 
-            String repoKey = targetDom.getChild( "repoKey" ).getValue();
+            ArtifactoryPermissionTarget target = new ArtifactoryPermissionTarget( name );
 
-            ArtifactoryPermissionTarget target = new ArtifactoryPermissionTarget( name, repoKey );
+            // Artifactory 1.3.0 - 2.0.x
+            if ( targetDom.getChild( "repoKey" ) != null )
+            {
+                String repoKey = targetDom.getChild( "repoKey" ).getValue();
+
+                target.addRepoKey( repoKey );
+            }
+            // Artifactory 2.1.x
+            else if ( targetDom.getChild( "repoKeys" ) != null )
+            {
+                for ( Xpp3Dom repoKeyDom : targetDom.getChild( "repoKeys" ).getChildren() )
+                {
+                    target.addRepoKey( repoKeyDom.getValue() );
+                }
+            }
 
             Xpp3Dom includes = targetDom.getChild( "includes" );
 
