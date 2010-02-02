@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 
 /**
  * This component simply preserves "state" and gets the needed GAVP values from the POM that it stores temporarily.

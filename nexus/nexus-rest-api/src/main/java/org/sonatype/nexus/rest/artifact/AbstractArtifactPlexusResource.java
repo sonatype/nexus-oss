@@ -54,6 +54,7 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.StorageFileItemRepresentation;
+import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource

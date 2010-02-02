@@ -42,35 +42,35 @@
     <class>
       <name>AuthenticationSettings</name>
       <version>1.0.0+</version>
-      <description>
-        Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected
-        remote
-        repositories.
-			</description>
+      <description>Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected remote repositories.</description>
       <fields>
         <field>
           <name>username</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>A username to be used in authentication.</description>
         </field>
         <field>
           <name>password</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>A password to be used in authentication.</description>
         </field>
         <field>
           <name>ntlmHost</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The Windows NT Lan Manager to use for authentication.</description>
         </field>
         <field>
           <name>ntlmDomain</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The Windows NT Lan Manager Domain to use for authentication.</description>
         </field>
       </fields>
     </class>
@@ -325,24 +325,28 @@
     <class>
       <name>ErrorReportingSettings</name>
       <version>1.0.0+</version>
+      <description>Connection parameters to allow Nexus to report errors to the Sonatype JIRA server.</description>
       <fields>
         <field>
           <name>jiraUsername</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Username of a valid jira account (if empty will use the default error reporting username).</description>
         </field>
         <field>
           <name>jiraPassword</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Password of a valid jira account (if empty will use the default error reporting password).</description>
         </field>
         <field>
           <name>useGlobalProxy</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that states whether to use the global proxy configuration in Nexus.</description>
         </field>
       </fields>
     </class>
@@ -1648,6 +1652,7 @@
       <name>ContentListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a content resource request, contains the typical 'data' parameter, which is a list of the content items requested.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1657,6 +1662,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of ContentListResource objects, each of which represents a single item in the repository.</description>
         </field>
       </fields>
     </class>
@@ -1664,51 +1670,49 @@
     <class>
       <name>ContentListResource</name>
       <version>1.0.0+</version>
+      <description>A Content Item definition, including all data needed to properly access the item, and understand the item.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URI that can be used to directly access this item in the future.</description>
         </field>
         <field>
           <name>relativePath</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The relative path in relation to the root of the repository.</description>
         </field>
         <field>
           <name>text</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>A name of the content item.</description>
         </field>
         <field>
           <name>leaf</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states whether the content item is a file item (if true), otherwise it is a folder item, and can use the resourceURI to retrieve the contained content.</description>
         </field>
         <field>
           <name>lastModified</name>
           <version>1.0.0+</version>
           <type>Date</type>
           <required>false</required>
+          <description>Timestamp the item was last modified.</description>
         </field>
         <field>
           <name>sizeOnDisk</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>false</required>
-        </field>
-        <field>
-          <name>children</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>ContentListResource</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>false</required>
+          <description>Size of the item on the disk.</description>
         </field>
       </fields>
     </class>
@@ -1718,6 +1722,7 @@
       <name>ContentListDescribeResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a content resource request, contains the typical 'data' parameter, which is a list of the content items requested.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1726,6 +1731,7 @@
             <type>ContentListDescribeResource</type>
           </association>
           <required>true</required>
+          <description>List of describe items, that will contain useful information about the retrieved data.</description>
         </field>
       </fields>
     </class>
@@ -1733,18 +1739,21 @@
     <class>
       <name>ContentListDescribeResource</name>
       <version>1.0.0+</version>
+      <description>Details about the requested item, that should be useful in finding how the item was retrieved.</description>
       <fields>
         <field>
           <name>requestUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The original request url used to access the resource.</description>
         </field>
         <field>
           <name>processingTimeMillis</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of milliseconds that passed while retrieving the item.</description>
         </field>
         <field>
           <name>request</name>
@@ -1753,6 +1762,7 @@
             <type>ContentListDescribeRequestResource</type>
           </association>
           <required>true</required>
+          <description>A set of request parameters for the item.</description>
         </field>
         <field>
           <name>response</name>
@@ -1761,12 +1771,14 @@
             <type>ContentListDescribeResponseResource</type>
           </association>
           <required>true</required>
+          <description>A set of response parameters for the item.</description>
         </field>
       </fields>
     </class>
 
     <class>
       <name>ContentListDescribeRequestResource</name>
+      <description>A set of request parameters that were used to retrieve the item.</description>
       <version>1.0.0+</version>
       <fields>
         <field>
@@ -1774,12 +1786,14 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The request url that initially generated this request.</description>
         </field>
         <field>
           <name>requestPath</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The path on the server that was requested.</description>
         </field>
         <field>
           <name>requestContext</name>
@@ -1789,11 +1803,13 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>A list of String objects that were in the Restlet request context.</description>
         </field>
       </fields>
     </class>
     <class>
       <name>ContentListDescribeResponseResource</name>
+      <description>A set of response parameters that were sent back with response.</description>
       <version>1.0.0+</version>
       <fields>
         <field>
@@ -1801,42 +1817,49 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>States the type of item that was returned (or NONE if not found).</description>
         </field>
         <field>
           <name>responseActualClass</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The classname of the returned item.</description>
         </field>
         <field>
           <name>responsePath</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The path of the item in the repository.</description>
         </field>
         <field>
           <name>responseUid</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>A string that uniquely defines this item in the system (or 'virtual' if this is an item from a virtual repository).</description>
         </field>
         <field>
           <name>originatingRepositoryId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository this item was retrieved from (or null if this is an item from a virtual repository).</description>
         </field>
         <field>
           <name>originatingRepositoryName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository this item was retrieved from (or null if this is an item from a virtual repository).</description>
         </field>
         <field>
           <name>originatingRepositoryMainFacet</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The main facet (Repository implementation) of the repository this item was retrieved from (or null if this is an item from a virtual repository).</description>
         </field>
         <field>
           <name>processedRepositoriesList</name>
@@ -1846,6 +1869,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repositories that were processed while retrieving this item (in case item was retrieved via a group url, for example, would list all repositories in the group scanned until item was found).</description>
         </field>
         <field>
           <name>appliedMappings</name>
@@ -1855,6 +1879,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of mappings applied while retrieving this item.</description>
         </field>
         <field>
           <name>properties</name>
@@ -1864,6 +1889,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of extra properties containing more information.</description>
         </field>
         <field>
           <name>attributes</name>
@@ -1873,6 +1899,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of attributes stored on disk for the item.</description>
         </field>
         <field>
           <name>sources</name>
@@ -1882,6 +1909,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>If this is a composite item, the list of sources that this item was generated from.</description>
         </field>
       </fields>
     </class>
@@ -1940,6 +1968,7 @@
       <name>ConfigurationsListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of Nexus configuration objects, contains the typical 'data' parameter, which is a list of the configuration items.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1949,6 +1978,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of Nexus configuration objects.</description>
         </field>
       </fields>
     </class>
@@ -1956,18 +1986,21 @@
     <class>
       <name>ConfigurationsListResource</name>
       <version>1.0.0+</version>
+      <description>A Nexus configuration item, and the url needed to retrieve the configuration details.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The url that can be accessed to retrieve details about the configuration.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the configuration item.</description>
         </field>
       </fields>
     </class>
@@ -2094,6 +2127,7 @@
       <name>FeedListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of Nexus feed items, contains the typical 'data' parameter, which is a list of the feed items.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2103,6 +2137,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of feeds available from Nexus.</description>
         </field>
       </fields>
     </class>
@@ -2110,18 +2145,21 @@
     <class>
       <name>FeedListResource</name>
       <version>1.0.0+</version>
+      <description>Details about an RSS Feed that Nexus supplies.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL that must be used to retrieve the feed data.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the feed.</description>
         </field>
       </fields>
     </class>
@@ -2878,18 +2916,21 @@
 	<class>
 	  <name>ErrorReportRequestDTO</name>
 	  <version>1.0.0+</version>
+      <description>Details required to generate an error report.</description>
 	  <fields>
 	    <field>
 	      <name>title</name>
 	      <version>1.0.0+</version>
 	      <type>String</type>
 	      <required>true</required>
+          <description>The title of the error report.</description>
 	    </field>
 	    <field>
 	      <name>description</name>
 	      <version>1.0.0+</version>
 	      <type>String</type>
 	      <required>false</required>
+          <description>A detailed explanation of the error report.</description>
 	    </field>
 	  </fields>
 	</class>
@@ -2897,6 +2938,7 @@
 	<class>
 	  <name>ErrorReportRequest</name>
 	  <version>1.0.0+</version>
+      <description>REST Request object for generating an error report, contains the typical 'data' parameter, which is an error report item.</description>
 	  <fields>
 	    <field>
 	      <name>data</name>
@@ -2905,6 +2947,7 @@
             <type>ErrorReportRequestDTO</type>
           </association>
           <required>true</required>
+          <description>The error report object.</description>
 	    </field>
 	  </fields>
 	</class>
@@ -2912,18 +2955,21 @@
 	<class>
 	  <name>ErrorReportResponseDTO</name>
 	  <version>1.0.0+</version>
+      <description>The response data that is returned after generating an error report.</description>
 	  <fields>
 	    <field>
 	      <name>jiraUrl</name>
 	      <version>1.0.0+</version>
 	      <type>String</type>
 	      <required>true</required>
+          <description>The JIRA server URL for the error report that was created.</description>
 	    </field>
 	  </fields>
 	</class>
 	
 	<class>
 	  <name>ErrorReportResponse</name>
+      <description>REST Response object received after generating an error report, contains the typical 'data' parameter, which is the error report response item.</description>
 	  <version>1.0.0+</version>
 	  <fields>
 	    <field>
@@ -2933,6 +2979,7 @@
             <type>ErrorReportResponseDTO</type>
           </association>
           <required>true</required>
+          <description>The error report response object.</description>
 	    </field>
 	  </fields>
 	</class>
@@ -2941,78 +2988,91 @@
     <class>
       <name>ArtifactResolveResource</name>
       <version>1.0.0+</version>
+      <description>A resource which contains full maven details of the requested artifact.</description>
       <fields>
         <field>
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The groupId of the requested artifact.</description>
         </field>
         <field>
           <name>artifactId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The artifactId of the requested artifact.</description>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The version of the requested artifact.</description>
         </field>
         <field>
           <name>baseVersion</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The base version of the requested artifact.</description>
         </field>
         <field>
           <name>classifier</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The classifier of the requested artifact.</description>
         </field>
         <field>
           <name>extension</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The file extension of the requested artifact.</description>
         </field>
         <field>
           <name>snapshot</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if requested artifact is a snapshot.</description>
         </field>
         <field>
           <name>snapshotBuildNumber</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The build number of the snapshot version of the requested artifact.</description>
         </field>
         <field>
           <name>snapshotTimeStamp</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The timestamp portion of the snapshot version of the requested artifact.</description>
         </field>
         <field>
           <name>fileName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The filename of the requested artifact.</description>
         </field>
         <field>
           <name>sha1</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The sha1 hash of the requested artifact.</description>
         </field>
         <field>
           <name>repositoryPath</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The path in the repository of the requested artifact.</description>
         </field>
       </fields>
     </class>
@@ -3020,6 +3080,7 @@
     <class>
       <name>ArtifactResolveResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object received after requesting an artifact resolve, contains the typical 'data' parameter, which is the artifact resolve details.</description>
       <fields>
         <field>
           <name>data</name>
@@ -3028,6 +3089,43 @@
             <type>ArtifactResolveResource</type>
           </association>
           <required>true</required>
+          <description>The artifact details requested.</description>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>ArtifactCoordinate</name>
+      <version>1.0.0+</version>
+      <description>Uniquely identifies a maven artifact.  This is returned by the artifact upload request.</description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The group id of the artifact.</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The artifact id of the artifact.</description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The version of the artifact.</description>
+        </field>
+        <field>
+          <name>packaging</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The packaging type of the artifact.</description>
         </field>
       </fields>
     </class>

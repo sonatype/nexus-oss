@@ -215,7 +215,6 @@ public class TestMarshalUnmarchal
         resource3.setResourceURI( "resourceURI3" );
         resource3.setSizeOnDisk( 43 );
         resource3.setText( "resource3" );
-        resource1.addChildren( resource3 );
 
         responseResponse.addData( resource1 );
         responseResponse.addData( resource2 );
