@@ -40,6 +40,12 @@
       </itar>
       <itar>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>itar-nexus-plugin-manager-plexus</artifactId>
+        <version>${project.version}</version>
+        <type>zip</type>
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>itar-nexus-plugin-console-plugin</artifactId>
         <version>${project.version}</version>
         <type>zip</type>
