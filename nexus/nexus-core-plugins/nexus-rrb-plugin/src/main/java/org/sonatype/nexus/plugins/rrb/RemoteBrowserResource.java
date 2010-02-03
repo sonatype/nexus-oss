@@ -17,9 +17,6 @@ import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.mapper.MapperException;
-import com.sdicons.json.model.JSONValue;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -84,15 +81,7 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
         MavenRepositoryReader mr = new MavenRepositoryReader();
         MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
         data.setData(mr.extract(remoteUrl, request.getResourceRef().toString(false, false), proxyRepository,id));
-        String returnValue;
-        try {
-            JSONValue value = JSONMapper.toJSON(data);
-            returnValue = value.render(true);
-        } catch (MapperException e) {
-        	logger.error(e.getMessage(), e);
-        	throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Failure serializing data", e);
-        }
-        logger.debug("return value is {}", returnValue);
+        logger.debug("return value is {}", data.toString());
         return data;
     }
     

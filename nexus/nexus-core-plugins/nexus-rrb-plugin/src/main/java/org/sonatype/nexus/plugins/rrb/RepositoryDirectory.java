@@ -1,8 +1,5 @@
 package org.sonatype.nexus.plugins.rrb;
 
-import com.sdicons.json.mapper.JSONMapper;
-import com.sdicons.json.mapper.MapperException;
-import com.sdicons.json.model.JSONValue;
 
 public class RepositoryDirectory {
     @Override
@@ -64,17 +61,6 @@ public class RepositoryDirectory {
             return false;
         }
         return true;
-    }
-
-    public String toJSON() {
-        JSONValue value = null;
-        try {
-            value = JSONMapper.toJSON(this);
-        } catch (MapperException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return value.render(true);
     }
 
     public String getRelativePath() {
