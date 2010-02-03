@@ -11,7 +11,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sonatype.nexus.plugins.rrb.MavenRepositoryReader.Data;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -21,6 +20,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.sdicons.json.mapper.JSONMapper;
 import com.sdicons.json.mapper.MapperException;
 import com.sdicons.json.model.JSONValue;
+import com.thoughtworks.xstream.XStream;
 
 /**
  * A REST resource for retrieving directories from a remote repository. By
@@ -39,6 +39,15 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
         return null;
     }
 
+    @Override
+        public void configureXStream( XStream xstream )
+        {
+            // TODO Auto-generated method stub
+            super.configureXStream( xstream );
+            xstream.alias( "rrbresponse", MavenRepositoryReaderResponse.class );
+            xstream.alias( "node", RepositoryDirectory.class);
+        }
+    
     @Override
     public PathProtectionDescriptor getResourceProtection() {
         // Allow anonymous access
@@ -73,7 +82,7 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
 			throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Could not find repository: "+ id, e1 );
 		}
         MavenRepositoryReader mr = new MavenRepositoryReader();
-        Data data = mr.new Data();
+        MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
         data.setData(mr.extract(remoteUrl, request.getResourceRef().toString(false, false), proxyRepository,id));
         String returnValue;
         try {
@@ -84,7 +93,7 @@ public class RemoteBrowserResource extends AbstractNexusPlexusResource implement
         	throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Failure serializing data", e);
         }
         logger.debug("return value is {}", returnValue);
-        return returnValue;
+        return data;
     }
     
 // TODO: if/when xxx is implemented the renderItem method might look something like:

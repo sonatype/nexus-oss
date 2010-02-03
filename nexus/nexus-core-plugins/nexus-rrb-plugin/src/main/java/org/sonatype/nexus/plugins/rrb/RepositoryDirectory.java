@@ -13,11 +13,11 @@ public class RepositoryDirectory {
 				+ "]";
 	}
 
-	private String resourceURI;
-    private String relativePath;
-    private String text;
+	private String resourceURI="";
+    private String relativePath="";
+    private String text="";
     private boolean leaf;
-    private String lastModified;
+    private String lastModified="";
     private int sizeOnDisk = -1;
 
     public String getResourceURI() {

@@ -162,19 +162,5 @@ public class MavenRepositoryReader {
      * Inner class used to imitate the for Nexus expected structure for the json
      * reply.
      */
-    public class Data {
-        List<RepositoryDirectory> data;
-
-        public Data() {
-            super();
-        }
-
-        public List<RepositoryDirectory> getData() {
-            return data;
-        }
-
-        public void setData(List<RepositoryDirectory> data) {
-            this.data = data;
-        }
-    }
+   
 }
