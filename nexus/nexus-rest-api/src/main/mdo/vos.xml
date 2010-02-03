@@ -171,12 +171,14 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The proxy hostname.</description>
         </field>
         <field>
           <name>proxyPort</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The proxy port.</description>
         </field>
         <field>
           <name>authentication</name>
@@ -185,6 +187,7 @@
             <type>AuthenticationSettings</type>
           </association>
           <required>false</required>
+          <description>Authentication used to connect with proxy server.</description>
         </field>
       </fields>
     </class>
@@ -374,6 +377,7 @@
       <name>RepositoryStatusListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository status list request, contains the typical 'data' parameter, which is the list of repository status objects.</description>
       <fields>
         <field>
           <name>data</name>
@@ -383,6 +387,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository status objects.</description>
         </field>
       </fields>
     </class>
@@ -390,42 +395,49 @@
     <class>
       <name>RepositoryStatusListResource</name>
       <version>1.0.0+</version>
+      <description>Some general details and status of the repostiory.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URI that can be used to manage the repository</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of repository.</description>
         </field>
         <field>
           <name>repoPolicy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository policy.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository format.</description>
         </field>
         <field>
           <name>status</name>
@@ -434,6 +446,7 @@
             <type>RepositoryStatusResource</type>
           </association>
           <required>true</required>
+          <description>The repository status object</description>
         </field>
       </fields>
     </class>
@@ -443,6 +456,7 @@
       <name>RepositoryListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository list request, contains the typical 'data' parameter, which is the list of repository objects.</description>
       <fields>
         <field>
           <name>data</name>
@@ -452,6 +466,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository objects.</description>
         </field>
       </fields>
     </class>
@@ -459,66 +474,77 @@
     <class>
       <name>RepositoryListResource</name>
       <version>1.0.0+</version>
+      <description>Repository general details.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>URI used to manage the repository.</description>
         </field>
         <field>
           <name>contentResourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>URI used to access repository over /content URL (as maven would do for example).</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the repository.</description>
         </field>
         <field>
           <name>repoPolicy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The policy of the repository.</description>
         </field>
         <field>
           <name>provider</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository provider.</description>
         </field>
         <field>
           <name>providerRole</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The role of the repository (classname).</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The format of the repository.</description>
         </field>
         <field>
           <name>userManaged</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the repository is manageable by the user.</description>
         </field>
         <field>
           <name>exposed</name>
@@ -526,18 +552,21 @@
           <type>boolean</type>
           <required>true</required>
           <defaultValue>true</defaultValue>
+          <description>Flag that states if the repository is exposed over the content url.</description>
         </field>
         <field>
           <name>effectiveLocalStorageUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL where the repository storage is on server.</description>
         </field>
         <field>
           <name>remoteUri</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The remote URI of the repository.</description>
         </field>
       </fields>
     </class>
@@ -546,6 +575,7 @@
       <name>RepositoryResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository request, contains the typical 'data' parameter, which is the repository object.</description>
       <fields>
         <field>
           <name>data</name>
@@ -554,6 +584,7 @@
             <type>RepositoryBaseResource</type>
           </association>
           <required>true</required>
+          <description>The repository object.</description>
         </field>
       </fields>
     </class>
@@ -561,54 +592,63 @@
     <class>
       <name>RepositoryBaseResource</name>
       <version>1.0.0+</version>
+      <description>The repository base object, this could be extended by a new object if new fields are required.</description>
       <fields>
         <field>
           <name>contentResourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL to access the content resource of the repository.</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository.</description>
         </field>
         <field>
           <name>provider</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The provider of the repository (i.e. maven, p2, obr, etc.).</description>
         </field>
         <field>
           <name>providerRole</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The role of the repository (i.e. Repository, GroupRepository, etc.).</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The format of the repository.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the repository.</description>
         </field>
         <field>
           <name>exposed</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states whether the repository should be available over the content resource.</description>
         </field>
       </fields>
     </class>
@@ -617,61 +657,70 @@
       <name>RepositoryResource</name>
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>Hosted or Proxy repository parameters, extending the base resource.</description>
       <fields>
-        <!-- Hosted/Proxied specific -->
         <field>
           <name>writePolicy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Write policy on the repository, allows for no write, write once, overwrite, etc.</description>
         </field>
         <field>
           <name>browseable</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the repository is browseable.</description>
         </field>
         <field>
           <name>indexable</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the repository is indexable.</description>
         </field>
         <field>
           <name>notFoundCacheTTL</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>How long requests should remain in the NFC before checking for existance again.</description>
         </field>
         <field>
           <name>repoPolicy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository policy (release, snapshot).</description>
         </field>
         <field>
           <name>checksumPolicy</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository checksum policy (ignore checksum errors, dont download if checksum errors, etc.).</description>
         </field>
         <field>
           <name>downloadRemoteIndexes</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the proxy repository should download indexes from remote repository.</description>
         </field>
         <field>
           <name>overrideLocalStorageUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User defined storage directory on server (which is not the default).</description>
         </field>
         <field>
           <name>defaultLocalStorageUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The default storage directory on the server.</description>
         </field>
         <field>
           <name>remoteStorage</name>
@@ -680,6 +729,7 @@
             <type>RepositoryResourceRemoteStorage</type>
           </association>
           <required>false</required>
+          <description>The remote storage details.</description>
         </field>
       </fields>
     </class>
@@ -688,6 +738,7 @@
       <name>RepositoryShadowResource</name>
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>Shadow (or Virtual) repository parameters, extending the base resource.</description>
       <fields>
         <!-- Shadow specific -->
         <field>
@@ -695,14 +746,15 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository that this virtual repository is shadowing.</description>
         </field>
         <field>
           <name>syncAtStartup</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that determines if the virtual repository should sync its content with master on startup.</description>
         </field>
-
       </fields>
     </class>
 
@@ -710,6 +762,7 @@
       <name>RepositoryProxyResource</name>
       <superClass>RepositoryResource</superClass>
       <version>1.0.0+</version>
+      <description>Proxy repository parameters, extending the repository resource.</description>
       <fields>
         <!-- Proxy specific -->
         <field>
@@ -717,12 +770,14 @@
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The max age of artifacts before we will check remote again for updates (in milliseconds, -1 for never).</description>
         </field>
         <field>
           <name>metadataMaxAge</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The max age of metadata before we will check remote again for updated (in milliseconds, -1 for never).</description>
         </field>
       </fields>
     </class>
@@ -730,12 +785,14 @@
     <class>
       <name>RepositoryResourceRemoteStorage</name>
       <version>1.0.0+</version>
+      <description>Remote storage details for the proxy repository.</description>
       <fields>
         <field>
           <name>remoteStorageUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The remote URL that this repository is proxying.</description>
         </field>
         <field>
           <name>authentication</name>
@@ -744,6 +801,7 @@
             <type>AuthenticationSettings</type>
           </association>
           <required>false</required>
+          <description>The authentication details of the remote connection.</description>
         </field>
         <field>
           <name>connectionSettings</name>
@@ -752,6 +810,7 @@
             <type>RemoteConnectionSettings</type>
           </association>
           <required>false</required>
+          <description>The connection settings for the remote connection.</description>
         </field>
         <field>
           <name>httpProxySettings</name>
@@ -760,6 +819,7 @@
             <type>RemoteHttpProxySettings</type>
           </association>
           <required>false</required>
+          <description>Repository specific proxy server settings for the remote connection (overrides the global proxy server configuration).</description>
         </field>
       </fields>
     </class>
@@ -768,6 +828,7 @@
       <name>RepositoryStatusResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository status request, contains the typical 'data' parameter, which is the repository status objects.</description>
       <fields>
         <field>
           <name>data</name>
@@ -776,6 +837,7 @@
             <type>RepositoryStatusResource</type>
           </association>
           <required>true</required>
+          <description>Repository status details.</description>
         </field>
       </fields>
     </class>
@@ -783,42 +845,49 @@
     <class>
       <name>RepositoryStatusResource</name>
       <version>1.0.0+</version>
+      <description>Repository status parameters.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the repository.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The format of the repository.</description>
         </field>
         <field>
           <name>localStatus</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The local status of the repository (user blocked for example).</description>
         </field>
         <field>
           <name>remoteStatus</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The remote status of the repository (unreachable for example).</description>
         </field>
         <field>
           <name>proxyMode</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The repository proxy mode (allow, blocked, etc.).</description>
         </field>
         <field>
           <name>dependentRepos</name>
@@ -828,36 +897,42 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>The lsit of repositories that shadow this repository.</description>
         </field>
       </fields>
     </class>
     <class>
       <name>RepositoryDependentStatusResource</name>
       <version>1.0.0+</version>
+      <description>Details of a repository that shadow another repository.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The shadow repository id.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The shadow repository type.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The shadow repository format.</description>
         </field>
         <field>
           <name>localStatus</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The shadow repository local status.</description>
         </field>
       </fields>
     </class>
@@ -866,6 +941,7 @@
       <name>RepositoryMetaResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository metadata request, contains the typical 'data' parameter, which is the repository metadata object.</description>
       <fields>
         <field>
           <name>data</name>
@@ -874,6 +950,7 @@
             <type>RepositoryMetaResource</type>
           </association>
           <required>true</required>
+          <description>The repository metadata parameters.</description>
         </field>
       </fields>
     </class>
@@ -881,72 +958,84 @@
     <class>
       <name>RepositoryMetaResource</name>
       <version>1.0.0+</version>
+      <description>Details about the repository.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository id.</description>
         </field>
         <field>
           <name>repoType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository type.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository format.</description>
         </field>
         <field>
           <name>sizeOnDisk</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The size on disk the repository consumes.</description>
         </field>
         <field>
           <name>freeSpaceOnDisk</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The size available on disk where the repository is located.</description>
         </field>
         <field>
           <name>fileCountInRepository</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of files held in the repository.</description>
         </field>
         <field>
           <name>notFoundCacheSize</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of requested paths that are currently in the not found cache.</description>
         </field>
         <field>
           <name>notFoundCacheHits</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of checks against the not found cache that have succeeded (and thus saved a remote check).</description>
         </field>
         <field>
           <name>notFoundCacheMisses</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of checks against the not found cache that have failed (and thus required a remote check).</description>
         </field>
         <field>
           <name>localStorageErrorsCount</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The number of errors reported by local storage.</description>
         </field>
         <field>
           <name>remoteStorageErrorsCount</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The number of errors reported by remote storage.</description>
         </field>
         <field>
           <name>groups</name>
@@ -956,6 +1045,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository groups that this repository is contained in.</description>
         </field>
       </fields>
     </class>
@@ -964,6 +1054,7 @@
       <name>RepositoryGroupListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository group list request, contains the typical 'data' parameter, which is the list of repository group objects.</description>
       <fields>
         <field>
           <name>data</name>
@@ -973,6 +1064,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository group objects.</description>
         </field>
       </fields>
     </class>
@@ -980,42 +1072,49 @@
     <class>
       <name>RepositoryGroupListResource</name>
       <version>1.0.0+</version>
+      <description>The basic set of details of a repository group.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>URL used to manage the repository group.</description>
         </field>
         <field>
           <name>contentResourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>URL used to manage content of the repository group.</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository group.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository group.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The format of the repository group.</description>
         </field>
         <field>
           <name>exposed</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the repository group is available over the content resource.</description>
         </field>
       </fields>
     </class>
@@ -1024,6 +1123,7 @@
       <name>RepositoryGroupResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository group request, contains the typical 'data' parameter, which is the repository group object.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1032,6 +1132,7 @@
             <type>RepositoryGroupResource</type>
           </association>
           <required>true</required>
+          <description>The repository group object.</description>
         </field>
       </fields>
     </class>
@@ -1040,6 +1141,7 @@
       <name>RepositoryGroupResource</name>
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>The set of items that define the repository group (extends repository base resource).</description>
       <fields>
         <field>
           <name>repositories</name>
@@ -1049,6 +1151,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repositories that this repository group contains (order IS important).</description>
         </field>
       </fields>
     </class>
@@ -1056,24 +1159,28 @@
     <class>
       <name>RepositoryGroupMemberRepository</name>
       <version>1.0.0+</version>
+      <description>A repository that is contained within a group.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository id.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository name.</description>
         </field>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL used to manage the repository.</description>
         </field>
       </fields>
     </class>
@@ -1083,6 +1190,7 @@
       <name>RepositoryRouteListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository route list request, contains the typical 'data' parameter, which is the list of repository route objects.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1092,6 +1200,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository route objects.</description>
         </field>
       </fields>
     </class>
@@ -1099,30 +1208,35 @@
     <class>
       <name>RepositoryRouteListResource</name>
       <version>1.0.0+</version>
+      <description>A repository route basic set of details, for display in lists (full details can be retrieved using the resourceURI).</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL used to manage this repository route.</description>
         </field>
         <field>
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The group this route is attached to.</description>
         </field>
         <field>
           <name>ruleType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of rule (inclusive, exclusive, etc.).</description>
         </field>
         <field>
           <name>pattern</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The pattern associated to this route.</description>
         </field>
         <field>
           <name>repositories</name>
@@ -1132,6 +1246,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of repositories in the associated group, that will be applied to route (or excluded based upon ruleType).</description>
         </field>
       </fields>
     </class>
@@ -1140,6 +1255,7 @@
       <name>RepositoryRouteResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository route request, contains the typical 'data' parameter, which is the repository route object.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1148,6 +1264,7 @@
             <type>RepositoryRouteResource</type>
           </association>
           <required>true</required>
+          <description>Repository Route details.</description>
         </field>
       </fields>
     </class>
@@ -1161,24 +1278,28 @@
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository route.</description>
         </field>
         <field>
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The group id that the route is applied on.</description>
         </field>
         <field>
           <name>ruleType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The rule type of the route (inclusive, exclusive, etc.).</description>
         </field>
         <field>
           <name>pattern</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The regex pattern that will be matched to see if route is applied to request.</description>
         </field>
         <field>
           <name>repositories</name>
@@ -1188,6 +1309,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of repositories in the group that will be included (or excluded depending on ruleType).</description>
         </field>
       </fields>
       <codeSegments>
@@ -1207,24 +1329,28 @@
     <class>
       <name>RepositoryRouteMemberRepository</name>
       <version>1.0.0+</version>
+      <description>Repository details in a repository route.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository id.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository name.</description>
         </field>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL that can be used to manage the repository.</description>
         </field>
       </fields>
     </class>
@@ -2074,75 +2200,86 @@
     </class>
 
     <class>
-      <!-- Simple artifact infos sent on search, etc -->
       <name>NexusArtifact</name>
       <version>1.0.0+</version>
+      <description>Artifact details sent back on search requests.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL that can be used to retrieve the artifact.</description>
         </field>
         <field>
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The group id of the artifact.</description>
         </field>
         <field>
           <name>artifactId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The artifact id of the artifact.</description>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The version of the artifact.</description>
         </field>
         <field>
           <name>classifier</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The classifier of the artifact.</description>
         </field>
         <field>
           <name>packaging</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The packaging of the artifact.</description>
         </field>
         <field>
           <name>extension</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The extension of the artifact.</description>
         </field>
         <field>
           <name>repoId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository id where the artifact is stored.</description>
         </field>
         <field>
           <name>contextId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The indexing context where the artifact is indexed.</description>
         </field>
         <field>
           <name>pomLink</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>URL that would give you the pom file.</description>
         </field>
         <field>
           <name>artifactLink</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>URL that would give you the artifact file.</description>
         </field>
       </fields>
     </class>
@@ -2193,8 +2330,8 @@
     <class>
       <name>NexusAuthenticationClientPermissions</name>
       <version>1.0.0+</version>
-      <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions
-      </superClass>
+      <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions</superClass>
+      <description>Permissions that are granted to the user.</description>
     </class>
 
     <!-- NFCs -->
@@ -2202,6 +2339,7 @@
       <name>NFCResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for an NFC resource item, contains the typical 'data' parameter, which is the NFC resource item.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2210,6 +2348,7 @@
             <type>NFCResource</type>
           </association>
           <required>true</required>
+          <description>An object which contains the contents of the NFC.</description>
         </field>
       </fields>
     </class>
@@ -2217,6 +2356,7 @@
     <class>
       <name>NFCResource</name>
       <version>1.0.0+</version>
+      <description>Contains a list of items stored in the NFC.</description>
       <fields>
         <field>
           <name>nfcContents</name>
@@ -2226,6 +2366,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of NFC repository items.</description>
         </field>
       </fields>
     </class>
@@ -2233,12 +2374,14 @@
     <class>
       <name>NFCRepositoryResource</name>
       <version>1.0.0+</version>
+      <description>Details about NFC usage for a repository.</description>
       <fields>
         <field>
           <name>repositoryId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository id that the nfc details are for.</description>
         </field>
         <field>
           <name>nfcStats</name>
@@ -2247,6 +2390,7 @@
             <type>NFCStats</type>
           </association>
           <required>true</required>
+          <description>NFC statistics.</description>
         </field>
         <field>
           <name>nfcPaths</name>
@@ -2256,6 +2400,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>List of paths in the NFC.</description>
         </field>
       </fields>
     </class>
@@ -2263,24 +2408,28 @@
     <class>
       <name>NFCStats</name>
       <version>1.0.0+</version>
+      <description>NFC Statistics.</description>
       <fields>
         <field>
           <name>size</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of paths stored in the NFC.</description>
         </field>
         <field>
           <name>hits</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of checks against this NFC that have found matches.</description>
         </field>
         <field>
           <name>misses</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of checks against this NFC that have not found matches.</description>
         </field>
       </fields>
     </class>
@@ -2499,6 +2648,7 @@
       <name>RepositoryTargetListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of repository targets, contains the typical 'data' parameter, which is the list of repository targets.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2508,6 +2658,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of repository targets.</description>
         </field>
       </fields>
     </class>
@@ -2515,30 +2666,35 @@
     <class>
       <name>RepositoryTargetListResource</name>
       <version>1.0.0+</version>
+      <description>The repository target list details.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>URL that can be used to manage the repository target.</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository target.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository target.</description>
         </field>
         <field>
           <name>contentClass</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The content class of the repository target.</description>
         </field>
       </fields>
     </class>
@@ -2547,6 +2703,7 @@
       <name>RepositoryTargetResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a repository target, contains the typical 'data' parameter, which is the repository target.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2555,6 +2712,7 @@
             <type>RepositoryTargetResource</type>
           </association>
           <required>true</required>
+          <description>The repository target details.</description>
         </field>
       </fields>
     </class>
@@ -2562,30 +2720,35 @@
     <class>
       <name>RepositoryTargetResource</name>
       <version>1.0.0+</version>
+      <description>The repository target configuration.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL used to manage the repository target.</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the repository target.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the repository target.</description>
         </field>
         <field>
           <name>contentClass</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The content class of the repository target.</description>
         </field>
         <field>
           <name>patterns</name>
@@ -2595,6 +2758,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of regular expression patterns associated with the repository target.</description>
         </field>
       </fields>
     </class>
@@ -2604,6 +2768,7 @@
       <name>RepositoryContentClassListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of repository content classes, contains the typical 'data' parameter, which is the repository content class list.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2613,6 +2778,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository content classes.</description>
         </field>
       </fields>
     </class>
@@ -2620,18 +2786,21 @@
     <class>
       <name>RepositoryContentClassListResource</name>
       <version>1.0.0+</version>
+      <description>Repository content class definition.</description>
       <fields>
         <field>
           <name>contentClass</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The content class.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the content class.</description>
         </field>
       </fields>
     </class>
@@ -2640,18 +2809,21 @@
     <class>
       <name>PlexusComponentListResource</name>
       <version>1.0.0+</version>
+      <description>Plexus component details.</description>
       <fields>
         <field>
           <name>roleHint</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The plexus role hint of the component.</description>
         </field>
         <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The plexus description of the component.</description>
         </field>
       </fields>
     </class>
@@ -2659,6 +2831,7 @@
     <class>
       <name>PlexusComponentListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object for a list of plexus components, contains the typical 'data' parameter, which is the plexus components.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2668,6 +2841,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of plexus components.</description>
         </field>
       </fields>
     </class>
@@ -2675,30 +2849,35 @@
     <class>
       <name>NexusRepositoryTypeListResource</name>
       <version>1.0.0+</version>
+      <description>Repository type definition.</description>
       <fields>
         <field>
           <name>provider</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository provider.</description>
         </field>
         <field>
           <name>providerRole</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository provider role.</description>
         </field>
         <field>
           <name>format</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository format.</description>
         </field>
         <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The repository type description.</description>
         </field>
       </fields>
     </class>
@@ -2706,6 +2885,7 @@
     <class>
       <name>NexusRepositoryTypeListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object for a list of repository types, contains the typical 'data' parameter, which is the repository types.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2715,6 +2895,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of repository types.</description>
         </field>
       </fields>
     </class>
@@ -2780,6 +2961,7 @@
       <name>MirrorResourceListResponse</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
+      <description>REST Response object for a list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2788,6 +2970,7 @@
             <type>MirrorResource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <description>The list of mirrors for a repository.</description>
         </field>
       </fields>
     </class>
@@ -2796,6 +2979,7 @@
       <name>MirrorResourceListRequest</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
+      <description>REST Request object to persiste list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2804,6 +2988,7 @@
             <type>MirrorResource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <description>List of mirrors</description>
         </field>
       </fields>
     </class>
@@ -2812,6 +2997,7 @@
       <name>MirrorStatusResourceListResponse</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
+      <description>REST Response object for a list of mirror statuses associated with a repository, contains the typical 'data' parameter, which is the list of mirrors statuses.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2820,6 +3006,7 @@
             <type>MirrorStatusResource</type>
             <multiplicity>*</multiplicity>
           </association>
+          <description>List of mirror status objects.</description>
         </field>
       </fields>
     </class>
@@ -2827,16 +3014,19 @@
     <class>
       <name>MirrorResource</name>
       <version>1.0.0+</version>
+      <description>Repository mirror configuration.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
+          <description>The id of the repository mirror.</description>
         </field>
         <field>
           <name>url</name>
           <version>1.0.0+</version>
           <type>String</type>
+          <description>The url of the repository mirror.</description>
         </field>
       </fields>
     </class>
@@ -2845,11 +3035,13 @@
       <name>MirrorStatusResource</name>
       <superClass>MirrorResource</superClass>
       <version>1.0.0+</version>
+      <description>Repository mirror status.</description>
       <fields>
         <field>
           <name>status</name>
           <version>1.0.0+</version>
           <type>String</type>
+          <description>The status of the mirror.</description>
         </field>
       </fields>
     </class>
@@ -2929,18 +3121,21 @@
 	<class>
 		<name>RestApiSettings</name>
 		<version>1.0.0+</version>
+        <description>The rest api configuration settings.</description>
 		<fields>
 			<field>
 				<name>forceBaseUrl</name>
 				<version>1.0.0+</version>
 				<type>boolean</type>
 				<required>false</required>
+                <description>Flag that states whether to forcefully set the baseUrl defined in rest responses.</description>
 			</field>
 			<field>
 				<name>baseUrl</name>
 				<version>1.0.0+</version>
 				<type>String</type>
 				<required>false</required>
+                <description>The baseUrl of the nexus server.</description>
 			</field>
 		</fields>
 	</class>
