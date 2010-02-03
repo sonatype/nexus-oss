@@ -11,8 +11,8 @@
 
 	<artifactId>nexus-rrb-plugin</artifactId>
 	<packaging>nexus-plugin</packaging>
-	<name>Nexus RRB Plugin</name>
-	<description>Nexus Remote Repository Browsing Plugin</description>
+	<name>Nexus Core Plugin :: Remote Repository Browsing</name>
+	<description>Adds browsing support for proxied remote repositories</description>
 
 	<developers>
 		<developer>
@@ -177,6 +177,11 @@
 			<version>1.8.2</version>
 			<type>jar</type>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
