@@ -22,7 +22,7 @@
   </modules>
 
   <properties>
-    <nexus.version>1.4.0</nexus.version>
+    <nexus.version>1.4.1</nexus.version>
     <plexus.version>1.2.1</plexus.version>
   </properties>
 
