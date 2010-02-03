@@ -194,6 +194,7 @@
       <name>GlobalConfigurationListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a global configuration list request, contains the typical 'data' parameter, which is a list of the global configuration items requested.</description>
       <fields>
         <field>
           <name>data</name>
@@ -203,6 +204,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of global configuration items.</description>
         </field>
       </fields>
     </class>
@@ -210,18 +212,21 @@
     <class>
       <name>GlobalConfigurationListResource</name>
       <version>1.0.0+</version>
+      <description>An item that contains details about a global configuration item, including the url required to retrieve the configuration details.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The url that can be GET requested to retrieve the details of the global configuration.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the global configuration.</description>
         </field>
       </fields>
     </class>
@@ -230,6 +235,7 @@
       <name>GlobalConfigurationResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a global configuration request, contains the typical 'data' parameter, which is the global configuration item requested.</description>
       <fields>
         <field>
           <name>data</name>
@@ -238,6 +244,7 @@
             <type>GlobalConfigurationResource</type>
           </association>
           <required>true</required>
+          <description>The global configuration details.</description>
         </field>
       </fields>
     </class>
@@ -245,30 +252,35 @@
     <class>
       <name>GlobalConfigurationResource</name>
       <version>1.0.0+</version>
+      <description>List of all global configuration items in Nexus.</description>
       <fields>
         <field>
           <name>securityEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that determines if security is enabled, if false, there will be no authc/authz checks performed on any requests to the systme.</description>
         </field>
         <field>
           <name>securityAnonymousAccessEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that, if true, will allow anonymous access while security is enabled.</description>
         </field>
         <field>
           <name>securityAnonymousUsername</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The username to use for anonymous access (so that roles/privileges can be applied to the anonymous access users).</description>
         </field>
         <field>
           <name>securityAnonymousPassword</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The password to use for anonymous access.</description>
         </field>
         <field>
           <name>securityRealms</name>
@@ -278,6 +290,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of security realms that are enabled for Nexus, note that order IS important.</description>
         </field>
         <field>
           <name>globalConnectionSettings</name>
@@ -286,6 +299,7 @@
             <type>RemoteConnectionSettings</type>
           </association>
           <required>true</required>
+          <description>Global remote connection settings.</description>
         </field>
         <field>
           <name>smtpSettings</name>
@@ -294,6 +308,7 @@
             <type>SmtpSettings</type>
           </association>
           <required>true</required>
+          <description>SMTP settings for email notifications that Nexus generates.</description>
         </field>
         <field>
           <name>globalHttpProxySettings</name>
@@ -302,6 +317,7 @@
             <type>RemoteHttpProxySettings</type>
           </association>
           <required>false</required>
+          <description>Global HTTP Proxy Settings (will be applied to all repositories by default).</description>
         </field>
         <field>
           <name>globalRestApiSettings</name>
@@ -310,6 +326,7 @@
           	<type>RestApiSettings</type>
           </association>
           <required>false</required>
+          <description>Rest API configuration parameters.</description>
         </field>
         <field>
           <name>errorReportingSettings</name>
@@ -318,6 +335,7 @@
             <type>ErrorReportingSettings</type>
           </association>
           <required>false</required>
+          <description>Error reporting configuration parameters.</description>
         </field>
       </fields>
     </class>
@@ -1919,6 +1937,7 @@
       <name>LogsListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a log list resource request, contains the typical 'data' parameter, which is a list of the log items requested.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1928,6 +1947,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of Log file items.</description>
         </field>
       </fields>
     </class>
@@ -1935,30 +1955,35 @@
     <class>
       <name>LogsListResource</name>
       <version>1.0.0+</version>
+      <description>Details to retrieve a log file from the Nexus server.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The url that can be GET requested to retrieve the log file content.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the file.</description>
         </field>
         <field>
           <name>size</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The size of the file.</description>
         </field>
         <field>
           <name>mimeType</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>MIME type of the file.</description>
         </field>
       </fields>
     </class>
@@ -2700,30 +2725,35 @@
     <class>
       <name>LogConfigResource</name>
       <version>1.0.0+</version>
+      <description>Set of parameters that describe how logging is configured</description>
       <fields>
         <field>
           <name>rootLoggerLevel</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The root logger level (i.e. DEBUG, INFO, etc.).</description>
         </field>
         <field>
           <name>rootLoggerAppenders</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The appenders that the root logger will use.</description>
         </field>
         <field>
           <name>fileAppenderLocation</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Where the file will be stored.</description>
         </field>
         <field>
           <name>fileAppenderPattern</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The pattern used to write to the file.</description>
         </field>
       </fields>
     </class>
@@ -2732,6 +2762,7 @@
       <name>LogConfigResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for the log config request, contains the typical 'data' parameter, which is the log configuration.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2740,6 +2771,7 @@
             <type>LogConfigResource</type>
           </association>
           <required>true</required>
+          <description>The log configuration parameters.</description>
         </field>
       </fields>
     </class>

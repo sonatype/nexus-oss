@@ -14,6 +14,12 @@ package org.sonatype.nexus.index.treeview;
 public class DefaultTreeNode
     extends AbstractTreeNode
 {
+    /**
+     * Constructor that takes an IndexTreeView implementation and a TreeNodeFactory implementation. 
+     * 
+     * @param tview
+     * @param factory
+     */
     public DefaultTreeNode( IndexTreeView tview, TreeNodeFactory factory )
     {
         super( tview, factory );

@@ -142,7 +142,7 @@
     <plexus-security.version>1.1.7</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
-    <nexus.indexer.version>2.0.4</nexus.indexer.version>
+    <nexus.indexer.version>2.0.5-SNAPSHOT</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.2</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.13</plexus.restlet.bridge.version>

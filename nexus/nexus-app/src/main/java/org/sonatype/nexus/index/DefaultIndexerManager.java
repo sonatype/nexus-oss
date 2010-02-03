@@ -24,7 +24,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -66,6 +65,7 @@ import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.index.updater.AbstractResourceFetcher;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
+import org.sonatype.nexus.index.updater.IndexUpdateResult;
 import org.sonatype.nexus.index.updater.IndexUpdater;
 import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeUtil;
@@ -1230,10 +1230,10 @@ public class DefaultIndexerManager
                 }
             }
         } );
+        
+        IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
-        Date contextTimestamp = indexUpdater.fetchAndUpdateIndex( updateRequest );
-
-        return contextTimestamp != null;
+        return result.getTimestamp() != null;
     }
 
     // TODO Toni Prior Snownexus, this was contained in RepositoryPolicy split to separate concerns (NEXUS-2872)
