@@ -218,6 +218,19 @@ public abstract class AbstractImportSecurityTest
         }
         return false;
     }
+    
+    protected boolean containRoleStartAndEndWith( List<RoleResource> roleList, String start, String end )
+    {
+        for ( RoleResource role : roleList )
+        {
+            if ( role.getId().startsWith( start ) && role.getId().endsWith( end ))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     protected boolean containPlexusRole( List<PlexusRoleResource> roleList, String roleId )
     {
@@ -260,6 +273,18 @@ public abstract class AbstractImportSecurityTest
         for ( PrivilegeStatusResource priv : privList )
         {
             if ( priv.getName().equals( privName ) )
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected boolean containPrivilegeStartAndEndWith( List<PrivilegeStatusResource> privList, String start, String end )
+    {
+        for ( PrivilegeStatusResource priv : privList )
+        {
+            if ( priv.getName().startsWith( start ) && priv.getName().endsWith( end ) )
             {
                 return true;
             }

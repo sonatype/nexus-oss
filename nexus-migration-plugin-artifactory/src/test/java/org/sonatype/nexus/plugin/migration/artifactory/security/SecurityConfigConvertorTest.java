@@ -148,8 +148,8 @@ public class SecurityConfigConvertorTest
 
         // assert the privileges
         Assert.assertNotNull( privList.get( 0 ).getId() );
-        Assert.assertEquals( "apachePermTarget-create", privList.get( 0 ).getName() );
-        Assert.assertEquals( "apachePermTarget-create", privList.get( 0 ).getDescription() );
+        Assert.assertEquals( "apachePermTarget-apache-create", privList.get( 0 ).getName() );
+        Assert.assertEquals( "apachePermTarget-apache-create", privList.get( 0 ).getDescription() );
         Assert.assertEquals( "target", privList.get( 0 ).getType() );
 
         Assert.assertEquals( "method", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 0 ) ).getKey() );
@@ -192,8 +192,8 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( 9, roleList.size() );
 
         // the READER, DEPLOYER, DELETE, ADMIN by order for each target
-        Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getId() );
-        Assert.assertEquals( "apachePermTarget-reader", roleList.get( 0 ).getName() );
+        Assert.assertEquals( "apachePermTarget-apache-reader", roleList.get( 0 ).getId() );
+        Assert.assertEquals( "apachePermTarget-apache-reader", roleList.get( 0 ).getName() );
         Assert.assertEquals( 60, roleList.get( 0 ).getSessionTimeout() );
         // read priv
         Assert.assertEquals( 1, roleList.get( 0 ).getPrivileges().size() );
@@ -258,8 +258,8 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( "active", user.getStatus() );
 
         Assert.assertEquals( 5, user.getRoles().size() );
-        Assert.assertFalse( user.getRoles().contains( "apachePermTarget-admin" ) );
-        Assert.assertTrue( user.getRoles().contains( "apachePermTarget-reader" ) );
+        Assert.assertFalse( user.getRoles().contains( "apachePermTarget-apache-admin" ) );
+        Assert.assertTrue( user.getRoles().contains( "apachePermTarget-apache-reader" ) );
         Assert.assertTrue( user.getRoles().contains( roleList.get( 5 ).getId() ) );
         // for group
         Assert.assertTrue( user.getRoles().contains( "group" ) );
@@ -367,6 +367,12 @@ public class SecurityConfigConvertorTest
         {
             // TODO Auto-generated method stub
 
+        }
+
+        public List<CMapping> listMappings()
+        {
+            // TODO Auto-generated method stub
+            return null;
         }
 
     }

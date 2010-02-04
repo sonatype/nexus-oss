@@ -41,7 +41,6 @@ public class Nexus1434ImportSecurity125Test
         commitMigration( migrationSummary );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     public void verifySecurity()
         throws Exception
@@ -67,15 +66,15 @@ public class Nexus1434ImportSecurity125Test
             String key = target.getId();
 
             // 4 privileges for 1 repoTarget imported
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-create" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-read" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-update" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-delete" ) );
+            Assert.assertTrue( containPrivilegeStartAndEndWith( privilegeList, key , "-create" ) );
+            Assert.assertTrue( containPrivilegeStartAndEndWith( privilegeList, key , "-read" ) );
+            Assert.assertTrue( containPrivilegeStartAndEndWith( privilegeList, key , "-update" ) );
+            Assert.assertTrue( containPrivilegeStartAndEndWith( privilegeList, key , "-delete" ) );
 
             // 3 roles for 1 repoTarget imported
-            Assert.assertTrue( containRole( roleList, key + "-reader" ) );
-            Assert.assertTrue( containRole( roleList, key + "-deployer" ) );
-            Assert.assertTrue( containRole( roleList, key + "-admin" ) );
+            Assert.assertTrue( containRoleStartAndEndWith( roleList, key , "-reader" ) );
+            Assert.assertTrue( containRoleStartAndEndWith( roleList, key , "-deployer" ) );
+            Assert.assertTrue( containRoleStartAndEndWith( roleList, key , "-admin" ) );
         }
 
         // verify user-role mapping

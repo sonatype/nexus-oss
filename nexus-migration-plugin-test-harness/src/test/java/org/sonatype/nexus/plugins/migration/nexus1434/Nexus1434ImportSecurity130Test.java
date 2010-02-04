@@ -59,22 +59,26 @@ public class Nexus1434ImportSecurity130Test
         Assert.assertTrue( containUser( userList, "user" ) );
         Assert.assertTrue( containUser( userList, "user1" ) );
 
-        for ( RepositoryTargetListResource target : targetList )
-        {
-            String key = target.getId();
 
-            // 4 privileges for each repoTarget imported
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-create" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-read" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-update" ) );
-            Assert.assertTrue( containPrivilegeName( privilegeList, key + "-delete" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-create" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-read" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-update" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "Anything-ANY-delete" ) );
 
-            // 4 roles for each repoTarget imported
-            Assert.assertTrue( containRole( roleList, key + "-reader" ) );
-            Assert.assertTrue( containRole( roleList, key + "-deployer" ) );
-            Assert.assertTrue( containRole( roleList, key + "-delete" ) );
-            Assert.assertTrue( containRole( roleList, key + "-admin" ) );
-        }
+        Assert.assertTrue( containRole( roleList, "Anything-ANY-reader" ) );
+        Assert.assertTrue( containRole( roleList, "Anything-ANY-deployer" ) );
+        Assert.assertTrue( containRole( roleList, "Anything-ANY-delete" ) );
+        Assert.assertTrue( containRole( roleList, "Anything-ANY-admin" ) );
+
+        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-create" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-read" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-update" ) );
+        Assert.assertTrue( containPrivilegeName( privilegeList, "permTarget-repo1-cache-delete" ) );
+
+        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-reader" ) );
+        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-deployer" ) );
+        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-delete" ) );
+        Assert.assertTrue( containRole( roleList, "permTarget-repo1-cache-admin" ) );
 
         // verify user-role mapping
         PlexusUserResource anonymous = getUserById( userList, "anonymous-artifactory" );
@@ -96,10 +100,10 @@ public class Nexus1434ImportSecurity130Test
         // verify the group role
         RoleResource groupRole = getRoleById(roleList, "group");
         Assert.assertNotNull ( groupRole);
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-reader" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-deployer" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-delete" ) );
-        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-admin" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-reader" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-deployer" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-delete" ) );
+        Assert.assertTrue( groupRole.getRoles().contains( "permTarget-repo1-cache-admin" ) );
     }
 
 }

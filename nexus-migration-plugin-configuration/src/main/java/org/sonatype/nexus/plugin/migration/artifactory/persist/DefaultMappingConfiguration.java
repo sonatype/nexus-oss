@@ -248,4 +248,9 @@ public class DefaultMappingConfiguration
         }
     }
 
+    public List<CMapping> listMappings()
+    {
+        return getConfiguration().getUrlsMapping();
+    }
+
 }
