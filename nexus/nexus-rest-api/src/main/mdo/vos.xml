@@ -112,51 +112,56 @@
     <class>
       <name>SmtpSettings</name>
       <version>1.0.0+</version>
-      <description>
-        The connections settings for an smtp server.
-            </description>
+      <description>The connections settings for an smtp server.</description>
       <fields>
         <field>
           <name>host</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The smtp host.</description>
         </field>
         <field>
           <name>port</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The smtp port.</description>
         </field>
         <field>
           <name>username</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The smtp server username.</description>
         </field>
         <field>
           <name>password</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The smtp server password.</description>
         </field>
         <field>
           <name>systemEmailAddress</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The email address that emails will be sent from.</description>
         </field>
         <field>
           <name>sslEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that states whether to use ssl.</description>
         </field>
         <field>
           <name>tlsEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that states whether to use tls.</description>
         </field>
       </fields>
     </class>
@@ -1360,6 +1365,7 @@
       <name>ScheduledServiceListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of scheduled service items, contains the typical 'data' parameter, which is the list of scheduled services..</description>
       <fields>
         <field>
           <name>data</name>
@@ -1369,6 +1375,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of scheduled services.</description>
         </field>
       </fields>
     </class>
@@ -1376,78 +1383,91 @@
     <class>
       <name>ScheduledServiceListResource</name>
       <version>1.0.0+</version>
+      <description>Scheduled service list item details.</description>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL that can be used to manage the scheduled service.</description>
         </field>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the scheduled service.</description>
         </field>
         <field>
           <name>enabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the service is enabled.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the scheduled service.</description>
         </field>
         <field>
           <name>typeId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type id of the scheduled service.</description>
         </field>
         <field>
           <name>typeName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type name of the scheduled service.</description>
         </field>
         <field>
           <name>status</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The status of the scheduled service (running, broken, etc.).</description>
         </field>
         <field>
           <name>schedule</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of schedule the service is run on (monthly, daily, etc.).</description>
         </field>
         <field>
           <name>nextRunTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The next time the scheduled service will run.</description>
         </field>
         <field>
           <name>lastRunTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The last time the scheduled service ran.</description>
         </field>
         <field>
           <name>lastRunResult</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The result of the last service run.</description>
         </field>
         <field>
           <name>created</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The date the service was created.</description>
         </field>
       </fields>
     </class>
@@ -1456,6 +1476,7 @@
       <name>ScheduledServiceResourceStatusResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a scheduled service status request, contains the typical 'data' parameter, which is the scheduled service status.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1464,6 +1485,7 @@
             <type>ScheduledServiceResourceStatus</type>
           </association>
           <required>true</required>
+          <description>The scheduled service status details.</description>
         </field>
       </fields>
     </class>
@@ -1471,6 +1493,7 @@
     <class>
       <name>ScheduledServiceResourceStatus</name>
       <version>1.0.0+</version>
+      <description>Scheduled service status details.</description>
       <fields>
         <field>
           <name>resource</name>
@@ -1479,42 +1502,49 @@
             <type>ScheduledServiceBaseResource</type>
           </association>
           <required>true</required>
+          <description>The scheduled service configuration.</description>
         </field>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URL used to managed the scheduled service.</description>
         </field>
         <field>
           <name>status</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The status of the scheduled service.</description>
         </field>
         <field>
           <name>nextRunTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The next time the scheduled service will run.</description>
         </field>
         <field>
           <name>lastRunTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The last time the scheduled service ran.</description>
         </field>
         <field>
           <name>lastRunResult</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The result of the last service run.</description>
         </field>
         <field>
           <name>created</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The date the service was created.</description>
         </field>
       </fields>
     </class>
@@ -1523,6 +1553,7 @@
       <name>ScheduledServiceResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a scheduled service configuration request, contains the typical 'data' parameter, which is the scheduled service configuration.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1531,6 +1562,7 @@
             <type>ScheduledServiceBaseResource</type>
           </association>
           <required>true</required>
+          <description>The scheduled service configuration.</description>
         </field>
       </fields>
     </class>
@@ -1538,42 +1570,49 @@
     <class>
       <name>ScheduledServiceBaseResource</name>
       <version>1.0.0+</version>
+      <description>The scheduled service configuration.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the service.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the service.</description>
         </field>
         <field>
           <name>enabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the service is enabled.</description>
         </field>
         <field>
           <name>typeId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type id of the service.</description>
         </field>
         <field>
           <name>alertEmail</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The email to send notifications to if the service fails.</description>
         </field>
         <field>
           <name>schedule</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The schedule the service is run on.</description>
         </field>
         <field>
           <name>properties</name>
@@ -1583,6 +1622,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>A list of configuration properties for the service.</description>
         </field>
       </fields>
     </class>
@@ -1590,18 +1630,21 @@
     <class>
       <name>ScheduledServicePropertyResource</name>
       <version>1.0.0+</version>
+      <description>A configuration property for a scheduled service.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the property.</description>
         </field>
         <field>
           <name>value</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The value of the property.</description>
         </field>
       </fields>
     </class>
@@ -1610,18 +1653,21 @@
       <name>ScheduledServiceOnceResource</name>
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run only once.</description>
       <fields>
         <field>
           <name>startDate</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The date to start running the service.</description>
         </field>
         <field>
           <name>startTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The time to start running the service.</description>
         </field>
       </fields>
     </class>
@@ -1630,18 +1676,21 @@
       <name>ScheduledServiceHourlyResource</name>
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run hourly.</description>
       <fields>
         <field>
           <name>startDate</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The date to start running the service.</description>
         </field>
         <field>
           <name>startTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The time to start running the service.</description>
         </field>
       </fields>
     </class>
@@ -1650,18 +1699,21 @@
       <name>ScheduledServiceDailyResource</name>
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run daily.</description>
       <fields>
         <field>
           <name>startDate</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The date to start running the service.</description>
         </field>
         <field>
           <name>recurringTime</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The time of the day to run the service.</description>
         </field>
       </fields>
     </class>
@@ -1670,6 +1722,7 @@
       <name>ScheduledServiceWeeklyResource</name>
       <superClass>ScheduledServiceDailyResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run weekly.</description>
       <fields>
         <field>
           <name>recurringDay</name>
@@ -1679,6 +1732,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of days that the service will be run.</description>
         </field>
       </fields>
     </class>
@@ -1687,18 +1741,21 @@
       <name>ScheduledServiceMonthlyResource</name>
       <superClass>ScheduledServiceWeeklyResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run monthly.</description>
     </class>
 
     <class>
       <name>ScheduledServiceAdvancedResource</name>
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
+      <description>A service that is run on a cron schedule.</description>
       <fields>
         <field>
           <name>cronCommand</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>A cron schedule string.</description>
         </field>
       </fields>
     </class>
@@ -1707,6 +1764,7 @@
       <name>ScheduledServiceTypeResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a scheduled service type list request, contains the typical 'data' parameter, which is the scheduled service type details.</description>
       <fields>
         <field>
           <name>data</name>
@@ -1716,6 +1774,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of scheduled service types.</description>
         </field>
       </fields>
     </class>
@@ -1723,18 +1782,21 @@
     <class>
       <name>ScheduledServiceTypeResource</name>
       <version>1.0.0+</version>
+      <description>Scheduled service type, which you can create a scheduled task against.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the service type.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the service type.</description>
         </field>
         <field>
           <name>properties</name>
@@ -1744,6 +1806,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of service type properties that configure the service.</description>
         </field>
       </fields>
     </class>
@@ -1751,42 +1814,49 @@
     <class>
       <name>ScheduledServiceTypePropertyResource</name>
       <version>1.0.0+</version>
+      <description>Property that helps configure a scheduled service.</description>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the property.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the property.</description>
         </field>
         <field>
           <name>type</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the property (string, date, checkbox, etc.)</description>
         </field>
         <field>
           <name>helpText</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The help text for the property.</description>
         </field>
         <field>
           <name>required</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the property is required to be set.</description>
         </field>
         <field>
           <name>regexValidation</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>Regular expression validation for the value of the property.</description>
         </field>        
       </fields>
     </class>
@@ -2162,30 +2232,35 @@
       <name>SearchResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for a list of search results, contains the typical 'data' parameter, which is a list of search results.</description>
       <fields>
         <field>
           <name>totalCount</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The total number of results.</description>
         </field>
         <field>
           <name>from</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The starting index of the results.</description>
         </field>
         <field>
           <name>count</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The number of results in this response.</description>
         </field>
         <field>
           <name>tooManyResults</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if too many results were found.</description>
         </field>
         <field>
           <name>data</name>
@@ -2195,6 +2270,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of found artifacts.</description>
         </field>
       </fields>
     </class>
@@ -2439,6 +2515,7 @@
       <name>StatusResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for the nexus status, contains the typical 'data' parameter, which is the nexus status.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2447,6 +2524,7 @@
             <type>StatusResource</type>
           </association>
           <required>true</required>
+          <description>Nexus status details.</description>
         </field>
       </fields>
     </class>
@@ -2454,90 +2532,105 @@
     <class>
       <name>StatusResource</name>
       <version>1.0.0+</version>
+      <description>Nexus status details.</description>
       <fields>
         <field>
           <name>appName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The application name.</description>
         </field>
         <field>
           <name>formattedAppName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The formatted application name (html formatting).</description>
         </field>
         <field>
           <name>version</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The version of the nexus instance.</description>
         </field>
         <field>
           <name>apiVersion</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The version of the core nexus instance.</description>
         </field>
         <field>
           <name>editionLong</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The long version of the nexus edition (i.e. Open Source or Professional).</description>
         </field>
         <field>
           <name>editionShort</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The short version of the nexus edition (i.e. OSS or PRO).</description>
         </field>
         <field>
           <name>state</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The state of the nexus instance.</description>
         </field>
         <field>
           <name>operationMode</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The operation mode of the nexus instance.</description>
         </field>
         <field>
           <name>initializedAt</name>
           <version>1.0.0+</version>
           <type>Date</type>
           <required>true</required>
+          <description>The date the instance was first initialized.</description>
         </field>
         <field>
           <name>startedAt</name>
           <version>1.0.0+</version>
           <type>Date</type>
           <required>true</required>
+          <description>The date the instance was last started.</description>
         </field>
         <field>
           <name>lastConfigChange</name>
           <version>1.0.0+</version>
           <type>Date</type>
           <required>true</required>
+          <description>The last time the nexus configuration was updated.</description>
         </field>
         <field>
           <name>firstStart</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if this is the first time nexus was started.</description>
         </field>
         <field>
           <name>instanceUpgraded</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the nexus instance has been upgraded.</description>
         </field>
         <field>
           <name>configurationUpgraded</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the nexus configuration has been upgraded.</description>
         </field>
         <field>
           <name>configurationValidationResponse</name>
@@ -2546,12 +2639,14 @@
             <type>StatusConfigurationValidationResponse</type>
           </association>
           <required>false</required>
+          <description>Configuration validation status.</description>
         </field>
         <field>
           <name>errorCause</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>Errors occuring during nexus startup.</description>
         </field>
         <field>
           <name>clientPermissions</name>
@@ -2560,12 +2655,14 @@
             <type>NexusAuthenticationClientPermissions</type>
           </association>
           <required>true</required>
+          <description>Permissions that are available to the current user.</description>
         </field>
         <field>
           <name>baseUrl</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The base url of the nexus instance.</description>
         </field>
       </fields>
     </class>
@@ -2573,18 +2670,21 @@
     <class>
       <name>StatusConfigurationValidationResponse</name>
       <version>1.0.0+</version>
+      <description>Configuration validation status.</description>
       <fields>
         <field>
           <name>valid</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if the nexus configuration is valid.</description>
         </field>
         <field>
           <name>modified</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flag that states if nexus had to modify the nexus configuration.</description>
         </field>
         <field>
           <name>validationErrors</name>
@@ -2594,6 +2694,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>List of configuration validation errors.</description>
         </field>
         <field>
           <name>validationWarnings</name>
@@ -2603,6 +2704,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>List of configuration validation warnings.</description>
         </field>
       </fields>
     </class>
@@ -2612,6 +2714,7 @@
       <name>WastebasketResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Response object for the nexus wastebasket info, contains the typical 'data' parameter, which is the nexus wastebasket info.</description>
       <fields>
         <field>
           <name>data</name>
@@ -2620,6 +2723,7 @@
             <type>WastebasketResource</type>
           </association>
           <required>true</required>
+          <description>The wastebasket information.</description>
         </field>
       </fields>
     </class>
@@ -2627,18 +2731,21 @@
     <class>
       <name>WastebasketResource</name>
       <version>1.0.0+</version>
+      <description>Details about the nexus wastebasket.</description>
       <fields>
         <field>
           <name>size</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The size of the contents in the wastebasket.</description>
         </field>
         <field>
           <name>itemCount</name>
           <version>1.0.0+</version>
           <type>long</type>
           <required>true</required>
+          <description>The number of items in the wastebasket.</description>
         </field>
       </fields>
     </class>
@@ -3051,6 +3158,7 @@
       <name>SmtpSettingsResourceRequest</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <description>REST Request object for validating the nexus smtp settings, contains the typical 'data' parameter, which is the nexus stmp configuration.</description>
       <fields>
         <field>
           <name>data</name>
@@ -3059,6 +3167,7 @@
             <type>SmtpSettingsResource</type>
           </association>
           <required>true</required>
+          <description>The nexus smtp configuration</description>
         </field>
       </fields>
     </class>
@@ -3066,54 +3175,63 @@
     <class>
       <name>SmtpSettingsResource</name>
       <version>1.0.0+</version>
+      <description>The smtp settings request</description>
       <fields>
         <field>
           <name>testEmail</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Test email address to send a validation mail to.</description>
         </field>
         <field>
           <name>host</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The smtp host.</description>
         </field>
         <field>
           <name>port</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The smtp port.</description>
         </field>
         <field>
           <name>username</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The smtp username.</description>
         </field>
         <field>
           <name>password</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The smtp password.</description>
         </field>
         <field>
           <name>systemEmailAddress</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The email address that nexus will send emails from.</description>
         </field>
         <field>
           <name>sslEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that states whether to use SSL.</description>
         </field>
         <field>
           <name>tlsEnabled</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that states whether to use TLS.</description>
         </field>
       </fields>
     </class>
