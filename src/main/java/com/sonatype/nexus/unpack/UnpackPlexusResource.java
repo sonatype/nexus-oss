@@ -21,7 +21,15 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
 import org.apache.commons.fileupload.FileItem;
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
@@ -51,7 +59,15 @@ import com.sonatype.license.PlexusLicensingException;
 import com.sonatype.license.feature.PlexusFeature;
 import com.sonatype.nexus.licensing.NexusLicensingManager;
 
+/**
+ * A REST Resource that accepts upload (zip file), and it simply explodes it in the root of the given repository.
+ * 
+ * @author cstamas
+ */
 @Component( role = PlexusResource.class, hint = "UnpackPlexusResource" )
+@Path( "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/content-compressed" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class UnpackPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
@@ -92,7 +108,13 @@ public class UnpackPlexusResource
         return true;
     }
 
+    /**
+     * Handles uploads of ZIP files.
+     */
     @Override
+    @POST
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) } )
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
