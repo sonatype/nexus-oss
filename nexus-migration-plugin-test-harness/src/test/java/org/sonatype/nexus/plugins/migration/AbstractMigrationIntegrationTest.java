@@ -49,7 +49,7 @@ public abstract class AbstractMigrationIntegrationTest
     extends AbstractNexusIntegrationTest
 {
 
-    protected static File migrationLogFile;
+    protected File migrationLogFile;
 
     protected RepositoryMessageUtil repositoryUtil;
 
@@ -76,6 +76,9 @@ public abstract class AbstractMigrationIntegrationTest
         this.searchUtil = new SearchMessageUtil();
         this.userUtil = new UserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        
+        this.migrationLogFile = new File( nexusLogDir, getTestId() + "/migration.log" );
+        
     }
 
     @BeforeClass
@@ -87,11 +90,6 @@ public abstract class AbstractMigrationIntegrationTest
         NexusStatusUtil.stop();
 
         cleanWorkDir();
-        migrationLogFile = new File( nexusWorkDir, "logs/migration.log" );
-        if ( migrationLogFile.isFile() )
-        {
-            FileUtils.writeStringToFile( migrationLogFile, "" );
-        }
     }
 
     protected <E> void assertContains( ArrayList<E> collection, E item )

@@ -22,8 +22,15 @@
         <version>1.2</version>
         <executions>
           <execution>
+            <id>env</id>
+            <phase>initialize</phase>
             <goals>
               <goal>setup-environment</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>package</id>
+            <goals>
               <goal>package</goal>
             </goals>
           </execution>
@@ -43,6 +50,7 @@
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-test-harness-launcher</artifactId>
               <classifier>repo</classifier>
+              <version>${nexus.version}</version>
               <type>zip</type>
               <outputProperty>maven-repository</outputProperty>
             </resource>

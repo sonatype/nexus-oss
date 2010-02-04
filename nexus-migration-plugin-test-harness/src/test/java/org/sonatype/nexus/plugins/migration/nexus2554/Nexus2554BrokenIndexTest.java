@@ -1,7 +1,5 @@
 package org.sonatype.nexus.plugins.migration.nexus2554;
 
-import java.io.File;
-
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,12 +14,6 @@ public class Nexus2554BrokenIndexTest
     public void brokenIndex()
         throws Exception
     {
-        File nexusLog = new File( "./target/logs/nexus.log" );
-        if ( nexusLog.isFile() )
-        {
-            FileUtils.fileWrite( nexusLog.getAbsolutePath(), "" );
-        }
-
         MigrationSummaryDTO migrationSummary = prepareMigration( getTestFile( "20090825.081708.zip" ) );
         commitMigration( migrationSummary );
 

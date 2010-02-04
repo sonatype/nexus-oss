@@ -111,10 +111,14 @@ public class Nexus1435MapRepositoriesTest
     public Verifier createVerifier( File mavenProject, File settings )
         throws VerificationException, IOException
     {
+        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
+        
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
 
-        System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
-
+        String logname = "logs/maven-execution/" + getTestId() + "/" + mavenProject.getName() + ".log";
+        new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
+        verifier.setLogFileName( logname );
+        
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
         cleanRepository( mavenRepository );
