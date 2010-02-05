@@ -34,7 +34,7 @@ public class S3RemoteRepositoryParserTest
         throws Exception
     {
         // A S3 repo where the contents size is 15.
-        // One of them is keyed as a robots.txt.
+        // One of them is keyed as a robots.txt and should therefore in extractLinks method of the parser.
         StringBuilder indata = new StringBuilder( getExampleFileContent( "/s3Example" ) );
         List<RepositoryDirectory> result = parser.extractLinks( indata );
 
@@ -43,6 +43,10 @@ public class S3RemoteRepositoryParserTest
         assertEquals( 14, result.size() );
     }
 
+    /**
+     * A test that the right number of links with the right type (leaf) are extracted from ListBucketResult with one item
+     * @throws Exception
+     */
     @Test
     public void testRepoSize1()
         throws Exception
@@ -54,6 +58,9 @@ public class S3RemoteRepositoryParserTest
         assertTrue( repositoryDirectory.isLeaf() );
     }
 
+    /**
+     * A test that checks if  the parser extracts the uris and paths in the right way 
+     */
     @Test
     public void testExtractContent()
     {
@@ -70,6 +77,9 @@ public class S3RemoteRepositoryParserTest
                       repositoryDirectory.getRelativePath() );
     }
 
+    /**
+     * Check that expected common prefixes are extracted into the repository directories
+     */
     @Test
     public void testExtractCommonPrefix()
     {
@@ -87,6 +97,10 @@ public class S3RemoteRepositoryParserTest
         }
     }
 
+    /**
+     * A test links in the excluded list doesn't appear in the result
+     * @throws Exception
+     */
     @Test
     public void testWithOneExcluded()
         throws Exception
@@ -100,7 +114,8 @@ public class S3RemoteRepositoryParserTest
     {
         return "<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
             + "<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
-            + "<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "<Size>0</Size>"
+            + "<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>"
+            + "<Size>0</Size>"
             + "<StorageClass>STANDARD</StorageClass>";
     }
 
@@ -110,12 +125,17 @@ public class S3RemoteRepositoryParserTest
             + "	<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"
             + "		<Name>maven.springframework.org</Name>"
             + "		<Prefix>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli</Prefix>"
-            + "		<Marker></Marker>" + "		<MaxKeys>1000</MaxKeys>" + "		<IsTruncated>false</IsTruncated>	"
+            + "		<Marker></Marker>"
+            + "		<MaxKeys>1000</MaxKeys>"
+            + "		<IsTruncated>false</IsTruncated>	"
             + "		<Contents>"
             + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
             + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
-            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
-            + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "	</ListBucketResult>";
+            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>"
+            + "			<Size>0</Size>"
+            + "			<StorageClass>STANDARD</StorageClass>"
+            + "		</Contents>"
+            + "	</ListBucketResult>";
     }
 
     private String withOneInExcludedList()
