@@ -113,6 +113,7 @@ public interface Nexus
 
     void expireAllCaches( ResourceStoreRequest request );
 
+    @Deprecated
     void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException;
 

@@ -30,6 +30,11 @@
       <artifactId>nexus-indexer</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene</artifactId>
+      <version>1.5.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>

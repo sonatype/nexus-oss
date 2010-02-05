@@ -42,7 +42,8 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
-import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
+import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
 import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
@@ -103,12 +104,6 @@ public class DefaultNexus
      */
     @Requirement
     private NexusConfiguration nexusConfiguration;
-
-    /**
-     * The NexusIndexer.
-     */
-    @Requirement
-    private IndexerManager indexerManager;
 
     /**
      * The repository registry.
@@ -401,10 +396,11 @@ public class DefaultNexus
         }
     }
 
+    @Deprecated
     public void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException
     {
-        indexerManager.reindexAllRepositories( path, fullReindex );
+        this.applicationEventMulticaster.notifyEventListeners(  new ReindexRepositoriesEvent(this, new ReindexRepositoriesRequest( path, fullReindex ) ) );
     }
 
     public Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest req, long timestamp )
@@ -773,15 +769,6 @@ public class DefaultNexus
         nexusConfiguration.dropInternals();
 
         securitySystem.stop();
-
-        try
-        {
-            indexerManager.shutdown( false );
-        }
-        catch ( IOException e )
-        {
-            getLogger().error( "Error while stopping IndexerManager:", e );
-        }
         
         cacheWrapper.stop();
 

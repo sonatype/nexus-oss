@@ -10,11 +10,12 @@
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-configuration</artifactId>
+      <artifactId>nexus-indexer-artifact</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
+      <artifactId>nexus-configuration</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

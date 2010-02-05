@@ -31,6 +31,7 @@ under the License.
       <module>nexus-indexer</module>
       <module>nexus-repository-metadata</module>
       <module>nexus</module>
+      <module>nexus-indexer-artifact</module>
     </modules>
  
     <distributionManagement>

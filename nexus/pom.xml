@@ -983,6 +983,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>nexus-indexer-lucene</module>
         <module>nexus-plugins</module>
         <module>nexus-mock</module>
         <module>nexus-utils</module>

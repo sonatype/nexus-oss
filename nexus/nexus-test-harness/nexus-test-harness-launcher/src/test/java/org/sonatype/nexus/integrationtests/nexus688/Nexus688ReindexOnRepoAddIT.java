@@ -15,8 +15,6 @@ package org.sonatype.nexus.integrationtests.nexus688;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
@@ -27,10 +25,10 @@ import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;

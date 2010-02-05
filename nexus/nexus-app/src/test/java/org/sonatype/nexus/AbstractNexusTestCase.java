@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -30,7 +29,6 @@ import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 

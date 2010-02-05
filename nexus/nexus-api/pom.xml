@@ -55,11 +55,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>rome</groupId>
       <artifactId>rome</artifactId>
     </dependency>

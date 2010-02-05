@@ -23,6 +23,11 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-artifact</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
     </dependency>
     <dependency>
@@ -37,20 +42,6 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-classworlds</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
