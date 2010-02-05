@@ -1,5 +1,8 @@
 package org.sonatype.nexus.plugins.rrb;
 
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType( name = "node" )
 public class RepositoryDirectory
 {
     @Override

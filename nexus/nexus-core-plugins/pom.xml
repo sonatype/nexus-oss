@@ -11,27 +11,106 @@
 		implied. See the License for the specific language governing
 		permissions and limitations under the License.
 	-->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>nexus</artifactId>
-		<groupId>org.sonatype.nexus</groupId>
-		<version>1.5.1-SNAPSHOT</version>
-	</parent>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <artifactId>nexus</artifactId>
+    <groupId>org.sonatype.nexus</groupId>
+    <version>1.5.1-SNAPSHOT</version>
+  </parent>
 
-	<groupId>org.sonatype.nexus.plugins</groupId>
-	<artifactId>nexus-core-plugins</artifactId>
-	<packaging>pom</packaging>
-	<name>Nexus Core Plugins Aggregator</name>
+  <groupId>org.sonatype.nexus.plugins</groupId>
+  <artifactId>nexus-core-plugins</artifactId>
+  <packaging>pom</packaging>
+  <name>Nexus Core Plugins Aggregator</name>
 
-	<modules>
-		<module>nexus-lvo-plugin</module>
-		<module>nexus-plugin-console-plugin</module>
-		<!-- remove maven deps from core 1st!
-		<module>nexus-maven-plugin</module>
-		-->
-		<module>nexus-ldap-plugin-parent</module>
-		<module>nexus-rrb-plugin</module>
-	</modules>
+  <modules>
+    <module>nexus-lvo-plugin</module>
+    <module>nexus-plugin-console-plugin</module>
+    <module>nexus-ldap-plugin-parent</module>
+    <module>nexus-rrb-plugin</module>
+  </modules>
+
+  <profiles>
+    <profile>
+      <id>enunciate</id>
+      <activation>
+        <!-- A plugin is "enunciated" when enunciate.xml config file is present -->
+        <file>
+          <exists>enunciate.xml</exists>
+        </file>
+      </activation>
+      <properties>
+        <enunciate.version>1.18-RC2</enunciate.version>
+      </properties>
+      <dependencies>
+        <!-- Dependencies needed to annotate classes -->
+        <dependency>
+          <groupId>org.codehaus.enunciate</groupId>
+          <artifactId>enunciate-core</artifactId>
+          <version>${enunciate.version}</version>
+          <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
+          <!-- But nothing is using that annotation after build happened, and doco is generated -->
+          <scope>provided</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>commons-logging</groupId>
+              <artifactId>commons-logging</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-xc</artifactId>
+          <version>1.2.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+          <version>2.1</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>javax.ws.rs</groupId>
+          <artifactId>jsr311-api</artifactId>
+          <version>1.1.1</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <!-- Enunciate plugin (RT deps are above, plugin execution deps are below as plugin deps) -->
+          <plugin>
+            <groupId>org.codehaus.enunciate</groupId>
+            <artifactId>maven-enunciate-plugin</artifactId>
+            <version>${enunciate.version}</version>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>docs</goal>
+                </goals>
+                <configuration>
+                  <!-- the directory where to put the docs -->
+                  <docsDir>${project.build.directory}/docs</docsDir>
+                </configuration>
+              </execution>
+            </executions>
+            <dependencies>
+              <dependency>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>enunciate-docs</artifactId>
+                <version>${enunciate.version}</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <configFile>enunciate.xml</configFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

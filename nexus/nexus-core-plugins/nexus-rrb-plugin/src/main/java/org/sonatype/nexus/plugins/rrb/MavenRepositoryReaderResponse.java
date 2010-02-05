@@ -3,6 +3,11 @@ package org.sonatype.nexus.plugins.rrb;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement( name = "rrbresponse" )
 public class MavenRepositoryReaderResponse
     implements Serializable
 {
@@ -15,6 +20,8 @@ public class MavenRepositoryReaderResponse
         super();
     }
 
+    @XmlElementWrapper( name = "data" )
+    @XmlElement( name = "node" )
     public List<RepositoryDirectory> getData()
     {
         return data;

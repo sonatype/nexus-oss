@@ -3,6 +3,12 @@ package org.sonatype.nexus.plugins.rrb;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -24,6 +30,9 @@ import com.thoughtworks.xstream.XStream;
  * at: http://host:port/nexus/service/local/remotebrowser .
  */
 // @Component( role = PlexusResource.class, hint = "protected" )
+@Path( "/remotebrowser" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RemoteBrowserResource
     extends AbstractNexusPlexusResource
     implements PlexusResource
@@ -67,7 +76,12 @@ public class RemoteBrowserResource
         // Changing this would require JavaScript changes
     }
 
+    /**
+     * Returns the directory nodes retrieved by remote browsing of proxy repository.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = MavenRepositoryReaderResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
