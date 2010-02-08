@@ -27,6 +27,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.apache.commons.fileupload.FileItem;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -36,6 +37,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -71,6 +73,7 @@ import com.sonatype.nexus.licensing.NexusLicensingManager;
 public class UnpackPlexusResource
     extends AbstractResourceStoreContentPlexusResource
 {
+    private static final String DELETE_BEFORE_UNPACK = "delete";
 
     @Requirement( role = NexusLicensingManager.class )
     private NexusLicensingManager licenseManager;
@@ -114,7 +117,7 @@ public class UnpackPlexusResource
     @Override
     @POST
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) } )
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
     {
@@ -133,21 +136,28 @@ public class UnpackPlexusResource
 
             String basePath = getResourceStorePath( request );
 
+            Form form = request.getResourceRef().getQueryAsForm();
+
+            boolean delete = form.getFirst( DELETE_BEFORE_UNPACK ) != null;
+
             if ( basePath.toLowerCase().endsWith( ".md5" ) || basePath.toLowerCase().endsWith( ".sha1" ) )
             {
                 // maven deploys checksums even if not asked to
                 return null;
             }
 
-            try
+            if ( delete )
             {
-                StorageItem item = repository.retrieveItem( getResourceStoreRequest( request, basePath ) );
+                try
+                {
+                    StorageItem item = repository.retrieveItem( getResourceStoreRequest( request, basePath ) );
 
-                deleteItem( repository, item );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // that's good
+                    deleteItem( repository, item );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // that's good
+                }
             }
 
             for ( FileItem fileItem : files )
