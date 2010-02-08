@@ -16,6 +16,15 @@ package org.sonatype.nexus.rest.repotargets;
 import java.io.IOException;
 import java.util.regex.PatternSyntaxException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -36,11 +45,15 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTargetPlexusResource" )
+@Path( RepositoryTargetPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryTargetPlexusResource
     extends AbstractRepositoryTargetPlexusResource
 {
-
     public static final String REPO_TARGET_ID_KEY = "repoTargetId";
+    
+    public static final String RESOURCE_URI = "/repo_targets/{" + REPO_TARGET_ID_KEY + "}"; 
 
     public RepositoryTargetPlexusResource()
     {
@@ -56,8 +69,7 @@ public class RepositoryTargetPlexusResource
     @Override
     public String getResourceUri()
     {
-        // TODO Auto-generated method stub
-        return "/repo_targets/{" + REPO_TARGET_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -71,7 +83,13 @@ public class RepositoryTargetPlexusResource
         return request.getAttributes().get( REPO_TARGET_ID_KEY ).toString();
     }
 
+    /**
+     * Get the details of a repository target.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryTargetPlexusResource.REPO_TARGET_ID_KEY ) },
+                              output = RepositoryTargetResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -92,7 +110,14 @@ public class RepositoryTargetPlexusResource
         return result;
     }
 
+    /**
+     * Update the configuration of an existing repository target.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryTargetPlexusResource.REPO_TARGET_ID_KEY ) },
+                              input = RepositoryTargetResourceResponse.class, 
+                              output = RepositoryTargetResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -152,7 +177,12 @@ public class RepositoryTargetPlexusResource
         return resultResource;
     }
 
+    /**
+     * Delete an existing repository target.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryTargetPlexusResource.REPO_TARGET_ID_KEY ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

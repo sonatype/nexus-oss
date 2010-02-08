@@ -13,22 +13,35 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
 import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
+import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "ScheduledTaskTypeComonentListPlexusResource" )
-public class ScheduledTaskTypeComonentListPlexusResource
+@Path( ScheduledTaskTypeComponentListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+public class ScheduledTaskTypeComponentListPlexusResource
     extends AbstractComponentListPlexusResource
 {
+    public static final String RESOURCE_URI = "/components/schedule_types"; 
 
     @Override
     public String getResourceUri()
     {
-        return "/components/schedule_types";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -41,5 +54,17 @@ public class ScheduledTaskTypeComonentListPlexusResource
     protected String getRole( Request request )
     {
         return ScheduledTaskDescriptor.class.getName();
+    }
+    
+    /**
+     * Retrieve the list of scheduled task type plexus components.
+     */
+    @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        return super.get( context, request, response, variant );
     }
 }

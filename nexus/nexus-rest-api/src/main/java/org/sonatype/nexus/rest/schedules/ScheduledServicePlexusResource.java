@@ -17,6 +17,15 @@ import java.text.ParseException;
 import java.util.Iterator;
 import java.util.concurrent.RejectedExecutionException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -41,11 +50,15 @@ import org.sonatype.scheduling.TaskState;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "ScheduledServicePlexusResource" )
+@Path( ScheduledServicePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class ScheduledServicePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
-
     public static final String SCHEDULED_SERVICE_ID_KEY = "scheduledServiceId";
+    
+    public static final String RESOURCE_URI = "/schedules/{" + SCHEDULED_SERVICE_ID_KEY + "}"; 
 
     public ScheduledServicePlexusResource()
     {
@@ -61,7 +74,7 @@ public class ScheduledServicePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/schedules/{" + SCHEDULED_SERVICE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -75,7 +88,13 @@ public class ScheduledServicePlexusResource
         return request.getAttributes().get( SCHEDULED_SERVICE_ID_KEY ).toString();
     }
 
+    /**
+     * Get the details of an existing scheduled task.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
+                              output = ScheduledServiceResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -105,7 +124,14 @@ public class ScheduledServicePlexusResource
         return result;
     }
 
+    /**
+     * Update the configuration of an existing scheduled task.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
+                              input = ScheduledServiceResourceResponse.class,
+                              output = ScheduledServiceResourceStatusResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -130,9 +156,9 @@ public class ScheduledServicePlexusResource
 
                 task.setSchedule( getModelSchedule( resource ) );
 
-                for ( Iterator iter = resource.getProperties().iterator(); iter.hasNext(); )
+                for ( Iterator<ScheduledServicePropertyResource> iter = resource.getProperties().iterator(); iter.hasNext(); )
                 {
-                    ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
+                    ScheduledServicePropertyResource prop = iter.next();
 
                     task.getTaskParams().put( prop.getId(), prop.getValue() );
                 }
@@ -184,6 +210,8 @@ public class ScheduledServicePlexusResource
     }
 
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

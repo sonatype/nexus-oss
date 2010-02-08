@@ -18,6 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -47,9 +54,13 @@ import org.sonatype.scheduling.schedules.Schedule;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "ScheduledServiceListPlexusResource" )
+@Path( ScheduledServiceListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class ScheduledServiceListPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
+    public static final String RESOURCE_URI = "/schedules"; 
 
     public ScheduledServiceListPlexusResource()
     {
@@ -65,7 +76,7 @@ public class ScheduledServiceListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/schedules";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -91,7 +102,12 @@ public class ScheduledServiceListPlexusResource
         return false;
     }
 
+    /**
+     * Retrieve a list of scheduled tasks currently configured in nexus.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = ScheduledServiceListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -147,7 +163,12 @@ public class ScheduledServiceListPlexusResource
         return result;
     }
 
+    /**
+     * Add a new scheduled service to nexus.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = ScheduledServiceResourceResponse.class, output = ScheduledServiceResourceStatusResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

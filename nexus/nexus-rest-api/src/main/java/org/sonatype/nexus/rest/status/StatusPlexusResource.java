@@ -16,6 +16,12 @@ package org.sonatype.nexus.rest.status;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -34,10 +40,13 @@ import org.sonatype.security.rest.authentication.AbstractUIPermissionCalculating
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 
 @Component( role = ManagedPlexusResource.class, hint = "StatusPlexusResource" )
+@Path( StatusPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class StatusPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
     implements ManagedPlexusResource
 {
+    public static final String RESOURCE_URI = "/status"; 
 
     @Requirement
     private Nexus nexus;
@@ -51,7 +60,7 @@ public class StatusPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/status";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -60,7 +69,12 @@ public class StatusPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:status]" );
     }
 
+    /**
+     * Get the status of the nexus server.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = StatusResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

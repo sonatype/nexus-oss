@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.rest.status;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -25,10 +30,13 @@ import org.sonatype.plexus.rest.resource.ManagedPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 
 @Component( role = ManagedPlexusResource.class, hint = "CommandPlexusResource" )
+@Path( CommandPlexusResource.RESOURCE_URI )
+@Consumes( { "application/xml", "application/json" } )
 public class CommandPlexusResource
     extends AbstractNexusPlexusResource
     implements ManagedPlexusResource
 {
+    public static final String RESOURCE_URI = "/status/command"; 
 
     public CommandPlexusResource()
     {
@@ -45,7 +53,7 @@ public class CommandPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/status/command";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -54,7 +62,12 @@ public class CommandPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:command]" );
     }
 
+    /**
+     * Control the nexus server, you can START, STOP, RESTART or KILL it.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = String.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

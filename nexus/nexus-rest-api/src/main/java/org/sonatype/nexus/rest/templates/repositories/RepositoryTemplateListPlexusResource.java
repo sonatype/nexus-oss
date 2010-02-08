@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.rest.templates.repositories;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -38,9 +43,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTemplateListPlexusResource" )
+@Path( RepositoryTemplateListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryTemplateListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/templates/repositories";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -50,7 +59,7 @@ public class RepositoryTemplateListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/templates/repositories";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -59,7 +68,12 @@ public class RepositoryTemplateListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repotemplates]" );
     }
 
+    /**
+     * Retrieve a list of repository templates in nexus.  Some default configurations for common repository types.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RepositoryListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

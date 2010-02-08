@@ -15,6 +15,12 @@ package org.sonatype.nexus.rest.wastebasket;
 
 import java.io.IOException;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -39,9 +45,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "wastebasket" )
+@Path( WastebasketPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class WastebasketPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/wastebasket";
+    
     @Requirement
     private Wastebasket wastebasket;
     
@@ -57,7 +67,7 @@ public class WastebasketPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/wastebasket";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -66,7 +76,12 @@ public class WastebasketPlexusResource
         return new PathProtectionDescriptor( "/wastebasket**", "authcBasic,perms[nexus:wastebasket]" );
     }
 
+    /**
+     * Get details about the contents of the wastebasket.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = WastebasketResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -91,7 +106,12 @@ public class WastebasketPlexusResource
         }
     }
 
+    /**
+     * Empty the wastebasket.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature()
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

@@ -15,6 +15,11 @@ package org.sonatype.nexus.rest.schedules;
 
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,9 +38,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "ScheduledServiceTypePlexusResource" )
+@Path( ScheduledServiceTypePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ScheduledServiceTypePlexusResource
     extends AbstractScheduledServicePlexusResource
 {
+    public static final String RESOURCE_URI = "/schedule_types";
 
     @Override
     public Object getPayloadInstance()
@@ -46,7 +54,7 @@ public class ScheduledServiceTypePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/schedule_types";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -55,7 +63,13 @@ public class ScheduledServiceTypePlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:tasktypes]" );
     }
 
+    /**
+     * Get the list of scheduled service types available in nexus.  And all of the configuration parameters available
+     * for each type.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = ScheduledServiceTypeResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

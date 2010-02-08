@@ -17,6 +17,13 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.regex.PatternSyntaxException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -39,10 +46,14 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTargetListPlexusResource" )
+@Path( RepositoryTargetListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryTargetListPlexusResource
     extends AbstractRepositoryTargetPlexusResource
 {
-
+    public static final String RESOURCE_URI = "/repo_targets";
+    
     public RepositoryTargetListPlexusResource()
     {
         this.setModifiable( true );
@@ -57,7 +68,7 @@ public class RepositoryTargetListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repo_targets";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -66,7 +77,12 @@ public class RepositoryTargetListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:targets]" );
     }
 
+    /**
+     * Get the list of configuration repository targets.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RepositoryTargetListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -94,7 +110,12 @@ public class RepositoryTargetListPlexusResource
         return result;
     }
 
+    /**
+     * Add a new repository target to nexus.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = RepositoryTargetResourceResponse.class, output = RepositoryTargetResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

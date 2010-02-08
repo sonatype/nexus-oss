@@ -15,6 +15,11 @@ package org.sonatype.nexus.rest.repositorystatuses;
 
 import java.util.Collection;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -32,9 +37,12 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryStatusesListPlexusResource" )
+@Path( RepositoryStatusesListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryStatusesListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    public static final String RESOURCE_URI = "/repository_statuses";
 
     @Override
     public Object getPayloadInstance()
@@ -45,7 +53,7 @@ public class RepositoryStatusesListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repository_statuses";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -54,7 +62,12 @@ public class RepositoryStatusesListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repostatus]" );
     }
 
+    /**
+     * Get the list of all repository statuses.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RepositoryStatusListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

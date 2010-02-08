@@ -18,6 +18,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.PatternSyntaxException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -45,9 +54,13 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryRoutePlexusResource" )
+@Path( RepositoryRoutePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryRoutePlexusResource
     extends AbstractRepositoryRoutePlexusResource
 {
+    public static final String RESOURCE_URI = "/repo_routes/{" + ROUTE_ID_KEY + "}"; 
 
     public RepositoryRoutePlexusResource()
     {
@@ -63,7 +76,7 @@ public class RepositoryRoutePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repo_routes/{" + ROUTE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -77,7 +90,13 @@ public class RepositoryRoutePlexusResource
         return request.getAttributes().get( ROUTE_ID_KEY ).toString();
     }
 
+    /**
+     * Get the details of a repository route.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY ) },
+                              output = RepositoryRouteResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -138,8 +157,14 @@ public class RepositoryRoutePlexusResource
         return result;
     }
 
-    @SuppressWarnings( "unchecked" )
+    /**
+     * Update an existing repository route.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY ) },
+                              input = RepositoryRouteResourceResponse.class, 
+                              output = RepositoryRouteResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -237,7 +262,12 @@ public class RepositoryRoutePlexusResource
         return result;
     }
 
+    /**
+     * Delete an existing repository route.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryRoutePlexusResource.ROUTE_ID_KEY ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

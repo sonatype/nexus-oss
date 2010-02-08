@@ -13,6 +13,12 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,9 +39,12 @@ import org.sonatype.scheduling.TaskState;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "ScheduledServiceRunPlexusResource" )
+@Path( ScheduledServiceRunPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ScheduledServiceRunPlexusResource
     extends AbstractScheduledServicePlexusResource
 {
+    public static final String RESOURCE_URI = "/schedule_run/{" + SCHEDULED_SERVICE_ID_KEY + "}"; 
 
     @Override
     public Object getPayloadInstance()
@@ -46,7 +55,7 @@ public class ScheduledServiceRunPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/schedule_run/{" + SCHEDULED_SERVICE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -55,7 +64,13 @@ public class ScheduledServiceRunPlexusResource
         return new PathProtectionDescriptor( "/schedule_run/*", "authcBasic,perms[nexus:tasksrun]" );
     }
 
+    /**
+     * Run the specified scheduled task right now.  Will then be rescheduled upon completion for normal run.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) },
+                              output = ScheduledServiceResourceStatusResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

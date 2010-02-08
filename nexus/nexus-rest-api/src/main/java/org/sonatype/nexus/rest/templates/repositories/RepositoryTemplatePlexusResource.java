@@ -13,6 +13,12 @@
  */
 package org.sonatype.nexus.rest.templates.repositories;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -26,7 +32,6 @@ import org.sonatype.nexus.proxy.repository.ConfigurableRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -45,11 +50,15 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryTemplatePlexusResource" )
+@Path( RepositoryTemplatePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryTemplatePlexusResource
     extends AbstractNexusPlexusResource
 {
     /* Key to store Repo with which we work against. */
     public static final String REPOSITORY_ID_KEY = "repositoryId";
+    
+    public static final String RESOURCE_URI = "/templates/repositories/{" + REPOSITORY_ID_KEY + "}"; 
 
     @Override
     public Object getPayloadInstance()
@@ -60,7 +69,7 @@ public class RepositoryTemplatePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/templates/repositories/{" + REPOSITORY_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -74,7 +83,13 @@ public class RepositoryTemplatePlexusResource
         return request.getAttributes().get( REPOSITORY_ID_KEY ).toString();
     }
 
+    /**
+     * Retrieve the repository configuration stored in the specified template.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryTemplatePlexusResource.REPOSITORY_ID_KEY ) },
+                              output = RepositoryResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -191,18 +206,5 @@ public class RepositoryTemplatePlexusResource
         repoRes.setNotFoundCacheTTL( cfg.getNotFoundCacheTimeToLive() );
 
         return repoRes;
-    }
-    
-    private String getAllowWrite( boolean allowWrite )
-    {
-        // FIXME: set ENUM correctly 
-        if( allowWrite )
-        {
-            return RepositoryWritePolicy.ALLOW_WRITE.name();
-        }
-        else 
-        {
-            return RepositoryWritePolicy.READ_ONLY.name();
-        }
     }
 }
