@@ -1,5 +1,11 @@
 package org.sonatype.nexus.rest.mirrors;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -17,9 +23,13 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryMirrorStatusPlexusResource" )
+@Path( RepositoryMirrorStatusPlexusResource.RESOURCE_URI )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryMirrorStatusPlexusResource
     extends AbstractRepositoryMirrorPlexusResource
 {
+    public static final String RESOURCE_URI = "/repository_mirrors_status/{" + REPOSITORY_ID_KEY + "}";
+    
     public RepositoryMirrorStatusPlexusResource()
     {
         setModifiable( false );
@@ -40,11 +50,16 @@ public class RepositoryMirrorStatusPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repository_mirrors_status/{" + REPOSITORY_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Get the status of the mirrors of a repository.
+     */
     @Override
-    //TODO: return status of the mirror
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY ) },
+                              output = MirrorStatusResourceListResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

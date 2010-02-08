@@ -13,22 +13,35 @@
  */
 package org.sonatype.nexus.rest.contentclasses;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
 import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.rest.component.AbstractComponentListPlexusResource;
+import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "ContentClassComponentListPlexusResource" )
+@Path( ContentClassComponentListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ContentClassComponentListPlexusResource
     extends AbstractComponentListPlexusResource
 {
+    public static final String RESOURCE_URI = "/components/repo_content_classes";
 
     @Override
     public String getResourceUri()
     {
-        return "/components/repo_content_classes";
+        return RESOURCE_URI;
     }
 
     public PathProtectionDescriptor getResourceProtection()
@@ -40,6 +53,15 @@ public class ContentClassComponentListPlexusResource
     protected String getRole( Request request )
     {
         return ContentClass.class.getName();
+    }
+    
+    @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        return super.get( context, request, response, variant );
     }
 
 }

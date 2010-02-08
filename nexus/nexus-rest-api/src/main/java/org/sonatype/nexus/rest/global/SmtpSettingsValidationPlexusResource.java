@@ -15,6 +15,11 @@ package org.sonatype.nexus.rest.global;
 
 import java.util.regex.Pattern;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -36,9 +41,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author velo
  */
 @Component( role = PlexusResource.class, hint = "SmtpSettingsValidation" )
+@Path( SmtpSettingsValidationPlexusResource.RESOURCE_URI )
+@Consumes( { "application/xml", "application/json" } )
 public class SmtpSettingsValidationPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
 {
+    public static final String RESOURCE_URI = "/check_smtp_settings";
+        
     private static final Pattern EMAIL_PATTERN = Pattern.compile( ".+@.+\\.[a-z]+" );
 
     @Requirement
@@ -58,7 +67,7 @@ public class SmtpSettingsValidationPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/check_smtp_settings";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -67,7 +76,12 @@ public class SmtpSettingsValidationPlexusResource
         return new PathProtectionDescriptor( "/global_settings/*", "authcBasic,perms[nexus:settings]" );
     }
 
+    /**
+     * Validate smtp settings, send a test email using the configuration.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = SmtpSettingsResourceRequest.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

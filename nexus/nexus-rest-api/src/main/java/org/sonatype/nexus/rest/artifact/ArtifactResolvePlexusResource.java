@@ -13,6 +13,12 @@
  */
 package org.sonatype.nexus.rest.artifact;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -40,9 +46,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "ArtifactResolvePlexusResource" )
+@Path( ArtifactResolvePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ArtifactResolvePlexusResource
     extends AbstractArtifactPlexusResource
 {
+    public static final String RESOURCE_URI = "/artifact/maven/resolve";
 
     @Override
     public Object getPayloadInstance()
@@ -53,7 +62,7 @@ public class ArtifactResolvePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/artifact/maven/resolve";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -62,7 +71,14 @@ public class ArtifactResolvePlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifact]" );
     }
 
+    /**
+     * Resolve an artifact and retrieve a set of details about that artifact.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( queryParams = { @QueryParam( "g" ), @QueryParam( "a" ), @QueryParam( "v" ),
+        @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "r" ), @QueryParam( "e" ) }, 
+        output = ArtifactResolveResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

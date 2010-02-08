@@ -3,6 +3,12 @@ package org.sonatype.nexus.rest.mirrors;
 import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -22,9 +28,12 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryPredefinedMirrorListPlexusResource" )
+@Path( RepositoryPredefinedMirrorListPlexusResource.RESOURCE_URI )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryPredefinedMirrorListPlexusResource
     extends AbstractRepositoryMirrorPlexusResource
 {
+    public static final String RESOURCE_URI = "/repository_predefined_mirrors/{" + REPOSITORY_ID_KEY + "}"; 
     @Requirement
     private NexusRepositoryMetadataHandler repoMetadata;
 
@@ -49,10 +58,17 @@ public class RepositoryPredefinedMirrorListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repository_predefined_mirrors/{" + REPOSITORY_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Get the predefined list of mirrors for a repository (as defined in the repository metadata).  These
+     * mirrors may NOT be enabled, simply listed as available.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY ) },
+                              output = MirrorResourceListResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

@@ -13,6 +13,12 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -31,9 +37,12 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryMetaPlexusResource" )
+@Path( RepositoryMetaPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryMetaPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/meta"; 
 
     @Override
     public Object getPayloadInstance()
@@ -44,7 +53,7 @@ public class RepositoryMetaPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repositories/{" + REPOSITORY_ID_KEY + "}/meta";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -53,7 +62,13 @@ public class RepositoryMetaPlexusResource
         return new PathProtectionDescriptor( "/repositories/*/meta", "authcBasic,perms[nexus:repometa]" );
     }
 
+    /**
+     * Retrieve metadata of an existing repository.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, 
+                              output = RepositoryMetaResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

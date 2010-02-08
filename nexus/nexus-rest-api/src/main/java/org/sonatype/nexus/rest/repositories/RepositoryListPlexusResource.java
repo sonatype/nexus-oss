@@ -15,6 +15,13 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -37,6 +44,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfigu
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
+import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
@@ -56,9 +64,14 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryListPlexusResource" )
+@Path( RepositoryListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryListPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    public static final String RESOURCE_URI = "/repositories";
+    
     // UGLY HACK, SEE BELOW
     @Requirement( role = TemplateProvider.class, hint = DefaultRepositoryTemplateProvider.PROVIDER_ID )
     private DefaultRepositoryTemplateProvider repositoryTemplateProvider;
@@ -77,7 +90,7 @@ public class RepositoryListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repositories";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -86,14 +99,24 @@ public class RepositoryListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repositories]" );
     }
 
+    /**
+     * Get the list of user managed repositories.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RepositoryListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         return listRepositories( request, false, false );
     }
 
+    /**
+     * Add a new repository to nexus.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = RepositoryResourceResponse.class, output = RepositoryResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

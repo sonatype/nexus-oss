@@ -16,6 +16,14 @@ package org.sonatype.nexus.rest.global;
 import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -60,11 +68,16 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "GlobalConfigurationPlexusResource" )
+@Path( GlobalConfigurationPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class GlobalConfigurationPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
-{
+{    
     /** The config key used in URI and request attributes */
     public static final String CONFIG_NAME_KEY = "configName";
+    
+    public static final String RESOURCE_URI = "/global_settings/{" + CONFIG_NAME_KEY + "}";
 
     /** Name denoting current Nexus configuration */
     public static final String CURRENT_CONFIG_NAME = "current";
@@ -148,7 +161,7 @@ public class GlobalConfigurationPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/global_settings/{" + CONFIG_NAME_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -157,7 +170,12 @@ public class GlobalConfigurationPlexusResource
         return new PathProtectionDescriptor( "/global_settings/*", "authcBasic,perms[nexus:settings]" );
     }
 
+    /**
+     * Get the specified global configuration (i.e. current or default)
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ) }, output = GlobalConfigurationResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -188,7 +206,13 @@ public class GlobalConfigurationPlexusResource
         }
     }
 
+    /**
+     * Update the global configuration.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ) }, 
+                              input = GlobalConfigurationResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

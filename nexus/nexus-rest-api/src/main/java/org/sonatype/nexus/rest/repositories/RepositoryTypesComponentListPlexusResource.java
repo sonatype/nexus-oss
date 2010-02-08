@@ -13,6 +13,12 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -38,16 +44,20 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryTypesComponentListPlexusResource" )
+@Path( RepositoryTypesComponentListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryTypesComponentListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/components/repo_types";
+    
     @Requirement
     private RepositoryTypeRegistry repoTypeRegistry;
     
     @Override
     public String getResourceUri()
     {
-        return "/components/repo_types";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -62,7 +72,12 @@ public class RepositoryTypesComponentListPlexusResource
         return null;
     }
 
+    /**
+     * Retrieve the list of repository types available in Nexus.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( queryParams = { @QueryParam( "repoType" ) }, output = NexusRepositoryTypeListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

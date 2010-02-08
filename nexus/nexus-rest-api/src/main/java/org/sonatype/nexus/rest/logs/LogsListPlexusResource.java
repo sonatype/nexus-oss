@@ -16,6 +16,11 @@ package org.sonatype.nexus.rest.logs;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -36,9 +41,12 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "logsList" )
+@Path( LogsListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class LogsListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/logs"; 
     @Override
     public Object getPayloadInstance()
     {
@@ -49,7 +57,7 @@ public class LogsListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/logs";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -58,7 +66,12 @@ public class LogsListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:logs]" );
     }
 
+    /**
+     * Get the list of log files on the server.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = LogsListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

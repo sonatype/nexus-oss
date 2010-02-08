@@ -15,6 +15,15 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -56,9 +65,13 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "RepositoryPlexusResource" )
+@Path( RepositoryPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}"; 
 
     public RepositoryPlexusResource()
     {
@@ -74,7 +87,7 @@ public class RepositoryPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repositories/{" + REPOSITORY_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -83,14 +96,27 @@ public class RepositoryPlexusResource
         return new PathProtectionDescriptor( "/repositories/*", "authcBasic,perms[nexus:repositories]" );
     }
 
+    /**
+     * Get the configuration of an existing repository.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, 
+                              output = RepositoryResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         return this.getRepositoryResourceResponse( request, getRepositoryId( request ) );
     }
 
+    /**
+     * Update an existing repository in nexus with new configuration.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) },
+                              input = RepositoryResourceResponse.class,
+                              output = RepositoryResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -280,7 +306,12 @@ public class RepositoryPlexusResource
         return this.getRepositoryResourceResponse( request, getRepositoryId( request ) );
     }
 
+    /**
+     * Delete an existing repository from nexus.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

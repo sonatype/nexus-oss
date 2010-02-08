@@ -13,25 +13,47 @@
  */
 package org.sonatype.nexus.rest.attributes;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "DefaultAttributesPlexusResource" )
+@Path( DefaultAttributesPlexusResource.RESOURCE_URI )
 public class DefaultAttributesPlexusResource
     extends AbstractAttributesPlexusResource
 {
+    public static final String RESOURCE_URI = "/attributes";
 
     @Override
     public String getResourceUri()
     {
-        return "/attributes";
+        return RESOURCE_URI;
     }
 
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:cache]" );
+    }
+    
+    /**
+     * Rebuild all attributes in the system.
+     */
+    @Override
+    @DELETE
+    @ResourceMethodSignature()
+    public void delete( Context context, Request request, Response response )
+        throws ResourceException
+    {
+        super.delete( context, request, response );
     }
 
 }

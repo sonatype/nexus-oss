@@ -15,6 +15,11 @@ package org.sonatype.nexus.rest.feeds;
 
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -36,9 +41,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "feedList" )
+@Path( FeedsListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class FeedsListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/feeds";
+    
     @Requirement( role = FeedSource.class )
     private List<FeedSource> feeds;
 
@@ -52,7 +61,7 @@ public class FeedsListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/feeds";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -61,7 +70,12 @@ public class FeedsListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:feeds]" );
     }
 
+    /**
+     * Get the list of feeds available from the nexus server.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = FeedListResourceResponse.class )
     public Object get( Context context, Request req, Response res, Variant variant )
         throws ResourceException
     {

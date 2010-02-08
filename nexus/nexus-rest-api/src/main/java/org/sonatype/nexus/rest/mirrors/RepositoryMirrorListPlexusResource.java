@@ -3,6 +3,14 @@ package org.sonatype.nexus.rest.mirrors;
 import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -20,9 +28,14 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryMirrorListPlexusResource" )
+@Path( RepositoryMirrorListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryMirrorListPlexusResource
     extends AbstractRepositoryMirrorPlexusResource
 {
+    public static final String RESOURCE_URI = "/repository_mirrors/{" + REPOSITORY_ID_KEY + "}"; 
+        
     public RepositoryMirrorListPlexusResource()
     {
         setModifiable( true );
@@ -43,10 +56,16 @@ public class RepositoryMirrorListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repository_mirrors/{" + REPOSITORY_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Get the list of mirrors for the selected repository.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY ) },
+                              output = MirrorResourceListResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -74,8 +93,14 @@ public class RepositoryMirrorListPlexusResource
         return dto;
     }
 
+    /**
+     * Update the list of mirrors for a repository.
+     */
     @Override
-    //TODO: get url from rest object and update repository
+    @POST
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryMirrorPlexusResource.REPOSITORY_ID_KEY ) },
+                              input = MirrorResourceListRequest.class,
+                              output = MirrorResourceListResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {   

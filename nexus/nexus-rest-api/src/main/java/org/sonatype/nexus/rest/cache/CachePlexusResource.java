@@ -13,6 +13,13 @@
  */
 package org.sonatype.nexus.rest.cache;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -34,9 +41,12 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "CachePlexusResource" )
+@Path( CachePlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class CachePlexusResource
     extends AbstractRestorePlexusResource
 {
+    public static final String RESOURCE_URI = "/data_cache/{" + DOMAIN + "}/{" + TARGET_ID + "}/content"; 
 
     @Override
     public Object getPayloadInstance()
@@ -47,7 +57,7 @@ public class CachePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/data_cache/{" + DOMAIN + "}/{" + TARGET_ID + "}/content";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -56,7 +66,13 @@ public class CachePlexusResource
         return new PathProtectionDescriptor( "/data_cache/*/*/content**", "authcBasic,perms[nexus:cache]" );
     }
 
+    /**
+     * Retrieve the contents of the Not Found Cache at the specified domain (repository or group).
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRestorePlexusResource.DOMAIN ), @PathParam( AbstractRestorePlexusResource.TARGET_ID ) }, 
+                              output = NFCResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -119,8 +135,14 @@ public class CachePlexusResource
 
         return repoNfc;
     }
-
+    
+    /**
+     * Expire the cache of the selected domain (repository or group).  This includes expiring the cache of items in a proxy repository
+     * so the remote will be rechecked on next access, along with clearning the Not Found Cache.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRestorePlexusResource.DOMAIN ), @PathParam( AbstractRestorePlexusResource.TARGET_ID ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

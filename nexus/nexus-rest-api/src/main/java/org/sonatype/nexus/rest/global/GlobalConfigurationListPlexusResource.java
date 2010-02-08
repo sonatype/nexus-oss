@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -32,9 +37,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "GlobalConfigurationListPlexusResource" )
+@Path( GlobalConfigurationListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class GlobalConfigurationListPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
 {
+    public static final String RESOURCE_URI = "/global_settings";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -44,7 +53,7 @@ public class GlobalConfigurationListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/global_settings";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -53,7 +62,12 @@ public class GlobalConfigurationListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:settings]" );
     }
 
+    /**
+     * Get the list of global configuration objects in nexus.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = GlobalConfigurationListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

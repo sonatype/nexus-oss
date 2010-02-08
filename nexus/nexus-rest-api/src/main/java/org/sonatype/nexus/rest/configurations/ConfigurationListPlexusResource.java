@@ -15,6 +15,11 @@ package org.sonatype.nexus.rest.configurations;
 
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,9 +38,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "configurationList" )
+@Path( ConfigurationListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ConfigurationListPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/configs";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -46,7 +55,7 @@ public class ConfigurationListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/configs";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -55,7 +64,12 @@ public class ConfigurationListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:configuration]" );
     }
 
+    /**
+     * Get the list of configuration files in Nexus.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = ConfigurationsListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

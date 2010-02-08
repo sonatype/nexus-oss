@@ -15,6 +15,12 @@ package org.sonatype.nexus.rest.identify;
 
 import java.io.IOException;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -37,12 +43,16 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "IdentifyHashPlexusResource" )
+@Path( IdentifyHashPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class IdentifyHashPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String ALGORITHM_KEY = "algorithm";
 
     public static final String HASH_KEY = "hash";
+    
+    public static final String RESOURCE_URI = "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
     
     @Requirement
     private IndexerManager indexerManager;
@@ -56,7 +66,7 @@ public class IdentifyHashPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -65,7 +75,14 @@ public class IdentifyHashPlexusResource
         return new PathProtectionDescriptor( "/identify/*/*", "authcBasic,perms[nexus:identify]" );
     }
 
+    /**
+     * Retrieve artifact details using a hash value.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( IdentifyHashPlexusResource.ALGORITHM_KEY ), 
+                                             @PathParam( IdentifyHashPlexusResource.HASH_KEY ) }, 
+                              output = NexusArtifact.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

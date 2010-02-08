@@ -15,6 +15,14 @@ package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -37,9 +45,13 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "RepositoryStatusPlexusResource" )
+@Path( RepositoryStatusPlexusResource.RESOURCE_URI )
+@Consumes( { "application/xml", "application/json" } )
+@Produces( { "application/xml", "application/json" } )
 public class RepositoryStatusPlexusResource
     extends AbstractRepositoryPlexusResource
 {
+    public static final String RESOURCE_URI = "/repositories/{" + REPOSITORY_ID_KEY + "}/status"; 
 
     public RepositoryStatusPlexusResource()
     {
@@ -55,7 +67,7 @@ public class RepositoryStatusPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repositories/{" + REPOSITORY_ID_KEY + "}/status";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -64,7 +76,13 @@ public class RepositoryStatusPlexusResource
         return new PathProtectionDescriptor( "/repositories/*/status", "authcBasic,perms[nexus:repostatus]" );
     }
 
+    /**
+     * Retrieve the local and remote status of the requested repository.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, 
+                              output = RepositoryStatusResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -116,7 +134,14 @@ public class RepositoryStatusPlexusResource
         return result;
     }
 
+    /**
+     * Update the local status of the requested repositories.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) },
+                              input = RepositoryStatusResourceResponse.class,
+                              output = RepositoryStatusResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

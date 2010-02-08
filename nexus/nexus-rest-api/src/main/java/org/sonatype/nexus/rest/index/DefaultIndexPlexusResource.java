@@ -13,18 +13,32 @@
  */
 package org.sonatype.nexus.rest.index;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
+import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
+import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "DefaultIndexPlexusResource" )
+@Path( DefaultIndexPlexusResource.RESOURCE_URI )
 public class DefaultIndexPlexusResource
     extends AbstractIndexPlexusResource
 {
+    public static final String RESOURCE_URI = "/data_index";
+    
     @Override
     public String getResourceUri()
     {
-        return "/data_index";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -37,5 +51,31 @@ public class DefaultIndexPlexusResource
     protected boolean getIsFullReindex()
     {
         return true;
+    }
+    
+    /**
+     * Search against all repositories using provided parameters.  Note there are a few different types of searches you can perform.
+     * If you provide the 'q' query parameter, a keyword search will be performed.
+     * If you provide the 'g, a, v, p or c' query parameters, a maven coordinate search will be performed.
+     * If you provide the 'cn' query parameter, a classname search will be performed.
+     * If you provide the 'sha1' query parameter, a checksum search will be performed.
+     */
+    @Override
+    @GET
+    @ResourceMethodSignature( queryParams = { @QueryParam( "q" ),
+                                              @QueryParam( "g" ), 
+                                              @QueryParam( "a" ), 
+                                              @QueryParam( "v" ), 
+                                              @QueryParam( "p" ), 
+                                              @QueryParam( "c" ),
+                                              @QueryParam( "cn" ),
+                                              @QueryParam( "sha1" ), 
+                                              @QueryParam( "from" ), 
+                                              @QueryParam( "count" ) }, 
+                              output = SearchResponse.class )
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        return super.get( context, request, response, variant );
     }
 }

@@ -15,6 +15,15 @@ package org.sonatype.nexus.rest.groups;
 
 import java.io.IOException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -40,9 +49,13 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryGroupPlexusResource" )
+@Path( RepositoryGroupPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryGroupPlexusResource
     extends AbstractRepositoryGroupPlexusResource
 {
+    public static final String RESOURCE_URI = "/repo_groups/{" + GROUP_ID_KEY + "}"; 
 
     public RepositoryGroupPlexusResource()
     {
@@ -58,7 +71,7 @@ public class RepositoryGroupPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repo_groups/{" + GROUP_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -72,7 +85,13 @@ public class RepositoryGroupPlexusResource
         return request.getAttributes().get( GROUP_ID_KEY ).toString();
     }
 
+    /**
+     * Get the details of an existing repository group.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryGroupPlexusResource.GROUP_ID_KEY ) }, 
+                              output = RepositoryGroupResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -107,7 +126,14 @@ public class RepositoryGroupPlexusResource
         return result;
     }
 
+    /**
+     * Update details of an existing repository group.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryGroupPlexusResource.GROUP_ID_KEY ) },
+                              input = RepositoryGroupResourceResponse.class,
+                              output = RepositoryGroupResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -157,7 +183,12 @@ public class RepositoryGroupPlexusResource
         return result;
     }
 
+    /**
+     * Delete an existing repository group.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature( pathParams = { @PathParam( RepositoryGroupPlexusResource.GROUP_ID_KEY ) } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

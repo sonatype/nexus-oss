@@ -3,6 +3,12 @@ package org.sonatype.nexus.rest.error.reporting;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.swizzle.IssueSubmissionException;
 import org.codehaus.plexus.util.StringUtils;
@@ -20,9 +26,14 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "ErrorReportingPlexusResource" )
+@Path( ErrorReportingPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class ErrorReportingPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/error_reporting";
+    
     public ErrorReportingPlexusResource()
     {
         setModifiable( true );
@@ -44,10 +55,15 @@ public class ErrorReportingPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/error_reporting";
+        return RESOURCE_URI;
     }
     
+    /**
+     * Generate a new error report, will return a url that can be used to access the error ticket.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = ErrorReportRequest.class, output = ErrorReportResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

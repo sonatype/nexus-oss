@@ -13,6 +13,13 @@
  */
 package org.sonatype.nexus.rest.artifact;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.apache.maven.model.Model;
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,10 +35,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "ArtifactPlexusResource" )
+@Path( ArtifactPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class ArtifactPlexusResource
     extends AbstractArtifactPlexusResource
 {
-
+    public static final String RESOURCE_URI = "/artifact/maven";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -41,7 +51,7 @@ public class ArtifactPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/artifact/maven";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -50,7 +60,13 @@ public class ArtifactPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifact]" );
     }
 
+    /**
+     * Get a POM file from provided GAV parameters.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( queryParams = { @QueryParam( "g" ), @QueryParam( "a" ), @QueryParam( "v" ),
+        @QueryParam( "r" ) }, output = Model.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

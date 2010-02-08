@@ -15,6 +15,13 @@ package org.sonatype.nexus.rest.logs;
 
 import java.io.IOException;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,9 +40,14 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author juven
  */
 @Component( role = PlexusResource.class, hint = "logConfig" )
+@Path( LogConfigPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class LogConfigPlexusResource
     extends AbstractNexusPlexusResource
 {
+    public static final String RESOURCE_URI = "/log/config";
+    
     public LogConfigPlexusResource()
     {
         this.setModifiable( true );
@@ -56,10 +68,15 @@ public class LogConfigPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/log/config";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Get the logging configuration.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = LogConfigResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -91,7 +108,12 @@ public class LogConfigPlexusResource
         }
     }
 
+    /**
+     * Update the logging configuration.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = LogConfigResourceResponse.class, output = LogConfigResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

@@ -15,6 +15,13 @@ package org.sonatype.nexus.rest.groups;
 
 import java.util.Collection;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -40,9 +47,13 @@ import org.sonatype.plexus.rest.resource.PlexusResourceException;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RepositoryGroupListPlexusResource" )
+@Path( RepositoryGroupListPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class RepositoryGroupListPlexusResource
     extends AbstractRepositoryGroupPlexusResource
 {
+    public static final String RESOURCE_URI = "/repo_groups";
 
     public RepositoryGroupListPlexusResource()
     {
@@ -58,7 +69,7 @@ public class RepositoryGroupListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/repo_groups";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -67,7 +78,12 @@ public class RepositoryGroupListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:repogroups]" );
     }
 
+    /**
+     * Get the list of repository groups defined in nexus.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RepositoryGroupListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -115,7 +131,12 @@ public class RepositoryGroupListPlexusResource
         return result;
     }
 
+    /**
+     * Add a new repository group to nexus.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = RepositoryGroupResourceResponse.class, output = RepositoryGroupResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

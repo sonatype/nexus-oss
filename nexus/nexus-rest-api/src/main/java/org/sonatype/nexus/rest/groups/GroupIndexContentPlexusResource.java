@@ -13,9 +13,20 @@
  */
 package org.sonatype.nexus.rest.groups;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.restlet.Context;
 import org.restlet.data.Request;
+import org.restlet.data.Response;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.Variant;
 import org.sonatype.nexus.rest.indextreeview.AbstractIndexContentPlexusResource;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -25,15 +36,19 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "groupIndexResource" )
+@Path( GroupIndexContentPlexusResource.RESOURCE_URI )
+@Produces( { "application/xml", "application/json" } )
 public class GroupIndexContentPlexusResource
     extends AbstractIndexContentPlexusResource
 {
     public static final String GROUP_ID_KEY = "groupId";
+    
+    public static final String RESOURCE_URI = "/repo_groups/{" + GROUP_ID_KEY + "}/index_content"; 
 
     @Override
     public String getResourceUri()
     {
-        return "/repo_groups/{" + GROUP_ID_KEY + "}/index_content";
+        return RESOURCE_URI; 
     }
 
     @Override
@@ -46,5 +61,18 @@ public class GroupIndexContentPlexusResource
     protected String getRepositoryId( Request request )
     {
         return String.valueOf( request.getAttributes().get( GROUP_ID_KEY ) );
-        }
-        }
+    }
+    
+    /**
+     * Get the index content from the specified group at the specified path (path is appended to the end of the uri).
+     */
+    @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( GroupIndexContentPlexusResource.GROUP_ID_KEY ) }, 
+                              output = IndexBrowserTreeViewResponseDTO.class )
+    public Object get( Context context, Request request, Response response, Variant variant )
+        throws ResourceException
+    {
+        return super.get( context, request, response, variant );
+    }
+}
