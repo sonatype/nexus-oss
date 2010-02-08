@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<enunciate xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://enunciate.codehaus.org/schemas/enunciate-1.17.xsd">
+
+  <!-- Off for now -->
+  <!-- 
+  <api-classes>
+    <include pattern="org.sonatype.nexus.remote.*" />
+  </api-classes>
+
+  <namespaces>
+    <namespace id="api" uri="http://nexus.sonatype.org/api/1.0.0" />
+    <namespace id="domain" uri="http://nexus.sonatype.org/domain/1.0.0" />
+  </namespaces>
+  -->
+
+  <services>
+    <rest defaultRestSubcontext="service/local"/>
+  </services>
+
+  <modules>
+
+    <jersey usePathBasedConneg="false"  />
+    
+  <!-- Off for now -->
+  <!-- 
+    <jersey disabled="true" />
+    <jaxws disabled="true" />
+    <jaxws-client disabled="true" />
+    <jaxws-support disabled="true" />
+    <jaxws-ri disabled="true" />
+    <gwt disabled="true" />
+    <jaxws-client disabled="true" />
+  -->
+
+    <docs disabled="false" title="Sonatype Nexus Plugin Console Plugin API" includeExampleXml="true" includeExampleJson="true" >
+      <war docsDir="apidocs" />
+    </docs>
+
+  </modules>
+
+</enunciate>

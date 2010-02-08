@@ -1,8 +1,11 @@
 package org.sonatype.nexus.plugins.plugin.console.api.dto;
 
+import javax.xml.bind.annotation.XmlType;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "restInfo" )
+@XmlType( name = "restInfo" )
 public class RestInfoDTO
 {
     private String URI;

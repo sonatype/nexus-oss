@@ -3,13 +3,20 @@ package org.sonatype.nexus.plugins.plugin.console.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "pluginInfos" )
+@XmlRootElement( name = "pluginInfos" )
 public class PluginInfoListResponseDTO
 {
     private List<PluginInfoDTO> data = new ArrayList<PluginInfoDTO>();
 
+    @XmlElementWrapper( name = "data" )
+    @XmlElement( name = "pluginInfo" )
     public List<PluginInfoDTO> getData()
     {
         return data;

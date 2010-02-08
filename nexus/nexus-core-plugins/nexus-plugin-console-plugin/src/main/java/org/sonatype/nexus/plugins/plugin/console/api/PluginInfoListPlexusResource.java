@@ -1,5 +1,11 @@
 package org.sonatype.nexus.plugins.plugin.console.api;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -22,9 +28,12 @@ import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * @author juven
+ * Resource publishing Nexus plugin details.
  */
 @Component( role = PlexusResource.class, hint = "PluginInfoListPlexusResource" )
+@Path( "/plugin_console/plugin_infos" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public class PluginInfoListPlexusResource
     extends AbstractPlexusResource
 {
@@ -46,13 +55,11 @@ public class PluginInfoListPlexusResource
         xstream.processAnnotations( PluginInfoListResponseDTO.class );
         xstream.processAnnotations( RestInfoDTO.class );
 
-        xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
-            PluginInfoDTO.class,
-            "pluginInfo" ) );
+        xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data",
+                                        new AliasingListConverter( PluginInfoDTO.class, "pluginInfo" ) );
 
-        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter(
-            RestInfoDTO.class,
-            "restInfo" ) );
+        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter( RestInfoDTO.class,
+                                                                                                     "restInfo" ) );
     }
 
     @Override
@@ -73,7 +80,12 @@ public class PluginInfoListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:pluginconsoleplugininfos]" );
     }
 
+    /**
+     * Returns the list of known Nexus plugins with details describing them.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PluginInfoListResponseDTO.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -97,8 +109,8 @@ public class PluginInfoListPlexusResource
         result.setDescription( pluginInfo.getDescription() );
         result.setSite( pluginInfo.getSite() );
         result.setScmVersion( StringUtils.isEmpty( pluginInfo.getScmVersion() ) ? "N/A" : pluginInfo.getScmVersion() );
-        result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A" : pluginInfo
-            .getScmTimestamp() );
+        result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A"
+                        : pluginInfo.getScmTimestamp() );
         result.setFailureReason( pluginInfo.getFailureReason() );
 
         for ( RestInfo restInfo : pluginInfo.getRestInfos() )

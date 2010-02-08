@@ -3,9 +3,14 @@ package org.sonatype.nexus.plugins.plugin.console.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlType;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "pluginInfo" )
+@XmlType( name = "pluginInfo" )
 public class PluginInfoDTO
 {
     private String name;
@@ -106,6 +111,8 @@ public class PluginInfoDTO
         this.scmTimestamp = scmTimestamp;
     }
 
+    @XmlElementWrapper( name = "restInfos" )
+    @XmlElement( name = "restInfo" )
     public List<RestInfoDTO> getRestInfos()
     {
         return restInfos;
