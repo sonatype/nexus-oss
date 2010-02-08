@@ -6,9 +6,12 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "userAndGroupConfig" )
+@XmlRootElement( name = "userAndGroupConfig" )
 public class LdapUserAndGroupConfigurationResponse
 {
 
@@ -29,6 +32,5 @@ public class LdapUserAndGroupConfigurationResponse
     {
         this.data = userAndGroupConfig;
     }
-    
-    
+
 }

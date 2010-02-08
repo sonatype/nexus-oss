@@ -9,9 +9,14 @@ package org.sonatype.nexus.security.ldap.realms.api.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "userList" )
+@XmlRootElement( name = "userList" )
 public class LdapUserListResponse
 {
 
@@ -20,6 +25,8 @@ public class LdapUserListResponse
     /**
      * @return the ldapUserRoleMappings
      */
+    @XmlElementWrapper( name = "data" )
+    @XmlElement( name = "user" )
     public List<LdapUserResponseDTO> getLdapUserRoleMappings()
     {
         return data;
@@ -33,7 +40,7 @@ public class LdapUserListResponse
         this.data = ldapUserRoleMappings;
     }
 
-    public void addLdapUserRoleMapping(LdapUserResponseDTO ldapUserRoleMapping)
+    public void addLdapUserRoleMapping( LdapUserResponseDTO ldapUserRoleMapping )
     {
         data.add( ldapUserRoleMapping );
     }

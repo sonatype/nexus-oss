@@ -8,13 +8,16 @@ package org.sonatype.nexus.security.ldap.realms.api.dto;
 
 import java.util.ArrayList;
 
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType( name = "user" )
 public class LdapUserResponseDTO
 {
     /**
-     * User ID.  The id of the user.
+     * User ID. The id of the user.
      */
     private String userId;
-    
+
     /**
      * Field name
      */
@@ -61,8 +64,8 @@ public class LdapUserResponseDTO
     {
         this.roles = roles;
     }
-    
-    public void addRole(String role)
+
+    public void addRole( String role )
     {
         this.roles.add( role );
     }
@@ -83,7 +86,6 @@ public class LdapUserResponseDTO
         this.name = name;
     }
 
-
     /**
      * @return the email
      */
@@ -100,7 +102,8 @@ public class LdapUserResponseDTO
         this.email = email;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -115,7 +118,8 @@ public class LdapUserResponseDTO
         return result;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -158,6 +162,5 @@ public class LdapUserResponseDTO
             return false;
         return true;
     }
-    
-    
+
 }

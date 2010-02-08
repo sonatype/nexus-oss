@@ -6,9 +6,12 @@
  */
 package org.sonatype.nexus.security.ldap.realms.api.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "connectionInfo" )
+@XmlRootElement( name = "connectionInfo" )
 public class LdapConnectionInfoResponse
 {
 
@@ -29,7 +32,5 @@ public class LdapConnectionInfoResponse
     {
         this.data = connectionInfo;
     }
-    
-    
-    
+
 }

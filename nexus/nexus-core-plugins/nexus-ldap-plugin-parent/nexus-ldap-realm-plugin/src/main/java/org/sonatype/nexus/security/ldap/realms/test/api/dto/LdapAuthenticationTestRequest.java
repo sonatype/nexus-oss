@@ -6,14 +6,16 @@
  */
 package org.sonatype.nexus.security.ldap.realms.test.api.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapConnectionInfoDTO;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "connectionInfoTest" )
+@XmlRootElement( name = "connectionInfoTest" )
 public class LdapAuthenticationTestRequest
 {
-
     private LdapConnectionInfoDTO data;
 
     /**
@@ -31,7 +33,5 @@ public class LdapAuthenticationTestRequest
     {
         this.data = ldapConnectionInfoDTO;
     }
-    
-    
-    
+
 }

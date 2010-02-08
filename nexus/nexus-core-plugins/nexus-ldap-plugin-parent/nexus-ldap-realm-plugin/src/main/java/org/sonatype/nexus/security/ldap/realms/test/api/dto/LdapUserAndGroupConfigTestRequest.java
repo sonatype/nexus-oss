@@ -6,9 +6,12 @@
  */
 package org.sonatype.nexus.security.ldap.realms.test.api.dto;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias( value = "userAndGroupConfigTest" )
+@XmlRootElement( name = "userAndGroupConfigTest" )
 public class LdapUserAndGroupConfigTestRequest
 {
     private LdapUserAndGroupConfigTestRequestDTO data;
