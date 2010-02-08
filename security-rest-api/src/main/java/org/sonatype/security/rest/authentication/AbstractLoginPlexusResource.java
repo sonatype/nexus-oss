@@ -32,6 +32,8 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 public abstract class AbstractLoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
+    public static final String RESOURCE_URI = "/authentication/login";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -41,7 +43,7 @@ public abstract class AbstractLoginPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/authentication/login";
+        return RESOURCE_URI;
     }
 
     @Override
