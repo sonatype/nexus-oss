@@ -40,9 +40,16 @@
 		<class>
 			<name>PlexusRoleResource</name>
 			<version>1.0.0+</version>
+			<description>Details of a security role.  A roles uniqueness is made up of an id and a source (where the role came from).</description>
+			<annotations>
+			  <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "plexus-role" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "plexus-role" )</annotation>
+			  <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+			</annotations>
 			<fields>
 				<field>
 					<name>roleId</name>
+					<description>The id of the role.</description>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -55,6 +62,7 @@
 				</field>
 				<field>
 					<name>source</name>
+					<description>The source id of the role.  Defines what source the role came from.</description>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
@@ -65,7 +73,13 @@
 		<!-- Response/Request wrapper Data -->
 		<class>
 			<name>RoleListResourceResponse</name>
+			<description>REST Response object for a role list request.</description>
 			<version>1.0.0+</version>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "roles-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "roles-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>data</name>
@@ -75,13 +89,24 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+					<description>List of roles.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "roles-list-item" )</annotation>
+          </annotations>
 				</field>
 			</fields>
 		</class>
 
 		<class>
 			<name>RoleResourceResponse</name>
-			<version>1.0.0+</version>
+			<description>REST Response object for role request.</description>
+      <version>1.0.0+</version>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "role-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "role-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>data</name>
@@ -90,13 +115,20 @@
 						<type>RoleResource</type>
 					</association>
 					<required>true</required>
+					<description>Role returned.</description>
 				</field>
 			</fields>
 		</class>
 
 		<class>
 			<name>RoleResourceRequest</name>
+			<description>REST Request object to persist a role</description>
 			<version>1.0.0+</version>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "role-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "role-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>data</name>
@@ -105,6 +137,7 @@
 						<type>RoleResource</type>
 					</association>
 					<required>true</required>
+					<description>Role to persist.</description>
 				</field>
 			</fields>
 		</class>
@@ -114,36 +147,45 @@
 		<class>
 			<name>RoleResource</name>
 			<version>1.0.0+</version>
+			<description>Role configuration.</description>
+			<annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+			</annotations>
 			<fields>
 				<field>
 					<name>resourceURI</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
+					<description>The URI of the role.</description>
 				</field>
 				<field>
 					<name>id</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
+          <description>The id of the role.</description>
 				</field>
 				<field>
 					<name>name</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
+          <description>The name of the role.</description>
 				</field>
 				<field>
 					<name>description</name>
 					<version>1.0.0+</version>
 					<type>String</type>
 					<required>true</required>
+          <description>The description of the role.</description>
 				</field>
 				<field>
 					<name>sessionTimeout</name>
 					<version>1.0.0+</version>
 					<type>int</type>
 					<required>true</required>
+          <description>The sessionTimeout of the role (legacy, actual value not used).</description>
 				</field>
 				<field>
 					<name>roles</name>
@@ -153,6 +195,7 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+          <description>List of role id's contained by this role.</description>
 				</field>
 				<field>
 					<name>privileges</name>
@@ -162,12 +205,14 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+					<description>List of privilege id's contained by this role.</description>
 				</field>
 				<field>
 					<name>userManaged</name>
 					<version>1.0.0+</version>
 					<type>boolean</type>
 					<required>false</required>
+					<description>Flag that defines if a user can update this role (read-only).</description>
 				</field>
 			</fields>
 		</class>
@@ -175,6 +220,12 @@
 		<class>
 			<name>ExternalRoleMappingResourceResponse</name>
 			<version>1.0.0+</version>
+			<description>REST Response object to list role mappings.  A role mapping maps roles of one security realm to the default one.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "external-role-mapping" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "external-role-mapping" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>data</name>
@@ -184,6 +235,11 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+					<description>List of the role mappings.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "mapping" )</annotation>
+          </annotations>
 				</field>
 			</fields>
 		</class>
@@ -191,6 +247,12 @@
 		<class>
 			<name>ExternalRoleMappingResource</name>
 			<version>1.0.0+</version>
+			<description>A role mapping maps roles of one security realm to the default one.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "mapping" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "mapping" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>defaultRole</name>
@@ -199,6 +261,7 @@
 						<type>PlexusRoleResource</type>
 					</association>
 					<required>true</required>
+					<description>The systems's role.</description>
 				</field>
 				<field>
 					<name>mappedRoles</name>
@@ -208,6 +271,11 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+					<description>The external role.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "mappedRoles" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "plexus-role" )</annotation>
+          </annotations>
 				</field>
 			</fields>
 		</class>
@@ -215,6 +283,12 @@
 		<class>
 			<name>PlexusRoleListResourceResponse</name>
 			<version>1.0.0+</version>
+			<description>REST Response object that lists roles.</description>
+			<annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "plexus-roles" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "plexus-roles" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 			<fields>
 				<field>
 					<name>data</name>
@@ -224,6 +298,11 @@
 						<multiplicity>*</multiplicity>
 					</association>
 					<required>true</required>
+          <description>List of roles.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "plexus-role" )</annotation>
+          </annotations>
 				</field>
 			</fields>
 		</class>
@@ -235,6 +314,12 @@
     <class>
       <name>UserListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object that lists users.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "users-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "users-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -244,6 +329,12 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of users.</description>
+          <description>List of roles.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "users-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -251,6 +342,12 @@
     <class>
       <name>UserResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST response object containing a user.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -259,6 +356,7 @@
             <type>UserResource</type>
           </association>
           <required>true</required>
+          <description>User information.</description>
         </field>
       </fields>
     </class>
@@ -266,6 +364,12 @@
     <class>
       <name>UserResourceRequest</name>
       <version>1.0.0+</version>
+      <description>REST request object to persist a user.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -274,6 +378,7 @@
             <type>UserResource</type>
           </association>
           <required>true</required>
+          <description>User information.</description>
         </field>
       </fields>
     </class>
@@ -281,6 +386,12 @@
     <class>
       <name>UserForgotPasswordRequest</name>
       <version>1.0.0+</version>
+      <description>REST Request to reset a user's password.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-forgotpw" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-forgotpw" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -289,6 +400,7 @@
             <type>UserForgotPasswordResource</type>
           </association>
           <required>true</required>
+          <description>Details needed to reset a users's password.</description>
         </field>
       </fields>
     </class>
@@ -296,6 +408,12 @@
     <class>
       <name>UserChangePasswordRequest</name>
       <version>1.0.0+</version>
+      <description>REST Request to change a user's password.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-changepw" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-changepw" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -304,6 +422,7 @@
             <type>UserChangePasswordResource</type>
           </association>
           <required>true</required>
+          <description>Details needed to change a users's password.</description>
         </field>
       </fields>
     </class>
@@ -313,42 +432,52 @@
     <class>
       <name>UserResource</name>
       <version>1.0.0+</version>
+      <description>User's details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URI of the user.</description>
         </field>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the user.</description>
         </field>
         <field>
           <name>password</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The password of the user (write only).</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The common name of the user.</description>
         </field>
         <field>
           <name>status</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The status of the user. Available status: active, locked, disabled.</description>
         </field>
         <field>
           <name>email</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The email address of the user.</description>
         </field>
         <field>
           <name>roles</name>
@@ -358,12 +487,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
-        </field>
-        <field>
-          <name>userManaged</name>
-          <version>1.0.0+</version>
-          <type>boolean</type>
-          <required>false</required>
+          <description>List of the user's roles.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "roles" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "role" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -371,18 +499,24 @@
     <class>
       <name>UserForgotPasswordResource</name>
       <version>1.0.0+</version>
+      <description>Details needed to reset a users's password.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>email</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User's email address.</description>
         </field>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User's id.</description>
         </field>
       </fields>
     </class>
@@ -390,24 +524,31 @@
     <class>
       <name>UserChangePasswordResource</name>
       <version>1.0.0+</version>
+      <description>Details needed to change a users's password.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User's id.</description>
         </field>
         <field>
           <name>oldPassword</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User's old password.</description>
         </field>
         <field>
           <name>newPassword</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User's new password.</description>
         </field>
       </fields>
     </class>
@@ -415,6 +556,12 @@
 		<class>
       <name>PlexusUserListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object that lists users.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "plexus-user-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "plexus-user-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -424,6 +571,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of users.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "plexus-user" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -431,6 +583,12 @@
     <class>
       <name>PlexusUserResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST response object containing a user.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "plexus-user" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "plexus-user" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -439,6 +597,7 @@
             <type>PlexusUserResource</type>
           </association>
           <required>true</required>
+          <description>User's details.</description>
         </field>
       </fields>
     </class>
@@ -446,30 +605,38 @@
     <class>
       <name>PlexusUserResource</name>
       <version>1.0.0+</version>
+      <description>User's details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the user.</description>
         </field>
         <field>
           <name>source</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The source of the role, i.e. what realm the user belongs to.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The common name of the user.</description>
         </field>
         <field>
           <name>email</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The email address of the user.</description>
         </field>
         <field>
           <name>roles</name>
@@ -479,6 +646,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of user's roles.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "roles" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "plexus-role" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -486,6 +658,12 @@
     <class>
       <name>PlexusUserSearchCriteriaResourceRequest</name>
       <version>1.0.0+</version>
+      <description>REST Request object to search for users based on criteria.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-search" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-search" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -494,6 +672,7 @@
             <type>PlexusUserSearchCriteriaResource</type>
           </association>
           <required>true</required>
+          <description>Search criteria.</description>
         </field>
       </fields>
     </class>
@@ -501,27 +680,37 @@
     <class>
       <name>PlexusUserSearchCriteriaResource</name>
       <version>1.0.0+</version>
+      <description>User search criteria details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>Partial user Id to search for.  Uses 'starts with' search.  So 'jcod' will match 'jcoder' but not 'cjcoder'.</description>
         </field>
         <field>
           <name>effectiveUsers</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>An effective user is one that can login to the system.</description>
         </field>
       </fields>
     </class>
 
-    
-
     <class>
       <name>UserToRoleResourceRequest</name>
       <version>1.0.0+</version>
+      <description>REST Request object to assign a roles to a user.  Typically used when assigning roles to a user NOT managed by this system.</description>    
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "user-to-role" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "user-to-role" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -530,6 +719,12 @@
             <type>UserToRoleResource</type>
           </association>
           <required>true</required>
+          <description>Details of request.</description>
+          <annotations>
+          <!--  FIXME: this isn't generating correctly -->
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "plexus-role" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -537,18 +732,24 @@
     <class>
       <name>UserToRoleResource</name>
       <version>1.0.0+</version>
+      <description>Details to assign roles to a users.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>userId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the user.</description>
         </field>
         <field>
           <name>source</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The source of the user.</description>
         </field>
         <field>
           <name>roles</name>
@@ -558,6 +759,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>The list of roles to assign to the user.  This list will replace the roles the user currently has.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "roles" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "role" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -566,18 +772,26 @@
     <class>
       <name>PlexusComponentListResource</name>
       <version>1.0.0+</version>
+      <description>Details of a component used by the system.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "component" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "component" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>roleHint</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The hint of the component.</description>
         </field>
         <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The description of the component.</description>
         </field>
       </fields>
     </class>
@@ -587,6 +801,12 @@
     <class>
       <name>PrivilegeListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object to list privileges.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "privilege-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name ="privilege-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>      
       <fields>
         <field>
           <name>data</name>
@@ -596,6 +816,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of privileges.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "privilege-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -603,6 +828,12 @@
     <class>
       <name>PrivilegeStatusResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST response object containing a privilege.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "privilege-status-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name ="privilege-status-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>   
       <fields>
         <field>
           <name>data</name>
@@ -611,117 +842,61 @@
             <type>PrivilegeStatusResource</type>
           </association>
           <required>true</required>
+          <description>Privilege details.</description>
         </field>
       </fields>
     </class>
 
-    <class>
-      <name>PrivilegeResourceRequest</name>
-      <version>1.0.0+</version>
-      <fields>
-        <field>
-          <name>data</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>PrivilegeResource</type>
-          </association>
-          <required>true</required>
-        </field>
-      </fields>
-    </class>
-
-    <class>
-      <name>PrivilegeResource</name>
-      <version>1.0.0+</version>
-      <fields>
-        <field>
-          <name>name</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>type</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>description</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-        </field>
-        <field>
-          <name>method</name>
-          <version>1.0.0+</version>
-          <association>
-            <type>String</type>
-            <multiplicity>*</multiplicity>
-          </association>
-          <required>true</required>
-        </field>
-        <field>
-          <name>repositoryTargetId</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-        </field>
-        <field>
-          <name>repositoryId</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-        </field>
-        <field>
-          <name>repositoryGroupId</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-        </field>
-      </fields>
-    </class>
-    <!-- Purposefully no PrivilegeApplicationResource as that type of resource cannot be created -->
-
+    
     <class>
       <name>PrivilegeStatusResource</name>
       <version>1.0.0+</version>
+      <description>Privilege details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the privilege.</description>
         </field>
         <field>
           <name>resourceURI</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The URI of the privilege.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the privilege.</description>
         </field>
         <field>
           <name>description</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
+          <description>The description of the privilege.</description>
         </field>
         <field>
           <name>type</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the privilege.</description>
         </field>
         <field>
           <name>userManaged</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>false</required>
+          <description>Flag that defines if a privilege can update this role (read-only).</description>
         </field>
         <field>
           <name>properties</name>
@@ -731,25 +906,36 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>false</required>
+          <description>List of properties for this privilege.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "properties" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "privilege-property" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
     
     <class>
       <name>PrivilegeProperty</name>
+      <description>Key value pair.</description>
       <version>1.0.0+</version>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>key</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The key of the property.</description>
         </field>
         <field>
           <name>value</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The value of the property.</description>
         </field>
       </fields>
     </class>
@@ -757,6 +943,12 @@
     <class>
       <name>PrivilegeTypeResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Request object to lists the types of privilege in the system.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "privilege-type-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "privilege-type-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -766,6 +958,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of privilege types.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "privilege-type" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -773,18 +970,24 @@
     <class>
       <name>PrivilegeTypeResource</name>
       <version>1.0.0+</version>
+      <description>Privilege type details. Used to dynamically define types of privileges.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the privilege type.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the privilege type.</description>
         </field>
         <field>
           <name>properties</name>
@@ -794,6 +997,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of properties used to create privileges.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "properties" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "privilege-type-property" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -801,30 +1009,38 @@
     <class>
       <name>PrivilegeTypePropertyResource</name>
       <version>1.0.0+</version>
+      <description>Privilege property details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The id of the privilege property.</description>
         </field>
         <field>
           <name>name</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The name of the privilege property.</description>
         </field>
         <field>
           <name>helpText</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The help text of the privilege property.</description>
         </field>
         <field>
           <name>type</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The type of the privilege property.</description>
         </field>
       </fields>
     </class>
@@ -833,6 +1049,12 @@
     <class>
       <name>AuthenticationLoginResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object to list the privileges a users has.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "authentication-login" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "authentication-login" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -841,6 +1063,7 @@
             <type>AuthenticationLoginResource</type>
           </association>
           <required>true</required>
+          <description>Login details.</description>
         </field>
       </fields>
     </class>
@@ -848,6 +1071,10 @@
     <class>
       <name>AuthenticationLoginResource</name>
       <version>1.0.0+</version>
+      <description>Wrapper around login details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>clientPermissions</name>
@@ -856,30 +1083,39 @@
             <type>AuthenticationClientPermissions</type>
           </association>
           <required>true</required>
+          <description>Login details info.</description>
         </field>
       </fields>
     </class>
+    
     <class>
       <name>AuthenticationClientPermissions</name>
       <version>1.0.0+</version>
+      <description>Login details info.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>loggedIn</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <description>Flags if a user is logged in.</description>
         </field>
         <field>
           <name>loggedInUsername</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The logged in user's id.</description>
         </field>
         <field>
           <name>loggedInUserSource</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>The logged in user's source.</description>
         </field>
         <field>
           <name>permissions</name>
@@ -889,24 +1125,36 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>Lists of privileges.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "permissions" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "permission" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
+    
     <class>
       <name>ClientPermission</name>
       <version>1.0.0+</version>
+      <description>Permission details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Id of the permission.</description>
         </field>
         <field>
           <name>value</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>Privilege value: NONE = 0, READ = 1, UPDATE = 2, DELETE = 4, CREATE = 8, or you can OR them together.</description>
         </field>
       </fields>
     </class>
@@ -914,6 +1162,12 @@
     <class>
       <name>PlexusComponentListResourceResponse</name>
       <version>1.0.0+</version>
+      <description>REST Response object to list components.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( "sec-components-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "sec-components-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -923,6 +1177,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
+          <description>List of components.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "component" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>

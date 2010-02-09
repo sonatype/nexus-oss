@@ -12,6 +12,10 @@
  */
 package org.sonatype.security.rest.authentication;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -29,6 +33,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * 
  * @author cstamas
  */
+@Path( AbstractLoginPlexusResource.RESOURCE_URI )
 public abstract class AbstractLoginPlexusResource
     extends AbstractUIPermissionCalculatingPlexusResource
 {
@@ -47,6 +52,8 @@ public abstract class AbstractLoginPlexusResource
     }
 
     @Override
+    @GET
+    @ResourceMethodSignature( output = AuthenticationLoginResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

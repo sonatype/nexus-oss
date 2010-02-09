@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -24,12 +30,22 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
+ * 
+ * REST resource to reset a users password. Default implementations will generate and email a user password to the user.
+ * <BR/>
+ * This resource is similar to {@link UserForgotPasswordPlexusResource} except that a system administrator can reset other users passwords.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "UserResetPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserResetPlexusResource.RESOURCE_URI )
 public class UserResetPlexusResource
     extends AbstractUserPlexusResource
 {
+
+    public static final String RESOURCE_URI = "/users_reset/{" + USER_ID_KEY + "}";
 
     public UserResetPlexusResource()
     {
@@ -45,7 +61,7 @@ public class UserResetPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/users_reset/{" + USER_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -53,8 +69,12 @@ public class UserResetPlexusResource
     {
         return new PathProtectionDescriptor( "/users_reset/*", "authcBasic,perms[security:usersreset]" );
     }
-
+    /**
+     * Reset a user's password.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

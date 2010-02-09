@@ -17,8 +17,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,19 +33,30 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
+/**
+ *  REST resource for listing external role mappings.  An external role mapping, maps a role of an external 
+ *  source to one of managed by the system, giving a user all the privileges contained in this system role.
+ *  
+ * @author bdemers
+ */
 @Component( role = PlexusResource.class, hint = "ExternalRoleMappingPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( ExternalRoleMappingPlexusResource.RESOURCE_URI )
 public class ExternalRoleMappingPlexusResource
     extends AbstractRolePlexusResource
 {
-    public static final String SOURCE_ID_KEY = "sourceId";
 
+    public static final String SOURCE_ID_KEY = "sourceId";
+    
+    public static final String RESOURCE_URI = "/external_role_map/{" + SOURCE_ID_KEY + "}";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -56,10 +72,15 @@ public class ExternalRoleMappingPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/external_role_map/{" + SOURCE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+    * Retrieves the list of external role mappings.
+    */
     @Override
+    @GET
+    @ResourceMethodSignature( output = ExternalRoleMappingResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

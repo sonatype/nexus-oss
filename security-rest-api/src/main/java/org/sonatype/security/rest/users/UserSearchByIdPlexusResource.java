@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -20,13 +26,25 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
+import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
+/** 
+ * REST resource that searches for users based on a users source and partial user Id (user Id starts with xxx).
+ * 
+ * @author bdemers
+ *
+ */
 @Component( role = PlexusResource.class, hint = "UserSearchByIdPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserSearchByIdPlexusResource.RESOURCE_URI )
 public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
-        
+
+    public static final String RESOURCE_URI = "/user_search/{" + USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
+    
     public UserSearchByIdPlexusResource()
     {
         setModifiable( false );
@@ -47,10 +65,15 @@ public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResour
     @Override
     public String getResourceUri()
     {
-        return "/user_search/{" + USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
-    @Override
+    /**
+     * Returns a list of users in which the source and partial user id matches the parameters. 
+     */
+    @Override 
+    @GET
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

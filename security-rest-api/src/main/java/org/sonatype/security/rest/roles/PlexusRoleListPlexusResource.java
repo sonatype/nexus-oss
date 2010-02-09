@@ -14,8 +14,13 @@ package org.sonatype.security.rest.roles;
 
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -24,18 +29,30 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
 
+/**
+ *  REST resource for listing security roles.
+ * 
+ * @author bdemers
+ * @see RoleListPlexusResource
+ */
 @Component(role=PlexusResource.class, hint="PlexusRoleListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( PlexusRoleListPlexusResource.RESOURCE_URI )
+@Deprecated
 public class PlexusRoleListPlexusResource
     extends AbstractSecurityPlexusResource
 {
+    
     public static final String SOURCE_ID_KEY = "sourceId";
 
+    public static final String RESOURCE_URI = "/plexus_roles/{" + SOURCE_ID_KEY + "}";
+    
     @Override
     public Object getPayloadInstance()
     {
@@ -51,10 +68,15 @@ public class PlexusRoleListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/plexus_roles/{" + SOURCE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Retrieves the list of security roles.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusRoleListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

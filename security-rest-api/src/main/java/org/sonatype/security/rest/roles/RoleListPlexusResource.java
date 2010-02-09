@@ -12,6 +12,13 @@
  */
 package org.sonatype.security.rest.roles;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -31,12 +38,19 @@ import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.sonatype.security.rest.model.RoleResourceResponse;
 
 /**
+ * REST resource for listing security roles.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RoleListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( RoleListPlexusResource.RESOURCE_URI )
 public class RoleListPlexusResource
     extends AbstractRolePlexusResource
 {
+
+    public static final String RESOURCE_URI = "/roles";
 
     public RoleListPlexusResource()
     {
@@ -52,7 +66,7 @@ public class RoleListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/roles";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -61,7 +75,12 @@ public class RoleListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:roles]" );
     }
 
+    /**
+     * Retrieves the list of security roles.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RoleListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -88,7 +107,12 @@ public class RoleListPlexusResource
         return result;
     }
 
+    /**
+     * Creates a new security role.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

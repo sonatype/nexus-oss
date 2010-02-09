@@ -12,13 +12,11 @@
  */
 package org.sonatype.security.rest.users;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.restlet.data.Request;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 

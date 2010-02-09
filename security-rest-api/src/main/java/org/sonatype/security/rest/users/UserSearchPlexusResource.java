@@ -15,6 +15,13 @@ package org.sonatype.security.rest.users;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -25,17 +32,28 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
+/**
+ * REST resource that searches for users based on a users source and other search criteria.
+ * 
+ * @author bdemers
+ */
 @Component( role = PlexusResource.class, hint = "UserSearchPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserSearchPlexusResource.RESOURCE_URI )
 public class UserSearchPlexusResource
     extends AbstractUserSearchPlexusResource
 {
     public static final String USER_ID_KEY = "userId";
 
     public static final String USER_SOURCE_KEY = "userSource";
+
+    public static final String RESOURCE_URI = "/user_search/{" + USER_SOURCE_KEY + "}";
 
     public UserSearchPlexusResource()
     {
@@ -57,15 +75,20 @@ public class UserSearchPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/user_search/{" + USER_SOURCE_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Returns a list of users that match the search criteria.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = PlexusUserSearchCriteriaResourceRequest.class, output = PlexusUserListResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        PlexusUserSearchCriteriaResource criteriaResource = ( (PlexusUserSearchCriteriaResourceRequest) payload )
-            .getData();
+        PlexusUserSearchCriteriaResource criteriaResource =
+            ( (PlexusUserSearchCriteriaResourceRequest) payload ).getData();
 
         UserSearchCriteria criteria = this.toPlexusSearchCriteria( criteriaResource );
         criteria.setSource( this.getUserSource( request ) );
@@ -87,14 +110,16 @@ public class UserSearchPlexusResource
             Set<Role> roles = null;
             try
             {
-                roles = this.getSecuritySystem().listRoles("default");
+                roles = this.getSecuritySystem().listRoles( "default" );
             }
             catch ( NoSuchAuthorizationManager e )
             {
-                this.getLogger().error( "Cannot find default UserManager,  effective user search may not work properly.", e );
+                this.getLogger().error(
+                                        "Cannot find default UserManager,  effective user search may not work properly.",
+                                        e );
                 roles = this.getSecuritySystem().listRoles();
             }
-            
+
             for ( Role role : roles )
             {
                 roleIds.add( role.getRoleId() );
@@ -106,7 +131,12 @@ public class UserSearchPlexusResource
         return criteria;
     }
 
+    /**
+     * Returns a list of all the users managed by this a source.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

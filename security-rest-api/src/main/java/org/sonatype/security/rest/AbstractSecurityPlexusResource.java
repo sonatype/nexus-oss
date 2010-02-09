@@ -13,18 +13,18 @@
 package org.sonatype.security.rest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.Produces;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.configuration.validation.ValidationContext;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.plexus.rest.ReferenceFactory;
@@ -45,6 +45,14 @@ import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserStatus;
 
+/**
+ * Base class of SecurityPlexusResources.  Contains error handling util methods and conversion between DTO and persistence model.  
+ * 
+ * @author bdemers
+ *
+ */
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
 public abstract class AbstractSecurityPlexusResource
     extends AbstractPlexusResource
 {
@@ -108,8 +116,6 @@ public abstract class AbstractSecurityPlexusResource
             resourceId = resource.getUserId();
         }
         resource.setResourceURI( this.createChildReference( request, resourceId ).toString() );
-
-        resource.setUserManaged( !user.isReadOnly() );
 
         for ( RoleIdentifier role : user.getRoles() )
         {

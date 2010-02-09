@@ -14,6 +14,12 @@ package org.sonatype.security.rest.privileges;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
@@ -30,10 +36,22 @@ import org.sonatype.security.rest.model.PrivilegeTypePropertyResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResource;
 import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
 
+/**
+ * REST resource to retrieve the list of Privilege Types.  Each type of privilege that can be created is described by 
+ * a {@link PrivilegeTypeResource}. Each PrivilegeTypeResource lists the set of properties used to define a type of privilege.
+ * 
+ * @author bdemers
+ */
 @Component( role = PlexusResource.class, hint = "PrivilegeTypePlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( PrivilegeTypePlexusResource.RESOURCE_URI )
 public class PrivilegeTypePlexusResource
     extends AbstractPrivilegePlexusResource
 {
+
+    public static final String RESOURCE_URI = "/privilege_types";
+    
     @Requirement( hint = "resourceMerging")
     private ConfigurationManager configurationManager;
     
@@ -52,10 +70,15 @@ public class PrivilegeTypePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/privilege_types";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Retrieves the list of privilege types.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PrivilegeTypeResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

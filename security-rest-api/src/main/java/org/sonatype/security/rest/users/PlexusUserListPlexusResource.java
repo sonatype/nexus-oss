@@ -12,33 +12,45 @@
  */
 package org.sonatype.security.rest.users;
 
-import java.util.HashSet;
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
-import org.sonatype.security.authorization.Role;
-import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
-import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
-import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
+
+/**
+ * REST resource for listing users.
+ * 
+ * @author bdemers
+ * @see UserListPlexusResource
+ */
 @Component( role = PlexusResource.class, hint = "PlexusUserListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( PlexusUserListPlexusResource.RESOURCE_URI )
+@Deprecated
 public class PlexusUserListPlexusResource
     extends AbstractSecurityPlexusResource
 {
     public static final String USER_SOURCE_KEY = "userSource";
+
+    public static final String RESOURCE_URI = "/plexus_users/{" + USER_SOURCE_KEY + "}";
 
     public PlexusUserListPlexusResource()
     {
@@ -60,10 +72,15 @@ public class PlexusUserListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/plexus_users/{" + USER_SOURCE_KEY + "}";
+        return RESOURCE_URI;
     }
 
+    /**
+     * Retrieves the list of users.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

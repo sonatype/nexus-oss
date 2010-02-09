@@ -12,6 +12,13 @@
  */
 package org.sonatype.security.rest.privileges;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -23,19 +30,25 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 
 /**
+ * REST resource for managing security privileges.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "PrivilegePlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( PrivilegePlexusResource.RESOURCE_URI )
 public class PrivilegePlexusResource
     extends AbstractPrivilegePlexusResource
 {
+    
+    public static final String RESOURCE_URI = "/privileges/{" + PRIVILEGE_ID_KEY + "}";
 
     protected static final String PRIVILEGE_SOURCE = "default";
 
@@ -53,7 +66,7 @@ public class PrivilegePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/privileges/{" + PRIVILEGE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -67,7 +80,12 @@ public class PrivilegePlexusResource
         return request.getAttributes().get( PRIVILEGE_ID_KEY ).toString();
     }
 
+    /**
+     * Retrieves the list of security privileges.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -97,7 +115,12 @@ public class PrivilegePlexusResource
         return result;
     }
 
+    /**
+     * Removes a security privilege.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

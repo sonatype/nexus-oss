@@ -13,10 +13,17 @@
 package org.sonatype.security.rest.roles;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 
-import org.apache.commons.codec.StringDecoder;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -31,20 +38,27 @@ import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.sonatype.security.rest.model.RoleResourceResponse;
 
 /**
+ *  REST resource for managing security roles.
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "RolePlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( RolePlexusResource.RESOURCE_URI )
 public class RolePlexusResource
     extends AbstractRolePlexusResource
 {
 
     public static final String ROLE_ID_KEY = "roleId";
 
+    public static final String RESOURCE_URI = "/roles/{" + ROLE_ID_KEY + "}";
+    
     public RolePlexusResource()
     {
         this.setModifiable( true );
@@ -59,7 +73,7 @@ public class RolePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/roles/{" + ROLE_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -83,7 +97,12 @@ public class RolePlexusResource
         return value;
     }
 
+    /**
+     * Returns the request security role.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = RoleResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -109,7 +128,12 @@ public class RolePlexusResource
         return result;
     }
 
+    /**
+     * Updates and returns a security role.
+     */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -159,7 +183,12 @@ public class RolePlexusResource
         return resourceResponse;
     }
 
+    /**
+     * Removes a security role.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
