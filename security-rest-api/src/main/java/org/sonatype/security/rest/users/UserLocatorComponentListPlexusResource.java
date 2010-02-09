@@ -14,6 +14,12 @@ package org.sonatype.security.rest.users;
 
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -32,10 +38,22 @@ import org.sonatype.security.rest.model.PlexusComponentListResource;
 import org.sonatype.security.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.security.usermanagement.UserManager;
 
+/**
+ * REST resource for listing the types of {@link UserManager} that are configured in the system. Each
+ * {@link UserManager} manages a list of users from a spesific source.
+ * 
+ * @author bdemers
+ */
 @Component( role = PlexusResource.class, hint = "UserLocatorComponentListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserLocatorComponentListPlexusResource.RESOURCE_URI )
 public class UserLocatorComponentListPlexusResource
     extends AbstractPlexusResource
 {
+
+    public static final String RESOURCE_URI = "/components/userLocators";
+
     @Requirement
     private PlexusContainer container;
 
@@ -51,7 +69,7 @@ public class UserLocatorComponentListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/components/userLocators";
+        return RESOURCE_URI;
     }
 
     public PathProtectionDescriptor getResourceProtection()
@@ -59,9 +77,13 @@ public class UserLocatorComponentListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:componentsuserlocatortypes]" );
     }
 
-    // TODO: this was copied from the Nexus AbstractComponentListPlexusResource
-    @SuppressWarnings( "unchecked" )
+    /**
+     * Retrieves a list of User Managers.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )
+    @SuppressWarnings( "unchecked" )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -74,17 +96,14 @@ public class UserLocatorComponentListPlexusResource
 
         for ( String hint : userManagers.keySet() )
         {
-            ComponentDescriptor componentDescriptor = container.getComponentDescriptor(
-                UserManager.class,
-                UserManager.class.getName(),
-                hint );
+            ComponentDescriptor componentDescriptor =
+                container.getComponentDescriptor( UserManager.class, UserManager.class.getName(), hint );
 
             PlexusComponentListResource resource = new PlexusComponentListResource();
 
             resource.setRoleHint( componentDescriptor.getRoleHint() );
-            resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) )
-                ? componentDescriptor.getDescription()
-                : componentDescriptor.getRoleHint() );
+            resource.setDescription( ( StringUtils.isNotEmpty( componentDescriptor.getDescription() ) ) ? componentDescriptor.getDescription()
+                            : componentDescriptor.getRoleHint() );
 
             // add it to the collection
             result.addData( resource );

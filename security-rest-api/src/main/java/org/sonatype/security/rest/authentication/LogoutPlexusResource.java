@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.authentication;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,9 +34,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "LogoutPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( LogoutPlexusResource.RESOURCE_URI )
 public class LogoutPlexusResource
     extends AbstractPlexusResource
-{
+{    
+    public static final String RESOURCE_URI = "/authentication/logout";
 
     @Override
     public Object getPayloadInstance()
@@ -41,7 +51,7 @@ public class LogoutPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/authentication/logout";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -51,6 +61,8 @@ public class LogoutPlexusResource
     }
 
     @Override
+    @GET
+    @ResourceMethodSignature( output = String.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

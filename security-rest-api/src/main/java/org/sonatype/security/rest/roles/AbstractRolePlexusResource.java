@@ -19,7 +19,6 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.security.authorization.Role;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.RoleResource;
 

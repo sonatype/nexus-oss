@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -30,9 +36,14 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "UserChangePasswordPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserChangePasswordPlexusResource.RESOURCE_URI )
 public class UserChangePasswordPlexusResource
     extends AbstractUserPlexusResource
 {
+
+    public static final String RESOURCE_URI = "/users_changepw";
 
     public UserChangePasswordPlexusResource()
     {
@@ -48,7 +59,7 @@ public class UserChangePasswordPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/users_changepw";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -57,7 +68,12 @@ public class UserChangePasswordPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:userschangepw]" );
     }
 
+    /**
+     * Changes a user's password.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = UserChangePasswordRequest.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

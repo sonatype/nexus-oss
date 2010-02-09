@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -25,11 +31,22 @@ import org.sonatype.security.rest.model.UserChangePasswordRequest;
 import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * REST resource to allow an administrator to change a user's password.
+ * 
+ * @author bdemers
+ *
+ */
 @Component( role = PlexusResource.class, hint = "UserSetPasswordPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserSetPasswordPlexusResource.RESOURCE_URI )
 public class UserSetPasswordPlexusResource
     extends AbstractUserPlexusResource
 {
 
+    public static final String RESOURCE_URI = "/users_setpw";
+    
     public UserSetPasswordPlexusResource()
     {
         this.setModifiable( true );
@@ -53,7 +70,12 @@ public class UserSetPasswordPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:userssetpw]" );
     }
 
+    /**
+     * Changes a user's password.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( input = UserChangePasswordRequest.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

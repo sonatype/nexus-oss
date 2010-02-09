@@ -12,6 +12,12 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -23,13 +29,20 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
+ * REST resource to email the user his/her user Id.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "UserForgotIdPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserForgotIdPlexusResource.RESOURCE_URI )
 public class UserForgotIdPlexusResource
     extends AbstractUserPlexusResource
 {
 
+    public static final String RESOURCE_URI = "/users_forgotid/{" + USER_EMAIL_KEY + "}";
+    
     public UserForgotIdPlexusResource()
     {
         this.setModifiable( true );
@@ -44,7 +57,7 @@ public class UserForgotIdPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/users_forgotid/{" + USER_EMAIL_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -53,7 +66,12 @@ public class UserForgotIdPlexusResource
         return new PathProtectionDescriptor( "/users_forgotid/*", "authcBasic,perms[security:usersforgotid]" );
     }
 
+    /**
+     * Email user his/her user Id.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

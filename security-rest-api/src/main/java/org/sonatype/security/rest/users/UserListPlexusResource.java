@@ -12,6 +12,13 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -33,12 +40,19 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 /**
+ * REST resource for listing and creating users.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "UserListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserListPlexusResource.RESOURCE_URI )
 public class UserListPlexusResource
     extends AbstractUserPlexusResource
 {
+
+    public static final String RESOURCE_URI = "/users";
 
     public UserListPlexusResource()
     {
@@ -54,7 +68,7 @@ public class UserListPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/users";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -63,7 +77,12 @@ public class UserListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:users]" );
     }
 
+    /**
+     * Retrieves the list of users.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = UserListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -82,7 +101,12 @@ public class UserListPlexusResource
         return result;
     }
 
+    /**
+     * Creates a user.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( output = UserListResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -109,8 +133,6 @@ public class UserListPlexusResource
 
                 resource.setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
                 
-                resource.setUserManaged( true );
-
                 result.setData( resource );
 
             }

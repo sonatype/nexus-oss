@@ -17,6 +17,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,19 +37,31 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
+import org.sonatype.security.rest.model.UserResourceResponse;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * REST resource to manage a users list of roles.  Used when a user belongs to an external source.
+ * 
+ * @author bdemers
+ *
+ */
 @Component( role = PlexusResource.class, hint = "UserToRolePlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserToRolePlexusResource.RESOURCE_URI )
 public class UserToRolePlexusResource
     extends AbstractUserPlexusResource
 {
 
     public static final String SOURCE_ID_KEY = "sourceId";
 
+    public static final String RESOURCE_URI = "/user_to_roles/{" + SOURCE_ID_KEY + "}/{" + USER_ID_KEY + "}";
+    
     public UserToRolePlexusResource()
     {
         this.setModifiable( true );
@@ -62,7 +83,7 @@ public class UserToRolePlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/user_to_roles/{" + SOURCE_ID_KEY + "}/{" + USER_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     protected String getUserId( Request request )
@@ -75,12 +96,12 @@ public class UserToRolePlexusResource
         return request.getAttributes().get( SOURCE_ID_KEY ).toString();
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.plexus.rest.resource.AbstractPlexusResource#put(org.restlet.Context, org.restlet.data.Request,
-     * org.restlet.data.Response, java.lang.Object)
+    /**
+     * Sets a users roles.
      */
     @Override
+    @PUT
+    @ResourceMethodSignature( input = UserToRoleResourceRequest.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -145,7 +166,12 @@ public class UserToRolePlexusResource
         return null;
     }
 
+    /**
+     * Gets a users roles.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = UserToRoleResourceRequest.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -174,12 +200,12 @@ public class UserToRolePlexusResource
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.sonatype.plexus.rest.resource.AbstractPlexusResource#delete(org.restlet.Context,
-     * org.restlet.data.Request, org.restlet.data.Response)
+    /**
+     * Removes all roles from a user.
      */
     @Override
+    @DELETE
+    @ResourceMethodSignature
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

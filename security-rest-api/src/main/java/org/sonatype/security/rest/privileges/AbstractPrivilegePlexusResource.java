@@ -25,7 +25,6 @@ public abstract class AbstractPrivilegePlexusResource
 {
     public static final String PRIVILEGE_ID_KEY = "privilegeId";
 
-    @SuppressWarnings( "unchecked" )
     public PrivilegeStatusResource securityToRestModel( Privilege privilege, Request request, boolean appendResourceId )
     {
         PrivilegeStatusResource resource = new PrivilegeStatusResource();

@@ -12,6 +12,14 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.SecurityUtils;
@@ -27,6 +35,7 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.sonatype.security.rest.model.PlexusUserResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
@@ -35,12 +44,19 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
+ * REST resource for getting user information.
+ * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "UserPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserPlexusResource.RESOURCE_URI )
 public class UserPlexusResource
     extends AbstractUserPlexusResource
 {
+
+    public static final String RESOURCE_URI = "/users/{" + USER_ID_KEY + "}";
 
     public UserPlexusResource()
     {
@@ -56,7 +72,7 @@ public class UserPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/users/{" + USER_ID_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -70,7 +86,12 @@ public class UserPlexusResource
         return request.getAttributes().get( USER_ID_KEY ).toString();
     }
 
+    /**
+     * Retrieves a user's information.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = UserResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -89,7 +110,12 @@ public class UserPlexusResource
         return result;
     }
 
+    /**
+     * Updates a user's information.
+     */
     @Override
+    @POST
+    @ResourceMethodSignature( output = UserResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -120,8 +146,6 @@ public class UserPlexusResource
 
                 result.setData( resourceRequest.getData() );
                 
-                result.getData().setUserManaged( !user.isReadOnly() );
-
                 result.getData().setResourceURI( createChildReference( request, resource.getUserId() ).toString() );
 
             }
@@ -143,7 +167,12 @@ public class UserPlexusResource
         return result;
     }
 
+    /**
+     * Removes a user.
+     */
     @Override
+    @DELETE
+    @ResourceMethodSignature
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

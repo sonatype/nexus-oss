@@ -14,6 +14,12 @@ package org.sonatype.security.rest.privileges;
 
 import java.util.Set;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -24,29 +30,33 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeResourceRequest;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 /**
- * Handles the GET and POST request for the Security privileges.
+ * Handles the GET request for the Security privileges.
  * 
  * @author tstevens
  */
 @Component( role = PlexusResource.class, hint = "PrivilegeListPlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( PrivilegeListPlexusResource.RESOURCE_URI )
 public class PrivilegeListPlexusResource
     extends AbstractPrivilegePlexusResource
 {
 
+    public static final String RESOURCE_URI = "/privileges";
+    
     @Override
     public Object getPayloadInstance()
     {
-        return new PrivilegeResourceRequest();
+        return null;
     }
 
     @Override
     public String getResourceUri()
     {
-        return "/privileges";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -55,7 +65,12 @@ public class PrivilegeListPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[security:privileges]" );
     }
 
+    /**
+    * Retrieves the list of security privileges.
+    */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PrivilegeListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

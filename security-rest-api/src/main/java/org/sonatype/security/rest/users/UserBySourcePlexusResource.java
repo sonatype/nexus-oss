@@ -12,8 +12,13 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -22,7 +27,6 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserResourceResponse;
@@ -30,13 +34,24 @@ import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * REST resource for retrieving a users by source. The sources is typically the security realm the user belongs too.
+ * 
+ * @author bdemers
+ *
+ */
 @Component( role = PlexusResource.class, hint = "UserBySourcePlexusResource" )
+@Produces( { "application/xml", "application/json" } )
+@Consumes( { "application/xml", "application/json" } )
+@Path( UserBySourcePlexusResource.RESOURCE_URI )
 public class UserBySourcePlexusResource
     extends AbstractSecurityPlexusResource
 {
-public static final String USER_ID_KEY = "userId";
+    public static final String USER_ID_KEY = "userId";
     
     public static final String USER_SOURCE_KEY = "userSource";
+    
+    public static final String RESOURCE_URI = "/plexus_user/{"+ USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
         
     public UserBySourcePlexusResource()
     {
@@ -58,10 +73,15 @@ public static final String USER_ID_KEY = "userId";
     @Override
     public String getResourceUri()
     {
-        return "/plexus_user/{"+ USER_SOURCE_KEY +"}/{" + USER_ID_KEY + "}";
+        return RESOURCE_URI;
     }
     
+    /**
+     * Retrieves user information.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( output = PlexusUserResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
