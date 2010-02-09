@@ -26,12 +26,12 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeResource;
-import org.sonatype.security.rest.model.PrivilegeResourceRequest;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 

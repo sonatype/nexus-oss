@@ -1031,7 +1031,7 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.18-RC2</enunciate.version>
+        <enunciate.version>1.18</enunciate.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
@@ -1077,6 +1077,7 @@
             <version>${enunciate.version}</version>
             <executions>
               <execution>
+                <phase>process-classes</phase>
                 <goals>
                   <goal>docs</goal>
                 </goals>

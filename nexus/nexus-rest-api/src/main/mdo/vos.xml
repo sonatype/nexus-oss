@@ -3086,7 +3086,7 @@
       <name>MirrorResourceListRequest</name>
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
-      <description>REST Request object to persiste list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
+      <description>REST Request object to persist list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
       <fields>
         <field>
           <name>data</name>
@@ -3474,6 +3474,85 @@
         </field>
       </fields>
     </class>
+    
+    <class>
+      <name>PrivilegeResourceRequest</name>
+      <version>1.0.0+</version>
+      <description>REST response object to persist a privilege.</description>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>PrivilegeResource</type>
+          </association>
+          <required>true</required>
+          <description>Privilege details.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>PrivilegeResource</name>
+      <version>1.0.0+</version>
+          <description>Privilege details.</description>
+      <fields>
+        <field>
+          <name>name</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The name of the privilege.</description>
+        </field>
+        <field>
+          <name>type</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The type of the privilege.</description>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The description of the privilege.</description>
+        </field>
+        <field>
+          <name>method</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+          <description>The type of the privilege.</description>
+        </field>
+        <field>
+          <name>repositoryTargetId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Target id for the privilege.</description>
+        </field>
+        <field>
+          <name>repositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Repository id of the privilege.</description>
+        </field>
+        <field>
+          <name>repositoryGroupId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Group id of the privilege.</description>
+        </field>
+      </fields>
+    </class>
+    <!-- Purposefully no PrivilegeApplicationResource as that type of resource cannot be created -->
+    
 	
   </classes>
 </model>

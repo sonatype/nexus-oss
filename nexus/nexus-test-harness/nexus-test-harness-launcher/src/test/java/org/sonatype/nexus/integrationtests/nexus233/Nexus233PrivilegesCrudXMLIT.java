@@ -27,10 +27,10 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
-import org.sonatype.security.rest.model.PrivilegeResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 /**

@@ -14,7 +14,6 @@
 package org.sonatype.nexus.integrationtests.nexus429;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;

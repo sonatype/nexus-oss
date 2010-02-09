@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -34,7 +35,6 @@ import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.rest.model.PrivilegeResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;

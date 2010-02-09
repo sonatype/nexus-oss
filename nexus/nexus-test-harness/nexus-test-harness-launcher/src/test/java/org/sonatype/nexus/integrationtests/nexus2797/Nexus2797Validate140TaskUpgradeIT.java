@@ -2,13 +2,11 @@ package org.sonatype.nexus.integrationtests.nexus2797;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 

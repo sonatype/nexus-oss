@@ -32,6 +32,8 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
@@ -39,8 +41,6 @@ import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
-import org.sonatype.security.rest.model.PrivilegeResource;
-import org.sonatype.security.rest.model.PrivilegeResourceRequest;
 import org.sonatype.security.rest.privileges.AbstractPrivilegePlexusResource;
 
 /**

@@ -2,14 +2,11 @@ package org.sonatype.nexus.integrationtests.nexus3039;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
-import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 

@@ -16,12 +16,10 @@ package org.sonatype.nexus.integrationtests.nexus258;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;
 
-import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;

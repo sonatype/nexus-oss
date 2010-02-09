@@ -15,7 +15,6 @@ package org.sonatype.nexus.integrationtests.nexus167;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Date;
 
 import junit.framework.Assert;

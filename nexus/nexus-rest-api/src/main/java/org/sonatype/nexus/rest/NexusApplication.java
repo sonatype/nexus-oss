@@ -35,9 +35,7 @@ import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.ErrorReportRequest;
-import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
-import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
@@ -62,6 +60,8 @@ import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
+import org.sonatype.nexus.rest.model.PrivilegeResource;
+import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
@@ -134,7 +134,6 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
-import org.sonatype.security.rest.model.AuthenticationLoginResource;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
@@ -144,12 +143,9 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserResourceResponse;
-import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeProperty;
-import org.sonatype.security.rest.model.PrivilegeResource;
-import org.sonatype.security.rest.model.PrivilegeResourceRequest;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeTypePropertyResource;
@@ -160,9 +156,7 @@ import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
 import org.sonatype.security.rest.model.RoleResourceResponse;
 import org.sonatype.security.rest.model.UserChangePasswordRequest;
-import org.sonatype.security.rest.model.UserChangePasswordResource;
 import org.sonatype.security.rest.model.UserForgotPasswordRequest;
-import org.sonatype.security.rest.model.UserForgotPasswordResource;
 import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
@@ -407,11 +401,8 @@ public class NexusApplication
         xstream.omitField( NexusArtifact.class, "modelEncoding" );
         xstream.alias( "artifact", NexusArtifact.class );
 
-        xstream.omitField( AuthenticationLoginResourceResponse.class, "modelEncoding" );
-        xstream.omitField( AuthenticationLoginResource.class, "modelEncoding" );
-        xstream.omitField( AuthenticationClientPermissions.class, "modelEncoding" );
         xstream.omitField( NexusAuthenticationClientPermissions.class, "modelEncoding" );
-        xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class ); // Look at
+        // Look at
         // NexusAuthenticationLoginResourceConverter,
         // we are only converting
         // the clientPermissions
@@ -464,63 +455,9 @@ public class NexusApplication
         xstream.registerLocalConverter( ScheduledServiceListResourceResponse.class, "data", new AliasingListConverter(
             ScheduledServiceListResource.class, "schedules-list-item" ) );
 
-        xstream.omitField( UserListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( UserResourceRequest.class, "modelEncoding" );
-        xstream.omitField( UserResourceResponse.class, "modelEncoding" );
-        xstream.omitField( UserResource.class, "modelEncoding" );
-        xstream.omitField( UserForgotPasswordRequest.class, "modelEncoding" );
-        xstream.omitField( UserForgotPasswordResource.class, "modelEncoding" );
-        xstream.omitField( UserChangePasswordRequest.class, "modelEncoding" );
-        xstream.omitField( UserChangePasswordResource.class, "modelEncoding" );
-        xstream.alias( "users-list", UserListResourceResponse.class );
-        // xstream.alias( "users-list-item", UserResource.class );
-        xstream.alias( "user-request", UserResourceRequest.class );
-        xstream.alias( "user-response", UserResourceResponse.class );
-        xstream.alias( "user-forgotpw", UserForgotPasswordRequest.class );
-        xstream.alias( "user-changepw", UserChangePasswordRequest.class );
-        xstream.registerLocalConverter( UserResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
-        xstream.registerLocalConverter( UserListResourceResponse.class, "data", new AliasingListConverter(
-            UserResource.class, "users-list-item" ) );
-
-        xstream.omitField( RoleListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RoleResource.class, "modelEncoding" );
-        xstream.omitField( RoleResourceRequest.class, "modelEncoding" );
-        xstream.omitField( RoleResourceResponse.class, "modelEncoding" );
-        xstream.alias( "roles-list", RoleListResourceResponse.class );
-        // xstream.alias( "roles-list-item", RoleResource.class );
-        xstream.alias( "role-request", RoleResourceRequest.class );
-        xstream.alias( "role-response", RoleResourceResponse.class );
-        xstream.registerLocalConverter( RoleListResourceResponse.class, "data", new AliasingListConverter(
-            RoleResource.class, "roles-list-item" ) );
-        xstream.registerLocalConverter( RoleResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
-        xstream.registerLocalConverter( RoleResource.class, "privileges", new AliasingListConverter( String.class,
-            "privilege" ) );
-
-        xstream.omitField( PrivilegeResourceRequest.class, "modelEncoding" );
-        xstream.omitField( PrivilegeResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeStatusResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PrivilegeStatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PrivilegeProperty.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTypeResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTypePropertyResource.class, "modelEncoding" );
-        xstream.omitField( PrivilegeTypeResourceResponse.class, "modelEncoding" );
         xstream.alias( "privilege-request", PrivilegeResourceRequest.class );
-        xstream.alias( "privilege-list-response", PrivilegeListResourceResponse.class );
-        xstream.alias( "privilege-status-response", PrivilegeStatusResourceResponse.class );
-        xstream.alias( "privilege-type-response", PrivilegeTypeResourceResponse.class );
         xstream.aliasField( "methods", PrivilegeResource.class, "method" );
-        xstream.registerLocalConverter( PrivilegeListResourceResponse.class, "data", new AliasingListConverter(
-            PrivilegeStatusResource.class, "privilege-item" ) );
-        xstream.registerLocalConverter( PrivilegeResource.class, "method", new AliasingListConverter( String.class,
-            "method" ) );
-        xstream.registerLocalConverter( PrivilegeStatusResource.class, "properties", new AliasingListConverter(
-            PrivilegeProperty.class, "privilege-property" ) );
-        xstream.registerLocalConverter( PrivilegeTypeResourceResponse.class, "data", new AliasingListConverter(
-            PrivilegeTypeResource.class, "privilege-type" ) );
-        xstream.registerLocalConverter( PrivilegeTypeResource.class, "properties", new AliasingListConverter(
-            PrivilegeTypePropertyResource.class, "privilege-type-property" ) );
-
+                
         xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
         xstream.omitField( NFCResource.class, "modelEncoding" );
         xstream.omitField( NFCRepositoryResource.class, "modelEncoding" );
@@ -556,49 +493,6 @@ public class NexusApplication
         xstream.alias( "component", PlexusComponentListResource.class );
         xstream.registerLocalConverter( PlexusComponentListResourceResponse.class, "data", new AliasingListConverter(
             PlexusComponentListResource.class, "component" ) );
-
-        xstream.omitField( UserToRoleResourceRequest.class, "modelEncoding" );
-        xstream.omitField( UserToRoleResource.class, "modelEncoding" );
-        xstream.alias( "user-to-role", UserToRoleResourceRequest.class );
-        xstream.registerLocalConverter( UserToRoleResource.class, "roles", new AliasingListConverter( String.class,
-            "role" ) );
-
-        xstream.omitField( PlexusUserResourceResponse.class, "modelEncoding" );
-        xstream.alias( "plexus-user", PlexusUserResourceResponse.class );
-        xstream.omitField( PlexusUserResource.class, "modelEncoding" );
-        xstream.registerLocalConverter( PlexusUserResource.class, "roles", new AliasingListConverter(
-            PlexusRoleResource.class, "plexus-role" ) );
-
-        xstream.omitField( PlexusRoleResource.class, "modelEncoding" );
-        xstream.alias( "plexus-role", PlexusRoleResource.class );
-
-        xstream.omitField( PlexusUserListResourceResponse.class, "modelEncoding" );
-        xstream.alias( "plexus-user-list", PlexusUserListResourceResponse.class );
-        xstream.registerLocalConverter( PlexusUserListResourceResponse.class, "data", new AliasingListConverter(
-            PlexusUserResource.class, "plexus-user" ) );
-
-        xstream.omitField( ExternalRoleMappingResourceResponse.class, "modelEncoding" );
-        xstream.alias( "external-role-mapping", ExternalRoleMappingResourceResponse.class );
-        xstream.registerLocalConverter( ExternalRoleMappingResourceResponse.class, "data", new AliasingListConverter(
-            ExternalRoleMappingResource.class, "mapping" ) );
-        xstream.omitField( ExternalRoleMappingResource.class, "modelEncoding" );
-        xstream.alias( "mapping", ExternalRoleMappingResource.class );
-        xstream.registerLocalConverter( ExternalRoleMappingResource.class, "mappedRoles", new AliasingListConverter(
-            PlexusRoleResource.class, "plexus-role" ) );
-
-        xstream.omitField( PlexusRoleListResourceResponse.class, "modelEncoding" );
-        xstream.alias( "plexus-roles", PlexusRoleListResourceResponse.class );
-        xstream.registerLocalConverter( PlexusRoleListResourceResponse.class, "data", new AliasingListConverter(
-            PlexusRoleResource.class, "plexus-role" ) );
-
-        xstream.omitField( PlexusUserSearchCriteriaResourceRequest.class, "modelEncoding" );
-        xstream.alias( "user-search", PlexusUserSearchCriteriaResourceRequest.class );
-        xstream.omitField( PlexusUserSearchCriteriaResource.class, "modelEncoding" );
-        
-        xstream.omitField( ErrorReportRequest.class, "modelEncoding" );
-        xstream.omitField( ErrorReportRequestDTO.class, "modelEncoding" );
-        xstream.omitField( ErrorReportResponse.class, "modelEncoding" );
-        xstream.omitField( ErrorReportResponseDTO.class, "modelEncoding" );
         
         xstream.alias( "error-report-request", ErrorReportRequest.class );
         xstream.alias( "error-report-response", ErrorReportResponse.class );
@@ -624,6 +518,79 @@ public class NexusApplication
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );
         xstream.omitField( Scm.class, "modelEncoding" );
+
+        // SECURITY below
+        xstream.processAnnotations( AuthenticationLoginResourceResponse.class );
+        xstream.processAnnotations( UserResourceResponse.class );
+        xstream.processAnnotations( UserListResourceResponse.class );
+        xstream.processAnnotations( UserResourceRequest.class );
+        xstream.processAnnotations( UserForgotPasswordRequest.class );
+        xstream.processAnnotations( UserChangePasswordRequest.class );
+        xstream.registerLocalConverter( UserResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
+        xstream.registerLocalConverter( UserListResourceResponse.class, "data",
+                                        new AliasingListConverter( UserResource.class, "users-list-item" ) );
+
+        xstream.processAnnotations( RoleListResourceResponse.class );
+        xstream.processAnnotations( RoleResource.class );
+        xstream.processAnnotations( RoleResourceRequest.class );
+
+        xstream.processAnnotations( RoleResourceResponse.class );
+        xstream.registerLocalConverter( RoleListResourceResponse.class, "data",
+                                        new AliasingListConverter( RoleResource.class, "roles-list-item" ) );
+        xstream.registerLocalConverter( RoleResource.class, "roles", new AliasingListConverter( String.class, "role" ) );
+        xstream.registerLocalConverter( RoleResource.class, "privileges", new AliasingListConverter( String.class,
+                                                                                                     "privilege" ) );
+
+        xstream.processAnnotations( PrivilegeListResourceResponse.class );
+        xstream.processAnnotations( PrivilegeStatusResourceResponse.class );
+        xstream.processAnnotations( PrivilegeTypeResourceResponse.class );
+        xstream.registerLocalConverter( PrivilegeListResourceResponse.class, "data",
+                                        new AliasingListConverter( PrivilegeStatusResource.class, "privilege-item" ) );
+        xstream.registerLocalConverter( PrivilegeResource.class, "method", new AliasingListConverter( String.class,
+                                                                                                      "method" ) );
+        xstream.registerLocalConverter( PrivilegeStatusResource.class, "properties",
+                                        new AliasingListConverter( PrivilegeProperty.class, "privilege-property" ) );
+        xstream.registerLocalConverter( PrivilegeTypeResourceResponse.class, "data",
+                                        new AliasingListConverter( PrivilegeTypeResource.class, "privilege-type" ) );
+        xstream.registerLocalConverter( PrivilegeTypeResource.class, "properties",
+                                        new AliasingListConverter( PrivilegeTypePropertyResource.class,
+                                                                   "privilege-type-property" ) );
+
+        xstream.processAnnotations( UserToRoleResourceRequest.class );
+        xstream.registerLocalConverter( UserToRoleResource.class, "roles", new AliasingListConverter( String.class,
+                                                                                                      "role" ) );
+
+        xstream.processAnnotations( PlexusUserResourceResponse.class );
+        xstream.registerLocalConverter( PlexusUserResource.class, "roles",
+                                        new AliasingListConverter( PlexusRoleResource.class, "plexus-role" ) );
+
+        xstream.processAnnotations( PlexusRoleResource.class );
+
+        xstream.processAnnotations( PlexusUserListResourceResponse.class );
+        xstream.registerLocalConverter( PlexusUserListResourceResponse.class, "data",
+                                        new AliasingListConverter( PlexusUserResource.class, "plexus-user" ) );
+
+        xstream.processAnnotations( ExternalRoleMappingResourceResponse.class );
+        xstream.processAnnotations( ExternalRoleMappingResource.class );
+
+        xstream.registerLocalConverter( ExternalRoleMappingResourceResponse.class, "data",
+                                        new AliasingListConverter( ExternalRoleMappingResource.class, "mapping" ) );
+        xstream.registerLocalConverter( ExternalRoleMappingResource.class, "mappedRoles",
+                                        new AliasingListConverter( PlexusRoleResource.class, "plexus-role" ) );
+
+        xstream.processAnnotations( PlexusRoleListResourceResponse.class );
+        xstream.registerLocalConverter( PlexusRoleListResourceResponse.class, "data",
+                                        new AliasingListConverter( PlexusRoleResource.class, "plexus-role" ) );
+
+        xstream.processAnnotations( PlexusUserSearchCriteriaResourceRequest.class );
+
+        xstream.processAnnotations( org.sonatype.security.rest.model.PlexusComponentListResourceResponse.class );
+        xstream.processAnnotations( org.sonatype.security.rest.model.PlexusComponentListResource.class );
+        xstream.registerLocalConverter(
+                                        org.sonatype.security.rest.model.PlexusComponentListResourceResponse.class,
+                                        "data",
+                                        new AliasingListConverter(
+                                        org.sonatype.security.rest.model.PlexusComponentListResource.class, "component" ) );
 
         return xstream;
     }
