@@ -106,7 +106,7 @@ public class UserListPlexusResource
      */
     @Override
     @POST
-    @ResourceMethodSignature( output = UserListResourceResponse.class )
+    @ResourceMethodSignature( input = UserResourceRequest.class, output = UserResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

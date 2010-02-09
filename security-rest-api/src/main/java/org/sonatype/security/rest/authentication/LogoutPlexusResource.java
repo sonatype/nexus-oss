@@ -60,6 +60,9 @@ public class LogoutPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "logout" );
     }
 
+    /**
+     * Logout of the application, doesn't actually do anything, a Filter is expected to logout the user.
+     */
     @Override
     @GET
     @ResourceMethodSignature( output = String.class )

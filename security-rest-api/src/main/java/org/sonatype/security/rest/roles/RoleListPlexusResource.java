@@ -112,7 +112,7 @@ public class RoleListPlexusResource
      */
     @Override
     @POST
-    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class )
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleResourceResponse.class )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

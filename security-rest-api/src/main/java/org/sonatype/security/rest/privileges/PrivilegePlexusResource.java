@@ -81,7 +81,7 @@ public class PrivilegePlexusResource
     }
 
     /**
-     * Retrieves the list of security privileges.
+     * Retrieves the details of a security privilege.
      */
     @Override
     @GET
