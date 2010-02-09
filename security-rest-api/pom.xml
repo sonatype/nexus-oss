@@ -154,6 +154,12 @@
                 <artifactId>enunciate-docs</artifactId>
                 <version>${enunciate.version}</version>
               </dependency>
+              <!-- jaxb is needed for java 1.5 support -->
+              <dependency>
+                <groupId>javax.xml.bind</groupId>
+                <artifactId>jaxb-api</artifactId>
+                <version>2.1</version>
+              </dependency>
             </dependencies>
             <configuration>
               <configFile>enunciate.xml</configFile>
