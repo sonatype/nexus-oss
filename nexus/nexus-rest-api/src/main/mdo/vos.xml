@@ -43,6 +43,10 @@
       <name>AuthenticationSettings</name>
       <version>1.0.0+</version>
       <description>Remote authentication tokens used in remote authentications against HTTP Proxies and/or protected remote repositories.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "authentication-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>username</name>
@@ -81,6 +85,10 @@
       <description>
         The connections settings defines common connection properties, like retries count and timeouts.
       </description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "remote-connection-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>connectionTimeout</name>
@@ -113,6 +121,10 @@
       <name>SmtpSettings</name>
       <version>1.0.0+</version>
       <description>The connections settings for an smtp server.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "smtp-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>host</name>
@@ -170,6 +182,10 @@
       <name>RemoteHttpProxySettings</name>
       <version>1.0.0+</version>
       <description>The HTTP Proxy defines proxies used to access the internet.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "remote-http-proxy-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>proxyHostname</name>
@@ -202,6 +218,11 @@
       <name>GlobalConfigurationListResourceResponse</name>
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "global-settings-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "global-settings-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>      
       <description>REST Response object for a global configuration list request, contains the typical 'data' parameter, which is a list of the global configuration items requested.</description>
       <fields>
         <field>
@@ -213,6 +234,10 @@
           </association>
           <required>true</required>
           <description>List of global configuration items.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "global-settings-list-item" )</annotation>
+          </annotations>      
         </field>
       </fields>
     </class>
@@ -221,6 +246,10 @@
       <name>GlobalConfigurationListResource</name>
       <version>1.0.0+</version>
       <description>An item that contains details about a global configuration item, including the url required to retrieve the configuration details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "global-configuration-list-item" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -244,6 +273,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a global configuration request, contains the typical 'data' parameter, which is the global configuration item requested.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "global-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "global-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -261,6 +295,10 @@
       <name>GlobalConfigurationResource</name>
       <version>1.0.0+</version>
       <description>List of all global configuration items in Nexus.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "global-settings-item" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>securityEnabled</name>
@@ -352,6 +390,10 @@
       <name>ErrorReportingSettings</name>
       <version>1.0.0+</version>
       <description>Connection parameters to allow Nexus to report errors to the Sonatype JIRA server.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "error-reporting-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>jiraUsername</name>
@@ -383,6 +425,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository status list request, contains the typical 'data' parameter, which is the list of repository status objects.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository-status-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository-status-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations> 
       <fields>
         <field>
           <name>data</name>
@@ -393,6 +440,10 @@
           </association>
           <required>true</required>
           <description>List of repository status objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repository-status-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -401,6 +452,10 @@
       <name>RepositoryStatusListResource</name>
       <version>1.0.0+</version>
       <description>Some general details and status of the repostiory.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-status-list-item" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -462,6 +517,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository list request, contains the typical 'data' parameter, which is the list of repository objects.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repositories" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repositories" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -472,6 +532,10 @@
           </association>
           <required>true</required>
           <description>List of repository objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repositories-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -480,6 +544,10 @@
       <name>RepositoryListResource</name>
       <version>1.0.0+</version>
       <description>Repository general details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repositories-item" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -581,6 +649,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository request, contains the typical 'data' parameter, which is the repository object.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -598,6 +671,10 @@
       <name>RepositoryBaseResource</name>
       <version>1.0.0+</version>
       <description>The repository base object, this could be extended by a new object if new fields are required.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "base-repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>contentResourceURI</name>
@@ -663,6 +740,10 @@
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
       <description>Hosted or Proxy repository parameters, extending the base resource.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "hosted-repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>writePolicy</name>
@@ -744,6 +825,10 @@
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
       <description>Shadow (or Virtual) repository parameters, extending the base resource.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "shadow-repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <!-- Shadow specific -->
         <field>
@@ -768,6 +853,10 @@
       <superClass>RepositoryResource</superClass>
       <version>1.0.0+</version>
       <description>Proxy repository parameters, extending the repository resource.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "proxy-repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <!-- Proxy specific -->
         <field>
@@ -791,6 +880,10 @@
       <name>RepositoryResourceRemoteStorage</name>
       <version>1.0.0+</version>
       <description>Remote storage details for the proxy repository.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-remote-storage" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>remoteStorageUrl</name>
@@ -834,6 +927,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository status request, contains the typical 'data' parameter, which is the repository status objects.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations> 
       <fields>
         <field>
           <name>data</name>
@@ -851,6 +949,10 @@
       <name>RepositoryStatusResource</name>
       <version>1.0.0+</version>
       <description>Repository status parameters.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -910,6 +1012,10 @@
       <name>RepositoryDependentStatusResource</name>
       <version>1.0.0+</version>
       <description>Details of a repository that shadow another repository.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-dependent-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -947,6 +1053,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository metadata request, contains the typical 'data' parameter, which is the repository metadata object.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository-meta-data" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository-meta-data" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -964,6 +1075,10 @@
       <name>RepositoryMetaResource</name>
       <version>1.0.0+</version>
       <description>Details about the repository.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-meta-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1060,6 +1175,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository group list request, contains the typical 'data' parameter, which is the list of repository group objects.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-group-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-group-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1070,6 +1190,10 @@
           </association>
           <required>true</required>
           <description>List of repository group objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-group-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1078,6 +1202,10 @@
       <name>RepositoryGroupListResource</name>
       <version>1.0.0+</version>
       <description>The basic set of details of a repository group.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-group-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -1129,6 +1257,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository group request, contains the typical 'data' parameter, which is the repository group object.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-group" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-group" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1147,6 +1280,10 @@
       <superClass>RepositoryBaseResource</superClass>
       <version>1.0.0+</version>
       <description>The set of items that define the repository group (extends repository base resource).</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-group-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>repositories</name>
@@ -1165,6 +1302,10 @@
       <name>RepositoryGroupMemberRepository</name>
       <version>1.0.0+</version>
       <description>A repository that is contained within a group.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-group-member-repository" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1196,6 +1337,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository route list request, contains the typical 'data' parameter, which is the list of repository route objects.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-routes-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-routes-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1206,6 +1352,10 @@
           </association>
           <required>true</required>
           <description>List of repository route objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-routes-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1214,6 +1364,10 @@
       <name>RepositoryRouteListResource</name>
       <version>1.0.0+</version>
       <description>A repository route basic set of details, for display in lists (full details can be retrieved using the resourceURI).</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-route-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -1261,6 +1415,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository route request, contains the typical 'data' parameter, which is the repository route object.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-route" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-route" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1277,6 +1436,10 @@
     <class>
       <name>RepositoryRouteResource</name>
       <version>1.0.0+</version>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-route-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1335,6 +1498,10 @@
       <name>RepositoryRouteMemberRepository</name>
       <version>1.0.0+</version>
       <description>Repository details in a repository route.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-route-member-repo" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1366,6 +1533,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of scheduled service items, contains the typical 'data' parameter, which is the list of scheduled services..</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "schedules-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "schedules-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1376,6 +1548,10 @@
           </association>
           <required>true</required>
           <description>List of scheduled services.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "schedules-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1384,6 +1560,10 @@
       <name>ScheduledServiceListResource</name>
       <version>1.0.0+</version>
       <description>Scheduled service list item details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -1477,6 +1657,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a scheduled service status request, contains the typical 'data' parameter, which is the scheduled service status.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "schedule-service-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "schedule-service-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1494,6 +1679,10 @@
       <name>ScheduledServiceResourceStatus</name>
       <version>1.0.0+</version>
       <description>Scheduled service status details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-resource-status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resource</name>
@@ -1554,6 +1743,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a scheduled service configuration request, contains the typical 'data' parameter, which is the scheduled service configuration.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "scheduled-task" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "scheduled-task" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1571,6 +1765,10 @@
       <name>ScheduledServiceBaseResource</name>
       <version>1.0.0+</version>
       <description>The scheduled service configuration.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-base-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1631,6 +1829,10 @@
       <name>ScheduledServicePropertyResource</name>
       <version>1.0.0+</version>
       <description>A configuration property for a scheduled service.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-property-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1654,6 +1856,10 @@
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run only once.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-once-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>startDate</name>
@@ -1677,6 +1883,10 @@
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run hourly.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-hourly-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>startDate</name>
@@ -1700,6 +1910,10 @@
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run daily.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-daily-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>startDate</name>
@@ -1723,6 +1937,10 @@
       <superClass>ScheduledServiceDailyResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run weekly.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-daily-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>recurringDay</name>
@@ -1742,6 +1960,10 @@
       <superClass>ScheduledServiceWeeklyResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run monthly.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-monthly-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
     </class>
 
     <class>
@@ -1749,6 +1971,10 @@
       <superClass>ScheduledServiceBaseResource</superClass>
       <version>1.0.0+</version>
       <description>A service that is run on a cron schedule.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-advanced-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>cronCommand</name>
@@ -1765,6 +1991,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a scheduled service type list request, contains the typical 'data' parameter, which is the scheduled service type details.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "schedule-types" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "schedule-types" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1775,6 +2006,10 @@
           </association>
           <required>true</required>
           <description>List of scheduled service types.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "schedule-type" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1783,6 +2018,10 @@
       <name>ScheduledServiceTypeResource</name>
       <version>1.0.0+</version>
       <description>Scheduled service type, which you can create a scheduled task against.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-type-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1815,6 +2054,10 @@
       <name>ScheduledServiceTypePropertyResource</name>
       <version>1.0.0+</version>
       <description>Property that helps configure a scheduled service.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "scheduled-service-type-property-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -1867,6 +2110,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a content resource request, contains the typical 'data' parameter, which is a list of the content items requested.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "content" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "content" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1877,6 +2125,10 @@
           </association>
           <required>true</required>
           <description>List of ContentListResource objects, each of which represents a single item in the repository.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "content-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1885,6 +2137,10 @@
       <name>ContentListResource</name>
       <version>1.0.0+</version>
       <description>A Content Item definition, including all data needed to properly access the item, and understand the item.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "content-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -1937,6 +2193,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a content resource request, contains the typical 'data' parameter, which is a list of the content items requested.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "contentDescribe" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "contentDescribe" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1954,6 +2215,10 @@
       <name>ContentListDescribeResource</name>
       <version>1.0.0+</version>
       <description>Details about the requested item, that should be useful in finding how the item was retrieved.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "content-list-describe-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>requestUrl</name>
@@ -1994,6 +2259,10 @@
       <name>ContentListDescribeRequestResource</name>
       <description>A set of request parameters that were used to retrieve the item.</description>
       <version>1.0.0+</version>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "content-list-describe-request-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>requestUrl</name>
@@ -2025,6 +2294,10 @@
       <name>ContentListDescribeResponseResource</name>
       <description>A set of response parameters that were sent back with response.</description>
       <version>1.0.0+</version>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "content-list-describe-response-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>responseType</name>
@@ -2134,6 +2407,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a log list resource request, contains the typical 'data' parameter, which is a list of the log items requested.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "logs-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "logs-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2144,6 +2422,10 @@
           </association>
           <required>true</required>
           <description>List of Log file items.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "logs-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2152,6 +2434,10 @@
       <name>LogsListResource</name>
       <version>1.0.0+</version>
       <description>Details to retrieve a log file from the Nexus server.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "logs-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2190,6 +2476,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of Nexus configuration objects, contains the typical 'data' parameter, which is a list of the configuration items.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "configs-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "configs-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2200,6 +2491,10 @@
           </association>
           <required>true</required>
           <description>List of Nexus configuration objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "configs-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2208,6 +2503,10 @@
       <name>ConfigurationsListResource</name>
       <version>1.0.0+</version>
       <description>A Nexus configuration item, and the url needed to retrieve the configuration details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "configs-list-item" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2233,6 +2532,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of search results, contains the typical 'data' parameter, which is a list of search results.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "search-results" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "search-results" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>totalCount</name>
@@ -2271,6 +2575,10 @@
           </association>
           <required>true</required>
           <description>List of found artifacts.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "artifact" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2279,6 +2587,10 @@
       <name>NexusArtifact</name>
       <version>1.0.0+</version>
       <description>Artifact details sent back on search requests.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nexus-artifact" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2366,6 +2678,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of Nexus feed items, contains the typical 'data' parameter, which is a list of the feed items.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "feeds-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "feeds-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2376,6 +2693,10 @@
           </association>
           <required>true</required>
           <description>List of feeds available from Nexus.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "feeds-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2384,6 +2705,10 @@
       <name>FeedListResource</name>
       <version>1.0.0+</version>
       <description>Details about an RSS Feed that Nexus supplies.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "feed-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2408,6 +2733,10 @@
       <version>1.0.0+</version>
       <superClass>org.sonatype.security.rest.model.AuthenticationClientPermissions</superClass>
       <description>Permissions that are granted to the user.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nexus-authentication-client-permissions" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
     </class>
 
     <!-- NFCs -->
@@ -2416,6 +2745,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for an NFC resource item, contains the typical 'data' parameter, which is the NFC resource item.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "nfc-info" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "nfc-info" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2433,6 +2767,10 @@
       <name>NFCResource</name>
       <version>1.0.0+</version>
       <description>Contains a list of items stored in the NFC.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nfc-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>nfcContents</name>
@@ -2451,6 +2789,10 @@
       <name>NFCRepositoryResource</name>
       <version>1.0.0+</version>
       <description>Details about NFC usage for a repository.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nfc-repository-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>repositoryId</name>
@@ -2485,6 +2827,10 @@
       <name>NFCStats</name>
       <version>1.0.0+</version>
       <description>NFC Statistics.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nfc-stats" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>size</name>
@@ -2516,6 +2862,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for the nexus status, contains the typical 'data' parameter, which is the nexus status.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "status" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2533,6 +2884,10 @@
       <name>StatusResource</name>
       <version>1.0.0+</version>
       <description>Nexus status details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "status-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>appName</name>
@@ -2671,6 +3026,10 @@
       <name>StatusConfigurationValidationResponse</name>
       <version>1.0.0+</version>
       <description>Configuration validation status.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "status-configuration-validation-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>valid</name>
@@ -2715,6 +3074,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for the nexus wastebasket info, contains the typical 'data' parameter, which is the nexus wastebasket info.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "wastebasket" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "wastebasket" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2732,6 +3096,10 @@
       <name>WastebasketResource</name>
       <version>1.0.0+</version>
       <description>Details about the nexus wastebasket.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "wastebasket-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>size</name>
@@ -2756,6 +3124,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of repository targets, contains the typical 'data' parameter, which is the list of repository targets.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-targets-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-targets-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2766,6 +3139,10 @@
           </association>
           <required>true</required>
           <description>The list of repository targets.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-targets-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2774,6 +3151,10 @@
       <name>RepositoryTargetListResource</name>
       <version>1.0.0+</version>
       <description>The repository target list details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-target-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2811,6 +3192,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a repository target, contains the typical 'data' parameter, which is the repository target.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-target" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-target" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2828,6 +3214,10 @@
       <name>RepositoryTargetResource</name>
       <version>1.0.0+</version>
       <description>The repository target configuration.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-target-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>resourceURI</name>
@@ -2876,6 +3266,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for a list of repository content classes, contains the typical 'data' parameter, which is the repository content class list.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repo-content-classes-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repo-content-classes-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2886,6 +3281,10 @@
           </association>
           <required>true</required>
           <description>List of repository content classes.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-content-classes-list-item" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2894,6 +3293,10 @@
       <name>RepositoryContentClassListResource</name>
       <version>1.0.0+</version>
       <description>Repository content class definition.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repository-content-class-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>contentClass</name>
@@ -2917,6 +3320,10 @@
       <name>PlexusComponentListResource</name>
       <version>1.0.0+</version>
       <description>Plexus component details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "plexus-component-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>roleHint</name>
@@ -2939,6 +3346,11 @@
       <name>PlexusComponentListResourceResponse</name>
       <version>1.0.0+</version>
       <description>REST Response object for a list of plexus components, contains the typical 'data' parameter, which is the plexus components.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "components-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "components-list" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -2949,6 +3361,10 @@
           </association>
           <required>true</required>
           <description>List of plexus components.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "component" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2957,6 +3373,10 @@
       <name>NexusRepositoryTypeListResource</name>
       <version>1.0.0+</version>
       <description>Repository type definition.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nexus-repository-type-list-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>provider</name>
@@ -2993,6 +3413,11 @@
       <name>NexusRepositoryTypeListResourceResponse</name>
       <version>1.0.0+</version>
       <description>REST Response object for a list of repository types, contains the typical 'data' parameter, which is the repository types.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repositoryTypes" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repositoryTypes" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3003,6 +3428,10 @@
           </association>
           <required>true</required>
           <description>List of repository types.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repositoryType" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3014,6 +3443,10 @@
       <name>LogConfigResource</name>
       <version>1.0.0+</version>
       <description>Set of parameters that describe how logging is configured</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "log-config-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>rootLoggerLevel</name>
@@ -3051,6 +3484,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Response object for the log config request, contains the typical 'data' parameter, which is the log configuration.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "log-config" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "log-config" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3069,6 +3507,11 @@
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <description>REST Response object for a list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "mirror-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "mirror-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3078,6 +3521,10 @@
             <multiplicity>*</multiplicity>
           </association>
           <description>The list of mirrors for a repository.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "mirrorResource" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3087,6 +3534,11 @@
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <description>REST Request object to persist list of mirrors associated with a repository, contains the typical 'data' parameter, which is the list of mirrors.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "mirror-list-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "mirror-list-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>      
       <fields>
         <field>
           <name>data</name>
@@ -3096,6 +3548,10 @@
             <multiplicity>*</multiplicity>
           </association>
           <description>List of mirrors</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "mirrorResource" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3105,6 +3561,11 @@
       <superClass>NexusResponse</superClass>
       <version>1.0.0+</version>
       <description>REST Response object for a list of mirror statuses associated with a repository, contains the typical 'data' parameter, which is the list of mirrors statuses.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "mirror-status-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "mirror-status-list-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3114,6 +3575,10 @@
             <multiplicity>*</multiplicity>
           </association>
           <description>List of mirror status objects.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "mirrorResource" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3122,6 +3587,10 @@
       <name>MirrorResource</name>
       <version>1.0.0+</version>
       <description>Repository mirror configuration.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "mirror-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>id</name>
@@ -3143,6 +3612,10 @@
       <superClass>MirrorResource</superClass>
       <version>1.0.0+</version>
       <description>Repository mirror status.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "mirror-status-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>status</name>
@@ -3159,6 +3632,11 @@
       <version>1.0.0+</version>
       <superClass>NexusResponse</superClass>
       <description>REST Request object for validating the nexus smtp settings, contains the typical 'data' parameter, which is the nexus stmp configuration.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "smtp-settings-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "smtp-settings-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3176,6 +3654,10 @@
       <name>SmtpSettingsResource</name>
       <version>1.0.0+</version>
       <description>The smtp settings request</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "smtp-settings-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>testEmail</name>
@@ -3240,6 +3722,10 @@
 		<name>RestApiSettings</name>
 		<version>1.0.0+</version>
         <description>The rest api configuration settings.</description>
+        <annotations>
+          <annotation>@javax.xml.bind.annotation.XmlType( name = "rest-api-settings" )</annotation>
+          <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+        </annotations>
 		<fields>
 			<field>
 				<name>forceBaseUrl</name>
@@ -3262,6 +3748,10 @@
 	  <name>ErrorReportRequestDTO</name>
 	  <version>1.0.0+</version>
       <description>Details required to generate an error report.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "error-report-request-dto" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 	  <fields>
 	    <field>
 	      <name>title</name>
@@ -3284,6 +3774,11 @@
 	  <name>ErrorReportRequest</name>
 	  <version>1.0.0+</version>
       <description>REST Request object for generating an error report, contains the typical 'data' parameter, which is an error report item.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "error-report-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "error-report-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 	  <fields>
 	    <field>
 	      <name>data</name>
@@ -3301,6 +3796,10 @@
 	  <name>ErrorReportResponseDTO</name>
 	  <version>1.0.0+</version>
       <description>The response data that is returned after generating an error report.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "error-report-response-dto" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
 	  <fields>
 	    <field>
 	      <name>jiraUrl</name>
@@ -3316,6 +3815,11 @@
 	  <name>ErrorReportResponse</name>
       <description>REST Response object received after generating an error report, contains the typical 'data' parameter, which is the error report response item.</description>
 	  <version>1.0.0+</version>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "error-report-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "error-report-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>      
 	  <fields>
 	    <field>
 	      <name>data</name>
@@ -3334,6 +3838,10 @@
       <name>ArtifactResolveResource</name>
       <version>1.0.0+</version>
       <description>A resource which contains full maven details of the requested artifact.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "artifact-resolve-resource" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>groupId</name>
@@ -3426,6 +3934,11 @@
       <name>ArtifactResolveResourceResponse</name>
       <version>1.0.0+</version>
       <description>REST Response object received after requesting an artifact resolve, contains the typical 'data' parameter, which is the artifact resolve details.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "artifact-resolution" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "artifact-resolution" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>   
       <fields>
         <field>
           <name>data</name>
@@ -3443,6 +3956,10 @@
       <name>ArtifactCoordinate</name>
       <version>1.0.0+</version>
       <description>Uniquely identifies a maven artifact.  This is returned by the artifact upload request.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "artifact-coordinate" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>groupId</name>
@@ -3479,6 +3996,11 @@
       <name>PrivilegeResourceRequest</name>
       <version>1.0.0+</version>
       <description>REST response object to persist a privilege.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "privilege-request" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "privilege" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>   
       <fields>
         <field>
           <name>data</name>
@@ -3495,7 +4017,11 @@
     <class>
       <name>PrivilegeResource</name>
       <version>1.0.0+</version>
-          <description>Privilege details.</description>
+      <description>Privilege details.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "privilege" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
       <fields>
         <field>
           <name>name</name>

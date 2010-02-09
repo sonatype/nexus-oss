@@ -29,20 +29,22 @@ import org.sonatype.nexus.plugins.rest.StaticResource;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.rest.model.ArtifactResolveResourceResponse;
-import org.sonatype.nexus.rest.model.AuthenticationSettings;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
+import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
+import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
+import org.sonatype.nexus.rest.model.ContentListDescribeResponseResource;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.model.ErrorReportRequest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
-import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
+import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -54,19 +56,15 @@ import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
-import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
 import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
-import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
-import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
-import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
+import org.sonatype.nexus.rest.model.RepositoryDependentStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
@@ -74,18 +72,13 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryListResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryMetaResource;
 import org.sonatype.nexus.rest.model.RepositoryMetaResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
-import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
@@ -94,28 +87,20 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
-import org.sonatype.nexus.rest.model.RestApiSettings;
-import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
-import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
-import org.sonatype.nexus.rest.model.WastebasketResource;
 import org.sonatype.nexus.rest.model.WastebasketResourceResponse;
 import org.sonatype.nexus.rest.repositories.RepositoryBaseResourceConverter;
 import org.sonatype.nexus.rest.repositories.RepositoryResourceResponseConverter;
@@ -262,65 +247,62 @@ public class NexusApplication
         // Maven POM
         xstream.alias( "project", Model.class );
         
-        // artifact
-        xstream.alias( "artifact-resolution", ArtifactResolveResourceResponse.class );
+        xstream.processAnnotations( ErrorReportResponse.class );
+        xstream.processAnnotations( ErrorReportRequest.class );
+        xstream.processAnnotations( ArtifactResolveResourceResponse.class );
+        xstream.processAnnotations( GlobalConfigurationListResourceResponse.class );
+        xstream.processAnnotations( GlobalConfigurationResourceResponse.class );
+        xstream.processAnnotations( RepositoryStatusListResourceResponse.class );
+        xstream.processAnnotations( RepositoryListResourceResponse.class );
+        xstream.processAnnotations( RepositoryResourceResponse.class );
+        xstream.processAnnotations( RepositoryStatusResourceResponse.class );
+        xstream.processAnnotations( RepositoryMetaResourceResponse.class );
+        xstream.processAnnotations( RepositoryGroupListResourceResponse.class );
+        xstream.processAnnotations( RepositoryGroupResourceResponse.class );
+        xstream.processAnnotations( RepositoryRouteListResourceResponse.class );
+        xstream.processAnnotations( RepositoryRouteResourceResponse.class );
+        xstream.processAnnotations( ScheduledServiceListResourceResponse.class );
+        xstream.processAnnotations( ScheduledServiceResourceStatusResponse.class );
+        xstream.processAnnotations( ScheduledServiceResourceResponse.class );
+        xstream.processAnnotations( ScheduledServiceTypeResourceResponse.class );
+        xstream.processAnnotations( ContentListResourceResponse.class );
+        xstream.processAnnotations( ContentListDescribeResourceResponse.class );
+        xstream.processAnnotations( LogsListResourceResponse.class );
+        xstream.processAnnotations( ConfigurationsListResourceResponse.class );
+        xstream.processAnnotations( SearchResponse.class );
+        xstream.processAnnotations( FeedListResourceResponse.class );
+        xstream.processAnnotations( NFCResourceResponse.class );
+        xstream.processAnnotations( StatusResourceResponse.class );
+        xstream.processAnnotations( WastebasketResourceResponse.class );
+        xstream.processAnnotations( RepositoryTargetListResourceResponse.class );
+        xstream.processAnnotations( RepositoryTargetResourceResponse.class );
+        xstream.processAnnotations( RepositoryContentClassListResourceResponse.class );
+        xstream.processAnnotations( LogConfigResourceResponse.class );
+        xstream.processAnnotations( MirrorResourceListResponse.class );
+        xstream.processAnnotations( MirrorResourceListRequest.class );
+        xstream.processAnnotations( MirrorStatusResourceListResponse.class );
+        xstream.processAnnotations( SmtpSettingsResourceRequest.class );
+        xstream.processAnnotations( PlexusComponentListResourceResponse.class );
+        xstream.processAnnotations( NexusRepositoryTypeListResourceResponse.class );
+        xstream.processAnnotations( PrivilegeResourceRequest.class );
 
-        // omitting modelEncoding
-        xstream.omitField( ErrorResponse.class, "modelEncoding" );
-        // xstream.addImplicitCollection( ErrorResponse.class, "errors", "error", ErrorMessage.class ); // FIXME:
-        // this might break the JSON parser, test it before checking in
-        xstream.omitField( ErrorMessage.class, "modelEncoding" );
         xstream.alias( "nexus-error", ErrorResponse.class );
         xstream.alias( "error", ErrorMessage.class );
         xstream.registerLocalConverter( ErrorResponse.class, "errors", new AliasingListConverter( ErrorMessage.class,
             "error" ) );
 
-        xstream.omitField( ContentListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ContentListResource.class, "modelEncoding" );
-        xstream.alias( "content", ContentListResourceResponse.class );
-        xstream.alias( "content-item", ContentListResource.class );
         xstream.registerLocalConverter( ContentListResourceResponse.class, "data", new AliasingListConverter(
             ContentListResource.class, "content-item" ) );
 
-        xstream.omitField( RepositoryResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryBaseResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryProxyResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryShadowResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryResourceRemoteStorage.class, "modelEncoding" );
-        xstream.alias( "repository", RepositoryResourceResponse.class );
-
-        xstream.omitField( RepositoryListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryListResource.class, "modelEncoding" );
-        xstream.alias( "repositories", RepositoryListResourceResponse.class );
-        // xstream.alias( "repositories-item", RepositoryListResource.class);
         xstream.registerLocalConverter( RepositoryListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryListResource.class, "repositories-item" ) );
 
-        xstream.alias( "repositoryTypes", NexusRepositoryTypeListResourceResponse.class );
         xstream.registerLocalConverter( NexusRepositoryTypeListResourceResponse.class, "data",
             new AliasingListConverter( NexusRepositoryTypeListResource.class, "repositoryType" ) );
 
-        xstream.omitField( RepositoryStatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryStatusResource.class, "modelEncoding" );
-        xstream.alias( "repository-status", RepositoryStatusResourceResponse.class );
-
-        xstream.omitField( RepositoryStatusListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryStatusListResource.class, "modelEncoding" );
-        xstream.alias( "repository-status-list", RepositoryStatusListResourceResponse.class );
-        // xstream.alias( "repository-status-list-item", RepositoryStatusListResource.class);
         xstream.registerLocalConverter( RepositoryStatusListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryStatusListResource.class, "repository-status-list-item" ) );
 
-        xstream.omitField( RepositoryMetaResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryMetaResource.class, "modelEncoding" );
-        xstream.alias( "repository-meta-data", RepositoryMetaResourceResponse.class );
-
-        xstream.omitField( RepositoryGroupListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupListResource.class, "modelEncoding" );
-        xstream.alias( "repo-group-list", RepositoryGroupListResourceResponse.class );
-        // xstream.alias( "repo-group-list-item", RepositoryGroupListResource.class);
-        // xstream.alias( "repo-group-member", RepositoryGroupMemberRepository.class);
         xstream.registerLocalConverter( RepositoryGroupListResource.class, "repositories", new AliasingListConverter(
             RepositoryGroupMemberRepository.class, "repo-group-member" ) );
         xstream.registerLocalConverter( RepositoryGroupResource.class, "repositories", new AliasingListConverter(
@@ -328,81 +310,30 @@ public class NexusApplication
         xstream.registerLocalConverter( RepositoryGroupListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryGroupListResource.class, "repo-group-list-item" ) );
 
-        xstream.omitField( RepositoryGroupResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryGroupMemberRepository.class, "modelEncoding" );
-        xstream.alias( "repo-group", RepositoryGroupResourceResponse.class );
-
-        xstream.omitField( RepositoryRouteListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteListResource.class, "modelEncoding" );
-        xstream.alias( "repo-routes-list", RepositoryRouteListResourceResponse.class );
-        // xstream.alias( "repo-routes-list-item", RepositoryRouteListResource.class);
-        // xstream.alias( "repo-routes-member", RepositoryRouteMemberRepository.class);
         xstream.registerLocalConverter( RepositoryRouteListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryRouteListResource.class, "repo-routes-list-item" ) );
         xstream.registerLocalConverter( RepositoryRouteListResource.class, "repositories", new AliasingListConverter(
             RepositoryRouteMemberRepository.class, "repo-routes-member" ) );
 
-        xstream.omitField( RepositoryRouteResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryRouteMemberRepository.class, "modelEncoding" );
-        xstream.alias( "repo-route", RepositoryRouteResourceResponse.class );
         xstream.registerLocalConverter( RepositoryRouteResource.class, "repositories", new AliasingListConverter(
             RepositoryRouteMemberRepository.class, "repository" ) );
 
-        xstream.omitField( GlobalConfigurationListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationListResource.class, "modelEncoding" );
-        xstream.alias( "global-settings-list", GlobalConfigurationListResourceResponse.class );
-        // xstream.alias( "global-settings-list-item", GlobalConfigurationListResource.class);
         xstream.registerLocalConverter( GlobalConfigurationListResourceResponse.class, "data",
             new AliasingListConverter( GlobalConfigurationListResource.class, "global-settings-list-item" ) );
 
-        xstream.omitField( GlobalConfigurationResourceResponse.class, "modelEncoding" );
-        xstream.omitField( GlobalConfigurationResource.class, "modelEncoding" );
-        xstream.omitField( RemoteConnectionSettings.class, "modelEncoding" );
-        xstream.omitField( RemoteHttpProxySettings.class, "modelEncoding" );
-        xstream.omitField( RestApiSettings.class, "modelEncoding" );
-        xstream.omitField( AuthenticationSettings.class, "modelEncoding" );
-        xstream.omitField( SmtpSettings.class, "modelEncoding" );
-        xstream.omitField( ErrorReportingSettings.class, "modelEncoding" );
-        xstream.alias( "global-settings", GlobalConfigurationResourceResponse.class );
-
-        xstream.omitField( WastebasketResource.class, "modelEncoding" );
-        xstream.omitField( WastebasketResourceResponse.class, "modelEncoding" );
-        xstream.alias( "wastebasket", WastebasketResourceResponse.class );
-
-        xstream.omitField( LogsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( LogsListResource.class, "modelEncoding" );
-        xstream.alias( "logs-list", LogsListResourceResponse.class );
-        // xstream.alias( "logs-list-item", LogsListResource.class);
         xstream.registerLocalConverter( LogsListResourceResponse.class, "data", new AliasingListConverter(
             LogsListResource.class, "logs-list-item" ) );
 
-        xstream.omitField( ConfigurationsListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ConfigurationsListResource.class, "modelEncoding" );
-        xstream.alias( "configs-list", ConfigurationsListResourceResponse.class );
-        // xstream.alias( "configs-list-tem", ConfigurationsListResource.class);
         xstream.registerLocalConverter( ConfigurationsListResourceResponse.class, "data", new AliasingListConverter(
-            ConfigurationsListResource.class, "configs-list-tem" ) );
+            ConfigurationsListResource.class, "configs-list-item" ) );
 
-        xstream.omitField( FeedListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( FeedListResource.class, "modelEncoding" );
-        xstream.alias( "feeds-list", FeedListResourceResponse.class );
-        // xstream.alias( "feeds-list-item", FeedListResource.class);
         xstream.registerLocalConverter( FeedListResourceResponse.class, "data", new AliasingListConverter(
             FeedListResource.class, "feeds-list-item" ) );
 
-        xstream.omitField( SearchResponse.class, "modelEncoding" );
-        xstream.alias( "search-results", SearchResponse.class );
         xstream.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
             "artifact" ) );
 
-        xstream.omitField( NexusResponse.class, "modelEncoding" );
-        xstream.omitField( NexusArtifact.class, "modelEncoding" );
-        xstream.alias( "artifact", NexusArtifact.class );
-
-        xstream.omitField( NexusAuthenticationClientPermissions.class, "modelEncoding" );
-        // Look at
+        xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class ); // Look at
         // NexusAuthenticationLoginResourceConverter,
         // we are only converting
         // the clientPermissions
@@ -411,39 +342,11 @@ public class NexusApplication
         xstream.registerLocalConverter( AuthenticationClientPermissions.class, "permissions",
             new AliasingListConverter( ClientPermission.class, "permission" ) );
 
-        xstream.omitField( ClientPermission.class, "modelEncoding" );
-
-        xstream.omitField( StatusResource.class, "modelEncoding" );
-        xstream.omitField( StatusResourceResponse.class, "modelEncoding" );
-        xstream.omitField( StatusConfigurationValidationResponse.class, "modelEncoding" );
-        xstream.alias( "status", StatusResourceResponse.class );
         xstream.registerLocalConverter( StatusConfigurationValidationResponse.class, "validationErrors",
             new AliasingListConverter( String.class, "error" ) );
         xstream.registerLocalConverter( StatusConfigurationValidationResponse.class, "validationWarnings",
             new AliasingListConverter( String.class, "warning" ) );
 
-        xstream.omitField( ScheduledServiceListResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceBaseResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServicePropertyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceOnceResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceDailyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceAdvancedResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceMonthlyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceWeeklyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceTypeResourceResponse.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceTypeResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceTypePropertyResource.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceResourceStatus.class, "modelEncoding" );
-        xstream.omitField( ScheduledServiceResourceStatusResponse.class, "modelEncoding" );
-        xstream.alias( "schedules-list", ScheduledServiceListResourceResponse.class );
-        // xstream.alias( "schedules-list-item", ScheduledServiceListResource.class );
-        xstream.alias( "scheduled-task", ScheduledServiceResourceResponse.class );
-        // xstream.alias( "scheduled-task-property", ScheduledServicePropertyResource.class );
-        xstream.alias( "schedule-types", ScheduledServiceTypeResourceResponse.class );
-        xstream.alias( "schedule-type", ScheduledServiceTypeResource.class );
-        // xstream.alias( "schedule-type-property", ScheduledServiceTypePropertyResource.class );
         xstream.registerLocalConverter( ScheduledServiceBaseResource.class, "properties", new AliasingListConverter(
             ScheduledServicePropertyResource.class, "scheduled-task-property" ) );
         xstream.registerLocalConverter( ScheduledServiceWeeklyResource.class, "recurringDay",
@@ -455,57 +358,23 @@ public class NexusApplication
         xstream.registerLocalConverter( ScheduledServiceListResourceResponse.class, "data", new AliasingListConverter(
             ScheduledServiceListResource.class, "schedules-list-item" ) );
 
-        xstream.alias( "privilege-request", PrivilegeResourceRequest.class );
         xstream.aliasField( "methods", PrivilegeResource.class, "method" );
-                
-        xstream.omitField( NFCResourceResponse.class, "modelEncoding" );
-        xstream.omitField( NFCResource.class, "modelEncoding" );
-        xstream.omitField( NFCRepositoryResource.class, "modelEncoding" );
-        xstream.alias( "nfc-info", NFCResourceResponse.class );
-        // xstream.alias( "nfc-repo-info", NFCRepositoryResource.class );
+
         xstream.registerLocalConverter( NFCResource.class, "nfcContents", new AliasingListConverter(
             NFCRepositoryResource.class, "nfc-repo-info" ) );
         xstream.registerLocalConverter( NFCRepositoryResource.class, "nfcPaths", new AliasingListConverter(
             String.class, "path" ) );
 
-        xstream.omitField( RepositoryTargetListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryTargetListResource.class, "modelEncoding" );
-        xstream.omitField( RepositoryTargetResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryTargetResource.class, "modelEncoding" );
-        xstream.alias( "repo-targets-list", RepositoryTargetListResourceResponse.class );
-        // xstream.alias( "repo-targets-list-item", RepositoryTargetListResource.class );
-        xstream.alias( "repo-target", RepositoryTargetResourceResponse.class );
         xstream.registerLocalConverter( RepositoryTargetResource.class, "patterns", new AliasingListConverter(
             String.class, "pattern" ) );
         xstream.registerLocalConverter( RepositoryTargetListResourceResponse.class, "data", new AliasingListConverter(
             RepositoryTargetListResource.class, "repo-targets-list-item" ) );
 
-        xstream.omitField( RepositoryContentClassListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( RepositoryContentClassListResource.class, "modelEncoding" );
-        xstream.alias( "repo-content-classes-list", RepositoryContentClassListResourceResponse.class );
-        // xstream.alias( "repo-content-classes-list-item", RepositoryContentClassListResource.class );
         xstream.registerLocalConverter( RepositoryContentClassListResourceResponse.class, "data",
             new AliasingListConverter( RepositoryContentClassListResource.class, "repo-content-classes-list-item" ) );
 
-        xstream.omitField( PlexusComponentListResourceResponse.class, "modelEncoding" );
-        xstream.omitField( PlexusComponentListResource.class, "modelEncoding" );
-        xstream.alias( "components-list", PlexusComponentListResourceResponse.class );
-        xstream.alias( "component", PlexusComponentListResource.class );
         xstream.registerLocalConverter( PlexusComponentListResourceResponse.class, "data", new AliasingListConverter(
             PlexusComponentListResource.class, "component" ) );
-        
-        xstream.alias( "error-report-request", ErrorReportRequest.class );
-        xstream.alias( "error-report-response", ErrorReportResponse.class );
-
-        xstream.omitField( MirrorResourceListRequest.class, "modelEncoding" );
-        xstream.omitField( MirrorResourceListResponse.class, "modelEncoding" );
-        xstream.omitField( MirrorStatusResourceListResponse.class, "modelEncoding" );
-        xstream.omitField( MirrorResource.class, "modelEncoding" );
-        xstream.omitField( MirrorStatusResource.class, "modelEncoding" );
-
-        xstream.alias( "mirror-list-request", MirrorResourceListRequest.class );
-        xstream.alias( "mirror-list-response", MirrorResourceListResponse.class );
-        xstream.alias( "mirror-status-list-response", MirrorStatusResourceListResponse.class );
 
         xstream.registerLocalConverter( MirrorResourceListRequest.class, "data", new AliasingListConverter(
             MirrorResource.class, "mirrorResource" ) );
@@ -513,12 +382,32 @@ public class NexusApplication
             MirrorResource.class, "mirrorResource" ) );
         xstream.registerLocalConverter( MirrorStatusResourceListResponse.class, "data", new AliasingListConverter(
             MirrorStatusResource.class, "mirrorResource" ) );
+        
+        xstream.registerLocalConverter( ContentListDescribeRequestResource.class, "requestContext", new AliasingListConverter(
+            String.class, "requestContextItem" ) );
+        
+        xstream.registerLocalConverter( ContentListDescribeResponseResource.class, "appliedMappings", new AliasingListConverter(
+            String.class, "appliedMappingItem" ) );        
+        xstream.registerLocalConverter( ContentListDescribeResponseResource.class, "attributes", new AliasingListConverter(
+            String.class, "attributeItem" ) );        
+        xstream.registerLocalConverter( ContentListDescribeResponseResource.class, "processedRepositoriesList", new AliasingListConverter(
+            String.class, "processedRepositoriesListItem" ) );        
+        xstream.registerLocalConverter( ContentListDescribeResponseResource.class, "properties", new AliasingListConverter(
+            String.class, "propertyItem" ) );        
+        xstream.registerLocalConverter( ContentListDescribeResponseResource.class, "sources", new AliasingListConverter(
+            String.class, "sourceItem" ) );
+        
+        xstream.registerLocalConverter( RepositoryStatusResource.class, "dependentRepos", new AliasingListConverter(
+            RepositoryDependentStatusResource.class, "dependentRepoItem" ) );
+        
+        xstream.registerLocalConverter( GlobalConfigurationResource.class, "securityRealms", new AliasingListConverter(
+            String.class, "securityRealmItem" ) );
 
         // Maven model
         xstream.omitField( Model.class, "modelEncoding" );
         xstream.omitField( ModelBase.class, "modelEncoding" );
         xstream.omitField( Scm.class, "modelEncoding" );
-
+        
         // SECURITY below
         xstream.processAnnotations( AuthenticationLoginResourceResponse.class );
         xstream.processAnnotations( UserResourceResponse.class );
