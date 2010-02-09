@@ -1,8 +1,5 @@
 package org.sonatype.nexus.plugins.rrb;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -18,8 +15,12 @@ import org.restlet.resource.Variant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
+import org.sonatype.nexus.proxy.ResourceStore;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.AbstractResourceStoreContentPlexusResource;
+import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -34,10 +35,12 @@ import com.thoughtworks.xstream.XStream;
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 public class RemoteBrowserResource
-    extends AbstractNexusPlexusResource
+    extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
+
     // TODO: consider extending AbstractResourceStoreContentPlexusResource
+    public static final String REMOTE_REPOSITORY_URL = "remoteRepositoryUrl";
 
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
@@ -61,19 +64,16 @@ public class RemoteBrowserResource
     public PathProtectionDescriptor getResourceProtection()
     {
         // Allow anonymous access
-        return new PathProtectionDescriptor( this.getResourceUri(), "anon" );
+         return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
         // should be:
-        // return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**",
-        // "authcBasic,perms[nexus:remotebrowser]" );
+//        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**",
+//                                             "authcBasic,perms[nexus:remotebrowser]" );
     }
 
     @Override
     public String getResourceUri()
     {
-        return "/remotebrowser";
-        // should be:
-        // return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser/";
-        // Changing this would require JavaScript changes
+        return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
     }
 
     /**
@@ -86,16 +86,24 @@ public class RemoteBrowserResource
         throws ResourceException
     {
 
-        // vvvvvvvvvv
-        // this logic will be removed when URL is fixed
-        String query = request.getResourceRef().getQuery();
-        String id = getId( query );
-        String remoteUrl = getRemoteUrl( query ); // 
-        // ^^^^^^^^^^
+        String id = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
+        ResourceStoreRequest storageItem = getResourceStoreRequest( request );
+        String remoteUrl = storageItem.getRequestPath().substring( 1 );
+        String query = storageItem.getRequestUrl().substring( storageItem.getRequestUrl().indexOf( "?" ) + 1 );
+        String prefix = "";
+        if ( query.indexOf( "prefix=" ) != -1 )
+        {
+            int end = query.indexOf( '?', query.indexOf( "prefix=" ) );
+            if ( end == -1 )
+            {
+                end = query.length();
+            }
+            prefix = "?" + query.substring( query.indexOf( "prefix=" ), end );
+        }
+
         ProxyRepository proxyRepository = null;
         try
         {
-            // proxyRepository = getRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
             proxyRepository = getUnprotectedRepositoryRegistry().getRepositoryWithFacet( id, ProxyRepository.class );
         }
         catch ( NoSuchRepositoryException e1 )
@@ -105,7 +113,8 @@ public class RemoteBrowserResource
         }
         MavenRepositoryReader mr = new MavenRepositoryReader();
         MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-        data.setData( mr.extract( remoteUrl, request.getResourceRef().toString( false, false ), proxyRepository, id ) );
+        data.setData( mr.extract( remoteUrl + prefix, request.getResourceRef().toString( false, false ),
+                                  proxyRepository, id ) );
         logger.debug( "return value is {}", data.toString() );
         return data;
     }
@@ -149,83 +158,12 @@ public class RemoteBrowserResource
     //        
     // }
 
-    private String getId( String query )
+    @Override
+    protected ResourceStore getResourceStore( Request request )
+        throws NoSuchResourceStoreException, ResourceException
     {
-        String result = "";
-        int start = query.indexOf( "id=" );
-        if ( start != -1 )
-        {
-            int end = query.indexOf( '&', start );
-            if ( end > start )
-            {
-                result = query.substring( start + 3, end );
-            }
-            else
-            {
-                result = query.substring( start + 3 );
-            }
-        }
-        int islocal = result.indexOf( "?isLocal" );
-        if ( islocal > 0 )
-        {
-            result = result.substring( 0, islocal );
-        }
-        return result;
-    }
-
-    private String getRemoteUrl( String query )
-    {
-        String result = "";
-        String prefix = getPrefix( query );
-        int start = query.indexOf( "remoteurl=" );
-        if ( start != -1 )
-        {
-            int end = query.indexOf( '&', start );
-            if ( end > start )
-            {
-                result = query.substring( start + 10, end );
-            }
-            else
-            {
-                result = query.substring( start + 10 );
-            }
-        }
-
-        int islocal = result.indexOf( "?" );
-        if ( islocal > 0 )
-        {
-            result = result.substring( 0, islocal );
-        }
-        // if (!result.endsWith("/")) {
-        // result += "/";
-        // }
-        if ( prefix != "" )
-        {
-            result = result + "?prefix=" + prefix;
-        }
-
-        // decode the param
-        try
-        {
-            result = URLDecoder.decode( result, "UTF-8" );
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw new RuntimeException( "This system does not support the default UTF-8 encoding" );
-        }
-
-        logger.debug( "remoter url is {}", result );
-        return result;
-    }
-
-    private String getPrefix( String query )
-    {
-        String result = "";
-        int start = query.indexOf( "prefix=" );
-        if ( start != -1 )
-        {
-            result = query.substring( start + 7, query.indexOf( "?", start ) );
-        }
-        return result;
+        return getUnprotectedRepositoryRegistry().getRepository(
+                                                                 request.getAttributes().get(
+                                                                                              AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
     }
 }

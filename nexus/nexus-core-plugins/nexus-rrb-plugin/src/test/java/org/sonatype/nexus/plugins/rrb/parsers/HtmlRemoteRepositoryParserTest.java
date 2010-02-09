@@ -23,7 +23,7 @@ public class HtmlRemoteRepositoryParserTest
     {
         String remoteUrl = "http://www.xxx.com"; // The exact names of the urls
         String localUrl = "http://local"; // doesn't matter in the tests
-        parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, "test" );
+        parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, "test", "http://www.xxx.com/" );
 
         // htmlExample is an html repo with three sub directories
         StringBuilder indata = new StringBuilder( getExampleFileContent( "/htmlExample" ) );
@@ -48,7 +48,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFirstPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/central/?id=test", result.get( 0 ).getResourceURI() );
+        assertEquals( "http://local/central/", result.get( 0 ).getResourceURI() );
     }
 
     @Test
@@ -76,7 +76,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSecondPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/centralm1/?id=test", result.get( 1 ).getResourceURI() );
+        assertEquals( "http://local/centralm1/", result.get( 1 ).getResourceURI() );
     }
 
     @Test
@@ -104,7 +104,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriThirdPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/maven/?id=test", result.get( 2 ).getResourceURI() );
+        assertEquals( "http://local/maven/", result.get( 2 ).getResourceURI() );
     }
 
     @Test
@@ -132,7 +132,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFourthPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/file.jar?id=test", result.get( 3 ).getResourceURI() );
+        assertEquals( "http://local/file.jar", result.get( 3 ).getResourceURI() );
     }
 
     @Test
@@ -160,7 +160,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriFivthPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/file.txt?id=test", result.get( 4 ).getResourceURI() );
+        assertEquals( "http://local/file.txt", result.get( 4 ).getResourceURI() );
     }
 
     @Test
@@ -188,7 +188,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSixthPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/file.txt?id=test", result.get( 5 ).getResourceURI() );
+        assertEquals( "http://local/file.txt", result.get( 5 ).getResourceURI() );
     }
 
     @Test
@@ -216,7 +216,7 @@ public class HtmlRemoteRepositoryParserTest
     public void testUriSeventhPost()
         throws Exception
     {
-        assertEquals( "http://local?remoteurl=http://www.xxx.com/maven/?id=test", result.get( 6 ).getResourceURI() );
+        assertEquals( "http://local/maven/", result.get( 6 ).getResourceURI() );
     }
 
     @Test

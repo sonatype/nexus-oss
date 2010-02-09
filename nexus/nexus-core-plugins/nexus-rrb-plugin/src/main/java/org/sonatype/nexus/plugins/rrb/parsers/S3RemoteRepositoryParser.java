@@ -16,17 +16,20 @@ public class S3RemoteRepositoryParser
 
     private String localUrl;
 
+    private String basePrefix;
+
     private String remoteUrl;
 
     ArrayList<RepositoryDirectory> result = new ArrayList<RepositoryDirectory>();
 
     private String id;
 
-    public S3RemoteRepositoryParser( String remoteUrl, String localUrl, String id )
+    public S3RemoteRepositoryParser( String remoteUrl, String localUrl, String id, String basePrefix )
     {
         this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
         this.id = id;
+        this.basePrefix = basePrefix;
     }
 
     void extractContent( StringBuilder indata )
@@ -48,8 +51,12 @@ public class S3RemoteRepositoryParser
             {
                 rp.setLeaf( true );
                 rp.setText( getText( getKeyName( temp ) ) );
-                rp.setResourceURI( localUrl + "?remoteurl=" + remoteUrl + getKeyName( temp ) + "?id=" + id );
-                rp.setRelativePath( "/" + getKeyName( temp ) );
+                rp.setResourceURI( localUrl + "/" + getKeyName( temp ) );
+                rp.setRelativePath( ( getKeyName( temp ).replace( basePrefix, "" ) ).replace( "//", "/" ) );
+                if ( !rp.getRelativePath().startsWith( "/" ) )
+                {
+                    rp.setRelativePath( "/" + rp.getRelativePath() );
+                }
                 if ( !remoteUrl.endsWith( rp.getRelativePath().substring( 1 ) ) )
                 {
                     logger.debug( "addning {} to result", rp.toString() );
@@ -83,22 +90,30 @@ public class S3RemoteRepositoryParser
                 rp.setText( getText( getPrefix( temp ) ) );
                 if ( remoteUrl.indexOf( '?' ) != -1 )
                 {
-                    rp.setResourceURI( localUrl + "?remoteurl=" + remoteUrl.substring( 0, remoteUrl.indexOf( '?' ) )
-                        + "?prefix=" + getPrefix( temp ) + "?id=" + id );
+                    rp.setResourceURI( removePrefix( localUrl, getPrefix( temp ) ) + "?prefix=" + getPrefix( temp ) );
                 }
                 else
                 {
-                    rp.setResourceURI( localUrl + "?remoteurl=" + remoteUrl + "?prefix=" + getPrefix( temp ) + "?id="
-                        + id );
+                    rp.setResourceURI( removePrefix( localUrl, getPrefix( temp ) ) + "?prefix=" + getPrefix( temp ) );
                 }
 
-                rp.setRelativePath( "/" + getPrefix( temp ) );
+                rp.setRelativePath( "/?prefix=" + getPrefix( temp ) );
 
                 result.add( rp );
             }
             start = end + 1;
         }
         while ( start > 0 );
+    }
+
+    private String removePrefix( String localUrl, String prefix )
+    {
+        int end = localUrl.indexOf( prefix.substring( 0, prefix.indexOf( '/' ) ) );
+        if ( end > 0 )
+        {
+            localUrl = localUrl.substring( 0, end );
+        }
+        return localUrl;
     }
 
     private String getText( String keyName )

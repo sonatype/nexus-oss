@@ -48,6 +48,7 @@ public class MavenRepositoryReader
         this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
         this.proxyRepository = proxyRepository;
+
         this.id = id;
         StringBuilder html = getContent();
         if ( logger.isDebugEnabled() )
@@ -60,10 +61,16 @@ public class MavenRepositoryReader
     private ArrayList<RepositoryDirectory> parseResult( StringBuilder indata )
     {
         RemoteRepositoryParser parser = null;
+        String baseUrl = "";
+        if ( proxyRepository != null )
+        {
+            baseUrl = proxyRepository.getRemoteUrl();
+        }
+
         if ( indata.indexOf( "<html " ) != -1 )
         {
             logger.debug( "is html repository" );
-            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id );
+            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
         }
         if ( indata.indexOf( "xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"" ) != -1
             || ( indata.indexOf( "<?xml" ) != -1 && responseContainsError( indata ) ) )
@@ -72,34 +79,64 @@ public class MavenRepositoryReader
             if ( responseContainsError( indata ) )
             {
                 logger.debug( "response from S3 repository contains error, need to find rootUrl" );
-                remoteUrl = findRootUrl( indata );
+                remoteUrl = findcreateNewUrl( indata );
                 indata = getContent();
             }
-            parser = new S3RemoteRepositoryParser( remoteUrl, localUrl, id );
+            parser =
+                new S3RemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl.replace( findRootUrl( indata ), "" ) );
         }
         else
         {
             logger.debug( "Found no matching parser, using default html parser" );
-            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id );
+
+            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
         }
         return parser.extractLinks( indata );
     }
 
-    private String findRootUrl( StringBuilder indata )
+    private String findcreateNewUrl( StringBuilder indata )
     {
         logger.debug( "indata={}", indata.toString() );
-        String key = "";
+        String key = extracktKey( indata );
         String newUrl = "";
+        if ( !key.equals( "" ) )
+        {
+            newUrl = findRootUrl( indata );
+            newUrl += "?prefix=" + key;
+        }
+        if ( !newUrl.endsWith( "/" ) )
+        {
+            newUrl += "/";
+        }
+        logger.debug( "newUrl={}", newUrl );
+        return newUrl;
+    }
+
+    private String findRootUrl( StringBuilder indata )
+    {
+        int end = remoteUrl.indexOf( extracktKey( indata ) );
+        if ( end > 0 )
+        {
+            String newUrl = remoteUrl.substring( 0, end );
+            if ( newUrl.indexOf( '?' ) != -1 )
+            {
+                newUrl = newUrl.substring( 0, newUrl.indexOf( '?' ) );
+            }
+            return newUrl;
+        }
+        return remoteUrl;
+    }
+
+    private String extracktKey( StringBuilder indata )
+    {
+        String key = "";
         int start = indata.indexOf( "<Key>" );
         int end = indata.indexOf( "</Key>" );
         if ( start > 0 && end > start )
         {
             key = indata.substring( start + 5, end );
-            newUrl = remoteUrl.substring( 0, remoteUrl.indexOf( key ) );
-            newUrl += "?prefix=" + key;
         }
-        logger.debug( "newUrl={}", newUrl );
-        return newUrl;
+        return key;
     }
 
     private boolean responseContainsError( StringBuilder indata )

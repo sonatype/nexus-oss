@@ -21,7 +21,6 @@ Sonatype.Events.addListener( 'repositoryViewInit', function( cardPanel, rec ) {
   }
 } );
 
-
 Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	  var config = config || {};
 	  var defaultConfig = { 
@@ -107,8 +106,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	Ext.extend( Sonatype.repoServer.RemoteRepositoryBrowsePanel, Ext.tree.TreePanel, {
 		
 		getBrowsePath: function( baseUrl, remoteUrl, id ) {
-		var modUrl=baseUrl.substring(0,baseUrl.lastIndexOf("local/repositories")+6);
-		modUrl=modUrl+"remotebrowser?remoteurl="+remoteUrl+"&id="+id;
+		var modUrl=baseUrl+"/remotebrowser/"+remoteUrl;
 		return modUrl;
 	  },
 

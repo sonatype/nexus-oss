@@ -26,7 +26,7 @@ public class S3RemoteRepositoryParserTest
     @Before
     public void setUp()
     {
-        parser = new S3RemoteRepositoryParser( remoteUrl, localUrl, id );
+        parser = new S3RemoteRepositoryParser( remoteUrl, localUrl, id, "milestone" );
     }
 
     @Test
@@ -44,7 +44,9 @@ public class S3RemoteRepositoryParserTest
     }
 
     /**
-     * A test that the right number of links with the right type (leaf) are extracted from ListBucketResult with one item
+     * A test that the right number of links with the right type (leaf) are extracted from ListBucketResult with one
+     * item
+     * 
      * @throws Exception
      */
     @Test
@@ -59,7 +61,7 @@ public class S3RemoteRepositoryParserTest
     }
 
     /**
-     * A test that checks if  the parser extracts the uris and paths in the right way 
+     * A test that checks if the parser extracts the uris and paths in the right way
      */
     @Test
     public void testExtractContent()
@@ -70,10 +72,10 @@ public class S3RemoteRepositoryParserTest
         assertEquals( 1, result.size() );
         RepositoryDirectory repositoryDirectory = result.iterator().next();
         assertEquals( "org.springframework.batch.archetype.simple.cli", repositoryDirectory.getText() );
-        assertEquals( localUrl + "?remoteurl=" + remoteUrl
-            + "milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/" + "?id=" + id,
+        assertEquals(
+                      localUrl + "/milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getResourceURI() );
-        assertEquals( "/" + "milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
+        assertEquals( "/org/springframework/batch/org.springframework.batch.archetype.simple.cli/",
                       repositoryDirectory.getRelativePath() );
     }
 
@@ -99,6 +101,7 @@ public class S3RemoteRepositoryParserTest
 
     /**
      * A test links in the excluded list doesn't appear in the result
+     * 
      * @throws Exception
      */
     @Test
@@ -114,8 +117,7 @@ public class S3RemoteRepositoryParserTest
     {
         return "<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
             + "<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
-            + "<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>"
-            + "<Size>0</Size>"
+            + "<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "<Size>0</Size>"
             + "<StorageClass>STANDARD</StorageClass>";
     }
 
@@ -125,17 +127,12 @@ public class S3RemoteRepositoryParserTest
             + "	<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"
             + "		<Name>maven.springframework.org</Name>"
             + "		<Prefix>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli</Prefix>"
-            + "		<Marker></Marker>"
-            + "		<MaxKeys>1000</MaxKeys>"
-            + "		<IsTruncated>false</IsTruncated>	"
+            + "		<Marker></Marker>" + "		<MaxKeys>1000</MaxKeys>" + "		<IsTruncated>false</IsTruncated>	"
             + "		<Contents>"
             + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
             + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
-            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>"
-            + "			<Size>0</Size>"
-            + "			<StorageClass>STANDARD</StorageClass>"
-            + "		</Contents>"
-            + "	</ListBucketResult>";
+            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
+            + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "	</ListBucketResult>";
     }
 
     private String withOneInExcludedList()
@@ -149,16 +146,10 @@ public class S3RemoteRepositoryParserTest
             + "			<Key>milestone/org/springframework/batch/org.springframework.batch.archetype.simple.cli/</Key>"
             + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
             + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
-            + "			<StorageClass>STANDARD</StorageClass>"
-            + "		</Contents>"
-            + "		<Contents>"
-            + "			<Key>external/robots.txt</Key>"
-            + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
-            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>"
-            + "			<Size>0</Size>"
-            + "			<StorageClass>STANDARD</StorageClass>"
-            + "		</Contents>"
-            + "	</ListBucketResult>";
+            + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "		<Contents>"
+            + "			<Key>external/robots.txt</Key>" + "			<LastModified>2009-01-29T20:11:37.000Z</LastModified>"
+            + "			<ETag>&quot;d41d8cd98f00b204e9800998ecf8427e&quot;</ETag>" + "			<Size>0</Size>"
+            + "			<StorageClass>STANDARD</StorageClass>" + "		</Contents>" + "	</ListBucketResult>";
     }
 
     private String repoWithCommonPrefixes()
@@ -166,61 +157,27 @@ public class S3RemoteRepositoryParserTest
         // Fetched via http://s3.amazonaws.com/maven.springframework.org?delimiter=/
         return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
             + "<ListBucketResult xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"
-            + "	<Name>maven.springframework.org</Name>"
-            + "	<Prefix></Prefix>"
-            + "	<Marker></Marker>"
-            + "	<MaxKeys>1000</MaxKeys>"
-            + "	<Delimiter>/</Delimiter>"
-            + "	<IsTruncated>false</IsTruncated>"
-            + "	<Contents>"
-            + "		<Key>.VolumeIcon.icns</Key>"
+            + "	<Name>maven.springframework.org</Name>" + "	<Prefix></Prefix>" + "	<Marker></Marker>"
+            + "	<MaxKeys>1000</MaxKeys>" + "	<Delimiter>/</Delimiter>" + "	<IsTruncated>false</IsTruncated>"
+            + "	<Contents>" + "		<Key>.VolumeIcon.icns</Key>"
             + "		<LastModified>2010-01-26T21:06:40.000Z</LastModified>"
             + "		<ETag>&quot;837179d531bd8daa79625886bed898eb&quot;</ETag>"
-            + "		<Size>58927</Size><StorageClass>STANDARD</StorageClass>"
-            + "	</Contents>"
-            + "	<Contents>"
-            + "		<Key>._.</Key>"
-            + "		<LastModified>2010-01-27T00:22:00.000Z</LastModified>"
-            + "		<ETag>&quot;4381f675ace6679a83757b3860e66311&quot;</ETag>"
-            + "		<Size>4096</Size>"
-            + "		<StorageClass>STANDARD</StorageClass>"
-            + "	</Contents>"
-            + "	<Contents>"
-            + "		<Key>._.VolumeIcon.icns</Key>"
-            + "		<LastModified>2010-01-26T21:06:40.000Z</LastModified>"
-            + "		<ETag>&quot;2091acbd4fe93901bf107e82c7b5e2ab&quot;</ETag>"
-            + "		<Size>4096</Size>"
-            + "		<StorageClass>STANDARD</StorageClass>"
-            + "	</Contents>"
-            + "	<Contents>"
-            + "		<Key>0.dir</Key>"
+            + "		<Size>58927</Size><StorageClass>STANDARD</StorageClass>" + "	</Contents>" + "	<Contents>"
+            + "		<Key>._.</Key>" + "		<LastModified>2010-01-27T00:22:00.000Z</LastModified>"
+            + "		<ETag>&quot;4381f675ace6679a83757b3860e66311&quot;</ETag>" + "		<Size>4096</Size>"
+            + "		<StorageClass>STANDARD</StorageClass>" + "	</Contents>" + "	<Contents>"
+            + "		<Key>._.VolumeIcon.icns</Key>" + "		<LastModified>2010-01-26T21:06:40.000Z</LastModified>"
+            + "		<ETag>&quot;2091acbd4fe93901bf107e82c7b5e2ab&quot;</ETag>" + "		<Size>4096</Size>"
+            + "		<StorageClass>STANDARD</StorageClass>" + "	</Contents>" + "	<Contents>" + "		<Key>0.dir</Key>"
             + "		<LastModified>2010-01-27T00:22:02.000Z</LastModified>"
-            + "		<ETag>&quot;5f3c44666a9ca2461f27b87b4603b0d0&quot;</ETag>"
-            + "		<Size>16</Size>"
-            + "		<StorageClass>STANDARD</StorageClass>"
-            + "	</Contents>"
-            + "	<Contents>"
-            + "		<Key>robots.txt</Key>"
+            + "		<ETag>&quot;5f3c44666a9ca2461f27b87b4603b0d0&quot;</ETag>" + "		<Size>16</Size>"
+            + "		<StorageClass>STANDARD</StorageClass>" + "	</Contents>" + "	<Contents>" + "		<Key>robots.txt</Key>"
             + "		<LastModified>2009-07-09T17:35:59.000Z</LastModified>"
-            + "		<ETag>&quot;9152d7f1724ed8fbcd2e0c87029f193c&quot;</ETag>"
-            + "		<Size>25</Size>"
-            + "		<StorageClass>STANDARD</StorageClass>"
-            + "	</Contents>"
-            + "	<CommonPrefixes>"
-            + "		<Prefix>external/</Prefix>"
-            + "	</CommonPrefixes>"
-            + "	<CommonPrefixes>"
-            + "		<Prefix>milestone/</Prefix>"
-            + "	</CommonPrefixes>"
-            + "	<CommonPrefixes>"
-            + "		<Prefix>osgi/</Prefix>"
-            + "	</CommonPrefixes>"
-            + "	<CommonPrefixes>"
-            + "		<Prefix>release/</Prefix>"
-            + "	</CommonPrefixes>"
-            + "	<CommonPrefixes>"
-            + "		<Prefix>snapshot/</Prefix>"
-            + "	</CommonPrefixes>"
-            + "</ListBucketResult>";
+            + "		<ETag>&quot;9152d7f1724ed8fbcd2e0c87029f193c&quot;</ETag>" + "		<Size>25</Size>"
+            + "		<StorageClass>STANDARD</StorageClass>" + "	</Contents>" + "	<CommonPrefixes>"
+            + "		<Prefix>external/</Prefix>" + "	</CommonPrefixes>" + "	<CommonPrefixes>"
+            + "		<Prefix>milestone/</Prefix>" + "	</CommonPrefixes>" + "	<CommonPrefixes>" + "		<Prefix>osgi/</Prefix>"
+            + "	</CommonPrefixes>" + "	<CommonPrefixes>" + "		<Prefix>release/</Prefix>" + "	</CommonPrefixes>"
+            + "	<CommonPrefixes>" + "		<Prefix>snapshot/</Prefix>" + "	</CommonPrefixes>" + "</ListBucketResult>";
     }
 }

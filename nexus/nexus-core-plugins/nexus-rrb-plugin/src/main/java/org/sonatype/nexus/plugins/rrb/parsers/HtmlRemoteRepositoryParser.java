@@ -31,11 +31,14 @@ public class HtmlRemoteRepositoryParser
 
     private String id;
 
-    public HtmlRemoteRepositoryParser( String remoteUrl, String localUrl, String id )
+    private String baseUrl;
+
+    public HtmlRemoteRepositoryParser( String remoteUrl, String localUrl, String id, String baseUrl )
     {
         this.remoteUrl = remoteUrl;
         this.localUrl = localUrl;
         this.id = id;
+        this.baseUrl = baseUrl;
     }
 
     /**
@@ -79,8 +82,16 @@ public class HtmlRemoteRepositoryParser
                 {
                     remoteUrl += "/";
                 }
-                rp.setResourceURI( localUrl + "?remoteurl=" + remoteUrl + getLinkUrl( temp ) + "?id=" + id );
-                rp.setRelativePath( "/" + getLinkUrl( temp ) );
+                if ( !localUrl.endsWith( "/" ) )
+                {
+                    localUrl += "/";
+                }
+                rp.setResourceURI( localUrl + getLinkUrl( temp ) );
+                rp.setRelativePath( remoteUrl.replace( baseUrl, "" ) + getLinkUrl( temp ) );
+                if ( !rp.getRelativePath().startsWith( "/" ) )
+                {
+                    rp.setRelativePath( "/" + rp.getRelativePath() );
+                }
 
                 if ( StringUtils.isNotEmpty( rp.getText() ) )
                 {
