@@ -116,7 +116,6 @@ public class UnpackPlexusResource
      */
     @Override
     @POST
-    @PUT
     @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
     public Object upload( Context context, Request request, Response response, List<FileItem> files )
         throws ResourceException
@@ -213,6 +212,19 @@ public class UnpackPlexusResource
         }
 
         return null;
+    }
+    
+    /**
+     * Handles uploads of ZIP files.
+     */
+    @PUT
+    @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
+    public Object uploadPut( Context context, Request request, Response response, List<FileItem> files )
+    throws ResourceException
+    {
+        // NOTE: this method is only used to get the annotation processing to work correctly
+        // we can not have an @PUT and @POST on the same method, so this is the quick and dirty work around.
+        return this.upload( context, request, response, files );
     }
 
     private void deleteItem( Repository repository, StorageItem item )
