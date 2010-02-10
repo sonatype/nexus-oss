@@ -66,6 +66,8 @@ public class ScheduledServiceRunPlexusResource
 
     /**
      * Run the specified scheduled task right now.  Will then be rescheduled upon completion for normal run.
+     * 
+     * @param scheduledServiceId The scheduled task to access.
      */
     @Override
     @GET

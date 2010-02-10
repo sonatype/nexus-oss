@@ -98,6 +98,8 @@ public class RepositoryPlexusResource
 
     /**
      * Get the configuration of an existing repository.
+     * 
+     * @param repositoryId The repository to access.
      */
     @Override
     @GET
@@ -111,6 +113,8 @@ public class RepositoryPlexusResource
 
     /**
      * Update an existing repository in nexus with new configuration.
+     * 
+     * @param repositoryId The repository to access.
      */
     @Override
     @PUT
@@ -308,6 +312,8 @@ public class RepositoryPlexusResource
 
     /**
      * Delete an existing repository from nexus.
+     * 
+     * @param repositoryId The repository to access.
      */
     @Override
     @DELETE

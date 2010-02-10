@@ -49,7 +49,13 @@ public class RepositoryOrGroupMetadataPlexusResource
     }
     
     /**
-     * Rebuild maven metadata for the supplied repository or group.
+     * Rebuild maven metadata for the supplied repository or group. Note that
+     * appended to the end of the url should be the path that you want to rebuild.  i.e.
+     * /content/org/blah will rebuild maven metadata under the org/blah directory.  Leaving blank
+     * will simply rebuild maven metadata for the whole domain content.
+     * 
+     * @param domain The domain that will be used, valid options are 'repositories' or 'repo_groups' (Required).
+     * @param target The unique id in the domain to use (i.e. repository or group id) (Required).
      */
     @Override
     @DELETE

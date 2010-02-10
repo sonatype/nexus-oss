@@ -55,6 +55,8 @@ public class RepositoryMirrorStatusPlexusResource
 
     /**
      * Get the status of the mirrors of a repository.
+     * 
+     * @param repositoryId The repository to retrieve the assigned mirrors for.
      */
     @Override
     @GET

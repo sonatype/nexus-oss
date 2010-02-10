@@ -61,6 +61,8 @@ public class RepositoryMirrorListPlexusResource
 
     /**
      * Get the list of mirrors for the selected repository.
+     * 
+     * @param repositoryId The repository to retrieve the assigned mirrors for.
      */
     @Override
     @GET
@@ -95,6 +97,8 @@ public class RepositoryMirrorListPlexusResource
 
     /**
      * Update the list of mirrors for a repository.
+     * 
+     * @param repositoryId The repository to update the assigned mirrors for.
      */
     @Override
     @POST

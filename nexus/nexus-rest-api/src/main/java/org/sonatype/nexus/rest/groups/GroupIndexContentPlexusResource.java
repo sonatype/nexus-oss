@@ -64,7 +64,11 @@ public class GroupIndexContentPlexusResource
     }
     
     /**
-     * Get the index content from the specified group at the specified path (path is appended to the end of the uri).
+     * Get the index content from the specified group at the specified path.
+     * Note that appended to the end of the url should be the path that you want to retrieve index content for.
+     * i.e. /content/org/blah will retrieve the content of the index at that node.
+     * 
+     * @param groupId The group id to retrieve index content from.
      */
     @Override
     @GET

@@ -20,6 +20,7 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.maven.model.Model;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
+import org.codehaus.enunciate.doc.DocumentationExample;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -62,6 +63,11 @@ public class ArtifactPlexusResource
 
     /**
      * Get a POM file from provided GAV parameters.
+     * 
+     * @param g Group id of the pom (Required).
+     * @param a Artifact id of the pom (Required).
+     * @param v Version of the pom (Required).
+     * @param r Repository to retrieve the pom from (Required).
      */
     @Override
     @GET

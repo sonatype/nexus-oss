@@ -92,6 +92,8 @@ public class RepositoryRoutePlexusResource
 
     /**
      * Get the details of a repository route.
+     * 
+     * @param routeId The repository route to access.
      */
     @Override
     @GET
@@ -159,6 +161,8 @@ public class RepositoryRoutePlexusResource
 
     /**
      * Update an existing repository route.
+     * 
+     * @param routeId The repository route to access.
      */
     @Override
     @PUT
@@ -264,6 +268,8 @@ public class RepositoryRoutePlexusResource
 
     /**
      * Delete an existing repository route.
+     * 
+     * @param routeId The repository route to access.
      */
     @Override
     @DELETE

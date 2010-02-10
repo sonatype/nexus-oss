@@ -78,6 +78,8 @@ public class RepositoryStatusPlexusResource
 
     /**
      * Retrieve the local and remote status of the requested repository.
+     * 
+     * @param repositoryId The repository to access.
      */
     @Override
     @GET
@@ -136,6 +138,8 @@ public class RepositoryStatusPlexusResource
 
     /**
      * Update the local status of the requested repositories.
+     * 
+     * @param repositoryId The repository to access.
      */
     @Override
     @PUT

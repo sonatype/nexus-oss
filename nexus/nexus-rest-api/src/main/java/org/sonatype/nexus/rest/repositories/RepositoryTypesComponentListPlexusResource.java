@@ -74,6 +74,8 @@ public class RepositoryTypesComponentListPlexusResource
 
     /**
      * Retrieve the list of repository types available in Nexus.
+     * 
+     * @param repoType The type of repository to retrieve providers for. (valid values are 'hosted', 'proxy', 'shadow' and 'group').
      */
     @Override
     @GET

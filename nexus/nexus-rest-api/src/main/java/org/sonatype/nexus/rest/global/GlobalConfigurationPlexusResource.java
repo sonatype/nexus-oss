@@ -172,6 +172,7 @@ public class GlobalConfigurationPlexusResource
 
     /**
      * Get the specified global configuration (i.e. current or default)
+     * @param configName The name of the config (as returned by the global configuration list resource) to get. 
      */
     @Override
     @GET
@@ -208,6 +209,7 @@ public class GlobalConfigurationPlexusResource
 
     /**
      * Update the global configuration.
+     * @param configName The name of the config (as returned by the global configuration list resource) to update.
      */
     @Override
     @PUT

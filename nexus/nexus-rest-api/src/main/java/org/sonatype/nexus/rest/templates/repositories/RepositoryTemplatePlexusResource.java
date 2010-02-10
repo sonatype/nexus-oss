@@ -85,6 +85,8 @@ public class RepositoryTemplatePlexusResource
 
     /**
      * Retrieve the repository configuration stored in the specified template.
+     * 
+     * @param repositoryId The repository template to access.
      */
     @Override
     @GET

@@ -59,6 +59,17 @@ public class DefaultIndexPlexusResource
      * If you provide the 'g, a, v, p or c' query parameters, a maven coordinate search will be performed.
      * If you provide the 'cn' query parameter, a classname search will be performed.
      * If you provide the 'sha1' query parameter, a checksum search will be performed.
+     * 
+     * @param q provide this param for a keyword search (g, a, v, p, c, cn, sha1 params will be ignored).
+     * @param sha1 provide this param for a checksum search (g, a, v, p, c, cn params will be ignored).
+     * @param cn provide this param for a classname search (g, a, v, p, c params will be ignored).
+     * @param g group id to perform a maven search against (can be combined with a, v, p & c params as well).
+     * @param a artifact id to perform a maven search against (can be combined with g, v, p & c params as well).
+     * @param v version to perform a maven search against (can be combined with g, a, p & c params as well).
+     * @param p packaging type to perform a maven search against (can be combined with g, a, v & c params as well).
+     * @param c classifier to perform a maven search against (can be combined with g, a, v & p params as well).
+     * @param from result index to start retrieving results from.
+     * @param count number of results to have returned to you.
      */
     @Override
     @GET

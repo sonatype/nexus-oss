@@ -55,6 +55,9 @@ public class ContentClassComponentListPlexusResource
         return ContentClass.class.getName();
     }
     
+    /**
+     * Retrieve the list of content classes availabe in nexus.  Plugins can contribute to this list.
+     */
     @Override
     @GET
     @ResourceMethodSignature( output = PlexusComponentListResourceResponse.class )

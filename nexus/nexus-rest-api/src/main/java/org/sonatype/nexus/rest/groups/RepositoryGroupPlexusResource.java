@@ -87,6 +87,7 @@ public class RepositoryGroupPlexusResource
 
     /**
      * Get the details of an existing repository group.
+     * @param groupId The group id to retrieve details for.
      */
     @Override
     @GET
@@ -128,6 +129,7 @@ public class RepositoryGroupPlexusResource
 
     /**
      * Update details of an existing repository group.
+     * @param groupId The group id to to update.
      */
     @Override
     @PUT
@@ -185,6 +187,7 @@ public class RepositoryGroupPlexusResource
 
     /**
      * Delete an existing repository group.
+     * @param groupId The group id to delete.
      */
     @Override
     @DELETE

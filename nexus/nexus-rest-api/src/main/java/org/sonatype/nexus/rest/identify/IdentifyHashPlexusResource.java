@@ -77,6 +77,8 @@ public class IdentifyHashPlexusResource
 
     /**
      * Retrieve artifact details using a hash value.
+     * @param algorithm The hash algorithm (i.e. md5 or sha1).
+     * @param hash The hash string to compare.
      */
     @Override
     @GET

@@ -17,6 +17,12 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -39,11 +45,15 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "logs" )
+@Path( LogsPlexusResource.RESOURCE_URI )
+@Produces( { "text/plain" } )
 public class LogsPlexusResource
     extends AbstractNexusPlexusResource
 {
     /** Key for retrieving the requested filename from request. */
     public static final String FILE_NAME_KEY = "fileName";
+    
+    public static final String RESOURCE_URI = "/logs/{" + FILE_NAME_KEY + "}"; 
 
     @Override
     public List<Variant> getVariants()
@@ -61,7 +71,7 @@ public class LogsPlexusResource
     @Override
     public String getResourceUri()
     {
-        return "/logs/{" + FILE_NAME_KEY + "}";
+        return RESOURCE_URI;
     }
 
     @Override
@@ -74,8 +84,12 @@ public class LogsPlexusResource
      * The default handler. It simply extracts the requested file name and gets the file's InputStream from Nexus
      * instance. If Nexus finds the file appropriate, the handler wraps it into InputStream representation and ships it
      * as "text/plain" media type, otherwise HTTP 404 is returned.
+     * 
+     * @param fileName The file name to retrieve (as defined in the log list resource response).
      */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( LogsPlexusResource.FILE_NAME_KEY ) }, output = Object.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {

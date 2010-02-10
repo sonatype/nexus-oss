@@ -64,6 +64,8 @@ public class RepositoryStatusesListPlexusResource
 
     /**
      * Get the list of all repository statuses.
+     * 
+     * @param forceCheck If true, will force a remote check of status (Optional).
      */
     @Override
     @GET

@@ -64,6 +64,8 @@ public class RepositoryPredefinedMirrorListPlexusResource
     /**
      * Get the predefined list of mirrors for a repository (as defined in the repository metadata).  These
      * mirrors may NOT be enabled, simply listed as available.
+     * 
+     * @param repositoryId The repository to retrieve the predefined mirrors for.
      */
     @Override
     @GET

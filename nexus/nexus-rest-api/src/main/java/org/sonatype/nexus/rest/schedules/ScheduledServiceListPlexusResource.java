@@ -104,6 +104,8 @@ public class ScheduledServiceListPlexusResource
 
     /**
      * Retrieve a list of scheduled tasks currently configured in nexus.
+     * 
+     * @param allTasks If true, will return all tasks, even non-exposed tasks.
      */
     @Override
     @GET

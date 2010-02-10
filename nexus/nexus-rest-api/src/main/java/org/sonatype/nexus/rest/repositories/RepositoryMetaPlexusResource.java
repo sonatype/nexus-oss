@@ -64,6 +64,8 @@ public class RepositoryMetaPlexusResource
 
     /**
      * Retrieve metadata of an existing repository.
+     * 
+     * @param repositoryId The repository to retrieve the metadata for.
      */
     @Override
     @GET

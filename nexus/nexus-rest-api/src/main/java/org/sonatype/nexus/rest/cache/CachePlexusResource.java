@@ -67,7 +67,12 @@ public class CachePlexusResource
     }
 
     /**
-     * Retrieve the contents of the Not Found Cache at the specified domain (repository or group).
+     * Retrieve the contents of the Not Found Cache at the specified domain (repository or group). Note that
+     * appended to the end of the url should be the path that you want cache cleared from.  i.e.
+     * /content/org/blah will clear cache of everything under the org/blah directory.
+     * 
+     * @param domain The domain that will be used, valid options are 'repositories' or 'repo_groups' (Required).
+     * @param target The unique id in the domain to use (i.e. repository or group id) (Required).
      */
     @Override
     @GET

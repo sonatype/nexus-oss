@@ -65,6 +65,8 @@ public class RepositoryIndexContentPlexusResource
     
     /**
      * Get the index content from the specified repository. at the specified path (path is appended to the end of the uri).
+     * 
+     * @param repositoryId The repository to retrieve the index content for.
      */
     @Override
     @GET

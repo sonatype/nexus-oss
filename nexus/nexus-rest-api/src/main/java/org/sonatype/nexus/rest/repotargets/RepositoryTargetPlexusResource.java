@@ -85,6 +85,8 @@ public class RepositoryTargetPlexusResource
 
     /**
      * Get the details of a repository target.
+     * 
+     * @param repoTargetId Repository target to access.
      */
     @Override
     @GET
@@ -112,6 +114,8 @@ public class RepositoryTargetPlexusResource
 
     /**
      * Update the configuration of an existing repository target.
+     * 
+     * @param repoTargetId Repository target to access.
      */
     @Override
     @PUT
@@ -179,6 +183,8 @@ public class RepositoryTargetPlexusResource
 
     /**
      * Delete an existing repository target.
+     * 
+     * @param repoTargetId Repository target to access.
      */
     @Override
     @DELETE

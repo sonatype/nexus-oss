@@ -73,11 +73,19 @@ public class ArtifactResolvePlexusResource
 
     /**
      * Resolve an artifact and retrieve a set of details about that artifact.
+     * 
+     * @param g Group id of the artifact (Required).
+     * @param a Artifact id of the artifact (Required).
+     * @param v Version of the artifact (Required).
+     * @param r Repository that the artifact is contained in (Required).
+     * @param p Packaging type of the artifact (Optional).
+     * @param c Classifier of the artifact (Optional). 
+     * @param e Extension of the artifact (Optional).
      */
     @Override
     @GET
     @ResourceMethodSignature( queryParams = { @QueryParam( "g" ), @QueryParam( "a" ), @QueryParam( "v" ),
-        @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "r" ), @QueryParam( "e" ) }, 
+        @QueryParam( "r" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "e" ) }, 
         output = ArtifactResolveResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException

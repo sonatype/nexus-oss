@@ -90,6 +90,8 @@ public class ScheduledServicePlexusResource
 
     /**
      * Get the details of an existing scheduled task.
+     * 
+     * @param scheduledServiceId The scheduled task to access.
      */
     @Override
     @GET
@@ -126,6 +128,8 @@ public class ScheduledServicePlexusResource
 
     /**
      * Update the configuration of an existing scheduled task.
+     * 
+     * @param scheduledServiceId The scheduled task to access.
      */
     @Override
     @PUT
@@ -209,6 +213,11 @@ public class ScheduledServicePlexusResource
         return result;
     }
 
+    /**
+     * Delete an existing scheduled task.
+     * 
+     * @param scheduledServiceId The scheduled task to access.
+     */
     @Override
     @DELETE
     @ResourceMethodSignature( pathParams = { @PathParam( ScheduledServicePlexusResource.SCHEDULED_SERVICE_ID_KEY ) } )
