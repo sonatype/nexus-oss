@@ -8,12 +8,12 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>./target/assembly</directory>
+      <directory>${assembly.directory}</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>    
     <fileSet>
       <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/lib</directory>
-      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory>
+      <outputDirectory>data/${libraryDir}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>
