@@ -27,10 +27,9 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import com.thoughtworks.xstream.XStream;
 
 /**
- * A REST resource for retrieving directories from a remote repository. By default, this will automatically be mounted
- * at: http://host:port/nexus/service/local/remotebrowser .
+ * A REST resource for retrieving directories from a remote repository.
  */
-// @Component( role = PlexusResource.class, hint = "protected" )
+// FIXME: The path specified below isn't correct? Check getResourceUri method!
 @Path( "/remotebrowser" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
@@ -38,10 +37,6 @@ public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
-
-    // TODO: consider extending AbstractResourceStoreContentPlexusResource
-    public static final String REMOTE_REPOSITORY_URL = "remoteRepositoryUrl";
-
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
     @Override
@@ -54,7 +49,6 @@ public class RemoteBrowserResource
     @Override
     public void configureXStream( XStream xstream )
     {
-        // TODO Auto-generated method stub
         super.configureXStream( xstream );
         xstream.alias( "rrbresponse", MavenRepositoryReaderResponse.class );
         xstream.alias( "node", RepositoryDirectory.class );
@@ -63,11 +57,8 @@ public class RemoteBrowserResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        // Allow anonymous access
-         return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
-        // should be:
-//        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**",
-//                                             "authcBasic,perms[nexus:remotebrowser]" );
+        // Allow anonymous access for now
+        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
     }
 
     @Override
@@ -85,7 +76,6 @@ public class RemoteBrowserResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-
         String id = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
         ResourceStoreRequest storageItem = getResourceStoreRequest( request );
         String remoteUrl = storageItem.getRequestPath().substring( 1 );
