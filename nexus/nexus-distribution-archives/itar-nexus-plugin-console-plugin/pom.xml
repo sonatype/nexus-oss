@@ -44,7 +44,7 @@
               <includeArtifactIds>
                 nexus-plugin-console-plugin
               </includeArtifactIds>
-              <outputDirectory>${data.directory}/${runtimeDir}/runtime/apps/${appName}/plugin-repository
+              <outputDirectory>${data.directory}/${pluginDir}
               </outputDirectory>
             </configuration>
           </execution>

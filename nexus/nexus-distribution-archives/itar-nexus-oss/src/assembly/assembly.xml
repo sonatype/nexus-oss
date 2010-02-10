@@ -8,12 +8,12 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>./target/assembly</directory>
+      <directory>${assembly.directory}</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>    
     <fileSet>
       <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/lib</directory>
-      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory>
+      <outputDirectory>data/${libraryDir}</outputDirectory>
       <excludes>
         <exclude>plexus-app-booter-*</exclude>
         <exclude>plexus-container-default-*</exclude>
@@ -25,11 +25,11 @@
     </fileSet>
     <fileSet>
       <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/conf</directory>
-      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/conf</outputDirectory>
+      <outputDirectory>data/${appConfDir}</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</directory>
-      <outputDirectory>data/${runtimeDir}/runtime/apps/${appName}/webapp</outputDirectory>
+      <outputDirectory>data/${webAppDir}</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

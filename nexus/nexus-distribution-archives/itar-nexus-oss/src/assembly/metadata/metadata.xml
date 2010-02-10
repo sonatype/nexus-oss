@@ -16,6 +16,26 @@
       <default>${runtimeDir}/conf</default>
       <optional>true</optional>
     </property>
+    <property>
+    	<name>applicationDir</name>
+    	<default>${runtimeDir}/runtime/apps/${appName}</default>
+    	<optional>true</optional>
+    </property>
+    <property>
+    	<name>libraryDir</name>
+    	<default>${applicationDir}/lib</default>
+    	<optional>true</optional>
+    </property>
+    <property>
+      <name>appConfDir</name>
+      <default>${applicationDir}/conf</default>
+      <optional>true</optional>
+    </property>
+    <property>
+      <name>webAppDir</name>
+      <default>${applicationDir}/webapp</default>
+      <optional>true</optional>
+    </property>    
   </requires>
 
   <provides>
@@ -27,7 +47,7 @@
     <property>
       <name>bootLibraries</name>
       <values>
-        <value>${runtimeDir}/runtime/apps/${appName}/lib/plexus-classworlds-*.jar</value>
+        <value>${libraryDir}/plexus-classworlds-*.jar</value>
         <value>${confDir}/</value>
       </values>
     </property>

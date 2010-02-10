@@ -8,7 +8,7 @@
   <includeBaseDirectory>false</includeBaseDirectory>
   <fileSets>
     <fileSet>
-      <directory>./target/assembly</directory>
+      <directory>${assembly.directory}</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>    
     <fileSet>
