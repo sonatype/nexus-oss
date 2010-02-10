@@ -31,7 +31,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
@@ -46,7 +46,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Path( IdentifyHashPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 public class IdentifyHashPlexusResource
-    extends AbstractNexusPlexusResource
+    extends AbstractIndexerNexusPlexusResource
 {
     public static final String ALGORITHM_KEY = "algorithm";
 

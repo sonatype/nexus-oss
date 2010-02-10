@@ -55,7 +55,6 @@ import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
-import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
 import org.sonatype.nexus.rest.model.PlexusComponentListResource;
@@ -97,7 +96,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.nexus.rest.model.StatusConfigurationValidationResponse;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
@@ -269,7 +267,6 @@ public class NexusApplication
         xstream.processAnnotations( ContentListDescribeResourceResponse.class );
         xstream.processAnnotations( LogsListResourceResponse.class );
         xstream.processAnnotations( ConfigurationsListResourceResponse.class );
-        xstream.processAnnotations( SearchResponse.class );
         xstream.processAnnotations( FeedListResourceResponse.class );
         xstream.processAnnotations( NFCResourceResponse.class );
         xstream.processAnnotations( StatusResourceResponse.class );
@@ -329,9 +326,6 @@ public class NexusApplication
 
         xstream.registerLocalConverter( FeedListResourceResponse.class, "data", new AliasingListConverter(
             FeedListResource.class, "feeds-list-item" ) );
-
-        xstream.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
-            "artifact" ) );
 
         xstream.alias( "authentication-login", AuthenticationLoginResourceResponse.class ); // Look at
         // NexusAuthenticationLoginResourceConverter,

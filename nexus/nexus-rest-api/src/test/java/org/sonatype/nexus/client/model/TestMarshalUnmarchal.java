@@ -69,7 +69,6 @@ import org.sonatype.nexus.rest.model.NFCRepositoryResource;
 import org.sonatype.nexus.rest.model.NFCResource;
 import org.sonatype.nexus.rest.model.NFCResourceResponse;
 import org.sonatype.nexus.rest.model.NFCStats;
-import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResource;
 import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
@@ -125,7 +124,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
-import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.rest.model.SmtpSettings;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
@@ -196,6 +194,16 @@ public class TestMarshalUnmarchal
         xstreamXML = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
 
         xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
+    }
+    
+    protected XStream getXmlXStream()
+    {
+        return xstreamXML;
+    }
+    
+    protected XStream getJsonXStream()
+    {
+        return xstreamJSON;
     }
 
     public void testErrorResponse()
@@ -854,46 +862,6 @@ public class TestMarshalUnmarchal
 
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
-    }
-
-    public void testSearchResponse()
-    {
-        SearchResponse response = new SearchResponse();
-        response.setCount( 10 );
-        response.setFrom( 50 );
-        response.setTotalCount( 8 );
-        response.setTooManyResults( true );
-
-        NexusArtifact artifact1 = new NexusArtifact();
-        artifact1.setArtifactId( "artifactId1" );
-        artifact1.setClassifier( "classifier1" );
-        artifact1.setContextId( "contextId1" );
-        artifact1.setGroupId( "groupId1" );
-        artifact1.setPackaging( "packaging1" );
-        artifact1.setRepoId( "repoId1" );
-        artifact1.setResourceURI( "resourceURI1" );
-        artifact1.setVersion( "version1" );
-        artifact1.setArtifactLink( "artifactLink" );
-        artifact1.setExtension( "extension" );
-        artifact1.setPomLink( "pomLink" );
-        response.addData( artifact1 );
-
-        NexusArtifact artifact2 = new NexusArtifact();
-        artifact2.setArtifactId( "artifactId1" );
-        artifact2.setClassifier( "classifier1" );
-        artifact2.setContextId( "contextId1" );
-        artifact2.setGroupId( "groupId1" );
-        artifact2.setPackaging( "packaging1" );
-        artifact2.setRepoId( "repoId1" );
-        artifact2.setResourceURI( "resourceURI1" );
-        artifact2.setVersion( "version1" );
-        artifact2.setArtifactLink( "artifactLink2" );
-        artifact2.setExtension( "extension2" );
-        artifact2.setPomLink( "pomLink2" );
-        response.addData( artifact2 );
-
-        this.marshalUnmarchalThenCompare( response );
-        this.validateXmlHasNoPackageNames( response );
     }
 
     public void testAuthenticationLoginResourceResponse()
@@ -2181,7 +2149,7 @@ public class TestMarshalUnmarchal
         this.compareObjects( obj, xstream.fromXML( xml ) );
     }
 
-    private void validateXmlHasNoPackageNames( Object obj )
+    protected void validateXmlHasNoPackageNames( Object obj )
     {
         String xml = this.xstreamXML.toXML( obj );
 

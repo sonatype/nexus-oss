@@ -731,6 +731,16 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-lucene</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-lucene-rest-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-app</artifactId>
         <version>${project.version}</version>
         <classifier>tests</classifier>
@@ -984,6 +994,7 @@
       </activation>
       <modules>
         <module>nexus-indexer-lucene</module>
+        <module>nexus-indexer-lucene-rest-api</module>
         <module>nexus-plugins</module>
         <module>nexus-mock</module>
         <module>nexus-utils</module>

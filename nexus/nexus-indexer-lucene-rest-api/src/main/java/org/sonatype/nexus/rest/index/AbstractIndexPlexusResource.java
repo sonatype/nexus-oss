@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -36,21 +37,42 @@ import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.rest.restore.AbstractRestorePlexusResource;
+import org.sonatype.nexus.scheduling.NexusScheduler;
+import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.nexus.tasks.ReindexTask;
 
 public abstract class AbstractIndexPlexusResource
-    extends AbstractRestorePlexusResource
+    extends AbstractIndexerNexusPlexusResource
 {
     private static final int HIT_LIMIT = 500;
+    
+    public static final String DOMAIN = "domain";
+
+    public static final String DOMAIN_REPOSITORIES = "repositories";
+
+    public static final String DOMAIN_REPO_GROUPS = "repo_groups";
+
+    public static final String TARGET_ID = "target";
+
+    @Requirement
+    private NexusScheduler nexusScheduler;
 
     @Requirement
     private IndexerManager indexerManager;
 
     @Requirement( role = Searcher.class )
     private List<Searcher> m_searchers;
+    
+    public AbstractIndexPlexusResource()
+    {
+        this.setModifiable( true );
+    }
 
     @Override
     public Object getPayloadInstance()
@@ -240,5 +262,123 @@ public abstract class AbstractIndexPlexusResource
     }
 
     protected abstract boolean getIsFullReindex();
+
+    protected NexusScheduler getNexusScheduler()
+    {
+        return nexusScheduler;
+    }
+
+    protected String getRepositoryId( Request request )
+        throws ResourceException
+    {
+        String repoId = null;
+
+        if ( ( request.getAttributes().containsKey( DOMAIN ) && request.getAttributes().containsKey( TARGET_ID ) )
+            && DOMAIN_REPOSITORIES.equals( request.getAttributes().get( DOMAIN ) ) )
+        {
+            repoId = request.getAttributes().get( TARGET_ID ).toString();
+
+            try
+            {
+                // simply to throw NoSuchRepository exception
+                getRepositoryRegistry().getRepositoryWithFacet( repoId, Repository.class );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository not found!", e );
+            }
+        }
+
+        return repoId;
+    }
+
+    protected String getRepositoryGroupId( Request request )
+        throws ResourceException
+    {
+        String groupId = null;
+
+        if ( ( request.getAttributes().containsKey( DOMAIN ) && request.getAttributes().containsKey( TARGET_ID ) )
+            && DOMAIN_REPO_GROUPS.equals( request.getAttributes().get( DOMAIN ) ) )
+        {
+            groupId = request.getAttributes().get( TARGET_ID ).toString();
+
+            try
+            {
+                // simply to throw NoSuchRepository exception
+                getRepositoryRegistry().getRepositoryWithFacet( groupId, GroupRepository.class );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository group not found!", e );
+            }
+        }
+
+        return groupId;
+    }
+
+    protected String getResourceStorePath( Request request )
+        throws ResourceException
+    {
+        String path = null;
+
+        if ( getRepositoryId( request ) != null || getRepositoryGroupId( request ) != null )
+        {
+            path = request.getResourceRef().getRemainingPart();
+
+            // get rid of query part
+            if ( path.contains( "?" ) )
+            {
+                path = path.substring( 0, path.indexOf( '?' ) );
+            }
+
+            // get rid of reference part
+            if ( path.contains( "#" ) )
+            {
+                path = path.substring( 0, path.indexOf( '#' ) );
+            }
+
+            if ( StringUtils.isEmpty( path ) )
+            {
+                path = "/";
+            }
+        }
+        return path;
+    }
+
+    public void handleDelete( NexusTask<?> task, Request request )
+        throws ResourceException
+    {
+        try
+        {
+            // check reposes
+            if ( getRepositoryGroupId( request ) != null )
+            {
+                getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId( request ), GroupRepository.class );
+            }
+            else if ( getRepositoryId( request ) != null )
+            {
+                try
+                {
+                    getRepositoryRegistry().getRepository( getRepositoryId( request ) );
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId( request ), ShadowRepository.class );
+                }
+            }
+
+            getNexusScheduler().submit( "Internal", task );
+
+            throw new ResourceException( Status.SUCCESS_NO_CONTENT );
+        }
+        catch ( RejectedExecutionException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_CONFLICT, e.getMessage() );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
+        }
+    }
 
 }

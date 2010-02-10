@@ -27,7 +27,7 @@ import org.sonatype.nexus.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 
@@ -39,7 +39,7 @@ import com.thoughtworks.xstream.XStream;
  * @author dip
  */
 public abstract class AbstractIndexContentPlexusResource
-    extends AbstractNexusPlexusResource
+    extends AbstractIndexerNexusPlexusResource
 {
     @Requirement
     protected IndexerManager indexerManager;
