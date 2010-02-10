@@ -112,7 +112,8 @@ public class UnpackPlexusResource
     }
 
     /**
-     * Handles uploads of ZIP files.
+     * Handles uploads of ZIP files. Unpacks zip file to current path. If the delete query parameter is true the
+     * everything at the current path will be removed before the zip file is unpacked.
      */
     @Override
     @POST
@@ -215,7 +216,8 @@ public class UnpackPlexusResource
     }
     
     /**
-     * Handles uploads of ZIP files.
+     * Handles uploads of ZIP files. Unpacks zip file to current path. If the delete query parameter is true the
+     * everything at the current path will be removed before the zip file is unpacked.
      */
     @PUT
     @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
