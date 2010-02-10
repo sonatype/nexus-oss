@@ -139,6 +139,12 @@
 			<artifactId>enunciate-core</artifactId>
 			<version>1.18</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<artifactId>jsr311-api</artifactId>
