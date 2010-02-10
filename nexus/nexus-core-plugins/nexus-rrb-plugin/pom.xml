@@ -51,8 +51,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<!-- Need to manage some transite deps to force them into provided, as they are set
-	to compile through parent inheritance. This is kind of a workaround due to NEXUS-3189. -->
+	<!--
+		Need to manage some transite deps to force them into provided, as they are set to compile through
+		parent inheritance. This is kind of a workaround due to NEXUS-3189.
+	-->
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
@@ -133,6 +135,18 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.codehaus.enunciate</groupId>
+			<artifactId>enunciate-core</artifactId>
+			<version>1.18</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<artifactId>jsr311-api</artifactId>
+			<groupId>javax.ws.rs</groupId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.7</version>
@@ -151,6 +165,11 @@
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>
 			<artifactId>nexus-rest-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -175,7 +194,6 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.8.2</version>
-			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
