@@ -18,6 +18,7 @@ import java.util.Collection;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
@@ -69,7 +70,7 @@ public class RepositoryStatusesListPlexusResource
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = RepositoryStatusListResourceResponse.class )
+    @ResourceMethodSignature( queryParams = { @QueryParam( "forceCheck" ) }, output = RepositoryStatusListResourceResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
