@@ -64,7 +64,10 @@ public class RepositoryStatusesListPlexusResource
     }
 
     /**
-     * Get the list of all repository statuses.
+     * Get the list of all repository statuses. The remote statuses in case of Proxy repositories are cached (to avoid
+     * network flooding). You can force the remote status recheck by adding the "forceCheck" query parameter, but be
+     * aware, that this one inbound REST Request will induce as many Nexus outbound requests as many proxy repositories
+     * you have defined.
      * 
      * @param forceCheck If true, will force a remote check of status (Optional).
      */
