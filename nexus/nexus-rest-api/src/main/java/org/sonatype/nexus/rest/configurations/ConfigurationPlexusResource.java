@@ -16,6 +16,12 @@ package org.sonatype.nexus.rest.configurations;
 import java.io.IOException;
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -37,12 +43,13 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "configuration" )
+@Path( "/configs/{configName}" )
+@Produces( "text/xml" )
 public class ConfigurationPlexusResource
     extends AbstractNexusPlexusResource
 {
     /** The config key used in URI and request attributes */
     public static final String CONFIG_NAME_KEY = "configName";
-
 
     @Override
     public Object getPayloadInstance()
@@ -71,18 +78,25 @@ public class ConfigurationPlexusResource
         result.clear();
 
         result.add( new Variant( MediaType.TEXT_PLAIN ) );
-        
+
         result.add( new Variant( MediaType.APPLICATION_XML ) );
 
         return result;
     }
 
+    /**
+     * Returns the requested Nexus configuration. The keys for various configurations should be discovered by querying
+     * the "/configs" resource first. This resource emits the raw configuration file used by Nexus as response body.
+     * 
+     * @param configKey The configuration key for which we want to get the configuration.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( "configKey" ) }, output = String.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        String key = request
-            .getAttributes().get( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ).toString();
+        String key = request.getAttributes().get( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ).toString();
 
         try
         {
@@ -90,14 +104,15 @@ public class ConfigurationPlexusResource
 
             if ( !getNexus().getConfigurationFiles().containsKey( key ) )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No configuration with key '"
-                    + key + "' found!" );
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "No configuration with key '" + key
+                    + "' found!" );
             }
             else
             {
                 result = getNexus().getConfigurationAsStreamByKey( key );
             }
 
+            // TODO: make this real resource being able to be polled (ETag and last modified support)
             return new InputStreamRepresentation( MediaType.valueOf( result.getMimeType() ), result.getInputStream() );
         }
         catch ( IOException e )
