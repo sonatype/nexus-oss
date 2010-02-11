@@ -17,8 +17,8 @@
     	<optional>true</optional>
     </property>
     <property>
-      <name>pluginDir</name>
-      <default>${applicationDir}/plugin-repository</default>
+      <name>libraryDir</name>
+      <default>${applicationDir}/lib</default>
       <optional>true</optional>
     </property>     
   </requires>
