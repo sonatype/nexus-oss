@@ -14,6 +14,9 @@
 package org.sonatype.nexus.test.utils;
 
 import org.sonatype.nexus.rest.NexusApplication;
+import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
 import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
@@ -29,6 +32,11 @@ public class XStreamFactory
         NexusApplication napp = new NexusApplication();
 
         napp.doConfigureXstream( xs );
+        
+        xs.processAnnotations( SearchResponse.class );
+        
+        xs.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
+            "artifact" ) );
 
         return xs;
     }
@@ -43,6 +51,11 @@ public class XStreamFactory
         NexusApplication napp = new NexusApplication();
 
         napp.doConfigureXstream( xs );
+        
+        xs.processAnnotations( SearchResponse.class );
+        
+        xs.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
+            "artifact" ) );
 
         return xs;
     }
