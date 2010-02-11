@@ -17,6 +17,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.Context;
@@ -34,6 +41,8 @@ import com.sun.syndication.feed.synd.SyndFeed;
  * @author dip
  */
 @Component( role = PlexusResource.class, hint = "feed" )
+@Path( "/feeds/{" + FeedPlexusResource.FEED_KEY + "}" )
+@Produces( { "application/rss+xml", "application/atom+xml", "text/xml" } )
 public class FeedPlexusResource
     extends AbstractFeedPlexusResource
 {
@@ -64,11 +73,23 @@ public class FeedPlexusResource
         return new PathProtectionDescriptor( "/feeds/*", "authcBasic,perms[nexus:feeds]" );
     }
 
+    /**
+     * Returns the feed corresponding to the requested feed key. The existing feed keys (the list of feeds is not fixed,
+     * plugins may contribute new feeds) should be queried by fetching the /feeds resource. Content negotiation is used
+     * to figure out returned representation, but RSS (application/rss+xml MIME type) is the default one.
+     * 
+     * @param feedKey The feed key of the feed to be returned.
+     * @param from The number of skipped entries (for paging).
+     * @param count The count of entries to be returned (for paging).
+     * @param r The repository ID to which a feed entries should be narrowed/filtered.
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( pathParams = { @PathParam( "feedKey" ) }, queryParams = { @QueryParam( "from" ),
+        @QueryParam( "count" ), @QueryParam( "r" ) }, output = String.class )
     protected SyndFeed getFeed( Context context, Request request, String channelKey, Integer from, Integer count,
-        Map<String, String> params )
-        throws IOException,
-            ComponentLookupException
+                                Map<String, String> params )
+        throws IOException, ComponentLookupException
     {
         SyndFeed feed = super.getFeed( context, request, channelKey, from, count, params );
 
