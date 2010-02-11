@@ -12,5 +12,6 @@
   <modules>
     <module>nexus-indexer-lucene-app</module>
     <module>nexus-indexer-lucene-rest-api</module>
+    <module>nexus-indexer-lucene-plugin</module>
   </modules>
 </project>

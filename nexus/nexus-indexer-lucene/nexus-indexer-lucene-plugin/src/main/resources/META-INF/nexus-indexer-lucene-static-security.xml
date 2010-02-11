@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Default nexus security configuration -->
+<!-- used as default config source -->
+<security>
+    <version>2.0.1</version>
+    <roles>
+        <role>
+            <id>ui-search</id>
+            <name>UI: Search</name>
+            <description>Gives access to the Search screen in Nexus UI</description>
+            <sessionTimeout>60</sessionTimeout>
+            <privileges>
+                <privilege>17</privilege>
+                <privilege>19</privilege>
+            </privileges>
+        </role>   
+        <role>
+            <id>anonymous</id>
+            <roles>
+                <role>ui-search</role>
+            </roles>
+        </role>
+    </roles>
+    <privileges>
+        <privilege>
+            <id>17</id>
+            <type>method</type>
+            <name>Search Repositories</name>
+            <description>Give permission to perform searches of repository content.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:index</value>
+                </property>
+            </properties>
+        </privilege>
+        <privilege>
+            <id>18</id>
+            <type>method</type>
+            <name>Reindex</name>
+            <description>Give permission to Reindex repository content.  The extents of this privilege are related to the allowed targets.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>delete,read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:index</value>
+                </property>
+            </properties>
+        </privilege>
+        <privilege>
+            <id>19</id>
+            <type>method</type>
+            <name>Checksum Search</name>
+            <description>Give permission to perform checksum type searches of repository content.  The extents of this privilege are related to the allowed targets.</description>
+            <properties>
+                <property>
+                    <key>method</key>
+                    <value>read</value>
+                </property>
+                <property>
+                    <key>permission</key>
+                    <value>nexus:identify</value>
+                </property>
+            </properties>
+        </privilege>                    
+    </privileges>
+</security>

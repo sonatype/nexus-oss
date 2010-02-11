@@ -36,8 +36,7 @@ Sonatype.config = function() {
   var servicePath = contextPath + servicePathSnippet;
   var resourcePath = contextPath;
   var browsePathSnippet = '/content';
-  var contentPath = contextPath + browsePathSnippet;  
-  var browseIndexPathSnippet = '/index_content';
+  var contentPath = contextPath + browsePathSnippet;
   var repoBrowsePathSnippet = browsePathSnippet + '/repositories';
   var groupBrowsePathSnippet = browsePathSnippet + '/groups';
   var repoServicePathSnippet = servicePathSnippet + '/repositories';
@@ -53,7 +52,6 @@ Sonatype.config = function() {
     cssPath : '/styles',
     jsPath : '/js',
     browsePathSnippet : browsePathSnippet,
-    browseIndexPathSnippet : browseIndexPathSnippet,
   
     installedServers : {repoServer:true},
   
@@ -82,8 +80,7 @@ Sonatype.config = function() {
           proxy_release : servicePath + '/templates/repositories/default_proxy_release',
           proxy_snapshot : servicePath + '/templates/repositories/default_proxy_snapshot'
         },
-        index : servicePath + '/data_index',
-        incrementalIndex : servicePath + '/data_incremental_index',
+        
         metadata : servicePath + '/metadata',
         cache : servicePath + '/data_cache',
         groups : servicePath + '/repo_groups',
@@ -98,7 +95,6 @@ Sonatype.config = function() {
         recentlyDeployedArtifactsRss: servicePath + '/feeds/recentlyDeployed',
         systemChangesRss: servicePath + '/feeds/systemChanges',
         status: servicePath + '/status',
-        identify: servicePath + '/identify/sha1',
         schedules: servicePath + '/schedules',
         scheduleRun: servicePath + '/schedule_run',
         scheduleTypes: servicePath + '/schedule_types',

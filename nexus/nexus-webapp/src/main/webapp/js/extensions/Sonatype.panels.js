@@ -38,25 +38,7 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
   add: function( c ) {
     if ( this.items && this.items.length > 0 ) {
       if ( ! this.tabPanel ) {
-        var first = this.getComponent( 0 );
-        this.remove( first, false );
-        first.setTitle( first.tabTitle );
-  
-        this.tabPanel = new Ext.TabPanel( { 
-          activeItem: this.activeTab == -1 ? null : this.activeTab,
-          deferredRender: false,
-          autoScroll: false,
-          frame: false,
-          border: false,
-          layoutOnTabChange: true,
-          items: [ first ],
-          hideMode: 'offsets'
-        } );
-  
-        Sonatype.panels.AutoTabPanel.superclass.add.call( this, this.tabPanel );
-        if ( this.getLayout() && this.getLayout().setActiveItem ) {
-          this.getLayout().setActiveItem( this.tabPanel );
-        }
+        this.initTabPanel();
       }
 
       if ( ! c.title && c.tabTitle ) {
@@ -66,6 +48,42 @@ Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
     }
     else {
       return Sonatype.panels.AutoTabPanel.superclass.add.call( this, c );
+    }
+  },
+  insert: function( index, c ) {
+    if ( this.items && this.items.length > 0 ) {
+      if ( ! this.tabPanel ) {
+        this.initTabPanel();
+      }
+
+      if ( ! c.title && c.tabTitle ) {
+        c.title = c.tabTitle;
+      }
+      return this.tabPanel.insert( index, c );
+    }
+    else {
+      return Sonatype.panels.AutoTabPanel.superclass.insert.call( this, index, c );
+    }
+  },
+  initTabPanel: function() {
+    var first = this.getComponent( 0 );
+    this.remove( first, false );
+    first.setTitle( first.tabTitle );
+
+    this.tabPanel = new Ext.TabPanel( { 
+      activeItem: this.activeTab == -1 ? null : this.activeTab,
+      deferredRender: false,
+      autoScroll: false,
+      frame: false,
+      border: false,
+      layoutOnTabChange: true,
+      items: [ first ],
+      hideMode: 'offsets'
+    } );
+
+    Sonatype.panels.AutoTabPanel.superclass.add.call( this, this.tabPanel );
+    if ( this.getLayout() && this.getLayout().setActiveItem ) {
+      this.getLayout().setActiveItem( this.tabPanel );
     }
   }
 } );

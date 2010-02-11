@@ -7,8 +7,7 @@ Sonatype.repoServer.IndexBrowserPanel = function( config ) {
     nodeIconClass: 'x-tree-node-nexus-icon',
     useNodeIconClassParam: 'locallyAvailable',
     autoExpandRoot: false,
-    url: this.payload.data.resourceURI +
-      Sonatype.config.browseIndexPathSnippet
+    url: this.payload.data.resourceURI + '/index_content'
   } );
 };
 

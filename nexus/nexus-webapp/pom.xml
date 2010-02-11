@@ -78,6 +78,15 @@
       <scope>test</scope>
     </dependency>
     
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+    
     <!-- The bundle -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
@@ -248,6 +257,14 @@
                     <type>zip</type>
                     <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
                   </artifactItem>
+                  <artifactItem>
+                    <groupId>org.sonatype.nexus</groupId>
+                    <artifactId>nexus-indexer-lucene-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>bundle</classifier>
+                    <type>zip</type>
+                    <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                  </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
@@ -297,8 +314,6 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.FeedViewPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.ArtifactInformationPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.ArtifactContainer.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.SearchResultGrid.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.SearchPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.LogsViewPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.ServerEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RoutesEditPanel.js</include>
@@ -309,7 +324,6 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.AbstractRepoPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.FileUploadPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoMaintPanel.js</include>
-                    <include>${compressed-dir}/js/repoServer/repoServer.IndexBrowserPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepositoryBrowserContainer.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.GroupsEditPanel.js</include>

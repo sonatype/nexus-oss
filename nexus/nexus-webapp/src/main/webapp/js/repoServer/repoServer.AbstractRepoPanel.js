@@ -37,16 +37,6 @@ Sonatype.repoServer.AbstractRepoPanel = function(config){
       handler: this.clearCacheHandler,
       scope: this
     },
-    reIndex: {
-      text: 'ReIndex',
-      handler: this.reIndexHandler,
-      scope: this
-    },
-    incrementalReIndex: {
-      text: 'Incremental ReIndex',
-      handler: this.incrementalReIndexHandler,
-      scope: this
-    },
     rebuildMetadata: {
       text: 'Rebuild Metadata',
       handler: this.rebuildMetadataHandler,
@@ -99,10 +89,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
     var url = Sonatype.config.repos.urls.cache + rec.data.resourceURI.slice(
       Sonatype.config.host.length + Sonatype.config.servicePath.length );
     
-    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
-      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
-    }
-    
     //make sure to provide /content path for repository root requests like ../repositories/central
     if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
       url += '/content';
@@ -125,60 +111,10 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       Sonatype.utils.connectionError( response, 'The server did not clear the repository\'s cache.' );
     }
   },
-
-  incrementalReIndexHandler: function( rec ){
-  	this.reindexAction(rec, false);
-  },
-  
-  reIndexHandler: function( rec ){
-    this.reindexAction(rec, true);
-  },
-  
-  reindexAction: function (rec, full) {
-  	var indexUrl = null;
-  	if(full) {
-  		indexUrl = Sonatype.config.repos.urls.index;
-  	} else {
-  		indexUrl = Sonatype.config.repos.urls.incrementalIndex;
-  	}
-
-    var url = indexUrl +
-      rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-    
-    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
-      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
-    }
-    
-    //make sure to provide /content path for repository root requests like ../repositories/central
-    if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
-      url += '/content';
-    }
-    
-    Ext.Ajax.request({
-      url: url,
-      callback: this.reIndexCallback,
-      scope: this,
-      method: 'DELETE'
-    });
-  },
-  
-  reIndexCallback : function(options, isSuccess, response){
-    //@todo: stop updating messaging here
-    if(isSuccess){
-
-    }
-    else {
-      Sonatype.utils.connectionError( response, 'The server did not re-index the repository.' );
-    }
-  },
   
   rebuildMetadataHandler: function( rec ){
     var url = Sonatype.config.repos.urls.metadata +
       rec.data.resourceURI.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-    
-    if ( url.indexOf( Sonatype.config.browseIndexPathSnippet ) > -1 ) {
-      url = url.replace( Sonatype.config.browseIndexPathSnippet, Sonatype.config.browsePathSnippet );
-    }
     
     //make sure to provide /content path for repository root requests like ../repositories/central
     if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url)){
@@ -447,11 +383,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       menu.add( this.repoActions.clearCache );
     }
 
-    if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
-      menu.add( this.repoActions.reIndex );
-      menu.add( this.repoActions.incrementalReIndex );
-    }
-
     if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
       menu.add( this.repoActions.rebuildMetadata );
     }
@@ -493,10 +424,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       if ( this.sp.checkPermission( 'nexus:cache', this.sp.DELETE ) && ! isVirtual ) {
         menu.add( this.repoActions.clearCache );
       }
-      if ( this.sp.checkPermission( 'nexus:index', this.sp.DELETE ) && ! isVirtual ) {
-        menu.add( this.repoActions.reIndex );
-        menu.add( this.repoActions.incrementalReIndex );
-      }
       if ( this.sp.checkPermission( 'nexus:metadata', this.sp.DELETE ) && ( isHosted || isGroup ) ) {
         menu.add( this.repoActions.rebuildMetadata );
       }
@@ -530,11 +457,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         } );
       }
       
-      // only allow delete for local browsing
-      if ( contentRecord.data.resourceURI.indexOf( Sonatype.config.browseIndexPathSnippet ) == -1 ) {
-        menu.add( '-' );
-        menu.add( this.repoActions.deleteRepoItem );
-      }
+      menu.add( '-' );
+      menu.add( this.repoActions.deleteRepoItem );
     }
   }
 } );

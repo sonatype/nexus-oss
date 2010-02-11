@@ -18,28 +18,6 @@ Sonatype.repoServer.RepoServer = function(){
   var cfg = Sonatype.config.repos;
   var sp = Sonatype.lib.Permissions;
   
-  var searchConfig = {
-    xtype: 'trigger',
-    triggerClass: 'x-form-search-trigger',
-    listeners: {
-      'specialkey': {
-        fn: function(f, e){
-          if(e.getKey() == e.ENTER){
-            this.onTriggerClick();
-          }
-        }
-      }
-    },
-    onTriggerClick: function(a,b,c){
-      var v = this.getRawValue();
-      if ( v.length > 0 ) {
-        var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-            'nexus-search', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
-        panel.startQuickSearch( v );
-      }
-    }
-  };
-
 
 // ************************************  
   return {
@@ -248,28 +226,7 @@ Sonatype.repoServer.RepoServer = function(){
       }
     },
     
-    addNexusNavigationItems: function( nexusPanel ) {      
-      if(sp.checkPermission('nexus:index', sp.READ)){
-        nexusPanel.add(
-          {
-            title: 'Artifact Search',
-            id: 'st-nexus-search',
-            items: [
-              Ext.apply( {
-                repoPanel: this,
-                id: 'quick-search--field',
-                width: 140
-              }, searchConfig ),
-              {
-                title: 'Advanced Search',
-                tabCode: Sonatype.repoServer.SearchPanel,
-                tabId: 'nexus-search',
-                tabTitle: 'Search'
-              }
-            ]
-          }
-        );
-      }
+    addNexusNavigationItems: function( nexusPanel ) {
       
       //Views Group **************************************************
       nexusPanel.add( {
@@ -487,21 +444,18 @@ Sonatype.repoServer.RepoServer = function(){
                   columnWidth: .5,
                   html: '&nbsp;' 
                 }
-              ],
-              listeners: {
-                render: {
-                  fn: function() {
-                    var c = Ext.getCmp( 'quick-search-welcome-field' );
-                    if ( c ) {
-                      c.focus( true, 100 );
-                    }
-                  },
-                  single: true,
-                  delay: 300
-                }
-              }
+              ]
             }
-          ]
+          ],
+          listeners: {
+            render: {
+              fn: function() {
+                Sonatype.Events.fireEvent( 'welcomeTabRender' );
+              },
+              single: true,
+              delay: 300
+            }
+          }
         };
 
         var welcomeMsg = '<p style="text-align:center;"><a href="http://nexus.sonatype.org" target="new">' +
@@ -513,34 +467,19 @@ Sonatype.repoServer.RepoServer = function(){
         	welcomeMsg += '</br>';
         	welcomeMsg += '<p style="color:red">Warning: Could not retrieve Nexus status, anonymous access might be disabled.</p>';
         }
-        
-//        if( !Sonatype.user.curr.isLoggedIn ){
-//        	welcomeMsg += '</br>';
-//        	welcomeMsg += '<p>Administrators may login via the link on the top right.</p>';
-//        }
-        
-        var searchEnabled = sp.checkPermission('nexus:index', sp.READ);
-        var browseEnabled = sp.checkPermission('nexus:repostatus', sp.READ );
-
-//        if (searchEnabled || browseEnabled){
-//        	welcomeMsg += '</br>';
-//        	if (searchEnabled && browseEnabled){
-//        		welcomeMsg += '<p>You may browse and search the repositories using the options on the left.</p>'
-//        	}
-//        	else if (searchEnabled && !browseEnabled){
-//        		welcomeMsg += '<p>You may search the repositories using the options on the left.</p>'
-//        	}
-      	if (!searchEnabled && browseEnabled){
-      		welcomeMsg += '<p>You may browse the repositories using the options on the left.</p>'
-      	}
-//        }
 
       	welcomePanelConfig.items.push( {
           border: false,
           html: '<div class="little-padding">' + welcomeMsg + '</div>'
         } );
-        
-        if ( searchEnabled ) {
+      	
+      	var itemCount = welcomePanelConfig.items.length;
+      	
+      	Sonatype.Events.fireEvent( 'welcomePanelInit', this, welcomePanelConfig );
+      	
+      	// If nothing was added, then add the default blurb, if perm'd of course
+      	if ( welcomePanelConfig.items.length <= itemCount 
+      	    && sp.checkPermission('nexus:repostatus', sp.READ )){
           welcomePanelConfig.items.push( {
             layout: 'form',
             border: false,
@@ -550,24 +489,9 @@ Sonatype.repoServer.RepoServer = function(){
               {
                 border: false,
                 html: '<div class="little-padding">' +
-                  'Type in the name of a project, class, or artifact into the text box ' +
-                  'below, and click Search. Use "Advanced Search" on the left for more options.' +
+                  '<br/><p>You may browse the repositories using the options on the left.</p>' +
                   '</div>'
-              },
-              Ext.apply( {
-                repoPanel: this,
-                id: 'quick-search-welcome-field',
-                anchor: '-10',
-                labelSeparator: ''
-              }, searchConfig )
-//              {
-//                border: false,
-//                html: '<div class="little-padding">' +
-//                  'Firefox and Internet Explorer users can also install a Maven search plug-in. ' +
-//                  'Click the search box in your browser and select "Nexus" from the list of ' +
-//                  'available search providers.' +
-//                  '</div>'
-//              }
+              }
             ]
           } );
         }

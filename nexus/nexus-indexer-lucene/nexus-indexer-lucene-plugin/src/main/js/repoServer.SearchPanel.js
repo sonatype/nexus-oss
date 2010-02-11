@@ -70,17 +70,17 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   // search type switched on the drop down button
   switchSearchType : function(button, event) {
     // if event is null, this is called directly, and we
-  // we will reset regardless if already selected, otherwise
-  // no need to do anything if already set to same value
-  if (event == null || this.searchTypeButton.value != button.value) {
-    this.searchTypeButton.value = button.value;
-    this.searchTypeButton.setText(this.getSearchType(button.value).text);
-    this.clearWarningLabel();
-    this.loadSearchPanel();
-    this.switchStore();
-  }
-},
-// load the dynamic panel
+    // we will reset regardless if already selected, otherwise
+    // no need to do anything if already set to same value
+    if (event == null || this.searchTypeButton.value != button.value) {
+      this.searchTypeButton.value = button.value;
+      this.searchTypeButton.setText(this.getSearchType(button.value).text);
+      this.clearWarningLabel();
+      this.loadSearchPanel();
+      this.switchStore();
+    }
+  },
+  // load the dynamic panel
   loadSearchPanel : function() {
     // first remove current items
     while (this.searchToolbar.items.length > 1) {
