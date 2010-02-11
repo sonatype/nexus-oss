@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
+import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -41,7 +42,7 @@ import org.sonatype.plexus.appevents.Event;
  * @author Toni Menzel
  */
 @Component( role = EventInspector.class, hint = "IndexingRepositoryRegistryRepositoryEventInspector" )
-public class IndexingRepositoryRegistryRepositoryEventInspector extends AbstractEventInspector implements EventInspector
+public class IndexingRepositoryRegistryRepositoryEventInspector extends AbstractEventInspector
 {
 
     @Requirement
@@ -122,17 +123,7 @@ public class IndexingRepositoryRegistryRepositoryEventInspector extends Abstract
                 if( nexusStarted && repository.isIndexable() )
                 {
                     // Create the initial index for the repository
-                    ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
-
-                    if( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-                    {
-                        rt.setRepositoryGroupId( repository.getId() );
-                    }
-                    else
-                    {
-                        rt.setRepositoryId( repository.getId() );
-                    }
-                    nexusScheduler.submit( "Create initial index.", rt );
+                    reindexRepo( repository );
                 }
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
@@ -144,11 +135,56 @@ public class IndexingRepositoryRegistryRepositoryEventInspector extends Abstract
             else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {
                 getIndexerManager().updateRepositoryIndexContext( repository.getId() );
+                
+                RepositoryConfigurationUpdatedEvent event = (RepositoryConfigurationUpdatedEvent) evt;
+                
+                MavenProxyRepository mavenRepo = repository.adaptToFacet( MavenProxyRepository.class );
+
+                if ( event.isRemoteUrlChanged() 
+                    && mavenRepo != null && mavenRepo.isDownloadRemoteIndexes() )
+                {
+                    getLogger().info(
+                                      "The remote url of repository '" + event.getRepository().getId()
+                                          + "' has been changed, now reindex the repository." );
+                    
+                    reindexRepo( repository );
+                }
+                else if ( event.isDownloadRemoteIndexEnabled() )
+                {
+                    getLogger().info(
+                                      "The download remote index flag of repository '" + event.getRepository().getId()
+                                          + "' has been changed, now reindex the repository." );
+                 
+                    reindexRepo( repository );
+                }
+                else if ( event.isMadeSearchable() )
+                {
+                    getLogger().info(
+                                      "The repository '" + event.getRepository().getId()
+                                          + "' is made searchable, now reindex the repository." );
+                    
+                    reindexRepo( repository );
+                }
             }
         }
         catch( Exception e )
         {
             getLogger().error( "Could not maintain indexing contexts!", e );
         }
+    }
+    
+    private void reindexRepo( Repository repository )
+    {
+        ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+
+        if( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            rt.setRepositoryGroupId( repository.getId() );
+        }
+        else
+        {
+            rt.setRepositoryId( repository.getId() );
+        }
+        nexusScheduler.submit( "Create initial index.", rt );
     }
 }
