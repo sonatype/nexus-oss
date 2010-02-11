@@ -20,7 +20,6 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.maven.model.Model;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.enunciate.doc.DocumentationExample;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -42,7 +41,7 @@ public class ArtifactPlexusResource
     extends AbstractArtifactPlexusResource
 {
     public static final String RESOURCE_URI = "/artifact/maven";
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -62,11 +61,13 @@ public class ArtifactPlexusResource
     }
 
     /**
-     * Get a POM file from provided GAV parameters.
+     * Returns POM model in a serialized form (it is NOT consumable by Maven, the returned content is not XML
+     * representation of Maven POM!) for provided GAV coordinates.
      * 
      * @param g Group id of the pom (Required).
      * @param a Artifact id of the pom (Required).
-     * @param v Version of the pom (Required).
+     * @param v Version of the artifact (Required) Supports resolving of "LATEST", "RELEASE" and snapshot versions
+     *            ("1.0-SNAPSHOT") too.
      * @param r Repository to retrieve the pom from (Required).
      */
     @Override

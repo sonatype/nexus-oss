@@ -13,6 +13,11 @@
  */
 package org.sonatype.nexus.rest.artifact;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
@@ -28,6 +33,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
  * @author cstamas
  */
 @Component( role = PlexusResource.class, hint = "ArtifactRedirectPlexusResource" )
+@Path( "/artifact/maven/redirect" )
 public class ArtifactRedirectPlexusResource
     extends AbstractArtifactPlexusResource
 {
@@ -50,7 +56,24 @@ public class ArtifactRedirectPlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:artifact]" );
     }
 
+    /**
+     * Emits HTTP redirects (or Not found if not found) to the location of the requested artifact. This resource never
+     * returns any content, only 301 Moved permanently or 404 Not found status codes. The HTTP client accessing this
+     * resource has to follow the redirection to get to the content of the artifact.
+     * 
+     * @param g Group id of the artifact (Required).
+     * @param a Artifact id of the artifact (Required).
+     * @param v Version of the artifact (Required) Supports resolving of "LATEST", "RELEASE" and snapshot versions
+     *            ("1.0-SNAPSHOT") too.
+     * @param r Repository that the artifact is contained in (Required).
+     * @param p Packaging type of the artifact (Optional).
+     * @param c Classifier of the artifact (Optional).
+     * @param e Extension of the artifact (Optional).
+     */
     @Override
+    @GET
+    @ResourceMethodSignature( queryParams = { @QueryParam( "g" ), @QueryParam( "a" ), @QueryParam( "v" ),
+        @QueryParam( "r" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "e" ) }, output = String.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
