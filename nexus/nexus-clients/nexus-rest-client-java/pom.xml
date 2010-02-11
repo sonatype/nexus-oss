@@ -16,6 +16,13 @@
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
+        
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-indexer-lucene-rest-api</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
 
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
