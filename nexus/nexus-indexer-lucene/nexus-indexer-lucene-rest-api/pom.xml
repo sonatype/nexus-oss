@@ -2,13 +2,17 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
-    <artifactId>nexus</artifactId>
+    <artifactId>nexus-indexer-lucene</artifactId>
     <version>1.5.1-SNAPSHOT</version>
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer-lucene-rest-api</artifactId>
   
   <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-app</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
