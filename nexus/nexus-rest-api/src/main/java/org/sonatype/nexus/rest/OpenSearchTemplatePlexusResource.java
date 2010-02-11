@@ -16,6 +16,11 @@ package org.sonatype.nexus.rest;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+
+import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
@@ -30,6 +35,8 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
 @Component( role = PlexusResource.class, hint = "openSearchTemplate" )
+@Path( "/opensearch" )
+@Produces( "text/xml" )
 public class OpenSearchTemplatePlexusResource
     extends AbstractNexusPlexusResource
 {
@@ -61,23 +68,31 @@ public class OpenSearchTemplatePlexusResource
         return new PathProtectionDescriptor( getResourceUri(), "authcBasic,perms[nexus:index]" );
     }
 
+    /**
+     * Provides the OpenSearch description document for this Nexus instance. For the emitted XML, see <a
+     * href="http://www.opensearch.org/Specifications/OpenSearch/1.1#OpenSearch_description_document">OpenSearch
+     * Description Document</a>.
+     */
+    @Override
+    @GET
+    @ResourceMethodSignature( output = String.class )
     public Representation get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
         Map<String, Object> map = new HashMap<String, Object>();
 
-
         Reference nexusRef = getContextRoot( request );
         String nexusRoot = nexusRef.toString();
-        if ( nexusRoot.endsWith( "/" ) ) {
-        	nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
+        if ( nexusRoot.endsWith( "/" ) )
+        {
+            nexusRoot = nexusRoot.substring( 0, nexusRoot.length() - 1 );
         }
-        
+
         map.put( "nexusRoot", nexusRoot );
         map.put( "nexusHost", nexusRef.getHostDomain() );
 
-        VelocityRepresentation templateRepresentation = new VelocityRepresentation(
-            context, "/templates/opensearch.vm", map, MediaType.TEXT_XML );
+        VelocityRepresentation templateRepresentation =
+            new VelocityRepresentation( context, "/templates/opensearch.vm", map, MediaType.TEXT_XML );
 
         return templateRepresentation;
     }
