@@ -48,7 +48,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -214,7 +213,7 @@ public class UnpackPlexusResource
 
         return null;
     }
-    
+
     /**
      * Handles uploads of ZIP files. Unpacks zip file to current path. If the delete query parameter is true the
      * everything at the current path will be removed before the zip file is unpacked.
@@ -222,7 +221,7 @@ public class UnpackPlexusResource
     @PUT
     @ResourceMethodSignature( pathParams = { @PathParam( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) }, queryParams = { @QueryParam( DELETE_BEFORE_UNPACK ) } )
     public Object uploadPut( Context context, Request request, Response response, List<FileItem> files )
-    throws ResourceException
+        throws ResourceException
     {
         // NOTE: this method is only used to get the annotation processing to work correctly
         // we can not have an @PUT and @POST on the same method, so this is the quick and dirty work around.
@@ -233,17 +232,7 @@ public class UnpackPlexusResource
         throws AccessDeniedException, StorageException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, UnsupportedStorageOperationException
     {
-        if ( item instanceof StorageCollectionItem )
-        {
-            for ( StorageItem child : ( (StorageCollectionItem) item ).list() )
-            {
-                deleteItem( repository, child );
-            }
-        }
-        else
-        {
-            repository.deleteItem( item.getResourceStoreRequest() );
-        }
+        repository.deleteItem( item.getResourceStoreRequest() );
     }
 
     private void close( ZipFile zip )
