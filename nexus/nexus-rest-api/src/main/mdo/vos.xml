@@ -95,24 +95,28 @@
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>Connection timeout in milliseconds.</description>
         </field>
         <field>
           <name>retrievalRetryCount</name>
           <version>1.0.0+</version>
           <type>int</type>
           <required>true</required>
+          <description>The retry count before remote connection is declared unsuccesful.</description>
         </field>
         <field>
           <name>queryString</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>Query string that is appended to remote requests.</description>
         </field>
         <field>
           <name>userAgentString</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
+          <description>User agent string that is used to customize Nexus user agent string user for remote HTTP requests.</description>
         </field>
       </fields>
     </class>
