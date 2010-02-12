@@ -1,7 +1,6 @@
 package org.sonatype.nexus.rest;
 
 import java.util.ArrayList;
-
 import java.util.Collection;
 import java.util.List;
 
@@ -15,9 +14,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.SearchResponse;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -29,10 +26,7 @@ public abstract class AbstractIndexerNexusPlexusResource
     {
         super.configureXStream( xstream );
         
-        xstream.processAnnotations( SearchResponse.class );
-        
-        xstream.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
-            "artifact" ) );
+        XStreamInitializer.init( xstream );
     }
     /**
      * Convert a collection of ArtifactInfo's to NexusArtifacts

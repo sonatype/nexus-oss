@@ -38,6 +38,7 @@ import org.restlet.resource.StringRepresentation;
 import org.sonatype.nexus.client.NexusClientException;
 import org.sonatype.nexus.client.NexusConnectionException;
 import org.sonatype.nexus.rest.NexusApplication;
+import org.sonatype.nexus.rest.XStreamInitializer;
 import org.sonatype.nexus.rest.model.NexusResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
@@ -73,6 +74,8 @@ public class RestClientHelper
 
         NexusApplication napp = new NexusApplication();
         xstream = napp.doConfigureXstream( new XStream( new LookAheadXppDriver() ) );
+        
+        XStreamInitializer.init( xstream );
     }
 
     private String buildUrl( String service, String id )
