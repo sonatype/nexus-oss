@@ -341,6 +341,10 @@
           </association>
           <required>true</required>
           <description>List of security realms that are enabled for Nexus, note that order IS important.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "securityRealms" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "securityRealmItem" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>globalConnectionSettings</name>
@@ -1009,6 +1013,10 @@
           </association>
           <required>false</required>
           <description>The lsit of repositories that shadow this repository.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "dependentRepos" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "dependentRepoItem" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1170,6 +1178,11 @@
           </association>
           <required>true</required>
           <description>List of repository groups that this repository is contained in.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "groups" )</annotation>
+            <!-- FIXME: alias not set correctly -->
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "string" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1298,6 +1311,10 @@
           </association>
           <required>true</required>
           <description>List of repositories that this repository group contains (order IS important).</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositories" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-group-member" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1409,7 +1426,11 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
-          <description>The list of repositories in the associated group, that will be applied to route (or excluded based upon ruleType).</description>
+          <description>The list of repositories in the associated group, that will be applied to route (or excluded based upon ruleType).</description>        
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositories" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-routes-member" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1482,6 +1503,10 @@
           </association>
           <required>true</required>
           <description>The list of repositories in the group that will be included (or excluded depending on ruleType).</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositories" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repository" )</annotation>
+          </annotations>
         </field>
       </fields>
       <codeSegments>
@@ -1825,6 +1850,10 @@
           </association>
           <required>false</required>
           <description>A list of configuration properties for the service.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "properties" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "scheduled-task-property" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -1955,6 +1984,10 @@
           </association>
           <required>true</required>
           <description>The list of days that the service will be run.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "recurringDay" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "day" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2050,6 +2083,10 @@
           </association>
           <required>true</required>
           <description>List of service type properties that configure the service.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "properties" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "scheduled-task-property" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2291,6 +2328,10 @@
           </association>
           <required>true</required>
           <description>A list of String objects that were in the Restlet request context.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "requestContext" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "requestContextItem" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2361,6 +2402,10 @@
           </association>
           <required>true</required>
           <description>List of repositories that were processed while retrieving this item (in case item was retrieved via a group url, for example, would list all repositories in the group scanned until item was found).</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "processedRepositoriesList" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "processedRepositoriesListItem" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>appliedMappings</name>
@@ -2371,6 +2416,10 @@
           </association>
           <required>true</required>
           <description>List of mappings applied while retrieving this item.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "appliedMappings" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "appliedMappingItem" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>properties</name>
@@ -2381,6 +2430,10 @@
           </association>
           <required>true</required>
           <description>List of extra properties containing more information.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "properties" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "propertyItem" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>attributes</name>
@@ -2391,6 +2444,10 @@
           </association>
           <required>true</required>
           <description>List of attributes stored on disk for the item.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "attributes" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "attributeItem" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>sources</name>
@@ -2401,6 +2458,10 @@
           </association>
           <required>true</required>
           <description>If this is a composite item, the list of sources that this item was generated from.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "sources" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "sourceItem" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2638,6 +2699,10 @@
           </association>
           <required>true</required>
           <description>List of NFC repository items.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "nfcContents" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "nfc-repo-info" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2676,6 +2741,10 @@
           </association>
           <required>false</required>
           <description>List of paths in the NFC.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "nfcPaths" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "path" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -2911,6 +2980,10 @@
           </association>
           <required>false</required>
           <description>List of configuration validation errors.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "validationErrors" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "error" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>validationWarnings</name>
@@ -2921,6 +2994,10 @@
           </association>
           <required>false</required>
           <description>List of configuration validation warnings.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "validationWarnings" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "warning" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3113,6 +3190,10 @@
           </association>
           <required>true</required>
           <description>The list of regular expression patterns associated with the repository target.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "patterns" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "pattern" )</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
@@ -3910,6 +3991,10 @@
           </association>
           <required>true</required>
           <description>The type of the privilege.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "methods" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "method" )</annotation>
+          </annotations>
         </field>
         <field>
           <name>repositoryTargetId</name>
