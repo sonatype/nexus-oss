@@ -77,7 +77,8 @@ public class RoleComparator
         Set<String> role1Privileges = new HashSet<String>(role1.getPrivileges());
         Set<String> role2Privileges = new HashSet<String>(role2.getPrivileges());
         
-        if ( !role1Privileges.equals( role2Privileges ) )
+        if ( !( role1Privileges.size() == role2Privileges.size() 
+            && role1Privileges.containsAll( role2Privileges ) ) )
             return -1;
         if ( role1.getRoles() == null )
         {
@@ -88,7 +89,8 @@ public class RoleComparator
         Set<String> role1Roles = new HashSet<String>(role1.getRoles());
         Set<String> role2Roles = new HashSet<String>(role2.getRoles());
         
-        if ( !role1Roles.equals( role2Roles ) )
+        if ( !( role1Roles.size() == role2Roles.size() 
+            && role1Roles.containsAll( role2Roles ) ) )
             return -1;
         if ( role1.getSessionTimeout() != role2.getSessionTimeout() )
             return -1;
