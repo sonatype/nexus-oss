@@ -18,7 +18,7 @@
 Sonatype.SearchStore = function(config) {
   var config = config || {};
   var defaultConfig = {
-    searchUrl: Sonatype.config.repos.urls.index
+    searchUrl: Sonatype.config.servicePath + '/data_index'
   };
   Ext.apply(this, config, defaultConfig);
   
