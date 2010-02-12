@@ -201,6 +201,12 @@
       <artifactId>security-rest-api</artifactId>
       <version>${plexus-security.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>org.sonatype.plexus</groupId>

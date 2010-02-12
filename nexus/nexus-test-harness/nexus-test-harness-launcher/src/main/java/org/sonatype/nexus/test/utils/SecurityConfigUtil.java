@@ -290,6 +290,50 @@ public class SecurityConfigUtil
             {
                 configuration.addPrivilege( priv );
             }
+            
+            /**
+             * This is really really hacky, as we are manually joining together roles here.  I don't like it
+             * but it makes the IT pass.
+             * TODO: Come up with some other means to do this.
+             */
+            fr = new InputStreamReader( SecurityConfigUtil.class
+                                        .getResourceAsStream( "/META-INF/nexus-indexer-lucene-static-security.xml" ) );
+
+            try
+            {
+                staticConfiguration = reader.read( fr );
+            }
+            finally
+            {
+                fr.close();
+            }
+
+            for ( CPrivilege priv : (List<CPrivilege>) staticConfiguration.getPrivileges() )
+            {
+                configuration.addPrivilege( priv );
+            }
+            
+            for ( CRole role : (List<CRole>) staticConfiguration.getRoles() )
+            {
+                CRole existingRole = getRole( role.getId(), configuration.getRoles() );
+                
+                if ( existingRole != null )
+                {
+                    for ( String containedRole : role.getRoles() )
+                    {
+                        existingRole.addRole( containedRole );
+                    }
+                    
+                    for ( String containedPriv : role.getPrivileges() )
+                    {
+                        existingRole.addPrivilege( containedPriv );
+                    }
+                }
+                else
+                {
+                    configuration.addRole( role );
+                }
+            }
 
         }
         catch ( XmlPullParserException e )
@@ -297,6 +341,19 @@ public class SecurityConfigUtil
             Assert.fail( "could not parse nexus.xml: " + e.getMessage() );
         }
         return configuration;
+    }
+    
+    private static CRole getRole( String id, List<CRole> roles )
+    {
+        for ( CRole role : roles )
+        {
+            if ( role.getId().equals( id ) )
+            {
+                return role;
+            }
+        }
+        
+        return null;
     }
 
 }
