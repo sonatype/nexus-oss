@@ -29,14 +29,15 @@ import com.thoughtworks.xstream.XStream;
 /**
  * A REST resource for retrieving directories from a remote repository.
  */
-// FIXME: The path specified below isn't correct? Check getResourceUri method!
-@Path( "/remotebrowser" )
+@Path( RemoteBrowserResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
+    public static final String RESOURCE_URI = "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser"; 
+
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
     @Override
@@ -64,7 +65,7 @@ public class RemoteBrowserResource
     @Override
     public String getResourceUri()
     {
-        return "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser";
+        return RESOURCE_URI;
     }
 
     /**
