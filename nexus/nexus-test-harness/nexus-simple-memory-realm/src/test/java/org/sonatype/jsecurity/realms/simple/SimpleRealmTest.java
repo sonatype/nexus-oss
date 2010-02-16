@@ -37,7 +37,7 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 public class SimpleRealmTest
     extends PlexusTestCase
 {
-    private static java.io.File confdir = new File( "/target/app-conf" );
+    private static java.io.File confdir = new File( "target/app-conf" );
     // Realm Tests
     /**
      * Test authentication with a valid user and password.
