@@ -1046,7 +1046,7 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.18</enunciate.version>
+        <enunciate.version>1.19-SNAPSHOT</enunciate.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
