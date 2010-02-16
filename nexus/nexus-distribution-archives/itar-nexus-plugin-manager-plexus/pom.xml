@@ -50,9 +50,12 @@
               </includeArtifactIds>              
               <outputDirectory>${nexus.unpack.dir}</outputDirectory>
               <includes>
+                **/atinject-*,
+                **/google-collect-*,
                 **/nexus-plugin-manager-*,
                 **/reflect-class-descriptor-*,
-                **/plugin-gleaner-*
+                **/plugin-gleaner-*,
+                **/xbean-reflect-*
               </includes>
             </configuration>
           </execution>

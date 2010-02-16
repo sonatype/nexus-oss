@@ -18,9 +18,13 @@
         <exclude>plexus-app-booter-*</exclude>
         <exclude>plexus-container-default-*</exclude>
         <exclude>plexus-jsw-app-booter-*</exclude>
+        <exclude>atinject-*</exclude>
+        <exclude>google-collect-*</exclude>
+        <exclude>nexus-plugin-api-*</exclude>
         <exclude>nexus-plugin-manager-*</exclude>
         <exclude>reflect-class-descriptor-*</exclude>
         <exclude>plugin-gleaner-*</exclude>
+        <exclude>xbean-reflect-*</exclude>
       </excludes>
     </fileSet>
     <fileSet>
