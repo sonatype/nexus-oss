@@ -13,6 +13,7 @@
  */
 package org.sonatype.jsecurity.realms.simple;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,24 +22,22 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.jsecurity.authc.AuthenticationInfo;
 import org.jsecurity.authc.AuthenticationToken;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.PrincipalCollection;
 import org.jsecurity.subject.SimplePrincipalCollection;
-import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 
 public class SimpleRealmTest
-    extends AbstractNexusTestCase
+    extends PlexusTestCase
 {
-
+    private static java.io.File confdir = new File( "/target/app-conf" );
     // Realm Tests
     /**
      * Test authentication with a valid user and password.
@@ -69,7 +68,7 @@ public class SimpleRealmTest
 
         try
         {
-            AuthenticationInfo authInfo = plexusSecurity.authenticate( token );
+            plexusSecurity.authenticate( token );
         }
         catch ( AuthenticationException e )
         {
@@ -90,7 +89,7 @@ public class SimpleRealmTest
 
         try
         {
-            AuthenticationInfo authInfo = plexusSecurity.authenticate( token );
+            plexusSecurity.authenticate( token );
         }
         catch ( AuthenticationException e )
         {
@@ -140,40 +139,14 @@ public class SimpleRealmTest
     @Override
     protected void setUp()
         throws Exception
-    {
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-
-        PLEXUS_HOME.mkdirs();
-        WORK_HOME.mkdirs();
-        CONF_HOME.mkdirs();
-        
+    {        
+        confdir.mkdirs();
         // copy the tests nexus.xml and security.xml to the correct location
         this.copyTestConfigToPlace();
-        
-        if ( loadConfigurationAtSetUp() )
-        {
-            nexusConfiguration = this.lookup( NexusConfiguration.class );
-
-            nexusConfiguration.loadConfiguration();
-
-            // TODO: SEE WHY IS SEC NOT STARTING? (Max, JSec changes)
-            nexusConfiguration.setSecurityEnabled( false );
-
-            nexusConfiguration.saveConfiguration();
-        }
         
         // restart security
         this.lookup( ConfigurationManager.class ).clearCache();
         this.lookup( SecuritySystem.class ).start();
-    }
-    
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
-        
-        FileUtils.deleteDirectory( PLEXUS_HOME );
     }
     
 
@@ -181,7 +154,9 @@ public class SimpleRealmTest
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
-        ctx.put( "application-conf", CONF_HOME.getAbsolutePath() );
+        
+        ctx.put( "application-conf", confdir.getAbsolutePath() );
+        ctx.put( "security-xml-file", confdir.getAbsolutePath() + "/security.xml" );
     }
 
     private void copyTestConfigToPlace()
@@ -199,15 +174,15 @@ public class SimpleRealmTest
         try
         {
             nexusConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "nexus.xml" );
-            nexusOut = new FileOutputStream( getNexusConfiguration() );
+            nexusOut = new FileOutputStream( new File( confdir, "nexus.xml" ) );
             IOUtil.copy( nexusConf, nexusOut );
 
             security = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security.xml" );
-            securityOut = new FileOutputStream( getNexusSecurityConfiguration() );
+            securityOut = new FileOutputStream( new File( confdir, "security.xml" ) );
             IOUtil.copy( security, securityOut);
             
             securityConf = Thread.currentThread().getContextClassLoader().getResourceAsStream( "security-configuration.xml" );
-            securityConfOut = new FileOutputStream( CONF_HOME + "/security-configuration.xml" );
+            securityConfOut = new FileOutputStream( new File( confdir, "security-configuration.xml" ) );
             IOUtil.copy( securityConf, securityConfOut);
         }
         finally
