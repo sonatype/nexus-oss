@@ -15,7 +15,7 @@ import org.sonatype.plexus.appevents.Event;
  * 
  * @author bdemers
  */
-@Component( role = EventInspector.class, hint = "IndexerNexusStoppedEventInspector" )
+@Component( role = EventInspector.class, hint = "LuceneIndexerNexusStoppedEventInspector" )
 public class IndexerNexusStoppedEventInspector
     extends AbstractEventInspector
 {

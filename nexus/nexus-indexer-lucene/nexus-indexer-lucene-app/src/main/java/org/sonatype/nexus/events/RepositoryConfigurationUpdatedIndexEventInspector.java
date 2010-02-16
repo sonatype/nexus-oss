@@ -11,7 +11,7 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.plexus.appevents.Event;
 
-@Component( role = EventInspector.class, hint = "RepositoryConfigurationUpdatedEventInspector" )
+@Component( role = EventInspector.class, hint = "LuceneRepositoryConfigurationUpdatedEventInspector" )
 public class RepositoryConfigurationUpdatedIndexEventInspector
     extends AbstractEventInspector
 {

@@ -29,7 +29,7 @@ import org.sonatype.plexus.appevents.Event;
  * 
  * @author cstamas
  */
-@Component( role = EventInspector.class, hint = "IndexerManagerEventInspector" )
+@Component( role = EventInspector.class, hint = "LuceneIndexerManagerEventInspector" )
 public class IndexerManagerEventInspector
     extends AbstractEventInspector
 {

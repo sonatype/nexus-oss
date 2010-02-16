@@ -41,7 +41,7 @@ import org.sonatype.plexus.appevents.Event;
  *
  * @author Toni Menzel
  */
-@Component( role = EventInspector.class, hint = "IndexingRepositoryRegistryRepositoryEventInspector" )
+@Component( role = EventInspector.class, hint = "LuceneIndexingRepositoryRegistryRepositoryEventInspector" )
 public class IndexingRepositoryRegistryRepositoryEventInspector extends AbstractEventInspector
 {
 

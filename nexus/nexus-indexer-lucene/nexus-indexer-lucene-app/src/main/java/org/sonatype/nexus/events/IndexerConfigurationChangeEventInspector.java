@@ -24,7 +24,7 @@ import org.sonatype.plexus.appevents.Event;
 /**
  * @author Juven Xu
  */
-@Component( role = EventInspector.class, hint = "IndexerConfigurationChangeEventInspector" )
+@Component( role = EventInspector.class, hint = "LuceneIndexerConfigurationChangeEventInspector" )
 public class IndexerConfigurationChangeEventInspector
     extends AbstractFeedRecorderEventInspector
 {
