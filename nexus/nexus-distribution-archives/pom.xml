@@ -20,7 +20,6 @@
     <module>car-nexus-oss</module>
     <module>itar-nexus-oss</module>
     <module>itar-nexus-plugin-manager-plexus</module>
-    <module>itar-nexus-plugin-console-plugin</module>
   </modules>
 
   <properties>

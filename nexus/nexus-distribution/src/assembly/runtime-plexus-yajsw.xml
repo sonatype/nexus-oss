@@ -45,11 +45,15 @@
         <type>zip</type>
       </itar>
       <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-nexus-plugin-console-plugin</artifactId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-plugin-console-plugin</artifactId>
         <version>${project.version}</version>
+        <classifier>bundle</classifier>
         <type>zip</type>
-      </itar>      
+		<virtual>true</virtual>
+		<unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>     
       <itar>
         <groupId>org.sonatype.runtime.itars</groupId>
         <artifactId>itar-plexus-app-booter</artifactId>
