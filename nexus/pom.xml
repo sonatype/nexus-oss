@@ -1108,6 +1108,11 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <dependency>
+                <groupId>org.sonatype.templates</groupId>
+                <artifactId>enunciate-doc-template</artifactId>
+                <version>1.0-SNAPSHOT</version>
+              </dependency>
+              <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
                 <version>2.1</version>
