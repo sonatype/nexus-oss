@@ -53,7 +53,37 @@
 		<virtual>true</virtual>
 		<unpack>true</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
-      </itar>      
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+		<virtual>true</virtual>
+		<unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-rrb-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+		<virtual>true</virtual>
+		<unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+		<virtual>true</virtual>
+		<unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>
       <itar>
         <groupId>org.sonatype.runtime.itars</groupId>
         <artifactId>itar-plexus-app-booter</artifactId>
