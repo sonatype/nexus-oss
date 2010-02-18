@@ -998,30 +998,27 @@
     <url>http://svn.sonatype.org/nexus/trunk/nexus</url>
   </scm>
 
+	<modules>
+		<module>nexus-indexer-lucene</module>
+		<module>nexus-plugins</module>
+		<module>nexus-mock</module>
+		<module>nexus-utils</module>
+		<module>nexus-api</module>
+		<module>nexus-oss-edition</module>
+		<module>nexus-configuration</module>
+		<module>nexus-proxy</module>
+		<module>nexus-app</module>
+		<module>nexus-rest-api</module>
+		<module>nexus-migration-tool</module>
+		<module>nexus-core-plugins</module>
+		<module>nexus-webapp</module>
+		<module>nexus-clients</module>
+    <module>nexus-distribution-archives</module>
+    <module>nexus-distribution</module>
+    <module>nexus-test-harness</module>
+	</modules>
+
   <profiles>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>nexus-indexer-lucene</module>
-        <module>nexus-plugins</module>
-        <module>nexus-mock</module>
-        <module>nexus-utils</module>
-        <module>nexus-api</module>
-        <module>nexus-oss-edition</module>
-        <module>nexus-configuration</module>
-        <module>nexus-proxy</module>
-        <module>nexus-app</module>
-        <module>nexus-rest-api</module>
-        <module>nexus-migration-tool</module>
-        <module>nexus-core-plugins</module>
-        <module>nexus-webapp</module>
-        <module>nexus-clients</module>
-        <module>nexus-test-harness</module>
-      </modules>
-    </profile>
     <profile>
       <id>skipTests</id>
       <build>
@@ -1036,13 +1033,6 @@
           </plugins>
         </pluginManagement>
       </build>
-    </profile>
-    <profile>
-      <id>distribution</id>
-      <modules>
-        <module>nexus-distribution-archives</module>
-        <module>nexus-distribution</module>
-      </modules>
     </profile>
     <profile>
       <id>enunciate</id>

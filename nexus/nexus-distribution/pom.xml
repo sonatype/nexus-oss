@@ -57,7 +57,7 @@
               <assemblyDescriptor>${assembly.directory}/runtime-plexus-jsw.xml</assemblyDescriptor>
             </configuration>
           </execution>
-          <execution>
+          <!-- <execution>
             <id>plexus-yajsw</id>
             <phase>process-resources</phase>
             <goals>
@@ -66,7 +66,7 @@
             <configuration>
               <assemblyDescriptor>${assembly.directory}/runtime-plexus-yajsw.xml</assemblyDescriptor>
             </configuration>
-          </execution>
+          </execution>-->
           <execution>
             <id>guice-jsw</id>
             <phase>process-resources</phase>
@@ -77,7 +77,7 @@
               <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw.xml</assemblyDescriptor>
             </configuration>
           </execution>
-          <execution>
+          <!-- <execution>
             <id>guice-yajsw</id>
             <phase>process-resources</phase>
             <goals>
@@ -86,7 +86,7 @@
             <configuration>
               <assemblyDescriptor>${assembly.directory}/runtime-guice-yajsw.xml</assemblyDescriptor>
             </configuration>
-          </execution>
+          </execution>-->
         </executions>
       </plugin>
     </plugins>
