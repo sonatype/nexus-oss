@@ -14,7 +14,6 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.swizzle.IssueSubmissionRequest;
 import org.codehaus.plexus.util.ExceptionUtils;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -32,19 +31,29 @@ public class DefaultErrorReportingManagerTest
 
     private NexusConfiguration nexusConfig;
 
-    private File unzipDir = new File( getBasedir(), "target/unzipdir" );
+    private File unzipHomeDir = null;
 
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-
-        FileUtils.deleteDirectory( unzipDir );
+        
+        unzipHomeDir = new File( getPlexusHomeDir(), "unzip" );
+        unzipHomeDir.mkdirs();
 
         nexusConfig = lookup( NexusConfiguration.class );
 
         manager = (DefaultErrorReportingManager) lookup( ErrorReportingManager.class );
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+        
+        cleanDir( unzipHomeDir );
     }
 
     private void enableErrorReports( boolean useProxy )
@@ -115,7 +124,7 @@ public class DefaultErrorReportingManagerTest
     public void testPackageFiles()
         throws Exception
     {
-        addBackupFiles( CONF_HOME );
+        addBackupFiles( getConfHomeDir() );
 
         Exception exception;
 
@@ -144,11 +153,11 @@ public class DefaultErrorReportingManagerTest
             + ExceptionUtils.getFullStackTrace( exception ), subRequest.getDescription() );
         assertNotNull( subRequest.getProblemReportBundle() );
 
-        extractZipFile( subRequest.getProblemReportBundle(), unzipDir );
+        extractZipFile( subRequest.getProblemReportBundle(), unzipHomeDir );
 
-        assertTrue( unzipDir.exists() );
+        assertTrue( unzipHomeDir.exists() );
 
-        File[] files = unzipDir.listFiles();
+        File[] files = unzipHomeDir.listFiles();
 
         assertNotNull( files );
         assertEquals( 4, files.length ); // TODO: was five with the directory listing, but that was removed, as it OOM'd
@@ -164,8 +173,6 @@ public class DefaultErrorReportingManagerTest
     private void extractZipFile( File zipFile, File outputDirectory )
         throws Exception
     {
-        unzipDir.mkdirs();
-
         FileInputStream fis = new FileInputStream( zipFile );
         ZipInputStream zin = null;
 

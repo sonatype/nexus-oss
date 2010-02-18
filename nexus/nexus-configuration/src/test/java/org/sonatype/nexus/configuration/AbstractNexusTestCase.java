@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
@@ -33,32 +34,91 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
-
     public static final String APPS_CONFIGURATION_KEY = "apps";
-
     public static final String CONF_DIR_KEY = "application-conf";
+    
+    private static File plexusHomeDir = null;
+    private static File appsHomeDir = null;
+    private static File workHomeDir = null;
+    private static File confHomeDir = null;
 
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-
-    protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
-
-    protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
-
+    @Override
     protected void customizeContext( Context ctx )
     {
-        ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
-        ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
-        ctx.put( CONF_DIR_KEY, CONF_HOME.getAbsolutePath() );
+        super.customizeContext( ctx );
+        
+        plexusHomeDir = new File( getBasedir(), "target/plexus-home-" + new Random( System.currentTimeMillis() ).nextLong() );
+        appsHomeDir = new File( plexusHomeDir, "apps" );
+        workHomeDir = new File( plexusHomeDir, "nexus-work" );
+        confHomeDir = new File( workHomeDir, "conf" );
+        
+        ctx.put( WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath() );
+        ctx.put( APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath() );
+        ctx.put( CONF_DIR_KEY, confHomeDir.getAbsolutePath() );
+    }
+    
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+        
+        // simply to make sure customizeContext is handled before anything else
+        getContainer();
+        
+        plexusHomeDir.mkdirs();
+        appsHomeDir.mkdirs();
+        workHomeDir.mkdirs();
+        confHomeDir.mkdirs();
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+        
+        cleanDir( plexusHomeDir );
+    }
+    
+    protected void cleanDir( File dir )
+    {
+        if ( dir != null )
+        {
+            try
+            {
+                FileUtils.deleteDirectory( plexusHomeDir );
+            }
+            catch ( IOException e )
+            {
+                //couldn't delete directory, too bad
+            }
+        }
+    }
+    
+    public static File getPlexusHomeDir()
+    {
+        return plexusHomeDir;
+    }
+    
+    public static File getWorkHomeDir()
+    {
+        return workHomeDir;
+    }
+    
+    public static File getConfHomeDir()
+    {
+        return confHomeDir;
     }
 
     protected String getNexusConfiguration()
     {
-        return CONF_HOME + "/nexus.xml";
+        return confHomeDir + "/nexus.xml";
     }
 
     protected String getSecurityConfiguration()
     {
-        return CONF_HOME + "/security.xml";
+        return confHomeDir + "/security.xml";
     }
 
     protected void copyDefaultConfigToPlace()
@@ -89,24 +149,6 @@ public abstract class AbstractNexusTestCase
             IOUtil.close( stream );
             IOUtil.close( ostream );
         }
-    }
-
-    protected void setUp()
-        throws Exception
-    {
-        super.setUp();
-
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-
-        PLEXUS_HOME.mkdirs();
-        WORK_HOME.mkdirs();
-        CONF_HOME.mkdirs();
-    }
-
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
     }
 
     protected void copyFromClasspathToFile( String path, String outputFilename )

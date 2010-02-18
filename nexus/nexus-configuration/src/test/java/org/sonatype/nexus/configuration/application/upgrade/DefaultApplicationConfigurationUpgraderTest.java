@@ -44,8 +44,6 @@ public class DefaultApplicationConfigurationUpgraderTest
     {
         super.setUp();
 
-        FileUtils.cleanDirectory( new File( getNexusConfiguration() ).getParentFile() );
-
         this.configurationUpgrader = lookup( ApplicationConfigurationUpgrader.class );
         this.securitySource = (FileSecurityConfigurationSource) this.lookup( SecurityConfigurationSource.class, "file" );
     }

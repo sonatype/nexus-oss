@@ -19,11 +19,6 @@ public abstract class AbstractIndexerManagerTest
 
     protected NexusScheduler nexusScheduler;
 
-    public AbstractIndexerManagerTest()
-    {
-        super();
-    }
-
     @Override
     protected void setUp()
         throws Exception
@@ -37,13 +32,6 @@ public abstract class AbstractIndexerManagerTest
         indexerManager = lookup( IndexerManager.class );
 
         nexusScheduler = lookup( NexusScheduler.class );
-    }
-
-    @Override
-    protected void tearDown()
-        throws Exception
-    {
-        super.tearDown();
     }
 
     protected void searchFor( String groupId, int expected )

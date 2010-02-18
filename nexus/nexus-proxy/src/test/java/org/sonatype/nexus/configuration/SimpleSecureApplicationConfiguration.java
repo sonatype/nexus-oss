@@ -15,7 +15,7 @@ package org.sonatype.nexus.configuration;
 
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
-public class SimpleSecureApplicationConfiguration extends SimpleApplicationConfiguration
+public class SimpleSecureApplicationConfiguration extends SimpleProxyApplicationConfiguration
     implements ApplicationConfiguration
 {
     public boolean isSecurityEnabled()

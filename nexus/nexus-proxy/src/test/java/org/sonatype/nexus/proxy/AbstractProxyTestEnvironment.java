@@ -200,9 +200,6 @@ public abstract class AbstractProxyTestEnvironment
 
         applicationEventMulticaster = lookup( ApplicationEventMulticaster.class );
 
-        // deleting files
-        FileUtils.forceDelete( getApplicationConfiguration().getWorkingDirectory() );
-
         repositoryRegistry = lookup( RepositoryRegistry.class );
 
         testEventListener = new TestItemEventListener();

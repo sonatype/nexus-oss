@@ -48,6 +48,14 @@ public class LogManagerTest
 
         logger = this.getLoggerManager().getLoggerForComponent( LogManagerTest.class.getName() );
     }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        Logger.getLogger( getClass() ).removeAllAppenders();
+        super.tearDown();
+    }
 
     public void testLogConfig()
         throws Exception
@@ -77,7 +85,7 @@ public class LogManagerTest
 
         // add file appender A to my logger
         Logger testLogger = Logger.getLogger( getClass() );
-        File appenderFileA = new File( getBasedir(), "target/logs/appenderA.log" );
+        File appenderFileA = new File( getPlexusHomeDir(), "logs/appenderA.log" );
         testLogger.addAppender( new FileAppender( new PatternLayout(), appenderFileA.getAbsolutePath() ) );
         testLogger.info( "test log A" );
 
@@ -87,7 +95,7 @@ public class LogManagerTest
 
         // add file appender B to root logger
         Logger rootLogger = Logger.getRootLogger();
-        File appenderFileB = new File( getBasedir(), "target/logs/appenderB.log" );
+        File appenderFileB = new File( getPlexusHomeDir(), "logs/appenderB.log" );
         rootLogger.addAppender( new FileAppender( new PatternLayout(), appenderFileB.getAbsolutePath() ) );
         rootLogger.info( "test log B" );
 

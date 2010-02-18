@@ -10,7 +10,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
@@ -42,13 +41,6 @@ public class ProtectedRepositoryRegistryTest
     private Nexus nexus;
 
     @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-        ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
-    }
-
-    @Override
     protected boolean loadConfigurationAtSetUp()
     {
         return false;
@@ -65,7 +57,7 @@ public class ProtectedRepositoryRegistryTest
         URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
         try
         {
-            File securityConfigFile = new File( CONF_HOME, "security-configuration.xml" );
+            File securityConfigFile = new File( getConfHomeDir(), "security-configuration.xml" );
             securityConfigFile.getParentFile().mkdirs();
             FileUtils.copyURLToFile( url, securityConfigFile );
         }

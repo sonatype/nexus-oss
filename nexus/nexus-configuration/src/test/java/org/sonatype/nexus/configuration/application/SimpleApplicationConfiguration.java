@@ -18,6 +18,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.configuration.AbstractNexusTestCase;
 import org.sonatype.nexus.configuration.ConfigurationCommitEvent;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
 import org.sonatype.nexus.configuration.ConfigurationSaveEvent;
@@ -63,7 +64,7 @@ public class SimpleApplicationConfiguration
 
     public File getWorkingDirectory()
     {
-        return new File( "target/plexus-home/" );
+        return AbstractNexusTestCase.getPlexusHomeDir();
     }
 
     public File getWorkingDirectory( String key )
@@ -73,26 +74,26 @@ public class SimpleApplicationConfiguration
 
     public File getTemporaryDirectory()
     {
-        File result = new File( "target/tmp" );
-
-        result.mkdirs();
-
-        return result;
+        File dir = getWorkingDirectory( "tmp" );
+        dir.mkdirs();
+        
+        return dir;
     }
 
     public File getWastebasketDirectory()
     {
-        return getWorkingDirectory( "trash" );
+        File dir = getWorkingDirectory( "trash" );
+        dir.mkdirs();
+        
+        return dir;
     }
 
     public File getConfigurationDirectory()
     {
-        File result = new File( getWorkingDirectory(), "conf" );
-        if ( !result.exists() )
-        {
-            result.mkdirs();
-        }
-        return result;
+        File dir = new File( getWorkingDirectory(), "conf" );
+        dir.mkdirs();
+        
+        return dir;
     }
 
     public void saveConfiguration()

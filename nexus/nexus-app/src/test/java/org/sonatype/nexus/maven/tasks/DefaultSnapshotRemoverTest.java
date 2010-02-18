@@ -564,7 +564,7 @@ public class DefaultSnapshotRemoverTest
         validateResults( snapshots, expecting );
 
         // we could not retrieve the illegal artifact, but we can check the file system
-        File snapshotsStorageBase = new File( WORK_HOME, "storage/" + snapshots.getId() );
+        File snapshotsStorageBase = new File( getWorkHomeDir(), "storage/" + snapshots.getId() );
         File illegalArtifact =
             new File(
                       snapshotsStorageBase,

@@ -15,133 +15,43 @@ package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.ServerSocket;
 import java.util.List;
 import java.util.Map;
 
-import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
 public abstract class AbstractNexusTestCase
-    extends PlexusTestCase
+    extends org.sonatype.nexus.proxy.AbstractNexusTestCase
 {
     private NexusScheduler nexusScheduler;
 
-    protected static final String PROXY_SERVER_PORT = "proxy.server.port";
-
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
-    public static final String WORK_CONFIGURATION_KEY = "nexus-work";
-
-    public static final String APP_CONFIGURATION_KEY = "nexus-app";
-
-    public static final String APPS_CONFIGURATION_KEY = "apps";
-
-    public static final String APPLICATION_CONF_KEY = "application-conf";
-
-    public static final String APPLICATION_CONFIG_KEY = APPLICATION_CONF_KEY;
-
-    public static final String SECURITY_CONFIG_KEY = "security-xml-file";
-
-    protected static final File PLEXUS_HOME = new File( getBasedir(), "target/plexus-home" );
-
-    protected static final File WORK_HOME = new File( PLEXUS_HOME, "nexus-work" );
-
-    protected static final File APP_HOME = new File( PLEXUS_HOME, "nexus-app" );
-
-    protected static final File CONF_HOME = new File( WORK_HOME, "conf" );
+    public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
 
     protected NexusConfiguration nexusConfiguration;
+    
+    private static File runtimeHomeDir = null;
+    private static File nexusappHomeDir = null;
 
     @Override
     protected void customizeContext( Context ctx )
     {
-        ctx.put( APPS_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
+        super.customizeContext( ctx );
+        
+        runtimeHomeDir = new File( getPlexusHomeDir(), "runtime" );
+        nexusappHomeDir = new File( getPlexusHomeDir(), "nexus-app" );
 
-        ctx.put( WORK_CONFIGURATION_KEY, WORK_HOME.getAbsolutePath() );
-
-        ctx.put( APP_CONFIGURATION_KEY, APP_HOME.getAbsolutePath() );
-
-        ctx.put( RUNTIME_CONFIGURATION_KEY, PLEXUS_HOME.getAbsolutePath() );
-
-        ctx.put( SECURITY_CONFIG_KEY, CONF_HOME.getAbsolutePath() + "/security.xml" );
-
-        ctx.put( APPLICATION_CONF_KEY, CONF_HOME.getAbsolutePath() );
-
-        ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
-    }
-
-    private int allocatePort()
-    {
-        ServerSocket ss;
-        try
-        {
-            ss = new ServerSocket( 0 );
-        }
-        catch ( IOException e )
-        {
-            return 0;
-        }
-        int port = ss.getLocalPort();
-        try
-        {
-            ss.close();
-        }
-        catch ( IOException e )
-        {
-            // does it matter?
-            fail( "Error allocating port " + e.getMessage() );
-        }
-        return port;
-    }
-
-    protected String getNexusConfiguration()
-    {
-        return CONF_HOME + "/nexus.xml";
-    }
-
-    protected String getNexusSecurityConfiguration()
-    {
-        return CONF_HOME + "/security.xml";
-    }
-
-    protected void copyDefaultConfigToPlace()
-        throws IOException
-    {
-        this.copyResource( "/META-INF/nexus/nexus.xml", getNexusConfiguration() );
-    }
-
-    protected void copyDefaultSecurityConfigToPlace()
-        throws IOException
-    {
-        this.copyResource( "/META-INF/security/security.xml", getNexusSecurityConfiguration() );
-    }
-
-    protected void copyResource( String resource, String dest )
-        throws IOException
-    {
-        InputStream stream = null;
-        try
-        {
-            // make the directory
-            new File( dest ).getParentFile().mkdirs();
-            stream = getClass().getResourceAsStream( resource );
-            IOUtil.copy( stream, new FileOutputStream( dest ) );
-        }
-        finally
-        {
-            IOUtil.close( stream );
-        }
+        ctx.put( RUNTIME_CONFIGURATION_KEY, runtimeHomeDir.getAbsolutePath() );
+        ctx.put( NEXUS_APP_CONFIGURATION_KEY, nexusappHomeDir.getAbsolutePath() );
     }
 
     protected boolean loadConfigurationAtSetUp()
@@ -153,15 +63,12 @@ public abstract class AbstractNexusTestCase
     protected void setUp()
         throws Exception
     {
-        nexusScheduler = lookup( NexusScheduler.class );
-
-        FileUtils.deleteDirectory( PLEXUS_HOME );
-
-        PLEXUS_HOME.mkdirs();
-        WORK_HOME.mkdirs();
-        CONF_HOME.mkdirs();
-
         super.setUp();
+        
+        runtimeHomeDir.mkdirs();
+        nexusappHomeDir.mkdirs();
+        
+        nexusScheduler = lookup( NexusScheduler.class );
 
         if ( loadConfigurationAtSetUp() )
         {
@@ -187,8 +94,9 @@ public abstract class AbstractNexusTestCase
         waitForTasksToStop();
 
         super.tearDown();
-
-        FileUtils.deleteDirectory( PLEXUS_HOME );
+        
+        cleanDir( runtimeHomeDir );
+        cleanDir( nexusappHomeDir );
     }
 
     protected void killActiveTasks()

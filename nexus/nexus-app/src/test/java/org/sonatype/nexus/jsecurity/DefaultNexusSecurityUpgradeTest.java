@@ -15,29 +15,20 @@ package org.sonatype.nexus.jsecurity;
 
 import java.io.File;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.security.SecuritySystem;
 
 public class DefaultNexusSecurityUpgradeTest
-    extends PlexusTestCase
+    extends AbstractNexusTestCase
 {
 
     private static final String ORG_CONFIG_FILE = "target/test-classes/org/sonatype/nexus/jsecurity/security.xml";
-
-    private final String workDir = "target/DefaultNexusSecurityUpgradeTest/work/";
-    
-    private final String configLocation = workDir+"conf/security.xml";
-
-    
     
     public void testDoUpgrade() throws Exception
     {
        this.lookup( SecuritySystem.class );
     }
-    
-    
     
     @Override
     protected void setUp()
@@ -46,18 +37,6 @@ public class DefaultNexusSecurityUpgradeTest
         super.setUp();
 
         // copy the file to a different location because we are going to change it
-        FileUtils.copyFile( new File( ORG_CONFIG_FILE ), new File( configLocation ) );
+        FileUtils.copyFileToDirectory( new File( ORG_CONFIG_FILE ), getConfHomeDir() );
     }
-
-    @Override
-    protected void customizeContext( Context context )
-    {
-        super.customizeContext( context );
-
-        context.put( "nexus-work", workDir );
-        
-//        context.put( "security-xml-file", COPY_CONFIG_FILE );
-        context.put( "application-conf", workDir+ "/conf" );
-    }
-
 }

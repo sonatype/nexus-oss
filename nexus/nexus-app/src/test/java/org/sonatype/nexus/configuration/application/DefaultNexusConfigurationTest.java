@@ -173,7 +173,7 @@ public class DefaultNexusConfigurationTest
     public void testGetAndReadConfigurationFiles()
         throws Exception
     {
-        File testConfFile = new File( CONF_HOME, "test.xml" );
+        File testConfFile = new File( getConfHomeDir(), "test.xml" );
 
         FileUtils.fileWrite( testConfFile.getAbsolutePath(), "test" );
 

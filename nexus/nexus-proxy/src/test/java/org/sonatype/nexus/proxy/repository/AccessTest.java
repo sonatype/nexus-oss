@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.jsecurity.subject.Subject;
@@ -44,7 +43,7 @@ public class AccessTest
 
         String resource = this.getClass().getName().replaceAll( "\\.", "\\/" ) + "-security-configuration.xml";
         URL url = Thread.currentThread().getContextClassLoader().getResource( resource );
-        FileUtils.copyURLToFile( url, new File( CONF_HOME, "security-configuration.xml" ) );
+        FileUtils.copyURLToFile( url, new File( getConfHomeDir(), "security-configuration.xml" ) );
 
         TargetRegistry targetRegistry = this.lookup( TargetRegistry.class );
 
@@ -57,13 +56,6 @@ public class AccessTest
 
         // setup security
         this.lookup( SecuritySystem.class ).start(); // need to call start to clear caches
-    }
-
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-        ctx.put( "security-xml-file", new File( CONF_HOME, "security.xml" ).getAbsolutePath() );
     }
 
     @Override

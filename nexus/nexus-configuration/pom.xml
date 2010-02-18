@@ -204,8 +204,19 @@
       </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata
-				</artifactId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>package-tests</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

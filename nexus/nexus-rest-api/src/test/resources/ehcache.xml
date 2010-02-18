@@ -1,22 +1,33 @@
 <ehcache>
 
-    <!-- Only ${basedir} is replaced by plexus! -->
-    <diskStore path="${basedir}/target/ehcache"/>
-    
-    <!-- all created caches shares these defaults 
+     <defaultCache
+            maxElementsInMemory="1000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
 
-            memoryStoreEvictionPolicy= ("LRU"|"LFU"|"FIFO")
-	      LRU - least recently used
-	      LFU - least frequently used
-	      FIFO - first in first out
-    -->
-    <defaultCache
+    <cache name="path-cache"
+            maxElementsInMemory="100000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LFU"
+            />
+
+    <cache name="jsecurity-activeSessionCache"
             maxElementsInMemory="10000"
             eternal="false"
             timeToIdleSeconds="120"
             timeToLiveSeconds="120"
-            overflowToDisk="true"
-            maxElementsOnDisk="10000000"
+            overflowToDisk="false"
             diskPersistent="false"
             diskExpiryThreadIntervalSeconds="120"
             memoryStoreEvictionPolicy="LFU"

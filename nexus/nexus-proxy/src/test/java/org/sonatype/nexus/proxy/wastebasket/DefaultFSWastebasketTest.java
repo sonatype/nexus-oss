@@ -16,47 +16,58 @@ package org.sonatype.nexus.proxy.wastebasket;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.FileUtils;
+import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 
 /**
  * @author Juven Xu
  */
 public class DefaultFSWastebasketTest
-    extends TestCase
+    extends AbstractNexusTestCase
 {
     DefaultFSWastebasketForTest wastebasket;
+    
+    private File trashDir = null;
+    private File wastebasketDir = null;
 
+    @Override
     public void setUp()
         throws Exception
     {
-        File trashDir = new File( "target/trash" );
-
-        FileUtils.deleteDirectory( trashDir );
-
+        super.setUp();
+        
+        trashDir = new File( getPlexusHomeDir(), "trash" );
         trashDir.mkdir();
+        
+        wastebasketDir = new File( getPlexusHomeDir(), "wastebasket" );
+        wastebasketDir.mkdir();
 
         wastebasket = new DefaultFSWastebasketForTest();
+    }
+    
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        super.tearDown();
+        
+        cleanDir( trashDir );
+        cleanDir( wastebasketDir );
     }
 
     public void testDeleteFile()
         throws Exception
     {
-        new File( "target/wastebasket" ).mkdir();
-        new File( "target/wastebasket/folderA" ).mkdir();
-        new File( "target/wastebasket/folderB" ).mkdir();
-        new File( "target/wastebasket/folderA/folerAA" ).mkdir();
-        new File( "target/wastebasket/folderA/folerAA/fileA.txt" ).createNewFile();
-        new File( "target/wastebasket/folderB/fileB.txt" ).createNewFile();
+        new File( wastebasketDir, "folderB" ).mkdirs();
+        new File( wastebasketDir, "folderA/folderAA" ).mkdirs();
+        new File( wastebasketDir, "folderA/folderAA/fileA.txt" ).createNewFile();
+        new File( wastebasketDir, "folderB/fileB.txt" ).createNewFile();
 
-        File toBeDeleted = new File( "target/wastebasket" );
+        wastebasket.delete( wastebasketDir );
 
-        wastebasket.delete( toBeDeleted );
-
-        File fileA = new File( "target/trash/wastebasket/folderA/folerAA/fileA.txt" );
-        File fileB = new File( "target/trash/wastebasket/folderB/fileB.txt" );
-        File folderAA = new File( "target/trash/wastebasket/folderA/folerAA" );
+        File fileA = new File( trashDir, "wastebasket/folderA/folderAA/fileA.txt" );
+        File fileB = new File( trashDir, "wastebasket/folderB/fileB.txt" );
+        File folderAA = new File( trashDir, "wastebasket/folderA/folderAA" );
 
         assertTrue( fileA.exists() && fileA.isFile() );
         assertTrue( fileB.exists() && fileB.isFile() );
@@ -72,7 +83,7 @@ public class DefaultFSWastebasketTest
         @Override
         public File getWastebasketDirectory()
         {
-            return new File( "target/trash" );
+            return trashDir;
         }
 
         public void delete( File file )

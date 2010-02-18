@@ -15,7 +15,7 @@ public class LegacyNexusTimelineTest
     {
         File legacyDataDir = new File( AbstractNexusTestCase.getBasedir(), "target/test-classes/timeline/legacy" );
 
-        File legacyTimelineDir = new File( AbstractNexusTestCase.WORK_HOME, "timeline" );
+        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
 
         FileUtils.copyDirectory( legacyDataDir, legacyTimelineDir );
 
@@ -33,9 +33,9 @@ public class LegacyNexusTimelineTest
 
         File newDataDir = new File( AbstractNexusTestCase.getBasedir(), "target/test-classes/timeline/new" );
 
-        File legacyTimelineDir = new File( AbstractNexusTestCase.WORK_HOME, "timeline" );
+        File legacyTimelineDir = new File( getWorkHomeDir(), "timeline" );
 
-        File newTimelineDir = new File( AbstractNexusTestCase.WORK_HOME, "timeline/index" );
+        File newTimelineDir = new File( getWorkHomeDir(), "timeline/index" );
 
         FileUtils.copyDirectory( legacyDataDir, legacyTimelineDir );
 
