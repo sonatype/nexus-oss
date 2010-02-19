@@ -18,7 +18,7 @@
   <description>Adds a repository type for deploying maven sites.</description>
 
   <properties>
-    <nexus.version>1.4.1</nexus.version>
+    <nexus.version>1.5.1-SNAPSHOT</nexus.version>
     <nexus-licensing-plugin.version>1.4.1</nexus-licensing-plugin.version>
   </properties>
 
@@ -48,6 +48,13 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -74,7 +81,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.3</version>
+        <version>1.4-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
@@ -84,7 +91,17 @@
           </execution>
         </executions>
         <configuration>
-          <nexusVersion>${nexus.version}</nexusVersion>
+          <nexusBundleArtifact>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-distribution</artifactId>
+            <version>${nexus.version}</version>
+            <type>zip</type>
+            <classifier>runtime-guice-jsw</classifier>
+          </nexusBundleArtifact>
+          
+          <nexusBundleName>nexus-oss-${nexus.version}</nexusBundleName>
+          
+          <nexusVersion>${project.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <license>
               <groupId>com.sonatype.nexus.plugin</groupId>
