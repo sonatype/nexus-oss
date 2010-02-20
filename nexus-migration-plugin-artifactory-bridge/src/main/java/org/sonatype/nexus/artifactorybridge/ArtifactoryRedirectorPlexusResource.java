@@ -12,6 +12,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.Context;
+import org.restlet.data.ChallengeRequest;
+import org.restlet.data.ChallengeScheme;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Request;
@@ -76,7 +78,7 @@ public class ArtifactoryRedirectorPlexusResource
         String nexusPath = urlConverter.convertDownload( servletPath );
         if ( nexusPath == null )
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Invalid artifact request '" + servletPath + "'" );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '" + servletPath + "'" );
         }
 
         HttpURLConnection urlConn = null;
@@ -84,7 +86,7 @@ public class ArtifactoryRedirectorPlexusResource
         try
         {
             URL url = new URL( nexusUrl + nexusPath );
-            getLogger().debug( "Redirecting request to: " + url );
+            getLogger().debug( "Redirecting GET request from:" +servletPath+" to: " + url );
 
             urlConn = (HttpURLConnection) url.openConnection();
 
@@ -97,6 +99,11 @@ public class ArtifactoryRedirectorPlexusResource
         catch ( Throwable e )
         {
             int statusCode = getReturnCode( urlConn );
+            if (statusCode == 401)
+            {
+            	getLogger().debug("Received 401 from Nexus, inserting Challenge request to the client.");
+            	response.setChallengeRequest(new ChallengeRequest(ChallengeScheme.HTTP_BASIC, "Sonatype Nexus Repository Manager"));
+            }
             throw new ResourceException( statusCode, e );
         }
         finally
@@ -127,11 +134,12 @@ public class ArtifactoryRedirectorPlexusResource
             String nexusPath = urlConverter.convertDeploy( servletPath );
             if ( nexusPath == null )
             {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Invalid artifact request '" + servletPath
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '" + servletPath
                     + "'" );
             }
 
             URL url = new URL( nexusUrl + nexusPath );
+            getLogger().debug( "Redirecting PUT request from:" +servletPath+" to: " + url );
             urlConn = (HttpURLConnection) url.openConnection();
             copyHeaders( request, urlConn );
 
@@ -144,7 +152,7 @@ public class ArtifactoryRedirectorPlexusResource
             int statusCode = getReturnCode( urlConn );
             if ( !Status.isSuccess( statusCode ) )
             {
-                throw new ResourceException( new Status( statusCode ), "URL connection return: " + statusCode + " - "
+                throw new ResourceException( new Status( statusCode ), "URL connection returned: " + statusCode + " - "
                     + urlConn.getResponseMessage() );
             }
             getLogger().debug( "URL connection return: " + statusCode + " - " + urlConn.getResponseMessage() );
@@ -152,6 +160,11 @@ public class ArtifactoryRedirectorPlexusResource
         catch ( Throwable e )
         {
             int statusCode = getReturnCode( urlConn );
+            if (statusCode == 401)
+            {
+            	getLogger().debug("Received 401 from Nexus, inserting Challenge request to the client.");
+            	response.setChallengeRequest(new ChallengeRequest(ChallengeScheme.HTTP_BASIC, "Sonatype Nexus Repository Manager"));
+            }
             throw new ResourceException( statusCode, e );
         }
         finally
