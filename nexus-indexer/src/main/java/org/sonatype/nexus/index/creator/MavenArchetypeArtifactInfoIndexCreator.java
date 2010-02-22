@@ -77,7 +77,18 @@ public class MavenArchetypeArtifactInfoIndexCreator
         }
         catch ( Exception e )
         {
-            getLogger().info( "Failed to parse Maven artifact " + artifact.getAbsolutePath(), e );
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().info(
+                                  "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to exception:",
+                                  e );
+            }
+            else
+            {
+                getLogger().info(
+                                  "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to "
+                                      + e.getMessage() );
+            }
         }
         finally
         {
