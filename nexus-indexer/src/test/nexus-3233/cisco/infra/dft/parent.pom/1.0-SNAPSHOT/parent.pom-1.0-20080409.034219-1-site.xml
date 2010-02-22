@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><project name="DFT Parent">
+  <skin>
+    <groupId>cisco.infra.dft</groupId>
+    <artifactId>maven.dft.skin</artifactId>
+    <version>1.1-SNAPSHOT</version>
+  </skin>
+  <body>
+    <links>
+      <item name="DFT" href="http://zed.cisco.com/confluence/display/DFTTD/" />
+    </links>
+  </body>
+</project>

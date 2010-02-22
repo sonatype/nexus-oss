@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <groupId>cisco.infra.dft</groupId>
+  <artifactId>dma.maven.plugins</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20080409.022326</timestamp>
+      <buildNumber>2</buildNumber>
+    </snapshot>
+    <lastUpdated>20080409022332</lastUpdated>
+  </versioning>
+</metadata>

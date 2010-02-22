@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><metadata>
+  <plugins>
+    <plugin>
+      <name>DMA AuthZ Maven Mojo</name>
+      <prefix>dma-mgmt</prefix>
+      <artifactId>maven-dma-mgmt-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>DMA SVN Repo Management Plugin</name>
+      <prefix>dma</prefix>
+      <artifactId>maven-dma-plugin</artifactId>
+    </plugin>
+    <plugin>
+      <name>SDF Archetype Plugin</name>
+      <prefix>archetype.sdf</prefix>
+      <artifactId>archetype.sdf</artifactId>
+    </plugin>
+  </plugins>
+</metadata>

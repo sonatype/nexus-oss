@@ -96,6 +96,38 @@ public class MinimalArtifactInfoIndexCreator
             }
         }
 
+        Model model = ac.getPomModel();
+
+        if ( model != null )
+        {
+            ai.name = model.getName();
+
+            ai.description = model.getDescription();
+
+            // for main artifacts (without classifier) only:
+            if ( ai.classifier == null )
+            {
+                // only when this is not a classified artifact
+                if ( model.getPackaging() != null )
+                {
+                    // set the read value that is coming from POM
+                    ai.packaging = model.getPackaging();
+                }
+                else
+                {
+                    // default it, since POM is present, is read, but does not contain explicit packaging
+                    // TODO: this change breaks junit tests, but not sure why is "null" expected value?
+                    // ai.packaging = "jar";
+                }
+            }
+        }
+
+        if ( "pom".equals( ai.packaging ) )
+        {
+            // special case, the POM _is_ the artifact
+            artifact = pom;
+        }
+
         if ( artifact != null )
         {
             File signature = sigl.locate( artifact );
@@ -125,21 +157,6 @@ public class MinimalArtifactInfoIndexCreator
             if ( ai.packaging == null )
             {
                 ai.packaging = ai.fextension;
-            }
-        }
-
-        Model model = ac.getPomModel();
-
-        if ( model != null )
-        {
-            ai.name = model.getName();
-
-            ai.description = model.getDescription();
-
-            if ( model.getPackaging() != null && ai.classifier == null )
-            {
-                // only when this is not a classified artifact
-                ai.packaging = model.getPackaging();
             }
         }
     }
@@ -172,10 +189,11 @@ public class MinimalArtifactInfoIndexCreator
     {
         String info =
             new StringBuilder().append( ai.packaging ).append( ArtifactInfo.FS ).append(
-                Long.toString( ai.lastModified ) ).append( ArtifactInfo.FS ).append( Long.toString( ai.size ) ).append(
-                ArtifactInfo.FS ).append( ai.sourcesExists.toString() ).append( ArtifactInfo.FS ).append(
-                ai.javadocExists.toString() ).append( ArtifactInfo.FS ).append( ai.signatureExists.toString() ).append(
-                ArtifactInfo.FS ).append( ai.fextension ).toString();
+                            Long.toString( ai.lastModified ) ).append( ArtifactInfo.FS ).append(
+                            Long.toString( ai.size ) ).append( ArtifactInfo.FS ).append( ai.sourcesExists.toString() )
+                            .append( ArtifactInfo.FS ).append( ai.javadocExists.toString() ).append( ArtifactInfo.FS )
+                            .append( ai.signatureExists.toString() ).append( ArtifactInfo.FS ).append( ai.fextension )
+                            .toString();
 
         doc.add( new Field( ArtifactInfo.INFO, info, Field.Store.YES, Field.Index.NO ) );
 
