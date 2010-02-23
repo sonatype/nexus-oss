@@ -15,7 +15,7 @@
 
   <properties>
     <nexus.version>1.4.1</nexus.version>
-    <nexus-licensing-plugin.version>1.4.1</nexus-licensing-plugin.version>
+    <nexus-licensing-extension.version>1.0.0-SNAPSHOT</nexus-licensing-extension.version>
   </properties>
 
   <dependencyManagement>
@@ -48,8 +48,8 @@
           <nexusVersion>${nexus.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <license>
-              <groupId>com.sonatype.nexus.plugin</groupId>
-              <artifactId>nexus-licensing-plugin</artifactId>
+              <groupId>com.sonatype.nexus.extension</groupId>
+              <artifactId>nexus-licensing-extension</artifactId>
             </license>
             <license>
               <groupId>com.sonatype.components</groupId>
@@ -108,9 +108,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.sonatype.nexus.plugin</groupId>
-      <artifactId>nexus-licensing-plugin</artifactId>
-      <version>${nexus-licensing-plugin.version}</version>
+      <groupId>com.sonatype.nexus.extension</groupId>
+      <artifactId>nexus-licensing-extension</artifactId>
+      <version>${nexus-licensing-extension.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -180,6 +180,7 @@
             <configuration>
               <injar>classes</injar>
               <options>
+                <option>-keep public class com.sonatype.nexus.unpack.license.UnpackPlexusFeature { *; }</option>
                 <option>-keep public interface * { public *; }</option>
                 <option>-dontusemixedcaseclassnames</option>
                 <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable</option>

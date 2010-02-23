@@ -70,7 +70,7 @@ public class UnpackPlexusResource
     @Requirement( role = NexusLicensingManager.class )
     private NexusLicensingManager licenseManager;
 
-    @Requirement( role = PlexusFeature.class, hint = "NexusProfessional" )
+    @Requirement( role = PlexusFeature.class, hint = "Unpack" )
     private PlexusFeature feature;
 
     public UnpackPlexusResource()
