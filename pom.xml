@@ -19,7 +19,7 @@
 
   <properties>
     <nexus.version>1.5.1-SNAPSHOT</nexus.version>
-    <nexus-licensing-plugin.version>1.4.1</nexus-licensing-plugin.version>
+    <nexus-licensing-extension.version>1.0.0-SNAPSHOT</nexus-licensing-extension.version>
   </properties>
 
   <dependencyManagement>
@@ -61,9 +61,9 @@
       <artifactId>nexus-plugin-test-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sonatype.nexus.plugin</groupId>
-      <artifactId>nexus-licensing-plugin</artifactId>
-      <version>${nexus-licensing-plugin.version}</version>
+      <groupId>com.sonatype.nexus.extension</groupId>
+      <artifactId>nexus-licensing-extension</artifactId>
+      <version>${nexus-licensing-extension.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -104,8 +104,8 @@
           <nexusVersion>${project.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <license>
-              <groupId>com.sonatype.nexus.plugin</groupId>
-              <artifactId>nexus-licensing-plugin</artifactId>
+              <groupId>com.sonatype.nexus.extension</groupId>
+              <artifactId>nexus-licensing-extension</artifactId>
             </license>
             <license>
               <groupId>com.sonatype.components</groupId>
@@ -234,6 +234,7 @@
                     }
                   ]]>
                 </option>
+                <option>-keep public class com.sonatype.nexus.proxy.maven.site.license.MavenSitePlexusFeature { *; }</option>
                 <option>-keep public class * implements org.sonatype.nexus.scheduling.NexusTask { }</option>
                 <option>-keep public class * implements org.sonatype.nexus.plugins.rest.NexusResourceBundle { }</option>
                 <option>-dontusemixedcaseclassnames</option>
