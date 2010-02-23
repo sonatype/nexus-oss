@@ -101,7 +101,7 @@
           
           <nexusBundleName>nexus-oss-${nexus.version}</nexusBundleName>
           
-          <nexusVersion>${project.version}</nexusVersion>
+          <nexusVersion>${nexus.version}</nexusVersion>
           <nexusPluginsArtifacts>
             <license>
               <groupId>com.sonatype.nexus.extension</groupId>
