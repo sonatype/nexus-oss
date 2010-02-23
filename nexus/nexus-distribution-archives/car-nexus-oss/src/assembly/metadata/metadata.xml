@@ -20,9 +20,30 @@
 
   <provides>
     <property>
+      <name>startupTimeout</name>
+      <value>90</value>
+      <mergePolicy>error</mergePolicy>
+    </property>
+    <property>
+      <name>pingTimeout</name>
+      <value>90</value>
+      <mergePolicy>error</mergePolicy>
+    </property>
+    <property>
       <name>jvmParameters</name>
       <values>
         <value>-Dbasedir=${runtimeDir}</value>
+      </values>
+      <mergePolicy>append</mergePolicy>
+    </property>
+    <property>
+      <name>commentedJvmParameters</name>
+      <values>
+        <value>-Djava.io.tmpdir=../../../runtime/tmp</value>
+        <value>-Xdebug</value>
+        <value>-Xnoagent</value>
+        <value>-Djava.compiler=NONE</value>
+        <value>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</value>
       </values>
       <mergePolicy>append</mergePolicy>
     </property>
