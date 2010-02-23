@@ -8,6 +8,7 @@ package com.sonatype.nexus.unpack.it.nxcm1326;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -38,6 +39,15 @@ public class NXCM1326AuthenticationIT
         this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
         this.privUtil = new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
     }
+    
+    @Before
+    public void setupUserPrivs() throws IOException
+    {
+        UserResource user = this.userUtil.getUser( "test-user" );
+        user.addRole( "repo-all-full" );
+        this.userUtil.updateUser( user );
+        
+    }
 
     @Test
     public void invalidUser()
@@ -64,7 +74,7 @@ public class NXCM1326AuthenticationIT
     {
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-
+        
         try
         {
             DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"

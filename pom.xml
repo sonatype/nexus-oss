@@ -13,11 +13,6 @@
   <name>Nexus Enterprise Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
 
-  <properties>
-    <nexus.version>1.4.1</nexus.version>
-    <nexus-licensing-extension.version>1.0.0-SNAPSHOT</nexus-licensing-extension.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -34,29 +29,7 @@
     <plugins>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.3</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>setup-nexus-plugin-environment</goal>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusVersion>${nexus.version}</nexusVersion>
-          <nexusPluginsArtifacts>
-            <license>
-              <groupId>com.sonatype.nexus.extension</groupId>
-              <artifactId>nexus-licensing-extension</artifactId>
-            </license>
-            <license>
-              <groupId>com.sonatype.components</groupId>
-              <artifactId>plexus-licensing</artifactId>
-            </license>
-          </nexusPluginsArtifacts>
-        </configuration>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>     
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -110,7 +83,6 @@
     <dependency>
       <groupId>com.sonatype.nexus.extension</groupId>
       <artifactId>nexus-licensing-extension</artifactId>
-      <version>${nexus-licensing-extension.version}</version>
       <scope>provided</scope>
     </dependency>
 
