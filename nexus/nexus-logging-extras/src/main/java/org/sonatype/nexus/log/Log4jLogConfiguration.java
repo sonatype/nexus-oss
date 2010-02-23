@@ -23,7 +23,7 @@ import java.util.Properties;
 import org.apache.log4j.PropertyConfigurator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.util.EnhancedProperties;
 
@@ -31,15 +31,23 @@ import org.sonatype.nexus.util.EnhancedProperties;
  * @author juven
  */
 @Component( role = LogConfiguration.class )
-public class Log4jLogConfiguration extends AbstractLogEnabled
+public class Log4jLogConfiguration
     implements LogConfiguration<EnhancedProperties>
 {
     private static final String NEXUS_REMARK = "Log4j configuration created by Sonatype Nexus";
+    
+    @Requirement
+    private Logger logger;
 
     @Requirement
     private LogConfigurationSource<File> logConfigurationSource;
 
     private EnhancedProperties config = new EnhancedProperties();
+    
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public void apply()
     {

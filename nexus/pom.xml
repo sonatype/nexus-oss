@@ -696,6 +696,11 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-logging-extras</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1001,6 +1006,7 @@
     <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
+    <module>nexus-logging-extras</module>
     <module>nexus-api</module>
     <module>nexus-oss-edition</module>
     <module>nexus-configuration</module>

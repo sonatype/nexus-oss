@@ -29,6 +29,8 @@ public class PluginDescriptor
 
     private List<PluginStaticResourceModel> pluginStaticResourceModels;
 
+    private List<PluginStaticResourceModel> pluginDocumentationResourceModels;
+
     private Map<String, PluginRepositoryType> pluginRepositoryTypes;
 
     public GAVCoordinate getPluginCoordinates()
@@ -146,6 +148,16 @@ public class PluginDescriptor
         }
 
         return pluginStaticResourceModels;
+    }
+
+    public List<PluginStaticResourceModel> getPluginDocumentationResourceModels()
+    {
+        if ( pluginDocumentationResourceModels == null )
+        {
+            pluginDocumentationResourceModels = new ArrayList<PluginStaticResourceModel>();
+        }
+
+        return pluginDocumentationResourceModels;
     }
 
     public Map<String, PluginRepositoryType> getPluginRepositoryTypes()

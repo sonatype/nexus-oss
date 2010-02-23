@@ -37,6 +37,10 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-logging-extras</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
     </dependency>
     <dependency>

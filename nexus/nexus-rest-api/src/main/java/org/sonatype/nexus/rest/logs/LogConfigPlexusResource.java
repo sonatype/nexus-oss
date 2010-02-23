@@ -23,12 +23,14 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.LogConfigResource;
@@ -48,6 +50,12 @@ public class LogConfigPlexusResource
 {
     public static final String RESOURCE_URI = "/log/config";
     
+    /**
+     * The LogFile Manager
+     */
+    @Requirement
+    private LogManager logManager;
+
     public LogConfigPlexusResource()
     {
         this.setModifiable( true );
@@ -84,7 +92,7 @@ public class LogConfigPlexusResource
 
         try
         {
-            SimpleLog4jConfig logConfig = (SimpleLog4jConfig) getNexus().getLogConfig();
+            SimpleLog4jConfig logConfig = (SimpleLog4jConfig) logManager.getLogConfig();
 
             LogConfigResource data = new LogConfigResource();
 
@@ -133,7 +141,7 @@ public class LogConfigPlexusResource
             SimpleLog4jConfig logConfig =
                 new SimpleLog4jConfig( rootLogger, data.getFileAppenderLocation(), data.getFileAppenderPattern() );
 
-            getNexus().setLogConfig( logConfig );
+            logManager.setLogConfig( logConfig );
 
             LogConfigResourceResponse responseResource = new LogConfigResourceResponse();
 

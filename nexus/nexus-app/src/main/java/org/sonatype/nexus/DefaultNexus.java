@@ -44,7 +44,6 @@ import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
 import org.sonatype.nexus.index.events.ReindexRepositoriesEvent;
 import org.sonatype.nexus.index.events.ReindexRepositoriesRequest;
-import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.logging.AbstractLoggingComponent;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
@@ -371,18 +370,6 @@ public class DefaultNexus
         response.setInputStream( new LimitedInputStream( new FileInputStream( log ), from, count ) );
 
         return response;
-    }
-
-    public LogConfig getLogConfig()
-        throws IOException
-    {
-        return logManager.getLogConfig();
-    }
-
-    public void setLogConfig( LogConfig config )
-        throws IOException
-    {
-        logManager.setLogConfig( config );
     }
 
     public void expireAllCaches( ResourceStoreRequest request )
