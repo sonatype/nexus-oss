@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.2</version>
+    <version>1.4.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
@@ -16,11 +16,6 @@
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
   
   <description>Adds a repository type for deploying maven sites.</description>
-
-  <properties>
-    <nexus.version>1.5.1-SNAPSHOT</nexus.version>
-    <nexus-licensing-extension.version>1.0.0-SNAPSHOT</nexus-licensing-extension.version>
-  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -53,7 +48,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -71,48 +65,16 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
       <scope>test</scope>
-      <version>${nexus.version}</version>
     </dependency>
 
   </dependencies>
 
   <build>
     <plugins>
+    
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.4-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>setup-nexus-plugin-environment</goal>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-distribution</artifactId>
-            <version>${nexus.version}</version>
-            <type>zip</type>
-            <classifier>runtime-guice-jsw</classifier>
-          </nexusBundleArtifact>
-          
-          <nexusBundleName>nexus-oss-${nexus.version}</nexusBundleName>
-          
-          <nexusVersion>${nexus.version}</nexusVersion>
-          <nexusPluginsArtifacts>
-            <license>
-              <groupId>com.sonatype.nexus.extension</groupId>
-              <artifactId>nexus-licensing-extension</artifactId>
-            </license>
-            <license>
-              <groupId>com.sonatype.components</groupId>
-              <artifactId>plexus-licensing</artifactId>
-            </license>
-          </nexusPluginsArtifacts>
-        </configuration>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>     
       </plugin>
 
       <plugin>
