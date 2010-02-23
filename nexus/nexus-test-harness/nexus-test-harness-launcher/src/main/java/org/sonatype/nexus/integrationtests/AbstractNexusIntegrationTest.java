@@ -467,7 +467,7 @@ public class AbstractNexusIntegrationTest
 
         // int status = DeployUtils.deployUsingPomWithRest( deployUrl, repositoryId, gav, artifactFile, pom );
 
-        if ( !artifactFile.isFile() )
+        if ( !"pom".equals( model.getPackaging() ) && !artifactFile.isFile() )
         {
             throw new FileNotFoundException( "File " + artifactFile.getAbsolutePath() + " doesn't exists!" );
         }
@@ -498,8 +498,11 @@ public class AbstractNexusIntegrationTest
                                              this.getRelitiveArtifactPath( gav ) + ".asc" );
             }
 
-            DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactFile,
-                                         this.getRelitiveArtifactPath( gav ) );
+            if ( artifactFile.exists() )
+            {
+                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactFile,
+                                             this.getRelitiveArtifactPath( gav ) );
+            }
 
             if ( pomSha1.exists() )
             {
