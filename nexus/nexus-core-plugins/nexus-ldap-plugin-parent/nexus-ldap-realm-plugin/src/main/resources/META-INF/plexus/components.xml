@@ -15,7 +15,7 @@
 	        </requirement>
 	      </requirements>
 	    </component>
-	    <component>
+	    <!-- <component>
 	      <role>com.sonatype.nexus.security.ldap.realms.test.api.LdapConnectionTester</role>
 	      <role-hint>default</role-hint>
 	      <implementation>com.sonatype.nexus.security.ldap.realms.test.api.LdapConnectionTester</implementation>
@@ -28,6 +28,6 @@
 	          <field-name>logger</field-name>
 	        </requirement>
 	      </requirements>
-	    </component>
+	    </component> -->
 	</components>
 </component-set>
