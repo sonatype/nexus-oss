@@ -9,8 +9,14 @@ import org.apache.commons.httpclient.HttpMethod;
 import org.codehaus.plexus.util.FileUtils;
 import org.junit.Test;
 import org.restlet.data.Status;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
+import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -34,8 +40,14 @@ public class Nexus3233IndexPomSha1IT
         throws Exception
     {
         final File pom = getTestFile( "wagon.pom" );
-        DeployUtils.deployWithWagon( container, "http", getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom,
-                                     getRelitiveArtifactPath( GavUtil.newGav( "nexus3222", "wagon", "1.0.0", "pom" ) ) );
+        final File sha1 = new File( pom.getParentFile(), "wagon.pom.sha1" );
+        FileUtils.fileWrite( sha1.getAbsolutePath(), FileTestingUtils.createSHA1FromFile( pom ) );
+
+        final String repo = getRepositoryUrl( REPO_TEST_HARNESS_REPO );
+        final Gav gav = GavUtil.newGav( "nexus3233", "wagon", "1.0.0", "pom" );
+        final String path = getRelitiveArtifactPath( gav );
+        DeployUtils.deployWithWagon( container, "http", repo, pom, path );
+        DeployUtils.deployWithWagon( container, "http", repo, sha1, path + ".sha1" );
         searchFor( pom );
     }
 
@@ -44,8 +56,8 @@ public class Nexus3233IndexPomSha1IT
         throws Exception
     {
         final File pom = getTestFile( "maven.pom" );
-        MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3222", "maven", "1.0.0", "pom" ),
-                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null );
+        MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3233", "maven", "1.0.0", "pom" ),
+                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null, "-DgeneratePom=false" ).verifyErrorFreeLog();
         searchFor( pom );
     }
 
@@ -72,8 +84,19 @@ public class Nexus3233IndexPomSha1IT
         String sha1 = FileTestingUtils.createSHA1FromFile( pom );
         Assert.assertNotNull( sha1 );
 
+        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+
+        repo.setId( "repositoryOrGroupId" );
+
+        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTaskDescriptor.ID, repo );
+        Assert.assertNotNull( task );
+        TaskScheduleUtil.waitForAllTasksToStop( RebuildMavenMetadataTask.class );
+
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.waitForAllTasksToStop();
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
         doSearch( sha1, "after reindexing!" );
     }
 
@@ -85,7 +108,7 @@ public class Nexus3233IndexPomSha1IT
         doSearch( sha1, "" );
 
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.waitForAllTasksToStop();
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
         doSearch( sha1, "after reindexing!" );
     }
 
