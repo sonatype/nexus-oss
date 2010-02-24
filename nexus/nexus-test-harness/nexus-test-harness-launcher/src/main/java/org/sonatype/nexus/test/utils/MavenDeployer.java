@@ -16,6 +16,7 @@ package org.sonatype.nexus.test.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +29,8 @@ import org.sonatype.nexus.artifact.Gav;
 public class MavenDeployer
 {
 
-    private static Verifier createVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
+    private static Verifier createVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings,
+                                            String[] extraOptions )
         throws VerificationException, IOException
     {
         File mavenProjectDir = new File( "target" );
@@ -60,14 +62,20 @@ public class MavenDeployer
         options.add( "-Dversion=\'" + gav.getVersion() + "\'" );
         options.add( "-Dpackaging=\'" + gav.getExtension() + "\'" );
 
+        if ( extraOptions != null )
+        {
+            options.addAll( Arrays.asList( extraOptions ) );
+        }
+
         verifier.setCliOptions( options );
         return verifier;
     }
 
-    public static Verifier deployAndGetVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings )
+    public static Verifier deployAndGetVerifier( Gav gav, String repositoryUrl, File fileToDeploy, File settings,
+                                                 String... extraOptions )
         throws VerificationException, IOException
     {
-        Verifier verifier = createVerifier( gav, repositoryUrl, fileToDeploy, settings );
+        Verifier verifier = createVerifier( gav, repositoryUrl, fileToDeploy, settings, extraOptions );
         // verifier.executeGoal( "deploy:deploy-file" );
 
         Map<String, String> args = new HashMap<String, String>();
@@ -83,7 +91,7 @@ public class MavenDeployer
 
         verifier.setSystemProperties( props );
 
-        verifier.executeGoal( "org.apache.maven.plugins:maven-deploy-plugin:2.4:deploy-file", args );
+        verifier.executeGoal( "org.apache.maven.plugins:maven-deploy-plugin:2.5:deploy-file", args );
 
         return verifier;
 
