@@ -48,6 +48,26 @@
         <version>0.1.1</version>
         <executions>
           <execution>
+            <id>fragments</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>attach-descriptor</goal>
+            </goals>
+            <configuration>
+              <assemblyDescriptor>${assembly.directory}/fragments.xml</assemblyDescriptor>
+            </configuration>
+          </execution>      
+          <execution>
+            <id>plexus-jsw-minimal</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>assemble</goal>
+            </goals>
+            <configuration>
+              <assemblyDescriptor>${assembly.directory}/runtime-plexus-jsw-minimal.xml</assemblyDescriptor>
+            </configuration>
+          </execution>            
+          <execution>
             <id>plexus-jsw</id>
             <phase>process-resources</phase>
             <goals>
@@ -57,16 +77,16 @@
               <assemblyDescriptor>${assembly.directory}/runtime-plexus-jsw.xml</assemblyDescriptor>
             </configuration>
           </execution>
-          <!-- <execution>
-            <id>plexus-yajsw</id>
+          <execution>
+            <id>guice-jsw-minimal</id>
             <phase>process-resources</phase>
             <goals>
               <goal>assemble</goal>
             </goals>
             <configuration>
-              <assemblyDescriptor>${assembly.directory}/runtime-plexus-yajsw.xml</assemblyDescriptor>
+              <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw-minimal.xml</assemblyDescriptor>
             </configuration>
-          </execution>-->
+          </execution>          
           <execution>
             <id>guice-jsw</id>
             <phase>process-resources</phase>
@@ -77,16 +97,6 @@
               <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw.xml</assemblyDescriptor>
             </configuration>
           </execution>
-          <!-- <execution>
-            <id>guice-yajsw</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>assemble</goal>
-            </goals>
-            <configuration>
-              <assemblyDescriptor>${assembly.directory}/runtime-guice-yajsw.xml</assemblyDescriptor>
-            </configuration>
-          </execution>-->
         </executions>
       </plugin>
     </plugins>
