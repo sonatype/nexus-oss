@@ -13,6 +13,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sonatype.nexus.plugins.rrb.parsers.ArtifactoryRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.HtmlRemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.RemoteRepositoryParser;
 import org.sonatype.nexus.plugins.rrb.parsers.S3RemoteRepositoryParser;
@@ -69,10 +70,16 @@ public class MavenRepositoryReader
 
         if ( indata.indexOf( "<html " ) != -1 )
         {
-            logger.debug( "is html repository" );
-            parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            //if title="Artifactory" then it is an Artifactory repo...
+            if ( indata.indexOf( "title=\"Artifactory\"" ) != -1 ) {
+            	logger.debug( "is Artifactory repository" );
+            	parser = new ArtifactoryRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            } else {
+                logger.debug( "is html repository" );
+            	parser = new HtmlRemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl );
+            }
         }
-        if ( indata.indexOf( "xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"" ) != -1
+        else if ( indata.indexOf( "xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\"" ) != -1
             || ( indata.indexOf( "<?xml" ) != -1 && responseContainsError( indata ) ) )
         {
             logger.debug( "is S3 repository" );

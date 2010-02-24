@@ -35,9 +35,7 @@ public class MavenRepositoryReaderTest
 
     String localUrl = "http://local"; // This URL doesn't matter for the tests
 
-    String nameOfConnector; // This is the host:portnumber of the Jetty
-
-    // connector
+    String nameOfConnector; // This is the host:portnumber of the Jetty connector
 
     @Before
     public void setUp()
@@ -113,7 +111,7 @@ public class MavenRepositoryReaderTest
     }
 
     /**
-     * Below follows a set of tests of some typical existing repos The respectively repo's top level is stored as a file
+     * Below follows a set of tests of some typical existing repos. The respectively repo's top level is stored as a file
      * in the ordinary test resource catalog. Each file has a name indicating the repo it is taken from and an extension
      * with the date it was downloaded in the format YYYYMMDD.
      */

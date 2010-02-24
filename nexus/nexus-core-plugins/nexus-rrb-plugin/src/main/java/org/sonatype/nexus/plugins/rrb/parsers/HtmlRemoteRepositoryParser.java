@@ -1,37 +1,42 @@
 package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
+
 public class HtmlRemoteRepositoryParser
     implements RemoteRepositoryParser
 {
 
-    private final Logger logger = LoggerFactory.getLogger( HtmlRemoteRepositoryParser.class );
+    private static final String[] EXCLUDES = 
+	        new String[] { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?", ">../", ">..<", ">._.<", "-logo.png",
+	            ">Community<", ">Support<", ">Resources<", ">About us<", ">Downloads<", ">Documentation<", ">Resources<",
+	            ">About This Site<", ">Contact Us<", ">Legal Terms and Privacy Policy<", ">Log out<",
+	            ">IONA Technologies<", ">Site Index<", ">Skip to content<", ">Log In<"};
 
-    private static final String[] EXCLUDES =
-        { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?", ">../", ">..<", "-logo.png",
-            ">Community<", ">Support<", ">Resources<", ">About us<", ">Downloads<", ">Documentation<", ">Resources<",
-            ">About This Site<", ">Contact Us<", ">Legal Terms and Privacy Policy<", ">Log out<",
-            ">IONA Technologies<", ">Site Index<", ">Skip to content<" };
+	private final Logger logger = LoggerFactory.getLogger( HtmlRemoteRepositoryParser.class );
 
-    private String localUrl;
+    List<String> excludes = new ArrayList<String>(Arrays.asList(EXCLUDES));
 
-    private String remoteUrl;
-
-    private String linkStart = "<a ";
-
-    private String linkEnd = "/a>";
-
-    private String href = "href=\"";
-
-    private String id;
-
-    private String baseUrl;
+	String localUrl;
+	
+	String remoteUrl;
+	
+	String linkStart = "<a ";
+	
+	String linkEnd = "/a>";
+	
+	String href = "href=\"";
+	
+	String id;
+	
+	String baseUrl;
 
     public HtmlRemoteRepositoryParser( String remoteUrl, String localUrl, String id, String baseUrl )
     {
@@ -59,6 +64,7 @@ public class HtmlRemoteRepositoryParser
         }
         int start = 0;
         int end = 0;
+
         do
         {
             RepositoryDirectory rp = new RepositoryDirectory();
@@ -97,7 +103,7 @@ public class HtmlRemoteRepositoryParser
                 {
                     result.add( rp );
                 }
-                logger.debug( "addning {} to result", rp.toString() );
+                logger.debug( "adding {} to result", rp.toString() );
             }
             start = end + 1;
         }
@@ -144,7 +150,7 @@ public class HtmlRemoteRepositoryParser
      */
     boolean exclude( StringBuilder value )
     {
-        for ( String s : EXCLUDES )
+        for ( String s : getExcluded() )
         {
             if ( value.indexOf( s ) > 0 )
             {
@@ -154,4 +160,8 @@ public class HtmlRemoteRepositoryParser
         }
         return false;
     }
+
+	private List<String> getExcluded() {
+		return excludes;
+	}
 }
