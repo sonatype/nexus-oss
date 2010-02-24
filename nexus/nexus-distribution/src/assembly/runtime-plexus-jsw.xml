@@ -28,6 +28,19 @@
         <assemblyId>fragment-nexus-oss-plugins</assemblyId>
       </extend>      
     </extends>
+    
+    <itars>
+      <itar>
+        <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+        <artifactId>nexus-ldap-realm-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+		<virtual>true</virtual>
+		<unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>      
+   </itars>    
 
   </assembly>
 

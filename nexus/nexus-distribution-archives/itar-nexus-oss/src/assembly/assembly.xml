@@ -25,6 +25,7 @@
         <exclude>reflect-class-descriptor-*</exclude>
         <exclude>plugin-gleaner-*</exclude>
         <exclude>xbean-reflect-*</exclude>
+        <exclude>nexus-oss-edition-*</exclude>
       </excludes>
     </fileSet>
     <fileSet>

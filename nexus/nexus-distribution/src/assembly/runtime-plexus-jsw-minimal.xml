@@ -26,7 +26,7 @@
         <version>${project.version}</version>
         <classifier>runtime-fragments</classifier>
         <type>xml</type>
-        <assemblyId>fragment-plexus</assemblyId>
+        <assemblyId>fragment-nexus-plexus</assemblyId>
       </extend>      
     </extends>
     
