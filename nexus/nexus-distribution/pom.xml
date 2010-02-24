@@ -45,7 +45,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>maven-runtime-assembler-plugin</artifactId>
-        <version>0.1.2-SNAPSHOT</version>
+        <version>0.1.2</version>
         <executions>
           <execution>
             <id>fragments</id>
