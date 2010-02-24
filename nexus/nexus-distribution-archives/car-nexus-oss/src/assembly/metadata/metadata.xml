@@ -44,6 +44,7 @@
         <value>-Xnoagent</value>
         <value>-Djava.compiler=NONE</value>
         <value>-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000</value>
+        <value>-XX:+HeapDumpOnOutOfMemoryError</value>
       </values>
       <mergePolicy>append</mergePolicy>
     </property>
