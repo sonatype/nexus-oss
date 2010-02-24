@@ -36,5 +36,19 @@
       <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</directory>
       <outputDirectory>data/${webAppDir}</outputDirectory>
     </fileSet>
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}</directory>
+      <outputDirectory>data/${runtimeDir}</outputDirectory>
+      <includes>
+        <include>*.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/runtime/apps/nexus</directory>
+      <outputDirectory>data/${applicationDir}</outputDirectory>
+      <includes>
+        <include>*.txt</include>
+      </includes>
+    </fileSet>    
   </fileSets>
 </assembly>
