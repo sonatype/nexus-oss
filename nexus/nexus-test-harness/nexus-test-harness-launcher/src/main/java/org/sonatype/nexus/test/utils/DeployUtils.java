@@ -157,4 +157,28 @@ public class DeployUtils
         return deployUsingPomWithRestReturnResult( restServiceURL, repositoryId, fileToDeploy, pomFile, classifier,
                                                    extention ).getStatusCode();
     }
+
+    public static HttpMethod deployPomWithRest( String repositoryId, File pomFile )
+        throws HttpException, IOException
+    {
+        String restServiceURL = AbstractNexusIntegrationTest.nexusBaseUrl + "service/local/artifact/maven/content";
+        // the method we are calling
+        PostMethod filePost = new PostMethod( restServiceURL );
+        filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
+
+        Part[] parts =
+            { new StringPart( "r", repositoryId ), new StringPart( "hasPom", "true" ),
+                new FilePart( pomFile.getName(), pomFile ), };
+
+        filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
+
+        LOG.debug( "URL:  " + restServiceURL );
+        LOG.debug( "Method: Post" );
+        LOG.debug( "params: " );
+        LOG.debug( "\tr: " + repositoryId );
+        LOG.debug( "\thasPom: true" );
+        LOG.debug( "\tpom: " + pomFile );
+
+        return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
+    }
 }
