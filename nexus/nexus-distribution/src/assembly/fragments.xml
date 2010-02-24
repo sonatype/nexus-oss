@@ -1,27 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>plexus-yajsw</id>
+  <id>fragments</id>
 
   <assembly>
 
-    <description>Nexus OSS / Plexus / YAJSW</description>
+	<id>fragment-nexus-oss-minimal</id>
+
+    <description>Nexus OSS Minimal Fragment</description>
 
     <properties>
       <appName>nexus</appName>
       <appVersion>${project.version}</appVersion>
-      <appLongName>Nexus OSS / Plexus</appLongName>
       <runtimeDir>${appName}-oss-${appVersion}</runtimeDir>
       <workDir>sonatype-work</workDir>
     </properties>
-
-    <bar>
-      <groupId>org.sonatype.runtime.bars</groupId>
-      <artifactId>bar-yajsw</artifactId>
-      <version>9.5-v0001-SNAPSHOT</version>
-      <type>zip</type>
-    </bar>
-
+    
     <cars>
       <car>
         <groupId>org.sonatype.nexus</groupId>
@@ -39,9 +33,15 @@
         <type>zip</type>
       </itar>
       <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-nexus-plugin-manager-plexus</artifactId>
-        <version>${project.version}</version>
+        <groupId>org.sonatype.runtime.itars</groupId>
+        <artifactId>itar-plexus-app-booter</artifactId>
+        <version>2.1.0-v0001-SNAPSHOT</version>
+        <type>zip</type>
+      </itar>
+      <itar>
+        <groupId>org.sonatype.runtime.itars</groupId>
+        <artifactId>itar-plexus-jsw-app-booter</artifactId>
+        <version>2.1.0-v0001-SNAPSHOT</version>
         <type>zip</type>
       </itar>
       <itar>
@@ -53,7 +53,70 @@
 		<virtual>true</virtual>
 		<unpack>true</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
+      </itar>      
+      <itar>
+        <groupId>org.sonatype.runtime.itars</groupId>
+        <artifactId>itar-work-dir</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+        <type>zip</type>
       </itar>
+    </itars>    
+    
+  </assembly>
+  
+  <assembly>
+
+	<id>fragment-nexus-guice</id>
+
+    <description>Nexus Guice Fragment</description>
+
+    <itars>
+      <itar>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>itar-plexus-container-guice</artifactId>
+        <version>${project.version}</version>
+        <type>zip</type>
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>itar-nexus-plugin-manager-guice</artifactId>
+        <version>${project.version}</version>
+        <type>zip</type>
+      </itar>
+    </itars>
+
+  </assembly>
+  
+  <assembly>
+
+	<id>fragment-nexus-plexus</id>
+
+    <description>Nexus Plexus Fragment</description>
+
+    <itars>
+      <itar>
+        <groupId>org.sonatype.runtime.itars</groupId>
+        <artifactId>itar-plexus-container-default</artifactId>
+        <version>1.2.1.4-v0001-SNAPSHOT</version>
+        <type>zip</type>
+      </itar>
+      <itar>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>itar-nexus-plugin-manager-plexus</artifactId>
+        <version>${project.version}</version>
+        <type>zip</type>
+      </itar>
+    </itars>
+
+  </assembly>  
+  
+  <assembly>
+
+	<id>fragment-nexus-oss-plugins</id>
+
+    <description>Nexus OSS Plugins Fragment</description>
+
+    <itars>
       <itar>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
@@ -84,32 +147,8 @@
 		<unpack>true</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
       </itar>
-      <itar>
-        <groupId>org.sonatype.runtime.itars</groupId>
-        <artifactId>itar-plexus-app-booter</artifactId>
-        <version>2.1.0-v0001-SNAPSHOT</version>
-        <type>zip</type>
-      </itar>
-      <itar>
-        <groupId>org.sonatype.runtime.itars</groupId>
-        <artifactId>itar-plexus-jsw-app-booter</artifactId>
-        <version>2.1.0-v0001-SNAPSHOT</version>
-        <type>zip</type>
-      </itar>
-      <itar>
-        <groupId>org.sonatype.runtime.itars</groupId>
-        <artifactId>itar-plexus-container-default</artifactId>
-        <version>1.2.1.4-v0001-SNAPSHOT</version>
-        <type>zip</type>
-      </itar>
-      <itar>
-        <groupId>org.sonatype.runtime.itars</groupId>
-        <artifactId>itar-work-dir</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
-        <type>zip</type>
-      </itar>
     </itars>
 
-  </assembly>
+  </assembly>  
 
 </assemblies>

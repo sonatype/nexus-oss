@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>plexus-jsw</id>
+  <id>plexus-jsw-minimal</id>
 
   <assembly>
 
-    <description>Nexus OSS / Plexus / JSW</description>
+    <description>Nexus OSS Minimal / Plexus / JSW</description>
 
     <properties>
-      <appLongName>Nexus OSS / Plexus</appLongName>
+      <appLongName>Nexus OSS Minimal / Plexus</appLongName>
     </properties>
 
     <extends>
@@ -16,8 +16,9 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-distribution</artifactId>
         <version>${project.version}</version>
-        <classifier>runtime-plexus-jsw-minimal</classifier>
+        <classifier>runtime-fragments</classifier>
         <type>xml</type>
+        <assemblyId>fragment-nexus-oss-minimal</assemblyId>
       </extend>
       <extend>
         <groupId>org.sonatype.nexus</groupId>
@@ -25,9 +26,16 @@
         <version>${project.version}</version>
         <classifier>runtime-fragments</classifier>
         <type>xml</type>
-        <assemblyId>fragment-nexus-oss-plugins</assemblyId>
+        <assemblyId>fragment-plexus</assemblyId>
       </extend>      
     </extends>
+    
+    <bar>
+      <groupId>org.sonatype.runtime.bars</groupId>
+      <artifactId>bar-jsw</artifactId>
+      <version>3.2.3-v0001-SNAPSHOT</version>
+      <type>zip</type>
+    </bar>
 
   </assembly>
 
