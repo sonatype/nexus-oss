@@ -91,7 +91,7 @@ public class MavenRepositoryReaderTest
     }
 
     /**
-     * First two test of two architypical test repos
+     * First some tests of architypical test repos
      */
 
     @Test( timeout = 5000 )
@@ -108,6 +108,16 @@ public class MavenRepositoryReaderTest
         List<RepositoryDirectory> result =
             reader.extract( getURLForTestRepoResource( "s3Example" ), localUrl, null, "test" );
         assertEquals( 14, result.size() );
+    }
+    
+    @Test( timeout = 5000 )
+    public void testReadArtifactory()
+    {
+    	//In this test the format of the local URL is important
+    	localUrl = "http://localhost:8081/nexus/service/local/repositories/ArtyJavaNet/remotebrowser/http://repo.jfrog.org/artifactory/java.net";
+        List<RepositoryDirectory> result =
+            reader.extract( getURLForTestRepoResource( "Artifactory.java.net.htm" ), localUrl, null, "test" );
+        assertEquals( 30, result.size() );
     }
 
     /**
