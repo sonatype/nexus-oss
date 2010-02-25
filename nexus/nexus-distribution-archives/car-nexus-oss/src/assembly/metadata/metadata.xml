@@ -22,12 +22,12 @@
     <property>
       <name>startupTimeout</name>
       <value>90</value>
-      <mergePolicy>error</mergePolicy>
+      <mergePolicy>first</mergePolicy>
     </property>
     <property>
       <name>pingTimeout</name>
       <value>90</value>
-      <mergePolicy>error</mergePolicy>
+      <mergePolicy>first</mergePolicy>
     </property>
     <property>
       <name>jvmParameters</name>
