@@ -19,22 +19,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <id>env</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>setup-environment</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>package</id>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <nexusPluginsArtifacts>
             <plugin>
@@ -45,20 +29,12 @@
               <outputProperty>nexus-base-dir</outputProperty>
             </plugin>
           </nexusPluginsArtifacts>
-          <extraResourcesArtifacts>
-            <resource>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
-              <classifier>repo</classifier>
-              <version>${nexus.version}</version>
-              <type>zip</type>
-              <outputProperty>maven-repository</outputProperty>
-            </resource>
-            <!--
-              <resource> <groupId>org.sonatype.nexus</groupId> <artifactId>nexus-test-harness-launcher</artifactId> <classifier>resources</classifier> <type>zip</type> </resource>
-            -->
-          </extraResourcesArtifacts>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>failsafe-maven-plugin</artifactId>
       </plugin>
 
       <plugin>
@@ -75,16 +51,6 @@
           </filesets>
         </configuration>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>-Xmx512M</argLine>
-          <forkMode>always</forkMode>
-        </configuration>
-      </plugin>
-
     </plugins>
   </build>
 

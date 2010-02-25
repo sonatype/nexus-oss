@@ -22,7 +22,6 @@
   </modules>
 
   <properties>
-    <nexus.version>1.5.0</nexus.version>
     <plexus.version>1.2.1</plexus.version>
   </properties>
 
@@ -78,50 +77,6 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0-alpha-4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, 
-                so moving to a later phase to get out of 
-                the way of m2eclipse. -->
-            <phase>package</phase>
-            <id>enforce</id>
-            <configuration>
-              <rules>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>velocity:velocity:jar:1.4</exclude>
-                    <exclude>velocity:velocity-dep:jar:1.4</exclude>
-                  </excludes>
-                  <message> Velocity 1.4 is banned, Velocity 1.5 should be used! You probably added a dependency that is missing the exclusions. </message>
-                </bannedDependencies>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>commons-logging:*</exclude>
-                  </excludes>
-                  <message> commons-logging conflicts with slf4j. You probably added a dependency that is missing the exclusions. </message>
-                </bannedDependencies>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>*:plexus-component-api</exclude>
-                  </excludes>
-                  <message> plexus-component-api conflicts with newer plexus-container-default. You probably added a dependency that is plexus component made with older plexus container. </message>
-                </bannedDependencies>
-                <!--  <requirePluginVersions>
-								<banSnapshots>false</banSnapshots>
-								</requirePluginVersions>-->
-              </rules>
-              <fail>true</fail>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
     </plugins>
   </build>
 </project>

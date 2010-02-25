@@ -7,7 +7,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.log.SimpleLog4jConfig;
@@ -20,9 +19,6 @@ public class MigrationLogInitializer
 
     @Requirement
     private LogManager logManager;
-
-    @Requirement
-    private Nexus nexus;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
@@ -41,7 +37,7 @@ public class MigrationLogInitializer
         try
         {
             SimpleLog4jConfig logConfig =
-                new MigrationLog4jConfig( (SimpleLog4jConfig) nexus.getLogConfig(), migrationLog );
+                new MigrationLog4jConfig( (SimpleLog4jConfig) logManager.getLogConfig(), migrationLog );
             logManager.setLogConfig( logConfig );
         }
         catch ( IOException e )

@@ -77,7 +77,25 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-app</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-app</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+      <version>${nexus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-proxy</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+      <version>${nexus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
       <classifier>tests</classifier>
       <scope>test</scope>
       <version>${nexus.version}</version>
