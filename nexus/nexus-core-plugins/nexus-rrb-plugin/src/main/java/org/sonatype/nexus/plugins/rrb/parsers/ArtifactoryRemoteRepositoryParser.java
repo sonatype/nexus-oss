@@ -7,7 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
 public class ArtifactoryRemoteRepositoryParser extends
-		HtmlRemoteRepositoryParser {
+		HtmlRemoteRepositoryParser
+{
 	private final Logger logger = LoggerFactory.getLogger( ArtifactoryRemoteRepositoryParser.class );
 
 	/** Links to sub-repos contain the pattern assigned to artifactoryLinkPattern
@@ -39,8 +40,8 @@ public class ArtifactoryRemoteRepositoryParser extends
         
         int uriPrefixEndPosition = localUrl.indexOf(uriPrefixEnd);
         String uriPrefix = "";
-        if(uriPrefixEndPosition > 0 ) {
-           uriPrefix = localUrl.substring(0, uriPrefixEndPosition) + "/";
+        if( uriPrefixEndPosition > 0 ) {
+           uriPrefix = localUrl.substring( 0, uriPrefixEndPosition ) + "/";
         }
         for (String artifactoryLink : artifactoryLinks) {
         	RepositoryDirectory repositoryDirectory = new RepositoryDirectory();
@@ -65,7 +66,7 @@ public class ArtifactoryRemoteRepositoryParser extends
 		ArrayList<String> result = new ArrayList<String>();
 		int currentStartPosition = -1;
 		int endPosition = currentStartPosition;
-		while((currentStartPosition = getNextArtifactoryAnchorPosition(indata, endPosition)) > 0) {
+		while((currentStartPosition = getNextArtifactoryAnchorPosition( indata, endPosition )) > 0) {
 		    endPosition = indata.indexOf( linkEnd, currentStartPosition ) + linkEnd.length();
 			String string = indata.substring( currentStartPosition, endPosition );
 			if( containsValidArtifactoryReference( string )) {
@@ -95,17 +96,17 @@ public class ArtifactoryRemoteRepositoryParser extends
 	private int getNextArtifactoryAnchorPosition(StringBuilder indata,
 			int lastEndPosition)
 	{
-		return indata.indexOf(startOfArtifactoryLink, lastEndPosition + 1);
+		return indata.indexOf( startOfArtifactoryLink, lastEndPosition + 1 );
 	}	
 	
     protected String getLinkName( String anchorString )
     {
-        return getLinkName( new StringBuilder( anchorString ));
+        return getLinkName( new StringBuilder( anchorString ) );
     }
 
     protected String getLinkUrl( String anchorString )
     {
-    	return getLinkUrl( new StringBuilder( anchorString ));
+    	return getLinkUrl( new StringBuilder( anchorString ) );
     }
 
 }
