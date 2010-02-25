@@ -96,7 +96,7 @@ public class ArtifactoryRemoteRepositoryParser extends
 	private int getNextArtifactoryAnchorPosition(StringBuilder indata,
 			int lastEndPosition)
 	{
-		return indata.indexOf( startOfArtifactoryLink, lastEndPosition + 1 );
+		return indata.indexOf( startOfArtifactoryLink, lastEndPosition );
 	}	
 	
     protected String getLinkName( String anchorString )
