@@ -26,6 +26,7 @@ import org.sonatype.nexus.feeds.ErrorWarningEvent;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.feeds.SystemEvent;
 import org.sonatype.nexus.feeds.SystemProcess;
+import org.sonatype.nexus.log.LogConfig;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalRequest;
 import org.sonatype.nexus.maven.tasks.SnapshotRemovalResult;
 import org.sonatype.nexus.proxy.AccessDeniedException;
@@ -149,6 +150,26 @@ public interface Nexus
      * @throws IOException
      */
     NexusStreamResponse getConfigurationAsStreamByKey( String key )
+        throws IOException;
+
+    /**
+     * Gets log config.
+     * 
+     * @return
+     * @throws IOException
+     * @deprecated Use org.sonatype.nexus.log.LogManager component to manage logs.
+     */
+    LogConfig getLogConfig()
+        throws IOException;
+
+    /**
+     * Sets log config.
+     * 
+     * @param config
+     * @throws IOException
+     * @deprecated Use org.sonatype.nexus.log.LogManager component to manage logs.
+     */
+    void setLogConfig( LogConfig config )
         throws IOException;
 
     // ----------------------------------------------------------------------------
