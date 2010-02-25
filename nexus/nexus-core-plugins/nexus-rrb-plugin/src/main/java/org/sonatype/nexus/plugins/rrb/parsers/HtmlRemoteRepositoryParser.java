@@ -1,42 +1,36 @@
 package org.sonatype.nexus.plugins.rrb.parsers;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.plugins.rrb.RepositoryDirectory;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-
 public class HtmlRemoteRepositoryParser
     implements RemoteRepositoryParser
 {
 
-    private static final String[] EXCLUDES = 
-	        new String[] { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?", ">../", ">..<", ">._.<", "-logo.png",
+    private static final String[] EXCLUDES = { ">Skip to content<", ">Log in<", ">Products<", "Parent Directory", "?", ">../", ">..<", ">._.<", "-logo.png",
 	            ">Community<", ">Support<", ">Resources<", ">About us<", ">Downloads<", ">Documentation<", ">Resources<",
 	            ">About This Site<", ">Contact Us<", ">Legal Terms and Privacy Policy<", ">Log out<",
 	            ">IONA Technologies<", ">Site Index<", ">Skip to content<", ">Log In<"};
 
 	private final Logger logger = LoggerFactory.getLogger( HtmlRemoteRepositoryParser.class );
 
-    List<String> excludes = new ArrayList<String>(Arrays.asList(EXCLUDES));
-
-	String localUrl;
+	protected String localUrl;
 	
-	String remoteUrl;
+	protected String remoteUrl;
 	
-	String linkStart = "<a ";
+	protected String linkStart = "<a ";
 	
-	String linkEnd = "/a>";
+	protected String linkEnd = "/a>";
 	
-	String href = "href=\"";
+	protected String href = "href=\"";
 	
-	String id;
+	protected String id;
 	
-	String baseUrl;
+	protected String baseUrl;
 
     public HtmlRemoteRepositoryParser( String remoteUrl, String localUrl, String id, String baseUrl )
     {
@@ -115,14 +109,14 @@ public class HtmlRemoteRepositoryParser
     /**
      * Extracts the link name.
      */
-    String getLinkName( StringBuilder temp )
+    protected String getLinkName( StringBuilder temp )
     {
         int start = temp.indexOf( ">" ) + 1;
         int end = temp.indexOf( "</" );
         return cleanup( temp.substring( start, end ) );
     }
 
-    String cleanup( String value )
+    protected String cleanup( String value )
     {
         int start = value.indexOf( '<' );
         int end = value.indexOf( '>' );
@@ -138,7 +132,7 @@ public class HtmlRemoteRepositoryParser
     /**
      * Extracts the link url.
      */
-    String getLinkUrl( StringBuilder temp )
+    protected String getLinkUrl( StringBuilder temp )
     {
         int start = temp.indexOf( href ) + href.length();
         int end = temp.indexOf( "\"", start + 1 );
@@ -150,7 +144,7 @@ public class HtmlRemoteRepositoryParser
      */
     boolean exclude( StringBuilder value )
     {
-        for ( String s : getExcluded() )
+        for ( String s : EXCLUDES )
         {
             if ( value.indexOf( s ) > 0 )
             {
@@ -161,7 +155,4 @@ public class HtmlRemoteRepositoryParser
         return false;
     }
 
-	private List<String> getExcluded() {
-		return excludes;
-	}
 }
