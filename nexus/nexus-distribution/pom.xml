@@ -68,13 +68,13 @@
             </configuration>
           </execution>          
           <execution>
-            <id>guice-jsw</id>
+            <id>guice-jsw-oss</id>
             <phase>process-resources</phase>
             <goals>
               <goal>assemble</goal>
             </goals>
             <configuration>
-              <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw.xml</assemblyDescriptor>
+              <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw-oss.xml</assemblyDescriptor>
             </configuration>
           </execution>
         </executions>

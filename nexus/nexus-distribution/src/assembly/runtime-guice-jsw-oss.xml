@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>guice-jsw</id>
+  <id>oss</id>
 
   <assembly>
 
     <description>Nexus OSS / Guice / JSW</description>
 
     <properties>
-      <appLongName>Nexus OSS / Guice</appLongName>
+      <appLongName>Nexus OSS</appLongName>
     </properties>
 
     <extends>
