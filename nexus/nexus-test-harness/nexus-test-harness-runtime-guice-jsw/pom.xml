@@ -64,7 +64,7 @@
             <artifactId>nexus-distribution</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>runtime-guice-jsw</classifier>
+            <classifier>runtime-oss</classifier>
           </nexusBundleArtifact>
 
           <nexusBundleName>nexus-oss-${project.version}</nexusBundleName>
