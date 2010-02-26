@@ -58,26 +58,6 @@
             </configuration>
           </execution>      
           <execution>
-            <id>plexus-jsw-minimal</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>assemble</goal>
-            </goals>
-            <configuration>
-              <assemblyDescriptor>${assembly.directory}/runtime-plexus-jsw-minimal.xml</assemblyDescriptor>
-            </configuration>
-          </execution>            
-          <execution>
-            <id>plexus-jsw</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>assemble</goal>
-            </goals>
-            <configuration>
-              <assemblyDescriptor>${assembly.directory}/runtime-plexus-jsw.xml</assemblyDescriptor>
-            </configuration>
-          </execution>
-          <execution>
             <id>guice-jsw-minimal</id>
             <phase>process-resources</phase>
             <goals>

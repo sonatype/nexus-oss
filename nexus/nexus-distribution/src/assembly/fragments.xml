@@ -99,29 +99,6 @@
   
   <assembly>
 
-	<id>fragment-nexus-plexus</id>
-
-    <description>Nexus Plexus Fragment</description>
-
-    <itars>
-      <itar>
-        <groupId>org.sonatype.runtime.itars</groupId>
-        <artifactId>itar-plexus-container-default</artifactId>
-        <version>1.2.1.4-v0001-SNAPSHOT</version>
-        <type>zip</type>
-      </itar>
-      <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-nexus-plugin-manager-plexus</artifactId>
-        <version>${project.version}</version>
-        <type>zip</type>
-      </itar>
-    </itars>
-
-  </assembly>  
-  
-  <assembly>
-
 	<id>fragment-nexus-oss-plugins</id>
 
     <description>Nexus OSS Plugins Fragment</description>
