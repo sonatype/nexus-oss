@@ -31,6 +31,17 @@
     <templates.directory>${assembly.directory}/templates</templates.directory>
   </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-webapp</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
 	<build>
 		<pluginManagement>
 			<plugins>

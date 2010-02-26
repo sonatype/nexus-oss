@@ -1,7 +1,5 @@
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -19,6 +17,87 @@
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
   </properties>
+
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>car-nexus-oss</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>itar-nexus-oss</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.itars</groupId>
+      <artifactId>itar-plexus-app-booter</artifactId>
+      <version>2.1.0-v0001-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.itars</groupId>
+      <artifactId>itar-plexus-jsw-app-booter</artifactId>
+      <version>2.1.0-v0001-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-oss-edition</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.itars</groupId>
+      <artifactId>itar-work-dir</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>itar-plexus-container-guice</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>itar-nexus-plugin-manager-guice</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-rrb-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+
+  </dependencies>
+
 
   <build>
     <plugins>
@@ -56,7 +135,7 @@
             <configuration>
               <assemblyDescriptor>${assembly.directory}/fragments.xml</assemblyDescriptor>
             </configuration>
-          </execution>      
+          </execution>
           <execution>
             <id>guice-jsw-minimal</id>
             <phase>process-resources</phase>
@@ -66,7 +145,7 @@
             <configuration>
               <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw-minimal.xml</assemblyDescriptor>
             </configuration>
-          </execution>          
+          </execution>
           <execution>
             <id>guice-jsw-oss</id>
             <phase>process-resources</phase>
