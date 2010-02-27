@@ -268,6 +268,8 @@ public class DefaultTaskConfigManager
             }
             catch ( ComponentLookupException e )
             {
+                // print original debug
+                this.logger.debug( "Failed to load Schedule Task: "+ taskType, e );
                 throw new IllegalArgumentException( "Could not create task of type" + taskType, e );
             }
         }
