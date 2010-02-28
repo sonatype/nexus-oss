@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.spice.inject</groupId>
+    <artifactId>guice-plexus</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <packaging>pom</packaging>
+
+  <artifactId>guice-nexus</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+
+  <name>Guice - Nexus</name>
+
+  <properties>
+    <nexus.api.version>1.5.1-SNAPSHOT</nexus.api.version>
+    <guice.nexus.version>0.1.0-SNAPSHOT</guice.nexus.version>
+    <sonatype.plugin.version>1.0.2</sonatype.plugin.version>
+  </properties>
+
+  <modules>
+    <module>guice-nexus-scanners</module>
+    <module>guice-nexus-shim</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-api</artifactId>
+        <version>${nexus.api.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-configuration</artifactId>
+        <version>${nexus.api.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-api</artifactId>
+        <version>${sonatype.plugin.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.code.atinject</groupId>
+            <artifactId>atinject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-host-api</artifactId>
+        <version>${sonatype.plugin.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.google.code.atinject</groupId>
+            <artifactId>atinject</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-model-api</artifactId>
+        <version>${sonatype.plugin.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plexus.appevents</groupId>
+        <artifactId>plexus-app-events-api</artifactId>
+        <version>1.0.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+        <artifactId>plexus-app-booter</artifactId>
+        <version>2.1.0</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-nexus-scanners</artifactId>
+        <version>${guice.nexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-nexus-shim</artifactId>
+        <version>${guice.nexus.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>

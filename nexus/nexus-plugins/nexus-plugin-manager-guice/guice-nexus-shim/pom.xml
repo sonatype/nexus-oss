@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.spice.inject</groupId>
+    <artifactId>guice-nexus</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <packaging>bundle</packaging>
+
+  <artifactId>guice-nexus-shim</artifactId>
+
+  <name>Guice - Nexus shim</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>1.5.4</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <!-- stop the contents of split-packages from leaking into the final bundle -->
+          <excludeDependencies>*;groupId=!org.sonatype.spice.inject</excludeDependencies>
+          <instructions>
+            <Bundle-RequiredExecutionEnvironment>
+              J2SE-1.5,JavaSE-1.6
+            </Bundle-RequiredExecutionEnvironment>
+            <_exportcontents>org.sonatype.nexus.*;-noimport:=true</_exportcontents>
+            <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
+            <_nouses>true</_nouses>
+            <Embed-Dependency>
+              *;groupId=org.sonatype.spice.inject;optional=true;inline=org/**
+            </Embed-Dependency>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Include-Resource>
+              META-INF/plexus/components.xml=${project.build.directory}/components.xml
+            </Include-Resource>
+            <_removeheaders>
+              Embed-Dependency,Embed-Transitive,
+              Built-By,Tool,Created-By,Build-Jdk,
+              Include-Resource,Private-Package,
+              Ignore-Package,Bnd-LastModified
+            </_removeheaders>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>plexus-app-events-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-app-booter</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>javax.inject</groupId>
+      <artifactId>javax.inject</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-patches</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-nexus-scanners</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-classworlds</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-locators</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-binders</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+</project>
