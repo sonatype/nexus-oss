@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>oss</id>
+  <id>runtime-oss</id>
 
   <assembly>
 
