@@ -125,6 +125,12 @@
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>maven-runtime-assembler-plugin</artifactId>
         <version>0.1.3-SNAPSHOT</version>
+        <configuration>
+          <formats>
+            <format>zip</format>
+            <format>tar.gz</format>
+          </formats>
+        </configuration>
         <executions>
           <execution>
             <id>fragments</id>
