@@ -1017,8 +1017,7 @@
     <module>nexus-core-plugins</module>
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
-    <module>nexus-distribution-archives</module>
-    <module>nexus-distribution</module>
+    <module>nexus-distributions</module>
     <module>nexus-test-harness</module>
   </modules>
 
