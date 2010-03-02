@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -7,7 +8,7 @@
   </parent>
   <artifactId>nexus-logging-extras</artifactId>
   <name>Nexus Logging Extras</name>
-  
+
   <dependencies>
     <!-- We have components in here -->
     <dependency>
@@ -18,17 +19,30 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-container-default</artifactId>
     </dependency>
+
     <!-- Need some classes from here -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-utils</artifactId>
+      <scope>compile</scope>
     </dependency>
 
-    <!-- We configure Log4j in programmatic way, so we need this -->    
+    <!-- We configure Log4j in programmatic way, so we need this -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <scope>compile</scope>
+    </dependency>
+
+    <!-- We have servlet util classes too -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
     </dependency>
 
     <!-- Testing -->
@@ -38,7 +52,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -47,6 +61,6 @@
       </plugin>
     </plugins>
   </build>
-  
-  
+
+
 </project>
