@@ -98,6 +98,15 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-distribution</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <classifier>oss</classifier>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
@@ -131,7 +140,7 @@
             <artifactId>nexus-distribution</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>runtime-oss</classifier>
+            <classifier>oss</classifier>
           </nexusBundleArtifact>
           
           <nexusBundleName>nexus-oss-${project.version}</nexusBundleName>
