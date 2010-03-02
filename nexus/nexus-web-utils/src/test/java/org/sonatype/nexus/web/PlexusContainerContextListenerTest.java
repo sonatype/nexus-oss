@@ -1,0 +1,59 @@
+/**
+ * Sonatype Nexus (TM) Open Source Version.
+ * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
+ * Includes the third-party code listed at http://nexus.sonatype.org/dev/attributions.html
+ * This program is licensed to you under Version 3 only of the GNU General Public License as published by the Free Software Foundation.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License Version 3 for more details.
+ * You should have received a copy of the GNU General Public License Version 3 along with this program.
+ * If not, see http://www.gnu.org/licenses/.
+ * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
+ * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
+ */
+package org.sonatype.nexus.web;
+
+import java.io.File;
+
+import javax.servlet.http.HttpServlet;
+
+import junit.framework.TestCase;
+
+import com.meterware.httpunit.PostMethodWebRequest;
+import com.meterware.httpunit.WebRequest;
+import com.meterware.servletunit.InvocationContext;
+import com.meterware.servletunit.ServletRunner;
+import com.meterware.servletunit.ServletUnitClient;
+
+public class PlexusContainerContextListenerTest
+    extends TestCase
+{
+    protected File webXml;
+
+    protected ServletRunner servletRunner;
+
+    @Override
+    protected void setUp()
+        throws Exception
+    {
+        super.setUp();
+
+        webXml = new File( "src/test/resources/httpunit/WEB-INF/web.xml" );
+
+        servletRunner = new ServletRunner( webXml, "/target/httpunit" );
+    }
+
+    public void testListener()
+        throws Exception
+    {
+        ServletUnitClient client = servletRunner.newClient();
+
+        WebRequest request = new PostMethodWebRequest( "http://localhost/target/httpunit/dummyServlet" );
+
+        InvocationContext context = client.newInvocation( request );
+
+        HttpServlet servlet = (HttpServlet) context.getServlet();
+
+        assertNotNull( servlet.getServletContext().getAttribute( "plexus" ) );
+    }
+}
