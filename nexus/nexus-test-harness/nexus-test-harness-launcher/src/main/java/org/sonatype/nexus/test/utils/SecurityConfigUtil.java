@@ -16,6 +16,7 @@ package org.sonatype.nexus.test.utils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 import org.sonatype.security.rest.model.PrivilegeProperty;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
@@ -75,9 +77,8 @@ public class SecurityConfigUtil
         String roleStringA = xStream.toXML( roleA );
         String roleStringB = xStream.toXML( roleB );
 
-        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n" + roleStringA, new RoleComparator().compare(
-            roleA,
-            roleB ) == 0 );
+        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n" + roleStringA,
+                           new RoleComparator().compare( roleA, roleB ) == 0 );
     }
 
     private static RoleResource getRoleResource( String id, List<RoleResource> roles )
@@ -135,7 +136,7 @@ public class SecurityConfigUtil
 
     public static String getPrivilegeProperty( PrivilegeStatusResource priv, String key )
     {
-        for ( PrivilegeProperty prop : (List<PrivilegeProperty>) priv.getProperties() )
+        for ( PrivilegeProperty prop : priv.getProperties() )
         {
             if ( prop.getKey().equals( key ) )
             {
@@ -161,7 +162,7 @@ public class SecurityConfigUtil
             Assert.assertEquals( privResource.getName(), secPriv.getName() );
             Assert.assertEquals( privResource.getDescription(), secPriv.getDescription() );
 
-            for ( CProperty prop : (List<CProperty>) secPriv.getProperties() )
+            for ( CProperty prop : secPriv.getProperties() )
             {
                 Assert.assertEquals( getPrivilegeProperty( privResource, prop.getKey() ), prop.getValue() );
             }
@@ -266,8 +267,9 @@ public class SecurityConfigUtil
 
             Configuration staticConfiguration = null;
 
-            fr = new InputStreamReader( SecurityConfigUtil.class
-                .getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
+            fr =
+                new InputStreamReader(
+                                       SecurityConfigUtil.class.getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
 
             try
             {
@@ -278,71 +280,108 @@ public class SecurityConfigUtil
                 fr.close();
             }
 
-            for ( CUser user : (List<CUser>) staticConfiguration.getUsers() )
+            for ( CUser user : staticConfiguration.getUsers() )
             {
                 configuration.addUser( user );
             }
-            for ( CRole role : (List<CRole>) staticConfiguration.getRoles() )
+            for ( CRole role : staticConfiguration.getRoles() )
             {
                 configuration.addRole( role );
             }
-            for ( CPrivilege priv : (List<CPrivilege>) staticConfiguration.getPrivileges() )
+            for ( CPrivilege priv : staticConfiguration.getPrivileges() )
             {
                 configuration.addPrivilege( priv );
             }
-            
+
+            List<StaticSecurityResource> resources =
+                AbstractNexusIntegrationTest.getStaticContainer().lookupList( StaticSecurityResource.class );
+            for ( StaticSecurityResource resource : resources )
+            {
+                addStaticSecurity( configuration, resource.getConfiguration() );
+            }
+
             /**
-             * This is really really hacky, as we are manually joining together roles here.  I don't like it
-             * but it makes the IT pass.
-             * TODO: Come up with some other means to do this.
+             * This is really really hacky, as we are manually joining together roles here. I don't like it but it makes
+             * the IT pass. TODO: Come up with some other means to do this. Need guice to handle this properly
              */
-            fr = new InputStreamReader( SecurityConfigUtil.class
-                                        .getResourceAsStream( "/META-INF/nexus-indexer-lucene-static-security.xml" ) );
-
-            try
-            {
-                staticConfiguration = reader.read( fr );
-            }
-            finally
-            {
-                fr.close();
-            }
-
-            for ( CPrivilege priv : (List<CPrivilege>) staticConfiguration.getPrivileges() )
-            {
-                configuration.addPrivilege( priv );
-            }
-            
-            for ( CRole role : (List<CRole>) staticConfiguration.getRoles() )
-            {
-                CRole existingRole = getRole( role.getId(), configuration.getRoles() );
-                
-                if ( existingRole != null )
-                {
-                    for ( String containedRole : role.getRoles() )
-                    {
-                        existingRole.addRole( containedRole );
-                    }
-                    
-                    for ( String containedPriv : role.getPrivileges() )
-                    {
-                        existingRole.addPrivilege( containedPriv );
-                    }
-                }
-                else
-                {
-                    configuration.addRole( role );
-                }
-            }
+            addStaticSecurity( configuration, reader, "/META-INF/nexus-indexer-lucene-static-security.xml" );
+            addStaticSecurity( configuration, reader, "/META-INF/nexus-archive-browser-plugin-security.xml" );
 
         }
-        catch ( XmlPullParserException e )
+        catch ( Exception e )
         {
             Assert.fail( "could not parse nexus.xml: " + e.getMessage() );
         }
         return configuration;
     }
-    
+
+    private static void addStaticSecurity( Configuration configuration, SecurityConfigurationXpp3Reader reader,
+                                           String securityFile )
+        throws IOException, XmlPullParserException
+    {
+
+        final InputStream input = SecurityConfigUtil.class.getResourceAsStream( securityFile );
+        if ( input == null )
+        {
+            //probably a pro XML.
+            return;
+        }
+        InputStreamReader fr = new InputStreamReader( input );
+
+        Configuration staticConfiguration;
+        try
+        {
+            staticConfiguration = reader.read( fr );
+        }
+        finally
+        {
+            fr.close();
+        }
+
+        addStaticSecurity( configuration, staticConfiguration );
+    }
+
+    private static void addStaticSecurity( Configuration configuration, Configuration staticConfiguration )
+    {
+        for ( CPrivilege priv : staticConfiguration.getPrivileges() )
+        {
+            CPrivilege p = getPrivilege( priv.getId(), configuration.getPrivileges() );
+            if ( p == null )
+            {
+                configuration.addPrivilege( priv );
+            }
+        }
+
+        for ( CRole role : staticConfiguration.getRoles() )
+        {
+            CRole existingRole = getRole( role.getId(), configuration.getRoles() );
+
+            if ( existingRole != null )
+            {
+
+                for ( String containedRole : role.getRoles() )
+                {
+                    if ( !existingRole.getRoles().contains( containedRole ) )
+                    {
+                        existingRole.addRole( containedRole );
+                    }
+                }
+
+                for ( String containedPriv : role.getPrivileges() )
+                {
+                    if ( !existingRole.getPrivileges().contains( containedPriv ) )
+                    {
+                        existingRole.addPrivilege( containedPriv );
+                    }
+                }
+            }
+            else
+            {
+                configuration.addRole( role );
+            }
+        }
+    }
+
     private static CRole getRole( String id, List<CRole> roles )
     {
         for ( CRole role : roles )
@@ -352,7 +391,20 @@ public class SecurityConfigUtil
                 return role;
             }
         }
-        
+
+        return null;
+    }
+
+    private static CPrivilege getPrivilege( String id, List<CPrivilege> privs )
+    {
+        for ( CPrivilege priv : privs )
+        {
+            if ( priv.getId().equals( id ) )
+            {
+                return priv;
+            }
+        }
+
         return null;
     }
 
