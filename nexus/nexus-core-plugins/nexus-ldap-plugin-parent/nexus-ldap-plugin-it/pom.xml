@@ -104,7 +104,7 @@
       <artifactId>nexus-distribution</artifactId>
       <version>${project.version}</version>
       <type>zip</type>
-      <classifier>oss</classifier>
+      <classifier>runtime-oss</classifier>
       <scope>test</scope>
     </dependency>
 
@@ -140,7 +140,7 @@
             <artifactId>nexus-distribution</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>oss</classifier>
+            <classifier>runtime-oss</classifier>
           </nexusBundleArtifact>
           
           <nexusBundleName>nexus-oss-${project.version}</nexusBundleName>
