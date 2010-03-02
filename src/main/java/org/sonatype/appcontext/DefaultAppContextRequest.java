@@ -21,7 +21,11 @@ public class DefaultAppContextRequest
 
     public void setName( String name )
     {
-        this.name = name;
+        // avoid NPE, set only if name is not null
+        if ( name != null )
+        {
+            this.name = name;
+        }
     }
 
     public BasedirDiscoverer getBasedirDiscoverer()
