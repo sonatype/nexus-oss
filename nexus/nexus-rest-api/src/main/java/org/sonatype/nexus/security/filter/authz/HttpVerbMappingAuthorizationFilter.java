@@ -25,7 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.jsecurity.subject.Subject;
 import org.jsecurity.web.filter.authz.PermissionsAuthorizationFilter;
 import org.sonatype.nexus.Nexus;
@@ -36,7 +35,6 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
-import org.sonatype.nexus.web.NexusBooterListener;
 
 /**
  * A filter that maps the action from the HTTP Verb.
@@ -67,21 +65,7 @@ public class HttpVerbMappingAuthorizationFilter
 
     protected Nexus getNexus( ServletRequest request )
     {
-        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
-        if ( nexus == null )
-        {
-            PlexusContainer plexus = NexusBooterListener.getPlexus();
-
-            try
-            {
-                nexus = plexus.lookup( Nexus.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                throw new IllegalArgumentException( "Unable to lookup for nexus", e );
-            }
-        }
-        return nexus;
+        return (Nexus) request.getAttribute( Nexus.class.getName() );
     }
     
     protected PlexusContainer getPlexusContainer()
