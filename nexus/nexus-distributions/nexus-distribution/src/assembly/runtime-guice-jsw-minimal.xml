@@ -16,7 +16,7 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-distribution</artifactId>
         <version>${project.version}</version>
-        <classifier>runtime-fragments</classifier>
+        <classifier>fragments</classifier>
         <type>xml</type>
         <assemblyId>fragment-nexus-oss-minimal</assemblyId>
       </extend>
@@ -24,7 +24,7 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-distribution</artifactId>
         <version>${project.version}</version>
-        <classifier>runtime-fragments</classifier>
+        <classifier>fragments</classifier>
         <type>xml</type>
         <assemblyId>fragment-nexus-guice</assemblyId>
       </extend>      

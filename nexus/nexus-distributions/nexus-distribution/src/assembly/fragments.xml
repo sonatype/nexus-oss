@@ -13,7 +13,7 @@
       <appName>nexus</appName>
       <ntServiceName>nexus-webapp</ntServiceName>
       <appVersion>${project.version}</appVersion>
-      <runtimeDir>${appName}-oss-${appVersion}</runtimeDir>
+      <runtimeDir>.</runtimeDir>
       <workDir>sonatype-work</workDir>
     </properties>
     
