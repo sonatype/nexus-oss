@@ -22,17 +22,6 @@
     <nexus.unpack.dir>${project.build.directory}/unpacked/nexus-oss</nexus.unpack.dir>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -40,24 +29,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-      </plugin>  
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>core</id>
-            <phase>process-resources</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeArtifactIds>
-                nexus-webapp
-              </includeArtifactIds>              
-              <outputDirectory>${nexus.unpack.dir}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>   

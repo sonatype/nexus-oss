@@ -36,8 +36,8 @@
         <version>${project.version}</version>
         <classifier>bundle</classifier>
         <type>zip</type>
-		<virtual>true</virtual>
-		<unpack>true</unpack>
+        <virtual>true</virtual>
+        <unpack>true</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
       </itar>      
    </itars>    

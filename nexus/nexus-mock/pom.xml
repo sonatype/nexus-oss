@@ -37,7 +37,7 @@
               <goal>unpack-dependencies</goal>
             </goals>
             <configuration>
-              <includeArtifactIds>nexus-webapp</includeArtifactIds>
+              <includeArtifactIds>nexus-distribution</includeArtifactIds>
               <outputDirectory>target/nexus-ui</outputDirectory>
             </configuration>
           </execution>
@@ -89,10 +89,10 @@
     <!-- The bundle we test -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
+      <artifactId>nexus-distribution</artifactId>
       <version>${project.version}</version>
-      <classifier>bundle</classifier>
       <type>zip</type>
+      <classifier>runtime-oss</classifier>
     </dependency>
 
   </dependencies>

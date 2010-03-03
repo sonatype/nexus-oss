@@ -28,8 +28,9 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>itar-nexus-oss</artifactId>
+      <artifactId>nexus-webapp</artifactId>
       <version>${project.version}</version>
+      <classifier>itar</classifier>
       <type>zip</type>
     </dependency>
     <dependency>

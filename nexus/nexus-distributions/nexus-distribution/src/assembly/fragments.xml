@@ -29,8 +29,9 @@
     <itars>
       <itar>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-nexus-oss</artifactId>
+        <artifactId>nexus-webapp</artifactId>
         <version>${project.version}</version>
+        <classifier>itar</classifier>
         <type>zip</type>
       </itar>
       <itar>
@@ -50,20 +51,22 @@
         <artifactId>nexus-oss-edition</artifactId>
         <version>${project.version}</version>
         <type>jar</type>
-		<virtual>true</virtual>
-		<unpack>false</unpack>
-        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory>        
-      </itar>       
+        <virtual>true</virtual>
+        <unpack>false</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/lib
+        </outputDirectory>
+      </itar>
       <itar>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-plugin-console-plugin</artifactId>
         <version>${project.version}</version>
         <classifier>bundle</classifier>
         <type>zip</type>
-		<virtual>true</virtual>
-		<unpack>true</unpack>
-        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository</outputDirectory>        
-      </itar>      
+        <virtual>true</virtual>
+        <unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository
+        </outputDirectory>
+      </itar>
       <itar>
         <groupId>org.sonatype.runtime.itars</groupId>
         <artifactId>itar-work-dir</artifactId>

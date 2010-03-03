@@ -445,7 +445,7 @@
             </goals>
             <configuration>
                 <descriptors>
-                  <descriptor>src/main/assembly/bundle.xml</descriptor>
+                  <!-- <descriptor>src/main/assembly/bundle.xml</descriptor>  -->
                   <descriptor>src/main/assembly/itar.xml</descriptor>
             <!--base changed...no updates for this version-->
             <!--

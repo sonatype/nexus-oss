@@ -10,15 +10,6 @@
     <fileSet>
       <directory>${assembly.directory}</directory>
       <outputDirectory>/</outputDirectory>
-    </fileSet>    
-    <fileSet>
-      <directory>${nexus.unpack.dir}/nexus-webapp-${project.version}/conf</directory>
-      <outputDirectory>data/${confDir}</outputDirectory>
-      <excludes>
-        <exclude>classworlds.conf</exclude>
-        <exclude>wrapper.conf</exclude>
-        <exclude>plexus.properties</exclude>
-      </excludes>
     </fileSet>
   </fileSets>
 </assembly>
