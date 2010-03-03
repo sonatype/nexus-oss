@@ -39,6 +39,10 @@
   
   <fileSets>
     <fileSet>
+      <directory>src/main/assembly/sonatype-work</directory>
+      <outputDirectory>data/sonatype-work</outputDirectory>
+    </fileSet>
+    <fileSet>
       <directory>src/main/assembly/metadata</directory>
       <outputDirectory>metadata</outputDirectory>
     </fileSet>
