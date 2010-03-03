@@ -35,10 +35,11 @@ import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.rest.RemoteIPFinder;
 import org.sonatype.nexus.security.filter.NexusJSecurityFilter;
+import org.sonatype.nexus.web.NexusBooterListener;
 
 /**
  * A filter that maps the action from the HTTP Verb.
- *
+ * 
  * @author cstamas
  */
 public class HttpVerbMappingAuthorizationFilter
@@ -65,9 +66,16 @@ public class HttpVerbMappingAuthorizationFilter
 
     protected Nexus getNexus( ServletRequest request )
     {
-        return (Nexus) request.getAttribute( Nexus.class.getName() );
+        Nexus nexus = (Nexus) request.getAttribute( Nexus.class.getName() );
+
+        if ( nexus == null )
+        {
+            nexus = NexusBooterListener.getNexus();
+        }
+
+        return nexus;
     }
-    
+
     protected PlexusContainer getPlexusContainer()
     {
         return (PlexusContainer) getAttribute( PlexusConstants.PLEXUS_KEY );
@@ -173,7 +181,7 @@ public class HttpVerbMappingAuthorizationFilter
         String msg =
             "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request ).name()
                 + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from IP Address "
-                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
+                + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         if ( isSimilarEvent( msg ) )
         {
@@ -183,11 +191,11 @@ public class HttpVerbMappingAuthorizationFilter
         getLogger().info( msg );
 
         AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );
-        
+
         if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
         {
-            String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
-            
+            String ip = RemoteIPFinder.findIP( (HttpServletRequest) request );
+
             if ( ip != null )
             {
                 authzEvt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
