@@ -210,7 +210,7 @@ public final class DefaultNexusPluginManager
                 beanLocator.add( createPluginInjector( plugin, descriptor ) );
                 result.setAchievedGoal( PluginActivationResult.ACTIVATED );
             }
-            catch ( final Exception e )
+            catch ( final Throwable e )
             {
                 result.setThrowable( e );
             }

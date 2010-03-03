@@ -65,7 +65,7 @@ public final class PluginStaticResource
         {
             return resourceURL.openConnection().getContentLength();
         }
-        catch ( final Exception e ) // NOPMD
+        catch ( final Throwable e ) // NOPMD
         {
             // default to unknown size
         }
