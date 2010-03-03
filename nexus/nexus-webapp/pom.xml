@@ -423,9 +423,6 @@
           <webResources>
             <webResource>
               <directory>${basedir}/src/main/webapp-war-extras</directory>
-              <excludes>
-                <exclude>**/web.xml</exclude>
-              </excludes>
             </webResource>
             <webResource>
               <directory>${compressed-dir}</directory>
@@ -435,7 +432,6 @@
               </includes>
             </webResource>
           </webResources>
-          <webXml>${basedir}/src/main/webapp-war-extras/WEB-INF/web.xml</webXml>
         </configuration>
       </plugin>
 

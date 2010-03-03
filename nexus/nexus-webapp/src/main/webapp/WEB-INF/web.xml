@@ -13,10 +13,12 @@
     <display-name>Nexus Application</display-name>
 
     <!-- Booter -->
+    <listener>
+      <listener-class>org.sonatype.nexus.web.PlexusContainerContextListener</listener-class>
+    </listener>
    	<listener>
   		<listener-class>org.sonatype.nexus.web.LogConfigListener</listener-class>
   	</listener> 
-  	    
     <listener>
         <listener-class>org.sonatype.nexus.web.NexusBooterListener</listener-class>
     </listener>
@@ -82,17 +84,20 @@
         <servlet-name>nexus</servlet-name>
         <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
         <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter
+-->
             <param-name>nexus.role</param-name>
             <param-value>org.restlet.Application</param-value>
         </init-param>
         <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter
+-->
             <param-name>nexus.roleHint</param-name>
             <param-value>nexus</param-value>
         </init-param>
         <init-param>
-            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter -->
+            <!-- A stupid hack to avoid OneServletServerPerWebapp limitation, see PlexusServerServlet#getInitParameter
+-->
             <param-name>nexus.org.restlet.clients</param-name>
             <param-value>FILE CLAP</param-value>
         </init-param>
