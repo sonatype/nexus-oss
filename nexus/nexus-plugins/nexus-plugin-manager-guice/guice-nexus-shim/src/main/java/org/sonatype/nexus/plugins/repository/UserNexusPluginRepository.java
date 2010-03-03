@@ -58,6 +58,10 @@ final class UserNexusPluginRepository
     @Override
     protected File getNexusPluginsDirectory()
     {
+        if ( !userPluginsFolder.exists() )
+        {
+            userPluginsFolder.mkdirs();
+        }
         return userPluginsFolder;
     }
 }

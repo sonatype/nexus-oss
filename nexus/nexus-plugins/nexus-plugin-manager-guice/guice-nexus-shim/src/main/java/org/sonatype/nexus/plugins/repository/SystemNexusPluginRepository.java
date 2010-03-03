@@ -58,6 +58,10 @@ final class SystemNexusPluginRepository
     @Override
     protected File getNexusPluginsDirectory()
     {
+        if ( !systemPluginsFolder.exists() )
+        {
+            systemPluginsFolder.mkdirs();
+        }
         return systemPluginsFolder;
     }
 }
