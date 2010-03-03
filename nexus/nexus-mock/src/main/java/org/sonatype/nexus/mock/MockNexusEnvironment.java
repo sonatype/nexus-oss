@@ -45,10 +45,22 @@ public class MockNexusEnvironment
     public static File getBundleRoot( File unpackDir )
         throws IOException
     {
-        return new File( unpackDir, "nexus-webapp-" + getTestNexusVersion() );
+        return new File( unpackDir, getTestNexusBundleBase() + "-" + getTestNexusVersion() );
+    }
+    
+    public static String getTestNexusBundleBase()
+        throws IOException
+    {
+        return getNexusInfoProperty( "nexus.bundlebase" );
     }
 
     public static String getTestNexusVersion()
+        throws IOException
+    {
+        return getNexusInfoProperty( "nexus.version" );
+    }
+    
+    public static String getNexusInfoProperty( String key )
         throws IOException
     {
         Properties props = new Properties();
@@ -60,6 +72,6 @@ public class MockNexusEnvironment
             props.load( is );
         }
 
-        return props.getProperty( "nexus.version" );
+        return props.getProperty( key );        
     }
 }
