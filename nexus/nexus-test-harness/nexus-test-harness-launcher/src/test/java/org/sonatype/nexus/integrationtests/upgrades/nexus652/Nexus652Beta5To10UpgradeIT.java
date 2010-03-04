@@ -14,6 +14,8 @@
 package org.sonatype.nexus.integrationtests.upgrades.nexus652;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -24,6 +26,7 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
+import org.sonatype.security.model.CRole;
 
 /**
  * Test nexus.xml after and upgrade from 1.0.0-beta-5 to 1.0.0.
@@ -90,7 +93,12 @@ public class Nexus652Beta5To10UpgradeIT
         org.sonatype.security.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
 
         Assert.assertEquals( "User Count:", 7, secConfig.getUsers().size());
-        Assert.assertEquals( "Roles Count:", 22, secConfig.getRoles().size());
+        List<String> roleIds = new ArrayList<String>();
+        for ( CRole role : secConfig.getRoles() )
+        {
+            roleIds.add( role.getId() );
+        }
+        Assert.assertEquals( "Roles Count differs, expected: 23, found: "+ roleIds, 23, secConfig.getRoles().size());
 
         // again, everything should have been upgraded.
     }

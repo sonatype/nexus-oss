@@ -18,10 +18,6 @@
 
   <name>Nexus (CAR :: Nexus OSS)</name>
 
-  <properties>
-    <nexus.unpack.dir>${project.build.directory}/unpacked/nexus-oss</nexus.unpack.dir>
-  </properties>
-
   <build>
     <plugins>
       <plugin>

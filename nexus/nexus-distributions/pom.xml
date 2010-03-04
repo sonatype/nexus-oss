@@ -14,7 +14,7 @@
 
   <modules>
     <module>nexus-distribution-archives</module>
-    <module>nexus-distribution</module>
+    <module>nexus-oss-webapp</module>
   </modules>
   
 </project>

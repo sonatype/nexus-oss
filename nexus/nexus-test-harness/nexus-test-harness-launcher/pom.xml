@@ -50,13 +50,13 @@
           
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-distribution</artifactId>
+            <artifactId>nexus-oss-webapp</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
-            <classifier>runtime-oss</classifier>
+            <classifier>bundle</classifier>
           </nexusBundleArtifact>
           
-          <nexusBundleName>nexus-oss-${project.version}</nexusBundleName>
+          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
         
           <nexusPluginsArtifacts>
             <plugin>

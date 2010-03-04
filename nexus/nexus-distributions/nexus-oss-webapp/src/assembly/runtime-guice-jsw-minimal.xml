@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>guice-jsw-minimal</id>
+  <id>minimal</id>
 
   <assembly>
 
-    <description>Nexus OSS Minimal / Guice / JSW</description>
+    <description>Nexus OSS Minimal</description>
 
     <properties>
-      <appLongName>Nexus OSS Minimal / Guice</appLongName>
+      <appLongName>Nexus OSS Minimal</appLongName>
     </properties>
 
     <extends>

@@ -9,10 +9,10 @@
     <version>1.5.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>nexus-distribution</artifactId>
+  <artifactId>nexus-oss-webapp</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus (Distribution Bundles)</name>
+  <name>Nexus OSS Webapp Bundle</name>
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
@@ -147,7 +147,7 @@
             <id>guice-jsw-minimal</id>
             <phase>process-resources</phase>
             <goals>
-              <goal>assemble</goal>
+              <goal>attach-descriptor</goal>
             </goals>
             <configuration>
               <assemblyDescriptor>${assembly.directory}/runtime-guice-jsw-minimal.xml</assemblyDescriptor>

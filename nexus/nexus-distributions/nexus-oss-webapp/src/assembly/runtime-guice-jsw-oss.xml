@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assemblies>
 
-  <id>runtime-oss</id>
+  <id>bundle</id>
 
   <assembly>
 
-    <description>Nexus OSS / Guice / JSW</description>
+    <description>Nexus OSS</description>
 
     <properties>
       <appLongName>Nexus OSS</appLongName>
+      <appName>nexus</appName>
+      <runtimeDir>${appName}-oss-webapp-${appVersion}</runtimeDir>
     </properties>
 
     <extends>
