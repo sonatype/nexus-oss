@@ -76,14 +76,17 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-api</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
