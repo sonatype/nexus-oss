@@ -16,7 +16,7 @@
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
-    <guice-nexus-shim.version>0.1.0-SNAPSHOT</guice-nexus-shim.version>
+    <guice-nexus-shim.version>0.2.0-SNAPSHOT</guice-nexus-shim.version>
   </properties>
 
 
