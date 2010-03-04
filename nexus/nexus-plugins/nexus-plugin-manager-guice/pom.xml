@@ -13,13 +13,13 @@
   <packaging>pom</packaging>
 
   <artifactId>guice-nexus</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
 
   <name>Guice - Nexus</name>
 
   <properties>
     <nexus.api.version>1.5.1-SNAPSHOT</nexus.api.version>
-    <guice.nexus.version>0.1.0-SNAPSHOT</guice.nexus.version>
+    <guice.nexus.version>0.2.0-SNAPSHOT</guice.nexus.version>
     <sonatype.plugin.version>1.0.2</sonatype.plugin.version>
   </properties>
 
