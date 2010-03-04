@@ -27,7 +27,7 @@
     <dependency>
       <groupId>org.sonatype.spice.inject</groupId>
       <artifactId>guice-plexus-shim</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
+      <version>0.1.0</version>
     </dependency>
   </dependencies>
 
