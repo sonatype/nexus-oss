@@ -789,7 +789,13 @@ public class AbstractEnvironmentMojo
             }
             else if ( "zip".equals( type ) || "tar.gz".equals( type ) )
             {
-                unpack( pluginArtifact.getFile(), destination, type );
+                File file = pluginArtifact.getFile();
+                if ( file == null || !file.isFile() )
+                {
+                    throw new MojoFailureException( "Could not properly resolve artifact " + pluginArtifact + ", got "
+                        + file );
+                }
+                unpack( file, destination, type );
             }
             else
             {
