@@ -18,9 +18,6 @@
 
   <modules>
     <module>car-nexus-oss</module>
-    <module>itar-nexus-oss</module>
-    <module>itar-nexus-plugin-manager-plexus</module>
-    <module>itar-nexus-plugin-manager-guice</module>
     <module>itar-plexus-container-guice</module>
   </modules>
 
@@ -30,17 +27,6 @@
     <data.directory>${assembly.directory}/data</data.directory>
     <templates.directory>${assembly.directory}/templates</templates.directory>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
 
 	<build>
 		<pluginManagement>

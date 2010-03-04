@@ -16,6 +16,7 @@
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
+    <guice-nexus-shim.version>0.1.0-SNAPSHOT</guice-nexus-shim.version>
   </properties>
 
 
@@ -71,12 +72,6 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>itar-nexus-plugin-manager-guice</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
@@ -95,6 +90,11 @@
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-nexus-shim</artifactId>
+      <version>${guice-nexus-shim.version}</version>
     </dependency>
 
   </dependencies>

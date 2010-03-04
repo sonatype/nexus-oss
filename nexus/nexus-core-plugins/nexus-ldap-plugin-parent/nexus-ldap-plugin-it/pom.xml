@@ -129,7 +129,7 @@
         <executions>
           <execution>
             <goals>
-              <goal>setup-nexus-plugin-environment</goal>
+              <goal>setup-environment</goal>
               <goal>package</goal>
             </goals>
           </execution>

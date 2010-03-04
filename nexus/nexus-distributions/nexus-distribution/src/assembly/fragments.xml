@@ -91,6 +91,15 @@
         <type>zip</type>
       </itar>
       <itar>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-nexus-shim</artifactId>
+        <version>${guice-nexus-shim.version}</version>
+        <type>jar</type>
+        <virtual>true</virtual>
+		    <unpack>false</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory> 
+      </itar>
+      <itar>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>itar-nexus-plugin-manager-guice</artifactId>
         <version>${project.version}</version>
