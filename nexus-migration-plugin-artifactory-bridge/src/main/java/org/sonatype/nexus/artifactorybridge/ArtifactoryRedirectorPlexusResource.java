@@ -78,38 +78,32 @@ public class ArtifactoryRedirectorPlexusResource
         String nexusPath = urlConverter.convertDownload( servletPath );
         if ( nexusPath == null )
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '" + servletPath + "'" );
+            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '" + servletPath
+                + "'" );
         }
 
         HttpURLConnection urlConn = null;
-        InputStream in = null;
         try
         {
             URL url = new URL( nexusUrl + nexusPath );
-            getLogger().debug( "Redirecting GET request from:" +servletPath+" to: " + url );
+            getLogger().debug( "Redirecting GET request from:" + servletPath + " to: " + url );
 
             urlConn = (HttpURLConnection) url.openConnection();
 
             copyHeaders( request, urlConn );
             String type = urlConn.getContentType();
-            in = urlConn.getInputStream();
-            byte[] bytes = IOUtil.toByteArray( in );
-            return new ByteArrayRepresentation( type, bytes );
+            return new URLInputStreamRepresentation( type, urlConn.getInputStream(), urlConn );
         }
         catch ( Throwable e )
         {
             int statusCode = getReturnCode( urlConn );
-            if (statusCode == 401)
+            if ( statusCode == 401 )
             {
-            	getLogger().debug("Received 401 from Nexus, inserting Challenge request to the client.");
-            	response.setChallengeRequest(new ChallengeRequest(ChallengeScheme.HTTP_BASIC, "Sonatype Nexus Repository Manager"));
+                getLogger().debug( "Received 401 from Nexus, inserting Challenge request to the client." );
+                response.setChallengeRequest( new ChallengeRequest( ChallengeScheme.HTTP_BASIC,
+                                                                    "Sonatype Nexus Repository Manager" ) );
             }
             throw new ResourceException( statusCode, e );
-        }
-        finally
-        {
-            IOUtil.close( in );
-            urlConn.disconnect();
         }
     }
 
@@ -134,12 +128,12 @@ public class ArtifactoryRedirectorPlexusResource
             String nexusPath = urlConverter.convertDeploy( servletPath );
             if ( nexusPath == null )
             {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '" + servletPath
-                    + "'" );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to map artifact request '"
+                    + servletPath + "'" );
             }
 
             URL url = new URL( nexusUrl + nexusPath );
-            getLogger().debug( "Redirecting PUT request from:" +servletPath+" to: " + url );
+            getLogger().debug( "Redirecting PUT request from:" + servletPath + " to: " + url );
             urlConn = (HttpURLConnection) url.openConnection();
             copyHeaders( request, urlConn );
 
@@ -147,7 +141,7 @@ public class ArtifactoryRedirectorPlexusResource
             urlConn.setDoOutput( true );
             out = urlConn.getOutputStream();
             in = file.getInputStream();
-            IOUtil.copy( in, out );
+            IOUtil.copy( in, out, 8 * 1024 );
 
             int statusCode = getReturnCode( urlConn );
             if ( !Status.isSuccess( statusCode ) )
@@ -160,10 +154,11 @@ public class ArtifactoryRedirectorPlexusResource
         catch ( Throwable e )
         {
             int statusCode = getReturnCode( urlConn );
-            if (statusCode == 401)
+            if ( statusCode == 401 )
             {
-            	getLogger().debug("Received 401 from Nexus, inserting Challenge request to the client.");
-            	response.setChallengeRequest(new ChallengeRequest(ChallengeScheme.HTTP_BASIC, "Sonatype Nexus Repository Manager"));
+                getLogger().debug( "Received 401 from Nexus, inserting Challenge request to the client." );
+                response.setChallengeRequest( new ChallengeRequest( ChallengeScheme.HTTP_BASIC,
+                                                                    "Sonatype Nexus Repository Manager" ) );
             }
             throw new ResourceException( statusCode, e );
         }
