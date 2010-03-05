@@ -16,7 +16,7 @@
     <extends>
       <extend>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-distribution</artifactId>
+        <artifactId>nexus-oss-webapp</artifactId>
         <version>${project.version}</version>
         <classifier>fragments</classifier>
         <type>xml</type>
@@ -24,7 +24,7 @@
       </extend>
       <extend>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-distribution</artifactId>
+        <artifactId>nexus-oss-webapp</artifactId>
         <version>${project.version}</version>
         <classifier>fragments</classifier>
         <type>xml</type>
