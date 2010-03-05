@@ -169,9 +169,9 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-webapp</artifactId>
+      <artifactId>nexus-oss-webapp</artifactId>
       <version>${project.version}</version>
-      <type>tar.gz</type>
+      <type>zip</type>
       <classifier>bundle</classifier>
     </dependency>
     <dependency>
