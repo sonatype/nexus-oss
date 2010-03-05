@@ -30,7 +30,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.3</version>
+        <version>1.4-SNAPSHOT</version>
         <executions>
           <execution>
             <phase>initialize</phase>
@@ -40,6 +40,17 @@
           </execution>
         </executions>
         <configuration>
+        
+          <nexusBundleArtifact>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-oss-webapp</artifactId>
+            <version>${project.version}</version>
+            <type>zip</type>
+            <classifier>bundle</classifier>
+          </nexusBundleArtifact>
+          
+          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+        
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>${project.groupId}</groupId>
