@@ -1,11 +1,11 @@
 package org.sonatype.nexus.integrationtests.nexus2497;
 
+import static org.sonatype.nexus.test.utils.FileTestingUtils.populate;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,8 +14,6 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.maven.it.Verifier;
-import org.codehaus.plexus.archiver.zip.ZipEntry;
-import org.codehaus.plexus.archiver.zip.ZipOutputStream;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -41,37 +39,16 @@ public class Nexus2497ConcurrentRepoAccessIT
         throws Exception
     {
         files = new File[5];
-        files[0] = populate( new File( "./target/downloads/nexus2497", "file1.jar" ) );
-        files[1] = populate( new File( "./target/downloads/nexus2497", "file2.jar" ) );
-        files[2] = populate( new File( "./target/downloads/nexus2497", "file3.jar" ) );
-        files[3] = populate( new File( "./target/downloads/nexus2497", "file4.jar" ) );
-        files[4] = populate( new File( "./target/downloads/nexus2497", "file5.jar" ) );
+        files[0] = populate( new File( "./target/downloads/nexus2497", "file1.jar" ), 3 );
+        files[1] = populate( new File( "./target/downloads/nexus2497", "file2.jar" ), 3 );
+        files[2] = populate( new File( "./target/downloads/nexus2497", "file3.jar" ), 3 );
+        files[3] = populate( new File( "./target/downloads/nexus2497", "file4.jar" ), 3 );
+        files[4] = populate( new File( "./target/downloads/nexus2497", "file5.jar" ), 3 );
         // files[5] = populate( new File( "./target/downloads/nexus2497", "file6.jar" ) );
         // files[6] = populate( new File( "./target/downloads/nexus2497", "file7.jar" ) );
         // files[7] = populate( new File( "./target/downloads/nexus2497", "file8.jar" ) );
         // files[8] = populate( new File( "./target/downloads/nexus2497", "file9.jar" ) );
         // files[9] = populate( new File( "./target/downloads/nexus2497", "file0.jar" ) );
-    }
-
-    private static File populate( File file )
-        throws IOException
-    {
-        file.getParentFile().mkdirs();
-
-        ZipOutputStream zip = new ZipOutputStream( file );
-        zip.putNextEntry( new ZipEntry( "content.random" ) );
-        for ( int i = 0; i < 3 * 1024; i++ )
-        {
-            byte[] b = new byte[1024];
-            SecureRandom r = new SecureRandom();
-            r.nextBytes( b );
-
-            zip.write( b );
-        }
-        zip.closeEntry();
-        zip.close();
-
-        return file;
     }
 
     @Ignore

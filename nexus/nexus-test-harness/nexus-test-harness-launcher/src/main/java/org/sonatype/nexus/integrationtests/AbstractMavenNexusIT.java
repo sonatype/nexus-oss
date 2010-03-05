@@ -57,31 +57,34 @@ public class AbstractMavenNexusIT
     public Verifier createVerifier( File mavenProject, File settings )
         throws VerificationException, IOException
     {
+        if ( settings == null )
+        {
+            settings = getOverridableFile( "settings.xml" );
+        }
+        return createMavenVerifier( mavenProject, settings, getTestId() );
+    }
+
+    public static Verifier createMavenVerifier( File mavenProject, File settings, String testId )
+        throws VerificationException, IOException
+    {
         System.setProperty( "maven.home", TestProperties.getString( "maven.instance" ) );
 
         Verifier verifier = new Verifier( mavenProject.getAbsolutePath(), false );
 
-        String logname = "logs/maven-execution/" + getTestId() + "/" + mavenProject.getName() + ".log";
+        String logname = "logs/maven-execution/" + testId + "/" + mavenProject.getName() + ".log";
         new File( verifier.getBasedir(), logname ).getParentFile().mkdirs();
         verifier.setLogFileName( logname );
 
         File mavenRepository = new File( TestProperties.getString( "maven.local.repo" ) );
         verifier.setLocalRepo( mavenRepository.getAbsolutePath() );
-        cleanRepository( mavenRepository );
+        cleanRepository( mavenRepository, testId );
 
         verifier.resetStreams();
 
         List<String> options = new ArrayList<String>();
         options.add( "-X" );
         options.add( "-Dmaven.repo.local=" + mavenRepository.getAbsolutePath() );
-        if ( settings != null )
-        {
-            options.add( "-s " + settings.getAbsolutePath() );
-        }
-        else
-        {
-            options.add( "-s " + this.getOverridableFile( "settings.xml" ) );
-        }
+        options.add( "-s " + settings.getAbsolutePath() );
         verifier.setCliOptions( options );
         return verifier;
     }
@@ -96,7 +99,20 @@ public class AbstractMavenNexusIT
         throws IOException
     {
 
-        File testGroupIdFolder = new File( mavenRepo, getTestId() );
+        cleanRepository( mavenRepo, getTestId() );
+    }
+
+    /**
+     * Remove all artifacts on <code>testId</code> groupId
+     * 
+     * @param verifier
+     * @throws IOException
+     */
+    public static void cleanRepository( File mavenRepo, String testId )
+        throws IOException
+    {
+
+        File testGroupIdFolder = new File( mavenRepo, testId );
         FileUtils.deleteDirectory( testGroupIdFolder );
 
     }
