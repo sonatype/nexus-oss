@@ -64,6 +64,82 @@ public class MergeOperationTest
         validate( md2, true, true );
     }
 
+    public void testMergeReleaseAndSnapshot()
+        throws Exception
+    {
+        Metadata release = getReleaseMetadata();
+        Metadata snapshot = getSnapshotMetadata();
+        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( release ) );
+        mergeOp.perform( snapshot );
+        
+        //check the snapshot metadata, which should now be merged
+        assertEquals( "test", snapshot.getArtifactId() );
+        assertEquals( "test", snapshot.getGroupId() );
+        assertTrue( snapshot.getPlugins().isEmpty() );
+        assertNull( snapshot.getVersion() );
+        assertNotNull( snapshot.getVersioning() );
+        assertEquals( "1234568", snapshot.getVersioning().getLastUpdated() );
+        assertEquals( "1.2-SNAPSHOT", snapshot.getVersioning().getLatest() );
+        assertEquals( "1.1", snapshot.getVersioning().getRelease() );
+        assertNull( snapshot.getVersioning().getSnapshot() );
+        assertNotNull( snapshot.getVersioning().getVersions() );
+        assertTrue( snapshot.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
+        
+        //now do the merge in reverse
+        release = getReleaseMetadata();
+        snapshot = getSnapshotMetadata();
+        mergeOp = new MergeOperation( new MetadataOperand( snapshot ) );
+        mergeOp.perform( release );
+        
+        //check the release metadata, which should now be merged
+        assertEquals( "test", release.getArtifactId() );
+        assertEquals( "test", release.getGroupId() );
+        assertTrue( release.getPlugins().isEmpty() );
+        assertNull( release.getVersion() );
+        assertNotNull( release.getVersioning() );
+        assertEquals( "1234568", release.getVersioning().getLastUpdated() );
+        assertEquals( "1.2-SNAPSHOT", release.getVersioning().getLatest() );
+        assertEquals( "1.1", release.getVersioning().getRelease() );
+        assertNull( release.getVersioning().getSnapshot() );
+        assertNotNull( release.getVersioning().getVersions() );
+        assertTrue( release.getVersioning().getVersions().containsAll( Arrays.asList( "1.1", "1.1-SNAPSHOT", "1.2-SNAPSHOT" ) ) );
+    }
+    
+    private Metadata getReleaseMetadata()
+    {
+        Metadata releaseMetadata = new Metadata();
+        releaseMetadata.setArtifactId( "test" );
+        releaseMetadata.setGroupId( "test" );
+        
+        Versioning versioning = new Versioning();
+        versioning.addVersion( "1.1" );
+        versioning.setLatest( "1.1" );
+        versioning.setRelease( "1.1" );
+        versioning.setLastUpdated( "1234567" );
+        
+        releaseMetadata.setVersioning( versioning );
+        
+        return releaseMetadata;
+    }
+    
+    private Metadata getSnapshotMetadata()
+    {
+        Metadata snapshotMetadata = new Metadata();
+        snapshotMetadata.setArtifactId( "test" );
+        snapshotMetadata.setGroupId( "test" );
+        
+        Versioning versioning = new Versioning();
+        versioning.addVersion( "1.1-SNAPSHOT" );
+        versioning.addVersion( "1.2-SNAPSHOT" );
+        versioning.setLatest( "1.2-SNAPSHOT" );
+        versioning.setRelease( "" );
+        versioning.setLastUpdated( "1234568" );
+        
+        snapshotMetadata.setVersioning( versioning );
+        
+        return snapshotMetadata;
+    }
+
     private Metadata getSource( boolean setLastUpdate )
     {
         Metadata md = new Metadata();

@@ -221,17 +221,21 @@ public class M2GroupRepository
             {
                 throw new ItemNotFoundException( request, this );
             }
-
-            Metadata result = new Metadata();
-
-            List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
-
-            for ( Metadata metadata : existingMetadatas )
+            
+            Metadata result = existingMetadatas.get( 0 );
+            
+            // do a merge if necessary
+            if ( existingMetadatas.size() > 1 )
             {
-                ops.add( new MergeOperation( new MetadataOperand( metadata ) ) );
+                List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
+                
+                for ( int i = 1 ; i < existingMetadatas.size() ; i++ )
+                {
+                    ops.add( new MergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
+                }
+    
+                MetadataBuilder.changeMetadata( result, ops );
             }
-
-            MetadataBuilder.changeMetadata( result, ops );
 
             // build the result item
             ByteArrayOutputStream resultOutputStream = new ByteArrayOutputStream();
