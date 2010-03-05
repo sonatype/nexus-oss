@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.maven.mercury.repository.metadata.MergeOperation;
+import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
@@ -231,7 +231,7 @@ public class M2GroupRepository
                 
                 for ( int i = 1 ; i < existingMetadatas.size() ; i++ )
                 {
-                    ops.add( new MergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
+                    ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
                 }
     
                 MetadataBuilder.changeMetadata( result, ops );

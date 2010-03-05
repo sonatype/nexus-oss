@@ -2,7 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata.mercury;
 
 import java.util.Arrays;
 
-import org.apache.maven.mercury.repository.metadata.MergeOperation;
+import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataOperand;
 import org.apache.maven.mercury.repository.metadata.Versioning;
@@ -19,7 +19,7 @@ public class MergeOperationTest
 
         Metadata md2 = getTarget( false );
 
-        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( md1 ) );
+        NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( md1 ) );
         mergeOp.perform( md2 );
 
         validate( md2, false, false );
@@ -32,7 +32,7 @@ public class MergeOperationTest
 
         Metadata md2 = getTarget( true );
 
-        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( md1 ) );
+        NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( md1 ) );
         mergeOp.perform( md2 );
 
         validate( md2, true, true );
@@ -45,7 +45,7 @@ public class MergeOperationTest
 
         Metadata md2 = getTarget( false );
 
-        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( md1 ) );
+        NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( md1 ) );
         mergeOp.perform( md2 );
 
         validate( md2, true, false );
@@ -58,7 +58,7 @@ public class MergeOperationTest
 
         Metadata md2 = getTarget( true );
 
-        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( md1 ) );
+        NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( md1 ) );
         mergeOp.perform( md2 );
 
         validate( md2, true, true );
@@ -69,7 +69,7 @@ public class MergeOperationTest
     {
         Metadata release = getReleaseMetadata();
         Metadata snapshot = getSnapshotMetadata();
-        MergeOperation mergeOp = new MergeOperation( new MetadataOperand( release ) );
+        NexusMergeOperation mergeOp = new NexusMergeOperation( new MetadataOperand( release ) );
         mergeOp.perform( snapshot );
         
         //check the snapshot metadata, which should now be merged
@@ -88,7 +88,7 @@ public class MergeOperationTest
         //now do the merge in reverse
         release = getReleaseMetadata();
         snapshot = getSnapshotMetadata();
-        mergeOp = new MergeOperation( new MetadataOperand( snapshot ) );
+        mergeOp = new NexusMergeOperation( new MetadataOperand( snapshot ) );
         mergeOp.perform( release );
         
         //check the release metadata, which should now be merged

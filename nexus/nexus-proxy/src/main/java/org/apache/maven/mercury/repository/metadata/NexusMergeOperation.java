@@ -7,14 +7,14 @@ import org.codehaus.plexus.lang.DefaultLanguage;
 import org.codehaus.plexus.lang.Language;
 import org.codehaus.plexus.util.StringUtils;
 
-public class MergeOperation
+public class NexusMergeOperation
     implements MetadataOperation
 {
     private static final Language LANG = new DefaultLanguage( MergeOperation.class );
 
     private Metadata sourceMetadata;
 
-    public MergeOperation( MetadataOperand data )
+    public NexusMergeOperation( MetadataOperand data )
         throws MetadataException
     {
         setOperand( data );
@@ -115,7 +115,7 @@ public class MergeOperation
         // versioning
 
         if ( sourceMetadata.getVersioning() != null )
-        {
+        {            
             // versioning.verions
             // merge all versions together
             for ( String version : (List<String>) sourceMetadata.getVersioning().getVersions() )
