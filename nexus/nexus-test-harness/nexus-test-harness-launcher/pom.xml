@@ -168,13 +168,6 @@
       <version>2.1.5320</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <classifier>bundle</classifier>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
       <version>2.0.9</version>

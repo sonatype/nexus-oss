@@ -35,9 +35,10 @@
       <type>zip</type>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.runtime.itars</groupId>
-      <artifactId>itar-plexus-app-booter</artifactId>
-      <version>2.1.0-v0001-SNAPSHOT</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
@@ -47,46 +48,8 @@
       <type>zip</type>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-edition</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.runtime.itars</groupId>
-      <artifactId>itar-work-dir</artifactId>
-      <version>0.1.0-SNAPSHOT</version>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>itar-plexus-container-guice</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-rrb-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
-      <artifactId>nexus-ldap-realm-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
@@ -96,7 +59,59 @@
       <artifactId>guice-nexus-shim</artifactId>
       <version>${guice-nexus-shim.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-rrb-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>itar-plexus-container-guice</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.itars</groupId>
+      <artifactId>itar-plexus-app-booter</artifactId>
+      <version>2.1.0-v0001-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-oss-edition</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.itars</groupId>
+      <artifactId>itar-work-dir</artifactId>
+      <version>0.1.0-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.runtime.bars</groupId>
+      <artifactId>bar-jsw</artifactId>
+      <version>3.2.3-v0001-SNAPSHOT</version>
+      <type>zip</type>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+      <artifactId>nexus-ldap-realm-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
 
+<!--   
+
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>itar-nexus-plugin-manager-guice</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+    </dependency>
+-->
   </dependencies>
 
 

@@ -97,12 +97,6 @@
 		    <unpack>false</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory> 
       </itar>
-      <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-nexus-plugin-manager-guice</artifactId>
-        <version>${project.version}</version>
-        <type>zip</type>
-      </itar>     
     </itars>
 
   </assembly>

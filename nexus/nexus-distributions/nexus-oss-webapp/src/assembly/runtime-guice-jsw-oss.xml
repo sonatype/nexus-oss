@@ -5,6 +5,8 @@
 
   <assembly>
 
+    <id>nexus-oss</id>
+
     <description>Nexus OSS</description>
 
     <properties>
