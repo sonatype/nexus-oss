@@ -23,11 +23,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.archiver.zip.ZipEntry;
+import org.codehaus.plexus.archiver.zip.ZipOutputStream;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -47,7 +50,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from a file.
-     *
+     * 
      * @param file The file to be digested.
      * @return An SHA1 hash based on the contents of the file.
      * @throws IOException
@@ -64,13 +67,15 @@ public class FileTestingUtils
         finally
         {
             if ( fis != null )
+            {
                 fis.close();
+            }
         }
     }
 
     /**
      * Creates a SHA1 hash from a url.
-     *
+     * 
      * @param url The URL to opened and digested.
      * @return An SHA1 hash based on the contents of the URL.
      * @throws IOException
@@ -94,7 +99,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from the contents of a String.
-     *
+     * 
      * @param data the String to be digested.
      * @return An SHA1 hash based on the contents of the String.
      * @throws IOException
@@ -110,7 +115,7 @@ public class FileTestingUtils
 
     /**
      * Creates a SHA1 hash from an InputStream.
-     *
+     * 
      * @param in Inputstream to be digested.
      * @returnn SHA1 hash based on the contents of the stream.
      * @throws IOException
@@ -156,7 +161,7 @@ public class FileTestingUtils
         throws IOException
     {
 
-        if ( file1 != null && file1.exists() && file2 != null && file2.exists() )
+        if ( file1 != null && file1.exists() && file2 != null && file2.exists() && file1.length() == file2.length() )
         {
             String file1SHA1 = createSHA1FromFile( file1 );
             String file2SHA1 = createSHA1FromFile( file2 );
@@ -268,7 +273,7 @@ public class FileTestingUtils
 
             if ( Arrays.asList( "zip", "jar", "gz", "jpg", "png" ).contains( extension ) )
             {
-                //just copy know binaries
+                // just copy know binaries
                 FileUtils.copyFile( sourceFile, destFile );
             }
             else
@@ -293,6 +298,27 @@ public class FileTestingUtils
             }
         }
 
+    }
+
+    public static File populate( File file, int sizeInMB )
+        throws IOException
+    {
+        file.getParentFile().mkdirs();
+
+        ZipOutputStream zip = new ZipOutputStream( file );
+        zip.putNextEntry( new ZipEntry( "content.random" ) );
+        for ( int i = 0; i < sizeInMB * 1024; i++ )
+        {
+            byte[] b = new byte[1024];
+            SecureRandom r = new SecureRandom();
+            r.nextBytes( b );
+
+            zip.write( b );
+        }
+        zip.closeEntry();
+        zip.close();
+
+        return file;
     }
 
 }
