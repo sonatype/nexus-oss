@@ -5,23 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice.inject</groupId>
-    <artifactId>guice-plexus</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugins</artifactId>
+    <version>1.5.1-SNAPSHOT</version>
   </parent>
 
   <packaging>pom</packaging>
 
   <artifactId>guice-nexus</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
 
-  <name>Guice - Nexus</name>
-
-  <properties>
-    <nexus.api.version>1.5.1-SNAPSHOT</nexus.api.version>
-    <guice.nexus.version>0.2.0-SNAPSHOT</guice.nexus.version>
-    <sonatype.plugin.version>1.0.2</sonatype.plugin.version>
-  </properties>
+  <name>Nexus Plugins : Manager (Guice)</name>
 
   <modules>
     <module>guice-nexus-scanners</module>
@@ -32,9 +25,17 @@
     <dependencies>
 
       <dependency>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-plexus</artifactId>
+        <version>0.2.0-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-api</artifactId>
-        <version>${nexus.api.version}</version>
+        <artifactId>nexus-plugin-api</artifactId>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -45,7 +46,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
-        <version>${nexus.api.version}</version>
+        <version>${project.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -85,7 +86,7 @@
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>plexus-app-events-api</artifactId>
-        <version>1.0.0</version>
+        <version>${plexus-app-events.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -97,7 +98,7 @@
       <dependency>
         <groupId>org.sonatype.appbooter.plexus-booters</groupId>
         <artifactId>plexus-app-booter</artifactId>
-        <version>2.1.0</version>
+        <version>${plexus.appbooter.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -107,14 +108,14 @@
       </dependency>
 
       <dependency>
-        <groupId>org.sonatype.spice.inject</groupId>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>guice-nexus-scanners</artifactId>
-        <version>${guice.nexus.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.spice.inject</groupId>
+        <groupId>org.sonatype.nexus</groupId>
         <artifactId>guice-nexus-shim</artifactId>
-        <version>${guice.nexus.version}</version>
+        <version>${project.version}</version>
       </dependency>
 
     </dependencies>

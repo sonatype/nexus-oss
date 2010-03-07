@@ -16,7 +16,6 @@
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
-    <guice-nexus-shim.version>0.2.0-SNAPSHOT</guice-nexus-shim.version>
   </properties>
 
 
@@ -55,9 +54,9 @@
       <type>zip</type>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>guice-nexus-shim</artifactId>
-      <version>${guice-nexus-shim.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>

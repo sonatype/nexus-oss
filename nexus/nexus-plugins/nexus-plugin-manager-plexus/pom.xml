@@ -17,7 +17,7 @@
   <packaging>jar</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Plugins : Manager</name>
+  <name>Nexus Plugins : Manager (Plexus)</name>
 
   <dependencies>
 

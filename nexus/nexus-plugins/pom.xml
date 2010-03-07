@@ -27,27 +27,31 @@
     <module>nexus-plugin-manager-guice</module>
   </modules>
 
+  <properties>
+    <sonatype.plugin.version>1.0.3-SNAPSHOT</sonatype.plugin.version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-api</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>${sonatype.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-host-api</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>${sonatype.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-model-api</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>${sonatype.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plugin</groupId>
         <artifactId>plugin-gleaner</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>${sonatype.plugin.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -5,16 +5,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.sonatype.spice.inject</groupId>
+    <groupId>org.sonatype.nexus</groupId>
     <artifactId>guice-nexus</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>1.5.1-SNAPSHOT</version>
   </parent>
 
   <packaging>bundle</packaging>
 
   <artifactId>guice-nexus-shim</artifactId>
 
-  <name>Guice - Nexus shim</name>
+  <name>Nexus Plugins : Guice - Nexus shim</name>
 
   <build>
     <plugins>
@@ -29,7 +29,7 @@
         <extensions>true</extensions>
         <configuration>
           <!-- stop the contents of split-packages from leaking into the final bundle -->
-          <excludeDependencies>*;groupId=!org.sonatype.spice.inject</excludeDependencies>
+          <excludeDependencies>*;artifactId=!guice-*</excludeDependencies>
           <instructions>
             <Bundle-RequiredExecutionEnvironment>
               J2SE-1.5,JavaSE-1.6
@@ -38,7 +38,7 @@
             <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
             <_nouses>true</_nouses>
             <Embed-Dependency>
-              *;groupId=org.sonatype.spice.inject;optional=true;inline=org/**
+              *;artifactId=guice-*;optional=true;inline=org/**
             </Embed-Dependency>
             <Embed-Transitive>true</Embed-Transitive>
             <Include-Resource>
@@ -75,7 +75,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-api</artifactId>
+      <artifactId>nexus-plugin-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -95,9 +95,10 @@
     <dependency>
       <groupId>org.sonatype.spice.inject</groupId>
       <artifactId>guice-patches</artifactId>
+      <classifier>noaop</classifier>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
+      <groupId>org.sonatype.nexus</groupId>
       <artifactId>guice-nexus-scanners</artifactId>
       <optional>true</optional>
     </dependency>
