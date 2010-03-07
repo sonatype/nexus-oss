@@ -23,6 +23,7 @@
       <groupId>org.sonatype.spice.inject</groupId>
       <artifactId>guice-patches</artifactId>
       <version>2.1.2-SNAPSHOT</version>
+      <classifier>noaop</classifier>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice.inject</groupId>
