@@ -64,7 +64,7 @@
               <version>1.2</version>
               <type>js</type>
               <classifier>compressed</classifier>
-              <outputDirectory>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</outputDirectory>
+              <outputDirectory>${basedir}/target/nexus/nexus-oss-webapp-${project.version}/runtime/apps/nexus/webapp</outputDirectory>
             </artifact>
           </extraResourcesArtifacts>
         </configuration>
@@ -156,7 +156,7 @@
           </execution>
         </executions>
         <configuration>
-          <source>${basedir}/target/nexus/nexus-webapp-${project.version}/runtime/apps/nexus/webapp</source>
+          <source>${basedir}/target/nexus/nexus-oss-webapp-${project.version}/runtime/apps/nexus/webapp</source>
           <doNotInstrument>
             <js>ext-2.2</js>
             <js>firebug-lite-1.2-compressed.js</js>
