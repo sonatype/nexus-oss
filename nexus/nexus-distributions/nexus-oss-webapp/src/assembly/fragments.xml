@@ -77,32 +77,6 @@
   
   <assembly>
 
-	<id>fragment-nexus-guice</id>
-
-    <description>Nexus Guice Fragment</description>
-
-    <itars>
-      <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>itar-plexus-container-guice</artifactId>
-        <version>${project.version}</version>
-        <type>zip</type>
-      </itar>
-      <itar>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>guice-nexus-shim</artifactId>
-        <version>${project.version}</version>
-        <type>jar</type>
-        <virtual>true</virtual>
-        <unpack>false</unpack>
-        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/lib</outputDirectory> 
-      </itar>
-    </itars>
-
-  </assembly>
-  
-  <assembly>
-
 	<id>fragment-nexus-oss-plugins</id>
 
     <description>Nexus OSS Plugins Fragment</description>

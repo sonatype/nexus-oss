@@ -22,14 +22,6 @@
         <type>xml</type>
         <assemblyId>fragment-nexus-oss-minimal</assemblyId>
       </extend>
-      <extend>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-oss-webapp</artifactId>
-        <version>${project.version}</version>
-        <classifier>fragments</classifier>
-        <type>xml</type>
-        <assemblyId>fragment-nexus-guice</assemblyId>
-      </extend>      
     </extends>
     
     <bar>
