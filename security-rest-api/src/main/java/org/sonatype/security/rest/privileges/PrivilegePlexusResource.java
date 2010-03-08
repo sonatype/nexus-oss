@@ -16,6 +16,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -82,10 +83,11 @@ public class PrivilegePlexusResource
 
     /**
      * Retrieves the details of a security privilege.
+     * @param privilegeId The Id of the privilege.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class )
+    @ResourceMethodSignature( output = PrivilegeStatusResourceResponse.class, pathParams = { @PathParam(value = "privilegeId") } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -117,10 +119,12 @@ public class PrivilegePlexusResource
 
     /**
      * Removes a security privilege.
+     * 
+     * @param privilegeId The Id of the privilege to be removed.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = { @PathParam(value = "privilegeId") } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

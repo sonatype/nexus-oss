@@ -15,6 +15,7 @@ package org.sonatype.security.rest.users;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -71,10 +72,11 @@ public class UserResetPlexusResource
     }
     /**
      * Reset a user's password.
+     * @param userId The id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" )} )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

@@ -99,10 +99,11 @@ public class RolePlexusResource
 
     /**
      * Returns the request security role.
+     * @param roleId Id of the role.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = RoleResourceResponse.class )
+    @ResourceMethodSignature( output = RoleResourceResponse.class, pathParams = { @PathParam(value = "roleId") }  )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -130,10 +131,11 @@ public class RolePlexusResource
 
     /**
      * Updates and returns a security role.
+     * @param roleId Id of the role to be updated.
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class )
+    @ResourceMethodSignature( input = RoleResourceRequest.class, output = RoleListResourceResponse.class, pathParams = { @PathParam(value = "roleId") }  )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -185,10 +187,11 @@ public class RolePlexusResource
 
     /**
      * Removes a security role.
+     * @param roleId Id of the role to be removed.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = { @PathParam(value = "roleId") } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

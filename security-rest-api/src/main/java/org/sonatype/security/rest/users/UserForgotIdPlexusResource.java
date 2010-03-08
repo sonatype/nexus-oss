@@ -15,6 +15,7 @@ package org.sonatype.security.rest.users;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -68,10 +69,11 @@ public class UserForgotIdPlexusResource
 
     /**
      * Email user his/her user Id.
+     * @param email The email address of the user.
      */
     @Override
     @POST
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = {@PathParam( value = "email" ) } )
     public Object post( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {

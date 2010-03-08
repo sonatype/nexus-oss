@@ -20,9 +20,9 @@ import java.util.Set;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -37,7 +37,6 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.rest.model.UserResourceResponse;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -98,10 +97,15 @@ public class UserToRolePlexusResource
 
     /**
      * Sets a users roles.
+     * 
+     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
+     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * 
+     * @param userId The Id of the user.
      */
     @Override
     @PUT
-    @ResourceMethodSignature( input = UserToRoleResourceRequest.class )
+    @ResourceMethodSignature( input = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -168,10 +172,15 @@ public class UserToRolePlexusResource
 
     /**
      * Gets a users roles.
+     * 
+     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
+     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * 
+     * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserToRoleResourceRequest.class )
+    @ResourceMethodSignature( output = UserToRoleResourceRequest.class, pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -202,10 +211,15 @@ public class UserToRolePlexusResource
 
     /**
      * Removes all roles from a user.
+     * 
+     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
+     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * 
+     * @param userId The Id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "sourceId"), @PathParam( value = "userId") } )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

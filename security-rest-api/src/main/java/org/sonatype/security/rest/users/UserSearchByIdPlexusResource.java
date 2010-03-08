@@ -15,6 +15,7 @@ package org.sonatype.security.rest.users;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -70,10 +71,15 @@ public class UserSearchByIdPlexusResource extends AbstractUserSearchPlexusResour
 
     /**
      * Returns a list of users in which the source and partial user id matches the parameters. 
+     * 
+     * @param sourceId The Id of the source.  A source specifies where the users/roles came from, 
+     * for example the source Id of 'LDAP' identifies the users/roles as coming from an LDAP source.
+     * 
+     * @param userId The Id of the user.
      */
     @Override 
     @GET
-    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class )
+    @ResourceMethodSignature( output = PlexusUserListResourceResponse.class, pathParams = { @PathParam( value = "userId"), @PathParam( value = "sourceId") } )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
