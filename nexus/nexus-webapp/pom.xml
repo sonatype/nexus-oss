@@ -23,8 +23,9 @@
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
     
-    <plugin-repository.directory>${project.build.finalName}/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
-    <optional-plugins.directory>${project.build.finalName}/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
+    <plugin-repository.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
+    <optional-plugins.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
+    <plugin-api.version>1.0.3-SNAPSHOT</plugin-api.version>
     
   </properties>
   <dependencies>
@@ -47,6 +48,16 @@
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
     <!-- There are problems with the Maven reactor that would require these modules 
@@ -58,6 +69,16 @@
 	  <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -67,6 +88,16 @@
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -76,6 +107,16 @@
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -85,6 +126,16 @@
       <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
     <!-- The bundle -->
@@ -92,16 +143,34 @@
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-jsw-app-booter</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-classworlds</artifactId>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>tanukisoft</groupId>
@@ -112,6 +181,12 @@
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-legacy-adapter</artifactId>
       <version>${plexus-security.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -121,10 +196,22 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-web-utils</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-logging-extras</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -138,7 +225,20 @@
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>servlet-api</artifactId>
         </exclusion>        
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>        
+        <exclusion>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-plugin-manager</artifactId>
+        </exclusion>        
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>guice-nexus-shim</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -159,6 +259,12 @@
       <artifactId>jsw-binaries</artifactId>
       <type>tar.gz</type>
       <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-api</artifactId>
+      <version>${plugin-api.version}</version>
     </dependency>
 
     <dependency>
