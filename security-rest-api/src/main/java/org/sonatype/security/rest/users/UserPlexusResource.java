@@ -17,6 +17,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -35,7 +36,6 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.sonatype.security.rest.model.PlexusUserResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
 import org.sonatype.security.rest.model.UserResourceResponse;
@@ -88,10 +88,11 @@ public class UserPlexusResource
 
     /**
      * Retrieves a user's information.
+     * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = UserResourceResponse.class )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" )} )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -112,10 +113,11 @@ public class UserPlexusResource
 
     /**
      * Updates a user's information.
+     * @param userId The Id of the user.
      */
     @Override
     @POST
-    @ResourceMethodSignature( output = UserResourceResponse.class )
+    @ResourceMethodSignature( output = UserResourceResponse.class, pathParams = { @PathParam( value = "userId" )} )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -169,10 +171,11 @@ public class UserPlexusResource
 
     /**
      * Removes a user.
+     * @param userId The Id of the user.
      */
     @Override
     @DELETE
-    @ResourceMethodSignature
+    @ResourceMethodSignature( pathParams = { @PathParam( value = "userId" )} )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

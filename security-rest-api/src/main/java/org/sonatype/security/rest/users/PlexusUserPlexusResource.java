@@ -15,6 +15,7 @@ package org.sonatype.security.rest.users;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
@@ -76,10 +77,11 @@ public class PlexusUserPlexusResource
     
     /**
      * Retrieves user information.
+     * @param userId The Id of the user.
      */
     @Override
     @GET
-    @ResourceMethodSignature( output = PlexusUserResourceResponse.class )
+    @ResourceMethodSignature( output = PlexusUserResourceResponse.class, pathParams = {@PathParam( value = "userId" )} )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
