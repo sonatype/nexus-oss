@@ -5,6 +5,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionEvent;
 import org.sonatype.nexus.configuration.model.CGlobalRemoteConnectionSettingsCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
@@ -30,8 +31,7 @@ public class DefaultGlobalRemoteConnectionSettings
     @Override
     protected CRemoteConnectionSettings getCurrentConfiguration( boolean forWrite )
     {
-        return ( (CGlobalRemoteConnectionSettingsCoreConfiguration) getCurrentCoreConfiguration() )
-            .getConfiguration( forWrite );
+        return ( (CGlobalRemoteConnectionSettingsCoreConfiguration) getCurrentCoreConfiguration() ).getConfiguration( forWrite );
     }
 
     @Override
@@ -144,6 +144,20 @@ public class DefaultGlobalRemoteConnectionSettings
     public String getName()
     {
         return "Global Remote Connection Settings";
+    }
+
+    @Override
+    public boolean commitChanges()
+        throws ConfigurationException
+    {
+        boolean wasDirty = super.commitChanges();
+
+        if ( wasDirty )
+        {
+            getApplicationEventMulticaster().notifyEventListeners( new GlobalRemoteConnectionEvent( this ) );
+        }
+
+        return wasDirty;
     }
 
 }
