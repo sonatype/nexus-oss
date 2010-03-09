@@ -196,6 +196,7 @@
           <type>int</type>
           <description>HTTP connection timeout in miliseconds.</description>
           <required>true</required>
+          <defaultValue>20000</defaultValue>
         </field>
         <field>
           <name>retrievalRetryCount</name>
