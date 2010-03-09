@@ -14,6 +14,7 @@
 package org.sonatype.nexus.rest.repositories;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -267,6 +268,30 @@ public class RepositoryPlexusResource
                                 pRepository.setArtifactMaxAge( proxyModel.getArtifactMaxAge() );
 
                                 pRepository.setMetadataMaxAge( proxyModel.getMetadataMaxAge() );   
+                            }
+                        }
+                        else
+                        {
+                            //This is a total hack to be able to retrieve this data from a non core repo if available
+                            try
+                            {
+                                Method artifactMethod = repository.getClass().getMethod( "setArtifactMaxAge", int.class );
+                                Method metadataMethod = repository.getClass().getMethod( "setMetadataMaxAge", int.class );
+                                
+                                RepositoryProxyResource proxyModel = ( RepositoryProxyResource ) model;
+                                
+                                if ( artifactMethod != null )
+                                {
+                                    artifactMethod.invoke( repository, proxyModel.getArtifactMaxAge() ); 
+                                }
+                                if ( metadataMethod != null )
+                                {
+                                    metadataMethod.invoke( repository, proxyModel.getMetadataMaxAge() ); 
+                                }
+                            }
+                            catch ( Exception e )
+                            {
+                                //nothing to do here, doesn't support artifactmax age
                             }
                         }
 

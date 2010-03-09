@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.rest.repositories;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -396,12 +397,33 @@ public abstract class AbstractRepositoryPlexusResource
         resource.getRemoteStorage().setHttpProxySettings(
                                                           AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
                                                                                                                                                         repository ).getRemoteStorage().getHttpProxySettings() ) );
-
         if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
             resource.setArtifactMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getArtifactMaxAge() );
 
             resource.setMetadataMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getMetadataMaxAge() );
+        }
+        else
+        {
+            //This is a total hack to be able to retrieve this data from a non core repo if available
+            try
+            {
+                Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?> [0] );
+                Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?> [0] );
+                
+                if ( artifactMethod != null )
+                {
+                    resource.setArtifactMaxAge( ( Integer ) artifactMethod.invoke( repository, new Object [0] ) ); 
+                }
+                if ( metadataMethod != null )
+                {
+                    resource.setMetadataMaxAge( ( Integer ) metadataMethod.invoke( repository, new Object [0] ) ); 
+                }
+            }
+            catch ( Exception e )
+            {
+                //nothing to do here, doesn't support artifactmax age
+            }
         }
 
         return resource;
