@@ -17,8 +17,6 @@ public class RolesConfigurationForm
 
     private TextField description;
 
-    private TextField sessionTimeout;
-
     private TwinPanel privileges;
 
     private Button saveButton;
@@ -32,7 +30,6 @@ public class RolesConfigurationForm
         roleId = new TextField( selenium, expression + ".find('name', 'id')[0]" );
         name = new TextField( selenium, expression + ".find('name', 'name')[0]" );
         description = new TextField( selenium, expression + ".find('name', 'description')[0]" );
-        sessionTimeout = new TextField( selenium, expression + ".find('name', 'sessionTimeout')[0]" );
         privileges = new TwinPanel( selenium, expression + ".find('name', 'privileges')[0]" );
 
         saveButton = new Button( selenium, expression + ".buttons[0]" );
@@ -54,11 +51,6 @@ public class RolesConfigurationForm
         return description;
     }
 
-    public final TextField getSessionTimeout()
-    {
-        return sessionTimeout;
-    }
-
     public final TwinPanel getPrivileges()
     {
         return privileges;
@@ -78,11 +70,10 @@ public class RolesConfigurationForm
         return this;
     }
 
-    public RolesConfigurationForm populate( String roleId, String name, String timeout, String... privs )
+    public RolesConfigurationForm populate( String roleId, String name, String... privs )
     {
         this.roleId.type( roleId );
         this.name.type( name );
-        this.sessionTimeout.type( timeout );
         for ( String priv : privs )
         {
             this.privileges.add( priv );

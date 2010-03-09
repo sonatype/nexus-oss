@@ -23,7 +23,6 @@ public class Nexus2208RolesTest
 
         NxAssert.requiredField( roles.getRoleId(), "selrole" );
         NxAssert.requiredField( roles.getName(), "selrole" );
-        NxAssert.requiredField( roles.getSessionTimeout(), "60" );
 
         roles.save();
         NxAssert.hasErrorText( roles.getPrivileges(), "One or more roles or privileges are required" );
@@ -44,9 +43,8 @@ public class Nexus2208RolesTest
         // create
         String roleId = "selrole";
         String name = "selrolename";
-        String timeout = "60";
         String priv = "admin";
-        roles.addRole().populate( roleId, name, timeout, priv ).save();
+        roles.addRole().populate( roleId, name, priv ).save();
         roles.refresh();
 
         Assert.assertTrue( roles.getGrid().contains( roleId ) );
@@ -56,24 +54,20 @@ public class Nexus2208RolesTest
         RolesConfigurationForm role = roles.select( roleId ).selectConfiguration();
         NxAssert.valueEqualsTo( role.getRoleId(), roleId );
         NxAssert.valueEqualsTo( role.getName(), name );
-        NxAssert.valueEqualsTo( role.getSessionTimeout(), timeout );
         NxAssert.contains( role.getPrivileges(), priv );
 
         roles.refresh();
 
         // update
-        String newTO = "30";
         String newName = "new selenium role name";
 
         role = roles.select( roleId ).selectConfiguration();
         role.getName().type( newName );
-        role.getSessionTimeout().type( newTO );
         role.save();
 
         roles.refresh();
         role = roles.select( roleId ).selectConfiguration();
         NxAssert.valueEqualsTo( role.getName(), newName );
-        NxAssert.valueEqualsTo( role.getSessionTimeout(), newTO );
 
         roles.refresh();
 

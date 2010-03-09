@@ -24,6 +24,5 @@ public class Nexus1060InteralRolesTest
         Assert.assertTrue( role.getRoleId().isDisabled() );
         Assert.assertTrue( role.getName().isDisabled() );
         Assert.assertTrue( role.getDescription().isDisabled() );
-        Assert.assertTrue( role.getSessionTimeout().isDisabled() );
     }
 }

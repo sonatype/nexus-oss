@@ -108,11 +108,6 @@ Sonatype.repoServer.RoleEditPanel = function( config ) {
         convert: this.convertMapping.createDelegate( this )
       },
       { 
-        name: 'sessionTimeout',
-        header: 'Session Timeout',
-        width: 100
-      },
-      { 
         name: 'description',
         header: 'Description',
         width: 175,
@@ -320,8 +315,7 @@ Ext.extend( Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
       var defaultData = {
         id: roleId,
         name: roleRec.data.name,
-        description: 'External mapping for ' + roleRec.data.name + ' (' + sourceId + ')',
-        sessionTimeout: 60        
+        description: 'External mapping for ' + roleRec.data.name + ' (' + sourceId + ')'     
       };
       
       this.hostPanel.cardPanel.getLayout().activeItem.find( 'name', 'id' )[0].disable();
@@ -343,7 +337,8 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
       },
       submit: { 
         roles : this.saveRolesTreeHelper.createDelegate(this),
-        privileges : this.savePrivilegesTreeHelper.createDelegate(this)
+        privileges : this.savePrivilegesTreeHelper.createDelegate(this),
+        sessionTimeout : function() { return 60; }
       }
     },
     validationModifiers: {
@@ -444,21 +439,6 @@ Sonatype.repoServer.DefaultRoleEditor = function( config ) {
       name: 'description',
       allowBlank: true,
       width: this.COMBO_WIDTH
-    },
-    {
-      xtype: 'numberfield',
-      fieldLabel: 'Session Timeout',
-      itemCls: 'required-field',
-      labelStyle: 'margin-left: 15px; width: 185px;',
-      helpText: ht.sessionTimeout,
-      name: 'sessionTimeout',
-      allowBlank: false,
-      width: this.COMBO_WIDTH,
-      value: 60,
-      validator: function( value ){
-      // decimal values are not allowed
-      return (value - 0) % 1 == 0 ? true : 'Only integer values are allowed';
-      }
     },
     {
       xtype: 'panel',
@@ -650,7 +630,6 @@ Ext.extend( Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
       this.find('name', 'id')[0].disable();
       this.find('name', 'name')[0].disable();
       this.find('name', 'description')[0].disable();
-      this.find('name', 'sessionTimeout')[0].disable();
       this.find('name', 'twinpanel')[0].disable();
       this.find('name', 'roles-privs-tree')[0].dragZone.lock();
       this.find('name', 'all-roles-privs-tree')[0].dragZone.lock();
