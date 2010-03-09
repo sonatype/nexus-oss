@@ -3,7 +3,7 @@ package org.sonatype.nexus.configuration.application;
 import junit.framework.Assert;
 
 import org.sonatype.nexus.AbstractNexusTestCase;
-import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -25,9 +25,9 @@ public class DefaultGlobalRemoteConnectionSettingsTest
         {
             public void onEvent( Event<?> evt )
             {
-                if ( evt instanceof GlobalRemoteConnectionEvent )
+                if ( evt instanceof GlobalRemoteConnectionSettingsChangedEvent )
                 {
-                    event[0] = (GlobalRemoteConnectionEvent) evt;
+                    event[0] = (GlobalRemoteConnectionSettingsChangedEvent) evt;
                 }
             }
         } );

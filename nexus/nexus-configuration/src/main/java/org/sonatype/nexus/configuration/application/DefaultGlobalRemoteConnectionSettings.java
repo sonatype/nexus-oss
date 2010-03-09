@@ -5,7 +5,7 @@ import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.CoreConfiguration;
-import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionEvent;
+import org.sonatype.nexus.configuration.application.events.GlobalRemoteConnectionSettingsChangedEvent;
 import org.sonatype.nexus.configuration.model.CGlobalRemoteConnectionSettingsCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteConnectionSettings;
@@ -154,7 +154,7 @@ public class DefaultGlobalRemoteConnectionSettings
 
         if ( wasDirty )
         {
-            getApplicationEventMulticaster().notifyEventListeners( new GlobalRemoteConnectionEvent( this ) );
+            getApplicationEventMulticaster().notifyEventListeners( new GlobalRemoteConnectionSettingsChangedEvent( this ) );
         }
 
         return wasDirty;

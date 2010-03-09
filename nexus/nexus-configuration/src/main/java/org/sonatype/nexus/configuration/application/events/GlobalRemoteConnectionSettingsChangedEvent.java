@@ -3,11 +3,11 @@ package org.sonatype.nexus.configuration.application.events;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
 import org.sonatype.plexus.appevents.AbstractEvent;
 
-public class GlobalRemoteConnectionEvent
+public class GlobalRemoteConnectionSettingsChangedEvent
     extends AbstractEvent<GlobalRemoteConnectionSettings>
 {
 
-    public GlobalRemoteConnectionEvent( GlobalRemoteConnectionSettings settings )
+    public GlobalRemoteConnectionSettingsChangedEvent( GlobalRemoteConnectionSettings settings )
     {
         super( settings );
     }
