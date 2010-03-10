@@ -188,8 +188,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
             store.deleteItem( req );
 
             getLogger().info(
-                "Artifact(s) of path '" + req.getRequestPath() + "' was delete from repository ["
-                    + request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ) + "]" );
+                              "Artifact(s) of path '" + req.getRequestPath() + "' was delete from repository ["
+                                  + request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY )
+                                  + "]" );
         }
         catch ( Exception e )
         {
@@ -415,9 +416,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
                     resource.setLastModified( new Date( child.getModified() ) );
 
                     resource
-                        .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
-                            .getLength()
-                                        : -1 );
+                            .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
+                                                                                                                                    .getLength()
+                                            : -1 );
 
                     response.addData( resource );
 
@@ -459,8 +460,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             // Load up the template, and pass in the data
             VelocityRepresentation representation =
-                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel, variant
-                    .getMediaType() );
+                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel,
+                                            variant.getMediaType() );
 
             return representation;
         }
@@ -469,7 +470,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
-        ResourceStoreRequest request, StorageItem item )
+                                         ResourceStoreRequest request, StorageItem item )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
@@ -500,7 +501,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected ContentListDescribeRequestResource describeRequest( Context context, Request req, Response res,
-        Variant variant, ResourceStoreRequest request )
+                                                                  Variant variant, ResourceStoreRequest request )
     {
         ContentListDescribeRequestResource result = new ContentListDescribeRequestResource();
 
@@ -517,7 +518,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected ContentListDescribeResponseResource describeResponse( Context context, Request req, Response res,
-        Variant variant, ResourceStoreRequest request, StorageItem item )
+                                                                    Variant variant, ResourceStoreRequest request,
+                                                                    StorageItem item )
     {
         ContentListDescribeResponseResource result = new ContentListDescribeResponseResource();
 
@@ -568,7 +570,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             result.setOriginatingRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
 
             result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind()
-                .getMainFacet().getName() );
+                                                          .getMainFacet().getName() );
         }
         else
         {
@@ -662,7 +664,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                "Got exception during processing " + req.getMethod() + " " + req.getResourceRef().toString(), t );
+                               "Got exception during processing " + req.getMethod() + " "
+                                   + req.getResourceRef().toString() + ": " + t.getMessage() );
         }
 
         if ( t instanceof ResourceException )
