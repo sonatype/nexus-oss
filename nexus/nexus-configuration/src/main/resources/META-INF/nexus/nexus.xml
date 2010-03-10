@@ -32,7 +32,7 @@
       <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://repo1.maven.org/maven2/</url>
+        <url>http://repo1.maven.org/maven2</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -60,7 +60,7 @@
       <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
+        <url>http://google-maven-repository.googlecode.com/svn/repository</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -88,7 +88,7 @@
       <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://download.java.net/maven/2/</url>
+        <url>http://download.java.net/maven/2</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -117,7 +117,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://download.java.net/maven/1/</url>
+        <url>http://download.java.net/maven/1</url>
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -143,7 +143,7 @@
       <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://repository.apache.org/snapshots/</url>
+        <url>http://repository.apache.org/snapshots</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -171,7 +171,7 @@
       <searchable>true</searchable>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://nexus.codehaus.org/snapshots/</url>
+        <url>http://nexus.codehaus.org/snapshots</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
