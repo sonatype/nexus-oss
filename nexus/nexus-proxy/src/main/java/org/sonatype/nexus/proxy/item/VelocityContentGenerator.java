@@ -13,17 +13,17 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component( role = ContentGenerator.class, hint = "VelocityContentGenerator" )
+@Component( role = ContentGenerator.class, hint = VelocityContentGenerator.VELOCITY )
 public class VelocityContentGenerator
     implements ContentGenerator
 {
+    public static final String VELOCITY = "velocity";
+
     @Requirement
     private VelocityComponent velocityComponent;
 
     public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         InputStreamReader isr = null;
 

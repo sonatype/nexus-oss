@@ -34,11 +34,26 @@ public class DefaultStorageFileTemplateItem
      * @param contentLocator the content locator
      */
     public DefaultStorageFileTemplateItem( Repository repository, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, ContentLocator contentLocator )
+                                           boolean canWrite, ContentLocator contentLocator )
     {
         super( repository, request, canRead, canWrite, contentLocator );
 
-        getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, "velocity" );
+        getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, VelocityContentGenerator.VELOCITY );
+    }
+
+    /**
+     * Instantiates a new default storage file item.
+     * 
+     * @param repository the repository
+     * @param path the path
+     * @param canRead the can read
+     * @param canWrite the can write
+     * @param template the velocity template to be used
+     */
+    public DefaultStorageFileTemplateItem( Repository repository, ResourceStoreRequest request, boolean canRead,
+                                           boolean canWrite, String template )
+    {
+        this( repository, request, canRead, canWrite, new StringContentLocator( template ) );
     }
 
     /**
@@ -51,10 +66,10 @@ public class DefaultStorageFileTemplateItem
      * @param contentLocator the content locator
      */
     public DefaultStorageFileTemplateItem( RepositoryRouter router, ResourceStoreRequest request, boolean canRead,
-        boolean canWrite, ContentLocator contentLocator )
+                                           boolean canWrite, ContentLocator contentLocator )
     {
         super( router, request, canRead, canWrite, contentLocator );
 
-        getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, VelocityContentGenerator.class.getSimpleName() );
+        getItemContext().put( ContentGenerator.CONTENT_GENERATOR_ID, VelocityContentGenerator.VELOCITY );
     }
 }
