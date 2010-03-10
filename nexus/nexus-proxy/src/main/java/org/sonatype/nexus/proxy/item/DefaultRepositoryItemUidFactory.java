@@ -64,7 +64,14 @@ public class DefaultRepositoryItemUidFactory
 
         itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
 
-        RepositoryItemUid toBeReturned = itemUidMap.get( key ).get();
+        WeakReference<RepositoryItemUid> ref = itemUidMap.get( key );
+
+        RepositoryItemUid toBeReturned = null;
+
+        if ( ref != null )
+        {
+            toBeReturned = ref.get();
+        }
 
         if ( toBeReturned != null )
         {
@@ -137,7 +144,7 @@ public class DefaultRepositoryItemUidFactory
         {
             cleanUpItemUidMap( true );
         }
-        
+
         return itemUidMap.size();
     }
 
