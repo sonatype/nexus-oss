@@ -663,9 +663,20 @@ public abstract class AbstractResourceStoreContentPlexusResource
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug(
-                               "Got exception during processing " + req.getMethod() + " "
-                                   + req.getResourceRef().toString() + ": " + t.getMessage() );
+            if ( t instanceof RuntimeException )
+            {
+                // I still want to see runtime exceptions
+                getLogger().debug(
+                                   "Got exception during processing " + req.getMethod() + " "
+                                       + req.getResourceRef().toString(), t );
+            }
+            else
+            {
+                // checked ones are anyway handled below one by one, or by the "catch all" last catch
+                getLogger().debug(
+                                   "Got exception during processing " + req.getMethod() + " "
+                                       + req.getResourceRef().toString() + ": " + t.getMessage() );
+            }
         }
 
         if ( t instanceof ResourceException )
