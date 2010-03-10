@@ -31,7 +31,9 @@ Sonatype.panels.AutoTabPanel = function( config ) {
     hideMode: 'offsets'
   };
   Ext.apply( this, config, defaultConfig );
-  Sonatype.panels.AutoTabPanel.superclass.constructor.call( this, {} );
+  Sonatype.panels.AutoTabPanel.superclass.constructor.call( this, {
+    collapseMode: 'mini'
+  } );
 };
 
 Ext.extend( Sonatype.panels.AutoTabPanel, Ext.Panel, {
