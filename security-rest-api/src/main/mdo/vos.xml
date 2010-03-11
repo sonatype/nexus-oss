@@ -186,6 +186,9 @@
 					<type>int</type>
 					<required>true</required>
           <description>The sessionTimeout of the role (legacy, actual value not used).</description>
+                    <annotations>
+                      <annotation>@Deprecated</annotation>
+                    </annotations>
 				</field>
 				<field>
 					<name>roles</name>
