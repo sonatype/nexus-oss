@@ -287,3 +287,12 @@ button.st-icon-refresh {
 .disable-cell {
   background-color: lightgrey !important;
 }
+
+.x-layout-split-north .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-top.gif);}
+.x-layout-split-south .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-bottom.gif);}
+.x-layout-split-west .x-layout-mini{top:48%;background-image:url(../images/icons/mini-left.gif);}
+.x-layout-split-east .x-layout-mini{top:48%;background-image:url(../images/icons/mini-right.gif);}
+.x-layout-cmini-north .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-bottom.gif);}
+.x-layout-cmini-south .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-top.gif);}
+.x-layout-cmini-west .x-layout-mini{top:48%;background-image:url(../images/icons/mini-right.gif);}
+.x-layout-cmini-east .x-layout-mini{top:48%;background-image:url(../images/icons/mini-left.gif);}
