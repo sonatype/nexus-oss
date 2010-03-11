@@ -56,13 +56,6 @@ public class DefaultErrorReportingManagerTest
         cleanDir( unzipHomeDir );
     }
     
-    // dummy test to not fail this test case
-    // UTs below are disabled for now, while SBOX jira project is not accessible again
-    public void testNothing()
-    {
-        
-    }
-
     private void enableErrorReports( boolean useProxy )
         throws ConfigurationException, IOException
     {
@@ -87,7 +80,7 @@ public class DefaultErrorReportingManagerTest
         nexusConfig.saveConfiguration();
     }
 
-    public void _testJiraAccess()
+    public void testJiraAccess()
         throws Exception
     {
         // enableProxy();
@@ -128,7 +121,7 @@ public class DefaultErrorReportingManagerTest
         Assert.assertEquals( 1, issues.size() );
     }
 
-    public void _testPackageFiles()
+    public void testPackageFiles()
         throws Exception
     {
         addBackupFiles( getConfHomeDir() );
@@ -223,7 +216,7 @@ public class DefaultErrorReportingManagerTest
         }
     }
 
-    public void _testTaskFailure()
+    public void testTaskFailure()
         throws Exception
     {
         enableErrorReports( false );
