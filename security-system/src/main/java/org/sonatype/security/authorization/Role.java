@@ -16,6 +16,7 @@ public class Role implements Comparable<Role>
     private boolean readOnly;
 
     // TODO: remove this, we don't use this
+    @Deprecated
     private int sessionTimeout;
 
     private Set<String> roles = new HashSet<String>();
@@ -90,23 +91,35 @@ public class Role implements Comparable<Role>
         final int after = 1;
 
         if ( this == o )
+        {
             return equal;
+        }
 
         if ( o == null )
+        {
             return after;
+        }
 
         if ( getRoleId() == null && o.getRoleId() != null )
+        {
             return before;
+        }
         else if ( getRoleId() != null && o.getRoleId() == null )
+        {
             return after;
+        }
 
         // the roleIds are not null
         int result = getRoleId().compareTo( o.getRoleId() );
         if ( result != equal )
+        {
             return result;
+        }
 
         if ( getSource() == null )
+        {
             return before;
+        }
 
         // if we are all the way to this point, the RoleIds are equal and this.getSource != null, so just return a
         // compareTo on the source
@@ -133,11 +146,13 @@ public class Role implements Comparable<Role>
         this.readOnly = readOnly;
     }
 
+    @Deprecated
     public int getSessionTimeout()
     {
         return sessionTimeout;
     }
 
+    @Deprecated
     public void setSessionTimeout( int sessionTimeout )
     {
         this.sessionTimeout = sessionTimeout;
@@ -163,58 +178,92 @@ public class Role implements Comparable<Role>
     public boolean equals( Object obj )
     {
         if ( this == obj )
+        {
             return true;
+        }
         if ( obj == null )
+        {
             return false;
+        }
         if ( getClass() != obj.getClass() )
+        {
             return false;
+        }
         Role other = (Role) obj;
         if ( description == null )
         {
             if ( other.description != null )
+            {
                 return false;
+            }
         }
         else if ( !description.equals( other.description ) )
+        {
             return false;
+        }
         if ( name == null )
         {
             if ( other.name != null )
+            {
                 return false;
+            }
         }
         else if ( !name.equals( other.name ) )
+        {
             return false;
+        }
         if ( privileges == null )
         {
             if ( other.privileges != null )
+            {
                 return false;
+            }
         }
         else if ( !privileges.equals( other.privileges ) )
+        {
             return false;
+        }
         if ( readOnly != other.readOnly )
+        {
             return false;
+        }
         if ( roleId == null )
         {
             if ( other.roleId != null )
+            {
                 return false;
+            }
         }
         else if ( !roleId.equals( other.roleId ) )
+        {
             return false;
+        }
         if ( roles == null )
         {
             if ( other.roles != null )
+            {
                 return false;
+            }
         }
         else if ( !roles.equals( other.roles ) )
+        {
             return false;
+        }
         if ( sessionTimeout != other.sessionTimeout )
+        {
             return false;
+        }
         if ( source == null )
         {
             if ( other.source != null )
+            {
                 return false;
+            }
         }
         else if ( !source.equals( other.source ) )
+        {
             return false;
+        }
         return true;
     }
 
