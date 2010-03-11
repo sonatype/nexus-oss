@@ -409,7 +409,7 @@ public class M2RepositoryTest
     {
         M2Repository repository = (M2Repository) getResourceStore();
 
-        String changedUrl = repository.getRemoteUrl() + "/foo";
+        String changedUrl = repository.getRemoteUrl() + "/foo/";
 
         repository.setRemoteUrl( changedUrl );
 
@@ -439,8 +439,8 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
-            repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
-                                                                                                     repository.createUid( request.getRequestPath() ) );
+            repository.getLocalStorage().getAttributesHandler().getAttributeStorage()
+                      .getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -453,8 +453,12 @@ public class M2RepositoryTest
         File inhouseLocalStorageDir =
             new File(
                       new URL(
-                               ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration(
-                                                                                                                             false ).getLocalStorage().getUrl() ).getFile() );
+                               ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() )
+                                                                                                          .getConfiguration(
+                                                                                                                             false )
+                                                                                                          .getLocalStorage()
+                                                                                                          .getUrl() )
+                                                                                                                     .getFile() );
 
         File artifactFile = new File( inhouseLocalStorageDir, itemPath );
         artifactFile.getParentFile().mkdirs();
@@ -474,8 +478,8 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
-            repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
-                                                                                                     repository.createUid( request.getRequestPath() ) );
+            repository.getLocalStorage().getAttributesHandler().getAttributeStorage()
+                      .getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
 
@@ -499,8 +503,11 @@ public class M2RepositoryTest
         public void onEvent( Event<?> evt )
         {
             if ( evt instanceof RepositoryItemEventCache
-                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith(
-                                                                                                                                                                                 "spoof-1.0.txt" ) ) )
+                && ( ( (RepositoryItemEventCache) evt ).getItem().getPath().endsWith( "maven-metadata.xml" ) || ( (RepositoryItemEventCache) evt )
+                                                                                                                                                  .getItem()
+                                                                                                                                                  .getPath()
+                                                                                                                                                  .endsWith(
+                                                                                                                                                             "spoof-1.0.txt" ) ) )
             {
                 requestCount = requestCount + 1;
             }

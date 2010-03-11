@@ -289,9 +289,9 @@ public abstract class AbstractProxyRepository
 
             String oldRemoteUrl = getRemoteUrl();
 
-            if ( newRemoteUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+            if ( !newRemoteUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
             {
-                newRemoteUrl = newRemoteUrl.substring( 0, newRemoteUrl.length() - 1 );
+                newRemoteUrl = newRemoteUrl + RepositoryItemUid.PATH_SEPARATOR;
             }
 
             getRemoteStorage().validateStorageUrl( newRemoteUrl );

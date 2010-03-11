@@ -44,7 +44,7 @@ public abstract class AbstractRemoteRepositoryStorage
 {
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
-    
+
     @Requirement
     private MimeUtil mimeUtil;
 
@@ -62,7 +62,7 @@ public abstract class AbstractRemoteRepositoryStorage
      * Since storages are shared, we are tracking the last changes from each of them.
      */
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
-    
+
     protected MimeUtil getMimeUtil()
     {
         return mimeUtil;
@@ -85,13 +85,18 @@ public abstract class AbstractRemoteRepositoryStorage
     {
         StringBuffer urlStr = new StringBuffer( baseUrl );
 
-        if ( path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        if ( !baseUrl.endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        {
+            urlStr.append( RepositoryItemUid.PATH_SEPARATOR );
+        }
+
+        if ( !path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
         {
             urlStr.append( path );
         }
         else
         {
-            urlStr.append( RepositoryItemUid.PATH_SEPARATOR ).append( path );
+            urlStr.append( path.substring( RepositoryItemUid.PATH_SEPARATOR.length() ) );
         }
 
         try
@@ -121,13 +126,17 @@ public abstract class AbstractRemoteRepositoryStorage
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
             if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext()
-                .getLastChanged() > repositoryContexts.get( repository.getId() ).longValue() )
+                                                                                     .getLastChanged() > repositoryContexts
+                                                                                                                           .get(
+                                                                                                                                 repository
+                                                                                                                                           .getId() )
+                                                                                                                           .longValue() )
                 || !repositoryContexts.containsKey( repository.getId() ) )
             {
                 updateContext( repository, repository.getRemoteStorageContext() );
 
                 repositoryContexts.put( repository.getId(), Long.valueOf( repository.getRemoteStorageContext()
-                    .getLastChanged() ) );
+                                                                                    .getLastChanged() ) );
             }
         }
 
@@ -161,10 +170,11 @@ public abstract class AbstractRemoteRepositoryStorage
 
             userAgentPlatformInfo =
                 new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" )
-                    .append( status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) )
-                    .append( "; " ).append( System.getProperty( "os.version" ) ).append( "; " )
-                    .append( System.getProperty( "os.arch" ) ).append( "; " )
-                    .append( System.getProperty( "java.version" ) ).append( ") " ).toString();
+                                            .append( status.getEditionShort() ).append( "; " )
+                                            .append( System.getProperty( "os.name" ) ).append( "; " )
+                                            .append( System.getProperty( "os.version" ) ).append( "; " )
+                                            .append( System.getProperty( "os.arch" ) ).append( "; " )
+                                            .append( System.getProperty( "java.version" ) ).append( ") " ).toString();
         }
 
         return userAgentPlatformInfo;
