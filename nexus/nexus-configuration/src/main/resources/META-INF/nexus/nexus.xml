@@ -2,7 +2,7 @@
 <nexusConfiguration>
   <version>1.4.0</version>
   <globalConnectionSettings>
-    <connectionTimeout>10000</connectionTimeout>
+    <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
