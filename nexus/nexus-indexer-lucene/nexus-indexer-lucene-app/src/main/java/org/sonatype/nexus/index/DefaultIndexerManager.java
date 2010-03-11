@@ -1384,7 +1384,7 @@ public class DefaultIndexerManager
 
         for ( GroupRepository group : groups )
         {
-            publishRepositoryGroupIndex( group );
+            publishRepositoryIndex( group );
         }
     }
 
@@ -1406,7 +1406,7 @@ public class DefaultIndexerManager
                 publishRepositoryIndex( repository );
             }
 
-            publishRepositoryGroupIndex( group );
+            publishRepositoryIndex( group );
         }
     }
 
@@ -1517,96 +1517,6 @@ public class DefaultIndexerManager
         }
 
         return mergedContext;
-    }
-
-    protected void publishRepositoryGroupIndex( GroupRepository groupRepository )
-        throws IOException
-    {
-        if ( !isIndexingSupported( groupRepository ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Can't publish group index on repository \"" + groupRepository.getName() + "\" (ID=\""
-                        + groupRepository.getId() + "\") since indexing is not supported on it!" );
-            }
-
-            return;
-        }
-
-        if ( !groupRepository.isIndexable() )
-        {
-            return;
-        }
-
-        if ( isAlreadyBeingIndexed( groupRepository.getId() ) )
-        {
-            return;
-        }
-
-        String repoId = groupRepository.getId();
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Publishing merged index for repository group " + repoId );
-        }
-
-        // groups contains the merged context in -remote idx context
-        IndexingContext context = getRepositoryRemoteIndexContext( groupRepository );
-
-        File targetDir = null;
-
-        Lock lock = getLock( repoId ).writeLock();
-        lock.lock();
-        try
-        {
-            targetDir = new File( getTempDirectory(), "nx-index-" + Long.toHexString( System.nanoTime() ) );
-
-            if ( !targetDir.mkdirs() )
-            {
-                throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
-            }
-
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Packing the merged index context." );
-            }
-
-            // copy the current properties file to the temp directory, this is what the indexer uses to decide
-            // if chunks are necessary, and what to label it as
-            copyIndexPropertiesToTempDir( groupRepository, targetDir );
-
-            IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
-
-            packReq.setCreateIncrementalChunks( true );
-
-            packReq.setUseTargetProperties( true );
-
-            indexPacker.packIndex( packReq );
-
-            File[] files = targetDir.listFiles();
-
-            if ( files != null )
-            {
-                for ( File file : files )
-                {
-                    storeItem( groupRepository, file, context );
-                }
-            }
-        }
-        finally
-        {
-            lock.unlock();
-
-            if ( targetDir != null )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Cleanup of temp files..." );
-                }
-
-                FileUtils.deleteDirectory( targetDir );
-            }
-        }
     }
 
     private void copyIndexPropertiesToTempDir( Repository repository, File tempDir )
