@@ -102,7 +102,7 @@ Sonatype.repoServer.RoleEditPanel = function( config ) {
       },
       { 
         name: 'mapping',
-        header: 'Mapping',
+        header: 'Realm',
         width: 100,
         mapping: 'id', 
         convert: this.convertMapping.createDelegate( this )
@@ -148,7 +148,7 @@ Ext.extend( Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
       return s;
     }
     else {
-      return '';
+      return 'Legacy';
     }
   },
   onAddMenuInit: function( menu ) {
