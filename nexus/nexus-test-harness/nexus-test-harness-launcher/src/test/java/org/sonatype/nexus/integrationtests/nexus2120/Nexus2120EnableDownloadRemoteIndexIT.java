@@ -66,7 +66,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
     {
         RepositoryResource basic = (RepositoryResource) repoUtil.getRepository( "basic" );
         // ensure URL
-        Assert.assertEquals( "http://localhost:" + webProxyPort + "/repository",
+        Assert.assertEquals( "http://localhost:" + webProxyPort + "/repository/",
                              basic.getRemoteStorage().getRemoteStorageUrl() );
         // ensure is not downloading index
         Assert.assertFalse( basic.isDownloadRemoteIndexes() );

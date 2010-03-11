@@ -35,7 +35,7 @@
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
-        <url>http://localhost:${webproxy-server-port}/repository</url>
+        <url>http://localhost:${webproxy-server-port}/repository/</url>
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
