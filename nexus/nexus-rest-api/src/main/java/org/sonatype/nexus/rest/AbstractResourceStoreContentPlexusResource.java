@@ -661,112 +661,130 @@ public abstract class AbstractResourceStoreContentPlexusResource
     protected void handleException( Request req, Response res, Exception t )
         throws ResourceException
     {
-        if ( getLogger().isDebugEnabled() )
+        boolean shouldLogInfoStackTrace = false;
+
+        try
         {
-            if ( t instanceof RuntimeException )
+            if ( t instanceof ResourceException )
             {
-                // I still want to see runtime exceptions
-                getLogger().debug(
-                                   "Got exception during processing " + req.getMethod() + " "
-                                       + req.getResourceRef().toString(), t );
+                throw (ResourceException) t;
+            }
+            else if ( t instanceof IllegalArgumentException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+            }
+            else if ( t instanceof StorageException )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
+            }
+            else if ( t instanceof RepositoryNotAvailableException )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t );
+            }
+            else if ( t instanceof IllegalRequestException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+            }
+            else if ( t instanceof IllegalOperationException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+            }
+            else if ( t instanceof UnsupportedStorageOperationException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t );
+            }
+            else if ( t instanceof NoSuchRepositoryAccessException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t );
+            }
+            else if ( t instanceof NoSuchRepositoryException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+            }
+            else if ( t instanceof NoSuchResourceStoreException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+            }
+            else if ( t instanceof ItemNotFoundException )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t );
+            }
+            else if ( t instanceof AccessDeniedException )
+            {
+                // TODO: a big fat problem here!
+                // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
+                HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
+
+                String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
+
+                ChallengeScheme challengeScheme = null;
+
+                if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
+                {
+                    challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
+                }
+                else
+                {
+                    challengeScheme = ChallengeScheme.HTTP_BASIC;
+                }
+
+                String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
+
+                if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
+                {
+                    res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
+                }
+                else
+                {
+                    res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
+                }
+
+                res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
             }
             else
             {
-                // checked ones are anyway handled below one by one, or by the "catch all" last catch
-                getLogger().debug(
-                                   "Got exception during processing " + req.getMethod() + " "
-                                       + req.getResourceRef().toString() + ": " + t.getMessage() );
+                // Internal error, we force it to log
+                shouldLogInfoStackTrace = true;
+
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t );
             }
         }
-
-        if ( t instanceof ResourceException )
+        finally
         {
-            throw (ResourceException) t;
-        }
-        else if ( t instanceof IllegalArgumentException )
-        {
-            getLogger().info( "ResourceStoreContentResource, illegal argument:" + t.getMessage() );
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
-        }
-        else if ( t instanceof StorageException )
-        {
-            getLogger().error( "IO error!", t );
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
-        }
-        else if ( t instanceof RepositoryNotAvailableException )
-        {
-            throw new ResourceException( Status.SERVER_ERROR_SERVICE_UNAVAILABLE, t.getMessage() );
-        }
-        else if ( t instanceof IllegalRequestException )
-        {
-            getLogger().info( "ResourceStoreContentResource, illegal request:" + t.getMessage() );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
-        }
-        else if ( t instanceof IllegalOperationException )
-        {
-            getLogger().info( "ResourceStoreContentResource, illegal operation:" + t.getMessage() );
-
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
-        }
-        else if ( t instanceof UnsupportedStorageOperationException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, t.getMessage() );
-        }
-        else if ( t instanceof NoSuchRepositoryAccessException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_FORBIDDEN, t.getMessage() );
-        }
-        else if ( t instanceof NoSuchRepositoryException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof NoSuchResourceStoreException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof ItemNotFoundException )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, t.getMessage() );
-        }
-        else if ( t instanceof AccessDeniedException )
-        {
-            // TODO: a big fat problem here!
-            // this makes restlet code tied to Servlet code, and we what is happening here is VERY dirty!
-            HttpServletRequest servletRequest = ( (ServletCall) ( (HttpRequest) req ).getHttpCall() ).getRequest();
-
-            String scheme = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_SCHEME_KEY );
-
-            ChallengeScheme challengeScheme = null;
-
-            if ( NexusHttpAuthenticationFilter.FAKE_AUTH_SCHEME.equals( scheme ) )
+            if ( getLogger().isDebugEnabled() )
             {
-                challengeScheme = new ChallengeScheme( "HTTP_NXBASIC", "NxBasic", "Fake basic HTTP authentication" );
+                if ( t instanceof ItemNotFoundException )
+                {
+                    // we are "muting" item not found exception, it pollutes the DEBUG logs
+                    getLogger().debug(
+                                       "Got exception during processing " + req.getMethod() + " "
+                                           + req.getResourceRef().toString() + ": " + t.getMessage() );
+                }
+                else
+                {
+                    // in debug mode, we log _with_ stack trace
+                    getLogger().debug(
+                                       "Got exception during processing " + req.getMethod() + " "
+                                           + req.getResourceRef().toString(), t );
+                }
             }
             else
             {
-                challengeScheme = ChallengeScheme.HTTP_BASIC;
+                if ( shouldLogInfoStackTrace )
+                {
+                    // in INFO mode, we obey the shouldLogInfoStackTrace flag for serious errors (like internal is)
+                    getLogger().info(
+                                      "Got exception during processing \"" + req.getMethod() + " "
+                                          + req.getResourceRef().toString() + "\"", t );
+                }
+                else
+                {
+                    // in INFO mode, we want one liners usually
+                    getLogger().info(
+                                      "Got exception during processing \"" + req.getMethod() + " "
+                                          + req.getResourceRef().toString() + "\": " + t.getMessage() );
+                }
             }
-
-            String realm = (String) servletRequest.getAttribute( NexusHttpAuthenticationFilter.AUTH_REALM_KEY );
-
-            if ( servletRequest.getAttribute( NexusHttpAuthenticationFilter.ANONYMOUS_LOGIN ) != null )
-            {
-                res.setStatus( Status.CLIENT_ERROR_UNAUTHORIZED );
-            }
-            else
-            {
-                res.setStatus( Status.CLIENT_ERROR_FORBIDDEN );
-            }
-
-            res.getChallengeRequests().add( new ChallengeRequest( challengeScheme, realm ) );
-
-            // throw new ResourceException( Status.CLIENT_ERROR_UNAUTHORIZED, "Authenticate to access this resource!" );
-        }
-        else
-        {
-            getLogger().error( t.getMessage(), t );
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, t.getMessage() );
         }
     }
 }
