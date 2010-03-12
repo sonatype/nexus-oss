@@ -126,17 +126,13 @@ public abstract class AbstractRemoteRepositoryStorage
             // we have repo specific settings
             // if contextContains key and is newer, or does not contain yet
             if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getRemoteStorageContext()
-                                                                                     .getLastChanged() > repositoryContexts
-                                                                                                                           .get(
-                                                                                                                                 repository
-                                                                                                                                           .getId() )
-                                                                                                                           .longValue() )
-                || !repositoryContexts.containsKey( repository.getId() ) )
+                            .getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
+                 || !repositoryContexts.containsKey( repository.getId() ) )
             {
                 updateContext( repository, repository.getRemoteStorageContext() );
 
                 repositoryContexts.put( repository.getId(), Long.valueOf( repository.getRemoteStorageContext()
-                                                                                    .getLastChanged() ) );
+                                .getLastChanged() ) );
             }
         }
 
@@ -164,17 +160,16 @@ public abstract class AbstractRemoteRepositoryStorage
         SystemStatus status = applicationStatusSource.getSystemStatus();
 
         if ( platformEditionShort == null || !platformEditionShort.equals( status.getEditionShort() )
-            || userAgentPlatformInfo == null )
+             || userAgentPlatformInfo == null )
         {
             platformEditionShort = status.getEditionShort();
 
             userAgentPlatformInfo =
-                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" )
-                                            .append( status.getEditionShort() ).append( "; " )
-                                            .append( System.getProperty( "os.name" ) ).append( "; " )
-                                            .append( System.getProperty( "os.version" ) ).append( "; " )
-                                            .append( System.getProperty( "os.arch" ) ).append( "; " )
-                                            .append( System.getProperty( "java.version" ) ).append( ") " ).toString();
+                new StringBuffer( "Nexus/" ).append( status.getVersion() ).append( " (" ).append(
+                    status.getEditionShort() ).append( "; " ).append( System.getProperty( "os.name" ) ).append( "; " )
+                                .append( System.getProperty( "os.version" ) ).append( "; " ).append(
+                                    System.getProperty( "os.arch" ) ).append( "; " ).append(
+                                    System.getProperty( "java.version" ) ).append( ") " ).toString();
         }
 
         return userAgentPlatformInfo;

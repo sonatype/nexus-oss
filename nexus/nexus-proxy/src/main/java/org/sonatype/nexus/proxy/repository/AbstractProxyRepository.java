@@ -337,13 +337,13 @@ public abstract class AbstractProxyRepository
     }
 
     protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
-        throws StorageException, RemoteAuthenticationNeededException, RemoteAccessDeniedException
+        throws StorageException, RemoteAuthenticationNeededException
     {
         try
         {
             return getRemoteStorage().isReachable( this, request );
         }
-        catch ( RemoteAccessException ex )
+        catch ( RemoteAccessDeniedException ex )
         {
             getLogger().warn(
                 "RemoteStorage of repository " + getId()
