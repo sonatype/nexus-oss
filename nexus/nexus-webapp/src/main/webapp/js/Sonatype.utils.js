@@ -861,19 +861,31 @@ Sonatype.utils = {
     }
   },
   
-  updateHistory: function( tab ) {
+updateHistory: function( tab ) {
     if ( Sonatype.view.historyDisabled ) return;
+    
+    var bookmark = null;
 
     if ( tab ) {
       if ( tab.ownerCt != Sonatype.view.mainTabPanel ||
           tab != Sonatype.view.mainTabPanel.getActiveTab() ) return;
+          
+      bookmark = tab.id;
     }
     else {
-      tab = Sonatype.view.mainTabPanel.getActiveTab();
+      // this is to handle very special where we are passing a bookmark on
+      // redirect, in IE this is not handled very well at all, so we trick it
+      var oldBookmark = Ext.History.getToken();
+      if ( oldBookmark && oldBookmark.indexOf( 'force' ) == 0 ) {
+        bookmark = oldBookmark.substring( 'force'.length );
+      }
+      else {
+        tab = Sonatype.view.mainTabPanel.getActiveTab();
+        bookmark = tab.id;
+      }
     }
 
-    var bookmark = tab.id;
-    if ( tab.getBookmark ) {
+    if ( tab && tab.getBookmark ) {
       var b2 = tab.getBookmark();
       if ( b2 ) {
         bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
