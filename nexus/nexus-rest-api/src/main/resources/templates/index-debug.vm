@@ -72,8 +72,6 @@
   <script src="js/repoServer/repoServer.FeedViewPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.ArtifactContainer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.ArtifactInformationPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.SearchResultGrid.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.SearchPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/repoServer/repoServer.LogsViewPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.ServerEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
@@ -85,7 +83,6 @@
   <script src="js/repoServer/repoServer.AbstractRepoPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.FileUploadPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
   <script src="js/repoServer/repoServer.RepoMaintPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
-  <script src="js/repoServer/repoServer.IndexBrowserPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.RepositoryBrowserContainer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.RepoEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.GroupsEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
