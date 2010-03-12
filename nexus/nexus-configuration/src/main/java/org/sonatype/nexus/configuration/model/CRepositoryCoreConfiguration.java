@@ -9,6 +9,7 @@ import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.ExternalConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 
 public class CRepositoryCoreConfiguration
@@ -68,7 +69,7 @@ public class CRepositoryCoreConfiguration
         {
             // just put an elephant in South Africa to find it for sure ;)
             repositoryModel
-                .setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
+                           .setExternalConfiguration( new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME ) );
         }
 
         // set the holder
@@ -110,8 +111,8 @@ public class CRepositoryCoreConfiguration
         else if ( !cfg.getId().matches( REPOSITORY_ID_PATTERN ) )
         {
             response
-                .addValidationError( new ValidationMessage( "id",
-                                                            "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID" ) );
+                    .addValidationError( new ValidationMessage( "id",
+                                                                "Only letters, digits, underscores, hyphens, and dots are allowed in Repository ID" ) );
         }
         // ID uniqueness
         List<CRepository> repositories = getApplicationConfiguration().getConfigurationModel().getRepositories();
@@ -157,10 +158,17 @@ public class CRepositoryCoreConfiguration
         {
             response.addValidationWarning( new ValidationMessage( "indexable", "Indexing isn't supported for \""
                 + cfg.getProviderHint() + "\" repositories, only Maven2 repositories are indexable!" ) );
-            
+
             cfg.setIndexable( false );
-            
+
             response.setModified( true );
+        }
+
+        // proxy repo URL (if set)
+        if ( cfg.getRemoteStorage() != null && cfg.getRemoteStorage().getUrl() != null
+            && !cfg.getRemoteStorage().getUrl().endsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        {
+            cfg.getRemoteStorage().setUrl( cfg.getRemoteStorage().getUrl() + RepositoryItemUid.PATH_SEPARATOR );
         }
 
         return response;
