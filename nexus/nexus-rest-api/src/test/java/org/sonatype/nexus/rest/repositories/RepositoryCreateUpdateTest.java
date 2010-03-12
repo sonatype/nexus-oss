@@ -68,7 +68,7 @@ public class RepositoryCreateUpdateTest
         Assert.assertEquals( RepositoryPolicy.RELEASE.name(), result.getRepoPolicy() );
         Assert.assertEquals( "proxy", result.getRepoType() );
 
-        Assert.assertEquals( "http://foo.com", result.getRemoteStorage().getRemoteStorageUrl() );
+        Assert.assertEquals( "http://foo.com/", result.getRemoteStorage().getRemoteStorageUrl() );
 
         AuthenticationSettings resultAuth = result.getRemoteStorage().getAuthentication();
 
