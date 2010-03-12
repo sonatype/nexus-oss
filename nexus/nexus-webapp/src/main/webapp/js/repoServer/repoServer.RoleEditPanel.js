@@ -148,7 +148,7 @@ Ext.extend( Sonatype.repoServer.RoleEditPanel, Sonatype.panels.GridViewer, {
       return s;
     }
     else {
-      return 'Legacy';
+      return 'Nexus';
     }
   },
   onAddMenuInit: function( menu ) {
