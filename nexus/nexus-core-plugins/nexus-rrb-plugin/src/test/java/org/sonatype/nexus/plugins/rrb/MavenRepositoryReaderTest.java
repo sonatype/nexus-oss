@@ -109,6 +109,16 @@ public class MavenRepositoryReaderTest
             reader.extract( getURLForTestRepoResource( "s3Example" ), localUrl, null, "test" );
         assertEquals( 14, result.size() );
     }
+
+    @Test( timeout = 5000 )
+    public void testReadProtectedS3()
+    {
+        // Fetched from URI http://coova-dev.s3.amazonaws.com/mvn/
+        // This S3 repo does _work_ (with maven and/or nexus proxying it), but it's setup (perms) does not allow "public browsing".
+        List<RepositoryDirectory> result =
+            reader.extract( getURLForTestRepoResource( "s3Example-foreign" ), localUrl, null, "test" );
+        assertEquals( 0, result.size() );
+    }
     
     @Test( timeout = 5000 )
     public void testReadArtifactory()

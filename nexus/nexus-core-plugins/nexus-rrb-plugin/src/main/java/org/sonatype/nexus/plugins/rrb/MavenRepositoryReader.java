@@ -83,12 +83,16 @@ public class MavenRepositoryReader
             || ( indata.indexOf( "<?xml" ) != -1 && responseContainsError( indata ) ) )
         {
             logger.debug( "is S3 repository" );
-            if ( responseContainsError( indata ) )
+            if ( responseContainsError( indata ) && !responseContainsAccessDenied( indata ) )
             {
                 logger.debug( "response from S3 repository contains error, need to find rootUrl" );
                 remoteUrl = findcreateNewUrl( indata );
                 indata = getContent();
+            } else if ( responseContainsError( indata ) && responseContainsAccessDenied( indata ) ) {
+                logger.debug( "response from S3 repository contains access denied response" );
+                indata = new StringBuilder();
             }
+            
             parser =
                 new S3RemoteRepositoryParser( remoteUrl, localUrl, id, baseUrl.replace( findRootUrl( indata ), "" ) );
         }
@@ -146,9 +150,30 @@ public class MavenRepositoryReader
         return key;
     }
 
+    /**
+     * Used to detect error in S3 response.
+     * 
+     * @param indata
+     * @return
+     */
     private boolean responseContainsError( StringBuilder indata )
     {
         if ( indata.indexOf( "<Error>" ) != -1 || indata.indexOf( "<error>" ) != -1 )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Used to detect access denied in S3 response.
+     * 
+     * @param indata
+     * @return
+     */
+    private boolean responseContainsAccessDenied( StringBuilder indata )
+    {
+        if ( indata.indexOf( "<Code>AccessDenied</Code>" ) != -1 || indata.indexOf( "<code>AccessDenied</code>" ) != -1 )
         {
             return true;
         }
