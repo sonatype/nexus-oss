@@ -1,4 +1,4 @@
-﻿Ext.util.MD5 = function(s,raw,hexcase,chrsz) {
+Ext.util.MD5 = function(s,raw,hexcase,chrsz) {
 	raw = raw || false;	
 	hexcase = hexcase || false;
 	chrsz = chrsz || 8;
