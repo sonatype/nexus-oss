@@ -155,7 +155,7 @@
     <plexus-digest.version>1.1</plexus-digest.version>
     <plexus-cli.version>1.2</plexus-cli.version>
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
-    <plexus-slf4j-logging.version>1.1-alpha-1</plexus-slf4j-logging.version>
+    <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
     <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
@@ -261,16 +261,6 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-slf4j-logging</artifactId>
         <version>${plexus-slf4j-logging.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-component-api</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.micromailer</groupId>
