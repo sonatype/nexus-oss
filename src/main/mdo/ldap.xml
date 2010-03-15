@@ -211,7 +211,7 @@
                     <version>1.0.0+</version>
                     <type>String</type>
                     <required>true</required>
-                    <description>Preferred Password Encoding. The encoding scheme used for user passwords: plain, crypt, ect</description>
+                    <description>TODO: Remove Field (no longer used) &lt;BR/&gt;Preferred Password Encoding. The encoding scheme used for user passwords: plain, crypt, ect</description>
                 </field>
                 <field>
                     <name>userIdAttribute</name>

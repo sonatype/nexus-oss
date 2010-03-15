@@ -17,5 +17,5 @@ public interface PasswordEncoder
     String encodePassword( String password, Object salt );
 
     boolean isPasswordValid( String encPassword, String inputPassword, Object salt );
-
+    
 }

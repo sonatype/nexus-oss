@@ -34,8 +34,6 @@ public class PlainPasswordEncoder
             encryptedPassword = encryptedPassword.substring( "{plain}".length() );
         }
 
-        String check = encodePassword( inputPassword, salt );
-
-        return check.equals( encryptedPassword );
+        return inputPassword.equals( encryptedPassword );
     }
 }

@@ -12,6 +12,7 @@ import java.security.MessageDigest;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.digest.Hex;
+import org.sonatype.plexus.components.cipher.Base64;
 
 /**
  * @author cstamas
@@ -39,7 +40,7 @@ public class SHA1PasswordEncoder
             encryptedPassword = encryptedPassword.substring( "{sha}".length() );
         }
 
-        String check = encodePassword( inputPassword, salt );
+        String check = encodePassword( inputPassword, salt ).substring( "{sha}".length() );
 
         return check.equals( encryptedPassword );
     }
@@ -62,7 +63,7 @@ public class SHA1PasswordEncoder
                 }
             }
             while ( numRead != -1 );
-            result = new String( Hex.encode( md.digest() ) );
+            result = new String( Base64.encodeBase64( md.digest() ) );
         }
         catch ( Exception e )
         {
