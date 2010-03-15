@@ -37,7 +37,6 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
       groupMemberFormat: '',
       groupObjectClass: '',
       userPasswordAttribute: '',
-      preferredPasswordEncoding: '',
       userIdAttribute: '',
       userObjectClass: '',
       userBaseDn: '',
@@ -56,16 +55,6 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
       ['none', 'Anonymous Authentication'], 
       ['DIGEST-MD5', 'DIGEST-MD5'], 
       ['CRAM-MD5', 'CRAM-MD5']
-    ]
-  });
-  
-  var passwordEncodingStore = new Ext.data.SimpleStore( { fields:['value','display'],
-    data:[
-      ['clear', 'Clear Text'], 
-      ['plain', 'Plain Text'], 
-      ['crypt', 'Crypt'], 
-      ['MD5', 'MD5'],
-      ['SHA', 'SHA']
     ]
   });
   
@@ -320,24 +309,6 @@ Sonatype.repoServer.LdapConfigPanel = function( config ) {
                 name: 'userPasswordAttribute',
                 anchor: Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
                 allowBlank: true
-              },
-              {
-                xtype: 'combo',
-                itemCls: 'required-field',
-                fieldLabel: 'Password Encoding',
-                helpText: 'Password encoding to protect plain text passwords.',
-                name: 'preferredPasswordEncoding',
-                width: 200,
-                store: passwordEncodingStore,
-                valueField: 'value',
-                displayField: 'display',
-                editable: false,
-                forceSelection: true,
-                mode: 'local',
-                triggerAction: 'all',
-                emptyText: 'Select...',
-                selectOnFocus: true,
-                allowBlank: false
               }
             ]
           },

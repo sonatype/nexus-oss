@@ -83,7 +83,6 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setGroupMemberAttribute( "groupMemberAttribute" );
         dto.setGroupMemberFormat( "groupMemberFormat" );
         dto.setGroupObjectClass( "groupObjectClass" );
-        dto.setPreferredPasswordEncoding( "preferredPasswordEncoding" );
         dto.setUserBaseDn( "userBaseDn" );
         dto.setUserIdAttribute( "userIdAttribute" );
         dto.setUserObjectClass( "userObjectClass" );
@@ -142,7 +141,6 @@ public class MarshalUnmarchalTest extends TestCase
         dto.setGroupMemberAttribute( "groupMemberAttribute" );
         dto.setGroupMemberFormat( "groupMemberFormat" );
         dto.setGroupObjectClass( "groupObjectClass" );
-        dto.setPreferredPasswordEncoding( "preferredPasswordEncoding" );
         dto.setUserBaseDn( "userBaseDn" );
         dto.setUserIdAttribute( "userIdAttribute" );
         dto.setUserObjectClass( "userObjectClass" );

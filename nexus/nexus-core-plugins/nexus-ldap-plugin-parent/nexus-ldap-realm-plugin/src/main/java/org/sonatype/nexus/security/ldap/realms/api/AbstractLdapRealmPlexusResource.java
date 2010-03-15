@@ -106,7 +106,6 @@ public abstract class AbstractLdapRealmPlexusResource
         cConf.setUserPasswordAttribute( userAndGroupConf.getUserPasswordAttribute() );
         cConf.setUserRealNameAttribute( userAndGroupConf.getUserRealNameAttribute() );
         cConf.setEmailAddressAttribute( userAndGroupConf.getEmailAddressAttribute() );
-        cConf.setPreferredPasswordEncoding( userAndGroupConf.getPreferredPasswordEncoding() );
         cConf.setLdapGroupsAsRoles( userAndGroupConf.isLdapGroupsAsRoles() );
         cConf.setUserMemberOfAttribute( userAndGroupConf.getUserMemberOfAttribute() );
         cConf.setGroupSubtree( userAndGroupConf.isGroupSubtree() );
@@ -130,7 +129,6 @@ public abstract class AbstractLdapRealmPlexusResource
         cConf.setUserPasswordAttribute( userAndGroupConf.getUserPasswordAttribute() );
         cConf.setUserRealNameAttribute( userAndGroupConf.getUserRealNameAttribute() );
         cConf.setEmailAddressAttribute( userAndGroupConf.getEmailAddressAttribute() );
-        cConf.setPreferredPasswordEncoding( userAndGroupConf.getPreferredPasswordEncoding() );
         cConf.setLdapGroupsAsRoles( userAndGroupConf.isLdapGroupsAsRoles() );
         cConf.setUserMemberOfAttribute( userAndGroupConf.getUserMemberOfAttribute() );
         cConf.setGroupSubtree( userAndGroupConf.isGroupSubtree() );

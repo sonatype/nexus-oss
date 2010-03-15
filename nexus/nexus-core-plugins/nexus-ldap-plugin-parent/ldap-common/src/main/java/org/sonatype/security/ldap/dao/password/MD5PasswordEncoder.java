@@ -16,7 +16,7 @@ import org.codehaus.plexus.digest.Hex;
 /**
  * @author cstamas
  */
-@Component(role=PasswordEncoder.class, hint="md5")
+@Component( role = PasswordEncoder.class, hint = "md5" )
 public class MD5PasswordEncoder
     implements PasswordEncoder
 {
@@ -33,16 +33,22 @@ public class MD5PasswordEncoder
 
     public boolean isPasswordValid( String encPassword, String inputPassword, Object salt )
     {
-        String encryptedPassword = encPassword;
-        if ( encryptedPassword.startsWith( "{MD5}" ) || encryptedPassword.startsWith( "{md5}" ) )
-        {
-            encryptedPassword = encryptedPassword.substring( "{MD5}".length() );
-        }
-
-        String check = encodePassword( inputPassword, salt );
+        String encryptedPassword = this.stripHeader( encPassword );
+        String check = this.stripHeader( encodePassword( inputPassword, salt ) );
 
         return check.equals( encryptedPassword );
     }
+    
+    protected String stripHeader( String encryptedPassword )
+    {
+        if ( encryptedPassword.startsWith( "{" + getMethod().toUpperCase() + "}" )
+            || encryptedPassword.startsWith( "{" + getMethod().toLowerCase() + "}" ) )
+        {
+            encryptedPassword = encryptedPassword.substring( "{MD5}".length() );
+        }
+        return encryptedPassword;
+    }
+
 
     protected String encodeString( String input )
     {

@@ -81,7 +81,6 @@ public class Nxcm147SavedPasswordConnectionJsonIT extends AbstractLdapIntegratio
         userGroupTestDto.setUserPasswordAttribute( "userpassword" );
         userGroupTestDto.setUserRealNameAttribute( "sn" );
         userGroupTestDto.setEmailAddressAttribute( "mail" );
-        userGroupTestDto.setPreferredPasswordEncoding( "crypt" );
         userGroupTestDto.setLdapGroupsAsRoles( false );
         userGroupTestDto.setUserSubtree( false );
         userGroupTestDto.setGroupSubtree( false );

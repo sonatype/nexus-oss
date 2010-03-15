@@ -185,7 +185,6 @@ public class LdapUserAndGroupConfigTestPlexusResource
         authConfig.setPasswordAttribute( dto.getUserPasswordAttribute() );
         authConfig.setUserRealNameAttribute( dto.getUserRealNameAttribute() );
         authConfig.setEmailAddressAttribute( dto.getEmailAddressAttribute() );
-        authConfig.setPasswordEncoding( dto.getPreferredPasswordEncoding() );
         authConfig.setLdapGroupsAsRoles( dto.isLdapGroupsAsRoles() );
         authConfig.setUserSubtree( dto.isUserSubtree() );
         authConfig.setGroupSubtree( dto.isGroupSubtree() );

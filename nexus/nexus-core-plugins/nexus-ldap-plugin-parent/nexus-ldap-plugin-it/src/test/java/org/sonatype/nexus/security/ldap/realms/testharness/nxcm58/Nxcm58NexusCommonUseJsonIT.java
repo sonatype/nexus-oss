@@ -110,7 +110,6 @@ public class Nxcm58NexusCommonUseJsonIT
         userGroupTestDto.setUserPasswordAttribute( "userpassword" );
         userGroupTestDto.setUserRealNameAttribute( "sn" );
         userGroupTestDto.setEmailAddressAttribute( "mail" );
-        userGroupTestDto.setPreferredPasswordEncoding( "crypt" );
         userGroupTestDto.setLdapGroupsAsRoles( false );
         userGroupTestDto.setUserSubtree( false );
         userGroupTestDto.setGroupSubtree( false );
@@ -134,7 +133,6 @@ public class Nxcm58NexusCommonUseJsonIT
         userGroupConfig.setUserPasswordAttribute( userGroupTestDto.getUserPasswordAttribute() );
         userGroupConfig.setUserRealNameAttribute( userGroupTestDto.getUserRealNameAttribute() );
         userGroupConfig.setEmailAddressAttribute( userGroupTestDto.getEmailAddressAttribute() );
-        userGroupConfig.setPreferredPasswordEncoding( userGroupTestDto.getPreferredPasswordEncoding() );
         userGroupConfig.setLdapGroupsAsRoles( userGroupTestDto.isLdapGroupsAsRoles() );
         userGroupConfig.setUserSubtree( userGroupTestDto.isUserSubtree() );
         userGroupConfig.setGroupSubtree( userGroupTestDto.isGroupSubtree() );

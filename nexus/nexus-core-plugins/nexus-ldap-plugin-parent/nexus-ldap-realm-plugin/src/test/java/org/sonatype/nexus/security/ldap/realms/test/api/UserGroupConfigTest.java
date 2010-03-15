@@ -58,7 +58,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );
@@ -130,7 +129,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );
@@ -169,7 +167,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -246,7 +243,6 @@ public class UserGroupConfigTest
         // dto.setUserPasswordAttribute("userPassword");
         // dto.setUserRealNameAttribute("sn");
         // dto.setEmailAddressAttribute( "mail");
-        // dto.setPreferredPasswordEncoding("clear");
 
         Request request = new Request();
         Response response = new Response( request );
@@ -289,7 +285,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );
@@ -332,7 +327,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -375,7 +369,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -421,7 +414,6 @@ public class UserGroupConfigTest
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );

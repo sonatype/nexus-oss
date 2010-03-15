@@ -59,7 +59,6 @@ public class LdapUserGroupConfNotConfiguredTest
         Assert.assertNull( dto.getUserPasswordAttribute() );
         // Assert.assertEquals("userPassword", dto.getUserPasswordAttribute());
         Assert.assertEquals( "cn", dto.getUserRealNameAttribute() );
-        Assert.assertEquals( "crypt", dto.getPreferredPasswordEncoding() );
         Assert.assertEquals( "mail", dto.getEmailAddressAttribute() );
         Assert.assertNull( dto.getUserMemberOfAttribute() );
         Assert.assertTrue( dto.isLdapGroupsAsRoles() );
@@ -88,7 +87,6 @@ public class LdapUserGroupConfNotConfiguredTest
         Assert.assertEquals( dto.getUserObjectClass(), userGroupConfig.getUserObjectClass() );
         Assert.assertEquals( dto.getUserPasswordAttribute(), userGroupConfig.getUserPasswordAttribute() );
         Assert.assertEquals( dto.getUserRealNameAttribute(), userGroupConfig.getUserRealNameAttribute() );
-        Assert.assertEquals( dto.getPreferredPasswordEncoding(), userGroupConfig.getPreferredPasswordEncoding() );
         Assert.assertEquals( dto.getEmailAddressAttribute(), userGroupConfig.getEmailAddressAttribute() );
         Assert.assertEquals( dto.getUserMemberOfAttribute(), userGroupConfig.getUserMemberOfAttribute() );
         Assert.assertEquals( dto.isLdapGroupsAsRoles(), userGroupConfig.isLdapGroupsAsRoles() );
@@ -116,7 +114,6 @@ public class LdapUserGroupConfNotConfiguredTest
         userGroupConf.setUserPasswordAttribute( "userPassword" );
         userGroupConf.setUserRealNameAttribute( "cn" );
         userGroupConf.setEmailAddressAttribute( "mail" );
-        userGroupConf.setPreferredPasswordEncoding( "clear" );
         userGroupConf.setGroupSubtree( false );
         userGroupConf.setUserSubtree( true );
 

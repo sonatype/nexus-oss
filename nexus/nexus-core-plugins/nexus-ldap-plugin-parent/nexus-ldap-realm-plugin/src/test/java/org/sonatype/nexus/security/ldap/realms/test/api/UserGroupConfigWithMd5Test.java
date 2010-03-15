@@ -64,7 +64,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         // expect no groups,
 
@@ -138,7 +137,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -215,8 +213,6 @@ public class UserGroupConfigWithMd5Test
         // dto.setUserPasswordAttribute("userPassword");
         // dto.setUserRealNameAttribute("sn");
         // dto.setEmailAddressAttribute( "mail");
-        // dto.setPreferredPasswordEncoding("clear");
-
         Request request = new Request();
         Response response = new Response( request );
 
@@ -261,7 +257,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );
@@ -307,7 +302,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -353,7 +347,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
         dto.setLdapGroupsAsRoles( true );
 
         Request request = new Request();
@@ -402,7 +395,6 @@ public class UserGroupConfigWithMd5Test
         dto.setUserPasswordAttribute( "userPassword" );
         dto.setUserRealNameAttribute( "sn" );
         dto.setEmailAddressAttribute( "mail" );
-        dto.setPreferredPasswordEncoding( "clear" );
 
         Request request = new Request();
         Response response = new Response( request );

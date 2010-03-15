@@ -82,8 +82,8 @@ public class LdapAuthConfiguration
     /** The password attribute. */
     private String passwordAttribute = DEFAULT_USER_PASSWORD_ATTRIBUTE;
     
-    /** The password encoding. */
-    private String passwordEncoding = DEFAULT_USER_PASSWORD_ENCODING;
+//    /** The password encoding. */
+//    private String passwordEncoding = DEFAULT_USER_PASSWORD_ENCODING;
 
     /** The user real name attribute. */
     private String userRealNameAttribute = DEFAULT_NAME_ATTRIBUTE;
@@ -465,21 +465,21 @@ public class LdapAuthConfiguration
     }
     
 
-    /**
-     * @return the passwordEncoding
-     */
-    public String getPasswordEncoding()
-    {
-        return passwordEncoding;
-    }
-
-    /**
-     * @param passwordEncoding the passwordEncoding to set
-     */
-    public void setPasswordEncoding( String passwordEncoding )
-    {
-        this.passwordEncoding = passwordEncoding;
-    }
+//    /**
+//     * @return the passwordEncoding
+//     */
+//    public String getPasswordEncoding()
+//    {
+//        return passwordEncoding;
+//    }
+//
+//    /**
+//     * @param passwordEncoding the passwordEncoding to set
+//     */
+//    public void setPasswordEncoding( String passwordEncoding )
+//    {
+//        this.passwordEncoding = passwordEncoding;
+//    }
 
     
     
@@ -558,7 +558,6 @@ public class LdapAuthConfiguration
         result = prime * result + ( isWebsiteAttributeLabelUri ? 1231 : 1237 );
         result = prime * result + ( ldapGroupsAsRoles ? 1231 : 1237 );
         result = prime * result + ( ( passwordAttribute == null ) ? 0 : passwordAttribute.hashCode() );
-        result = prime * result + ( ( passwordEncoding == null ) ? 0 : passwordEncoding.hashCode() );
         result = prime * result + ( ( userBaseDn == null ) ? 0 : userBaseDn.hashCode() );
         result = prime * result + ( ( userIdAttribute == null ) ? 0 : userIdAttribute.hashCode() );
         result = prime * result + ( ( userMemberOfAttribute == null ) ? 0 : userMemberOfAttribute.hashCode() );
@@ -648,13 +647,6 @@ public class LdapAuthConfiguration
                 return false;
         }
         else if ( !passwordAttribute.equals( other.passwordAttribute ) )
-            return false;
-        if ( passwordEncoding == null )
-        {
-            if ( other.passwordEncoding != null )
-                return false;
-        }
-        else if ( !passwordEncoding.equals( other.passwordEncoding ) )
             return false;
         if ( userBaseDn == null )
         {

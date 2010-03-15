@@ -25,6 +25,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
+import org.sonatype.security.ldap.dao.password.PasswordEncoderManager;
 import org.sonatype.security.ldap.realms.persist.model.CConnectionInfo;
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
 import org.sonatype.security.ldap.realms.persist.model.Configuration;
@@ -47,6 +48,9 @@ public class DefaultLdapConfiguration
 
     @Requirement
     private PasswordHelper passwordHelper;
+    
+    @Requirement
+    private PasswordEncoderManager passwordEncoderManager;
     
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
@@ -201,7 +205,7 @@ public class DefaultLdapConfiguration
 
             lock.unlock();
         }
-
+        
         return configuration;
     }
 
@@ -347,7 +351,7 @@ public class DefaultLdapConfiguration
         LdapAuthConfiguration authConfig = new LdapAuthConfiguration();
 
         authConfig.setEmailAddressAttribute( userAndGroupsConf.getEmailAddressAttribute() );
-        authConfig.setPasswordEncoding( userAndGroupsConf.getPreferredPasswordEncoding() );
+//        authConfig.setPasswordEncoding( userAndGroupsConf.getPreferredPasswordEncoding() );
         authConfig.setUserBaseDn( StringUtils.defaultString( userAndGroupsConf.getUserBaseDn(), "" ) );
         authConfig.setUserIdAttribute( userAndGroupsConf.getUserIdAttribute() );
         authConfig.setUserObjectClass( userAndGroupsConf.getUserObjectClass() );
@@ -365,6 +369,5 @@ public class DefaultLdapConfiguration
         authConfig.setUserMemberOfAttribute( userAndGroupsConf.getUserMemberOfAttribute() );
         authConfig.setLdapGroupsAsRoles( userAndGroupsConf.isLdapGroupsAsRoles() );
         return authConfig;
-
     }
 }

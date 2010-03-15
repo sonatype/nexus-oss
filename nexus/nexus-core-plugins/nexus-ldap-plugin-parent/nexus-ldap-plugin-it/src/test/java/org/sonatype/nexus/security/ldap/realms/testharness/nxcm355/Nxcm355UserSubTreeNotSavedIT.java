@@ -46,7 +46,6 @@ public class Nxcm355UserSubTreeNotSavedIT extends AbstractLdapIntegrationIT
         userGroupDto.setUserPasswordAttribute( "userpassword" );
         userGroupDto.setUserRealNameAttribute( "sn" );
         userGroupDto.setEmailAddressAttribute( "mail" );
-        userGroupDto.setPreferredPasswordEncoding( "crypt" );
         userGroupDto.setLdapGroupsAsRoles( false );
         // the problem was that subtree was getting set to groupSubtree
         userGroupDto.setUserSubtree( true );

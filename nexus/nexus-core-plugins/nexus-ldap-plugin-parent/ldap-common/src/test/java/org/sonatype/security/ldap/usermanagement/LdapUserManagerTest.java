@@ -17,7 +17,6 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
-import org.jsecurity.mgt.RealmSecurityManager;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.Role;

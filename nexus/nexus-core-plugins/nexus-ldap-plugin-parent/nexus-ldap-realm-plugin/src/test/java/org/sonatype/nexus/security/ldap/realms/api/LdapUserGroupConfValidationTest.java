@@ -42,7 +42,6 @@ public class LdapUserGroupConfValidationTest
         userGroupConf.setUserPasswordAttribute( "userPassword" );
         userGroupConf.setUserRealNameAttribute( "cn" );
         userGroupConf.setEmailAddressAttribute( "mail" );
-        userGroupConf.setPreferredPasswordEncoding( "clear" );
         return userGroupConf;
     }
 

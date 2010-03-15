@@ -133,7 +133,6 @@ public class LdapUserGroupMessageUtil
         Assert.assertEquals(connInfo.getUserObjectClass(), fileConfig.getUserObjectClass());
         Assert.assertEquals(connInfo.getUserPasswordAttribute(), fileConfig.getUserPasswordAttribute());
         Assert.assertEquals(connInfo.getUserRealNameAttribute(), fileConfig.getUserRealNameAttribute());
-        Assert.assertEquals(connInfo.getPreferredPasswordEncoding(), fileConfig.getPreferredPasswordEncoding());
         Assert.assertEquals(connInfo.getEmailAddressAttribute(), fileConfig.getEmailAddressAttribute());
         Assert.assertEquals(connInfo.isLdapGroupsAsRoles(), fileConfig.isLdapGroupsAsRoles() );
         Assert.assertEquals(connInfo.getUserMemberOfAttribute(), fileConfig.getUserMemberOfAttribute() );
@@ -157,7 +156,6 @@ public class LdapUserGroupMessageUtil
         Assert.assertEquals(expected.getUserObjectClass(), actual.getUserObjectClass());
         Assert.assertEquals(expected.getUserPasswordAttribute(), actual.getUserPasswordAttribute());
         Assert.assertEquals(expected.getUserRealNameAttribute(), actual.getUserRealNameAttribute());
-        Assert.assertEquals(expected.getPreferredPasswordEncoding(), actual.getPreferredPasswordEncoding());
         Assert.assertEquals(expected.getEmailAddressAttribute(), actual.getEmailAddressAttribute());
         Assert.assertEquals(expected.isLdapGroupsAsRoles(), actual.isLdapGroupsAsRoles() );
         Assert.assertEquals(expected.getUserMemberOfAttribute(), actual.getUserMemberOfAttribute() );

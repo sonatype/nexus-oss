@@ -56,12 +56,6 @@ public class LdapUserAndGroupConfigurationDTO
     private String userPasswordAttribute;
 
     /**
-     * Preferred Password Encoding. The encoding scheme used for
-     * user passwords: plain, crypt, ect.
-     */
-    private String preferredPasswordEncoding;
-
-    /**
      * User Id Attribute.  THe attribute of the userId field.
      */
     private String userIdAttribute;
@@ -214,22 +208,6 @@ public class LdapUserAndGroupConfigurationDTO
     }
 
     /**
-     * @return the preferredPasswordEncoding
-     */
-    public String getPreferredPasswordEncoding()
-    {
-        return preferredPasswordEncoding;
-    }
-
-    /**
-     * @param preferredPasswordEncoding the preferredPasswordEncoding to set
-     */
-    public void setPreferredPasswordEncoding( String preferredPasswordEncoding )
-    {
-        this.preferredPasswordEncoding = preferredPasswordEncoding;
-    }
-
-    /**
      * @return the userIdAttribute
      */
     public String getUserIdAttribute()
@@ -368,7 +346,6 @@ public class LdapUserAndGroupConfigurationDTO
         result = prime * result + ( ( groupObjectClass == null ) ? 0 : groupObjectClass.hashCode() );
         result = prime * result + ( groupSubtree ? 1231 : 1237 );
         result = prime * result + ( ldapGroupsAsRoles ? 1231 : 1237 );
-        result = prime * result + ( ( preferredPasswordEncoding == null ) ? 0 : preferredPasswordEncoding.hashCode() );
         result = prime * result + ( ( userBaseDn == null ) ? 0 : userBaseDn.hashCode() );
         result = prime * result + ( ( userIdAttribute == null ) ? 0 : userIdAttribute.hashCode() );
         result = prime * result + ( ( userMemberOfAttribute == null ) ? 0 : userMemberOfAttribute.hashCode() );
@@ -434,13 +411,6 @@ public class LdapUserAndGroupConfigurationDTO
         if ( groupSubtree != other.groupSubtree )
             return false;
         if ( ldapGroupsAsRoles != other.ldapGroupsAsRoles )
-            return false;
-        if ( preferredPasswordEncoding == null )
-        {
-            if ( other.preferredPasswordEncoding != null )
-                return false;
-        }
-        else if ( !preferredPasswordEncoding.equals( other.preferredPasswordEncoding ) )
             return false;
         if ( userBaseDn == null )
         {
