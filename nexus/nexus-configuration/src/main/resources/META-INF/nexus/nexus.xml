@@ -315,25 +315,6 @@
           <memberRepository>java.net-m2</memberRepository>
           <memberRepository>java.net-m1-m2</memberRepository>
           <memberRepository>google</memberRepository>
-        </memberRepositories>
-      </externalConfiguration>
-    </repository>
-    <repository>
-      <id>public-snapshots</id>
-      <name>Public Snapshot Repositories</name>
-      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
-      <providerHint>maven2</providerHint>
-      <localStatus>IN_SERVICE</localStatus>
-      <notFoundCacheActive>true</notFoundCacheActive>
-      <notFoundCacheTTL>15</notFoundCacheTTL>
-      <userManaged>true</userManaged>
-      <exposed>true</exposed>
-      <browseable>true</browseable>
-      <writePolicy>READ_ONLY</writePolicy>
-      <indexable>true</indexable>
-      <externalConfiguration>
-        <mergeMetadata>true</mergeMetadata>
-        <memberRepositories>
           <memberRepository>apache-snapshots</memberRepository>
           <memberRepository>codehaus-snapshots</memberRepository>
         </memberRepositories>
