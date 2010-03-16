@@ -203,8 +203,8 @@ public class NexusHttpAuthenticationFilter
         Subject subject = getSubject( request, response );
 
         UsernamePasswordToken usernamePasswordToken =
-            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
-                                       getNexusConfiguration().getAnonymousPassword() );
+            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(), getNexusConfiguration()
+                            .getAnonymousPassword() );
 
         try
         {
@@ -216,7 +216,7 @@ public class NexusHttpAuthenticationFilter
             {
                 getLogger().debug( "Successfully logged in as anonymous" );
             }
-            
+
             postAuthcEvent( request, getNexusConfiguration().getAnonymousUsername(), true );
 
             return true;
@@ -224,8 +224,8 @@ public class NexusHttpAuthenticationFilter
         catch ( AuthenticationException ae )
         {
             getLogger().info(
-                              "Unable to authenticate user [anonymous] from IP Address "
-                              + RemoteIPFinder.findIP( ( HttpServletRequest ) request ) );
+                "Unable to authenticate user [anonymous] from IP Address "
+                                + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -244,28 +244,29 @@ public class NexusHttpAuthenticationFilter
     {
         String msg =
             "Successfully authenticated user [" + token.getPrincipal() + "] from IP Address "
-                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
+                            + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         recordAuthcEvent( request, msg );
-        
+
         postAuthcEvent( request, token.getPrincipal().toString(), true );
 
         return true;
     }
-    
+
     private void postAuthcEvent( ServletRequest request, String username, boolean success )
     {
         try
         {
             ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
-            
-            multicaster.notifyEventListeners( 
-                new NexusAuthenticationEvent(
-                    this,
-                    new AuthenticationItem( 
-                        username, 
-                        RemoteIPFinder.findIP( ( HttpServletRequest ) request ),
-                        success ) ) );
+
+            multicaster
+                            .notifyEventListeners( new NexusAuthenticationEvent(
+                                                                                 this,
+                                                                                 new AuthenticationItem(
+                                                                                                         username,
+                                                                                                         RemoteIPFinder
+                                                                                                                         .findIP( (HttpServletRequest) request ),
+                                                                                                         success ) ) );
         }
         catch ( ComponentLookupException e )
         {
@@ -284,9 +285,9 @@ public class NexusHttpAuthenticationFilter
         getLogger().debug( msg );
 
         AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
-        
-        String ip = RemoteIPFinder.findIP( ( HttpServletRequest ) request );
-        
+
+        String ip = RemoteIPFinder.findIP( (HttpServletRequest) request );
+
         if ( ip != null )
         {
             evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
@@ -305,7 +306,7 @@ public class NexusHttpAuthenticationFilter
         }
 
         if ( currentAuthcEvt.getMessage().equals( msg )
-            && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
+             && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
         {
             return true;
         }
@@ -319,10 +320,10 @@ public class NexusHttpAuthenticationFilter
     {
         String msg =
             "Unable to authenticate user [" + token.getPrincipal() + "] from IP Address "
-                + RemoteIPFinder.findIP( ( HttpServletRequest ) request );
+                            + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         recordAuthcEvent( request, msg );
-        
+
         postAuthcEvent( request, token.getPrincipal().toString(), false );
 
         HttpServletResponse httpResponse = WebUtils.toHttp( response );
@@ -356,17 +357,27 @@ public class NexusHttpAuthenticationFilter
 
         if ( request.getAttribute( NexusJSecurityFilter.REQUEST_IS_AUTHZ_REJECTED ) != null )
         {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug( "Request processing is rejected coz lacking of perms/roles." );
-            }
-
             if ( request.getAttribute( ANONYMOUS_LOGIN ) != null )
             {
                 sendChallenge( request, response );
             }
             else
             {
+
+                Subject subject = getSubject( request, response );
+
+                String username = getNexusConfiguration().getAnonymousUsername();
+
+                if ( subject != null && subject.isAuthenticated() )
+                {
+                    username = subject.getPrincipal().toString();
+                }
+
+                getLogger()
+                                .info(
+                                    "Request processing is rejected because user \"" + username
+                                                    + "\" lacks permissions." );
+
                 sendForbidden( request, response );
             }
         }
@@ -384,25 +395,25 @@ public class NexusHttpAuthenticationFilter
 
         httpResponse.setStatus( HttpServletResponse.SC_FORBIDDEN );
     }
-    
-    // Will retrieve authz header.  if missing from header, will try
+
+    // Will retrieve authz header. if missing from header, will try
     // to retrieve from request params instead
     @Override
     protected String getAuthzHeader( ServletRequest request )
     {
         String authzHeader = super.getAuthzHeader( request );
-        
-        //If in header use it
+
+        // If in header use it
         if ( !StringUtils.isEmpty( authzHeader ) )
         {
             getLogger().debug( "Using authorization header from request" );
             return authzHeader;
         }
-        //otherwise check request params for it
+        // otherwise check request params for it
         else
         {
             authzHeader = request.getParameter( "authorization" );
-            
+
             if ( !StringUtils.isEmpty( authzHeader ) )
             {
                 getLogger().debug( "Using authorization from request parameter" );
@@ -411,18 +422,19 @@ public class NexusHttpAuthenticationFilter
             {
                 getLogger().debug( "No authorization found (header or request parameter)" );
             }
-            
+
             return authzHeader;
         }
     }
-    
+
     // work around to accept password with ':' character
     @Override
-    protected String[] getPrincipalsAndCredentials(String scheme, String encoded) {
-        String decoded = Base64.decodeToString(encoded);
-        
+    protected String[] getPrincipalsAndCredentials( String scheme, String encoded )
+    {
+        String decoded = Base64.decodeToString( encoded );
+
         String[] parts = decoded.split( ":" );
-        
+
         return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
     }
 }
