@@ -64,7 +64,7 @@ public class RepositoryMirrorDownloadTest
 
     private static final Mirror MIRROR2 = new Mirror( "2", "mirror2-url" );
 
-    private static final String CANONICAL_URL = "http://canonical-url";
+    private static final String CANONICAL_URL = "http://canonical-url/";
 
     private static final ItemNotFoundException itemNotFount =
         new ItemNotFoundException( new ResourceStoreRequest( ITEM_PATH ) );
