@@ -22,21 +22,22 @@ public class GroupReindexIndexerManagerTest
         File indexFile = new File( index, "nexus-maven-repository-index.gz" );
         File incrementalIndexFile = new File( index, "nexus-maven-repository-index.1.gz" );
 
-        assertFalse( indexFile.exists() );
-        assertFalse( incrementalIndexFile.exists() );
+        assertFalse( "No index .gz file should exist.", indexFile.exists() );
+        assertFalse( "No incremental chunk should exists.", incrementalIndexFile.exists() );
 
         indexerManager.reindexRepositoryGroup( null, group.getId(), true );
 
-        assertTrue( indexFile.exists() );
-        assertFalse( incrementalIndexFile.exists() );
+        assertTrue( "Index .gz file should exist.", indexFile.exists() );
+        assertFalse( "No incremental chunk should exists.", incrementalIndexFile.exists() );
 
-        File sourceApacheSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/apache-snapshots" );
+        // copy some _new_ stuff, not found in any of the members
+        File sourceApacheSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/apache-snapshots-2" );
         File snapshotsRoot = new File( new URL( snapshots.getLocalUrl() ).toURI() );
         copyDirectory( sourceApacheSnapshotsRoot, snapshotsRoot );
-        indexerManager.reindexRepositoryGroup( null, group.getId(), true );
+        indexerManager.reindexRepositoryGroup( null, group.getId(), false );
 
-        assertTrue( indexFile.exists() );
-        assertTrue( incrementalIndexFile.exists() );
+        assertTrue( "Index .gz file should exist.", indexFile.exists() );
+        assertTrue( "Incremental chunk should exists.", incrementalIndexFile.exists() );
 
         assertTrue(incrementalIndexFile.length() < 300 );
 
