@@ -287,8 +287,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertTrue( groupIds.contains( "group1" ) );
         Assert.assertTrue( groupIds.contains( "group2" ) );
         Assert.assertTrue( groupIds.contains( "public" ) );
-        Assert.assertTrue( groupIds.contains( "public-snapshots" ) );
-        Assert.assertEquals( 4, groups.size() );
+        Assert.assertEquals( 3, groups.size() );
 
         // logout user
         this.securitySystem.logout( subject.getPrincipals() );
