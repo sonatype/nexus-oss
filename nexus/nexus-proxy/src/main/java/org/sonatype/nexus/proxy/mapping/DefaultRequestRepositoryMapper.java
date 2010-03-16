@@ -137,8 +137,8 @@ public class DefaultRequestRepositoryMapper
         else
         {
             throw new ConfigurationException( "The passed configuration object is of class \""
-                + configuration.getClass().getName() + "\" and not the required \""
-                + ApplicationConfiguration.class.getName() + "\"!" );
+                                              + configuration.getClass().getName() + "\" and not the required \""
+                                              + ApplicationConfiguration.class.getName() + "\"!" );
         }
     }
 
@@ -186,9 +186,11 @@ public class DefaultRequestRepositoryMapper
         {
             if ( mapping.matches( repository, request ) )
             {
-                getLogger().info(
-                                  "The request path [" + request.toString() + "] is blocked by rule "
-                                      + mapping.toString() );
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        "The request path [" + request.toString() + "] is blocked by rule " + mapping.toString() );
+                }
 
                 return Collections.emptyList();
             }
@@ -214,7 +216,7 @@ public class DefaultRequestRepositoryMapper
                 // add only those that are in initial resolvedRepositories list and that are non-user managed
                 // (preserve ordering)
                 if ( mapping.getMappedRepositories().size() == 1
-                    && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
+                     && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
                 {
                     for ( Repository repo : resolvedRepositories )
                     {
@@ -242,7 +244,7 @@ public class DefaultRequestRepositoryMapper
                 appliedMappings.add( mapping );
 
                 if ( mapping.getMappedRepositories().size() == 1
-                    && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
+                     && "*".equals( mapping.getMappedRepositories().get( 0 ) ) )
                 {
                     reposIdSet.clear();
 
@@ -283,9 +285,9 @@ public class DefaultRequestRepositoryMapper
             {
                 StringBuilder sb =
                     new StringBuilder( "Request for path \"" + request.toString()
-                        + "\" with the initial list of processable repositories of \""
-                        + ResourceStoreUtils.getResourceStoreListAsString( resolvedRepositories )
-                        + "\" got these mappings applied:\n" );
+                                       + "\" with the initial list of processable repositories of \""
+                                       + ResourceStoreUtils.getResourceStoreListAsString( resolvedRepositories )
+                                       + "\" got these mappings applied:\n" );
 
                 for ( RepositoryPathMapping mapping : appliedMappings )
                 {
@@ -297,14 +299,13 @@ public class DefaultRequestRepositoryMapper
                 if ( reposIdSet.size() == 0 )
                 {
                     getLogger().debug(
-                                       "Mapping for path [" + request.toString()
-                                           + "] excluded all storages from servicing the request." );
+                        "Mapping for path [" + request.toString()
+                                        + "] excluded all storages from servicing the request." );
                 }
                 else
                 {
                     getLogger().debug(
-                                       "Request path for [" + request.toString() + "] is MAPPED to reposes: "
-                                           + reposIdSet );
+                        "Request path for [" + request.toString() + "] is MAPPED to reposes: " + reposIdSet );
                 }
             }
         }
@@ -321,8 +322,8 @@ public class DefaultRequestRepositoryMapper
         catch ( NoSuchRepositoryException e )
         {
             getLogger().error(
-                               "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
-                                   + appliedMappingsList.toString() + "\"." );
+                "Some of the Routes contains references to non-existant repositories! Please check the following mappings: \""
+                                + appliedMappingsList.toString() + "\"." );
 
             throw e;
         }
@@ -407,8 +408,8 @@ public class DefaultRequestRepositoryMapper
             throw new IllegalArgumentException( "Unknown route type: " + item.getRouteType() );
         }
 
-        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(),
-                                          item.getRepositories() );
+        return new RepositoryPathMapping( item.getId(), type, item.getGroupId(), item.getRoutePatterns(), item
+                        .getRepositories() );
     }
 
     protected CPathMappingItem convert( RepositoryPathMapping item )
