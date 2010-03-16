@@ -52,7 +52,7 @@ public class Nexus2216GroupValidationTest
             }
             assertEquals( "Repo object list returned a different set of repos", publicGroup.getMemberRepositoryIds(), memberIds );
             
-            assertEquals( "The config should be correct, ids found are: "+ publicGroup.getMemberRepositoryIds(), 7, publicGroup.getMemberRepositories().size() );
+            assertEquals( "The config should be correct, ids found are: "+ publicGroup.getMemberRepositoryIds(), 9, publicGroup.getMemberRepositories().size() );
         }
         catch ( Exception e )
         {
