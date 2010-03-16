@@ -363,7 +363,7 @@ public class Nexus531RepositoryCrudValidationIT
         // resource.setDownloadRemoteIndexes( true );
         resource.setChecksumPolicy( "IGNORE" ); // [ignore, warn, strictIfExists, strict]
         RepositoryResourceRemoteStorage remote = new RepositoryResourceRemoteStorage();
-        remote.setRemoteStorageUrl( "http://localhost:123/remote_resource_repo" );
+        remote.setRemoteStorageUrl( "http://localhost:123/remote_resource_repo/" );
         resource.setRemoteStorage( remote  );
 
         // this also validates

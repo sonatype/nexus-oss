@@ -68,19 +68,19 @@ public class Nexus1581MirrorMetadataIT
         
         RepositoryMirrorMetadata rmm = new RepositoryMirrorMetadata();
         rmm.setId( "id1" );
-        rmm.setUrl( "http://localhost:8081/somemirror" );
+        rmm.setUrl( "http://localhost:8081/somemirror/" );
         
         rm.addMirror( rmm );
         
         rmm = new RepositoryMirrorMetadata();
         rmm.setId( "id2" );
-        rmm.setUrl( "http://localhost:8086/somemirror2" );
+        rmm.setUrl( "http://localhost:8086/somemirror2/" );
         
         rm.addMirror( rmm );
         
         rmm = new RepositoryMirrorMetadata();
         rmm.setId( "id3" );
-        rmm.setUrl( "http://localhost:8086/somemirror3" );
+        rmm.setUrl( "http://localhost:8086/somemirror3/" );
         
         rm.addMirror( rmm );
         
@@ -97,11 +97,11 @@ public class Nexus1581MirrorMetadataIT
         
         Assert.assertEquals( 3, response.getData().size() );
         Assert.assertEquals( "id1", ( ( MirrorResource ) response.getData().get(0) ).getId() );
-        Assert.assertEquals( "http://localhost:8081/somemirror", ( ( MirrorResource ) response.getData().get(0) ).getUrl() );
+        Assert.assertEquals( "http://localhost:8081/somemirror/", ( ( MirrorResource ) response.getData().get(0) ).getUrl() );
         Assert.assertEquals( "id2", ( ( MirrorResource ) response.getData().get(1) ).getId() );
-        Assert.assertEquals( "http://localhost:8086/somemirror2", ( ( MirrorResource ) response.getData().get(1) ).getUrl() );
+        Assert.assertEquals( "http://localhost:8086/somemirror2/", ( ( MirrorResource ) response.getData().get(1) ).getUrl() );
         Assert.assertEquals( "id3", ( ( MirrorResource ) response.getData().get(2) ).getId() );
-        Assert.assertEquals( "http://localhost:8086/somemirror3", ( ( MirrorResource ) response.getData().get(2) ).getUrl() );
+        Assert.assertEquals( "http://localhost:8086/somemirror3/", ( ( MirrorResource ) response.getData().get(2) ).getUrl() );
     }
     
     protected void createProxyRepository()
@@ -122,7 +122,7 @@ public class Nexus1581MirrorMetadataIT
         resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo" );
+        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/nexus-test-harness-repo/" );
         resource.setRemoteStorage( remoteStorage );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );

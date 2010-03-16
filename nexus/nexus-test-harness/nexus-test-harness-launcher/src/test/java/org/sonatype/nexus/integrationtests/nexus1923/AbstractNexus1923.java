@@ -124,7 +124,7 @@ public abstract class AbstractNexus1923
         resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID );
+        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID +"/" );
         resource.setRemoteStorage( remoteStorage );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );

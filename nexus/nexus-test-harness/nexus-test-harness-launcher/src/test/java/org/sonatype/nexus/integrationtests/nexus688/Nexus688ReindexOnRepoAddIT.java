@@ -129,7 +129,7 @@ public class Nexus688ReindexOnRepoAddIT
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
+        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL/" );
         resource.setRemoteStorage( remoteStorage );
 
         // this also validates
@@ -162,7 +162,7 @@ public class Nexus688ReindexOnRepoAddIT
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
+        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL/" );
         resource.setRemoteStorage( remoteStorage );
 
         // this also validates
@@ -195,7 +195,7 @@ public class Nexus688ReindexOnRepoAddIT
         resource.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
 
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL" );
+        remoteStorage.setRemoteStorageUrl( "http://INVALID-URL/" );
         resource.setRemoteStorage( remoteStorage );
 
         // this also validates
