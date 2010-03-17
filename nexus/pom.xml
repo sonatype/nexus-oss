@@ -149,7 +149,7 @@
     <plexus.restlet.bridge.version>1.14-SNAPSHOT</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
-    <restlet.version>1.1.6-SONATYPE-5348</restlet.version>
+    <restlet.version>1.1.6-SONATYPE-5348-V2</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-task-scheduler.version>1.3</plexus-task-scheduler.version>
     <plexus-digest.version>1.1</plexus-digest.version>
