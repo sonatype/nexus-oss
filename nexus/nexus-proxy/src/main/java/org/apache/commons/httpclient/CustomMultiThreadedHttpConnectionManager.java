@@ -86,7 +86,7 @@ public class CustomMultiThreadedHttpConnectionManager implements HttpConnectionM
     /** The default maximum number of connections allowed overall */
     public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 20;
     
-    public static final String NON_PROXY_HOSTS_KEY = "http.nonProxyHosts";
+    public static final String NON_PROXY_HOSTS_PATTERNS_KEY = "http.nonProxyHosts.patterns";
 
     /**
      * A mapping from Reference to ConnectionSource.  Used to reclaim resources when connections
@@ -684,28 +684,21 @@ public class CustomMultiThreadedHttpConnectionManager implements HttpConnectionM
         return connectionConfiguration;
     }
     
+    @SuppressWarnings( "unchecked" )
     private boolean isNonProxyHost( HostConfiguration hostConfiguration ) {
         
         if( hostConfiguration == null || hostConfiguration.getHost() == null ) {
             return false;
         }
         
-        Object nonProxyHostsRaw = hostConfiguration.getParams().getParameter( NON_PROXY_HOSTS_KEY );
-        if( nonProxyHostsRaw != null && nonProxyHostsRaw instanceof Collection ) {
+        Collection<Pattern> nonProxyHostPatterns = (Collection<Pattern>) hostConfiguration.getParams().getParameter( NON_PROXY_HOSTS_PATTERNS_KEY );
+        if( nonProxyHostPatterns != null ) {
             
-            for ( Iterator iterator = (( Collection )nonProxyHostsRaw).iterator(); iterator.hasNext(); ) {
+            for ( Pattern hostPattern : nonProxyHostPatterns ) {
                 
-                String hostPatternRegex = (String) iterator.next();
-                try {
+                if( hostPattern.matcher( hostConfiguration.getHost() ).matches() ) {
                     
-                    if( hostConfiguration.getHost().matches( "(?i)"+hostPatternRegex ) ) {
-                        
-                        return true;
-                    }
-                }
-                catch( PatternSyntaxException e) {
-                    
-                    LOG.warn( NON_PROXY_HOSTS_KEY + " value: '"+ hostPatternRegex + "' is not a valid regular expression", e );
+                    return true;
                 }
             }
         }

@@ -1,8 +1,12 @@
 package org.sonatype.nexus.proxy.storage.remote.commonshttpclient;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HostConfiguration;
@@ -113,7 +117,19 @@ public class HttpClientProxyUtil
             // check if we have non-proxy hosts
             if( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
             {
-                httpConfiguration.getParams().setParameter( CustomMultiThreadedHttpConnectionManager.NON_PROXY_HOSTS_KEY, rps.getNonProxyHosts() );
+                Set<Pattern> nonProxyHostPatterns = new HashSet<Pattern>( rps.getNonProxyHosts().size() );
+                for ( String nonProxyHostRegex : rps.getNonProxyHosts() )
+                {
+                    try
+                    {
+                        nonProxyHostPatterns.add( Pattern.compile( nonProxyHostRegex, Pattern.CASE_INSENSITIVE ) );
+                    }
+                    catch( PatternSyntaxException e )
+                    {       
+                        LOG.warn( "Invalid non proxy host regex: "+ nonProxyHostRegex, e );
+                    }
+                }
+                httpConfiguration.getParams().setParameter( CustomMultiThreadedHttpConnectionManager.NON_PROXY_HOSTS_PATTERNS_KEY, nonProxyHostPatterns );
             }
 
             if ( rps.getProxyAuthentication() != null )
