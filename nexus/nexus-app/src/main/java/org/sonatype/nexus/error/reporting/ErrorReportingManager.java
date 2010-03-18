@@ -39,6 +39,10 @@ public interface ErrorReportingManager
     ErrorReportResponse handleError( ErrorReportRequest request )
         throws IssueSubmissionException, IOException, GeneralSecurityException;
 
+    ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword,
+                                     boolean useGlobalHttpProxy )
+        throws IssueSubmissionException, IOException, GeneralSecurityException;
+
     File assembleBundle( ErrorReportRequest request )
         throws IOException;
 }

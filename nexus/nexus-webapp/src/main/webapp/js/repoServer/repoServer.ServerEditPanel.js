@@ -532,7 +532,11 @@ Sonatype.repoServer.ServerEditPanel = function(config){
         buttons: [
           {
             text: 'Generate Report',
-            handler: this.generateErrorReportHandler,
+            handler: function() {
+            	var jiraUsername = this.formPanel.form.findField('errorReportingSettings.jiraUsername').getValue()
+            	Sonatype.utils.generateErrorReportHandler( jiraUsername );
+            }
+            ,
             scope: this
           }
         ]
@@ -806,41 +810,6 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
     } );
   },
   
-  createProblemReport : function( window, title, description ) {
-    Sonatype.MessageBox.wait( 'Generating Report ...' );
-    Ext.Ajax.request({
-      method: 'PUT',
-      url: Sonatype.config.servicePath + '/error_reporting',
-      // 10 minute timeout, upload may be large...
-      timeout: 600000,
-      jsonData: {
-        data: {
-          title: title,
-          description: description
-        }
-      },
-      cbPassThru : {
-        window: window
-      },
-      callback: function( options, success, response ) {        
-        var json = Ext.decode( response.responseText );
-        
-        if ( success ) {
-          options.cbPassThru.window.close();
-          Sonatype.MessageBox.show({
-            title: 'Error Report Generated',
-            msg: 'Your error report was generated <a href=' + json.data.jiraUrl + ' target="_new">here</a>.',
-            buttons: Sonatype.MessageBox.OK,
-            icon: Sonatype.MessageBox.INFO
-          });
-        }
-        else {
-          Sonatype.utils.connectionError( response, 'Error generating report' );
-        }
-      }
-    });
-  },
-
   //(Ext.form.BasicForm, Ext.form.Action)
   actionCompleteHandler : function(form, action) {
     if (action.type == 'sonatypeSubmit'){
@@ -892,71 +861,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
   anonymousCheckHandler : function(checkbox, checked){
     this.ownerCt.find('name', 'securityAnonymousUsername')[0].setDisabled(!checked);
     this.ownerCt.find('name', 'securityAnonymousPassword')[0].setDisabled(!checked);
-  },
-  
-  generateErrorReportHandler : function() {
-    var w = new Ext.Window({
-      title: 'Generate Nexus Error Report',
-      closable: true,
-      autoWidth: false,
-      width: 350,
-      autoHeight: true,
-      modal:true,
-      constrain: true,
-      resizable: false,
-      draggable: false,
-      items: [
-        {
-          xtype: 'form',
-          labelWidth:60,
-          frame:true,  
-          defaultType:'textfield',
-          monitorValid:true,
-          items:[
-            {
-              xtype: 'panel',
-              style: 'padding-left: 70px; padding-bottom: 10px',
-              html: 'Enter a short title for the problem report, along with a more detailed description.  A JIRA ticket will get created at the public Nexus JIRA server.'
-            },
-            { 
-              fieldLabel: 'Title', 
-              name: 'title',
-              width: 250,
-              allowBlank: false 
-            },
-            { 
-              xtype: 'textarea',
-              fieldLabel: 'Description', 
-              name: 'description',
-              width: 250,
-              height: 150 
-            }
-          ],
-          buttons: [
-            {
-              text: 'Submit',
-              formBind: true,
-              scope: this,
-              handler: function(){
-                var title = w.find('name', 'title')[0].getValue();
-                var description = w.find('name', 'description')[0].getValue();
-                this.createProblemReport( w, title, description );
-              }
-            },
-            {
-              text: 'Cancel',
-              formBind: false,
-              scope: this,
-              handler: function(){
-                w.close();
-              }
-            }
-          ]
-        }
-      ]
-    });
-    
-    w.show();
   }
+  
   
 });

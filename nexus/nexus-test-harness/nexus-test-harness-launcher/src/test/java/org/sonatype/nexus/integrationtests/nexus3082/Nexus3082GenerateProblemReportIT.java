@@ -27,4 +27,12 @@ public class Nexus3082GenerateProblemReportIT
     {
         ErrorReportUtil.generateProblemReport( null, "somedescription" );
     }
+
+    @Test
+    // NXCM-1928
+    public void generateReportWithAuthentication()
+        throws Exception
+    {
+        ErrorReportUtil.generateProblemReport( null, "somedescription", "sonatypeits", "sonatypeits" );
+    }
 }

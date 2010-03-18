@@ -306,6 +306,11 @@ Sonatype.repoServer.RepoServer = function(){
             tabCode: Sonatype.repoServer.RepoTargetEditPanel
           },
           {
+            enabled : sp.checkPermission('nexus:settings', sp.READ),
+            title : 'Report a Problem',
+            handler : Sonatype.utils.generateErrorReportHandler
+          },
+          {
             enabled: sp.checkPermission('nexus:logconfig', sp.READ) &&
               ( sp.checkPermission('nexus:logconfig', sp.CREATE) ||
                 sp.checkPermission('nexus:logconfig', sp.DELETE) ||

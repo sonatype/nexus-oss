@@ -20,8 +20,10 @@ import org.restlet.resource.ResourceException;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ErrorReportRequest;
+import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
+import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -33,13 +35,13 @@ public class ErrorReportingPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String RESOURCE_URI = "/error_reporting";
-    
+
     public ErrorReportingPlexusResource()
     {
         setModifiable( true );
         setReadable( false );
     }
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -57,7 +59,7 @@ public class ErrorReportingPlexusResource
     {
         return RESOURCE_URI;
     }
-    
+
     /**
      * Generate a new error report, will return a url that can be used to access the error ticket.
      */
@@ -67,13 +69,13 @@ public class ErrorReportingPlexusResource
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
-        ErrorReportRequest dto = ( ErrorReportRequest ) payload;
-        
-        if ( StringUtils.isBlank( dto.getData().getTitle() ) )
+        ErrorReportRequestDTO dto = ( (ErrorReportRequest) payload ).getData();
+
+        if ( StringUtils.isBlank( dto.getTitle() ) )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "A Title for the report is required." );
         }
-        
+
         ErrorReportingManager manager =
             (ErrorReportingManager) context.getAttributes().get( ErrorReportingManager.class.getName() );
 
@@ -81,27 +83,65 @@ public class ErrorReportingPlexusResource
         {
             throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to retrieve error reporting manager." );
         }
-        
-        org.sonatype.nexus.error.reporting.ErrorReportRequest genReq = new org.sonatype.nexus.error.reporting.ErrorReportRequest();
-        genReq.setTitle( dto.getData().getTitle() );
-        genReq.setDescription( dto.getData().getDescription() );
+
+        ErrorReportingSettings settings = dto.getErrorReportingSettings();
+
+        if ( dto.isSaveErrorReportingSettings() )
+        {
+            if ( settings == null )
+            {
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
+                                             "Jira settings must be provided when set to save as default." );
+            }
+
+            manager.setJIRAUsername( settings.getJiraUsername() );
+            manager.setJIRAPassword( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) );
+            manager.setUseGlobalProxy( settings.isUseGlobalProxy() );
+
+            try
+            {
+                getNexusConfiguration().saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Got IO Exception during update of Nexus configuration.", e );
+
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e );
+            }
+        }
+
+        org.sonatype.nexus.error.reporting.ErrorReportRequest genReq =
+            new org.sonatype.nexus.error.reporting.ErrorReportRequest();
+        genReq.setTitle( dto.getTitle() );
+        genReq.setDescription( dto.getDescription() );
         genReq.getContext().putAll( context.getAttributes() );
-        
+
         try
         {
             ErrorReportResponse dtoResponse = new ErrorReportResponse();
             dtoResponse.setData( new ErrorReportResponseDTO() );
-            
-            org.sonatype.nexus.error.reporting.ErrorReportResponse genRes = manager.handleError( genReq );
-            
+
+            org.sonatype.nexus.error.reporting.ErrorReportResponse genRes;
+            if ( settings != null && !dto.isSaveErrorReportingSettings()
+                && !StringUtils.isEmpty( settings.getJiraUsername() ) )
+            {
+                genRes =
+                    manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword(),
+                                         settings.isUseGlobalProxy() );
+            }
+            else
+            {
+                genRes = manager.handleError( genReq );
+            }
+
             if ( !genRes.isSuccess() )
             {
                 getLogger().debug( "Unable to submit jira ticket." );
                 throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to submit jira ticket." );
             }
-            
+
             dtoResponse.getData().setJiraUrl( genRes.getJiraUrl() );
-            
+
             return dtoResponse;
         }
         catch ( IssueSubmissionException e )

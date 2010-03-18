@@ -38,7 +38,7 @@ public class DefaultErrorReportingManagerTest
         throws Exception
     {
         super.setUp();
-        
+
         unzipHomeDir = new File( getPlexusHomeDir(), "unzip" );
         unzipHomeDir.mkdirs();
 
@@ -46,16 +46,16 @@ public class DefaultErrorReportingManagerTest
 
         manager = (DefaultErrorReportingManager) lookup( ErrorReportingManager.class );
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
     {
         super.tearDown();
-        
+
         cleanDir( unzipHomeDir );
     }
-    
+
     private void enableErrorReports( boolean useProxy )
         throws ConfigurationException, IOException
     {
@@ -99,24 +99,24 @@ public class DefaultErrorReportingManagerTest
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( "APR: "
-                + request.getThrowable().getMessage() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertNull( issues );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: "
-                + request.getThrowable().getMessage() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
 
         manager.handleError( request );
 
         issues =
-            manager.retrieveIssues( "APR: "
-                + request.getThrowable().getMessage() );
+            manager.retrieveIssues( "APR: " + request.getThrowable().getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
     }
@@ -136,16 +136,17 @@ public class DefaultErrorReportingManagerTest
         {
             exception = e;
         }
-        
+
         manager.setEnabled( true );
         manager.setJIRAProject( "NEXUS" );
-        
+
         nexusConfiguration.saveConfiguration();
 
         ErrorReportRequest request = new ErrorReportRequest();
         request.setThrowable( exception );
 
-        IssueSubmissionRequest subRequest = manager.buildRequest( request );
+        IssueSubmissionRequest subRequest =
+            manager.buildRequest( request, manager.getValidJIRAUsername(), manager.isUseGlobalProxy() );
 
         assertEquals( "NEXUS", subRequest.getProjectId() );
         assertEquals( "APR: Test exception", subRequest.getSummary() );
@@ -223,28 +224,28 @@ public class DefaultErrorReportingManagerTest
 
         String msg = "Runtime exception " + Long.toHexString( System.currentTimeMillis() );
         ExceptionTask task = (ExceptionTask) lookup( SchedulerTask.class, "ExceptionTask" );
-        task.setMessage(msg);
+        task.setMessage( msg );
 
         // First make sure item doesn't already exist
         List<Issue> issues =
-            manager.retrieveIssues( "APR: "
-                + new RuntimeException( msg ).getMessage() );
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertNull( issues );
 
         doCall( task );
 
         issues =
-            manager.retrieveIssues( "APR: "
-                + new RuntimeException( msg ).getMessage() );
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
 
         doCall( task );
 
         issues =
-            manager.retrieveIssues( "APR: "
-                + new RuntimeException( msg ).getMessage() );
+            manager.retrieveIssues( "APR: " + new RuntimeException( msg ).getMessage(), manager.getValidJIRAUsername(),
+                                    manager.getValidJIRAPassword() );
 
         Assert.assertEquals( 1, issues.size() );
     }

@@ -3716,6 +3716,23 @@
 	      <required>false</required>
           <description>A detailed explanation of the error report.</description>
 	    </field>
+	    <field>
+	      <name>saveErrorReportingSettings</name>
+	      <version>1.0.0+</version>
+	      <type>boolean</type>
+	      <required>false</required>
+	      <defaultValue>false</defaultValue>
+          <description>If true will overwrite currect error report settings with the credentials provided.</description>
+	    </field>
+	    <field>
+	      <name>errorReportingSettings</name>
+	      <version>1.0.0+</version>
+          <association>
+            <type>ErrorReportingSettings</type>
+          </association>
+	      <required>false</required>
+          <description>The error report settings.</description>
+	    </field>
 	  </fields>
 	</class>
 	

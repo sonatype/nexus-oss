@@ -162,7 +162,7 @@ public class DefaultErrorReportingManager
     {
         return getCurrentConfiguration( false ).getJiraUsername();
     }
-    
+
     protected String getValidJIRAUsername()
     {
         String username = getJIRAUsername();
@@ -172,7 +172,7 @@ public class DefaultErrorReportingManager
             username = DEFAULT_USERNAME;
         }
 
-        return username;        
+        return username;
     }
 
     public void setJIRAUsername( String username )
@@ -184,11 +184,11 @@ public class DefaultErrorReportingManager
     {
         return getCurrentConfiguration( false ).getJiraPassword();
     }
-    
+
     protected String getValidJIRAPassword()
     {
         String password = getJIRAPassword();
-        
+
         if ( StringUtils.isEmpty( password ) )
         {
             password = DEFAULT_USERNAME;
@@ -224,34 +224,34 @@ public class DefaultErrorReportingManager
 
     // ==
 
-    public ErrorReportResponse handleError( ErrorReportRequest request )
+    public ErrorReportResponse handleError( ErrorReportRequest request, String jiraUsername, String jiraPassword,
+                                            boolean useGlobalHttpProxy )
         throws IssueSubmissionException, IOException, GeneralSecurityException
     {
         getLogger().error( "Detected Error in Nexus", request.getThrowable() );
-        
+
         ErrorReportResponse response = new ErrorReportResponse();
-        
+
         // if title is not null, this is a manual report, so we will generate regardless
         // of other checks
         if ( request.getTitle() != null
-            || ( isEnabled()
-            && shouldHandleReport( request )
-            && !shouldIgnore( request.getThrowable() ) ) )
+            || ( isEnabled() && shouldHandleReport( request ) && !shouldIgnore( request.getThrowable() ) ) )
         {
-            IssueSubmissionRequest subRequest = buildRequest( request );
-            
+            IssueSubmissionRequest subRequest = buildRequest( request, jiraUsername, useGlobalHttpProxy );
+
             File unencryptedFile = subRequest.getProblemReportBundle();
 
             encryptRequest( subRequest );
-            
+
             File encryptedFile = subRequest.getProblemReportBundle();
-            
+
             try
             {
                 // manual, no check for existing
                 if ( request.getTitle() != null )
                 {
-                    IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
+                    IssueSubmissionResult result =
+                        getIssueSubmitter( jiraUsername, jiraPassword ).submitIssue( subRequest );
                     response.setCreated( true );
                     response.setJiraUrl( result.getIssueUrl() );
                     renameBundle( unencryptedFile, result.getKey() );
@@ -259,18 +259,19 @@ public class DefaultErrorReportingManager
                 }
                 else
                 {
-                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary() );
-        
+                    List<Issue> existingIssues = retrieveIssues( subRequest.getSummary(), jiraUsername, jiraPassword );
+
                     if ( existingIssues == null )
                     {
-                        IssueSubmissionResult result = getIssueSubmitter().submitIssue( subRequest );
+                        IssueSubmissionResult result =
+                            getIssueSubmitter( jiraUsername, jiraPassword ).submitIssue( subRequest );
                         response.setCreated( true );
                         response.setJiraUrl( result.getIssueUrl() );
                         renameBundle( unencryptedFile, result.getKey() );
                         getLogger().info( "Generated problem report, ticket " + result.getIssueUrl() + " was created." );
                     }
                     else
-                    {   
+                    {
                         response.setJiraUrl( existingIssues.get( 0 ).getLink() );
                         renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
                         getLogger().info(
@@ -292,8 +293,14 @@ public class DefaultErrorReportingManager
         {
             response.setSuccess( true );
         }
-        
+
         return response;
+    }
+
+    public ErrorReportResponse handleError( ErrorReportRequest request )
+        throws IssueSubmissionException, IOException, GeneralSecurityException
+    {
+        return handleError( request, getValidJIRAUsername(), getValidJIRAPassword(), isUseGlobalProxy() );
     }
 
     private void encryptRequest( IssueSubmissionRequest subRequest )
@@ -323,12 +330,11 @@ public class DefaultErrorReportingManager
         {
             return true;
         }
-        
-        if ( request.getThrowable() != null 
-            && StringUtils.isNotEmpty( request.getThrowable().getMessage() ) )
+
+        if ( request.getThrowable() != null && StringUtils.isNotEmpty( request.getThrowable().getMessage() ) )
         {
             String hash = StringDigester.getSha1Digest( request.getThrowable().getMessage() );
-    
+
             if ( errorHashSet.contains( hash ) )
             {
                 getLogger().debug( "Received an exception we already processed, ignoring." );
@@ -344,23 +350,23 @@ public class DefaultErrorReportingManager
         {
             getLogger().debug( "Received an empty message in exception, will not handle" );
         }
-        
+
         return false;
     }
 
     @SuppressWarnings( "unchecked" )
-    protected List<Issue> retrieveIssues( String description )
+    protected List<Issue> retrieveIssues( String description, String jiraUsername, String jiraPassword )
     {
         Jira jira = null;
 
         try
         {
             jira = new Jira( getJIRAUrl() + "/rpc/xmlrpc" );
-            jira.login( getValidJIRAUsername(), getValidJIRAPassword() );
+            jira.login( jiraUsername, jiraPassword );
 
             List<Issue> issues =
-                jira.getIssuesFromTextSearchWithProject( Arrays.asList( getJIRAProject() ), "\""
-                    + description + "\"", 20 );
+                jira.getIssuesFromTextSearchWithProject( Arrays.asList( getJIRAProject() ), "\"" + description + "\"",
+                                                         20 );
 
             if ( !issues.isEmpty() )
             {
@@ -401,11 +407,11 @@ public class DefaultErrorReportingManager
         }
     }
 
-    protected IssueSubmissionRequest buildRequest( ErrorReportRequest request )
+    protected IssueSubmissionRequest buildRequest( ErrorReportRequest request, String username, boolean useGlobalProxy )
         throws IOException
     {
         String summary = null;
-        
+
         if ( request.getTitle() != null )
         {
             summary = "MPR: " + request.getTitle();
@@ -425,23 +431,23 @@ public class DefaultErrorReportingManager
         subRequest.setProjectId( getJIRAProject() );
         subRequest.setSummary( summary );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
-        subRequest.setReporter( getValidJIRAUsername() );
+        subRequest.setReporter( username );
         subRequest.setComponent( COMPONENT );
         subRequest.setEnvironment( assembleEnvironment( request ) );
-        
+
         // use description if set
         if ( request.getDescription() != null )
         {
-            subRequest.setDescription( request.getDescription() );    
+            subRequest.setDescription( request.getDescription() );
         }
         // otherwise pull from throwable
-        else if ( request.getThrowable() != null)
+        else if ( request.getThrowable() != null )
         {
             subRequest.setDescription( "The following exception occurred: " + StringDigester.LINE_SEPERATOR
                 + ExceptionUtils.getFullStackTrace( request.getThrowable() ) );
         }
 
-        if ( isUseGlobalProxy() )
+        if ( useGlobalProxy )
         {
             subRequest.setProxyConfigurator( new NexusProxyServerConfigurator(
                                                                                nexusConfig.getGlobalRemoteStorageContext(),
@@ -484,14 +490,12 @@ public class DefaultErrorReportingManager
         return sb.toString();
     }
 
-    private IssueSubmitter getIssueSubmitter()
+    private IssueSubmitter getIssueSubmitter( String jiraUsername, String jiraPassword )
         throws IssueSubmissionException
     {
         try
         {
-            return new JiraIssueSubmitter( getJIRAUrl(),
-                                           new DefaultAuthenticationSource( getValidJIRAUsername(),
-                                                                            getValidJIRAPassword() ) );
+            return new JiraIssueSubmitter( getJIRAUrl(), new DefaultAuthenticationSource( jiraUsername, jiraPassword ) );
         }
         catch ( InitializationException e )
         {
@@ -506,7 +510,7 @@ public class DefaultErrorReportingManager
         File securityXml = new SecurityXmlHandler().getFile( securityXmlSource, nexusConfig );
         File securityConfigurationXml =
             new SecurityConfigurationXmlHandler().getFile( securityConfigurationXmlSource, nexusConfig );
-//        File fileListing = getFileListing(); //TODO: replace with FileUtil call
+        // File fileListing = getFileListing(); //TODO: replace with FileUtil call
         File contextListing = getContextListing( request.getContext() );
         File exceptionListing = getExceptionListing( request.getThrowable() );
 
@@ -522,7 +526,7 @@ public class DefaultErrorReportingManager
             addFileToZip( nexusXml, zStream, "nexus.xml" );
             addFileToZip( securityXml, zStream, "security.xml" );
             addFileToZip( securityConfigurationXml, zStream, "security-configuration.xml" );
-//            addFileToZip( fileListing, zStream, "fileListing.txt" );
+            // addFileToZip( fileListing, zStream, "fileListing.txt" );
             addFileToZip( contextListing, zStream, "contextListing.txt" );
             addFileToZip( exceptionListing, zStream, "exception.txt" );
 
@@ -541,7 +545,7 @@ public class DefaultErrorReportingManager
             deleteFile( nexusXml );
             deleteFile( securityXml );
             deleteFile( securityConfigurationXml );
-//            deleteFile( fileListing );
+            // deleteFile( fileListing );
             deleteFile( contextListing );
             deleteFile( exceptionListing );
 
@@ -614,13 +618,14 @@ public class DefaultErrorReportingManager
         return files;
     }
 
-//  TODO: this should be replaced with a call to FileUtil, but first we need to make sure that will not eat memory too
-//    private File getFileListing()
-//        throws IOException
-//    {
-//        return writeStringToTempFile( FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
-//                                      "fileListing.txt" );
-//    }
+    // TODO: this should be replaced with a call to FileUtil, but first we need to make sure that will not eat memory
+    // too
+    // private File getFileListing()
+    // throws IOException
+    // {
+    // return writeStringToTempFile( FileListingHelper.buildFileListing( nexusConfig.getWorkingDirectory() ),
+    // "fileListing.txt" );
+    // }
 
     private File getExceptionListing( Throwable t )
         throws IOException
@@ -697,7 +702,7 @@ public class DefaultErrorReportingManager
     {
         return "Error Report Settings";
     }
-    
+
     protected boolean shouldIgnore( Throwable throwable )
     {
         if ( throwable != null )
@@ -705,16 +710,17 @@ public class DefaultErrorReportingManager
             if ( throwable instanceof EofException )
             {
                 return true;
-}
-            else if ( throwable.getMessage() != null 
-                && ( throwable.getMessage().contains( "An exception occured writing the response entity" ) 
-                || throwable.getMessage().contains( "Error while handling an HTTP server call" ) ) )
+            }
+            else if ( throwable.getMessage() != null
+                && ( throwable.getMessage().contains( "An exception occured writing the response entity" ) || throwable.getMessage().contains(
+                                                                                                                                               "Error while handling an HTTP server call" ) ) )
             {
                 return true;
             }
         }
-        
+
         return false;
-        
+
     }
+
 }
