@@ -56,6 +56,7 @@
   <script src="js/extensions/ext.util.md5?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/MultiSelectTree.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/TwinPanelController.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/TextEntryList.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Sonatype.events.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Sonatype.navigation.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Sonatype.panels.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

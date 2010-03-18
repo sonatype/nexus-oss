@@ -356,6 +356,7 @@
                     <include>${compressed-dir}/js/extensions/ext.util.md5.js</include>
                     <include>${compressed-dir}/js/extensions/MultiSelectTree.js</include>
                     <include>${compressed-dir}/js/extensions/TwinPanelController.js</include>
+                    <include>${compressed-dir}/js/extensions/TextEntryList.js</include>
                     <include>${compressed-dir}/js/extensions/Sonatype.events.js</include>
                     <include>${compressed-dir}/js/extensions/Sonatype.navigation.js</include>
                     <include>${compressed-dir}/js/extensions/Sonatype.panels.js</include>

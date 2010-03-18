@@ -427,6 +427,13 @@ Sonatype.repoServer.ServerEditPanel = function(config){
             maxValue: 65535
           },
           {
+            xtype: 'textentrylist',
+            name: 'nonProxyHosts',
+            entryHelpText: ht.nonProxyHosts,
+            entryLabel: 'Non Proxy Host',
+            listLabel: 'Non Proxy Hosts'
+          },
+          {
             xtype: 'fieldset',
             checkboxToggle:true,
             collapsed: true,
@@ -650,6 +657,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         },
         "securityAnonymousAccessEnabled" : function(val, fpanel){
           return fpanel.isSecurityAnonymousAccessEnabled;
+        },
+        "globalHttpProxySettings.nonProxyHosts" : function(val, fpanel) {
+          return fpanel.find( 'name', 'nonProxyHosts' )[0].getEntries();
         }
       },
       serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
@@ -707,6 +717,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
         },
         "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel){
           fpanel.isSecurityAnonymousAccessEnabled = arr;
+        },
+        "globalHttpProxySettings.nonProxyHosts" : function(arr, srcObj, fpanel) {
+          fpanel.find( 'name', 'nonProxyHosts' )[0].setEntries( arr );
         }
       }
     });

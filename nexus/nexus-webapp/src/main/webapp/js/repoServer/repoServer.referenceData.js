@@ -50,6 +50,7 @@ Sonatype.repoServer.referenceData = {
     globalHttpProxySettings: {
       proxyHostname: "",
       proxyPort: 0,
+      nonProxyHosts: [],
       authentication: {
         username: "",
         password: "",
