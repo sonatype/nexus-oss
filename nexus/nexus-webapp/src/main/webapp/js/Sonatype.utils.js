@@ -1004,18 +1004,6 @@
               layoutConfig : {
                 labelSeparator : ''
               },
-              listeners : {
-                'expand' : {
-                  fn : this.optionalFieldsetExpandHandler,
-                  scope : this
-                },
-                'collapse' : {
-                  fn : this.optionalFieldsetCollapseHandler,
-                  scope : this,
-                  delay : 100
-                }
-              },
-
               items : credentials
             });
       }
