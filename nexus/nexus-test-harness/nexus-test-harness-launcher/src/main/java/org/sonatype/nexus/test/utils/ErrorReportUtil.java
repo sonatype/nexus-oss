@@ -43,6 +43,8 @@ public class ErrorReportUtil
         if ( jiraUser != null )
         {
             request.getData().setErrorReportingSettings( new ErrorReportingSettings() );
+            request.getData().getErrorReportingSettings().setJiraUsername( jiraUser );
+            request.getData().getErrorReportingSettings().setJiraPassword( jiraPassword );
         }
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML );
@@ -55,10 +57,11 @@ public class ErrorReportUtil
 
         if ( title != null )
         {
-            Assert.assertTrue( response.getStatus().isSuccess() );
+            final String text = response.getEntity().getText();
 
-            representation =
-                new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+            Assert.assertTrue( text + "\n" + response.getStatus(), response.getStatus().isSuccess() );
+
+            representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
 
             ErrorReportResponse responseObj =
                 (ErrorReportResponse) representation.getPayload( new ErrorReportResponse() );
