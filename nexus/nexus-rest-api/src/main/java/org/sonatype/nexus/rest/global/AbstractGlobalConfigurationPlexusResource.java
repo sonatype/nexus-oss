@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.global;
 
+import java.util.ArrayList;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
@@ -186,6 +188,8 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         result.setAuthentication( convert( settings.getProxyAuthentication() ) );
 
+        result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
+        
         return result;
     }
     
@@ -294,6 +298,8 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setProxyPort( settings.getProxyPort() );
 
         result.setAuthentication( convert( settings.getAuthentication() ) );
+        
+        result.setNonProxyHosts( settings.getNonProxyHosts() );
 
         return result;
     }

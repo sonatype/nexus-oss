@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
 
+import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -26,7 +27,6 @@ import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.URI;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.DeleteMethod;
@@ -334,7 +334,7 @@ public class CommonsHttpClientRemoteStorage
             "Remote storage settings change detected for ProxyRepository ID=\"" + repository.getId() + "\" (\""
                             + repository.getName() + "\"), updating HttpClient..." );
 
-        HttpClient httpClient = new HttpClient( new MultiThreadedHttpConnectionManager() );
+        HttpClient httpClient = new HttpClient( new CustomMultiThreadedHttpConnectionManager() );
 
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, getLogger() );
 

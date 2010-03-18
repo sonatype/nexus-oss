@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy;
 
+import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -80,8 +81,8 @@ public class SimpleRemoteLeakTest
         // get the default context, since they used it
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm1 =
-            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
+        CustomMultiThreadedHttpConnectionManager cm1 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
                 .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
@@ -89,8 +90,8 @@ public class SimpleRemoteLeakTest
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm2 =
-            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+        CustomMultiThreadedHttpConnectionManager cm2 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
                 .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
@@ -127,8 +128,8 @@ public class SimpleRemoteLeakTest
         // get the default context, since they used it
         RemoteStorageContext ctx1 = repo1.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm1 =
-            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
+        CustomMultiThreadedHttpConnectionManager cm1 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
                 .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
@@ -136,8 +137,8 @@ public class SimpleRemoteLeakTest
 
         RemoteStorageContext ctx2 = repo2.getRemoteStorageContext();
 
-        MultiThreadedHttpConnectionManager cm2 =
-            (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
+        CustomMultiThreadedHttpConnectionManager cm2 =
+            (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
                 .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 

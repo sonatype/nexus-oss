@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Set;
+
 public interface RemoteProxySettings
 {
     boolean isEnabled();
@@ -19,4 +21,8 @@ public interface RemoteProxySettings
     RemoteAuthenticationSettings getProxyAuthentication();
 
     void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication );
+    
+    public Set<String> getNonProxyHosts();
+
+    public void setNonProxyHosts( Set<String> nonProxyHosts );
 }

@@ -214,6 +214,17 @@
           <required>false</required>
           <description>Authentication used to connect with proxy server.</description>
         </field>
+        <field>
+          <name>nonProxyHosts</name>
+          <version>1.0.0+</version>
+          <description>
+            List of addresses that can ignore the proxy settings.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
       </fields>
     </class>
 

@@ -105,8 +105,9 @@
             </goals>
             <configuration>
               <useJava5>true</useJava5>
-              <version>1.4.0</version>
+              <version>1.4.1</version>
               <packagedVersions>
+                <packagedVersion>1.4.0</packagedVersion>
               </packagedVersions>
               <models>
                 <model>src/main/mdo/nexus.xml</model>
@@ -144,40 +145,6 @@
             <goal>xpp3-writer</goal> </goals> <configuration> <version>1.0.0</version> <models>
             <model>src/main/mdo/security.xml </model> </models> </configuration> </execution>
           -->
-        </executions>
-        <configuration>
-          <packageWithVersion>false</packageWithVersion>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>3.2</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-      <plugin>
-        <!-- TODO remove when upgrade generator is marged into modello -->
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>modello-plugin-upgrade</artifactId>
-        <version>1.0</version>
-        <executions>
-          <execution>
-            <id>nexus-upgrade</id>
-            <goals>
-              <goal>upgrade</goal>
-            </goals>
-            <configuration>
-              <packageWithVersion>true</packageWithVersion>
-              <version>1.0.8</version>
-              <packagedVersions>
-                <packagedVersion>1.0.7</packagedVersion>
-              </packagedVersions>
-              <models>
-                <model>src/main/mdo/nexus-old.xml</model>
-              </models>
-            </configuration>
-          </execution>
         </executions>
         <configuration>
           <packageWithVersion>false</packageWithVersion>

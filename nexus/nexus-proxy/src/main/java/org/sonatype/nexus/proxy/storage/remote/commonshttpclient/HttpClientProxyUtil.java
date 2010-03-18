@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.commons.httpclient.CustomMultiThreadedHttpConnectionManager;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -28,6 +29,8 @@ public class HttpClientProxyUtil
     
     public static void applyProxyToHttpClient( HttpClient httpClient, RemoteStorageContext ctx, Logger logger )
     {
+        httpClient.setHttpConnectionManager( new CustomMultiThreadedHttpConnectionManager() );
+        
         // getting the timeout from RemoteStorageContext. The value we get depends on per-repo and global settings.
         // The value will "cascade" from repo level to global level, see imple of it.
         int timeout = ctx.getRemoteConnectionSettings().getConnectionTimeout();
@@ -106,6 +109,12 @@ public class HttpClientProxyUtil
             log( Level.INFO, "... proxy setup with host \"" + rps.getHostname() + "\"", logger );
 
             httpConfiguration.setProxy( rps.getHostname(), rps.getPort() );
+
+            // check if we have non-proxy hosts
+            if( rps.getNonProxyHosts() != null && !rps.getNonProxyHosts().isEmpty() )
+            {
+                httpConfiguration.getParams().setParameter( CustomMultiThreadedHttpConnectionManager.NON_PROXY_HOSTS_KEY, rps.getNonProxyHosts() );
+            }
 
             if ( rps.getProxyAuthentication() != null )
             {

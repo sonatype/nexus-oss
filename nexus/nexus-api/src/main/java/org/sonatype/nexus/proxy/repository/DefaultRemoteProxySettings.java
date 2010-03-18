@@ -1,5 +1,8 @@
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.codehaus.plexus.util.StringUtils;
 
 public class DefaultRemoteProxySettings
@@ -10,6 +13,8 @@ public class DefaultRemoteProxySettings
     private String hostname;
 
     private int port;
+    
+    private Set<String> nonProxyHosts = new HashSet<String>();
 
     private RemoteAuthenticationSettings proxyAuthentication;
 
@@ -56,5 +61,15 @@ public class DefaultRemoteProxySettings
     public void setProxyAuthentication( RemoteAuthenticationSettings proxyAuthentication )
     {
         this.proxyAuthentication = proxyAuthentication;
+    }
+
+    public Set<String> getNonProxyHosts()
+    {
+        return nonProxyHosts;
+    }
+
+    public void setNonProxyHosts( Set<String> nonProxyHosts )
+    {
+        this.nonProxyHosts = nonProxyHosts;
     }
 }

@@ -1,5 +1,12 @@
 package org.sonatype.nexus.configuration.application;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
@@ -173,6 +180,8 @@ public class DefaultGlobalHttpProxySettings
 
             remoteProxySettings.setProxyAuthentication( authenticationInfoConverter.convertAndValidateFromModel( model
                 .getAuthentication() ) );
+            
+            remoteProxySettings.setNonProxyHosts( new HashSet<String>( model.getNonProxyHosts() ) );
 
             return remoteProxySettings;
         }
@@ -199,6 +208,8 @@ public class DefaultGlobalHttpProxySettings
             model.setProxyPort( settings.getPort() );
 
             model.setAuthentication( authenticationInfoConverter.convertToModel( settings.getProxyAuthentication() ) );
+            
+            model.setNonProxyHosts( new ArrayList<String>(settings.getNonProxyHosts() ) );
 
             return model;
         }
@@ -224,5 +235,25 @@ public class DefaultGlobalHttpProxySettings
     public String getName()
     {
         return "Global Http Proxy Settings";
+    }
+
+    public Set<String> getNonProxyHosts()
+    {
+        if ( isEnabled() )
+        {
+            return new HashSet<String>( getCurrentConfiguration( false ).getNonProxyHosts() );
+        }
+        
+        return Collections.emptySet();
+    }
+
+    public void setNonProxyHosts( Set<String> nonProxyHosts )
+    {
+        if ( !isEnabled() )
+        {
+            initConfig();
+        }
+
+        getCurrentConfiguration( true ).setNonProxyHosts( new ArrayList<String>( nonProxyHosts ) );
     }
 }

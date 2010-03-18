@@ -14,6 +14,8 @@
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -26,6 +28,7 @@ import javax.ws.rs.Produces;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.restlet.Context;
@@ -303,7 +306,27 @@ public class GlobalConfigurationPlexusResource
                         getGlobalHttpProxySettings().setHostname( s.getProxyHostname() );
 
                         getGlobalHttpProxySettings().setPort( s.getProxyPort() );
-
+                        
+                        List<String> nonProxyHosts = resource.getGlobalHttpProxySettings().getNonProxyHosts();
+                        if( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
+                        {
+                            // removing nulls and empty strings 
+                            HashSet<String> cleanNonProxyHosts = new HashSet<String>();
+                            for ( String host : nonProxyHosts )
+                            {
+                                if( StringUtils.isNotEmpty( host ))
+                                {
+                                    cleanNonProxyHosts.add( host );
+                                }
+                            }
+                            getGlobalHttpProxySettings().setNonProxyHosts( cleanNonProxyHosts );
+                        }
+                        else
+                        {
+                            // clear it out
+                            getGlobalHttpProxySettings().setNonProxyHosts( new HashSet<String>(0) ); 
+                        }
+                        
                         if ( s.getAuthentication() != null )
                         {
                             CRemoteAuthentication auth = new CRemoteAuthentication();
