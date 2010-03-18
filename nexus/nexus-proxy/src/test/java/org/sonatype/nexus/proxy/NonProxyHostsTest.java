@@ -15,7 +15,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.repository.DefaultRemoteProxySettings;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.HttpClientProxyUtil;
 
 public class NonProxyHostsTest
@@ -65,6 +64,11 @@ public class NonProxyHostsTest
         if ( proxyServer != null )
         {
             proxyServer.stop();
+        }
+        
+        if( servletServer != null)
+        {
+            servletServer.stop();
         }
     }
 
