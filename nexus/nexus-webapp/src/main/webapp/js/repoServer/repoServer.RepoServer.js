@@ -307,7 +307,7 @@ Sonatype.repoServer.RepoServer = function(){
           },
           {
             enabled : sp.checkPermission('nexus:settings', sp.READ),
-            title : 'Report a Problem',
+            title : 'Generate Problem Report',
             handler : Sonatype.utils.generateErrorReportHandler
           },
           {

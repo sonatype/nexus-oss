@@ -971,7 +971,7 @@
                 }
                 else
                 {
-                  Sonatype.utils.connectionError(response, 'Error generating report');
+                  Sonatype.utils.connectionError(response, 'Error generating Problem Report');
                 }
               }
             });
@@ -979,37 +979,32 @@
     },
 
     showProbleReport : function(requestCredentials) {
-      var items = [{
-            xtype : 'panel',
-            style : 'padding-left: 70px; padding-bottom: 10px',
-            html : 'Enter a short title for the problem report, along with a more detailed description.  A JIRA ticket will get created at the public Nexus JIRA server.'
-          }];
+      var items = [];
 
-      var credentials;
-      if (requestCredentials)
-      {
-        credentials = items;
-      }
-      else
-      {
-        credentials = [];
-        items.push({
-              xtype : 'fieldset',
-              checkboxToggle : true,
-              collapsed : true,
-              name : 'errorReportingSettings',
-              title : 'Overwrite Error Reporting Settings (optional)',
-              anchor : Sonatype.view.FIELDSET_OFFSET,
-              autoHeight : true,
-              layoutConfig : {
-                labelSeparator : ''
-              },
-              items : credentials
-            });
-      }
+      var credentials = [];
+      items.push({
+            xtype : 'fieldset',
+            checkboxToggle : !requestCredentials,
+            collapsed : !requestCredentials,
+            collapsible : !requestCredentials,
+            name : 'errorReportingSettings',
+            title : requestCredentials ? 'Enter JIRA Credentials' : 'Override Default JIRA Credentials (optional)',
+            anchor : Sonatype.view.FIELDSET_OFFSET,
+            autoHeight : true,
+            layoutConfig : {
+              labelSeparator : ''
+            },
+            items : credentials
+          });
 
       credentials.push({
+            xtype : 'panel',
+            style : 'padding-bottom: 10px',
+            html : 'In order to submit a Problem Report you must have JIRA account. Click here to <a href="https://issues.sonatype.org/secure/Signup!default.jspa" target="_blank">Sign Up</a>.'
+          });
+      credentials.push({
             xtype : 'textfield',
+            itemCls : 'required-field',
             fieldLabel : 'JIRA Username',
             helpText : Sonatype.repoServer.resources.help.server.jiraUsername,
             name : 'jiraUsername',
@@ -1017,17 +1012,12 @@
           });
       credentials.push({
             xtype : 'textfield',
+            itemCls : 'required-field',
             fieldLabel : 'JIRA Password',
             helpText : Sonatype.repoServer.resources.help.server.jiraPassword,
             inputType : 'password',
             name : 'jiraPassword',
             allowBlank : !requestCredentials
-          });
-      credentials.push({
-            xtype : 'checkbox',
-            fieldLabel : 'Use Default HTTP Proxy Settings',
-            helpText : 'Apply the default HTTP Proxy Settings to the jira connection',
-            name : 'useGlobalProxy'
           });
 
       var sp = Sonatype.lib.Permissions;
@@ -1035,14 +1025,21 @@
       {
         credentials.push({
               xtype : 'checkbox',
-              fieldLabel : 'Save error report settings',
-              helpText : 'If selected will save currect error report settings as default settings.',
-              name : 'overwrite'
+              fieldLabel : 'Save as default',
+              helpText : 'If selected will save currect Problem Report settings as default settings.',
+              name : 'saveErrorReportingSettings'
             });
       }
 
       items.push({
-            fieldLabel : 'Title',
+            xtype : 'panel',
+            style : 'padding-left: 10px; padding-bottom: 10px',
+            html : 'Enter a short title for the Problem Report, along with a more detailed description.'
+          });
+
+      items.push({
+            fieldLabel : 'Enter a short title',
+            itemCls : 'required-field',
             name : 'title',
             width : 250,
             allowBlank : false
@@ -1055,11 +1052,17 @@
             height : 150
           });
 
+      items.push({
+            xtype : 'panel',
+            style : 'padding-left: 10px; padding-bottom: 10px',
+            html : 'Copies of your logs and configuration will be attached to this report to allow Sonatype to more quickly solve the problem. All passwords and emails are removed and the bundle is encrypted locally with Sonatype\'s Public key before transmitting it to Sonatype. Your data will be handled with strict confidence and will not be disclosed to any third parties.'
+          });
+
       var w = new Ext.Window({
-            title : 'Generate Nexus Error Report',
+            title : 'Generate Nexus Problem Report',
             closable : true,
             autoWidth : false,
-            width : 500,
+            width : 425,
             autoHeight : true,
             modal : true,
             constrain : true,
@@ -1067,7 +1070,7 @@
             draggable : false,
             items : [{
                   xtype : 'form',
-                  labelWidth : 200,
+                  labelWidth : 125,
                   frame : true,
                   defaultType : 'textfield',
                   monitorValid : true,
@@ -1083,9 +1086,8 @@
                           {
                             var jiraUser = w.find('name', 'jiraUsername')[0].getValue();
                             var jiraPass = w.find('name', 'jiraPassword')[0].getValue();
-                            var jiraProxy = w.find('name', 'useGlobalProxy')[0].getValue();
-                            var overwrite = w.find('name', 'overwrite')[0].getValue();
-                            Sonatype.utils.createProblemReport(w, title, description, jiraUser, jiraPass, jiraProxy, overwrite);
+                            var saveErrorReportingSettings = w.find('name', 'saveErrorReportingSettings')[0].getValue();
+                            Sonatype.utils.createProblemReport(w, title, description, jiraUser, jiraPass, saveErrorReportingSettings);
                           }
                           else
                           {
@@ -1106,7 +1108,7 @@
       w.show();
     },
 
-    createProblemReport : function(window, title, description, username, password, useGlobalProxy, overwrite) {
+    createProblemReport : function(window, title, description, username, password, saveErrorReportingSettings) {
       Sonatype.MessageBox.wait('Generating Report ...');
       Ext.Ajax.request({
             method : 'PUT',
@@ -1117,11 +1119,10 @@
               data : {
                 title : title,
                 description : description,
-                saveErrorReportingSettings : overwrite,
+                saveErrorReportingSettings : saveErrorReportingSettings,
                 errorReportingSettings : {
                   jiraUsername : username,
-                  jiraPassword : password,
-                  useGlobalProxy : useGlobalProxy
+                  jiraPassword : password
                 }
               }
             },
@@ -1135,15 +1136,15 @@
               {
                 options.cbPassThru.window.close();
                 Sonatype.MessageBox.show({
-                      title : 'Error Report Generated',
-                      msg : 'Your error report was generated <a href=' + json.data.jiraUrl + ' target="_new">here</a>.',
+                      title : 'Problem Report Generated',
+                      msg : 'Your Problem Report was generated <a href=' + json.data.jiraUrl + ' target="_new">here</a>.',
                       buttons : Sonatype.MessageBox.OK,
                       icon : Sonatype.MessageBox.INFO
                     });
               }
               else
               {
-                Sonatype.utils.connectionError(response, 'Error generating report');
+                Sonatype.utils.connectionError(response, 'Error generating Problem Report');
               }
             }
           });
