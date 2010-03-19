@@ -960,7 +960,8 @@
             callback : function(options, success, response) {
               if (success)
               {
-                var needCredentials = response.responseText.indexOf("jiraUsername") == -1;
+              	var dec = Ext.decode(response.responseText);
+                var needCredentials = dec.data.errorReportingSettings == null ||  dec.data.errorReportingSettings.jiraUsername == null || dec.data.errorReportingSettings.jiraUsername == '';
                 Sonatype.utils.showProbleReport(needCredentials);
               }
               else
@@ -1080,7 +1081,16 @@
                           {
                             var jiraUser = w.find('name', 'jiraUsername')[0].getValue();
                             var jiraPass = w.find('name', 'jiraPassword')[0].getValue();
-                            var saveErrorReportingSettings = w.find('name', 'saveErrorReportingSettings')[0].getValue();
+                            var saveCheck = w.find('name', 'saveErrorReportingSettings')[0];
+                            var saveErrorReportingSettings;
+                            if (saveCheck)
+                            {
+                              saveErrorReportingSettings = w.find('name', 'saveErrorReportingSettings')[0].getValue();
+                            }
+                            else
+                            {
+                              saveErrorReportingSettings = false
+                            }
                             Sonatype.utils.createProblemReport(w, title, description, jiraUser, jiraPass, saveErrorReportingSettings);
                           }
                           else
