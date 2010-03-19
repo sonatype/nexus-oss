@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -44,6 +45,9 @@ import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
+import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
+import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
+import org.sonatype.nexus.error.report.ErrorReportComponent;
 import org.sonatype.nexus.util.StringDigester;
 import org.sonatype.plexus.encryptor.PlexusEncryptor;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
@@ -75,9 +79,13 @@ public class DefaultErrorReportingManager
     @Requirement( hint = "rsa-aes" )
     private PlexusEncryptor plexusEncryptor;
 
-    private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
+    @Requirement
+    private ErrorReportComponent errorReportComponent;
 
-    private static final String COMPONENT = "Nexus";
+    @Requirement( role = ErrorReportBundleContentContributor.class )
+    private Map<String, ErrorReportBundleContentContributor> bundleExtraContent;
+
+    private static final String DEFAULT_USERNAME = "sonatype_problem_reporting";
 
     private static final String ERROR_REPORT_DIR = "error-report-bundles";
 
@@ -432,7 +440,7 @@ public class DefaultErrorReportingManager
         subRequest.setSummary( summary );
         subRequest.setProblemReportBundle( assembleBundle( request ) );
         subRequest.setReporter( username );
-        subRequest.setComponent( COMPONENT );
+        subRequest.setComponent( errorReportComponent.getComponent() );
         subRequest.setEnvironment( assembleEnvironment( request ) );
 
         // use description if set
@@ -538,6 +546,24 @@ public class DefaultErrorReportingManager
             for ( File logFile : getLogFiles() )
             {
                 addFileToZip( logFile, zStream, null );
+            }
+
+            Set<Entry<String, ErrorReportBundleContentContributor>> bundleExtraContent = this.bundleExtraContent.entrySet();
+            for ( Entry<String, ErrorReportBundleContentContributor> extraContent : bundleExtraContent )
+            {
+                String basePath = extraContent.getKey() + "/";
+                ErrorReportBundleEntry[] entries = extraContent.getValue().getEntries();
+                for ( ErrorReportBundleEntry errorReportBundleEntry : entries )
+                {
+                    String entryName = errorReportBundleEntry.getEntryName();
+                    InputStream content = errorReportBundleEntry.getContent();
+
+                    zStream.putNextEntry( new ZipEntry( basePath + entryName ) );
+                    IOUtil.copy( content, zStream );
+                    zStream.closeEntry();
+
+                    errorReportBundleEntry.releaseEntry();
+                }
             }
         }
         finally
