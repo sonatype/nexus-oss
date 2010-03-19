@@ -953,29 +953,22 @@
     },
 
     generateErrorReportHandler : function(username) {
-      if (username != null)
-      {
-        Sonatype.utils.showProbleReport(false);
-      }
-      else
-      {
-        Ext.Ajax.request({
-              method : 'GET',
-              scope : this,
-              url : Sonatype.config.repos.urls.globalSettingsState,
-              callback : function(options, success, response) {
-                if (success)
-                {
-                  var needCredentials = response.responseText.indexOf("jiraUsername") == -1;
-                  Sonatype.utils.showProbleReport(needCredentials);
-                }
-                else
-                {
-                  Sonatype.utils.connectionError(response, 'Error generating Problem Report');
-                }
+      Ext.Ajax.request({
+            method : 'GET',
+            scope : this,
+            url : Sonatype.config.repos.urls.globalSettingsState,
+            callback : function(options, success, response) {
+              if (success)
+              {
+                var needCredentials = response.responseText.indexOf("jiraUsername") == -1;
+                Sonatype.utils.showProbleReport(needCredentials);
               }
-            });
-      }
+              else
+              {
+                Sonatype.utils.connectionError(response, 'Error generating Problem Report');
+              }
+            }
+          });
     },
 
     showProbleReport : function(requestCredentials) {
@@ -1021,7 +1014,8 @@
           });
 
       var sp = Sonatype.lib.Permissions;
-      if (sp.checkPermission('nexus:settings', sp.EDIT))
+      // we can't ofer to save if APR is not enabled
+      if (sp.checkPermission('nexus:settings', sp.EDIT) && !requestCredentials)
       {
         credentials.push({
               xtype : 'checkbox',
@@ -1053,10 +1047,10 @@
           });
 
       items.push({
-            xtype : 'panel',
-            style : 'padding-left: 10px; padding-bottom: 10px',
-            html : 'Copies of your logs and configuration will be attached to this report to allow Sonatype to more quickly solve the problem. All passwords and emails are removed and the bundle is encrypted locally with Sonatype\'s Public key before transmitting it to Sonatype. Your data will be handled with strict confidence and will not be disclosed to any third parties.'
-          });
+        xtype : 'panel',
+        style : 'padding-left: 10px; padding-bottom: 10px',
+        html : 'Copies of your logs and configuration will be attached to this report to allow Sonatype to more quickly solve the problem. All passwords and emails are removed and the bundle is encrypted locally with Sonatype\'s Public key before transmitting it to Sonatype. Your data will be handled with strict confidence and will not be disclosed to any third parties.'
+      });
 
       var w = new Ext.Window({
             title : 'Generate Nexus Problem Report',
