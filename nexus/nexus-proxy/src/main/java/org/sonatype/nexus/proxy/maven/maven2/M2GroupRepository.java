@@ -23,12 +23,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperand;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
+import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.IOUtil;
@@ -44,7 +44,6 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
-import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
@@ -119,7 +118,7 @@ public class M2GroupRepository
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
-            && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+             && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
         {
             // metadata checksum files are calculated and cached as side-effect
             // of doRetrieveMetadata.
@@ -197,23 +196,24 @@ public class M2GroupRepository
                 {
                     getLogger().warn(
                         "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
-                            + "\", will be skipped from aggregation!", e );
+                                        + "\", will be skipped from aggregation!", e );
 
                     getFeedRecorder()
-                        .addNexusArtifactEvent(
-                            newMetadataFailureEvent( fileItem,
-                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                                    .addNexusArtifactEvent(
+                                        newMetadataFailureEvent( fileItem,
+                                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
                 catch ( MetadataException e )
                 {
                     getLogger().warn(
                         "Metadata exception during parse of metadata from UID=\""
-                            + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
+                                        + fileItem.getRepositoryItemUid().toString()
+                                        + "\", will be skipped from aggregation!", e );
 
                     getFeedRecorder()
-                        .addNexusArtifactEvent(
-                            newMetadataFailureEvent( fileItem,
-                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                                    .addNexusArtifactEvent(
+                                        newMetadataFailureEvent( fileItem,
+                                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
             }
 
@@ -221,19 +221,19 @@ public class M2GroupRepository
             {
                 throw new ItemNotFoundException( request, this );
             }
-            
+
             Metadata result = existingMetadatas.get( 0 );
-            
+
             // do a merge if necessary
             if ( existingMetadatas.size() > 1 )
             {
                 List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
-                
-                for ( int i = 1 ; i < existingMetadatas.size() ; i++ )
+
+                for ( int i = 1; i < existingMetadatas.size(); i++ )
                 {
                     ops.add( new NexusMergeOperation( new MetadataOperand( existingMetadatas.get( i ) ) ) );
                 }
-    
+
                 MetadataBuilder.changeMetadata( result, ops );
             }
 
@@ -253,9 +253,9 @@ public class M2GroupRepository
 
             sha1Digest.update( resultOutputStream.toByteArray() );
 
-            storeDigest( request, md5Digest );
+            storeMergedMetadataItemDigest( request, md5Digest, items );
 
-            storeDigest( request, sha1Digest );
+            storeMergedMetadataItemDigest( request, sha1Digest, items );
 
             resultOutputStream.close();
 
@@ -263,7 +263,7 @@ public class M2GroupRepository
             {
                 getLogger().debug(
                     "Item for path " + request.toString() + " merged from " + Integer.toString( items.size() )
-                        + " found items." );
+                                    + " found items." );
             }
 
             return item;
@@ -283,23 +283,31 @@ public class M2GroupRepository
         }
     }
 
-    protected void storeDigest( ResourceStoreRequest request, MessageDigest digest )
+    protected void storeMergedMetadataItemDigest( ResourceStoreRequest request, MessageDigest digest,
+                                                  List<StorageItem> sources )
         throws IOException, UnsupportedStorageOperationException, IllegalOperationException
     {
-        byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes();
+        String digestFileName = request.getRequestPath() + "." + digest.getAlgorithm().toLowerCase();
 
-        ResourceStoreRequest req =
-            new ResourceStoreRequest( request.getRequestPath() + "." + digest.getAlgorithm().toLowerCase() );
+        // see nexus-configuration mime-types.properties (defaulted to text/plain, as central reports them)
+        String mimeType = getMimeUtil().getMimeType( digestFileName );
+
+        byte[] bytes = ( new String( Hex.encodeHex( digest.digest() ) ) + "\n" ).getBytes( "UTF-8" );
+
+        ContentLocator contentLocator = new ByteArrayContentLocator( bytes, mimeType );
+
+        ResourceStoreRequest req = new ResourceStoreRequest( digestFileName );
 
         req.getRequestContext().setParentContext( request.getRequestContext() );
 
-        AbstractStorageItem item = createStorageItem( req, bytes );
+        DefaultStorageCompositeFileItem digestFileItem =
+            new DefaultStorageCompositeFileItem( this, req, true, false, contentLocator, sources );
 
-        storeItem( false, item );
+        storeItem( false, digestFileItem );
     }
 
     protected StorageCompositeFileItem createMergedMetadataItem( ResourceStoreRequest request, byte[] content,
-        List<StorageItem> sources )
+                                                                 List<StorageItem> sources )
     {
         // we are creating file maven-metadata.xml, and ask the MimeUtil for it's exact MIME type to honor potential
         // user configuration
@@ -311,8 +319,6 @@ public class M2GroupRepository
             new DefaultStorageCompositeFileItem( this, request, true, false, contentLocator, sources );
 
         result.setLength( content.length );
-
-        result.getItemContext().put( CTX_TRANSITIVE_ITEM, Boolean.TRUE );
 
         return result;
     }

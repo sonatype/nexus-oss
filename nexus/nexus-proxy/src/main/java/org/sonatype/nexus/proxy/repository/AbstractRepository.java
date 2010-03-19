@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
@@ -91,15 +90,9 @@ import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
  */
 public abstract class AbstractRepository
     extends ConfigurableRepository
-    implements Repository, LogEnabled
+    implements Repository
 {
-    /**
-     * StorageItem context key. If value set to Boolean.TRUE, the item will not be stored locally. Useful to suppress
-     * caching of secondary items, like merged m2 group repository metadata.
-     */
-    public static final String CTX_TRANSITIVE_ITEM =
-        AbstractRepository.class.getCanonicalName() + ".CTX_TRANSITIVE_ITEM";
-
+    @Requirement
     private Logger logger;
 
     @Requirement
@@ -145,11 +138,6 @@ public abstract class AbstractRepository
     private boolean madeSearchable = false;
 
     // --
-
-    public void enableLogging( Logger logger )
-    {
-        this.logger = logger;
-    }
 
     protected Logger getLogger()
     {
@@ -1179,6 +1167,7 @@ public abstract class AbstractRepository
         return getRepositoryContentClass().isCompatible( repository.getRepositoryContentClass() );
     }
 
+    @Deprecated
     protected AbstractStorageItem createStorageItem( ResourceStoreRequest request, byte[] bytes )
     {
         ContentLocator content =

@@ -521,12 +521,6 @@ public abstract class AbstractProxyRepository
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
     {
-        // transitive items are not cached
-        if ( Boolean.TRUE.equals( item.getItemContext().get( CTX_TRANSITIVE_ITEM ) ) )
-        {
-            return item;
-        }
-
         boolean shouldCache = true;
 
         // ask request processors too
