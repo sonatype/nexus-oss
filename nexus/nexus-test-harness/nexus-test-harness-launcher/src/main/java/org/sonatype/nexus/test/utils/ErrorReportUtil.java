@@ -178,6 +178,7 @@ public class ErrorReportUtil
         Assert.assertTrue( foundNexusXml );
         Assert.assertTrue( foundSecurityXml );
         Assert.assertTrue( foundSecurityConfigXml );
-        Assert.assertFalse( foundOthers );
+        // plugins can input others!
+        // Assert.assertFalse( foundOthers );
     }
 }
