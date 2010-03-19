@@ -25,7 +25,6 @@ Sonatype.ext.TextEntryList = function(config){
   this.textEntryField = new Ext.form.Field( {
     xtype: 'textfield',
     fieldLabel: config.entryLabel,
-    style: 'padding: 0 20px 0 0',
     helpText: config.entryHelpText,
     name: 'entryName',
     width: 300
@@ -34,7 +33,7 @@ Sonatype.ext.TextEntryList = function(config){
   this.addEntryButton = new Ext.Button({
     xtype: 'button',
     text: 'Add', 
-    style: 'padding-left: 6px; margin-left: 23px',
+    style: 'padding-left: 7px',
     minWidth: 100,
     id: 'button-add',
     handler: this.addNewEntry,
@@ -90,28 +89,23 @@ Sonatype.ext.TextEntryList = function(config){
   });
   
   Sonatype.ext.TextEntryList.superclass.constructor.call(this, {
-    region: 'center',
-    height: '100%',
     autoScroll: true,
     border: false,
-//    frame: true,
     collapsible: false,
     collapsed: false,
     labelWidth: 175,
     layoutConfig: {
       labelSeparator: ''
     },
-    style: 'padding-bottom: 10px',
     items: [
       {
         xtype: 'panel',
         layout: 'column',
-        width: '100%',
         items: [
           {
             xtype: 'panel',
             layout: 'form',
-            width: 475,
+            width: 500,
             items: [
               this.textEntryField
             ]
@@ -119,7 +113,6 @@ Sonatype.ext.TextEntryList = function(config){
           {
           xtype: 'panel',
           width: 120,
-//          style: 'padding-left: 10px',
           items: [
              this.addEntryButton
           ]
