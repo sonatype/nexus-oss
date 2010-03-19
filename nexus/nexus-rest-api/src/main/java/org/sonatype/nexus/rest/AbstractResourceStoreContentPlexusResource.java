@@ -188,9 +188,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
             store.deleteItem( req );
 
             getLogger().info(
-                              "Artifact(s) of path '" + req.getRequestPath() + "' was delete from repository ["
-                                  + request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY )
-                                  + "]" );
+                "Artifact(s) of path '" + req.getRequestPath() + "' was delete from repository ["
+                                + request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY )
+                                + "]" );
         }
         catch ( Exception e )
         {
@@ -342,7 +342,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 }
             }
             else if ( req.getConditions().getNoneMatch() != null && req.getConditions().getNoneMatch().size() > 0
-                && file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
+                      && file.getAttributes().containsKey( DigestCalculatingInspector.DIGEST_SHA1_KEY ) )
             {
                 Tag tag = req.getConditions().getNoneMatch().get( 0 );
 
@@ -409,16 +409,16 @@ public abstract class AbstractResourceStoreContentPlexusResource
                     resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
                     resource.setResourceURI( createChildReference( req, this, child.getName() ).toString()
-                        + ( resource.isLeaf() ? "" : "/" ) );
+                                             + ( resource.isLeaf() ? "" : "/" ) );
 
                     resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
 
                     resource.setLastModified( new Date( child.getModified() ) );
 
                     resource
-                            .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
-                                                                                                                                    .getLength()
-                                            : -1 );
+                                    .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
+                                                    .getLength()
+                                                    : -1 );
 
                     response.addData( resource );
 
@@ -460,8 +460,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             // Load up the template, and pass in the data
             VelocityRepresentation representation =
-                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel,
-                                            variant.getMediaType() );
+                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel, variant
+                                .getMediaType() );
 
             return representation;
         }
@@ -570,7 +570,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             result.setOriginatingRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
 
             result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind()
-                                                          .getMainFacet().getName() );
+                            .getMainFacet().getName() );
         }
         else
         {
@@ -661,6 +661,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
     protected void handleException( Request req, Response res, Exception t )
         throws ResourceException
     {
+        // just set this flag to true in any if-else branch you want to see
+        // complete error loglines with stack traces.
+        // Note: when Nexus is in DEBUG logging mode, then we log _all_ exceptions
+        // with stack traces except ItemNotFoundException (to lessen the noise).
         boolean shouldLogInfoStackTrace = false;
 
         try
@@ -751,38 +755,38 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
         finally
         {
+            String message =
+                "Got exception during processing request \"" + req.getMethod() + " " + req.getResourceRef().toString()
+                                + "\": ";
+
             if ( getLogger().isDebugEnabled() )
             {
+                // if DEBUG level, we log _all_ errors with stack traces, except the ItemNotFoundException
+
                 if ( t instanceof ItemNotFoundException )
                 {
-                    // we are "muting" item not found exception, it pollutes the DEBUG logs
-                    getLogger().debug(
-                                       "Got exception during processing " + req.getMethod() + " "
-                                           + req.getResourceRef().toString() + ": " + t.getMessage() );
+                    // we are "muting" item not found exception stack traces, it pollutes the DEBUG logs
+                    getLogger().error( message + t.getMessage() );
                 }
                 else
                 {
                     // in debug mode, we log _with_ stack trace
-                    getLogger().debug(
-                                       "Got exception during processing " + req.getMethod() + " "
-                                           + req.getResourceRef().toString(), t );
+                    getLogger().error( message, t );
                 }
             }
             else
             {
+                // if not in DEBUG mode, we obey the flag to decide whether we need to log or not the stack trace
+
                 if ( shouldLogInfoStackTrace )
                 {
                     // in INFO mode, we obey the shouldLogInfoStackTrace flag for serious errors (like internal is)
-                    getLogger().info(
-                                      "Got exception during processing \"" + req.getMethod() + " "
-                                          + req.getResourceRef().toString() + "\"", t );
+                    getLogger().error( message, t );
                 }
                 else
                 {
                     // in INFO mode, we want one liners usually
-                    getLogger().info(
-                                      "Got exception during processing \"" + req.getMethod() + " "
-                                          + req.getResourceRef().toString() + "\": " + t.getMessage() );
+                    getLogger().error( message + t.getMessage() );
                 }
             }
         }
