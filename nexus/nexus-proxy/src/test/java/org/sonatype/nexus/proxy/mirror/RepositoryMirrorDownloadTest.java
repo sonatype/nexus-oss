@@ -66,7 +66,7 @@ public class RepositoryMirrorDownloadTest
 
     private static final String CANONICAL_URL = "http://canonical-url/";
 
-    private static final ItemNotFoundException itemNotFount =
+    private static final ItemNotFoundException itemNotFound =
         new ItemNotFoundException( new ResourceStoreRequest( ITEM_PATH ) );
 
     private static final StorageException storageException = new StorageException( ITEM_PATH );
@@ -147,11 +147,11 @@ public class RepositoryMirrorDownloadTest
 
         // checksums are from canonical
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFount );
+                                                                                                                     itemNotFound );
 
         // checksums are from canonical
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
-            itemNotFount );
+                                                                                                                     itemNotFound );
 
         rs.validateStorageUrl( MIRROR1.getUrl() );
         expectLastCall();
@@ -171,14 +171,14 @@ public class RepositoryMirrorDownloadTest
 
         // both mirror and canonical fail
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { itemNotFount };
-        req.canonicalFailures = new Exception[] { itemNotFount };
+        req.mirrorFailures = new Exception[] { itemNotFound };
+        req.canonicalFailures = new Exception[] { itemNotFound };
         req.assertFailureType = ItemNotFoundException.class;
         assertDownloadFromMirror( req );
 
         // mirror fails, but canonical succeeds => not blacklisted
         req = new AssertionRequest();
-        req.mirrorFailures = new Exception[] { itemNotFount };
+        req.mirrorFailures = new Exception[] { itemNotFound };
         req.canonicalSuccess = true;
         assertDownloadFromMirror( req );
     }
@@ -467,10 +467,10 @@ public class RepositoryMirrorDownloadTest
             .anyTimes();
 
         expect( ls.retrieveItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() ) ).andThrow(
-            itemNotFount ).anyTimes();
+                                                                                                            itemNotFound ).anyTimes();
 
         ls.deleteItem( (Repository) anyObject(), (ResourceStoreRequest) anyObject() );
-        expectLastCall().andThrow( itemNotFount ).anyTimes();
+        expectLastCall().andThrow( itemNotFound ).anyTimes();
 
         ls.storeItem( (Repository) anyObject(), (StorageItem) anyObject() );
         expectLastCall().anyTimes();
