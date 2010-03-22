@@ -947,11 +947,15 @@ public abstract class AbstractProxyRepository
     {
         DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
 
-        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
+        List<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Mirror count:" + mirrors.size() );
+        }
 
         mirrors.add( new Mirror( "default", getRemoteUrl() ) );
 
-        ArrayList<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
+        List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
 
         Exception lastException = null;
 
@@ -964,6 +968,26 @@ public abstract class AbstractProxyRepository
                 if ( getRemoteStorageContext() != null )
                 {
                     retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
+                }
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Using mirror URL:" + mirror.getUrl() + ", retryCount=" + retryCount );
+                }
+
+                // Validate the mirror URL
+                try
+                {
+                    getRemoteStorage().validateStorageUrl( mirror.getUrl() );
+                }
+                catch ( Exception e )
+                {
+                    lastException = e;
+
+                    selector.feedbackFailure( mirror );
+                    logFailedMirror( mirror, e );
+
+                    continue all_urls; // retry with next url
                 }
 
                 for ( int i = 0; i < retryCount; i++ )
@@ -1005,6 +1029,7 @@ public abstract class AbstractProxyRepository
                         lastException = e;
 
                         selector.feedbackFailure( mirror );
+                        logFailedMirror( mirror, e );
 
                         continue all_urls; // retry with next url
                     }
@@ -1015,6 +1040,16 @@ public abstract class AbstractProxyRepository
                         lastException = e;
 
                         selector.feedbackFailure( mirror );
+                        logFailedMirror( mirror, e );
+                    }
+                    catch ( RuntimeException e )
+                    {
+                        lastException = e;
+
+                        selector.feedbackFailure( mirror );
+                        logFailedMirror( mirror, e );
+
+                        continue all_urls; // retry with next url
                     }
 
                     // retry with same url
@@ -1056,11 +1091,20 @@ public abstract class AbstractProxyRepository
         throw new ItemNotFoundException( request, this );
     }
 
+    private void logFailedMirror( Mirror mirror, Exception e )
+    {
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Failed mirror URL:" + mirror.getUrl() );
+            getLogger().debug( e.getMessage(), e );
+        }
+    }
+
     /**
      * Checks if item is old with "default" maxAge.
      * 
      * @param item the item
-     * @return true, if is old
+     * @return true, if it is old
      */
     protected boolean isOld( StorageItem item )
     {

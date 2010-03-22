@@ -153,6 +153,9 @@ public class RepositoryMirrorDownloadTest
         expect( rs.retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( CANONICAL_URL ) ) ).andThrow(
             itemNotFount );
 
+        rs.validateStorageUrl( MIRROR1.getUrl() );
+        expectLastCall();
+
         replay( rs );
 
         repo.setRemoteStorage( rs );
@@ -292,6 +295,9 @@ public class RepositoryMirrorDownloadTest
 
         checkOrder( rs, true );
 
+        rs.validateStorageUrl( MIRROR1.getUrl() );
+        expectLastCall();
+
         for ( Exception exception : request.mirrorFailures )
         {
             if ( exception instanceof InvalidItemContentException )
@@ -311,6 +317,8 @@ public class RepositoryMirrorDownloadTest
                         .retrieveItem( same( repo ), (ResourceStoreRequest) anyObject(), eq( request.mirrors[0]
                             .getUrl() ) ) ).andThrow( exception );
             }
+            rs.validateStorageUrl( CANONICAL_URL );
+            expectLastCall().anyTimes();
         }
 
         if ( request.mirrorSuccess )
