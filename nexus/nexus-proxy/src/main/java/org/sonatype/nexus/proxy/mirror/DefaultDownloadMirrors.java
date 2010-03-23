@@ -37,7 +37,7 @@ public class DefaultDownloadMirrors
 
     private final CRepositoryCoreConfiguration configuration;
 
-    private Map<String, BlaclistEntry> blacklist = new HashMap<String, BlaclistEntry>();
+    private Map<String, BlacklistEntry> blacklist = new HashMap<String, BlacklistEntry>();
 
     private long blacklistExpiration = DEFAULT_EXPIRATION;
 
@@ -53,13 +53,13 @@ public class DefaultDownloadMirrors
      */
     private int maxMirrors = 1;
 
-    private static class BlaclistEntry
+    private static class BlacklistEntry
     {
         private String id;
 
         private long timestamp;
 
-        public BlaclistEntry( String id, long timestamp )
+        public BlacklistEntry( String id, long timestamp )
         {
             this.id = id;
 
@@ -108,7 +108,7 @@ public class DefaultDownloadMirrors
             getConfiguration( true ).getRemoteStorage().setMirrors( modelMirrors );
 
             // remove blacklist entries for removed mirrors, but retain others
-            Iterator<Entry<String, BlaclistEntry>> i = blacklist.entrySet().iterator();
+            Iterator<Entry<String, BlacklistEntry>> i = blacklist.entrySet().iterator();
 
             while ( i.hasNext() )
             {
@@ -140,7 +140,7 @@ public class DefaultDownloadMirrors
 
     public boolean isBlacklisted( Mirror mirror )
     {
-        BlaclistEntry entry = blacklist.get( mirror.getId() );
+        BlacklistEntry entry = blacklist.get( mirror.getId() );
 
         if ( entry == null )
         {
@@ -173,7 +173,7 @@ public class DefaultDownloadMirrors
 
             if ( existsMirrorWithId( false, mirror.getId() ) )
             {
-                blacklist.put( mirror.getId(), new BlaclistEntry( mirror.getId(), System.currentTimeMillis() ) );
+                blacklist.put( mirror.getId(), new BlacklistEntry( mirror.getId(), System.currentTimeMillis() ) );
             }
         }
     }
