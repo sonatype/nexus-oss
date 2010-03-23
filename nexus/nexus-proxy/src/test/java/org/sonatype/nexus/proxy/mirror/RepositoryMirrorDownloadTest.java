@@ -275,6 +275,16 @@ public class RepositoryMirrorDownloadTest
         assertDownloadFromMirror( req );
     }
 
+    public void testRuntimeException()
+        throws Exception
+    {
+        AssertionRequest req = new AssertionRequest();
+        req.mirrorFailures = new Exception[] { new RuntimeException( "testRuntimeException" ) };
+        req.canonicalSuccess = true;
+        req.assertMirrorBlacklisted = true;
+        assertDownloadFromMirror( req );
+    }
+
     private void assertDownloadFromMirror( AssertionRequest request )
         throws Exception
     {
