@@ -437,7 +437,7 @@ public class CommonsHttpClientRemoteStorage
         {
             method.releaseConnection();
 
-            throw new StorageException( "Tranport error while executing " + method.getName()
+            throw new StorageException( "Transport error while executing " + method.getName()
                                         + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                         + request.getRequestPath() + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
