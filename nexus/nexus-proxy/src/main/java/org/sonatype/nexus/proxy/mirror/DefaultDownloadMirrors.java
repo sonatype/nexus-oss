@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.mirror;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class DefaultDownloadMirrors
 
     private final CRepositoryCoreConfiguration configuration;
 
-    private Map<String, BlacklistEntry> blacklist = new HashMap<String, BlacklistEntry>();
+    private Map<String, BlacklistEntry> blacklist = new LinkedHashMap<String, BlacklistEntry>();
 
     private long blacklistExpiration = DEFAULT_EXPIRATION;
 
@@ -92,7 +92,9 @@ public class DefaultDownloadMirrors
         }
         else
         {
-            ArrayList<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
+            maxMirrors = mirrors.size();
+
+            List<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
 
             for ( Mirror mirror : mirrors )
             {
@@ -126,7 +128,7 @@ public class DefaultDownloadMirrors
     {
         List<CMirror> modelMirrors = getConfiguration( false ).getRemoteStorage().getMirrors();
 
-        ArrayList<Mirror> mirrors = new ArrayList<Mirror>( modelMirrors.size() );
+        List<Mirror> mirrors = new ArrayList<Mirror>( modelMirrors.size() );
 
         for ( CMirror model : modelMirrors )
         {
@@ -198,8 +200,6 @@ public class DefaultDownloadMirrors
         this.maxMirrors = maxMirrors;
     }
 
-    // ==
-
     protected CRepository getConfiguration( boolean forWrite )
     {
         return (CRepository) configuration.getConfiguration( forWrite );
@@ -219,5 +219,4 @@ public class DefaultDownloadMirrors
 
         return false;
     }
-
 }
