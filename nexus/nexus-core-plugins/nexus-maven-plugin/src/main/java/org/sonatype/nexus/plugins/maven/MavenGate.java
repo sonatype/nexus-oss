@@ -8,6 +8,11 @@ import org.apache.maven.model.Model;
 import org.apache.maven.project.ProjectBuildingException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 
+/**
+ * This is a facade interface that simplifies and "nexusizes" the touchpoint of Nexus-Maven interaction.
+ * 
+ * @author cstamas
+ */
 public interface MavenGate
 {
     /**
@@ -26,5 +31,5 @@ public interface MavenGate
                              Map<String, String> systemProperties, Map<String, String> userProperties )
         throws ProjectBuildingException, IOException;
 
-    // get transitive dependencies
+    // get transitive dependencies trail
 }

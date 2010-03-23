@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-core-plugins</artifactId>
-    <version>1.4.2-SNAPSHOT</version>
+    <version>1.5.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-plugin</artifactId>
@@ -18,7 +18,7 @@
   <description>A Nexus Maven Plugin embeds Maven3 into Nexus and provides some extra features. This is a headless plugin, it just adds new component that uses Maven3 under the hood.</description>
 
   <properties>
-    <maven.version>3.0-SNAPSHOT</maven.version>
+    <maven.version>3.0-alpha-7</maven.version>
   </properties>
 
   <dependencies>
@@ -50,6 +50,7 @@
       <artifactId>maven-embedder</artifactId>
       <version>${maven.version}</version>
     </dependency>
+    <!--  The one from Maven 3.x -->
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
@@ -63,12 +64,29 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-    <!-- Because we extend current "ugly" REST API -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-app</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact-manager</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact-manager</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Basic testing -->
@@ -78,12 +96,13 @@
       <version>4.4</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
+    <!-- Brings in too many incompatible deps -->
+    <!--
+      dependency> <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
+      <version>${project.version}</version> <scope>test</scope>
+      </dependency
+    -->
 
   </dependencies>
 
