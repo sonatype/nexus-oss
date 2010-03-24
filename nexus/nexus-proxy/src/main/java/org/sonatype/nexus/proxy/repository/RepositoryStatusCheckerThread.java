@@ -39,28 +39,38 @@ public class RepositoryStatusCheckerThread
         {
             while ( !isInterrupted() && getRepository().getProxyMode() != null )
             {
-                if ( RepositoryStatusCheckMode.ALWAYS.equals( getRepository().getRepositoryStatusCheckMode() ) )
+                LocalStatus repositoryLocalStatus = getRepository().getLocalStatus();
+                
+                // check only if repository is in service
+                if ( repositoryLocalStatus.shouldServiceRequest() )
                 {
-                    if ( getRepository().getLocalStatus().shouldServiceRequest() )
-                    {
-                        getRepository()
-                            .getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
-                    }
-                }
-                else if ( RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.equals( getRepository()
-                    .getRepositoryStatusCheckMode() ) )
-                {
-                    if ( getRepository().getProxyMode().shouldAutoUnblock() )
-                    {
-                        getRepository()
-                            .getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), false );
-                    }
-                }
-                else if ( RepositoryStatusCheckMode.NEVER.equals( getRepository().getRepositoryStatusCheckMode() ) )
-                {
-                    // nothing
-                }
+                    // get status check mode
+                    RepositoryStatusCheckMode repositoryStatusCheckMode =
+                        getRepository().getRepositoryStatusCheckMode();
 
+                    if ( RepositoryStatusCheckMode.ALWAYS.equals( repositoryStatusCheckMode ) )
+                    {
+                        // just do it, don't care for proxyMode
+                        getRepository()
+                            .getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ), true );
+                    }
+                    else if ( RepositoryStatusCheckMode.AUTO_BLOCKED_ONLY.equals( repositoryStatusCheckMode ) )
+                    {
+                        // do it only if proxyMode , don't care for proxyMode
+                        ProxyMode repositoryProxyMode = getRepository().getProxyMode();
+
+                        if ( repositoryProxyMode.shouldAutoUnblock() )
+                        {
+                            getRepository().getRemoteStatus( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ),
+                                true );
+                        }
+                    }
+                    else if ( RepositoryStatusCheckMode.NEVER.equals( repositoryStatusCheckMode ) )
+                    {
+                        // nothing
+                    }
+                }
+                
                 // sleep the time that repository says (repository is driving how much should be sleep)
                 Thread.sleep( getRepository().getRepositoryStatusCheckPeriod() );
             }

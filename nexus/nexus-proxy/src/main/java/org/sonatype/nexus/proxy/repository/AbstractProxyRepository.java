@@ -24,6 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
@@ -55,6 +56,9 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
+import org.sonatype.nexus.util.ConstantNumberSequence;
+import org.sonatype.nexus.util.FibonacciNumberSequence;
+import org.sonatype.nexus.util.NumberSequence;
 
 /**
  * Adds the proxying capability to a simple repository. The proxying will happen only if reposiory has remote storage!
@@ -70,6 +74,19 @@ public abstract class AbstractProxyRepository
     /** The time while we do NOT check an already known remote status: 5 mins. This value is system default. */
     private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
 
+    /**
+     * The initial amount of time to have a repository in AUTOBlock status: 10 seconds. This value is system default,
+     * but it is used only as starting point, and it grows.
+     */
+    private static final long AUTO_BLOCK_STATUS_RETAIN_TIME = 10L * 1000L;
+
+    /**
+     * The maximum amount of time to have a repository in AUTOBlock status: 60 minutes (1hr). This value is system
+     * default, is used only as limiting point. When repository steps here, it will be checked for remote status hourly
+     * only (unless forced by user).
+     */
+    private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
+
     private static final ExecutorService exec = Executors.newCachedThreadPool();
 
     /** if remote url changed, need special handling after save */
@@ -82,7 +99,8 @@ public abstract class AbstractProxyRepository
     private volatile long remoteStatusUpdated = 0;
 
     /** How much should be the last known remote status be retained. */
-    private volatile long remoteStatusRetainTime = REMOTE_STATUS_RETAIN_TIME;
+    private volatile NumberSequence remoteStatusRetainTimeSequence =
+        new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
 
     /** The remote storage. */
     private RemoteRepositoryStorage remoteStorage;
@@ -220,7 +238,7 @@ public abstract class AbstractProxyRepository
 
     public long getRepositoryStatusCheckPeriod()
     {
-        return remoteStatusRetainTime;
+        return remoteStatusRetainTimeSequence.peek();
     }
 
     public ProxyMode getProxyMode()
@@ -250,6 +268,29 @@ public abstract class AbstractProxyRepository
             ProxyMode oldProxyMode = getProxyMode();
 
             getExternalConfiguration( true ).setProxyMode( proxyMode );
+
+            // setting the time to retain remote status, depending on proxy mode
+            // if not blocked_auto, just use default as it was the case before AutoBlock
+            if ( !ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
+            {
+                this.remoteStatusRetainTimeSequence = new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
+            }
+            else
+            {
+                if ( this.remoteStatusRetainTimeSequence instanceof FibonacciNumberSequence )
+                {
+                    if ( this.remoteStatusRetainTimeSequence.peek() <= AUTO_BLOCK_STATUS_MAX_RETAIN_TIME )
+                    {
+                        // step it up
+                        this.remoteStatusRetainTimeSequence.next();
+                    }
+                }
+                else
+                {
+                    // make it a fibonacci one
+                    this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( AUTO_BLOCK_STATUS_RETAIN_TIME );
+                }
+            }
 
             // if this is proxy
             // and was !shouldProxy() and the new is shouldProxy()
@@ -324,16 +365,15 @@ public abstract class AbstractProxyRepository
 
         if ( autoBlockActive )
         {
-            // do not repeat ourselves
-            if ( getProxyMode() != null && getProxyMode().equals( ProxyMode.BLOCKED_AUTO ) )
-            {
-                return;
-            }
-
-            if ( getProxyMode() != null && getProxyMode().shouldProxy() )
+            if ( getProxyMode() != null )
             {
                 setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             }
+
+            getLogger().info(
+                "Next attempt to auto-unblock the \"" + getName() + "\" (id=" + getId()
+                    + ") repository by checking it's remote peer health will occur in "
+                    + DurationFormatUtils.formatDurationWords( getRepositoryStatusCheckPeriod(), true, true ) + "." );
 
             try
             {
@@ -437,8 +477,7 @@ public abstract class AbstractProxyRepository
             remoteStatus = RemoteStatus.UNKNOWN;
         }
 
-        if ( getProxyMode() != null && getProxyMode().shouldCheckRemoteStatus()
-            && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
+        if ( getProxyMode() != null && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
         {
             // check for thread and go check it
             _remoteStatusChecking = true;
