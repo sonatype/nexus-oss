@@ -1264,9 +1264,7 @@ public abstract class AbstractProxyRepository
                     }
                     else
                     {
-                        boolean reachable = getRemoteStorage().isReachable( AbstractProxyRepository.this, request );
-
-                        if ( reachable )
+                        if ( isRemoteStorageReachable( request ) )
                         {
                             setRemoteStatus( RemoteStatus.AVAILABLE, null );
                         }
@@ -1292,6 +1290,12 @@ public abstract class AbstractProxyRepository
 
             return null;
         }
+    }
+
+    protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
+        throws StorageException
+    {
+        return getRemoteStorage().isReachable( this, request );
     }
 
     // Need to allow delete for proxy repos
