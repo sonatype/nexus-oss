@@ -23,11 +23,6 @@
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer-artifact</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
     </dependency>
     <dependency>
@@ -82,16 +77,6 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-task-scheduler</artifactId>
-    </dependency>
-
-    <!-- these 3 deps are excluded in nexus-api, but is useful -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
     </dependency>
 
     <dependency>
