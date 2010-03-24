@@ -289,6 +289,9 @@ public abstract class AbstractProxyRepository
                 {
                     // make it a fibonacci one
                     this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( AUTO_BLOCK_STATUS_RETAIN_TIME );
+                    
+                    // step it at once once, since it will repeat starting value twice
+                    this.remoteStatusRetainTimeSequence.next();
                 }
             }
 
