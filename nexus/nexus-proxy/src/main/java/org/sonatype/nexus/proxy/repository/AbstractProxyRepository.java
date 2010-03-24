@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -31,9 +32,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
-import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -68,8 +67,8 @@ public abstract class AbstractProxyRepository
     extends AbstractRepository
     implements ProxyRepository
 {
-    /** The time while we do NOT check an already known remote status: 5 mins */
-    protected static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
+    /** The time while we do NOT check an already known remote status: 5 mins. This value is system default. */
+    private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
 
     private static final ExecutorService exec = Executors.newCachedThreadPool();
 
@@ -81,6 +80,9 @@ public abstract class AbstractProxyRepository
 
     /** Last time remote status was updated */
     private volatile long remoteStatusUpdated = 0;
+
+    /** How much should be the last known remote status be retained. */
+    private volatile long remoteStatusRetainTime = REMOTE_STATUS_RETAIN_TIME;
 
     /** The remote storage. */
     private RemoteRepositoryStorage remoteStorage;
@@ -156,7 +158,7 @@ public abstract class AbstractProxyRepository
     }
 
     protected Collection<String> doEvictUnusedItems( ResourceStoreRequest request, final long timestamp,
-        EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter )
+                                                     EvictUnusedItemsWalkerProcessor processor, WalkerFilter filter )
     {
         getLogger().info(
             "Evicting unused items from proxy repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
@@ -206,6 +208,21 @@ public abstract class AbstractProxyRepository
         getExternalConfiguration( true ).setItemAgingActive( value );
     }
 
+    public boolean isAutoBlockActive()
+    {
+        return getExternalConfiguration( false ).isAutoBlockActive();
+    }
+
+    public void setAutoBlockActive( boolean val )
+    {
+        getExternalConfiguration( true ).setAutoBlockActive( val );
+    }
+
+    public long getRepositoryStatusCheckPeriod()
+    {
+        return remoteStatusRetainTime;
+    }
+
     public ProxyMode getProxyMode()
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -218,6 +235,14 @@ public abstract class AbstractProxyRepository
         }
     }
 
+    /**
+     * ProxyMode is a persisted configuration property, hence it modifies configuration! It is the caller responsibility
+     * to save configuration.
+     * 
+     * @param proxyMode
+     * @param sendNotification
+     * @param cause
+     */
     protected void setProxyMode( ProxyMode proxyMode, boolean sendNotification, Throwable cause )
     {
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -253,9 +278,74 @@ public abstract class AbstractProxyRepository
         setProxyMode( proxyMode, true, null );
     }
 
+    /**
+     * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
+     * ProxyMode property of this repository, and this property is part of configuration, this call will result in
+     * configuration flush too (potentially saving any other unsaved changes)!
+     * 
+     * @param cause
+     */
     protected void autoBlockProxying( Throwable cause )
     {
         setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
+
+        boolean autoBlockActive = isAutoBlockActive();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") throwed an "
+            + cause.getClass().getName() + " exception." );
+
+        if ( cause instanceof RemoteAccessException )
+        {
+            sb.append( " Please set up authorization information for this repository." );
+        }
+        else if ( cause instanceof StorageException )
+        {
+            sb.append( " Connection/transport problems occured while connecting to remote peer of the repository." );
+        }
+
+        if ( autoBlockActive )
+        {
+            sb
+                .append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
+                    + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
+        }
+
+        // log the event
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().warn( sb.toString(), cause );
+        }
+        else
+        {
+            getLogger().warn( sb.toString() + " - " + cause.getMessage() );
+        }
+
+        if ( autoBlockActive )
+        {
+            // do not repeat ourselves
+            if ( getProxyMode() != null && getProxyMode().equals( ProxyMode.BLOCKED_AUTO ) )
+            {
+                return;
+            }
+
+            if ( getProxyMode() != null && getProxyMode().shouldProxy() )
+            {
+                setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
+            }
+
+            try
+            {
+                getApplicationConfiguration().saveConfiguration();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn(
+                    "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
+                        + ")", e );
+            }
+        }
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
@@ -336,27 +426,6 @@ public abstract class AbstractProxyRepository
         remoteStatusUpdated = 0;
     }
 
-    protected boolean isRemoteStorageReachable( ResourceStoreRequest request )
-        throws StorageException, RemoteAuthenticationNeededException
-    {
-        try
-        {
-            return getRemoteStorage().isReachable( this, request );
-        }
-        catch ( RemoteAccessDeniedException ex )
-        {
-            getLogger().warn(
-                "RemoteStorage of repository " + getId()
-                    + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                    + this.getId()
-                    + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.", ex );
-
-            autoBlockProxying( ex );
-
-            return false;
-        }
-    }
-
     /** Is checking in progress? */
     private volatile boolean _remoteStatusChecking = false;
 
@@ -376,13 +445,6 @@ public abstract class AbstractProxyRepository
 
             exec.submit( new RemoteStatusUpdateCallable( request ) );
         }
-        else if ( getProxyMode() != null && !getProxyMode().shouldCheckRemoteStatus()
-            && RemoteStatus.UNKNOWN.equals( remoteStatus ) && !_remoteStatusChecking )
-        {
-            setRemoteStatus( RemoteStatus.UNAVAILABLE, null );
-
-            _remoteStatusChecking = false;
-        }
 
         return remoteStatus;
     }
@@ -391,26 +453,10 @@ public abstract class AbstractProxyRepository
     {
         this.remoteStatus = remoteStatus;
 
-        if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) )
+        // UNKNOWN does not count
+        if ( RemoteStatus.AVAILABLE.equals( remoteStatus ) || RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
         {
             this.remoteStatusUpdated = System.currentTimeMillis();
-
-            if ( getProxyMode() != null && getProxyMode().shouldAutoUnblock() )
-            {
-                setProxyMode( ProxyMode.ALLOW, true, cause );
-            }
-        }
-        else if ( RemoteStatus.UNAVAILABLE.equals( remoteStatus ) )
-        {
-            this.remoteStatusUpdated = System.currentTimeMillis();
-
-            // TODO: To enable auto-block feature, uncomment this
-            // also take care that REMOTE_STATUS_RETAIN_TIME is a parameter, not
-            // constant, so user can tune how long should he keep repository autoblocked.
-            // if ( getProxyMode() != null && getProxyMode().shouldProxy() )
-            // {
-            // setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
-            // }
         }
     }
 
@@ -700,15 +746,6 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( RemoteAccessException ex )
                         {
-                            getLogger()
-                                .warn(
-                                    "RemoteStorage of repository "
-                                        + getId()
-                                        + " throws RemoteAccessException. Please set up authorization information for repository ID='"
-                                        + this.getId()
-                                        + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                    ex );
-
                             autoBlockProxying( ex );
 
                             // do not go remote, but we did not mark it as "remote checked" also.
@@ -717,15 +754,6 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            getLogger()
-                                .warn(
-                                    "RemoteStorage of repository "
-                                        + getId()
-                                        + " throws StorageException. Problem connecting to remote repository='"
-                                        + this.getId()
-                                        + "'. Setting ProxyMode of this repository to BlockedAuto. MANUAL INTERVENTION NEEDED.",
-                                    ex );
-
                             autoBlockProxying( ex );
 
                             // do not go remote, but we did not mark it as "remote checked" also.
@@ -751,8 +779,14 @@ public abstract class AbstractProxyRepository
                                 getLogger().debug( "Item " + request.toString() + " found in remote storage." );
                             }
                         }
-                        catch ( StorageException e )
+                        catch ( RemoteAccessException ex )
                         {
+                            autoBlockProxying( ex );
+                        }
+                        catch ( StorageException ex )
+                        {
+                            autoBlockProxying( ex );
+
                             remoteItem = null;
 
                             // cleanup if any remnant is here
@@ -856,7 +890,7 @@ public abstract class AbstractProxyRepository
     }
 
     private void sendContentValidationEvents( ResourceStoreRequest request, List<NexusArtifactEvent> events,
-        boolean isContentValid )
+                                              boolean isContentValid )
     {
         if ( getLogger().isDebugEnabled() && !isContentValid )
         {
@@ -884,7 +918,7 @@ public abstract class AbstractProxyRepository
      * </code>
      */
     protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
-        List<NexusArtifactEvent> events )
+                                                   List<NexusArtifactEvent> events )
         throws StorageException
     {
         boolean isValid = true;
@@ -1172,18 +1206,31 @@ public abstract class AbstractProxyRepository
             {
                 try
                 {
-                    if ( isRemoteStorageReachable( request ) )
-                    {
-                        setRemoteStatus( RemoteStatus.AVAILABLE, null );
-                    }
-                    else
+                    if ( !getProxyMode().shouldCheckRemoteStatus() )
                     {
                         setRemoteStatus( RemoteStatus.UNAVAILABLE, new ItemNotFoundException( request ) );
                     }
+                    else
+                    {
+                        boolean reachable = getRemoteStorage().isReachable( AbstractProxyRepository.this, request );
+
+                        if ( reachable )
+                        {
+                            setRemoteStatus( RemoteStatus.AVAILABLE, null );
+                        }
+                        else
+                        {
+                            autoBlockProxying( new ItemNotFoundException( request ) );
+                        }
+                    }
+                }
+                catch ( RemoteAccessException e )
+                {
+                    autoBlockProxying( e );
                 }
                 catch ( StorageException e )
                 {
-                    setRemoteStatus( RemoteStatus.UNAVAILABLE, e );
+                    autoBlockProxying( e );
                 }
             }
             finally

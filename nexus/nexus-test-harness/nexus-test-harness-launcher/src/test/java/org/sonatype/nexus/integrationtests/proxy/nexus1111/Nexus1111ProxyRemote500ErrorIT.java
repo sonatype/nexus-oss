@@ -17,10 +17,14 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.mortbay.jetty.Server;
+import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
+import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -84,9 +88,30 @@ public class Nexus1111ProxyRemote500ErrorIT
         prop.setValue( testRepositoryId );
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
 
-        // the proxy is now working
+        try
+        {
+            // the proxy is now working <- NOT TRUE, it is auto blocked!
+            downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );
+            Assert.fail( "Should fail, since repository is in AutoBlock mode!" );
+        }
+        catch ( Exception e )
+        {
+            // skip
+        }
+
+        // check for auto block
+        RepositoryMessageUtil util =
+            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+
+        RepositoryStatusResource status = util.getStatus( this.testRepositoryId );
+
+        Assert.assertEquals( "Repository should be auto-blocked", ProxyMode.BLOCKED_AUTO.name(), status.getProxyMode() );
+
+        // unblock it manually
+        status.setProxyMode( ProxyMode.ALLOW.name() );
+        util.updateStatus( status );
+
+        // and now, all should go well
         downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );
-
     }
-
 }

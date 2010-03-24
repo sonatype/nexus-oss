@@ -61,7 +61,8 @@ public class RepositoryStatusCheckerThread
                     // nothing
                 }
 
-                Thread.sleep( AbstractProxyRepository.REMOTE_STATUS_RETAIN_TIME );
+                // sleep the time that repository says (repository is driving how much should be sleep)
+                Thread.sleep( getRepository().getRepositoryStatusCheckPeriod() );
             }
         }
         catch ( InterruptedException e )

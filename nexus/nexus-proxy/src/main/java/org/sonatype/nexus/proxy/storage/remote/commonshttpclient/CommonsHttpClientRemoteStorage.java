@@ -114,7 +114,7 @@ public class CommonsHttpClientRemoteStorage
 
             try
             {
-                result = checkRemoteAvailability( 0, repository, request, isReachableCheckRelaxed() );
+                result = checkRemoteAvailability( 0, repository, request, false );
             }
             catch ( RemoteAccessDeniedException e )
             {
@@ -141,7 +141,7 @@ public class CommonsHttpClientRemoteStorage
     public boolean containsItem( long newerThen, ProxyRepository repository, ResourceStoreRequest request )
         throws RemoteAccessException, StorageException
     {
-        return checkRemoteAvailability( newerThen, repository, request, false );
+        return checkRemoteAvailability( newerThen, repository, request, true );
     }
 
     public AbstractStorageItem retrieveItem( ProxyRepository repository, ResourceStoreRequest request, String baseUrl )
@@ -474,16 +474,6 @@ public class CommonsHttpClientRemoteStorage
     }
 
     /**
-     * Are we "relaxed" regarding the interpretation of responses when checking remote availability.
-     * 
-     * @return
-     */
-    protected boolean isReachableCheckRelaxed()
-    {
-        return true;
-    }
-
-    /**
      * Initially, this method is here only to share the code for "availability check" and for "contains" check.
      * Unfortunately, the "availability" check cannot be done at RemoteStorage level, since it is completely repository
      * layout unaware and is able to tell only about the existence of remote server and that the URI on it exists. This
@@ -501,7 +491,7 @@ public class CommonsHttpClientRemoteStorage
      * @throws StorageException
      */
     protected boolean checkRemoteAvailability( long newerThen, ProxyRepository repository,
-                                               ResourceStoreRequest request, boolean relaxedCheck )
+                                               ResourceStoreRequest request, boolean isStrict )
         throws RemoteAuthenticationNeededException, RemoteAccessException, StorageException
     {
         URL remoteURL = getAbsoluteUrlFromBase( repository, request );
@@ -555,7 +545,8 @@ public class CommonsHttpClientRemoteStorage
             }
         }
 
-        if ( relaxedCheck )
+        // if we are not strict and remote is S3
+        if ( !isStrict && isRemotePeerAmazonS3Storage( repository ) )
         {
             // if we are relaxed, we will accept any HTTP response code below 500. This means anyway the HTTP
             // transaction succeeded. This method was never really detecting that the remoteUrl really denotes a root of

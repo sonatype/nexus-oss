@@ -13,6 +13,8 @@ public abstract class AbstractProxyRepositoryConfiguration
 
     private static final String ITEM_AGING_ACTIVE = "itemAgingActive";
 
+    private static final String AUTO_BLOCK_ACTIVE = "autoBlockActive";
+
     public AbstractProxyRepositoryConfiguration( Xpp3Dom configuration )
     {
         super( configuration );
@@ -57,5 +59,15 @@ public abstract class AbstractProxyRepositoryConfiguration
     public void setItemAgingActive( boolean value )
     {
         setNodeValue( getRootNode(), ITEM_AGING_ACTIVE, Boolean.toString( value ) );
+    }
+
+    public boolean isAutoBlockActive()
+    {
+        return Boolean.parseBoolean( getNodeValue( getRootNode(), AUTO_BLOCK_ACTIVE, Boolean.TRUE.toString() ) );
+    }
+
+    public void setAutoBlockActive( boolean value )
+    {
+        setNodeValue( getRootNode(), AUTO_BLOCK_ACTIVE, Boolean.toString( value ) );
     }
 }

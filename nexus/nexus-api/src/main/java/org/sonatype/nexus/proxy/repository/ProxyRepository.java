@@ -71,11 +71,33 @@ public interface ProxyRepository
     RepositoryStatusCheckMode getRepositoryStatusCheckMode();
 
     /**
+     * Returns in what time period should be the repository status be checked.
+     * 
+     * @return
+     */
+    long getRepositoryStatusCheckPeriod();
+
+    /**
      * Sets the RepositoryStatusCheckMode.
      * 
      * @param mode
      */
     void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
+
+    /**
+     * Returns true if this ProxyRepository should "auto block" itself when the remote repository has transport (or
+     * other) problems, like bad remoteUrl is set.
+     * 
+     * @return
+     */
+    boolean isAutoBlockActive();
+
+    /**
+     * Sets the ProxyRepository autoBlock feature active or inactive.
+     * 
+     * @param val
+     */
+    void setAutoBlockActive( boolean val );
 
     /**
      * Returns the remote URL of this repository, if any.
