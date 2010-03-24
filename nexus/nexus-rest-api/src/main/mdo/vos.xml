@@ -897,6 +897,7 @@
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
+          <defaultValue>true</defaultValue>
           <description>Flag that determines is the proxy repository "Auto block" feature active for this repository.</description>
         </field>
       </fields>
