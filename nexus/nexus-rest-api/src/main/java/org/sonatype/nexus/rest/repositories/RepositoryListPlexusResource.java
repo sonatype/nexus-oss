@@ -294,6 +294,9 @@ public class RepositoryListPlexusResource
 
         exConf.setMetadataMaxAge( model.getMetadataMaxAge() );
 
+        // set auto block
+        exConf.setAutoBlockActive( model.isAutoBlockActive() );
+
         if ( model.getRemoteStorage() != null )
         {
             if ( target.getRemoteStorage() == null )

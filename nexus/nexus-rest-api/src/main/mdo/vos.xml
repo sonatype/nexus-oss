@@ -892,6 +892,13 @@
           <required>true</required>
           <description>The max age of metadata before we will check remote again for updated (in milliseconds, -1 for never).</description>
         </field>
+        <field>
+          <name>autoBlockActive</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that determines is the proxy repository "Auto block" feature active for this repository.</description>
+        </field>
       </fields>
     </class>
 

@@ -117,7 +117,7 @@ public abstract class AbstractRepositoryPlexusResource
 
     /**
      * Pull the repository Id out of the Request.
-     *
+     * 
      * @param request
      * @return
      */
@@ -213,13 +213,14 @@ public abstract class AbstractRepositoryPlexusResource
                 repoRes = new RepositoryListResource();
 
                 repoRes.setResourceURI( createRepositoryReference( request, repository.getId() ).toString() );
-                
-                repoRes.setContentResourceURI( createRepositoryContentReference( request, repository.getId() ).toString() );
-                
+
+                repoRes.setContentResourceURI( createRepositoryContentReference( request, repository.getId() )
+                    .toString() );
+
                 repoRes.setRepoType( getRestRepoType( repository ) );
-                
+
                 repoRes.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
-                
+
                 repoRes.setProviderRole( NexusCompat.getRepositoryProviderRole( repository ) );
 
                 repoRes.setFormat( repository.getRepositoryContentClass().getId() );
@@ -236,7 +237,8 @@ public abstract class AbstractRepositoryPlexusResource
 
                 if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                 {
-                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
+                    repoRes.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy()
+                        .toString() );
                 }
 
                 if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -307,11 +309,11 @@ public abstract class AbstractRepositoryPlexusResource
         {
             resource = new RepositoryResource();
         }
-        
+
         resource.setContentResourceURI( createRepositoryContentReference( request, repository.getId() ).toString() );
 
         resource.setProvider( NexusCompat.getRepositoryProviderHint( repository ) );
-        
+
         resource.setProviderRole( NexusCompat.getRepositoryProviderRole( repository ) );
 
         resource.setFormat( repository.getRepositoryContentClass().getId() );
@@ -337,8 +339,8 @@ public abstract class AbstractRepositoryPlexusResource
         // so we can figure it out again, I think the default local Storage should be removed from the REST message
         // which is part of the reason for not exposing it. The other part is it is not used anywhere except to set
         // the localUrl if not already set.
-        
-        //apples to apples here, man i hate this section of code!!!!
+
+        // apples to apples here, man i hate this section of code!!!!
         // always set to default (see AbstractRepositoryConfigurator)
         String defaultLocalStorageUrl =
             ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false ).defaultLocalStorageUrl;
@@ -346,7 +348,8 @@ public abstract class AbstractRepositoryPlexusResource
 
         // if not user set (but using default), this is null, otherwise it contains user-set value
         String overrideLocalStorageUrl =
-            ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false ).getLocalStorage().getUrl();
+            ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false )
+                .getLocalStorage().getUrl();
         if ( StringUtils.isNotBlank( overrideLocalStorageUrl ) )
         {
             resource.setOverrideLocalStorageUrl( overrideLocalStorageUrl );
@@ -358,12 +361,14 @@ public abstract class AbstractRepositoryPlexusResource
 
             if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
             {
-                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy().toString() );
+                resource.setChecksumPolicy( repository.adaptToFacet( MavenProxyRepository.class ).getChecksumPolicy()
+                    .toString() );
 
-                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class ).isDownloadRemoteIndexes() );
+                resource.setDownloadRemoteIndexes( repository.adaptToFacet( MavenProxyRepository.class )
+                    .isDownloadRemoteIndexes() );
             }
         }
-        //as this is a required field on ui, we need this to be set for non-maven type repos
+        // as this is a required field on ui, we need this to be set for non-maven type repos
         else
         {
             resource.setRepoPolicy( RepositoryPolicy.MIXED.name() );
@@ -387,16 +392,20 @@ public abstract class AbstractRepositoryPlexusResource
         resource.getRemoteStorage().setRemoteStorageUrl( repository.getRemoteUrl() );
 
         resource.getRemoteStorage().setAuthentication(
-                                                       AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
-                                                                                                                                                     repository ).getRemoteStorage().getAuthentication() ) );
+            AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
+                .getRemoteStorage().getAuthentication() ) );
 
         resource.getRemoteStorage().setConnectionSettings(
-                                                           AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
-                                                                                                                                                         repository ).getRemoteStorage().getConnectionSettings() ) );
+            AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
+                .getRemoteStorage().getConnectionSettings() ) );
 
         resource.getRemoteStorage().setHttpProxySettings(
-                                                          AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration(
-                                                                                                                                                        repository ).getRemoteStorage().getHttpProxySettings() ) );
+            AbstractGlobalConfigurationPlexusResource.convert( NexusCompat.getRepositoryRawConfiguration( repository )
+                .getRemoteStorage().getHttpProxySettings() ) );
+
+        // set auto block
+        resource.setAutoBlockActive( repository.isAutoBlockActive() );
+
         if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
             resource.setArtifactMaxAge( repository.adaptToFacet( MavenProxyRepository.class ).getArtifactMaxAge() );
@@ -405,24 +414,24 @@ public abstract class AbstractRepositoryPlexusResource
         }
         else
         {
-            //This is a total hack to be able to retrieve this data from a non core repo if available
+            // This is a total hack to be able to retrieve this data from a non core repo if available
             try
             {
-                Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?> [0] );
-                Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?> [0] );
-                
+                Method artifactMethod = repository.getClass().getMethod( "getArtifactMaxAge", new Class<?>[0] );
+                Method metadataMethod = repository.getClass().getMethod( "getMetadataMaxAge", new Class<?>[0] );
+
                 if ( artifactMethod != null )
                 {
-                    resource.setArtifactMaxAge( ( Integer ) artifactMethod.invoke( repository, new Object [0] ) ); 
+                    resource.setArtifactMaxAge( (Integer) artifactMethod.invoke( repository, new Object[0] ) );
                 }
                 if ( metadataMethod != null )
                 {
-                    resource.setMetadataMaxAge( ( Integer ) metadataMethod.invoke( repository, new Object [0] ) ); 
+                    resource.setMetadataMaxAge( (Integer) metadataMethod.invoke( repository, new Object[0] ) );
                 }
             }
             catch ( Exception e )
             {
-                //nothing to do here, doesn't support artifactmax age
+                // nothing to do here, doesn't support artifactmax age
             }
         }
 
@@ -485,7 +494,7 @@ public abstract class AbstractRepositoryPlexusResource
         httpProxySettings.setProxyPort( remoteHttpProxySettings.getProxyPort() );
 
         httpProxySettings.setAuthentication( convertAuthentication( remoteHttpProxySettings.getAuthentication(),
-                                                                    oldPassword ) );
+            oldPassword ) );
 
         return httpProxySettings;
     }
