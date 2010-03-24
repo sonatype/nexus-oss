@@ -267,7 +267,11 @@ public abstract class AbstractProxyRepository
         {
             ProxyMode oldProxyMode = getProxyMode();
 
-            getExternalConfiguration( true ).setProxyMode( proxyMode );
+            // change configuration only if we have a transition
+            if ( !oldProxyMode.equals( proxyMode ) )
+            {
+                getExternalConfiguration( true ).setProxyMode( proxyMode );
+            }
 
             // setting the time to retain remote status, depending on proxy mode
             // if not blocked_auto, just use default as it was the case before AutoBlock
@@ -289,7 +293,7 @@ public abstract class AbstractProxyRepository
                 {
                     // make it a fibonacci one
                     this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( AUTO_BLOCK_STATUS_RETAIN_TIME );
-                    
+
                     // step it at once once, since it will repeat starting value twice
                     this.remoteStatusRetainTimeSequence.next();
                 }
@@ -368,6 +372,8 @@ public abstract class AbstractProxyRepository
 
         if ( autoBlockActive )
         {
+            ProxyMode oldProxyMode = getProxyMode();
+
             if ( getProxyMode() != null )
             {
                 setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
@@ -378,15 +384,19 @@ public abstract class AbstractProxyRepository
                     + ") repository by checking it's remote peer health will occur in "
                     + DurationFormatUtils.formatDurationWords( getRepositoryStatusCheckPeriod(), true, true ) + "." );
 
-            try
+            // save configuration only if we made a transition, otherwise no save is needed
+            if ( oldProxyMode != null && !oldProxyMode.equals( ProxyMode.BLOCKED_AUTO ) )
             {
-                getApplicationConfiguration().saveConfiguration();
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn(
-                    "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
-                        + ")", e );
+                try
+                {
+                    getApplicationConfiguration().saveConfiguration();
+                }
+                catch ( IOException e )
+                {
+                    getLogger().warn(
+                        "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
+                            + ")", e );
+                }
             }
         }
     }
