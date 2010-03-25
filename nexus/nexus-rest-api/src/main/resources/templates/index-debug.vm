@@ -90,6 +90,7 @@
   <script src="js/repoServer/repoServer.RepoServer.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>  
   <script src="js/repoServer/repoServer.RepoTargetEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.helpAbout.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/repoServer/repoServer.Documentation.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.LogEditPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.MirrorConfigPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/repoServer/repoServer.UserBrowserPanel.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

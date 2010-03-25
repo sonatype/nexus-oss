@@ -253,12 +253,6 @@
                     title : 'System Feeds',
                     tabId : 'feed-view-system-changes',
                     tabCode : Sonatype.repoServer.FeedViewPanel
-                  }, {
-                    enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
-                    title : 'System Files',
-                    tabId : 'view-logs',
-                    tabCode : Sonatype.repoServer.LogsViewPanel,
-                    tabTitle : 'System Files'
                   }]
             });
 
@@ -272,6 +266,7 @@
         nexusPanel.add({
               title : 'Administration',
               id : 'st-nexus-config',
+              collapsed : true,
               items : [{
                     enabled : sp.checkPermission('nexus:settings', sp.READ) && (sp.checkPermission('nexus:settings', sp.CREATE) || sp.checkPermission('nexus:settings', sp.DELETE) || sp.checkPermission('nexus:settings', sp.EDIT)),
                     title : 'Server',
@@ -289,14 +284,15 @@
                     tabId : 'schedules-config',
                     tabCode : Sonatype.repoServer.SchedulesEditPanel
                   }, {
-                    enabled : sp.checkPermission('nexus:targets', sp.READ) && (sp.checkPermission('nexus:targets', sp.CREATE) || sp.checkPermission('nexus:targets', sp.DELETE) || sp.checkPermission('nexus:targets', sp.EDIT)),
-                    title : 'Repository Targets',
-                    tabId : 'targets-config',
-                    tabCode : Sonatype.repoServer.RepoTargetEditPanel
-                  }, {
                     enabled : sp.checkPermission('nexus:settings', sp.READ),
                     title : 'Generate Problem Report',
                     handler : Sonatype.utils.generateErrorReportHandler
+                  }, {
+                    enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
+                    title : 'System Files',
+                    tabId : 'view-logs',
+                    tabCode : Sonatype.repoServer.LogsViewPanel,
+                    tabTitle : 'System Files'
                   }, {
                     enabled : sp.checkPermission('nexus:logconfig', sp.READ) && (sp.checkPermission('nexus:logconfig', sp.CREATE) || sp.checkPermission('nexus:logconfig', sp.DELETE) || sp.checkPermission('nexus:logconfig', sp.EDIT)),
                     title : 'Log Configuration',
@@ -309,6 +305,7 @@
         nexusPanel.add({
               title : 'Security',
               id : 'st-nexus-security',
+              collapsed : true,
               items : [{
                     enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
                     title : 'Change Password',
@@ -328,6 +325,11 @@
                     title : 'Privileges',
                     tabId : 'security-privileges',
                     tabCode : Sonatype.repoServer.PrivilegeEditPanel
+                  }, {
+                    enabled : sp.checkPermission('nexus:targets', sp.READ) && (sp.checkPermission('nexus:targets', sp.CREATE) || sp.checkPermission('nexus:targets', sp.DELETE) || sp.checkPermission('nexus:targets', sp.EDIT)),
+                    title : 'Repository Targets',
+                    tabId : 'targets-config',
+                    tabCode : Sonatype.repoServer.RepoTargetEditPanel
                   }]
             });
 
@@ -341,22 +343,11 @@
                     tabId : 'AboutNexus',
                     tabCode : Sonatype.repoServer.HelpAboutPanel
                   }, {
-                    title : 'Nexus Home',
-                    href : 'http://nexus.sonatype.org/'
+                    title : 'Documentation',
+                    tabId : 'Documentation',
+                    tabCode : Sonatype.repoServer.Documentation
                   }, {
-                    title : 'Getting Started',
-                    href : 'http://www.sonatype.com/book/reference/repository-manager.html'
-                  }, {
-                    title : 'Nexus Wiki',
-                    href : 'https://docs.sonatype.com/display/NX/Home'
-                  }, {
-                    title : 'Maven Book',
-                    href : 'http://www.sonatype.com/book/reference/public-book.html'
-                  }, {
-                    title : 'Release Notes',
-                    href : 'http://nexus.sonatype.org/changes.html'
-                  }, {
-                    title : 'Report Issue',
+                    title : 'Browse Issue Tracker',
                     href : 'http://issues.sonatype.org/secure/CreateIssue.jspa?pid=10001&issuetype=1'
                   }]
             });

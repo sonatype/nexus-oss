@@ -387,6 +387,7 @@
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoServer.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.RepoTargetEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.helpAbout.js</include>
+                    <include>${compressed-dir}/js/repoServer/repoServer.Documentation.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.LogEditPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.MirrorConfigPanel.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.UserBrowserPanel.js</include>
