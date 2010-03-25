@@ -48,15 +48,15 @@ public class RepositoryEventProxyModeChangedInspector
 
         sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was set to " );
 
-        if ( ProxyMode.ALLOW.equals( revt.getRepository().getProxyMode() ) )
+        if ( ProxyMode.ALLOW.equals( revt.getNewProxyMode() ) )
         {
             sb.append( "Allow." );
         }
-        else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getRepository().getProxyMode() ) )
+        else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getNewProxyMode() ) )
         {
             sb.append( "Blocked (auto)." );
         }
-        else if ( ProxyMode.BLOCKED_MANUAL.equals( revt.getRepository().getProxyMode() ) )
+        else if ( ProxyMode.BLOCKED_MANUAL.equals( revt.getNewProxyMode() ) )
         {
             sb.append( "Blocked (by user)." );
         }
