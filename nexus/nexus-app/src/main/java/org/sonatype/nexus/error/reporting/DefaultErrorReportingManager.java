@@ -507,7 +507,7 @@ public class DefaultErrorReportingManager
         }
         catch ( InitializationException e )
         {
-            throw new IssueSubmissionException( "Unable to initalized jira issue submitter", e );
+            throw new IssueSubmissionException( e.getMessage(), e );
         }
     }
 

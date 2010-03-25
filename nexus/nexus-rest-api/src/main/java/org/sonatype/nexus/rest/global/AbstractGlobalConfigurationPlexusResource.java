@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest.global;
 import java.util.ArrayList;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.application.AuthenticationInfoConverter;
 import org.sonatype.nexus.configuration.application.GlobalHttpProxySettings;
 import org.sonatype.nexus.configuration.application.GlobalRemoteConnectionSettings;
@@ -61,10 +62,10 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
     @Requirement
     private GlobalRemoteConnectionSettings globalRemoteConnectionSettings;
-    
+
     @Requirement
     private GlobalRestApiSettings globalRestApiSettings;
-    
+
     @Requirement
     private AuthenticationInfoConverter authenticationInfoConverter;
 
@@ -85,12 +86,12 @@ public abstract class AbstractGlobalConfigurationPlexusResource
     {
         return globalRemoteConnectionSettings;
     }
-    
+
     protected GlobalRestApiSettings getGlobalRestApiSettings()
     {
         return globalRestApiSettings;
     }
-    
+
     protected AuthenticationInfoConverter getAuthenticationInfoConverter()
     {
         return authenticationInfoConverter;
@@ -120,7 +121,10 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         result.setUsername( nexusEmailer.getSMTPUsername() );
 
-        result.setPassword( PASSWORD_PLACE_HOLDER );
+        if ( !StringUtils.isEmpty( nexusEmailer.getSMTPPassword() ) )
+        {
+            result.setPassword( PASSWORD_PLACE_HOLDER );
+        }
 
         result.setSystemEmailAddress( nexusEmailer.getSMTPSystemEmailAddress().getMailAddress() );
 
@@ -129,16 +133,19 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
     public static ErrorReportingSettings convert( ErrorReportingManager errorReportingManager )
     {
-        if ( errorReportingManager == null || errorReportingManager.isEnabled() == false )
-        {
-            return null;
-        }
-
         ErrorReportingSettings result = new ErrorReportingSettings();
 
         result.setJiraUsername( errorReportingManager.getJIRAUsername() );
-        result.setJiraPassword( PASSWORD_PLACE_HOLDER );
+        if ( StringUtils.isEmpty( errorReportingManager.getJIRAPassword() ) )
+        {
+            result.setJiraPassword( errorReportingManager.getJIRAPassword() );
+        }
+        else
+        {
+            result.setJiraPassword( PASSWORD_PLACE_HOLDER );
+        }
         result.setUseGlobalProxy( errorReportingManager.isUseGlobalProxy() );
+        result.setReportErrorsAutomatically( errorReportingManager.isEnabled() );
 
         return result;
     }
@@ -189,10 +196,10 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setAuthentication( convert( settings.getProxyAuthentication() ) );
 
         result.setNonProxyHosts( new ArrayList<String>( settings.getNonProxyHosts() ) );
-        
+
         return result;
     }
-    
+
     public static RestApiSettings convert( GlobalRestApiSettings settings )
     {
         if ( settings == null || !settings.isEnabled() )
@@ -298,12 +305,12 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setProxyPort( settings.getProxyPort() );
 
         result.setAuthentication( convert( settings.getAuthentication() ) );
-        
+
         result.setNonProxyHosts( settings.getNonProxyHosts() );
 
         return result;
     }
-    
+
     public static RestApiSettings convert( CRestApiSettings settings )
     {
         if ( settings == null )

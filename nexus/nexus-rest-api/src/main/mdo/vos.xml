@@ -435,6 +435,13 @@
           <required>false</required>
           <description>Flag that states whether to use the global proxy configuration in Nexus.</description>
         </field>
+        <field>
+          <name>reportErrorsAutomatically</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+          <description>Flag if Nexus should automatically report any problem found.</description>
+        </field>
       </fields>
     </class>
 

@@ -290,6 +290,70 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                   }]
             }, {
               xtype : 'fieldset',
+              checkboxToggle : false,
+              collapsed : false,
+              collapsible : true,
+              id : formId + '_' + 'errorReportingSettings',
+              name : 'errorReportingSettings',
+              title : 'Error Reporting Settings (optional)',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              listeners : {
+                'expand' : {
+                  fn : this.optionalFieldsetExpandHandler,
+                  scope : this
+                },
+                'collapse' : {
+                  fn : this.optionalFieldsetCollapseHandler,
+                  scope : this,
+                  delay : 100
+                }
+              },
+
+              items : [{
+                    xtype : 'textfield',
+                    fieldLabel : 'JIRA Username',
+                    helpText : ht.jiraUsername,
+                    anchor : Sonatype.view.FIELD_OFFSET,
+                    name : 'errorReportingSettings.jiraUsername',
+                    allowBlank : true
+                  }, {
+                    xtype : 'textfield',
+                    fieldLabel : 'JIRA Password',
+                    helpText : ht.jiraPassword,
+                    inputType : 'password',
+                    anchor : Sonatype.view.FIELD_OFFSET,
+                    name : 'errorReportingSettings.jiraPassword',
+                    allowBlank : true
+                  }, {
+                    xtype : 'checkbox',
+                    fieldLabel : 'Use Default HTTP Proxy Settings',
+                    helpText : 'Apply the default HTTP Proxy Settings to the jira connection',
+                    name : 'errorReportingSettings.useGlobalProxy',
+                    anchor : Sonatype.view.FIELD_OFFSET,
+                    allowBlank : true
+                  }, {
+                    xtype : 'checkbox',
+                    fieldLabel : 'Report Error Automatically',
+                    helpText : 'Set if Nexus should automatically report any problem found.',
+                    name : 'errorReportingSettings.reportErrorsAutomatically',
+                    anchor : Sonatype.view.FIELD_OFFSET,
+                    allowBlank : true
+                  }],
+              buttonAlign : 'left',
+              buttons : [{
+                    text : 'Generate Report',
+                    handler : function() {
+                      var jiraUsername = this.formPanel.form.findField('errorReportingSettings.jiraUsername').getValue()
+                      Sonatype.utils.generateErrorReportHandler(jiraUsername);
+                    },
+                    scope : this
+                  }]
+            }, {
+              xtype : 'fieldset',
               checkboxToggle : true,
               collapsed : true,
               id : formId + '_' + 'globalRestApiSettings',
@@ -469,64 +533,8 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                         }]
                   } // end auth fieldset
               ]
-            }, // end proxy settings
-            {
-              xtype : 'fieldset',
-              checkboxToggle : true,
-              collapsed : true,
-              id : formId + '_' + 'errorReportingSettings',
-              name : 'errorReportingSettings',
-              title : 'Automated Error Reporting Settings (optional)',
-              anchor : Sonatype.view.FIELDSET_OFFSET,
-              autoHeight : true,
-              layoutConfig : {
-                labelSeparator : ''
-              },
-              listeners : {
-                'expand' : {
-                  fn : this.optionalFieldsetExpandHandler,
-                  scope : this
-                },
-                'collapse' : {
-                  fn : this.optionalFieldsetCollapseHandler,
-                  scope : this,
-                  delay : 100
-                }
-              },
-
-              items : [{
-                    xtype : 'textfield',
-                    fieldLabel : 'JIRA Username',
-                    helpText : ht.jiraUsername,
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    name : 'errorReportingSettings.jiraUsername',
-                    allowBlank : true
-                  }, {
-                    xtype : 'textfield',
-                    fieldLabel : 'JIRA Password',
-                    helpText : ht.jiraPassword,
-                    inputType : 'password',
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    name : 'errorReportingSettings.jiraPassword',
-                    allowBlank : true
-                  }, {
-                    xtype : 'checkbox',
-                    fieldLabel : 'Use Default HTTP Proxy Settings',
-                    helpText : 'Apply the default HTTP Proxy Settings to the jira connection',
-                    name : 'errorReportingSettings.useGlobalProxy',
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    allowBlank : true
-                  }],
-              buttonAlign : 'left',
-              buttons : [{
-                    text : 'Generate Report',
-                    handler : function() {
-                      var jiraUsername = this.formPanel.form.findField('errorReportingSettings.jiraUsername').getValue()
-                      Sonatype.utils.generateErrorReportHandler(jiraUsername);
-                    },
-                    scope : this
-                  }]
-            }],
+            } // end proxy settings
+        ],
         buttons : [{
               id : 'savebutton',
               text : 'Save',
@@ -689,7 +697,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                 "securityRealms" : function(arr, srcObj, fpanel) {
                   fpanel.find('name', 'securityRealms')[0].setValue(arr);
                   return arr; // return arr, even if empty to comply with
-                              // sonatypeLoad data modifier requirement
+                  // sonatypeLoad data modifier requirement
                 },
                 "securityAnonymousAccessEnabled" : function(arr, srcObj, fpanel) {
                   fpanel.isSecurityAnonymousAccessEnabled = arr;

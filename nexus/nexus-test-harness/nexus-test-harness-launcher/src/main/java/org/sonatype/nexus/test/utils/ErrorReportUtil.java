@@ -36,6 +36,36 @@ public class ErrorReportUtil
                                                              String jiraPassword )
         throws IOException
     {
+        Response response = generateProblemResponse( title, description, jiraUser, jiraPassword );
+
+        Assert.assertNotNull( response );
+
+        if ( title != null )
+        {
+            final String text = response.getEntity().getText();
+
+            Assert.assertTrue( text + "\n" + response.getStatus(), response.getStatus().isSuccess() );
+
+            XStreamRepresentation representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
+
+            ErrorReportResponse responseObj =
+                (ErrorReportResponse) representation.getPayload( new ErrorReportResponse() );
+
+            return responseObj;
+        }
+        else
+        {
+            Assert.assertFalse( response.getStatus().isSuccess() );
+            Assert.assertEquals( 400, response.getStatus().getCode() );
+        }
+
+        return null;
+    }
+
+    public static Response generateProblemResponse( String title, String description, String jiraUser,
+                                                    String jiraPassword )
+        throws IOException
+    {
         ErrorReportRequest request = new ErrorReportRequest();
         request.setData( new ErrorReportRequestDTO() );
         request.getData().setTitle( title );
@@ -52,29 +82,7 @@ public class ErrorReportUtil
 
         String serviceURI = "service/local/error_reporting";
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
-
-        Assert.assertNotNull( response );
-
-        if ( title != null )
-        {
-            final String text = response.getEntity().getText();
-
-            Assert.assertTrue( text + "\n" + response.getStatus(), response.getStatus().isSuccess() );
-
-            representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
-
-            ErrorReportResponse responseObj =
-                (ErrorReportResponse) representation.getPayload( new ErrorReportResponse() );
-
-            return responseObj;
-        }
-        else
-        {
-            Assert.assertFalse( response.getStatus().isSuccess() );
-            Assert.assertEquals( 400, response.getStatus().getCode() );
-        }
-
-        return null;
+        return response;
     }
 
     public static void cleanErrorBundleDir( String directory )

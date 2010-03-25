@@ -14,7 +14,6 @@
 package org.sonatype.nexus.rest.global;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -28,7 +27,6 @@ import javax.ws.rs.Produces;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.jsecurity.authc.UsernamePasswordToken;
 import org.restlet.Context;
@@ -76,10 +74,10 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Consumes( { "application/xml", "application/json" } )
 public class GlobalConfigurationPlexusResource
     extends AbstractGlobalConfigurationPlexusResource
-{    
+{
     /** The config key used in URI and request attributes */
     public static final String CONFIG_NAME_KEY = "configName";
-    
+
     public static final String RESOURCE_URI = "/global_settings/{" + CONFIG_NAME_KEY + "}";
 
     /** Name denoting current Nexus configuration */
@@ -137,7 +135,7 @@ public class GlobalConfigurationPlexusResource
     {
         return configurationSource.getConfiguration().getGlobalHttpProxySettings();
     }
-    
+
     public CRestApiSettings readDefaultRestApiSettings()
     {
         return configurationSource.getConfiguration().getRestApi();
@@ -175,7 +173,8 @@ public class GlobalConfigurationPlexusResource
 
     /**
      * Get the specified global configuration (i.e. current or default)
-     * @param configName The name of the config (as returned by the global configuration list resource) to get. 
+     * 
+     * @param configName The name of the config (as returned by the global configuration list resource) to get.
      */
     @Override
     @GET
@@ -212,12 +211,12 @@ public class GlobalConfigurationPlexusResource
 
     /**
      * Update the global configuration.
+     * 
      * @param configName The name of the config (as returned by the global configuration list resource) to update.
      */
     @Override
     @PUT
-    @ResourceMethodSignature( pathParams = { @PathParam( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ) }, 
-                              input = GlobalConfigurationResourceResponse.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( GlobalConfigurationPlexusResource.CONFIG_NAME_KEY ) }, input = GlobalConfigurationResourceResponse.class )
     public Object put( Context context, Request request, Response response, Object payload )
         throws ResourceException
     {
@@ -250,8 +249,7 @@ public class GlobalConfigurationPlexusResource
                         // lookup old password
                         String oldPassword = getNexusEmailer().getSMTPPassword();
 
-                        getNexusEmailer()
-                            .setSMTPPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
+                        getNexusEmailer().setSMTPPassword( this.getActualPassword( settings.getPassword(), oldPassword ) );
 
                         getNexusEmailer().setSMTPPort( settings.getPort() );
 
@@ -262,28 +260,20 @@ public class GlobalConfigurationPlexusResource
                         getNexusEmailer().setSMTPUsername( settings.getUsername() );
 
                         getNexusEmailer().setSMTPSystemEmailAddress(
-                                                                     new Address( settings.getSystemEmailAddress()
-                                                                         .trim() ) );
+                                                                     new Address(
+                                                                                  settings.getSystemEmailAddress().trim() ) );
                     }
 
                     ErrorReportingSettings settings = resource.getErrorReportingSettings();
 
-                    if ( settings != null )
-                    {
-                        getErrorReportingManager().setEnabled( true );
-                        getErrorReportingManager().setJIRAUsername( settings.getJiraUsername() );
-
-                        // look up old password
-                        getErrorReportingManager().setJIRAPassword(
-                                                                    this.getActualPassword( settings.getJiraPassword(),
-                                                                                            getErrorReportingManager()
-                                                                                                .getJIRAPassword() ) );
-                        getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
-                    }
-                    else
-                    {
-                        getErrorReportingManager().setEnabled( false );
-                    }
+                    getErrorReportingManager().setEnabled( settings.isReportErrorsAutomatically() );
+                    getErrorReportingManager().setJIRAUsername( settings.getJiraUsername() );
+                    // look up old password
+                    getErrorReportingManager().setJIRAPassword(
+                                                                this.getActualPassword(
+                                                                                        settings.getJiraPassword(),
+                                                                                        getErrorReportingManager().getJIRAPassword() ) );
+                    getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
 
                     if ( resource.getGlobalConnectionSettings() != null )
                     {
@@ -306,15 +296,15 @@ public class GlobalConfigurationPlexusResource
                         getGlobalHttpProxySettings().setHostname( s.getProxyHostname() );
 
                         getGlobalHttpProxySettings().setPort( s.getProxyPort() );
-                        
+
                         List<String> nonProxyHosts = resource.getGlobalHttpProxySettings().getNonProxyHosts();
-                        if( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
+                        if ( nonProxyHosts != null && !nonProxyHosts.isEmpty() )
                         {
-                            // removing nulls and empty strings 
+                            // removing nulls and empty strings
                             HashSet<String> cleanNonProxyHosts = new HashSet<String>();
                             for ( String host : nonProxyHosts )
                             {
-                                if( StringUtils.isNotEmpty( host ))
+                                if ( StringUtils.isNotEmpty( host ) )
                                 {
                                     cleanNonProxyHosts.add( host );
                                 }
@@ -324,9 +314,9 @@ public class GlobalConfigurationPlexusResource
                         else
                         {
                             // clear it out
-                            getGlobalHttpProxySettings().setNonProxyHosts( new HashSet<String>(0) ); 
+                            getGlobalHttpProxySettings().setNonProxyHosts( new HashSet<String>( 0 ) );
                         }
-                        
+
                         if ( s.getAuthentication() != null )
                         {
                             CRemoteAuthentication auth = new CRemoteAuthentication();
@@ -337,12 +327,10 @@ public class GlobalConfigurationPlexusResource
                             if ( getGlobalHttpProxySettings().getProxyAuthentication() != null )
                             {
                                 oldPassword =
-                                    ( (UsernamePasswordRemoteAuthenticationSettings) getGlobalHttpProxySettings()
-                                        .getProxyAuthentication() ).getPassword();
+                                    ( (UsernamePasswordRemoteAuthenticationSettings) getGlobalHttpProxySettings().getProxyAuthentication() ).getPassword();
                             }
 
-                            auth
-                                .setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
+                            auth.setPassword( this.getActualPassword( s.getAuthentication().getPassword(), oldPassword ) );
 
                             auth.setNtlmDomain( s.getAuthentication().getNtlmDomain() );
 
@@ -352,10 +340,9 @@ public class GlobalConfigurationPlexusResource
 
                             // auth.setPassphrase( s.getAuthentication().getPassphrase() );
 
-                            getGlobalHttpProxySettings()
-                                .setProxyAuthentication(
-                                                         getAuthenticationInfoConverter()
-                                                             .convertAndValidateFromModel( auth ) );
+                            getGlobalHttpProxySettings().setProxyAuthentication(
+                                                                                 getAuthenticationInfoConverter().convertAndValidateFromModel(
+                                                                                                                                               auth ) );
                         }
                         else
                         {
@@ -367,7 +354,7 @@ public class GlobalConfigurationPlexusResource
                         getGlobalHttpProxySettings().disable();
                     }
 
-                    getNexusConfiguration().setRealms( (List<String>) resource.getSecurityRealms() );
+                    getNexusConfiguration().setRealms( resource.getSecurityRealms() );
 
                     getNexusConfiguration().setSecurityEnabled( resource.isSecurityEnabled() );
 
@@ -383,8 +370,8 @@ public class GlobalConfigurationPlexusResource
                         String newPassword =
                             this.getActualPassword( resource.getSecurityAnonymousPassword(), oldPassword );
 
-                        if ( !StringUtils.equals( getNexusConfiguration().getAnonymousUsername(), resource
-                            .getSecurityAnonymousUsername() )
+                        if ( !StringUtils.equals( getNexusConfiguration().getAnonymousUsername(),
+                                                  resource.getSecurityAnonymousUsername() )
                             || !StringUtils.equals( newPassword, oldPassword ) )
                         {
                             // test auth
@@ -394,17 +381,17 @@ public class GlobalConfigurationPlexusResource
                                 // the anon user a) should exists b) the pwd must work
                                 securitySystem.getUser( resource.getSecurityAnonymousUsername() );
 
-                                securitySystem.authenticate( new UsernamePasswordToken( resource
-                                    .getSecurityAnonymousUsername(), newPassword ) );
+                                securitySystem.authenticate( new UsernamePasswordToken(
+                                                                                        resource.getSecurityAnonymousUsername(),
+                                                                                        newPassword ) );
 
                             }
                             catch ( UserNotFoundException e )
                             {
 
-                                getLogger()
-                                    .warn(
-                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                           e );
+                                getLogger().warn(
+                                                  "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                                  e );
 
                                 String msg = "User '" + resource.getSecurityAnonymousUsername() + "' does not exist.";
 
@@ -415,10 +402,9 @@ public class GlobalConfigurationPlexusResource
                             catch ( AuthenticationException e )
                             {
                                 // the supplied anon auth info is wrong
-                                getLogger()
-                                    .warn(
-                                           "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
-                                           e );
+                                getLogger().warn(
+                                                  "Nexus refused to apply configuration, the supplied anonymous information is wrong.",
+                                                  e );
 
                                 String msg =
                                     "The password of user '" + resource.getSecurityAnonymousUsername()
@@ -437,16 +423,15 @@ public class GlobalConfigurationPlexusResource
                     else if ( resource.isSecurityAnonymousAccessEnabled() )
                     {
                         // the supplied anon auth info is wrong
-                        getLogger()
-                            .warn(
-                                   "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
+                        getLogger().warn(
+                                          "Nexus refused to apply configuration, the supplied anonymous username/pwd information is empty." );
 
                         throw new PlexusResourceException(
                                                            Status.CLIENT_ERROR_BAD_REQUEST,
                                                            getNexusErrorResponse( "securityAnonymousUsername",
                                                                                   "Cannot be empty when Anonynous access is enabled" ) );
                     }
-                    
+
                     if ( resource.getGlobalRestApiSettings() != null )
                     {
                         RestApiSettings restApiSettings = resource.getGlobalRestApiSettings();
@@ -460,36 +445,38 @@ public class GlobalConfigurationPlexusResource
                         else
                         {
                             getGlobalRestApiSettings().setBaseUrl(
-                                new Reference( restApiSettings.getBaseUrl() ).getTargetRef().toString() );
+                                                                   new Reference( restApiSettings.getBaseUrl() ).getTargetRef().toString() );
                         }
                     }
                     else
                     {
                         getGlobalRestApiSettings().disable();
                     }
-                    
+
                     // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
                     // repositories) about the change, but only if config is saved okay
                     // TODO: this is wrong, the config framework should "tell" this changed, but we have some
-                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are 
+                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are
                     boolean remoteConnectionSettingsIsDirty = getGlobalRemoteConnectionSettings().isDirty();
-                    
+
                     boolean remoteHttpProxySettingsIsDirty = getGlobalHttpProxySettings().isDirty();
-                    
+
                     getNexusConfiguration().saveConfiguration();
-                    
+
                     // NEXUS-3064: to "inform" global remote storage context (and hence, all affected proxy
                     // repositories) about the change, but only if config is saved okay
                     // TODO: this is wrong, the config framework should "tell" this changed, but we have some
-                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are 
-                    if (remoteConnectionSettingsIsDirty)
+                    // design flaw here: the globalRemoteStorageContext is NOT a component, while the settings are
+                    if ( remoteConnectionSettingsIsDirty )
                     {
-                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteConnectionSettings( getGlobalRemoteConnectionSettings() );
+                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteConnectionSettings(
+                                                                                                             getGlobalRemoteConnectionSettings() );
                     }
-                    
-                    if (remoteHttpProxySettingsIsDirty) 
+
+                    if ( remoteHttpProxySettingsIsDirty )
                     {
-                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteProxySettings( getGlobalHttpProxySettings() );
+                        getNexusConfiguration().getGlobalRemoteStorageContext().setRemoteProxySettings(
+                                                                                                        getGlobalHttpProxySettings() );
                     }
                 }
                 catch ( IOException e )

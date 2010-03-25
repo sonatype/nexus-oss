@@ -39,7 +39,8 @@
       errorReportingSettings : {
         jiraUsername : "",
         jiraPassword : "",
-        useGlobalProxy : false
+        useGlobalProxy : false,
+        reportErrorsAutomatically : false
       },
       globalConnectionSettings : {
         connectionTimeout : 0,
