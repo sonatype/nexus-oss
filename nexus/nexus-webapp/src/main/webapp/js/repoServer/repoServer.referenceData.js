@@ -109,6 +109,7 @@
         overrideLocalStorageUrl : "",
         defaultLocalStorageUrl : "",
         downloadRemoteIndexes : true,
+        autoBlockActive : true,
         exposed : true,
         checksumPolicy : "",
         remoteStorage : {

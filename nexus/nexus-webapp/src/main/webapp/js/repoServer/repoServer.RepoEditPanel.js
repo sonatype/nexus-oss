@@ -235,6 +235,9 @@ Sonatype.repoServer.HostedRepositoryEditor = function(config) {
         downloadRemoteIndexes : function() {
           return false;
         },
+        autoBlockActive : function() {
+          return false;
+        },
         checksumPolicy : function() {
           return 'IGNORE';
         }
@@ -531,6 +534,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
         indexable : Sonatype.utils.capitalize,
         exposed : Sonatype.utils.capitalize,
         downloadRemoteIndexes : Sonatype.utils.capitalize,
+        autoBlockActive : Sonatype.utils.capitalize,
         checksumPolicy : Sonatype.utils.upperFirstCharLowerRest
       },
       submit : {
@@ -539,6 +543,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
         indexable : Sonatype.utils.convert.stringContextToBool,
         exposed : Sonatype.utils.convert.stringContextToBool,
         downloadRemoteIndexes : Sonatype.utils.convert.stringContextToBool,
+        autoBlockActive : Sonatype.utils.convert.stringContextToBool,
         checksumPolicy : Sonatype.utils.uppercase
       }
     },
@@ -721,6 +726,23 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                     fieldLabel : 'Download Remote Indexes',
                     helpText : ht.downloadRemoteIndexes,
                     name : 'downloadRemoteIndexes',
+                    itemCls : 'required-field',
+                    width : 75,
+                    store : this.tfStore,
+                    displayField : 'value',
+                    editable : false,
+                    forceSelection : true,
+                    mode : 'local',
+                    triggerAction : 'all',
+                    emptyText : 'Select...',
+                    selectOnFocus : true,
+                    allowBlank : false
+                  }, {
+                  }, {
+                    xtype : 'combo',
+                    fieldLabel : 'Auto blocking active',
+                    helpText : ht.autoBlockActive,
+                    name : 'autoBlockActive',
                     itemCls : 'required-field',
                     width : 75,
                     store : this.tfStore,
