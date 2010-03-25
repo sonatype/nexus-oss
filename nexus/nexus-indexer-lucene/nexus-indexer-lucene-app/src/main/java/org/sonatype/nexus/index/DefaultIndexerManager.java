@@ -1322,7 +1322,7 @@ public class DefaultIndexerManager
                         + repository.getId() + "\" is member." );
 
                 // get the groups target ctx
-                IndexingContext groupContext = getRepositoryRemoteIndexContext( group );
+                IndexingContext groupContext = getRepositoryLocalIndexContext( group );
 
                 Lock groupLock = getLock( groupId ).writeLock();
                 groupLock.lock();
