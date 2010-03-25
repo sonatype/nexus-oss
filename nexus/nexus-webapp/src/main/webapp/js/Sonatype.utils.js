@@ -960,8 +960,8 @@
             callback : function(options, success, response) {
               if (success)
               {
-              	var dec = Ext.decode(response.responseText);
-                var needCredentials = dec.data.errorReportingSettings == null ||  dec.data.errorReportingSettings.jiraUsername == null || dec.data.errorReportingSettings.jiraUsername == '';
+                var dec = Ext.decode(response.responseText);
+                var needCredentials = dec.data.errorReportingSettings == null || dec.data.errorReportingSettings.jiraUsername == null || dec.data.errorReportingSettings.jiraUsername == '';
                 Sonatype.utils.showProbleReport(needCredentials);
               }
               else
