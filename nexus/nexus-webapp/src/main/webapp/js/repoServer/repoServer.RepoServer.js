@@ -307,11 +307,11 @@
               id : 'st-nexus-security',
               collapsed : true,
               items : [{
-                    enabled : Sonatype.user.curr.isLoggedIn && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
+                    enabled : Sonatype.user.curr.isLoggedIn == true && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
                     title : 'Change Password',
                     handler : Sonatype.utils.changePassword
                   }, {
-                    enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) && sp.checkPermission('security:users', sp.DELETE) && sp.checkPermission('security:users', sp.EDIT)),
+                    enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
                     title : 'Users',
                     tabId : 'security-users',
                     tabCode : Sonatype.repoServer.UserEditPanel

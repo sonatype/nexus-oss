@@ -18,7 +18,10 @@
 var checkedNewVersion = false;
 
 Sonatype.Events.addListener( 'nexusStatus', function() {
-  if ( !checkedNewVersion ){
+  if ( !checkedNewVersion
+    && Sonatype.lib.Permissions.checkPermission('nexus:status', Sonatype.lib.Permissions.READ)
+    && !Ext.isEmpty( Sonatype.utils.editionShort )
+    && !Ext.isEmpty( Sonatype.utils.versionShort )){
     Ext.Ajax.request( {
       method: 'GET',
       suppressStatus: [404,401,-1],

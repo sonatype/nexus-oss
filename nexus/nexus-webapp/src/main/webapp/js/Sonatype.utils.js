@@ -786,15 +786,6 @@
                 Sonatype.user.curr.username = respObj.data.clientPermissions.loggedInUsername;
                 Sonatype.user.curr.loggedInUserSource = respObj.data.clientPermissions.loggedInUserSource;
 
-                var availSvrs = Sonatype.config.installedServers;
-                for (var srv in availSvrs)
-                {
-                  if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined')
-                  {
-                    Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
-                  }
-                }
-
                 var baseUrl = respObj.data.baseUrl;
                 baseUrlMismatch = (baseUrl.toLowerCase() != window.location.href.substring(0, baseUrl.length).toLowerCase());
               }
@@ -806,6 +797,13 @@
                 Sonatype.user.curr.isLoggedIn = null;
                 Sonatype.user.curr.username = null;
                 Sonatype.user.curr.loggedInUserSource = null;
+              }
+              
+              var availSvrs = Sonatype.config.installedServers;
+              for (var srv in availSvrs) {
+                if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
+                  Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
+                }
               }
 
               Sonatype.Events.fireEvent('initHeadLinks');
