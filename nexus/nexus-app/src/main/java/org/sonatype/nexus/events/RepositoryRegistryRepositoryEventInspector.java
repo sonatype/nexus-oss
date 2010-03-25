@@ -36,12 +36,9 @@ import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Toni:
- * Split {@link RepositoryRegistryRepositoryEventInspector} into two parts.
- * One is this and the other is the extracted indexer logic.
- * This indexer related inspector now sits
- * IndexingRepositoryRegistryRepositoryEventInspector.
- *
+ * Toni: Split {@link RepositoryRegistryRepositoryEventInspector} into two parts. One is this and the other is the
+ * extracted indexer logic. This indexer related inspector now sits IndexingRepositoryRegistryRepositoryEventInspector.
+ * 
  * @author Juven Xu
  */
 @Component( role = EventInspector.class, hint = "RepositoryRegistryRepositoryEvent" )
@@ -96,9 +93,9 @@ public class RepositoryRegistryRepositoryEventInspector
             // if doesn't exist yet
             repoRegistry.getRepository( repository.getId() );
 
-            inspectForNexus( evt, repository );
+            inspectForTimeline( evt, repository );
 
-            inspectForIndexerManager( evt, repository );
+            inspectForRepositoryRemoval( evt, repository );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -106,7 +103,7 @@ public class RepositoryRegistryRepositoryEventInspector
         }
     }
 
-    private void inspectForNexus( Event<?> evt, Repository repository )
+    private void inspectForTimeline( Event<?> evt, Repository repository )
     {
         // we do not want RSS entries about boot and repo additions during boot
         if ( nexusStarted )
@@ -176,11 +173,11 @@ public class RepositoryRegistryRepositoryEventInspector
         }
     }
 
-    private void inspectForIndexerManager( Event<?> evt, Repository repository )
+    private void inspectForRepositoryRemoval( Event<?> evt, Repository repository )
     {
         try
         {
-           if ( evt instanceof RepositoryRegistryEventRemove )
+            if ( evt instanceof RepositoryRegistryEventRemove )
             {
                 // remove the storage folders for the repository
                 DeleteRepositoryFoldersTask task =
@@ -188,13 +185,16 @@ public class RepositoryRegistryRepositoryEventInspector
 
                 task.setRepository( repository );
 
-                nexusScheduler.submit( "Remove repository folder", task );
+                nexusScheduler.submit( "Deleting repository folder for repository \"" + repository.getName()
+                    + "\" (id=" + repository.getId() + ").", task );
             }
 
         }
         catch ( Exception e )
         {
-            getLogger().error( "Could not maintain indexing contexts!", e );
+            getLogger().error(
+                "Could not remove repository folders for repository \"" + repository.getName() + "\" (id="
+                    + repository.getId() + ")!", e );
         }
     }
 
