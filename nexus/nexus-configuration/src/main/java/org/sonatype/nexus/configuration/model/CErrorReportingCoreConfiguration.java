@@ -28,4 +28,19 @@ public class CErrorReportingCoreConfiguration
     {
         return new ValidationResponse();
     }
+
+    @Override
+    protected void copyTransients( Object source, Object destination )
+    {
+        super.copyTransients( source, destination );
+
+        if ( ( (CErrorReporting) source ).getJiraPassword() == null )
+        {
+            ( (CErrorReporting) destination ).setJiraPassword( null );
+        }
+        if ( ( (CErrorReporting) source ).getJiraUsername() == null )
+        {
+            ( (CErrorReporting) destination ).setJiraUsername( null );
+        }
+    }
 }
