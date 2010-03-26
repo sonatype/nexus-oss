@@ -113,4 +113,12 @@ public class DefaultStaticResource
         }
     }
 
+    public Long getLastModified()
+    {
+        if ( checkConnection() )
+        {
+            return urlConnection.getLastModified();
+        }
+        return null;
+    }
 }

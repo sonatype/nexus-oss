@@ -16,6 +16,7 @@ package org.sonatype.nexus.rest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
@@ -32,6 +33,7 @@ public class StaticResourceRepresentation
         super( MediaType.valueOf( resource.getContentType() ) );
 
         setSize( resource.getSize() );
+        setModificationDate( new Date( resource.getLastModified() ) );
 
         setAvailable( true );
 

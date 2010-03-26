@@ -2,7 +2,9 @@ package org.sonatype.nexus.plugins;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URLConnection;
+import java.util.jar.JarEntry;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.util.StringUtils;
@@ -92,5 +94,32 @@ public class PluginStaticResource
         throws IOException
     {
         return classLoader.getResourceAsStream( resourcePath );
+    }
+
+    public Long getLastModified()
+    {
+        try
+        {
+            URLConnection urlConn = classLoader.getRealmResource( resourcePath ).openConnection();
+            if ( !( urlConn instanceof JarURLConnection ) )
+            {
+                return urlConn.getLastModified();
+            }
+
+            JarURLConnection jarUrlConn = (JarURLConnection) urlConn;
+            JarEntry jarEntry = jarUrlConn.getJarEntry();
+            if ( jarEntry == null )
+            {
+                // This is a jar, not an entry in a jar
+                return urlConn.getLastModified();
+            }
+
+            return jarEntry.getTime();
+        }
+        catch ( final Throwable e ) // NOPMD
+        {
+            // default to unknown last modified time
+            return null;
+        }
     }
 }

@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.plugins.rest.StaticResource;
-
 public class ExternalStaticResource
     implements StaticResource
 {
@@ -40,5 +38,10 @@ public class ExternalStaticResource
     public long getSize()
     {
         return file.length();
+    }
+
+    public Long getLastModified()
+    {
+        return file.lastModified();
     }
 }

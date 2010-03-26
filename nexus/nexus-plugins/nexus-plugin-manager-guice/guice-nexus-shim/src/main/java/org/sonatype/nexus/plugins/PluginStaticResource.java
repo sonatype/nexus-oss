@@ -14,7 +14,10 @@ package org.sonatype.nexus.plugins;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.JarURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.util.jar.JarEntry;
 
 import org.sonatype.nexus.plugins.rest.StaticResource;
 
@@ -76,5 +79,32 @@ public final class PluginStaticResource
         throws IOException
     {
         return resourceURL.openStream();
+    }
+
+    public Long getLastModified()
+    {
+        try
+        {
+            URLConnection urlConn = resourceURL.openConnection();
+            if (! (urlConn instanceof JarURLConnection))
+            {
+                return urlConn.getLastModified();
+            }
+            
+            JarURLConnection jarUrlConn = (JarURLConnection) urlConn;
+            JarEntry jarEntry = jarUrlConn.getJarEntry();
+            if (jarEntry == null)
+            {
+                // This is a jar, not an entry in a jar
+                return urlConn.getLastModified();
+            }
+            
+            return jarEntry.getTime();
+        }
+        catch ( final Throwable e ) // NOPMD
+        {
+            // default to unknown last modified time
+            return null;
+        }
     }
 }

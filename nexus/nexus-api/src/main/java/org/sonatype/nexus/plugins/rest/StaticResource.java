@@ -29,6 +29,11 @@ public interface StaticResource
 
     long getSize();
 
+    /**
+     * @return the last time the resource was modified or null if the last modified time is unknown
+     */
+    Long getLastModified();
+
     InputStream getInputStream()
         throws IOException;
 }
