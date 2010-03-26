@@ -266,14 +266,23 @@ public class GlobalConfigurationPlexusResource
 
                     ErrorReportingSettings settings = resource.getErrorReportingSettings();
 
-                    getErrorReportingManager().setEnabled( settings.isReportErrorsAutomatically() );
-                    getErrorReportingManager().setJIRAUsername( settings.getJiraUsername() );
-                    // look up old password
-                    getErrorReportingManager().setJIRAPassword(
-                                                                this.getActualPassword(
-                                                                                        settings.getJiraPassword(),
-                                                                                        getErrorReportingManager().getJIRAPassword() ) );
-                    getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
+                    if ( settings != null )
+                    {
+                        getErrorReportingManager().setEnabled( settings.isReportErrorsAutomatically() );
+                        getErrorReportingManager().setJIRAUsername( settings.getJiraUsername() );
+                        // look up old password
+                        getErrorReportingManager().setJIRAPassword(
+                                                                    this.getActualPassword(
+                                                                                            settings.getJiraPassword(),
+                                                                                            getErrorReportingManager().getJIRAPassword() ) );
+                        getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
+                    }
+                    else
+                    {
+                        getErrorReportingManager().setEnabled( false );
+                        getErrorReportingManager().setJIRAUsername( null );
+                        getErrorReportingManager().setJIRAPassword( null );
+                    }
 
                     if ( resource.getGlobalConnectionSettings() != null )
                     {

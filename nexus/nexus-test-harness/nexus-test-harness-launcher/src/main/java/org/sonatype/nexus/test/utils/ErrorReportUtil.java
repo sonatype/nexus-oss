@@ -108,9 +108,11 @@ public class ErrorReportUtil
     {
         File errorBundleDir = new File( directory + "/error-report-bundles" );
 
+        Assert.assertTrue( errorBundleDir.exists() );
+
         File[] files = errorBundleDir.listFiles();
 
-        Assert.assertTrue( files != null );
+        Assert.assertNotNull( files );
         Assert.assertEquals( 1, files.length );
         Assert.assertTrue( files[0].getName().startsWith( "nexus-error-bundle" ) );
         Assert.assertTrue( files[0].getName().endsWith( ".zip" ) );

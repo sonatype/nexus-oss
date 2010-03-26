@@ -1,7 +1,6 @@
 package org.sonatype.nexus.integrationtests.nexus2178;
 
-import junit.framework.Assert;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
@@ -18,31 +17,33 @@ public class Nexus2178ErrorReportingConfigRestIT
     {
         // Default config
         GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
-        
-        Assert.assertNull( "Error reporting should be null by default", resource.getErrorReportingSettings() );
-        
+
+        Assert.assertFalse( "Error reporting should be null by default",
+                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
+
         // Set some values
-        ErrorReportingSettings settings = new ErrorReportingSettings();
+        ErrorReportingSettings settings = resource.getErrorReportingSettings();
         settings.setJiraUsername( "someusername" );
         settings.setJiraPassword( "somepassword" );
-        
-        resource.setErrorReportingSettings( settings );
-        
+        settings.setReportErrorsAutomatically( true );
+
         SettingsMessageUtil.save( resource );
-        
+
         resource = SettingsMessageUtil.getCurrentSettings();
-        
+
         Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
         Assert.assertEquals( "someusername", resource.getErrorReportingSettings().getJiraUsername() );
-        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER, resource.getErrorReportingSettings().getJiraPassword() );
-        
+        Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER,
+                             resource.getErrorReportingSettings().getJiraPassword() );
+
         // Clear them again
         resource.setErrorReportingSettings( null );
-        
-        SettingsMessageUtil.save( resource );
-        
+
+        Assert.assertTrue( SettingsMessageUtil.save( resource ).isSuccess() );
+
         resource = SettingsMessageUtil.getCurrentSettings();
-        
-        Assert.assertNull( "Error reporting should be null", resource.getErrorReportingSettings() );
+
+        Assert.assertFalse( "Error reporting should be null",
+                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
     }
 }
