@@ -9,7 +9,6 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
   <artifactId>nexus-ldap-plugin-parent</artifactId>
-  <version>1.5.1-SNAPSHOT</version>
   <name>Nexus LDAP Plugin :: LDAP Parent</name>
   <description>Nexus LDAP Parent</description>
   <packaging>pom</packaging>

@@ -8,7 +8,6 @@
 	<groupId>org.sonatype.nexus.restlight</groupId>
 	<artifactId>nexus-restlight-core-client</artifactId>
 	<name>Nexus Lightweight REST Clients: Core</name>
-	<version>1.5.1-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>

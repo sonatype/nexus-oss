@@ -1048,14 +1048,14 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.19-SNAPSHOT</enunciate.version>
+        <enunciate.version>1.19-RC2</enunciate.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
         <dependency>
           <groupId>org.codehaus.enunciate</groupId>
           <artifactId>enunciate-core</artifactId>
-          <version>${enunciate.version}</version>
+          <version>1.19-RC2</version>
           <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
           <!-- But nothing is using that annotation after build happened, and doco is generated -->
           <scope>provided</scope>
