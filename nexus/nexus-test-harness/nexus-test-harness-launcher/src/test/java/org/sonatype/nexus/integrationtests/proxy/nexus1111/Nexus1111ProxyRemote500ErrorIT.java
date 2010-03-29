@@ -100,8 +100,10 @@ public class Nexus1111ProxyRemote500ErrorIT
         }
 
         // check for auto block
+        // TODO: interestingly RepositoryMessageUtil.getStatus() neglects JSON here, so
+        // not using it and switched back to XML as it is wired in it this util class.
         RepositoryMessageUtil util =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         RepositoryStatusResource status = util.getStatus( this.testRepositoryId );
 
