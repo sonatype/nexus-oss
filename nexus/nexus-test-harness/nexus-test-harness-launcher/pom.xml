@@ -30,7 +30,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.4</version>
         <executions>
           <execution>
             <id>env</id>
