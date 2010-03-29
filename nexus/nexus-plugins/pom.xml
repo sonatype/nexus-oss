@@ -28,7 +28,7 @@
   </modules>
 
   <properties>
-    <sonatype.plugin.version>1.0.3-SNAPSHOT</sonatype.plugin.version>
+    <sonatype.plugin.version>1.0.3</sonatype.plugin.version>
   </properties>
 
   <dependencyManagement>

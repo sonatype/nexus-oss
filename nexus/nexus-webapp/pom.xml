@@ -25,7 +25,7 @@
     
     <plugin-repository.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
-    <plugin-api.version>1.0.3-SNAPSHOT</plugin-api.version>
+    <plugin-api.version>1.0.3</plugin-api.version>
     
   </properties>
   <dependencies>
