@@ -540,7 +540,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.3-SNAPSHOT</version>
+        <version>1.3</version>
         <executions>
           <execution>
             <goals>
