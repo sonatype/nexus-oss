@@ -139,7 +139,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>maven-runtime-assembler-plugin</artifactId>
-        <version>0.1.3-SNAPSHOT</version>
+        <version>0.1.3</version>
         <configuration>
           <formats>
             <format>zip</format>
