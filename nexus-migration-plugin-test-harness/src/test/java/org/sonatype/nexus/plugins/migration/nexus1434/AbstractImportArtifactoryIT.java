@@ -109,7 +109,7 @@ public abstract class AbstractImportArtifactoryIT
         Assert.assertNotNull( repo1 );
         Assert.assertEquals( "proxy", repo1.getRepoType() );
         Assert.assertEquals( RepositoryPolicy.RELEASE.name(), repo1.getRepoPolicy() );
-        Assert.assertEquals( "http://repo1.maven.org/maven2", repo1.getRemoteStorage().getRemoteStorageUrl() );
+        Assert.assertEquals( "http://repo1.maven.org/maven2/", repo1.getRemoteStorage().getRemoteStorageUrl() );
     }
 
     private void checkLocalRepo()
