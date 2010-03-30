@@ -374,7 +374,7 @@ public abstract class AbstractProxyRepository
         {
             ProxyMode oldProxyMode = getProxyMode();
 
-            if ( getProxyMode() != null )
+            if ( oldProxyMode != null )
             {
                 setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             }
@@ -398,6 +398,42 @@ public abstract class AbstractProxyRepository
                             + ")", e );
                 }
             }
+        }
+    }
+
+    /**
+     * This method should be called by AbstractProxyRepository and it's descendants only. Since this method modifies the
+     * ProxyMode property of this repository, and this property is part of configuration, this call will result in
+     * configuration flush too (potentially saving any other unsaved changes)!
+     */
+    protected void autoUnBlockProxying()
+    {
+        setRemoteStatus( RemoteStatus.AVAILABLE, null );
+
+        ProxyMode oldProxyMode = getProxyMode();
+
+        if ( !ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
+        {
+            return;
+        }
+
+        // log the event
+        getLogger().info(
+            "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId()
+                + ") detected as healty, un-blocking the proxy repository (it was AutoBlocked by Nexus)." );
+
+        setProxyMode( ProxyMode.ALLOW, true, null );
+
+        try
+        {
+            getApplicationConfiguration().saveConfiguration();
+        }
+        catch ( IOException e )
+        {
+            getLogger()
+                .warn(
+                    "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
+                        + ")", e );
         }
     }
 
@@ -1266,7 +1302,7 @@ public abstract class AbstractProxyRepository
                     {
                         if ( isRemoteStorageReachable( request ) )
                         {
-                            setRemoteStatus( RemoteStatus.AVAILABLE, null );
+                            autoUnBlockProxying();
                         }
                         else
                         {
