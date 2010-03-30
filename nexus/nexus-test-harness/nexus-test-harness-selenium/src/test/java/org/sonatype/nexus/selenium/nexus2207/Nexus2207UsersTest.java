@@ -174,7 +174,7 @@ public class Nexus2207UsersTest
         MockHelper.expect( "/users_reset/{userId}", new MockResponse( Status.SUCCESS_OK, null ) );
         users.contextMenuResetPassword( userId ).clickYes();
         response = new MessageBox( selenium );
-        assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Reseted" ) );
+        assertThat( response.getTitle(), CoreMatchers.equalTo( "Password Reset" ) );
         response.clickOk();
 
         MockHelper.checkExecutions();

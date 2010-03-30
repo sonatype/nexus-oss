@@ -326,7 +326,7 @@ Ext.extend(Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
       resetPasswordCallback : function(options, isSuccess, response) {
         if (isSuccess)
         {
-          Sonatype.MessageBox.alert('Password Reseted', 'The password has been reset.');
+          Sonatype.MessageBox.alert('Password Reset', 'The password has been reset.');
         }
         else
         {

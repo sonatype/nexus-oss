@@ -66,7 +66,7 @@ public class Nexus2145BlockProxyContextMenuTest
         MockHelper.checkExecutions();
         MockHelper.clearMocks();
         // check on server
-        assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.ALLOW ) );
+        assertThat( proxyRepo.getProxyMode(), equalTo( ProxyMode.BLOCKED_AUTO ) );
         // check on UI
         assertThat( repositories.getStatus( proxyRepo.getId() ), StringStartsWith.startsWith( "In Service" ) );
     }
