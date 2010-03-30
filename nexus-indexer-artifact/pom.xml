@@ -8,7 +8,7 @@
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer-artifact</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1-SNAPSHOT</version>
 
   <!-- a short but descriptive name for the project -->
   <name>Nexus Indexer Artifact</name>
@@ -67,11 +67,4 @@
       </plugin>
     </plugins>
   </build>
-
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.0</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.0</developerConnection>
-    <url>http://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.0</url>
-  </scm>
 </project>
