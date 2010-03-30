@@ -29,14 +29,4 @@ public class ViewsPanel
     {
         clickLink( "System Feeds" );
     }
-
-    public boolean logsAndConfigFilesAvailable()
-    {
-        return isLinkAvailable( "System Files" );
-    }
-
-    public void logsAndConfigFilesClick()
-    {
-        clickLink( "System Files" );
-    }
 }

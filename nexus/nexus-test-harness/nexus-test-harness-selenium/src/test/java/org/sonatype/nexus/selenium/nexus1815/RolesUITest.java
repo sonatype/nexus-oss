@@ -66,38 +66,40 @@ public class RolesUITest
 
         // views/repositories
         ViewsPanel viewsPanel = main.viewsPanel();
+        viewsPanel.expand();
         assertTrue( "Repositories link should be visible", viewsPanel.repositoriesAvailable() );
         assertTrue( "System Feeds link should be visible", viewsPanel.systemFeedsAvailable() );
-        assertTrue( "Logs and Config Files link should be visible", viewsPanel.logsAndConfigFilesAvailable() );
 
         // now collapse the panel and check
         viewsPanel.collapse();
         assertFalse( "Repositories link should not be visible", viewsPanel.repositoriesAvailable() );
         assertFalse( "System Feeds link should not be visible", viewsPanel.systemFeedsAvailable() );
-        assertFalse( "Logs and Config Files link should not be visible", viewsPanel.logsAndConfigFilesAvailable() );
 
         // administration
         AdministrationPanel adminPanel = main.adminPanel();
+        adminPanel.expand();
+        assertTrue( "Logs and Config Files link should be visible", adminPanel.logsAndConfigFilesAvailable() );
         assertTrue( "Server link should be visible", adminPanel.serverAvailable() );
         assertTrue( "Routing link should be visible", adminPanel.routingAvailable() );
         assertTrue( "Scheduled Tasks link should be visible", adminPanel.scheduleTasksAvailable() );
-        assertTrue( "Repository Targets link should be visible", adminPanel.repositoryTargetsAvailable() );
         assertTrue( "Log link should be visible", adminPanel.logAvailable() );
 
         // now collapse the panel and check
         adminPanel.collapse();
+        assertFalse( "Logs and Config Files link should not be visible", adminPanel.logsAndConfigFilesAvailable() );
         assertFalse( "Server link should not be visible", adminPanel.serverAvailable() );
         assertFalse( "Routing link should not be visible", adminPanel.routingAvailable() );
         assertFalse( "Scheduled Tasks link should not be visible", adminPanel.scheduleTasksAvailable() );
-        assertFalse( "Repository Targets link should not be visible", adminPanel.repositoryTargetsAvailable() );
         assertFalse( "Log link should not be visible", adminPanel.logAvailable() );
 
         // security
         SecurityPanel securityPanel = main.securityPanel();
+        securityPanel.expand();
         assertTrue( "Change Password link should be visible", securityPanel.changePasswordAvailable() );
         assertTrue( "Users link should be visible", securityPanel.usersAvailable() );
         assertTrue( "Roles link should be visible", securityPanel.rolesAvailable() );
         assertTrue( "Privileges link should be visible", securityPanel.privilegesAvailable() );
+        assertTrue( "Repository Targets link should be visible", securityPanel.repositoryTargetsAvailable() );
 
         // now collapse and check again
         securityPanel.collapse();
@@ -105,6 +107,7 @@ public class RolesUITest
         assertFalse( "Users link should not be visible", securityPanel.usersAvailable() );
         assertFalse( "Roles link should not be visible", securityPanel.rolesAvailable() );
         assertFalse( "Privileges link should not be visible", securityPanel.privilegesAvailable() );
+        assertFalse( "Repository Targets link should not be visible", securityPanel.repositoryTargetsAvailable() );
     }
 
     @Test
@@ -122,6 +125,7 @@ public class RolesUITest
 
         // security
         SecurityPanel securityPanel = main.securityPanel();
+        securityPanel.expand();
         assertTrue( "Change Password link should be visible", securityPanel.changePasswordAvailable() );
         assertFalse( "Users link should not be visible", securityPanel.usersAvailable() );
         assertTrue( "Roles link should be visible", securityPanel.rolesAvailable() );

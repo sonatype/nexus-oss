@@ -69,7 +69,7 @@ public class MainPage
 
     public LogsViewTab openViewLogs()
     {
-        viewsPanel().logsAndConfigFilesClick();
+        adminPanel().logsAndConfigFilesClick();
 
         return new LogsViewTab( selenium );
     }
@@ -130,7 +130,7 @@ public class MainPage
 
     public RepoTargetTab openRepoTargets()
     {
-        adminPanel().repositoryTargetsClick();
+        securityPanel().repositoryTargetsClick();
 
         return new RepoTargetTab( selenium );
     }

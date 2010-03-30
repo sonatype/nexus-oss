@@ -30,6 +30,11 @@ public class SecurityPanel
         return isLinkAvailable( "Privileges" );
     }
 
+    public boolean repositoryTargetsAvailable()
+    {
+        return isLinkAvailable( "Repository Targets" );
+    }
+
     public ChangePasswordWindow clickChangePassword()
     {
         clickLink( "Change Password" );
@@ -64,5 +69,10 @@ public class SecurityPanel
     public void ldapConfigurationClick()
     {
         clickLink( "LDAP Configuration" );
+    }
+    
+    public void repositoryTargetsClick()
+    {
+        clickLink( "Repository Targets" );
     }
 }

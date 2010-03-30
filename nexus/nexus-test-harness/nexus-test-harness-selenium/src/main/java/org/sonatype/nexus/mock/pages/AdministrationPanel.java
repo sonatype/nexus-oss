@@ -30,11 +30,6 @@ public class AdministrationPanel
         clickLink( "Scheduled Tasks" );
     }
 
-    public boolean repositoryTargetsAvailable()
-    {
-        return isLinkAvailable( "Repository Targets" );
-    }
-
     public boolean logAvailable()
     {
         return isLinkAvailable( "Log Configuration" );
@@ -50,13 +45,18 @@ public class AdministrationPanel
         clickLink( "Log Configuration" );
     }
 
-    public void repositoryTargetsClick()
-    {
-        clickLink( "Repository Targets" );
-    }
-
     public void routingClick()
     {
         clickLink( "Routing" );
+    }
+
+    public boolean logsAndConfigFilesAvailable()
+    {
+        return isLinkAvailable( "System Files" );
+    }
+
+    public void logsAndConfigFilesClick()
+    {
+        clickLink( "System Files" );
     }
 }
