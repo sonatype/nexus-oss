@@ -47,6 +47,7 @@ import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -118,7 +119,7 @@ public class M2GroupRepository
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         if ( M2ArtifactRecognizer.isMetadata( request.getRequestPath() )
-             && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
+            && !M2ArtifactRecognizer.isChecksum( request.getRequestPath() ) )
         {
             // metadata checksum files are calculated and cached as side-effect
             // of doRetrieveMetadata.
@@ -196,24 +197,23 @@ public class M2GroupRepository
                 {
                     getLogger().warn(
                         "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
-                                        + "\", will be skipped from aggregation!", e );
+                            + "\", will be skipped from aggregation!", e );
 
                     getFeedRecorder()
-                                    .addNexusArtifactEvent(
-                                        newMetadataFailureEvent( fileItem,
-                                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                        .addNexusArtifactEvent(
+                            newMetadataFailureEvent( fileItem,
+                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
                 catch ( MetadataException e )
                 {
                     getLogger().warn(
                         "Metadata exception during parse of metadata from UID=\""
-                                        + fileItem.getRepositoryItemUid().toString()
-                                        + "\", will be skipped from aggregation!", e );
+                            + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
 
                     getFeedRecorder()
-                                    .addNexusArtifactEvent(
-                                        newMetadataFailureEvent( fileItem,
-                                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                        .addNexusArtifactEvent(
+                            newMetadataFailureEvent( fileItem,
+                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
             }
 
@@ -263,7 +263,7 @@ public class M2GroupRepository
             {
                 getLogger().debug(
                     "Item for path " + request.toString() + " merged from " + Integer.toString( items.size() )
-                                    + " found items." );
+                        + " found items." );
             }
 
             return item;
@@ -300,8 +300,9 @@ public class M2GroupRepository
 
         req.getRequestContext().setParentContext( request.getRequestContext() );
 
-        DefaultStorageCompositeFileItem digestFileItem =
-            new DefaultStorageCompositeFileItem( this, req, true, false, contentLocator, sources );
+        // Metadata checksum files are not composite ones, they are derivatives of the Metadata (and metadata file _is_
+        // composite one)
+        DefaultStorageFileItem digestFileItem = new DefaultStorageFileItem( this, req, true, false, contentLocator );
 
         storeItem( false, digestFileItem );
     }

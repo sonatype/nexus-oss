@@ -130,7 +130,7 @@ public abstract class AbstractStorageItem
      * @param writable the writable
      */
     public AbstractStorageItem( RepositoryRouter router, ResourceStoreRequest request, boolean readable,
-        boolean writable )
+                                boolean writable )
     {
         this( request, readable, writable );
         this.store = router;
@@ -166,11 +166,11 @@ public abstract class AbstractStorageItem
     {
         return request;
     }
-    
-    public void setResourceStoreRequest(ResourceStoreRequest request)
+
+    public void setResourceStoreRequest( ResourceStoreRequest request )
     {
         this.request = request;
-        
+
         this.context = new RequestContext( request.getRequestContext() );
     }
 
@@ -403,7 +403,13 @@ public abstract class AbstractStorageItem
     public void overlay( StorageItem item )
         throws IllegalArgumentException
     {
-        if ( item != null && this.getClass().isAssignableFrom( item.getClass() ) )
+        if ( item == null )
+        {
+            throw new NullPointerException( "Cannot overlay null item onto this item of class "
+                + this.getClass().getName() );
+        }
+
+        if ( isOverlayable( item ) )
         {
             // TODO: WHY?
             // these do not overlays:
@@ -430,17 +436,14 @@ public abstract class AbstractStorageItem
         }
         else
         {
-            if ( item == null )
-            {
-                throw new IllegalArgumentException( "Cannot overlay null item onto this item of class "
-                    + this.getClass().getName() );
-            }
-            else
-            {
-                throw new IllegalArgumentException( "Cannot overlay storage item of class " + item.getClass().getName()
-                    + " onto this item of class " + this.getClass().getName() );
-            }
+            throw new IllegalArgumentException( "Cannot overlay storage item of class " + item.getClass().getName()
+                + " onto this item of class " + this.getClass().getName() );
         }
+    }
+
+    protected boolean isOverlayable( StorageItem item )
+    {
+        return this.getClass().isAssignableFrom( item.getClass() );
     }
 
 }

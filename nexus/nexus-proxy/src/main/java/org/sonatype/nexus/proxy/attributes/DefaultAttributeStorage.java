@@ -29,6 +29,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
+import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -73,6 +74,7 @@ public class DefaultAttributeStorage
         super();
         this.xstream = new XStream();
         this.xstream.alias( "file", DefaultStorageFileItem.class );
+        this.xstream.alias( "compositeFile", DefaultStorageCompositeFileItem.class );
         this.xstream.alias( "collection", DefaultStorageCollectionItem.class );
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
     }
