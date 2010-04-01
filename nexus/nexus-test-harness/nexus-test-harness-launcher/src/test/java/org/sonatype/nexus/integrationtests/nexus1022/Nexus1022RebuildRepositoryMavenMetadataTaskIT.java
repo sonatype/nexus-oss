@@ -14,6 +14,7 @@
 package org.sonatype.nexus.integrationtests.nexus1022;
 
 import java.io.File;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -31,10 +32,9 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
     public void rebuildMavenMetadata()
         throws Exception
     {
-/*        if(true) {
-            printKnownErrorButDoNotFail( getClass(), "rebuildMavenMetadata" );
-            return;
-        }*/
+        /*
+         * if(true) { printKnownErrorButDoNotFail( getClass(), "rebuildMavenMetadata" ); return; }
+         */
         String releaseRepoPath = "storage/nexus-test-harness-repo/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
@@ -43,7 +43,8 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
 
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
 
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask("RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         File artifactDirMd = new File( nexusWorkDir, releaseRepoPath + "nexus1022/foo/bar/artifact/maven-metadata.xml" );
@@ -52,6 +53,16 @@ public class Nexus1022RebuildRepositoryMavenMetadataTaskIT
         File groupPluginMd = new File( nexusWorkDir, releaseRepoPath + "nexus1022/foo/bar/plugins/maven-metadata.xml" );
         Assert.assertTrue( "Maven metadata file should be generated after rebuild", groupPluginMd.exists() );
 
+        downloadFile( new URL( nexusBaseUrl + "content/repositories/nexus-test-harness-repo/"
+            + "nexus1022/foo/bar/plugins/maven-metadata.xml" ), releaseRepoPath );
+        downloadFile(
+                      new URL( nexusBaseUrl + "content/groups/public/" + "nexus1022/foo/bar/plugins/maven-metadata.xml" ),
+                      releaseRepoPath );
+
+        downloadFile( new URL( nexusBaseUrl + "content/repositories/nexus-test-harness-repo/"
+            + "nexus1022/foo/bar/plugins/maven-metadata.xml" + ".sha1" ), releaseRepoPath );
+        downloadFile( new URL( nexusBaseUrl + "content/groups/public/" + "nexus1022/foo/bar/plugins/maven-metadata.xml"
+            + ".sha1" ), releaseRepoPath );
     }
 
 }
