@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.sonatype.security.realms</groupId>
   <artifactId>security-realms</artifactId>
-  <version>1.1.8</version>
+  <version>1.1.9-SNAPSHOT</version>
   <packaging>pom</packaging>  
   <name>Security: Realms Parent</name>
   
@@ -15,10 +15,4 @@
   	<module>security-xml-realm</module>
   	<module>security-url-realm</module>
   </modules>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</url>
-  </scm>
 </project>

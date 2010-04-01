@@ -8,7 +8,7 @@
   <artifactId>security-system</artifactId>
   <name>Security: System</name>
   <description>Main entry point and Facade around all things security.</description>
-  <version>1.1.8</version>
+  <version>1.1.9-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
@@ -83,10 +83,4 @@
     </dependency>
 
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</url>
-  </scm>
 </project>

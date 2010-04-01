@@ -9,7 +9,7 @@
   <artifactId>security-rest-api</artifactId>
   <name>Security: REST API</name>
   <description>Security CURD operations published over REST, using the plexus-restlet-bridge and PlexusResources.</description>
-  <version>1.1.8</version>
+  <version>1.1.9-SNAPSHOT</version>
 
   <properties>
     <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
@@ -169,11 +169,4 @@
       </build>
     </profile>
     </profiles>
-  
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</developerConnection>
-    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</url>
-  </scm>
 </project>
