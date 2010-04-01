@@ -62,6 +62,11 @@
       globalRestApiSettings : {
         baseUrl : "",
         forceBaseUrl : false
+      },
+      systemNotificationSettings : {
+        enabled : false,
+        emailAddresses : "",
+        roles : []
       }
     },
 

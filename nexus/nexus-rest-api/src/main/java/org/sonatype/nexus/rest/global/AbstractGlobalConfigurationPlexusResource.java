@@ -28,6 +28,9 @@ import org.sonatype.nexus.configuration.model.CRestApiSettings;
 import org.sonatype.nexus.configuration.model.CSmtpConfiguration;
 import org.sonatype.nexus.email.NexusEmailer;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
+import org.sonatype.nexus.notification.NotificationCheat;
+import org.sonatype.nexus.notification.NotificationManager;
+import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.repository.ClientSSLRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.NtlmRemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
@@ -39,6 +42,7 @@ import org.sonatype.nexus.rest.model.RemoteConnectionSettings;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.SmtpSettings;
+import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 
 /**
  * The base class for global configuration resources.
@@ -148,6 +152,42 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setReportErrorsAutomatically( errorReportingManager.isEnabled() );
 
         return result;
+    }
+    
+    public static SystemNotificationSettings convert( NotificationManager manager )
+    {
+        if ( manager == null )
+        {
+            return null;
+        }
+        
+        NotificationTarget target = manager.readNotificationTarget( NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID );
+        
+        if ( target == null )
+        {
+            return null;
+        }
+        
+        SystemNotificationSettings settings = new SystemNotificationSettings();
+        settings.setEnabled( manager.isEnabled() );
+        settings.getRoles().addAll( target.getTargetRoles() );
+        
+        StringBuffer sb = new StringBuffer();
+        
+        for ( String email : target.getExternalTargets() )
+        {
+            sb.append( email ).append( "," );
+        }
+        
+        // drop last comma
+        if ( sb.length() > 0 )
+        {
+            sb.setLength( sb.length() - 1 );
+        }
+        
+        settings.setEmailAddresses( sb.toString() );
+        
+        return settings;
     }
 
     /**

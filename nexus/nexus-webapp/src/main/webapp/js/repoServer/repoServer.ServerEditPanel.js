@@ -53,6 +53,31 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
           }
         }
       });
+      
+  this.roleStore = new Ext.data.JsonStore({
+        root : 'data',
+        id : 'roleId',
+        fields : [{
+              name : 'roleId'
+            }, {
+              name : 'name',
+              sortType : Ext.data.SortTypes.asUCString
+            }, {
+              name : 'source'
+            }],
+        sortInfo : {
+          field : 'name',
+          direction : 'ASC'
+        },
+        url : Sonatype.config.servicePath + '/plexus_roles/default',
+        listeners : {
+          load : {
+            fn : this.loadServerConfig,
+            scope : this
+          }
+        },
+        autoLoad: true
+      });
 
   // help text alias
   var ht = Sonatype.repoServer.resources.help.server;
@@ -533,7 +558,61 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                         }]
                   } // end auth fieldset
               ]
-            } // end proxy settings
+            }, // end proxy settings
+            {
+              xtype : 'fieldset',
+              checkboxToggle : false,
+              collapsed : false,
+              collapsible : true,
+              id : formId + '_' + 'systemNotificationSettings',
+              name : 'systemNotificationSettings',
+              title : 'System Notification Settings',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              listeners : {
+                'expand' : {
+                  fn : this.optionalFieldsetExpandHandler,
+                  scope : this
+                },
+                'collapse' : {
+                  fn : this.optionalFieldsetCollapseHandler,
+                  scope : this,
+                  delay : 100
+                }
+              },
+
+              items : [{
+                    xtype : 'panel',
+                    layout : 'fit',
+                    html : '<div style="padding-bottom:10px">' + ht.systemNotification + '</div>'
+                  },{
+                    xtype : 'checkbox',
+                    fieldLabel : 'Enabled',
+                    helpText : ht.notificationsEnabled,
+                    name : 'systemNotificationSettings.enabled'
+                  },{
+                    xtype : 'textfield',
+                    fieldLabel : 'Email Addresses',
+                    helpText : ht.notificationEmailAddresses,
+                    name : 'systemNotificationSettings.emailAddresses',
+                    anchor : Sonatype.view.FIELD_OFFSET,
+                    allowBlank : true
+                  },{
+                    xtype : 'twinpanelchooser',
+                    titleLeft : 'Roles',
+                    titleRight : 'Available Roles',
+                    name : 'systemNotificationSettings.roles',
+                    valueField : 'roleId',
+                    store : this.roleStore,
+                    required : false,
+                    validateLeftItems : true,
+                    halfSize : true
+                  }
+              ]
+            } // end notification settings
         ],
         buttons : [{
               id : 'savebutton',
@@ -610,7 +689,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       },
 
       saveBtnHandler : function() {
-        var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate();
+        var allValid = this.form.isValid() 
+          && this.find('name', 'securityRealms')[0].validate()
+          && this.find('name', 'systemNotificationSettings.roles')[0].validate();
 
         if (allValid)
         {
@@ -635,6 +716,9 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                 "routing.groups.mergeMetadata" : Sonatype.utils.convert.stringContextToBool,
                 "securityRealms" : function(val, fpanel) {
                   return fpanel.find('name', 'securityRealms')[0].getValue();
+                },
+                "systemNotificationSettings.roles" : function(val, fpanel) {
+                  return fpanel.find('name', 'systemNotificationSettings.roles')[0].getValue();
                 },
                 "securityAnonymousAccessEnabled" : function(val, fpanel) {
                   return fpanel.isSecurityAnonymousAccessEnabled;
@@ -683,7 +767,11 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       },
 
       loadServerConfig : function() {
-
+        // if stores aren't loaded, abort, they will load again when done
+        if (this.roleStore.lastOptions == null || this.realmTypeDataStore.lastOptions == null) {
+          return;
+        }
+        
         var fpanel = this.formPanel;
 
         this.formPanel.getForm().doAction('sonatypeLoad', {
@@ -696,6 +784,11 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                 "routing.groups.mergeMetadata" : Sonatype.utils.capitalize,
                 "securityRealms" : function(arr, srcObj, fpanel) {
                   fpanel.find('name', 'securityRealms')[0].setValue(arr);
+                  return arr; // return arr, even if empty to comply with
+                  // sonatypeLoad data modifier requirement
+                },
+                "systemNotificationSettings.roles" : function(arr, srcObj, fpanel) {
+                  fpanel.find('name', 'systemNotificationSettings.roles')[0].setValue(arr);
                   return arr; // return arr, even if empty to comply with
                   // sonatypeLoad data modifier requirement
                 },

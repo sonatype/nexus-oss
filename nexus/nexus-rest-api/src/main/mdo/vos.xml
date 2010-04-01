@@ -120,6 +120,44 @@
         </field>
       </fields>
     </class>
+    
+    <class>
+      <name>SystemNotificationSettings</name>
+      <version>1.0.0+</version>
+      <description>
+        The notification settings tell nexus who to notify when certain events occur (such as a proxy repository being auto-blocked).
+      </description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "system-notification-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+          <description>Flag that states whether to enable notifications.</description>
+        </field>
+        <field>
+          <name>emailAddresses</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Comma seperated list of email addresses to notify.</description>
+        </field>
+        <field>
+          <name>roles</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+          <description>List of role ids, users assigned to these roles will be notified by email as well.</description>
+        </field>
+      </fields>
+    </class>
 
     <class>
       <name>SmtpSettings</name>
@@ -365,6 +403,15 @@
           </association>
           <required>true</required>
           <description>Global remote connection settings.</description>
+        </field>
+        <field>
+          <name>systemNotificationSettings</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>SystemNotificationSettings</type>
+          </association>
+          <required>true</required>
+          <description>System notification settings.</description>
         </field>
         <field>
           <name>smtpSettings</name>

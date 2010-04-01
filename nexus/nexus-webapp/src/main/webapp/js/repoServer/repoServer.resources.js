@@ -46,6 +46,7 @@
       anonUsername : 'The username that will be used to authenticate anonymous users against the security realm.',
       anonPassword : 'The password that will be used to authenticate anonymous users against the security realm.',
       anonymousAccess : 'These fields are used to authenticate anonymous requests. When a request comes in without credentials, Nexus uses the Anonymous Username and Anonymous Password field as a substitute and pass it through the security subsystem. This is used in conjunction with third party security realm integration. For example if you were authenticating against Active Directory, the username might be "Guest" instead of anonymous. If you are using the default Nexus security realm, then these shouldn\'t be changed.',
+      systemNotification: 'Nexus can be used to notify users (by email address, or users that are part of a specified role) when certain events occur in the system.',
       security : 'Whether to enable security or not.',
       baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
       forceBaseUrl : 'If checked, this will force all URLs to be built with a Base URL. Otherwise, Base URL will only be used in emails and rss feeds, with other URLs built based on the incoming request.',
@@ -75,7 +76,9 @@
       smtptls : 'Enable TLS.',
       smtpsysemail : 'Default System email address.  This is who the "From" address will be.',
       jiraUsername : 'The Username of a JIRA account.  If left empty default username and password will be used.',
-      jiraPassword : 'The Password of a JIRA account.  If left empty default username and password will be used.'
+      jiraPassword : 'The Password of a JIRA account.  If left empty default username and password will be used.',
+      notificationEmailAddresses : 'A comma seperated list of email addresses to notify.',
+      notificationsEnabled : 'Enable the system to send notification messages to the receipients defined below.'
     },
 
     // Groups Config help text
