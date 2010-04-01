@@ -140,7 +140,7 @@
   <properties>
     <plexus.appbooter.version>2.1.0</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.8-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>1.1.8</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
     <nexus.indexer.version>2.0.5</nexus.indexer.version>
@@ -1048,7 +1048,7 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.19-RC2</enunciate.version>
+        <enunciate.version>1.19</enunciate.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
