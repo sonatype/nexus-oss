@@ -23,6 +23,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
+import org.sonatype.nexus.configuration.model.CNotification;
 import org.sonatype.nexus.configuration.model.v1_4_1.upgrade.BasicVersionConverter;
 
 
@@ -75,6 +76,9 @@ public class Upgrade140to141
         .getConfiguration();
 
         org.sonatype.nexus.configuration.model.Configuration newc = new BasicVersionConverter().convertConfiguration( oldc );
+        
+        // just add it, default is disabled
+        newc.setNotification( new CNotification() );
         
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );

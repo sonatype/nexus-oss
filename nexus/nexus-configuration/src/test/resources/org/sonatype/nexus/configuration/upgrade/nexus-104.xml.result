@@ -689,4 +689,5 @@
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
     <jiraProject>PR</jiraProject>
   </errorReporting>
+  <notification />
 </nexusConfiguration>

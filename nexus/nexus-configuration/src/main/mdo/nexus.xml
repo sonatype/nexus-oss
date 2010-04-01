@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
   <!--
-    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free software; you can
-    redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation;
-    either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
-    General Public License for more details. You should have received a copy of the GNU Lesser General Public License along with this
-    program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc.
+    This file is part of Nexus. This program is free software; you can
+    redistribute it and/or modify it under the terms of the GNU Lesser
+    General Public License as published by the Free Software Foundation;
+    either version 3 of the License, or (at your option) any later
+    version. This program is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    Lesser General Public License for more details. You should have
+    received a copy of the GNU Lesser General Public License along with
+    this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
   -->
 
-<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
 
   <id>nexus</id>
@@ -171,6 +178,15 @@
           <association>
             <type>CPlugin</type>
             <multiplicity>*</multiplicity>
+          </association>
+          <required>false</required>
+        </field>
+        <field>
+          <name>notification</name>
+          <version>1.4.1+</version>
+          <description>Notification targets</description>
+          <association>
+            <type>CNotification</type>
           </association>
           <required>false</required>
         </field>
@@ -516,16 +532,13 @@
           </description>
           <required>true</required>
         </field>
-        <!-- <field>
-          <name>allowWrite</name>
-          <version>1.4.0+</version>
-          <type>boolean</type>
-          <description>
-            If true, repository will deny any kind of deployment (write) request. Caching will still work.
-          </description>
-          <required>true</required>
-        </field> -->
-         <field>
+        <!--
+          <field> <name>allowWrite</name> <version>1.4.0+</version>
+          <type>boolean</type> <description> If true, repository will
+          deny any kind of deployment (write) request. Caching will
+          still work. </description> <required>true</required> </field>
+        -->
+        <field>
           <name>writePolicy</name>
           <version>1.4.0+</version>
           <type>String</type>
@@ -1115,7 +1128,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>CErrorReporting</name>
       <version>1.4.0+</version>
@@ -1222,6 +1235,76 @@
 ]]></code>
         </codeSegment>
       </codeSegments>
+    </class>
+
+    <class>
+      <name>CNotification</name>
+      <version>1.4.1+</version>
+      <description>Notification (global settings).</description>
+      <fields>
+        <field>
+          <name>enabled</name>
+          <version>1.4.1+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Is target notification enabled? (if false, no notification will be sent)</description>
+        </field>
+        <field>
+          <name>notificationTargets</name>
+          <version>1.4.1+</version>
+          <description>Notification targets.</description>
+          <required>true</required>
+          <association>
+            <type>CNotificationTarget</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>CNotificationTarget</name>
+      <version>1.4.1+</version>
+      <description>Notification target (target level settings).</description>
+      <fields>
+        <field>
+          <name>targetId</name>
+          <version>1.4.1+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The ID of the target.</description>
+        </field>
+        <field>
+          <name>targetRoles</name>
+          <version>1.4.1+</version>
+          <description>Security Roles that are member of this notification group.</description>
+          <required>false</required>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>targetUsers</name>
+          <version>1.4.1+</version>
+          <description>Security Users that are member of this notification group.</description>
+          <required>false</required>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>targetExternals</name>
+          <version>1.4.1+</version>
+          <description>External targets (not belonging to any user from Nexus) that are member of this notification group.</description>
+          <required>false</required>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
     </class>
 
   </classes>
