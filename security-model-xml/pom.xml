@@ -9,7 +9,7 @@
   <artifactId>security-model-xml</artifactId>
   <name>Security: XML Model</name>
   <description>Contains an xml implementation of the security-model.</description>
-  <version>1.1.8-SNAPSHOT</version>
+  <version>1.1.8</version>
 
   <build>
     <plugins>
@@ -37,4 +37,10 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</developerConnection>
+    <url>http://svn.sonatype.org/spice/tags/security-aggregator-1.1.8</url>
+  </scm>
 </project>
