@@ -2,6 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus421;
 
 import java.io.IOException;
 
+import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 
 import junit.framework.Assert;
@@ -9,8 +10,10 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
+import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.SystemNotificationSettings;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
@@ -30,14 +33,11 @@ public class Nexus421PlainNotificationTest
         // make central auto-block itself (point it to bad URL)
         pointCentralToRemoteUrl( "http://repo1.maven.org/mavenFooBar/not-here/" );
 
-        // expect 3 mails: for admin user, for pipi1 and for pipi2. Mail should be about "auto-blocked"
-        expectMails( 3, "auto-blocked" );
-
         // make central unblock itself (point it to good URL)
         pointCentralToRemoteUrl( "http://repo1.maven.org/maven2/" );
 
-        // expect 3 mails: for admin user, for pipi1 and for pipi2. Mail should be about "unblocked"
-        expectMails( 3, "unblocked" );
+        // we have 3 recipients set
+        checkMails( 3 );
     }
 
     // --
@@ -47,7 +47,7 @@ public class Nexus421PlainNotificationTest
     {
         // set up repo message util
         this.repoMessageUtil =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         // CONFIG CHANGES (using Nexus factory-defaults!)
         // set up SMTP to use our mailServer
@@ -95,7 +95,7 @@ public class Nexus421PlainNotificationTest
     }
 
     protected void pointCentralToRemoteUrl( String remoteUrl )
-        throws IOException
+        throws IOException, InterruptedException
     {
         // make a proxy server to block (do it by taking central, and breaking it's remoteURL)
         RepositoryProxyResource central = (RepositoryProxyResource) repoMessageUtil.getRepository( "central" );
@@ -104,20 +104,55 @@ public class Nexus421PlainNotificationTest
         central.getRemoteStorage().setRemoteStorageUrl( remoteUrl );
 
         repoMessageUtil.updateRepo( central );
+
+        // to "ping it" (and not wait for thread to check remote availability)
+        RepositoryStatusResource res = repoMessageUtil.getStatus( "central", true );
+
+        while ( RemoteStatus.UNKNOWN.name().equals( res.getRemoteStatus() ) )
+        {
+            res = repoMessageUtil.getStatus( "central", false );
+
+            Thread.sleep( 1000 );
+        }
     }
 
-    protected void expectMails( int count, String... contentToCheckFor )
-        throws InterruptedException
+    protected void checkMails( int recipientCount )
+        throws InterruptedException, MessagingException
     {
-        server.waitForIncomingEmail( 10000, count );
+        int expectedMailCount = recipientCount * 2;
+
+        // expect total 2*count mails: once for auto-block, once for unblock, for admin user, for pipi1 and for pipi2.
+        // Mail
+        // should be about "unblocked"
+        server.waitForIncomingEmail( 10000, expectedMailCount );
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
         Assert.assertNotNull( "Messages array should not be null!", msgs );
 
-        Assert.assertEquals( "We expect " + count + " mails!", count, msgs.length );
+        Assert.assertEquals( "We expect " + expectedMailCount + " mails, since we have " + recipientCount
+            + " recipients!", expectedMailCount, msgs.length );
 
-        // TODO: implement simple string search for contentToCheckFor in mail bodies
+        int blockedMails = 0;
+
+        int unblockedMails = 0;
+
+        for ( int i = 0; i < expectedMailCount; i++ )
+        {
+            MimeMessage msg = msgs[i];
+
+            if ( msg.getSubject().toLowerCase().contains( "auto-blocked" ) )
+            {
+                blockedMails++;
+            }
+            else if ( msg.getSubject().toLowerCase().contains( "unblocked" ) )
+            {
+                unblockedMails++;
+            }
+        }
+
+        Assert.assertEquals( "We should have equally " + recipientCount
+            + " for auto-blocked and unblocked mails! We have auto-blocked and unblocked!", blockedMails
+            + unblockedMails, expectedMailCount );
     }
-
 }

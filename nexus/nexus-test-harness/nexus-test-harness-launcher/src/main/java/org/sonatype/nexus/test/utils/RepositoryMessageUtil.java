@@ -65,7 +65,7 @@ public class RepositoryMessageUtil
         this.mediaType = mediaType;
         this.repositoryTypeRegistry = registry;
     }
-    
+
     public RepositoryBaseResource createRepository( RepositoryBaseResource repo )
         throws IOException
     {
@@ -130,15 +130,15 @@ public class RepositoryMessageUtil
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
-                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
+                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(), actual
+                    .getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
             }
             // NOTE one of these blocks should be removed
             else
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(),
-                                   actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
+                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(), actual
+                    .getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
             }
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
@@ -150,8 +150,8 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                                     actual.getRemoteStorage().getRemoteStorageUrl() );
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), actual.getRemoteStorage()
+                    .getRemoteStorageUrl() );
             }
 
             Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
@@ -183,13 +183,13 @@ public class RepositoryMessageUtil
 
         return resourceResponse.getData();
     }
-    
+
     public RepositoryBaseResource updateRepo( RepositoryBaseResource repo )
         throws IOException
     {
         return updateRepo( repo, true );
     }
-    
+
     public RepositoryBaseResource updateRepo( RepositoryBaseResource repo, boolean validate )
         throws IOException
     {
@@ -337,21 +337,22 @@ public class RepositoryMessageUtil
             ContentClass expectedCc =
                 repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
             Assert.assertNotNull( "Unknown repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint() + "'!",
-                                  expectedCc );
+                expectedCc );
             Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
 
             if ( expected.getOverrideLocalStorageUrl() == null )
             {
-                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
-                                   cRepo.getLocalStorage().getUrl() );
+                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.", cRepo
+                    .getLocalStorage().getUrl() );
             }
             else
             {
                 String actualLocalStorage =
-                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl()
-                                    : cRepo.getLocalStorage().getUrl() + "/";
+                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo
+                        .getLocalStorage().getUrl()
+                        + "/";
                 String overridLocalStorage =
                     expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
                                     : expected.getOverrideLocalStorageUrl() + "/";
@@ -364,8 +365,8 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                                     cRepo.getRemoteStorage().getUrl() );
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage()
+                    .getUrl() );
             }
 
             // check maven repo props (for not just check everything that is a Repository
@@ -423,8 +424,21 @@ public class RepositoryMessageUtil
     public RepositoryStatusResource getStatus( String repoId )
         throws IOException
     {
+        return getStatus( repoId, false );
+    }
 
-        Response response = RequestFacade.sendMessage( SERVICE_PART + "/" + repoId + "/status", Method.GET );
+    public RepositoryStatusResource getStatus( String repoId, boolean force )
+        throws IOException
+    {
+
+        String uri = SERVICE_PART + "/" + repoId + "/status";
+
+        if ( force )
+        {
+            uri = uri + "?forceCheck=true";
+        }
+
+        Response response = RequestFacade.sendMessage( uri, Method.GET );
         Status status = response.getStatus();
         Assert.assertTrue( "Fail to getStatus for '" + repoId + "' repository" + status, status.isSuccess() );
 
