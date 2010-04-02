@@ -60,14 +60,10 @@ public class DefaultRepositoryTypeRegistry
                     Set<RepositoryTypeDescriptor> result = new HashSet<RepositoryTypeDescriptor>();
 
                     // fill in the defaults
-                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( Repository.class.getName(),
-                                                                                 "repositories" ) );
-                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(),
-                                                                                 "shadows" ) );
-                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(),
-                                                                                 "groups" ) );
-                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(),
-                                                                                 "sites" ) );
+                    result.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
+                    result.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
+                    result.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
+                    result.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
 
                     this.repositoryTypeDescriptors = result;
                 }
