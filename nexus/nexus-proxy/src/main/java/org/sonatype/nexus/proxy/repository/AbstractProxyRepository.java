@@ -713,6 +713,13 @@ public abstract class AbstractProxyRepository
         return result;
     }
 
+    protected RepositoryItemUid getDownloadItemUid( ResourceStoreRequest request )
+    {
+        RepositoryItemUid uid = createUid( request.getRequestPath() + "?download=true" );
+
+        return uid;
+    }
+
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
@@ -732,42 +739,61 @@ public abstract class AbstractProxyRepository
             getLogger().debug( db.toString() );
         }
 
-        // From now on, the retrieve operation becomes WRITE operation,
-        // since this is proxy repository, and it _might_ have "fetch" as side-effect, or should wait for another thread
-        // to finish the fetch side effect.
-        // So, for same UIDs we start serialize the request processing.
-        RepositoryItemUid uid = createUid( request.getRequestPath() );
-
-        uid.lock( Action.create );
-
-        try
+        if ( !getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            return doRetrieveItem0( request );
+            // we have no proxy facet, just get 'em!
+            return super.doRetrieveItem( request );
         }
-        finally
+        else
         {
-            uid.unlock();
+            // we have Proxy facet, so we want to check carefully local storage
+            // Reason: a previous thread may still _downloading_ the stuff we want to
+            // serve to another client, so we have to _wait_ for download, but for download
+            // only.
+            // From now on, the retrieve operation becomes WRITE operation,
+            // since this is proxy repository, and it _might_ have "fetch" as side-effect, or should wait for another
+            // thread
+            // to finish the fetch side effect.
+            // So, for _download_ UIDs we start serialize the request processing.
+            RepositoryItemUid downloadUid = getDownloadItemUid( request );
+
+            downloadUid.lock( Action.create );
+
+            try
+            {
+                AbstractStorageItem localItem = null;
+
+                if ( !request.isRequestRemoteOnly() )
+                {
+                    try
+                    {
+                        localItem = (AbstractStorageItem) super.doRetrieveItem( request );
+
+                        if ( localItem != null && !isOld( localItem ) )
+                        {
+                            return localItem;
+                        }
+                    }
+                    catch ( ItemNotFoundException e )
+                    {
+                        localItem = null;
+                    }
+                }
+
+                return doRetrieveItem0( request, localItem );
+            }
+            finally
+            {
+                downloadUid.unlock();
+            }
         }
     }
 
-    protected StorageItem doRetrieveItem0( ResourceStoreRequest request )
+    protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         AbstractStorageItem item = null;
         AbstractStorageItem remoteItem = null;
-        AbstractStorageItem localItem = null;
-
-        if ( !request.isRequestRemoteOnly() )
-        {
-            try
-            {
-                localItem = (AbstractStorageItem) super.doRetrieveItem( request );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                localItem = null;
-            }
-        }
 
         // proxyMode and request.localOnly decides 1st
         boolean shouldProxy = !request.isRequestLocalOnly() && getProxyMode() != null && getProxyMode().shouldProxy();
@@ -1067,150 +1093,163 @@ public abstract class AbstractProxyRepository
     protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
         throws ItemNotFoundException, RemoteAccessException, StorageException
     {
-        DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
+        // this whole method _locks_ the downloadUid.
+        // See doRetrieveItem() method above
+        RepositoryItemUid downloadUid = getDownloadItemUid( request );
 
-        List<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().debug( "Mirror count:" + mirrors.size() );
-        }
-
-        mirrors.add( new Mirror( "default", getRemoteUrl() ) );
-
-        List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
-
-        Exception lastException = null;
+        downloadUid.lock( Action.create );
 
         try
         {
-            all_urls: for ( Mirror mirror : mirrors )
+            DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
+
+            List<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
+            if ( getLogger().isDebugEnabled() )
             {
-                int retryCount = 1;
+                getLogger().debug( "Mirror count:" + mirrors.size() );
+            }
 
-                if ( getRemoteStorageContext() != null )
+            mirrors.add( new Mirror( "default", getRemoteUrl() ) );
+
+            List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
+
+            Exception lastException = null;
+
+            try
+            {
+                all_urls: for ( Mirror mirror : mirrors )
                 {
-                    retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
-                }
+                    int retryCount = 1;
 
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Using mirror URL:" + mirror.getUrl() + ", retryCount=" + retryCount );
-                }
+                    if ( getRemoteStorageContext() != null )
+                    {
+                        retryCount = getRemoteStorageContext().getRemoteConnectionSettings().getRetrievalRetryCount();
+                    }
 
-                // Validate the mirror URL
-                try
-                {
-                    getRemoteStorage().validateStorageUrl( mirror.getUrl() );
-                }
-                catch ( Exception e )
-                {
-                    lastException = e;
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Using mirror URL:" + mirror.getUrl() + ", retryCount=" + retryCount );
+                    }
 
-                    selector.feedbackFailure( mirror );
-                    logFailedMirror( mirror, e );
-
-                    continue all_urls; // retry with next url
-                }
-
-                for ( int i = 0; i < retryCount; i++ )
-                {
+                    // Validate the mirror URL
                     try
                     {
-                        // events.clear();
+                        getRemoteStorage().validateStorageUrl( mirror.getUrl() );
+                    }
+                    catch ( Exception e )
+                    {
+                        lastException = e;
 
-                        AbstractStorageItem remoteItem =
-                            getRemoteStorage().retrieveItem( this, request, mirror.getUrl() );
+                        selector.feedbackFailure( mirror );
+                        logFailedMirror( mirror, e );
 
-                        remoteItem.getItemContext().putAll( request.getRequestContext() );
+                        continue all_urls; // retry with next url
+                    }
 
-                        remoteItem = doCacheItem( remoteItem );
-
-                        if ( doValidateRemoteItemContent( request, mirror.getUrl(), remoteItem, events ) )
+                    for ( int i = 0; i < retryCount; i++ )
+                    {
+                        try
                         {
-                            sendContentValidationEvents( request, events, true );
+                            // events.clear();
 
-                            selector.feedbackSuccess( mirror );
+                            AbstractStorageItem remoteItem =
+                                getRemoteStorage().retrieveItem( this, request, mirror.getUrl() );
 
-                            return remoteItem;
+                            remoteItem.getItemContext().putAll( request.getRequestContext() );
+
+                            remoteItem = doCacheItem( remoteItem );
+
+                            if ( doValidateRemoteItemContent( request, mirror.getUrl(), remoteItem, events ) )
+                            {
+                                sendContentValidationEvents( request, events, true );
+
+                                selector.feedbackSuccess( mirror );
+
+                                return remoteItem;
+                            }
+                            else
+                            {
+                                selector.feedbackFailure( mirror );
+
+                                lastException = new InvalidItemContentException( request, mirror );
+                            }
                         }
-                        else
+                        catch ( ItemNotFoundException e )
                         {
+                            lastException = e;
+
+                            continue all_urls; // retry with next url
+                        }
+                        catch ( RemoteAccessException e )
+                        {
+                            lastException = e;
+
                             selector.feedbackFailure( mirror );
+                            logFailedMirror( mirror, e );
 
-                            lastException = new InvalidItemContentException( request, mirror );
+                            continue all_urls; // retry with next url
                         }
+                        catch ( StorageException e )
+                        {
+                            getLogger().error(
+                                "Got Storage Exception while storing remote artifact, will attempt next mirror", e );
+                            lastException = e;
+
+                            selector.feedbackFailure( mirror );
+                            logFailedMirror( mirror, e );
+                        }
+                        catch ( RuntimeException e )
+                        {
+                            lastException = e;
+
+                            selector.feedbackFailure( mirror );
+                            logFailedMirror( mirror, e );
+
+                            continue all_urls; // retry with next url
+                        }
+
+                        // retry with same url
                     }
-                    catch ( ItemNotFoundException e )
-                    {
-                        lastException = e;
-
-                        continue all_urls; // retry with next url
-                    }
-                    catch ( RemoteAccessException e )
-                    {
-                        lastException = e;
-
-                        selector.feedbackFailure( mirror );
-                        logFailedMirror( mirror, e );
-
-                        continue all_urls; // retry with next url
-                    }
-                    catch ( StorageException e )
-                    {
-                        getLogger().error(
-                            "Got Storage Exception while storing remote artifact, will attempt next mirror", e );
-                        lastException = e;
-
-                        selector.feedbackFailure( mirror );
-                        logFailedMirror( mirror, e );
-                    }
-                    catch ( RuntimeException e )
-                    {
-                        lastException = e;
-
-                        selector.feedbackFailure( mirror );
-                        logFailedMirror( mirror, e );
-
-                        continue all_urls; // retry with next url
-                    }
-
-                    // retry with same url
                 }
             }
+            finally
+            {
+                selector.close();
+            }
+
+            // if we got here, requested item was not retrieved for some reason
+
+            sendContentValidationEvents( request, events, false );
+
+            try
+            {
+                getLocalStorage().deleteItem( this, request );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // good, we want this item deleted
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                getLogger().warn( "Unexpected Exception", e );
+            }
+
+            if ( lastException instanceof StorageException )
+            {
+                throw (StorageException) lastException;
+            }
+            else if ( lastException instanceof ItemNotFoundException )
+            {
+                throw (ItemNotFoundException) lastException;
+            }
+
+            // validation failed, I guess.
+            throw new ItemNotFoundException( request, this );
         }
         finally
         {
-            selector.close();
+            downloadUid.unlock();
         }
-
-        // if we got here, requested item was not retrieved for some reason
-
-        sendContentValidationEvents( request, events, false );
-
-        try
-        {
-            getLocalStorage().deleteItem( this, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // good, we want this item deleted
-        }
-        catch ( UnsupportedStorageOperationException e )
-        {
-            getLogger().warn( "Unexpected Exception", e );
-        }
-
-        if ( lastException instanceof StorageException )
-        {
-            throw (StorageException) lastException;
-        }
-        else if ( lastException instanceof ItemNotFoundException )
-        {
-            throw (ItemNotFoundException) lastException;
-        }
-
-        // validation failed, I guess.
-        throw new ItemNotFoundException( request, this );
     }
 
     private void logFailedMirror( Mirror mirror, Exception e )
