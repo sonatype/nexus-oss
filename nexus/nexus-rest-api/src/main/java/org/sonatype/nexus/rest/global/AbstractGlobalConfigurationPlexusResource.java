@@ -161,15 +161,16 @@ public abstract class AbstractGlobalConfigurationPlexusResource
             return null;
         }
         
+        SystemNotificationSettings settings = new SystemNotificationSettings();
+        settings.setEnabled( manager.isEnabled() );
+        
         NotificationTarget target = manager.readNotificationTarget( NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID );
         
         if ( target == null )
         {
-            return null;
+            return settings;
         }
         
-        SystemNotificationSettings settings = new SystemNotificationSettings();
-        settings.setEnabled( manager.isEnabled() );
         settings.getRoles().addAll( target.getTargetRoles() );
         
         StringBuffer sb = new StringBuffer();
