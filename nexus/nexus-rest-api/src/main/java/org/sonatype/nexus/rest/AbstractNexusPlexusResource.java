@@ -47,7 +47,7 @@ public abstract class AbstractNexusPlexusResource
     public static final String NEXUS_INSTANCE_LOCAL = "local";
 
     public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
-    
+
     @Requirement
     private Nexus nexus;
 
@@ -59,10 +59,10 @@ public abstract class AbstractNexusPlexusResource
 
     @Requirement( hint = "default" )
     private RepositoryRegistry defaultRepositoryRegistry;
-    
+
     @Requirement
     private RepositoryTypeRegistry repoTypeRegistry;
-    
+
     @Requirement
     private ReferenceFactory referenceFactory;
 
@@ -80,7 +80,7 @@ public abstract class AbstractNexusPlexusResource
     {
         return repositoryRegistry;
     }
-    
+
     protected RepositoryRegistry getUnprotectedRepositoryRegistry()
     {
         return defaultRepositoryRegistry;
@@ -89,7 +89,7 @@ public abstract class AbstractNexusPlexusResource
     /**
      * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one FileItemFactory
      * instance in context. This method simply encapsulates gettting it from Resource context.
-     *
+     * 
      * @return
      */
     protected FileItemFactory getFileItemFactory( Context context )
@@ -100,7 +100,7 @@ public abstract class AbstractNexusPlexusResource
     /**
      * Centralized, since this is the only "dependent" stuff that relies on knowledge where restlet.Application is
      * mounted (we had a /service => / move).
-     *
+     * 
      * @param request
      * @return
      */
@@ -152,22 +152,25 @@ public abstract class AbstractNexusPlexusResource
         try
         {
             Repository repo = repositoryRegistry.getRepository( repoId );
-            
+
             for ( RepositoryTypeDescriptor desc : repoTypeRegistry.getRegisteredRepositoryTypeDescriptors() )
             {
                 if ( NexusCompat.getRepositoryProviderRole( repo ).equals( desc.getRole() ) )
                 {
-                    return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId ).getTargetRef();        
+                    return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId )
+                        .getTargetRef();
                 }
             }
-            
-            getLogger().error( "Cannot create reference for repository with role of " + NexusCompat.getRepositoryProviderRole( repo ) );
+
+            getLogger().error(
+                "Cannot create reference for repository with id=\"" + repo.getId() + "\" having role of "
+                    + NexusCompat.getRepositoryProviderRole( repo ) );
         }
         catch ( NoSuchRepositoryException e )
         {
-            getLogger().error( "Cannot create reference for non-existant repository" );
+            getLogger().error( "Cannot create reference for non-existant repository with id=\"" + repoId + "\"" );
         }
-        
+
         return null;
     }
 
@@ -211,8 +214,9 @@ public abstract class AbstractNexusPlexusResource
 
     protected Reference createRedirectReference( Request request )
     {
-        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length() );
+        String uriPart =
+            request.getResourceRef().getTargetRef().toString().substring(
+                request.getRootRef().getTargetRef().toString().length() );
 
         // trim leading slash
         if ( uriPart.startsWith( "/" ) )
@@ -242,8 +246,7 @@ public abstract class AbstractNexusPlexusResource
         return ner;
     }
 
-    protected void handleInvalidConfigurationException(
-        InvalidConfigurationException e )
+    protected void handleInvalidConfigurationException( InvalidConfigurationException e )
         throws PlexusResourceException
     {
         getLogger().warn( "Configuration error!", e );
@@ -293,7 +296,7 @@ public abstract class AbstractNexusPlexusResource
 
         throw new PlexusResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Configuration error.", nexusErrorResponse );
     }
-    
+
     protected Reference createRedirectBaseRef( Request request )
     {
         return createReference( getContextRoot( request ), "service/local/artifact/maven/redirect" ).getTargetRef();
@@ -303,14 +306,14 @@ public abstract class AbstractNexusPlexusResource
     {
         return RemoteIPFinder.findIP( request );
     }
-    
+
     protected String getActualPassword( String newPassword, String oldPassword )
     {
-        if( PASSWORD_PLACE_HOLDER.equals( newPassword ) )
+        if ( PASSWORD_PLACE_HOLDER.equals( newPassword ) )
         {
-            return oldPassword;     
+            return oldPassword;
         }
-        
+
         return newPassword;
     }
 }
