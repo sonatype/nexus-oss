@@ -62,6 +62,12 @@ public class ServerTab
     private TextField proxyNtlmHost;
 
     private TextField proxyNtlmDomain;
+    
+    private TextField notificationEmails;
+    
+    private Checkbox notificationsEnabled;
+    
+    private TwinPanel notificationRoles;
 
     private Button saveButton;
 
@@ -72,6 +78,8 @@ public class ServerTab
     private Fieldset proxySettings;
 
     private Fieldset proxyAuthentication;
+    
+    private Fieldset notificationSettings;
 
     private TwinPanel securityRealms;
 
@@ -135,6 +143,10 @@ public class ServerTab
         proxySettings = new Fieldset( selenium, expression + ".find('name', 'globalHttpProxySettings')[0]" );
         proxyAuthentication =
             new Fieldset( selenium, expression + ".find('name', 'globalHttpProxySettings.authentication')[0]" );
+        notificationSettings = new Fieldset( selenium, expression + ".find('name', 'systemNotificationSettings')[0]" );
+        notificationEmails = new TextField( selenium, expression + ".find('name', 'systemNotificationSettings.emailAddresses')[0]" );
+        notificationsEnabled = new Checkbox( selenium, expression + ".find('name', 'systemNotificationSettings.enabled')[0]" );
+        notificationRoles = new TwinPanel( selenium, expression + ".find('name', 'systemNotificationSettings.roles')[0]" );
     }
 
     public ServerTab save()
@@ -318,5 +330,25 @@ public class ServerTab
     public TwinPanel getSecurityRealms()
     {
         return securityRealms;
+    }
+    
+    public Fieldset getNotificationSettings()
+    {
+        return notificationSettings;
+    }
+    
+    public TextField getNotificationEmails()
+    {
+        return notificationEmails;
+    }
+    
+    public TwinPanel getNotificationRoles()
+    {
+        return notificationRoles;
+    }
+    
+    public Checkbox getNotificationsEnabled()
+    {
+        return notificationsEnabled;
     }
 }
