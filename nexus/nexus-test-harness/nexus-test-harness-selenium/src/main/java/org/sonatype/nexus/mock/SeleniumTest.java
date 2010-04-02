@@ -88,6 +88,7 @@ public abstract class SeleniumTest
             selenium.getEval( "window.isRunning()" );
         }
 
+        MockHelper.clearMocks();
     }
 
     @AfterMethod( alwaysRun = true )

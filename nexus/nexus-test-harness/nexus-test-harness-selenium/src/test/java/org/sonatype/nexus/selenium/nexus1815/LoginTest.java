@@ -4,6 +4,8 @@ import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.MatcherAssert;
 import org.restlet.data.Status;
 import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.MockResponse;
@@ -59,11 +61,14 @@ public class LoginTest
     @Test
     public void doListenLoginTest()
     {
-        MockHelper.listen( "/authentication/login", new MockListener() );
+        MockListener<?> ml = MockHelper.listen( "/authentication/login", new MockListener<Object>() );
 
         doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
 
         assertFalse( "Login link should not be available", main.loginLinkAvailable() );
+
+        assertTrue( ml.wasExecuted() );
+        MatcherAssert.assertThat( ml.getResult(), CoreMatchers.notNullValue() );
 
         MockHelper.checkAndClean();
     }
@@ -81,9 +86,11 @@ public class LoginTest
         data.setClientPermissions( permissions );
         result.setData( data );
 
-        MockHelper.expect( "/authentication/login", new MockResponse( Status.SUCCESS_OK, result ) );
+        MockResponse mock = MockHelper.expect( "/authentication/login", new MockResponse( Status.SUCCESS_OK, result ) );
 
-        doLogin( User.ADMIN.getUsername(), User.ADMIN.getPassword() );
+        doLogin( "mockingworks", "mockingworks" );
+
+        assertTrue( mock.wasExecuted() );
 
         assertFalse( "Login link should not be available", main.loginLinkAvailable() );
 
