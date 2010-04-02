@@ -320,7 +320,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
               collapsible : true,
               id : formId + '_' + 'errorReportingSettings',
               name : 'errorReportingSettings',
-              title : 'Error Reporting Settings (optional)',
+              title : 'Error Reporting Settings',
               anchor : Sonatype.view.FIELDSET_OFFSET,
               autoHeight : true,
               layoutConfig : {
