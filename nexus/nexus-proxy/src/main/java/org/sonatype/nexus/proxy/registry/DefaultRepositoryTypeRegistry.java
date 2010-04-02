@@ -52,13 +52,26 @@ public class DefaultRepositoryTypeRegistry
     {
         if ( repositoryTypeDescriptors == null )
         {
-            repositoryTypeDescriptors = new HashSet<RepositoryTypeDescriptor>();
+            synchronized ( this )
+            {
+                // maybe the previous who was blocking us already did the job
+                if ( repositoryTypeDescriptors == null )
+                {
+                    Set<RepositoryTypeDescriptor> result = new HashSet<RepositoryTypeDescriptor>();
 
-            // fill in the defaults
-            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
-            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
-            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
-            repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
+                    // fill in the defaults
+                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( Repository.class.getName(),
+                                                                                 "repositories" ) );
+                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(),
+                                                                                 "shadows" ) );
+                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(),
+                                                                                 "groups" ) );
+                    repositoryTypeDescriptors.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(),
+                                                                                 "sites" ) );
+
+                    this.repositoryTypeDescriptors = result;
+                }
+            }
         }
 
         return repositoryTypeDescriptors;
