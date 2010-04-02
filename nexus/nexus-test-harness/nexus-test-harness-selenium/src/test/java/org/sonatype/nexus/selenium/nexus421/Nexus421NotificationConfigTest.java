@@ -1,6 +1,7 @@
 package org.sonatype.nexus.selenium.nexus421;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,16 +42,20 @@ public class Nexus421NotificationConfigTest
                 {
                     evt.block();
                 }
-                assertThat( payload, not( nullValue() ) );
-                
-                GlobalConfigurationResourceResponse resource = ( GlobalConfigurationResourceResponse ) payload;
-                
-                assertThat( resource.getData().getSystemNotificationSettings(), not( nullValue() ) );
-                assertThat( resource.getData().getSystemNotificationSettings().isEnabled(), equalTo( true ) );
-                assertThat( resource.getData().getSystemNotificationSettings().getEmailAddresses(), equalTo( "someemail@someemail.com,otheremail@otheremail.com" ) );
-                assertThat( resource.getData().getSystemNotificationSettings().getRoles().size(), equalTo( 2 ) );
-                assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 0 ), equalTo( "anonymous" ) );
-                assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 1 ), equalTo( "admin" ) );
+                else
+                {
+                    assertThat( payload, not( nullValue() ) );
+                    assertThat( payload, is( GlobalConfigurationResourceResponse.class ) );
+                    
+                    GlobalConfigurationResourceResponse resource = ( GlobalConfigurationResourceResponse ) payload;
+                    
+                    assertThat( resource.getData().getSystemNotificationSettings(), not( nullValue() ) );
+                    assertThat( resource.getData().getSystemNotificationSettings().isEnabled(), equalTo( true ) );
+                    assertThat( resource.getData().getSystemNotificationSettings().getEmailAddresses(), equalTo( "someemail@someemail.com,otheremail@otheremail.com" ) );
+                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().size(), equalTo( 2 ) );
+                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 0 ), equalTo( "anonymous" ) );
+                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 1 ), equalTo( "admin" ) );
+                }
             }
         } );
         
@@ -58,8 +63,7 @@ public class Nexus421NotificationConfigTest
         
         ml.getResult();
         
-        MockHelper.checkAssertions();
-        MockHelper.clearMocks();
+        MockHelper.checkAndClean();
         
     }
 }
