@@ -148,7 +148,7 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         {
             result.setJiraPassword( PASSWORD_PLACE_HOLDER );
         }
-        result.setUseGlobalProxy( errorReportingManager.isUseGlobalProxy() );
+        result.setUseGlobalProxy( true );
         result.setReportErrorsAutomatically( errorReportingManager.isEnabled() );
 
         return result;

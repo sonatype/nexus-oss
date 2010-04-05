@@ -96,7 +96,7 @@ public class ErrorReportingPlexusResource
 
             manager.setJIRAUsername( settings.getJiraUsername() );
             manager.setJIRAPassword( getActualPassword( settings.getJiraPassword(), manager.getJIRAPassword() ) );
-            manager.setUseGlobalProxy( settings.isUseGlobalProxy() );
+            manager.setUseGlobalProxy( true );
 
             try
             {

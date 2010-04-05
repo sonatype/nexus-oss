@@ -53,7 +53,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
           }
         }
       });
-      
+
   this.roleStore = new Ext.data.JsonStore({
         root : 'data',
         id : 'roleId',
@@ -76,7 +76,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
             scope : this
           }
         },
-        autoLoad: true
+        autoLoad : true
       });
 
   // help text alias
@@ -355,13 +355,6 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     allowBlank : true
                   }, {
                     xtype : 'checkbox',
-                    fieldLabel : 'Use Default HTTP Proxy Settings',
-                    helpText : 'Apply the default HTTP Proxy Settings to the jira connection',
-                    name : 'errorReportingSettings.useGlobalProxy',
-                    anchor : Sonatype.view.FIELD_OFFSET,
-                    allowBlank : true
-                  }, {
-                    xtype : 'checkbox',
                     fieldLabel : 'Report Error Automatically',
                     helpText : 'Set if Nexus should automatically report any problem found.',
                     name : 'errorReportingSettings.reportErrorsAutomatically',
@@ -588,19 +581,19 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     xtype : 'panel',
                     layout : 'fit',
                     html : '<div style="padding-bottom:10px">' + ht.systemNotification + '</div>'
-                  },{
+                  }, {
                     xtype : 'checkbox',
                     fieldLabel : 'Enabled',
                     helpText : ht.notificationsEnabled,
                     name : 'systemNotificationSettings.enabled'
-                  },{
+                  }, {
                     xtype : 'textfield',
                     fieldLabel : 'Email Addresses',
                     helpText : ht.notificationEmailAddresses,
                     name : 'systemNotificationSettings.emailAddresses',
                     anchor : Sonatype.view.FIELD_OFFSET,
                     allowBlank : true
-                  },{
+                  }, {
                     xtype : 'twinpanelchooser',
                     titleLeft : 'Roles',
                     titleRight : 'Available Roles',
@@ -611,8 +604,7 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     validateLeftItems : true,
                     halfSize : false,
                     doubleWide : true
-                  }
-              ]
+                  }]
             } // end notification settings
         ],
         buttons : [{
@@ -690,9 +682,7 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
       },
 
       saveBtnHandler : function() {
-        var allValid = this.form.isValid() 
-          && this.find('name', 'securityRealms')[0].validate()
-          && this.find('name', 'systemNotificationSettings.roles')[0].validate();
+        var allValid = this.form.isValid() && this.find('name', 'securityRealms')[0].validate() && this.find('name', 'systemNotificationSettings.roles')[0].validate();
 
         if (allValid)
         {
@@ -769,10 +759,11 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
 
       loadServerConfig : function() {
         // if stores aren't loaded, abort, they will load again when done
-        if (this.roleStore.lastOptions == null || this.realmTypeDataStore.lastOptions == null) {
+        if (this.roleStore.lastOptions == null || this.realmTypeDataStore.lastOptions == null)
+        {
           return;
         }
-        
+
         var fpanel = this.formPanel;
 
         this.formPanel.getForm().doAction('sonatypeLoad', {

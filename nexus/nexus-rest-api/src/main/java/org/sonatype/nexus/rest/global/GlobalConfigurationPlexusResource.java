@@ -282,7 +282,7 @@ public class GlobalConfigurationPlexusResource
                                                                     this.getActualPassword(
                                                                                             settings.getJiraPassword(),
                                                                                             getErrorReportingManager().getJIRAPassword() ) );
-                        getErrorReportingManager().setUseGlobalProxy( settings.isUseGlobalProxy() );
+                        getErrorReportingManager().setUseGlobalProxy( true );
                     }
                     else
                     {
