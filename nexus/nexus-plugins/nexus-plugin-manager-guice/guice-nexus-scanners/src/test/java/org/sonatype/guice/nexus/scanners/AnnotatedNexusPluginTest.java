@@ -186,9 +186,11 @@ public class AnnotatedNexusPluginTest
         assertEquals( BeanE.class, components.get(
                                                    new ComponentImpl( UserInterface1.class, Hints.DEFAULT_HINT,
                                                                       "per-lookup", "" ) ).get() );
-        assertEquals( BeanF.class, components.get(
-                                                   new ComponentImpl( UserInterface2.class, Hints.DEFAULT_HINT,
-                                                                      "singleton", "" ) ).get() );
+        final Class<?> duplicate =
+            components.get( new ComponentImpl( UserInterface2.class, Hints.DEFAULT_HINT, "singleton", "" ) ).get();
+
+        // duplicate binding, first-one wins... result may vary on different machines/OS's
+        assertTrue( duplicate.equals( BeanF.class ) || duplicate.equals( NamedBeanD.class ) );
 
         assertEquals( NamedBeanA.class, components.get(
                                                         new ComponentImpl( HostInterface1.class, "BeanA", "per-lookup",
