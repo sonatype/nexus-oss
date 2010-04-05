@@ -46,7 +46,7 @@
       anonUsername : 'The username that will be used to authenticate anonymous users against the security realm.',
       anonPassword : 'The password that will be used to authenticate anonymous users against the security realm.',
       anonymousAccess : 'These fields are used to authenticate anonymous requests. When a request comes in without credentials, Nexus uses the Anonymous Username and Anonymous Password field as a substitute and pass it through the security subsystem. This is used in conjunction with third party security realm integration. For example if you were authenticating against Active Directory, the username might be "Guest" instead of anonymous. If you are using the default Nexus security realm, then these shouldn\'t be changed.',
-      systemNotification: 'Nexus can be used to notify users (by email address, or users that are part of a specified role) when certain events occur in the system.',
+      systemNotification: 'Nexus can be used to notify users (by email address, or users that are part of a specified role) when one of the following actions is performed:<br><ul><li>&nbsp;&nbsp;Nexus automatically blocks a proxy repository because the remote is unreachable.</li><li>&nbsp;&nbsp;Nexus automatically unblocks a proxy repository because the remote is again reachable.</li></ul>',
       security : 'Whether to enable security or not.',
       baseUrl : 'This is the Base URL of the Nexus web application.  i.e. http://localhost:8081/nexus',
       forceBaseUrl : 'If checked, this will force all URLs to be built with a Base URL. Otherwise, Base URL will only be used in emails and rss feeds, with other URLs built based on the incoming request.',
