@@ -80,6 +80,12 @@ public class Upgrade140to141
         // just add it, default is disabled
         newc.setNotification( new CNotification() );
         
+        // we don't allow user to change this field any longer
+        if ( newc.getErrorReporting() != null )
+        {
+            newc.getErrorReporting().setUseGlobalProxy( true );
+        }
+        
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
