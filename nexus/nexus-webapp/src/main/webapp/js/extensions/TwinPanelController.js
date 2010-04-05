@@ -171,6 +171,7 @@ Ext.reg('twinpanelcontroller', Sonatype.ext.TwinPanelController);
 Sonatype.ext.TwinPanelChooser = function(config) {
   var config = config || {};
   var defaultConfig = {
+    doubleWide : false,
     displayField : 'name',
     validateLeftItems : false,
     validateLeftItemsText : 'Invalid items selected.',
@@ -208,7 +209,7 @@ Sonatype.ext.TwinPanelChooser = function(config) {
                                   // panel
               // note: this style matches the expected behavior
               bodyStyle : 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              width : 225,
+              width : this.doubleWide ? 400 : 225,
               height : this.halfSize ? 150 : 300,
               animate : true,
               lines : false,
@@ -292,7 +293,7 @@ Sonatype.ext.TwinPanelChooser = function(config) {
                                   // panel
               // note: this style matches the expected behavior
               bodyStyle : 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              width : 225,
+              width : this.doubleWide ? 400 : 225,
               height : (this.halfSize ? 150 : 300) + (Ext.isGecko ? 15 : 0),
               animate : true,
               lines : false,

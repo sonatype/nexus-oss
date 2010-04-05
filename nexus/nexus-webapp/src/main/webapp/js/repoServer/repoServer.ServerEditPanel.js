@@ -609,7 +609,8 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     store : this.roleStore,
                     required : false,
                     validateLeftItems : true,
-                    halfSize : true
+                    halfSize : false,
+                    doubleWide : true
                   }
               ]
             } // end notification settings

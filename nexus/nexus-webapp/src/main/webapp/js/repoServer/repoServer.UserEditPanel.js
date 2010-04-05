@@ -715,6 +715,8 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         valueField : 'id',
         store : this.roleDataStore,
         required : true,
+        doubleWide : true,
+        halfSize : false,
         nodeIcon : Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
       });
 
