@@ -58,7 +58,7 @@ Ext.override( Sonatype.repoServer.ServerEditPanel, {
           checkboxToggle:false,
           collapsible: true,
           id: this.id + '_' + 'lvoConfigurationSettings',
-          title: 'New Version Notification',
+          title: 'New Version Availability',
           anchor: Sonatype.view.FIELDSET_OFFSET,
           autoHeight:true,
           layoutConfig: {
