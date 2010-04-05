@@ -692,6 +692,7 @@
   <errorReporting>
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
     <jiraProject>PR</jiraProject>
+    <useGlobalProxy>true</useGlobalProxy>
   </errorReporting>
   <notification />
 </nexusConfiguration>
