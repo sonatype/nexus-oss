@@ -286,6 +286,7 @@
                   }, {
                     enabled : sp.checkPermission('nexus:settings', sp.READ),
                     title : 'Generate Problem Report',
+                    tabId : 'error-report',
                     handler : Sonatype.utils.generateErrorReportHandler
                   }, {
                     enabled : sp.checkPermission('nexus:logs', sp.READ) || sp.checkPermission('nexus:configuration', sp.READ),
@@ -309,7 +310,8 @@
               items : [{
                     enabled : Sonatype.user.curr.isLoggedIn == true && Sonatype.user.curr.loggedInUserSource == 'default' && sp.checkPermission('security:userschangepw', sp.CREATE),
                     title : 'Change Password',
-                    handler : Sonatype.utils.changePassword
+                    handler : Sonatype.utils.changePassword,
+                    tabId : 'change-password'
                   }, {
                     enabled : sp.checkPermission('security:users', sp.READ) && (sp.checkPermission('security:users', sp.CREATE) || sp.checkPermission('security:users', sp.DELETE) || sp.checkPermission('security:users', sp.EDIT)),
                     title : 'Users',
