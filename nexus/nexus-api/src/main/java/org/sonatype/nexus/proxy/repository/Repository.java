@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.repository;
 import java.util.Collection;
 import java.util.Map;
 
-import org.omg.CosNaming.NamingContextExtPackage.AddressHelper;
 import org.sonatype.nexus.configuration.Configurable;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
