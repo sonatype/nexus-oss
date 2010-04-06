@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.3-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Enterprise Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
