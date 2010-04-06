@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.sonatype.nexus.plugins</groupId>
 		<artifactId>nexus-core-plugins</artifactId>
-		<version>1.5.1-SNAPSHOT</version>
+		<version>1.6.0</version>
 	</parent>
 
 	<artifactId>nexus-plugin-console-plugin</artifactId>
