@@ -11,10 +11,6 @@
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>Nexus Test Harness Launcher</name>
 
-  <properties>
-  	<nexus-plugin-console-plugin.version>1.6.0</nexus-plugin-console-plugin.version>
-  </properties>
-
   <build>
 
     <testResources>
@@ -314,7 +310,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${nexus-plugin-console-plugin.version}</version>
+      <version>${project.version}</version>
     </dependency>
     
   </dependencies>
