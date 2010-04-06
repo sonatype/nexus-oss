@@ -9,7 +9,7 @@
 
   <artifactId>nexus-maven-site-plugin</artifactId>
   
-  <version>1.4.2-SNAPSHOT</version>
+  <version>1.4.3-SNAPSHOT</version>
 
   <packaging>nexus-plugin</packaging>
 
