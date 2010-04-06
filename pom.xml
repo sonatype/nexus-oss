@@ -8,7 +8,7 @@
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
-  <version>1.4.3-SNAPSHOT</version>
+  <version>1.4.2</version>
   <packaging>nexus-plugin</packaging>
   <name>Nexus Enterprise Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
@@ -159,4 +159,10 @@
       </build>
     </profile>
   </profiles>
+
+  <scm>
+    <connection>scm:svn:https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-unpack-plugin-1.4.2</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-unpack-plugin-1.4.2</developerConnection>
+    <url>https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-unpack-plugin-1.4.2</url>
+  </scm>
 </project>
