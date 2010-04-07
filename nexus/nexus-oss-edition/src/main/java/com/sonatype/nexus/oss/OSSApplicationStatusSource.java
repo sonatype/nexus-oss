@@ -13,67 +13,35 @@
  */
 package com.sonatype.nexus.oss;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
-
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.AbstractApplicationStatusSource;
 import org.sonatype.nexus.ApplicationStatusSource;
-import org.sonatype.nexus.SystemState;
 import org.sonatype.nexus.SystemStatus;
 
 @Component( role = ApplicationStatusSource.class )
 public class OSSApplicationStatusSource
-    extends AbstractLogEnabled
+    extends AbstractApplicationStatusSource
     implements ApplicationStatusSource
 {
     private static final String FORMATTED_APP_NAME_BASE = "Sonatype Nexus&trade;";
-    /**
-     * System status.
-     */
-    private SystemStatus systemStatus = new SystemStatus();
 
     public OSSApplicationStatusSource()
     {
-        try
-        {
-            Properties props = new Properties();
+        super();
 
-            InputStream is = getClass().getResourceAsStream(
-                "/META-INF/maven/org.sonatype.nexus/nexus-api/pom.properties" );
+        getSystemStatusInternal().setVersion(
+            readVersion( "/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties" ) );
 
-            if ( is != null )
-            {
-                props.load( is );
-            }
+        getSystemStatusInternal().setApiVersion( getSystemStatusInternal().getVersion() );
 
-            systemStatus.setVersion( props.getProperty( "version" ) );
-        }
-        catch ( IOException e )
-        {
-            getLogger()
-                .warn(
-                    "Could not load/read Nexus version from /META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties",
-                    e );
-
-            systemStatus.setVersion( "unknown" );
-        }
-
-        systemStatus.setApiVersion( systemStatus.getVersion() );
-        
-        systemStatus.setFormattedAppName( FORMATTED_APP_NAME_BASE + " " + systemStatus.getEditionLong() + " Edition, Version: " + systemStatus.getVersion() );
+        getSystemStatusInternal().setFormattedAppName(
+            FORMATTED_APP_NAME_BASE + " " + getSystemStatusInternal().getEditionLong() + " Edition, Version: "
+                + getSystemStatusInternal().getVersion() );
     }
 
-    public SystemStatus getSystemStatus()
+    @Override
+    protected void renewSystemStatus( SystemStatus systemStatus )
     {
-        return systemStatus;
-    }
-
-    public boolean setState( SystemState state )
-    {
-        systemStatus.setState( state );
-
-        return true;
+        // nothing changes in OSS yet
     }
 }
