@@ -29,8 +29,7 @@ public class OSSApplicationStatusSource
     {
         super();
 
-        getSystemStatusInternal().setVersion(
-            readVersion( "/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties" ) );
+        getSystemStatusInternal().setVersion( discoverApplicationVersion() );
 
         getSystemStatusInternal().setApiVersion( getSystemStatusInternal().getVersion() );
 
@@ -43,5 +42,11 @@ public class OSSApplicationStatusSource
     protected void renewSystemStatus( SystemStatus systemStatus )
     {
         // nothing changes in OSS yet
+    }
+
+    @Override
+    protected String discoverApplicationVersion()
+    {
+        return readVersion( "/META-INF/maven/org.sonatype.nexus/nexus-oss-edition/pom.properties" );
     }
 }

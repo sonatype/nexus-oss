@@ -179,6 +179,13 @@ public abstract class AbstractApplicationStatusSource
     }
 
     /**
+     * Discovers (probably in "edition specific" way) the version of the application.
+     * 
+     * @return
+     */
+    protected abstract String discoverApplicationVersion();
+
+    /**
      * Implement here any updates to SystemStatus needed. No need to bother with locking, it happens in the caller of
      * this method. The method body contains exclusive lock to SystemStatus.
      * 
