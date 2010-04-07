@@ -17,11 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.sonatype.nexus.configuration.model.CRepository;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.source.FileConfigurationSource;
-import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.util.FileUtils;
 
 public class FileConfigurationSourceTest
@@ -39,7 +36,7 @@ public class FileConfigurationSourceTest
     protected InputStream getOriginatingConfigurationInputStream()
         throws IOException
     {
-        return getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+        return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
     }
 
     public void testStoreConfiguration()

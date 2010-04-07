@@ -37,12 +37,22 @@ public class StaticConfigurationSource
     public InputStream getConfigurationAsStream()
         throws IOException
     {
-        return getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+        InputStream result = getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+
+        if ( result != null )
+        {
+            return result;
+        }
+        else
+        {
+            getLogger().info( "No edition-specific configuration found, falling back to Core default configuration." );
+
+            return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
+        }
     }
 
     public Configuration loadConfiguration()
-        throws ConfigurationException,
-            IOException
+        throws ConfigurationException, IOException
     {
         loadConfiguration( getConfigurationAsStream() );
 

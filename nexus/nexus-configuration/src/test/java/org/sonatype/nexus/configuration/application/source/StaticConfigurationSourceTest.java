@@ -33,7 +33,7 @@ public class StaticConfigurationSourceTest
     protected InputStream getOriginatingConfigurationInputStream()
         throws IOException
     {
-        return getClass().getResourceAsStream( "/META-INF/nexus/nexus.xml" );
+        return getClass().getResourceAsStream( "/META-INF/nexus/default-oss-nexus.xml" );
     }
 
     public void testStoreConfiguration()
