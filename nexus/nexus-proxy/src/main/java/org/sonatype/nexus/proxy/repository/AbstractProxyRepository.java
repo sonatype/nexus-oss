@@ -25,6 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteStorage;
@@ -1191,12 +1192,26 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException e )
                         {
-                            getLogger().error(
-                                "Got Storage Exception while storing remote artifact, will attempt next mirror", e );
                             lastException = e;
 
                             selector.feedbackFailure( mirror );
-                            logFailedMirror( mirror, e );
+                            // debug, print all
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                logFailedMirror( mirror, e );
+                            }
+                            // not debug, only print the message
+                            else
+                            {
+                                Throwable t = ExceptionUtils.getRootCause( e );
+                                
+                                if ( t == null )
+                                {
+                                    t = e;
+                                }
+                                
+                                getLogger().error( "Got Storage Exception while storing remote artifact, will attempt next mirror, cause: " + t.getClass().getName() + ": " + t.getMessage() );
+                            }
                         }
                         catch ( RuntimeException e )
                         {
