@@ -714,13 +714,6 @@ public abstract class AbstractProxyRepository
         return result;
     }
 
-    protected RepositoryItemUid getDownloadItemUid( ResourceStoreRequest request )
-    {
-        RepositoryItemUid uid = createUid( request.getRequestPath() + "?download=true" );
-
-        return uid;
-    }
-
     @Override
     protected StorageItem doRetrieveItem( ResourceStoreRequest request )
         throws IllegalOperationException, ItemNotFoundException, StorageException
@@ -740,28 +733,30 @@ public abstract class AbstractProxyRepository
             getLogger().debug( db.toString() );
         }
 
-        if ( !getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-        {
-            // we have no proxy facet, just get 'em!
-            return super.doRetrieveItem( request );
-        }
-        else
-        {
-            // we have Proxy facet, so we want to check carefully local storage
-            // Reason: a previous thread may still _downloading_ the stuff we want to
-            // serve to another client, so we have to _wait_ for download, but for download
-            // only.
-            // From now on, the retrieve operation becomes WRITE operation,
-            // since this is proxy repository, and it _might_ have "fetch" as side-effect, or should wait for another
-            // thread
-            // to finish the fetch side effect.
-            // So, for _download_ UIDs we start serialize the request processing.
-            RepositoryItemUid downloadUid = getDownloadItemUid( request );
+        // we have to re-set locking here explicitly, since we are going to
+        // make a "salto-mortale" here, see below
+        // we start with "usual" read lock, we still don't know is this hosted or proxy repo
+        // if proxy, we still don't know do we have to go remote (local copy is old) or not
+        // if proxy and need to go remote, we want to _protect_ ourselves from
+        // serving up partial downloads...
 
-            downloadUid.lock( Action.create );
+        RepositoryItemUid itemUid = createUid( request.getRequestPath() );
 
-            try
+        itemUid.lock( Action.read );
+
+        try
+        {
+            if ( !getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
+                // we have no proxy facet, just get 'em!
+                return super.doRetrieveItem( request );
+            }
+            else
+            {
+                // we have Proxy facet, so we want to check carefully local storage
+                // Reason: a previous thread may still _downloading_ the stuff we want to
+                // serve to another client, so we have to _wait_ for download, but for download
+                // only.
                 AbstractStorageItem localItem = null;
 
                 if ( !request.isRequestRemoteOnly() )
@@ -772,6 +767,7 @@ public abstract class AbstractProxyRepository
 
                         if ( localItem != null && !isOld( localItem ) )
                         {
+                            // local copy is just fine, so, we are proxy but we have valid local copy in cache
                             return localItem;
                         }
                     }
@@ -781,13 +777,50 @@ public abstract class AbstractProxyRepository
                     }
                 }
 
-                return doRetrieveItem0( request, localItem );
-            }
-            finally
-            {
-                downloadUid.unlock();
+                // we are a proxy, and we either don't have local copy or is stale, we need to
+                // go remote and potentially check for new version of file, but we still don't know
+                // will we actually fetch it (since aging != remote file changed!)
+                // BUT, from this point on, we want to _serialize_ access, so upgrade to CREATE lock
+
+                itemUid.lock( Action.create );
+
+                try
+                {
+                    // check local copy again, we were maybe blocked for a download, and we need to
+                    // recheck local copy after we acquired exclusive lock
+                    if ( !request.isRequestRemoteOnly() )
+                    {
+                        try
+                        {
+                            localItem = (AbstractStorageItem) super.doRetrieveItem( request );
+
+                            if ( localItem != null && !isOld( localItem ) )
+                            {
+                                // local copy is just fine (downloaded by a thread holding us blocked on acquiring
+                                // exclusive lock)
+                                return localItem;
+                            }
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            localItem = null;
+                        }
+                    }
+
+                    // this whole method happens with exclusive lock on UID
+                    return doRetrieveItem0( request, localItem );
+                }
+                finally
+                {
+                    itemUid.unlock();
+                }
             }
         }
+        finally
+        {
+            itemUid.unlock();
+        }
+
     }
 
     protected StorageItem doRetrieveItem0( ResourceStoreRequest request, AbstractStorageItem localItem )
@@ -1094,11 +1127,10 @@ public abstract class AbstractProxyRepository
     protected AbstractStorageItem doRetrieveRemoteItem( ResourceStoreRequest request )
         throws ItemNotFoundException, RemoteAccessException, StorageException
     {
-        // this whole method _locks_ the downloadUid.
-        // See doRetrieveItem() method above
-        RepositoryItemUid downloadUid = getDownloadItemUid( request );
+        RepositoryItemUid itemUid = createUid( request.getRequestPath() );
 
-        downloadUid.lock( Action.create );
+        // all this remote download happens in exclusive lock
+        itemUid.lock( Action.create );
 
         try
         {
@@ -1204,13 +1236,15 @@ public abstract class AbstractProxyRepository
                             else
                             {
                                 Throwable t = ExceptionUtils.getRootCause( e );
-                                
+
                                 if ( t == null )
                                 {
                                     t = e;
                                 }
-                                
-                                getLogger().error( "Got Storage Exception while storing remote artifact, will attempt next mirror, cause: " + t.getClass().getName() + ": " + t.getMessage() );
+
+                                getLogger().error(
+                                    "Got Storage Exception while storing remote artifact, will attempt next mirror, cause: "
+                                        + t.getClass().getName() + ": " + t.getMessage() );
                             }
                         }
                         catch ( RuntimeException e )
@@ -1263,7 +1297,7 @@ public abstract class AbstractProxyRepository
         }
         finally
         {
-            downloadUid.unlock();
+            itemUid.unlock();
         }
     }
 
