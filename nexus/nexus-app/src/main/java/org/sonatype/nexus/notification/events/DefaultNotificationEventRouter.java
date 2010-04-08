@@ -9,6 +9,7 @@ import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
 import org.sonatype.nexus.notification.NotificationTarget;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -29,21 +30,36 @@ public class DefaultNotificationEventRouter
     {
         if ( evt instanceof RepositoryEventProxyModeChanged )
         {
+            RepositoryEventProxyModeChanged rpmevt = (RepositoryEventProxyModeChanged) evt;
+
+            HashSet<NotificationTarget> targets = new HashSet<NotificationTarget>();
+
             // currently we "hardwire" this one only
             // later we should back this with real routing configuration
-            HashSet<NotificationTarget> result = new HashSet<NotificationTarget>();
-
             NotificationTarget autoBlockTarget =
                 notificationManager.readNotificationTarget( NotificationCheat.AUTO_BLOCK_NOTIFICATION_GROUP_ID );
 
             if ( autoBlockTarget != null )
             {
-                result.add( autoBlockTarget );
+                // do NOT send out email notification if event is AutoBlocked and repo is not blocked for at least
+                // 60secs
+                if ( !( ProxyMode.BLOCKED_AUTO.equals( rpmevt.getNewProxyMode() ) && rpmevt.getRepository()
+                    .getRepositoryStatusCheckPeriod() >= 60000 ) )
+                {
+                    targets.add( autoBlockTarget );
+                }
+            }
 
+            // we could lookup other groups too, like SMS notif, and even RSS feed could be one group
+            // ...
+            // stuff below this line is "generic" - hardwired stuff is above only
+
+            if ( !targets.isEmpty() )
+            {
                 RepositoryEventProxyModeChangedMessage message =
-                    new RepositoryEventProxyModeChangedMessage( (RepositoryEventProxyModeChanged) evt, null );
+                    new RepositoryEventProxyModeChangedMessage( rpmevt, null );
 
-                return new NotificationRequest( message, result );
+                return new NotificationRequest( message, targets );
             }
             else
             {
