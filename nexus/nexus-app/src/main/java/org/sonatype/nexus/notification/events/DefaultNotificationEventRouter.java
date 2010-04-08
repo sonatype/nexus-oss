@@ -44,7 +44,7 @@ public class DefaultNotificationEventRouter
                 // do NOT send out email notification if event is AutoBlocked and repo is not blocked for at least
                 // 60secs
                 if ( !( ProxyMode.BLOCKED_AUTO.equals( rpmevt.getNewProxyMode() ) && rpmevt.getRepository()
-                    .getRepositoryStatusCheckPeriod() >= 60000 ) )
+                    .getRepositoryStatusCheckPeriod() < 60000 ) )
                 {
                     targets.add( autoBlockTarget );
                 }
