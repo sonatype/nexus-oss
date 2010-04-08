@@ -403,13 +403,14 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         var isHosted = repoRecord.get('repoType') == 'hosted';
         var isProxy = repoRecord.get('repoType') == 'proxy';
         var isGroup = repoRecord.get('repoType') == 'group';
+        var isMaven = repoRecord.get('format') == 'maven2' || repoRecord.get('format') == 'maven1';
 
         if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && !isVirtual)
         {
           menu.add(this.repoActions.clearCache);
         }
 
-        if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && (isHosted || isGroup))
+        if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && isMaven && (isHosted || isGroup))
         {
           menu.add(this.repoActions.rebuildMetadata);
         }
@@ -454,6 +455,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         var isProxy = repoRecord.data.repoType == 'proxy';
         var isHosted = repoRecord.data.repoType == 'hosted';
         var isGroup = repoRecord.data.repoType == 'group';
+        var isMaven = repoRecord.get('format') == 'maven2' || repoRecord.get('format') == 'maven1';
 
         if (repoRecord.data.userManaged)
         {
@@ -461,7 +463,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
           {
             menu.add(this.repoActions.clearCache);
           }
-          if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && (isHosted || isGroup))
+          if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && isMaven && (isHosted || isGroup))
           {
             menu.add(this.repoActions.rebuildMetadata);
           }
