@@ -14,10 +14,11 @@
 package org.sonatype.nexus.maven.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.maven.MavenGroupRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -36,16 +37,23 @@ public class RebuildMavenMetadataTask
     {
         ResourceStoreRequest req = new ResourceStoreRequest( getResourceStorePath() );
 
-        if ( getRepositoryGroupId() != null )
+        // group wins if both given, repoId if group not given. Or null, if none given.
+        String repoId = StringUtils.isNotBlank( getRepositoryGroupId() ) ? getRepositoryGroupId() : getRepositoryId();
+
+        Repository repository = getRepositoryRegistry().getRepository( repoId );
+
+        // is this a Maven repository at all?
+        if ( repoId != null && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
-            getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryGroupId(), MavenGroupRepository.class ).recreateMavenMetadata(
-                    req );
+            MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
+
+            mavenRepository.recreateMavenMetadata( req );
         }
-        else if ( getRepositoryId() != null )
+        else if ( repoId != null )
         {
-            getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryId(), MavenRepository.class ).recreateMavenMetadata( req );
+            getLogger().warn(
+                "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
+                    + ") is not a Maven repository. Skipping it." );
         }
         else
         {
