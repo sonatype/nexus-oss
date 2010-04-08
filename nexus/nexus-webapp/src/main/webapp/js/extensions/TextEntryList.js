@@ -187,6 +187,8 @@ Ext.extend(Sonatype.ext.TextEntryList, Ext.Panel, {
 
       setEntries : function(stringArray) {
         var entry;
+        // first clear all
+        this.removeAllEntries();
 
         for (var i = 0; i < stringArray.length; i++)
         {
