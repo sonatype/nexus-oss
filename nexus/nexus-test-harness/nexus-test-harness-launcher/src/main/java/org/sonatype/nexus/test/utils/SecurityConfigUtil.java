@@ -63,6 +63,13 @@ public class SecurityConfigUtil
         {
             RoleResource roleResource = getRoleResource( cRole.getId(), roles );
 
+            if ( cRole.getId().endsWith( "-view" ) )
+            {
+                // view roles privileges are added at runtime by listening to repository events. Which it is not
+                // possible to do here
+                continue;
+            }
+
             Assert.assertNotNull( "Role '" + cRole.getId() + "' should be contained!", roleResource );
 
             CRole role = RoleConverter.toCRole( roleResource );
@@ -323,7 +330,7 @@ public class SecurityConfigUtil
         final InputStream input = SecurityConfigUtil.class.getResourceAsStream( securityFile );
         if ( input == null )
         {
-            //probably a pro XML.
+            // probably a pro XML.
             return;
         }
         InputStreamReader fr = new InputStreamReader( input );
