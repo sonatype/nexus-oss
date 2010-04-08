@@ -692,7 +692,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "retrieveItem() :: " + request.toString() );
+            getLogger().debug( getId() + ".retrieveItem() :: " + request.toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -789,7 +789,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "copyItem() :: " + from.toString() + " --> " + to.toString() );
+            getLogger().debug( getId() + ".copyItem() :: " + from.toString() + " --> " + to.toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -845,7 +845,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "moveItem() :: " + from.toString() + " --> " + to.toString() );
+            getLogger().debug( getId() + ".moveItem() :: " + from.toString() + " --> " + to.toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -863,7 +863,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "deleteItem() :: " + request.toString() );
+            getLogger().debug( getId() + ".deleteItem() :: " + request.toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -928,7 +928,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "storeItem() :: " + item.getRepositoryItemUid().toString() );
+            getLogger().debug( getId() + ".storeItem() :: " + item.getRepositoryItemUid().toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -964,7 +964,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "list() :: " + request.toString() );
+            getLogger().debug( getId() + ".list() :: " + request.toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
@@ -991,7 +991,7 @@ public abstract class AbstractRepository
     {
         if ( getLogger().isDebugEnabled() )
         {
-            getLogger().debug( "list() :: " + coll.getRepositoryItemUid().toString() );
+            getLogger().debug( getId() + ".list() :: " + coll.getRepositoryItemUid().toString() );
         }
 
         if ( !getLocalStatus().shouldServiceRequest() )
