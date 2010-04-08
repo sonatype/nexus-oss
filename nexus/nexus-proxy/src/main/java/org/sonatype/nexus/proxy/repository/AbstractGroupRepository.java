@@ -396,4 +396,15 @@ public abstract class AbstractGroupRepository
         }
     }
 
+    @Override
+    public void expireCaches( ResourceStoreRequest request )
+    {
+        List<Repository> members = getMemberRepositories();
+        for ( Repository member : members )
+        {
+            member.expireCaches( request );
+        }
+
+        super.expireCaches( request );
+    }
 }
