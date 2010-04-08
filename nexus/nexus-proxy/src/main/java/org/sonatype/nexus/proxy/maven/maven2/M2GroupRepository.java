@@ -170,9 +170,11 @@ public class M2GroupRepository
             throw new ItemNotFoundException( request, this );
         }
 
-        if ( !isMergeMetadata() )
+        // this group wont merge metdata, just return first
+        // or there is only 1 metadata, return that
+        if ( !isMergeMetadata()
+            || items.size() == 1)
         {
-            // not merging: return the 1st and ciao
             return items.get( 0 );
         }
 
