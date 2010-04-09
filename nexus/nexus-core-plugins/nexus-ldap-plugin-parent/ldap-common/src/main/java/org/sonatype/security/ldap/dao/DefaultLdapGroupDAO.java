@@ -196,7 +196,7 @@ public class DefaultLdapGroupDAO
 
         String groupMemberFormat = configuration.getGroupMemberFormat();
 
-        String filter = "(&(objectClass=" + configuration.getGroupObjectClass() + ") (&(" + groupIdAttribute + "=*) (";
+        String filter = "(&(objectClass=" + configuration.getGroupObjectClass() + ")(&(" + groupIdAttribute + "=*)(";
 
         if ( groupMemberFormat != null )
         {
