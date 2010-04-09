@@ -133,4 +133,11 @@ public class DefaultStorageFileItem
     {
         return this.contentLocator;
     }
+
+    @Override
+    protected boolean isOverlayable( StorageItem item )
+    {
+        // we have an exception here, so, Files are overlayable with any other Files
+        return super.isOverlayable( item ) || StorageFileItem.class.isAssignableFrom( item.getClass() );
+    }
 }
