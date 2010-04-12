@@ -127,7 +127,7 @@ public class ErrorReportingPlexusResource
             {
                 genRes =
                     manager.handleError( genReq, settings.getJiraUsername(), settings.getJiraPassword(),
-                                         settings.isUseGlobalProxy() );
+                                         manager.isUseGlobalProxy() );
             }
             else
             {
