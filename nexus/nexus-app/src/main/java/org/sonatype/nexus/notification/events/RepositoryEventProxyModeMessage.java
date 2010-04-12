@@ -4,15 +4,16 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.sonatype.nexus.notification.NotificationMessage;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.security.usermanagement.User;
 
-public class RepositoryEventProxyModeChangedMessage
+public class RepositoryEventProxyModeMessage
     implements NotificationMessage
 {
-    private final RepositoryEventProxyModeChanged repositoryEventProxyModeChanged;
+    private final RepositoryEventProxyMode repositoryEventProxyMode;
 
     private final User user;
 
@@ -20,9 +21,9 @@ public class RepositoryEventProxyModeChangedMessage
 
     private final String body;
 
-    public RepositoryEventProxyModeChangedMessage( RepositoryEventProxyModeChanged revt, User user )
+    public RepositoryEventProxyModeMessage( RepositoryEventProxyMode revt, User user )
     {
-        this.repositoryEventProxyModeChanged = revt;
+        this.repositoryEventProxyMode = revt;
 
         this.user = user;
 
@@ -63,7 +64,13 @@ public class RepositoryEventProxyModeChangedMessage
 
         sb.append( revt.getRepository().getName() );
 
-        sb.append( "\" (repoId=" ).append( revt.getRepository().getId() ).append( ") was set to " );
+        sb.append( "\" (repoId=" ).append( revt.getRepository().getId() );
+
+        sb.append( ", remoteUrl=" );
+
+        sb.append( revt.getRepository().getRemoteUrl() );
+
+        sb.append( ") was set to \n\n" );
 
         if ( ProxyMode.ALLOW.equals( revt.getNewProxyMode() ) )
         {
@@ -71,7 +78,11 @@ public class RepositoryEventProxyModeChangedMessage
         }
         else if ( ProxyMode.BLOCKED_AUTO.equals( revt.getNewProxyMode() ) )
         {
-            sb.append( "Blocked (automatically by Nexus)." );
+            sb.append( "Blocked (automatically by Nexus). Next attempt to check remote peer health will occur in " );
+
+            sb.append( DurationFormatUtils.formatDurationWords( revt.getRepository().getRepositoryStatusCheckPeriod(),
+                true, true )
+                + "." );
         }
         else if ( ProxyMode.BLOCKED_MANUAL.equals( revt.getNewProxyMode() ) )
         {
@@ -79,10 +90,10 @@ public class RepositoryEventProxyModeChangedMessage
         }
         else
         {
-            sb.append( revt.getRepository().getProxyMode().toString() ).append( "." );
+            sb.append( revt.getNewProxyMode().toString() ).append( "." );
         }
 
-        sb.append( " The previous state was " );
+        sb.append( "\n\nThe previous state was \n\n" );
 
         if ( ProxyMode.ALLOW.equals( revt.getOldProxyMode() ) )
         {
@@ -117,9 +128,9 @@ public class RepositoryEventProxyModeChangedMessage
         this.body = sb.toString();
     }
 
-    public RepositoryEventProxyModeChanged getRepositoryEventProxyModeChanged()
+    public RepositoryEventProxyMode getRepositoryEventProxyMode()
     {
-        return repositoryEventProxyModeChanged;
+        return repositoryEventProxyMode;
     }
 
     public User getUser()

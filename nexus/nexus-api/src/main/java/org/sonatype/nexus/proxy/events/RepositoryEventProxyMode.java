@@ -17,17 +17,48 @@ import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
 /**
- * The event fired when a repository's proxy mode changed. This event is fired on <b>transitions only</b>, when
- * ProxyMode of ProxyRepository is actually being changed (oldMode != newMode).
+ * The superclass event of ProxyReposiory ProxyMode related events.
  * 
  * @author cstamas
  */
-public class RepositoryEventProxyModeChanged
-    extends RepositoryEventProxyMode
+public abstract class RepositoryEventProxyMode
+    extends RepositoryEvent
 {
-    public RepositoryEventProxyModeChanged( final ProxyRepository repository, final ProxyMode oldProxyMode,
-                                            final ProxyMode newProxyMode, final Throwable cause )
+    private final ProxyMode oldProxyMode;
+
+    private final ProxyMode newProxyMode;
+
+    private final Throwable cause;
+
+    public RepositoryEventProxyMode( final ProxyRepository repository, final ProxyMode oldProxyMode,
+                                     final ProxyMode newProxyMode, final Throwable cause )
     {
-        super( repository, oldProxyMode, newProxyMode, cause );
+        super( repository );
+
+        this.oldProxyMode = oldProxyMode;
+
+        this.newProxyMode = newProxyMode;
+
+        this.cause = cause;
+    }
+
+    public ProxyMode getOldProxyMode()
+    {
+        return oldProxyMode;
+    }
+
+    public ProxyMode getNewProxyMode()
+    {
+        return newProxyMode;
+    }
+
+    public Throwable getCause()
+    {
+        return cause;
+    }
+
+    public ProxyRepository getRepository()
+    {
+        return (ProxyRepository) super.getRepository();
     }
 }

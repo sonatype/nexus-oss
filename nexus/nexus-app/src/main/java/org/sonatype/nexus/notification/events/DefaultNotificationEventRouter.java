@@ -8,7 +8,7 @@ import org.sonatype.nexus.notification.NotificationCheat;
 import org.sonatype.nexus.notification.NotificationManager;
 import org.sonatype.nexus.notification.NotificationRequest;
 import org.sonatype.nexus.notification.NotificationTarget;
-import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.plexus.appevents.Event;
 
@@ -28,9 +28,10 @@ public class DefaultNotificationEventRouter
 
     public NotificationRequest getRequestForEvent( Event<?> evt )
     {
-        if ( evt instanceof RepositoryEventProxyModeChanged )
+        if ( evt instanceof RepositoryEventProxyModeSet )
         {
-            RepositoryEventProxyModeChanged rpmevt = (RepositoryEventProxyModeChanged) evt;
+            // this event is _always_ fired! Do not mix it with RepositoryEventProxyModeChanged event! Read their JavaDoc!
+            RepositoryEventProxyModeSet rpmevt = (RepositoryEventProxyModeSet) evt;
 
             HashSet<NotificationTarget> targets = new HashSet<NotificationTarget>();
 
@@ -56,8 +57,8 @@ public class DefaultNotificationEventRouter
 
             if ( !targets.isEmpty() )
             {
-                RepositoryEventProxyModeChangedMessage message =
-                    new RepositoryEventProxyModeChangedMessage( rpmevt, null );
+                RepositoryEventProxyModeMessage message =
+                    new RepositoryEventProxyModeMessage( rpmevt, null );
 
                 return new NotificationRequest( message, targets );
             }

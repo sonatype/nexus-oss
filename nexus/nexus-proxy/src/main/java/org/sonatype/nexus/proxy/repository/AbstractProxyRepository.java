@@ -41,6 +41,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
+import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -314,10 +315,18 @@ public abstract class AbstractProxyRepository
                 resetRemoteStatus();
             }
 
-            if ( sendNotification && !proxyMode.equals( oldProxyMode ) )
+            if ( sendNotification )
             {
+                // this one should be fired _always_
                 getApplicationEventMulticaster().notifyEventListeners(
-                    new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                    new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
+                
+                if ( !proxyMode.equals( oldProxyMode ) )
+                {
+                    // this one should be fired on _transition_ only
+                    getApplicationEventMulticaster().notifyEventListeners(
+                        new RepositoryEventProxyModeChanged( this, oldProxyMode, proxyMode, cause ) );
+                }
             }
         }
     }
