@@ -1,5 +1,8 @@
 package org.sonatype.nexus.notification.events;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.notification.NotificationCheat;
@@ -10,10 +13,6 @@ import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeSet;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.plexus.appevents.Event;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 
 /**
  * This component routes based on Application event. Currently it is hardwired, but we would have some "mediation"
@@ -131,13 +130,13 @@ public class DefaultNotificationEventRouter
 
     // ==
 
-    private List<String> autoBlockedRepositoryIds;
+    private Set<String> autoBlockedRepositoryIds;
 
-    protected List<String> getAutoBlockedRepositoryIds()
+    protected Set<String> getAutoBlockedRepositoryIds()
     {
         if ( autoBlockedRepositoryIds == null )
         {
-            autoBlockedRepositoryIds = new ArrayList<String>();
+            autoBlockedRepositoryIds = new HashSet<String>();
         }
 
         return autoBlockedRepositoryIds;
