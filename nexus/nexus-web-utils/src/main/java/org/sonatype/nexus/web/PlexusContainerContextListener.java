@@ -52,12 +52,10 @@ public class PlexusContainerContextListener
                 AppContext plexusContext = createContainerContext( context );
 
                 ContainerConfiguration plexusConfiguration =
-                    new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
-                                                                                                                                 buildConfigurationURL(
-                                                                                                                                                        context,
-                                                                                                                                                        PLEXUS_CONFIG_PARAM,
-                                                                                                                                                        DEFAULT_PLEXUS_CONFIG ) ).setContext(
-                                                                                                                                                                                              plexusContext );
+                    new DefaultContainerConfiguration().setName( context.getServletContextName() )
+                        .setContainerConfigurationURL(
+                            buildConfigurationURL( context, PLEXUS_CONFIG_PARAM, DEFAULT_PLEXUS_CONFIG ) ).setContext(
+                            plexusContext );
 
                 plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
 
@@ -104,12 +102,15 @@ public class PlexusContainerContextListener
 
         AppContextRequest request = appContextFactory.getDefaultAppContextRequest();
 
-        String servletContextName = context.getServletContextName();
+        // TODO: disabling this feature for now, it interferes with Juven's stuff for logging
+        // TODO: but this change makes impossible to have more than one Nexus in a webapp container!
+        // String servletContextName = context.getServletContextName();
 
-        if ( servletContextName != null )
-        {
-            request.setName( context.getServletContextName() );
-        }
+        // if ( servletContextName != null )
+        // {
+        //     request.setName( context.getServletContextName() );
+        // }
+        // TODO: ^^^^
 
         // just pass over the already found basedir
         request.setBasedirDiscoverer( new SimpleBasedirDiscoverer( basedirFile ) );

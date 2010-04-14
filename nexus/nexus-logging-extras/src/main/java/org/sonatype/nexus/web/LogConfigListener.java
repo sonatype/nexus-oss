@@ -40,7 +40,7 @@ public class LogConfigListener
 
     private static final String KEY_NEXUS_WORK_DIR = "plexus.nexus-work";
 
-    private static final String RELATIVE_PATH_LOG_CONF = "/conf/log4j.properties";
+    private static final String RELATIVE_PATH_LOG_CONF = "conf/log4j.properties";
 
     private Handler[] originalHandlers;
 
