@@ -353,6 +353,7 @@ public class DefaultNexusConfiguration
         return wastebasketDirectory;
     }
 
+    @Deprecated
     public Repository createRepositoryFromModel( CRepository repository )
         throws ConfigurationException
     {
@@ -457,7 +458,7 @@ public class DefaultNexusConfiguration
 
 			if (!repo.getProviderRole().equals(GroupRepository.class.getName())) 
 			{
-				Repository repository = createRepositoryFromModel(repo);
+				Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
 				repositoryRegistry.addRepository(repository);
 			}
 		}
@@ -466,7 +467,7 @@ public class DefaultNexusConfiguration
 		{
 			if (repo.getProviderRole().equals(GroupRepository.class.getName())) 
 			{
-				Repository repository = createRepositoryFromModel(repo);
+                Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
 				repositoryRegistry.addRepository(repository);
 			}
 		}

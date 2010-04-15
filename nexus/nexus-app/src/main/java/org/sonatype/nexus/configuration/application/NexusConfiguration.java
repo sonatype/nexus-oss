@@ -56,6 +56,15 @@ public interface NexusConfiguration
 
     boolean isConfigurationDefaulted();
 
+    /**
+     * Creates a repository from the CRepository model. Do not use this method!
+     * 
+     * @param repository
+     * @return
+     * @throws ConfigurationException
+     * @deprecated Do not use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
+     *             used instead.
+     */
     Repository createRepositoryFromModel( CRepository repository )
         throws ConfigurationException;
 
