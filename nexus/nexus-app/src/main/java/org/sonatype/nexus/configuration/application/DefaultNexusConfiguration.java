@@ -208,10 +208,9 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent(
-                this,
-                prepare.getChanges(),
-                securitySystem.getSubject() ) );
+            applicationEventMulticaster
+                .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(), securitySystem
+                    .getSubject() ) );
 
             return true;
         }
@@ -241,7 +240,7 @@ public class DefaultNexusConfiguration
                 this.getLogger().error( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
                 throw new IOException( "Saving nexus configuration caused unexpected error:\n" + response.toString() );
             }
-            // END   <<<
+            // END <<<
 
             configurationSource.storeConfiguration();
 
@@ -449,29 +448,32 @@ public class DefaultNexusConfiguration
         dropRepositories();
     }
 
-	protected void createRepositories() throws ConfigurationException 
-	{
-		List<CRepository> reposes = getConfigurationModel().getRepositories();
+    protected void createRepositories()
+        throws ConfigurationException
+    {
+        List<CRepository> reposes = getConfigurationModel().getRepositories();
 
-		for (CRepository repo : reposes) 
-		{
+        for ( CRepository repo : reposes )
+        {
 
-			if (!repo.getProviderRole().equals(GroupRepository.class.getName())) 
-			{
-				Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
-				repositoryRegistry.addRepository(repository);
-			}
-		}
+            if ( !repo.getProviderRole().equals( GroupRepository.class.getName() ) )
+            {
+                Repository repository =
+                    runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
+                repositoryRegistry.addRepository( repository );
+            }
+        }
 
-		for (CRepository repo : reposes) 
-		{
-			if (repo.getProviderRole().equals(GroupRepository.class.getName())) 
-			{
-                Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
-				repositoryRegistry.addRepository(repository);
-			}
-		}
-	}
+        for ( CRepository repo : reposes )
+        {
+            if ( repo.getProviderRole().equals( GroupRepository.class.getName() ) )
+            {
+                Repository repository =
+                    runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
+                repositoryRegistry.addRepository( repository );
+            }
+        }
+    }
 
     protected void dropRepositories()
     {
