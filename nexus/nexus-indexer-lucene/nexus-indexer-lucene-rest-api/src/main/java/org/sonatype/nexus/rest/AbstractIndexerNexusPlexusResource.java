@@ -10,6 +10,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IteratorResultSet;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -25,12 +26,13 @@ public abstract class AbstractIndexerNexusPlexusResource
     public void configureXStream( XStream xstream )
     {
         super.configureXStream( xstream );
-        
+
         XStreamInitializer.init( xstream );
     }
+
     /**
      * Convert a collection of ArtifactInfo's to NexusArtifacts
-     *
+     * 
      * @param aic
      * @return
      */
@@ -40,7 +42,30 @@ public abstract class AbstractIndexerNexusPlexusResource
         {
             return null;
         }
-        List<NexusArtifact> result = new ArrayList<NexusArtifact>( aic.size() );
+        
+        List<NexusArtifact> result = new ArrayList<NexusArtifact>();
+        
+        for ( ArtifactInfo ai : aic )
+        {
+            NexusArtifact na = ai2Na( request, ai );
+
+            if ( na != null )
+            {
+                result.add( na );
+            }
+        }
+        return result;
+    }
+
+    protected Collection<NexusArtifact> ai2NaColl( Request request, IteratorResultSet aic )
+    {
+        if ( aic == null )
+        {
+            return null;
+        }
+        
+        List<NexusArtifact> result = new ArrayList<NexusArtifact>();
+        
         for ( ArtifactInfo ai : aic )
         {
             NexusArtifact na = ai2Na( request, ai );
@@ -77,7 +102,7 @@ public abstract class AbstractIndexerNexusPlexusResource
         a.setClassifier( ai.classifier );
 
         a.setPackaging( ai.packaging );
-        
+
         a.setExtension( ai.fextension );
 
         a.setRepoId( ai.repository );
@@ -96,22 +121,13 @@ public abstract class AbstractIndexerNexusPlexusResource
             {
                 MavenRepository mavenRepository = (MavenRepository) repository;
 
-                Gav gav = new Gav(
-                    ai.groupId,
-                    ai.artifactId,
-                    ai.version,
-                    ai.classifier,
-                    mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
-                    null,
-                    null,
-                    null,
-                    VersionUtils.isSnapshot( ai.version ),
-                    false,
-                    null,
-                    false,
-                    null );
+                Gav gav =
+                    new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier, mavenRepository
+                        .getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ), null, null, null,
+                             VersionUtils.isSnapshot( ai.version ), false, null, false, null );
 
-                ResourceStoreRequest req = new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
+                ResourceStoreRequest req =
+                    new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
 
                 a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
             }
@@ -131,7 +147,7 @@ public abstract class AbstractIndexerNexusPlexusResource
 
         return a;
     }
-    
+
     protected String createPomLink( Request request, ArtifactInfo ai )
     {
         if ( StringUtils.isNotEmpty( ai.classifier ) )
@@ -139,8 +155,8 @@ public abstract class AbstractIndexerNexusPlexusResource
             return "";
         }
 
-        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version
-            + "&e=pom";
+        String suffix =
+            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e=pom";
 
         return createRedirectBaseRef( request ).toString() + suffix;
     }
@@ -152,8 +168,9 @@ public abstract class AbstractIndexerNexusPlexusResource
             return "";
         }
 
-        String suffix = "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
-            + ai.fextension;
+        String suffix =
+            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
+                + ai.fextension;
 
         if ( StringUtils.isNotBlank( ai.classifier ) )
         {

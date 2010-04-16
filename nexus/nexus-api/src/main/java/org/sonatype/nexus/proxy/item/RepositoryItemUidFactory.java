@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.item;
 
+import java.util.Map;
+
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -38,4 +40,11 @@ public interface RepositoryItemUidFactory
      */
     public RepositoryItemUid createUid( String uidStr )
         throws IllegalArgumentException, NoSuchRepositoryException;
+
+    /**
+     * Returns a snapshot of the active UID maps. Keys are UID string representations, while values are actual UIDs.
+     * 
+     * @return
+     */
+    Map<String, RepositoryItemUid> getActiveUidMapSnapshot();
 }

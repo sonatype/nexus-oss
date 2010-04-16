@@ -35,7 +35,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
  * The default {@link IndexingContext} implementation.
- *
+ * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
  */
@@ -79,7 +79,7 @@ public class DefaultIndexingContext
 
     private IndexReader indexReader;
 
-    private IndexSearcher indexSearcher;
+    private NexusIndexSearcher indexSearcher;
 
     private NexusIndexWriter indexWriter;
 
@@ -295,7 +295,9 @@ public class DefaultIndexingContext
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
-        hdr.add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES, Field.Index.NO ) );
+        hdr
+            .add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES,
+                             Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
 
@@ -405,8 +407,8 @@ public class DefaultIndexingContext
                 indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
 
                 indexWriter.setRAMBufferSizeMB( 2 );
-                
-                indexWriter.setMergeScheduler(new SerialMergeScheduler());
+
+                indexWriter.setMergeScheduler( new SerialMergeScheduler() );
             }
 
             return indexWriter;
@@ -447,7 +449,7 @@ public class DefaultIndexingContext
                     indexSearcher.getIndexReader().close();
                 }
 
-                indexSearcher = new IndexSearcher( getIndexReader() );
+                indexSearcher = new NexusIndexSearcher( this );
             }
 
             return indexSearcher;

@@ -24,6 +24,7 @@ import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
@@ -38,6 +39,52 @@ public class NexusIndexerTest
 
     private IndexingContext context;
 
+    public void testSearchIterator()
+        throws Exception
+    {
+        NexusIndexer indexer = prepare();
+
+        Query q = indexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
+
+        IteratorSearchRequest request = new IteratorSearchRequest( q );
+
+        IteratorSearchResponse response = indexer.searchIterator( request );
+
+        assertEquals( 2, response.getTotalHits() );
+
+        for ( ArtifactInfo ai : response.getResults() )
+        {
+            assertEquals( "GroupId must match \"qdox\"!", "qdox", ai.groupId );
+        }
+    }
+
+    public void testSearchIteratorWithFilter()
+        throws Exception
+    {
+        NexusIndexer indexer = prepare();
+
+        Query q = indexer.constructQuery( ArtifactInfo.GROUP_ID, "qdox" );
+
+        IteratorSearchRequest request = new IteratorSearchRequest( q, new ArtifactInfoFilter()
+        {
+            public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+            {
+                // we reject version "1.5" for fun
+                return !StringUtils.equals( ai.version, "1.5" );
+            }
+        } );
+
+        IteratorSearchResponse response = indexer.searchIterator( request );
+
+        assertEquals( 2, response.getTotalHits() );
+
+        assertTrue( "Iterator has to have next (2 found, 1 filtered out)", response.getResults().hasNext() );
+
+        ArtifactInfo ai = response.getResults().next();
+
+        assertEquals( "1.5 is filtered out, so 1.6.1 must appear here!", "1.6.1", ai.version );
+    }
+
     public void testSearchGrouped()
         throws Exception
     {
@@ -49,7 +96,7 @@ public class NexusIndexerTest
             GroupedSearchResponse response = indexer.searchGrouped( request );
             Map<String, ArtifactInfoGroup> r = response.getResults();
             assertEquals( 1, r.size() );
-        
+
             ArtifactInfoGroup gi0 = r.values().iterator().next();
             assertEquals( "qdox : qdox", gi0.getGroupKey() );
             List<ArtifactInfo> list = new ArrayList<ArtifactInfo>( gi0.getArtifactInfos() );
@@ -61,7 +108,8 @@ public class NexusIndexerTest
         }
         {
             WildcardQuery q = new WildcardQuery( new Term( ArtifactInfo.UINFO, "commons-log*" ) );
-            GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping(), String.CASE_INSENSITIVE_ORDER );
+            GroupedSearchRequest request =
+                new GroupedSearchRequest( q, new GAGrouping(), String.CASE_INSENSITIVE_ORDER );
             GroupedSearchResponse response = indexer.searchGrouped( request );
             Map<String, ArtifactInfoGroup> r = response.getResults();
             assertEquals( 1, r.size() );
@@ -88,10 +136,10 @@ public class NexusIndexerTest
             bq.add( new WildcardQuery( new Term( ArtifactInfo.GROUP_ID, "testng*" ) ), Occur.SHOULD );
             bq.add( new WildcardQuery( new Term( ArtifactInfo.ARTIFACT_ID, "testng*" ) ), Occur.SHOULD );
             bq.setMinimumNumberShouldMatch( 1 );
-    
+
             FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( bq ) );
             Set<ArtifactInfo> r = response.getResults();
-    
+
             assertEquals( r.toString(), 4, r.size() );
         }
     }
@@ -148,14 +196,13 @@ public class NexusIndexerTest
     {
         NexusIndexer indexer = prepare();
 
-        Query q = new TermQuery( new Term(
-            ArtifactInfo.UINFO,
-            "org.apache.maven.plugins|maven-core-it-plugin|1.0|NA" ) );
+        Query q =
+            new TermQuery( new Term( ArtifactInfo.UINFO, "org.apache.maven.plugins|maven-core-it-plugin|1.0|NA" ) );
 
         FlatSearchRequest request = new FlatSearchRequest( q );
 
         FlatSearchResponse response1 = indexer.searchFlat( request );
-        Collection<ArtifactInfo> res1 = response1.getResults(); 
+        Collection<ArtifactInfo> res1 = response1.getResults();
         assertEquals( 1, res1.size() );
 
         ArtifactInfo ai = res1.iterator().next();
@@ -171,7 +218,7 @@ public class NexusIndexerTest
         IndexingContext indexingContext = indexer.getIndexingContexts().get( "test" );
 
         // String fname = indexingContext.getRepository().getAbsolutePath() + "/" + ai.groupId.replace( '.', '/' ) + "/"
-        //     + ai.artifactId + "/" + ai.version + "/" + ai.artifactId + "-" + ai.version;
+        // + ai.artifactId + "/" + ai.version + "/" + ai.artifactId + "-" + ai.version;
 
         // File pom = new File( fname + ".pom" );
 
@@ -180,7 +227,7 @@ public class NexusIndexerTest
         indexer.addArtifactToIndex( new ArtifactContext( null, null, null, ai, null ), indexingContext );
 
         FlatSearchResponse response2 = indexer.searchFlat( request );
-        Collection<ArtifactInfo> res2 = response2.getResults(); 
+        Collection<ArtifactInfo> res2 = response2.getResults();
         assertEquals( 1, res2.size() );
 
         ArtifactInfo ai2 = res2.iterator().next();
@@ -214,28 +261,21 @@ public class NexusIndexerTest
         indexer.removeIndexingContext( context, false );
 
         indexer.addIndexingContext( indexId, //
-            repositoryId,
-            repository,
-            newDirectory,
-            repositoryUrl,
-            null,
-            indexCreators );
+            repositoryId, repository, newDirectory, repositoryUrl, null, indexCreators );
 
         WildcardQuery q = new WildcardQuery( new Term( ArtifactInfo.PACKAGING, "maven-plugin" ) );
         FlatSearchResponse response = indexer.searchFlat( new FlatSearchRequest( q ) );
-        Collection<ArtifactInfo> infos = response.getResults(); 
+        Collection<ArtifactInfo> infos = response.getResults();
 
         assertEquals( infos.toString(), 2, infos.size() );
     }
 
     private NexusIndexer prepare()
-        throws Exception,
-            IOException,
-            UnsupportedExistingLuceneIndexException
+        throws Exception, IOException, UnsupportedExistingLuceneIndexException
     {
         NexusIndexer indexer = lookup( NexusIndexer.class );
 
-        //Directory indexDir = new RAMDirectory();
+        // Directory indexDir = new RAMDirectory();
         File indexDir = new File( getBasedir(), "target/index/test-" + Long.toString( System.currentTimeMillis() ) );
         FileUtils.deleteDirectory( indexDir );
 
@@ -244,25 +284,25 @@ public class NexusIndexerTest
         context = indexer.addIndexingContext( "test", "test", repo, indexDir, null, null, DEFAULT_CREATORS );
         indexer.scan( context );
 
-//        IndexReader indexReader = context.getIndexSearcher().getIndexReader();
-//        int numDocs = indexReader.numDocs();
-//        for ( int i = 0; i < numDocs; i++ ) 
-//        {
-//            Document doc = indexReader.document( i );
-//            System.err.println( i + " : " + doc.get( ArtifactInfo.UINFO));
-//          
-//        }
+        // IndexReader indexReader = context.getIndexSearcher().getIndexReader();
+        // int numDocs = indexReader.numDocs();
+        // for ( int i = 0; i < numDocs; i++ )
+        // {
+        // Document doc = indexReader.document( i );
+        // System.err.println( i + " : " + doc.get( ArtifactInfo.UINFO));
+        //          
+        // }
         return indexer;
     }
 
-//    private void printDocs(NexusIndexer nexus) throws IOException 
-//    {
-//        IndexingContext context = nexus.getIndexingContexts().get("test");
-//        IndexReader reader = context.getIndexSearcher().getIndexReader();
-//        int numDocs = reader.numDocs();
-//        for (int i = 0; i < numDocs; i++) {
-//          Document doc = reader.document(i);  
-//          System.err.println(i + " " + doc.get(ArtifactInfo.UINFO) + " : " + doc.get(ArtifactInfo.PACKAGING));
-//        }
-//    }
+    // private void printDocs(NexusIndexer nexus) throws IOException
+    // {
+    // IndexingContext context = nexus.getIndexingContexts().get("test");
+    // IndexReader reader = context.getIndexSearcher().getIndexReader();
+    // int numDocs = reader.numDocs();
+    // for (int i = 0; i < numDocs; i++) {
+    // Document doc = reader.document(i);
+    // System.err.println(i + " " + doc.get(ArtifactInfo.UINFO) + " : " + doc.get(ArtifactInfo.PACKAGING));
+    // }
+    // }
 }

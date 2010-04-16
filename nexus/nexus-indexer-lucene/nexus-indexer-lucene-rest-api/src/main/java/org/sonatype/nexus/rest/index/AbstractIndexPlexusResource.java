@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -33,8 +32,8 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.IteratorSearchResponse;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -51,7 +50,7 @@ public abstract class AbstractIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
     private static final int HIT_LIMIT = 500;
-    
+
     public static final String DOMAIN = "domain";
 
     public static final String DOMAIN_REPOSITORIES = "repositories";
@@ -68,7 +67,7 @@ public abstract class AbstractIndexPlexusResource
 
     @Requirement( role = Searcher.class )
     private List<Searcher> m_searchers;
-    
+
     public AbstractIndexPlexusResource()
     {
         this.setModifiable( true );
@@ -121,7 +120,7 @@ public abstract class AbstractIndexPlexusResource
             }
         }
 
-        FlatSearchResponse searchResult = null;
+        IteratorSearchResponse searchResult = null;
 
         NexusArtifact na = null;
 
@@ -136,7 +135,7 @@ public abstract class AbstractIndexPlexusResource
                 catch ( IOException e )
                 {
                     throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                        "IOException during configuration retrieval!", e );
+                                                 "IOException during configuration retrieval!", e );
                 }
             }
             else
@@ -201,47 +200,30 @@ public abstract class AbstractIndexPlexusResource
         return result;
     }
 
-    private FlatSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                              final Integer from, final Integer count )
+    private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
+                                                  final Integer from, final Integer count )
         throws NoSuchRepositoryException, ResourceException
     {
-        FlatSearchResponse searchResult;
-        int totalHits = 0;
-        Set<ArtifactInfo> artifacts = null;
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
             {
-                final FlatSearchResponse searchResponse =
-                    searcher.flatSearch( terms, repositoryId, from, count, HIT_LIMIT );
+                final IteratorSearchResponse searchResponse =
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT );
+
                 if ( searchResponse != null )
                 {
                     if ( searchResponse.isHitLimitExceeded() )
                     {
-                        return new FlatSearchResponse( null, -1, Collections.<ArtifactInfo> emptySet() );
+                        return new IteratorSearchResponse( null, -1, null );
                     }
 
-                    // Note that we are reusing the tree set from the indexer, otherwise using a new set
-                    // we will have to redefine the sorting as defined in indexer
-                    if ( artifacts == null )
-                    {
-                        artifacts = searchResponse.getResults();
-                    }
-                    else
-                    {
-                        artifacts.addAll( searchResponse.getResults() );
-                    }
-
-                    totalHits += searchResponse.getTotalHits();
+                    return searchResponse;
                 }
             }
         }
-        if ( artifacts == null )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Requested search query is not supported" );
-        }
-        searchResult = new FlatSearchResponse( null, totalHits, artifacts );
-        return searchResult;
+
+        throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Requested search query is not supported" );
     }
 
     @Override

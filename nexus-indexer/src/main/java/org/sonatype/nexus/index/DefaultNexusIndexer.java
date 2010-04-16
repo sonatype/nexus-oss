@@ -37,7 +37,7 @@ import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
 /**
  * A default {@link NexusIndexer} implementation.
- *
+ * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
@@ -216,7 +216,7 @@ public class DefaultNexusIndexer
      * Uses {@link Scanner} to scan repository content. A {@link ArtifactScanningListener} is used to process found
      * artifacts and to add them to the index using
      * {@link NexusIndexer#artifactDiscovered(ArtifactContext, IndexingContext)}.
-     *
+     * 
      * @see DefaultScannerListener
      * @see #artifactDiscovered(ArtifactContext, IndexingContext)
      */
@@ -393,6 +393,19 @@ public class DefaultNexusIndexer
         }
     }
 
+    public IteratorSearchResponse searchIterator( IteratorSearchRequest request )
+        throws IOException
+    {
+        if ( request.getContexts().isEmpty() )
+        {
+            return searcher.searchIteratorPaged( request, indexingContexts.values() );
+        }
+        else
+        {
+            return searcher.forceSearchIteratorPaged( request, request.getContexts() );
+        }
+    }
+
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
@@ -425,7 +438,7 @@ public class DefaultNexusIndexer
         throws IOException
     {
         return searcher.searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-                                       indexingContexts.values() ).getResults();
+            indexingContexts.values() ).getResults();
     }
 
     /**
@@ -438,7 +451,7 @@ public class DefaultNexusIndexer
         throws IOException
     {
         return searcher.searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-                                       Arrays.asList( new IndexingContext[] { context } ) ).getResults();
+            Arrays.asList( new IndexingContext[] { context } ) ).getResults();
     }
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )

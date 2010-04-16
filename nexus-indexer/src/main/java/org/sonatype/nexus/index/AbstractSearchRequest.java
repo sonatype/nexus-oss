@@ -29,6 +29,10 @@ public class AbstractSearchRequest
      */
     private int resultHitLimit;
 
+    private ArtifactInfoFilter artifactInfoFilter;
+
+    private ArtifactInfoPostprocessor artifactInfoPostprocessor;
+
     public AbstractSearchRequest( Query query )
     {
         this( query, null );
@@ -120,5 +124,25 @@ public class AbstractSearchRequest
     public void setResultHitLimit( int resultHitLimit )
     {
         this.resultHitLimit = resultHitLimit;
+    }
+
+    public ArtifactInfoFilter getArtifactInfoFilter()
+    {
+        return artifactInfoFilter;
+    }
+
+    public void setArtifactInfoFilter( ArtifactInfoFilter artifactInfoFilter )
+    {
+        this.artifactInfoFilter = artifactInfoFilter;
+    }
+
+    public ArtifactInfoPostprocessor getArtifactInfoPostprocessor()
+    {
+        return artifactInfoPostprocessor;
+    }
+
+    public void setArtifactInfoPostprocessor( ArtifactInfoPostprocessor artifactInfoPostprocessor )
+    {
+        this.artifactInfoPostprocessor = artifactInfoPostprocessor;
     }
 }
