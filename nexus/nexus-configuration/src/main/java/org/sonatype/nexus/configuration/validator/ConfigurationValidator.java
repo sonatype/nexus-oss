@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.configuration.validator;
 
+import org.sonatype.configuration.Configuration;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 
@@ -22,7 +23,8 @@ import org.sonatype.configuration.validation.ValidationResponse;
  * @author cstamas
  * @deprecated see Configurable
  */
-public interface ConfigurationValidator
+@Deprecated
+public interface ConfigurationValidator<E extends Configuration>
 {
     /**
      * Validates the model. This does "whole" (contextual) config validation.
@@ -30,5 +32,5 @@ public interface ConfigurationValidator
      * @param request
      * @returns response
      */
-    ValidationResponse validateModel( ValidationRequest request );
+    ValidationResponse validateModel( ValidationRequest<E> request );
 }
