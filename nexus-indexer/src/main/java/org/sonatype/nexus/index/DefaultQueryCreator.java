@@ -7,29 +7,29 @@
 package org.sonatype.nexus.index;
 
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.index.context.NexusAnalyzer;
 
 /**
- * A default {@link QueryCreator} constructs Lucene query for provided query text. 
- * 
+ * A default {@link QueryCreator} constructs Lucene query for provided query text.
  * <p>
- * By default wildcards are created such as query text matches beginning of the field 
- * value or beginning of the class/package name segment for {@link ArtifactInfo#NAMES NAMES} field.  
- * But it can be controlled by using special markers:
- * 
+ * By default wildcards are created such as query text matches beginning of the field value or beginning of the
+ * class/package name segment for {@link ArtifactInfo#NAMES NAMES} field. But it can be controlled by using special
+ * markers:
  * <ul>
  * <li>* - any character</li>
- * <li>'^' - beginning of the text</li> 
+ * <li>'^' - beginning of the text</li>
  * <li>'$' or '&lt;' or ' ' end of the text</li>
  * </ul>
- * 
  * For example:
- * 
  * <ul>
  * <li>junit - matches junit and junit-foo, but not foo-junit</li>
  * <li>*junit - matches junit, junit-foo and foo-junit</li>
@@ -38,12 +38,50 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
  * 
  * @author Eugene Kuleshov
  */
-@Component(role = QueryCreator.class)
+@Component( role = QueryCreator.class )
 public class DefaultQueryCreator
-    extends AbstractLogEnabled
     implements QueryCreator
 {
+    @Requirement
+    private Logger logger;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+
+    // ==
+
     public Query constructQuery( String field, String query )
+    {
+        QueryParser qp = new QueryParser( ArtifactInfo.ARTIFACT_ID, new NexusAnalyzer() );
+
+        Query result = null;
+
+        try
+        {
+            result = qp.parse( field + ":" + query );
+        }
+        catch ( ParseException e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
+            }
+
+            result = legacyConstructQuery( field, query );
+        }
+
+        if ( getLogger().isDebugEnabled() )
+        {
+            getLogger().debug( "Query parsed as: " + result.toString() );
+        }
+
+        return result;
+    }
+
+    public Query legacyConstructQuery( String field, String query )
     {
         if ( query == null || query.length() == 0 )
         {
@@ -51,43 +89,45 @@ public class DefaultQueryCreator
 
             return null;
         }
-        
+
         String q = query.toLowerCase();
-        
+
         char h = query.charAt( 0 );
-        
-        if( field.equals( ArtifactInfo.NAMES  ))
+
+        if ( field.equals( ArtifactInfo.NAMES ) )
         {
             q = q.replaceAll( "\\.", "/" );
-            
-            if( h == '^' )
-            {
-                q = q.substring( 1 );
-                if ( q.charAt( 0 ) != '/' )
-                {
-                    q = '/' + q;
-                }
-            }
-            else if( h != '*' )
-            {
-                q = "*/" + q;
-            }
-        }
-        else
-        {
-            if( h == '^' )
+
+            String[] s = q.split( "/" );
+
+            // NexusAnalyzer nal = new NexusAnalyzer();
+
+            // nal.reusableTokenStream( field, new StringReader( q ) );
+
+            if ( h == '^' )
             {
                 q = q.substring( 1 );
             }
-            else if( h != '*' )
+            else if ( h != '*' )
             {
                 q = "*" + q;
             }
         }
-        
+        else
+        {
+            if ( h == '^' )
+            {
+                q = q.substring( 1 );
+            }
+            else if ( h != '*' )
+            {
+                q = "*" + q;
+            }
+        }
+
         int l = q.length() - 1;
         char c = q.charAt( l );
-        if( c == ' ' || c == '<' || c == '$' )
+        if ( c == ' ' || c == '<' || c == '$' )
         {
             q = q.substring( 0, q.length() - 1 );
         }
@@ -97,15 +137,15 @@ public class DefaultQueryCreator
         }
 
         int n = q.indexOf( '*' );
-        if( n == -1 )
+        if ( n == -1 )
         {
             return new TermQuery( new Term( field, q ) );
         }
-        else if( n > 0 && n == q.length() -1 )
+        else if ( n > 0 && n == q.length() - 1 )
         {
-            return new PrefixQuery( new Term( field, q.substring( 0, q.length() - 2 ) ) );
+            return new PrefixQuery( new Term( field, q.substring( 0, q.length() - 1 ) ) );
         }
-        
+
         return new WildcardQuery( new Term( field, q ) );
     }
 }

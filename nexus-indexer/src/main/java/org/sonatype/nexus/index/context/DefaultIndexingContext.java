@@ -75,8 +75,6 @@ public class DefaultIndexingContext
 
     private String indexUpdateUrl;
 
-    private Analyzer analyzer;
-
     private IndexReader indexReader;
 
     private NexusIndexSearcher indexSearcher;
@@ -110,8 +108,6 @@ public class DefaultIndexingContext
         this.repositoryUrl = repositoryUrl;
 
         this.indexUpdateUrl = indexUpdateUrl;
-
-        this.analyzer = new NexusAnalyzer();
 
         this.indexReader = null;
 
@@ -236,7 +232,7 @@ public class DefaultIndexingContext
         }
 
         // create empty idx and store descriptor
-        new NexusIndexWriter( indexDirectory, analyzer, true ).close();
+        new NexusIndexWriter( getIndexDirectory(), new NexusAnalyzer(), true ).close();
 
         storeDescriptor();
     }
@@ -394,7 +390,7 @@ public class DefaultIndexingContext
 
     public Analyzer getAnalyzer()
     {
-        return analyzer;
+        return new NexusAnalyzer();
     }
 
     public IndexWriter getIndexWriter()
@@ -404,7 +400,7 @@ public class DefaultIndexingContext
         {
             if ( indexWriter == null || indexWriter.isClosed() )
             {
-                indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
+                indexWriter = new NexusIndexWriter( getIndexDirectory(), new NexusAnalyzer(), false );
 
                 indexWriter.setRAMBufferSizeMB( 2 );
 

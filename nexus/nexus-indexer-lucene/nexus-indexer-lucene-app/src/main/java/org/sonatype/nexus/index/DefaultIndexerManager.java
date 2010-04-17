@@ -1964,14 +1964,7 @@ public class DefaultIndexerManager
 
     protected Query createQuery( String field, String term )
     {
-        if ( ArtifactInfo.NAMES.equals( field ) )
-        {
-            return nexusIndexer.constructQuery( field, term );
-        }
-        else
-        {
-            return nexusIndexer.constructQuery( field, "^" + term );
-        }
+        return nexusIndexer.constructQuery( field, term );
     }
 
     protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit )
@@ -2063,11 +2056,19 @@ public class DefaultIndexerManager
 
             Query q2 = createQuery( ArtifactInfo.ARTIFACT_ID, term );
 
+            Query q3 = createQuery( ArtifactInfo.VERSION, term );
+
+            Query q4 = createQuery( ArtifactInfo.CLASSIFIER, term );
+
             BooleanQuery bq = new BooleanQuery();
 
             bq.add( q1, BooleanClause.Occur.SHOULD );
 
             bq.add( q2, BooleanClause.Occur.SHOULD );
+
+            bq.add( q3, BooleanClause.Occur.SHOULD );
+
+            bq.add( q4, BooleanClause.Occur.SHOULD );
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit );
 
