@@ -307,8 +307,9 @@ public class DefaultSearchEngine
         MultiSearcher multiSearcher =
             new MultiSearcher( contextsToSearch.toArray( new Searchable[contextsToSearch.size()] ) );
 
-        Hits hits = multiSearcher.search( request.getQuery() ); // , new Sort( new SortField( ArtifactInfo.UINFO,
-                                                                // SortField.STRING ) ) );
+        Hits hits =
+            multiSearcher.search( request.getQuery(), new Sort( new SortField[] { SortField.FIELD_SCORE,
+                new SortField( null, SortField.DOC, true ) } ) );
 
         return new IteratorSearchResponse( request.getQuery(), hits.length(),
                                            new DefaultIteratorResultSet( request, multiSearcher, hits ) );
