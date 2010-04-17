@@ -2053,8 +2053,12 @@ public class DefaultIndexerManager
             }
 
             Query q1 = createQuery( ArtifactInfo.GROUP_ID, term );
+            
+            q1.setBoost( 2.0f );
 
             Query q2 = createQuery( ArtifactInfo.ARTIFACT_ID, term );
+            
+            q2.setBoost( 2.0f );
 
             Query q3 = createQuery( ArtifactInfo.VERSION, term );
 
