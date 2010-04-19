@@ -145,7 +145,7 @@
     <nexus.indexer.version>2.0.5</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.2</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.14</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.15-SNAPSHOT</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>

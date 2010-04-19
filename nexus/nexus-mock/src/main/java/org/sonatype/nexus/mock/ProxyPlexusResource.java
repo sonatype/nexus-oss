@@ -298,6 +298,11 @@ public class ProxyPlexusResource
         return plexusResource.getPayloadInstance();
     }
 
+    public Object getPayloadInstance(Method m)
+    {
+        return plexusResource.getPayloadInstance(m);
+    }
+    
     public PathProtectionDescriptor getResourceProtection()
     {
         return plexusResource.getResourceProtection();
