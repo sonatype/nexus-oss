@@ -285,13 +285,13 @@ public class DefaultSearchEngine
         throws IOException
     {
         // manage defaults!
-        if ( request.getStart() == IteratorSearchRequest.UNDEFINED )
+        if ( request.getStart() < 0 )
         {
-            request.setStart( 0 );
+            request.setStart( IteratorSearchRequest.UNDEFINED );
         }
-        if ( request.getCount() == IteratorSearchRequest.UNDEFINED )
+        if ( request.getCount() < 0 )
         {
-            request.setCount( 200 );
+            request.setCount( IteratorSearchRequest.UNDEFINED );
         }
 
         ArrayList<IndexSearcher> contextsToSearch = new ArrayList<IndexSearcher>( indexingContexts.size() );

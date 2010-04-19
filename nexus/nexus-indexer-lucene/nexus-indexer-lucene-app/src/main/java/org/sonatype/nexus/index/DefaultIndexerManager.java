@@ -1967,17 +1967,28 @@ public class DefaultIndexerManager
         return nexusIndexer.constructQuery( field, term );
     }
 
-    protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit )
+    protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
+                                                   boolean latestVersionsOnly )
     {
         IteratorSearchRequest req = new IteratorSearchRequest( bq );
 
-        req.setArtifactInfoFilter( new ArtifactInfoFilter()
+        List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+
+        // security filter
+        filters.add( new ArtifactInfoFilter()
         {
             public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
             {
                 return indexArtifactFilter.filterArtifactInfo( ai );
             }
         } );
+
+        if ( latestVersionsOnly )
+        {
+            filters.add( new UniqueGAArtifactFilterPostprocessor( false ) );
+        }
+
+        req.setArtifactInfoFilter( new AndMultiArtifactInfoFilter( filters ) );
 
         req.setArtifactInfoPostprocessor( new ArtifactInfoPostprocessor()
         {
@@ -2024,6 +2035,11 @@ public class DefaultIndexerManager
         {
             req.setCount( count );
         }
+        else
+        {
+            // protect UI from break-down ;)
+            req.setCount( 500 );
+        }
 
         if ( hitLimit != null )
         {
@@ -2053,16 +2069,12 @@ public class DefaultIndexerManager
             }
 
             Query q1 = createQuery( ArtifactInfo.GROUP_ID, term );
-            
+
             q1.setBoost( 2.0f );
 
             Query q2 = createQuery( ArtifactInfo.ARTIFACT_ID, term );
-            
+
             q2.setBoost( 2.0f );
-
-            Query q3 = createQuery( ArtifactInfo.VERSION, term );
-
-            Query q4 = createQuery( ArtifactInfo.CLASSIFIER, term );
 
             BooleanQuery bq = new BooleanQuery();
 
@@ -2070,11 +2082,19 @@ public class DefaultIndexerManager
 
             bq.add( q2, BooleanClause.Occur.SHOULD );
 
-            bq.add( q3, BooleanClause.Occur.SHOULD );
+            // switch for "extended" keywords
+            if ( false )
+            {
+                Query q3 = createQuery( ArtifactInfo.VERSION, term );
 
-            bq.add( q4, BooleanClause.Occur.SHOULD );
+                Query q4 = createQuery( ArtifactInfo.CLASSIFIER, term );
 
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit );
+                bq.add( q3, BooleanClause.Occur.SHOULD );
+
+                bq.add( q4, BooleanClause.Occur.SHOULD );
+            }
+
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, true );
 
             if ( repositoryId != null )
             {
@@ -2141,7 +2161,7 @@ public class DefaultIndexerManager
 
             Query q = createQuery( ArtifactInfo.NAMES, term );
 
-            IteratorSearchRequest req = createRequest( q, from, count, hitLimit );
+            IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
 
             if ( repositoryId != null )
             {
@@ -2233,7 +2253,7 @@ public class DefaultIndexerManager
                 bq.add( createQuery( ArtifactInfo.CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
             }
 
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit );
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false );
 
             if ( repositoryId != null )
             {

@@ -13,6 +13,8 @@ import org.sonatype.nexus.index.context.NexusIndexSearcher;
 public class DefaultIteratorResultSet
     implements IteratorResultSet
 {
+    private static final int HARD_HIT_COUNT_LIMIT = 20000;
+    
     private final ArtifactInfoFilter filter;
 
     private final ArtifactInfoPostprocessor postprocessor;
@@ -24,6 +26,8 @@ public class DefaultIteratorResultSet
     private final int from;
 
     private final int count;
+
+    private final int maxRecPointer;
 
     private int pointer;
 
@@ -40,11 +44,13 @@ public class DefaultIteratorResultSet
 
         this.hits = hits;
 
-        this.from = request.getStart();
+        this.from = ( request.getStart() == AbstractSearchRequest.UNDEFINED ? 0 : request.getStart() );
 
-        this.count = request.getCount();
+        this.count = ( request.getCount() == AbstractSearchRequest.UNDEFINED ? Integer.MAX_VALUE : request.getCount() );
 
-        this.pointer = 0;
+        this.pointer = from;
+
+        this.maxRecPointer = ( request.getCount() == AbstractSearchRequest.UNDEFINED ? from + HARD_HIT_COUNT_LIMIT : from + count );
 
         ai = createNextAi();
     }
@@ -82,11 +88,11 @@ public class DefaultIteratorResultSet
         // b) pointer advanced over more documents that user requested
         // c) pointer advanced over more documents that hits has
         // or we found what we need
-        while ( ( result == null ) && ( from + pointer < from + count ) && ( from + pointer < hits.length() ) )
+        while ( ( result == null ) && ( pointer < maxRecPointer ) && ( pointer < hits.length() ) )
         {
-            Document doc = hits.doc( from + pointer );
+            Document doc = hits.doc( pointer );
 
-            IndexingContext context = getIndexingContextForPointer( hits.id( from + pointer ) );
+            IndexingContext context = getIndexingContextForPointer( hits.id( pointer ) );
 
             result = IndexUtils.constructArtifactInfo( doc, context );
 
