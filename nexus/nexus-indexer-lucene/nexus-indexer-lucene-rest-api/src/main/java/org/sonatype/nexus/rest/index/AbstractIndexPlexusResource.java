@@ -34,6 +34,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
+import org.sonatype.nexus.index.KeywordSearcher;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -95,6 +96,7 @@ public abstract class AbstractIndexPlexusResource
 
         Integer from = null;
         Integer count = null;
+        Boolean uniqueRGA = null;
 
         if ( form.getFirstValue( "from" ) != null )
         {
@@ -120,6 +122,11 @@ public abstract class AbstractIndexPlexusResource
             }
         }
 
+        if ( form.getFirstValue( "uniqueRGA" ) != null )
+        {
+            uniqueRGA = Boolean.valueOf( form.getFirstValue( "uniqueRGA" ) );
+        }
+
         IteratorSearchResponse searchResult = null;
 
         NexusArtifact na = null;
@@ -140,7 +147,7 @@ public abstract class AbstractIndexPlexusResource
             }
             else
             {
-                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count );
+                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -201,15 +208,19 @@ public abstract class AbstractIndexPlexusResource
     }
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final Integer count )
+                                                  final Integer from, final Integer count, final Boolean uniqueRGA )
         throws NoSuchRepositoryException, ResourceException
     {
+        // if uniqueRGA set, obey it, otherwise default it depending on query
+        // keyword search does collapse, others do not
+        boolean collapsed = uniqueRGA == null ? terms.containsKey( KeywordSearcher.TERM_KEYWORD ) : uniqueRGA;
+
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
             {
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT );
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed );
 
                 if ( searchResponse != null )
                 {

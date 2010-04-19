@@ -89,7 +89,7 @@ public class MavenCoordinatesSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit )
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )

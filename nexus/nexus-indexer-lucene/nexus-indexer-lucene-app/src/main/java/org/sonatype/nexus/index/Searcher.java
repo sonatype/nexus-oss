@@ -60,6 +60,6 @@ public interface Searcher
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
     IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+        Integer hitLimit, boolean uniqueRGA )
         throws NoSuchRepositoryException;
 }

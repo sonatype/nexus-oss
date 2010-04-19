@@ -62,14 +62,14 @@ public class KeywordSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit )
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
         {
             return new IteratorSearchResponse( null, 0, null );
         }
-        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit );
+        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit, uniqueRGA );
     }
 
 }

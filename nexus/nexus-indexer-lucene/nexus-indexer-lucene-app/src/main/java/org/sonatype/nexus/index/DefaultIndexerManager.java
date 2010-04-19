@@ -1968,7 +1968,7 @@ public class DefaultIndexerManager
     }
 
     protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
-                                                   boolean latestVersionsOnly )
+                                                   boolean uniqueRGA )
     {
         IteratorSearchRequest req = new IteratorSearchRequest( bq );
 
@@ -1983,7 +1983,7 @@ public class DefaultIndexerManager
             }
         } );
 
-        if ( latestVersionsOnly )
+        if ( uniqueRGA )
         {
             filters.add( new UniqueGAArtifactFilterPostprocessor( false ) );
         }
@@ -2050,7 +2050,7 @@ public class DefaultIndexerManager
     }
 
     public IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from,
-                                                          Integer count, Integer hitLimit )
+                                                          Integer count, Integer hitLimit, boolean uniqueRGA )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -2094,7 +2094,7 @@ public class DefaultIndexerManager
                 bq.add( q4, BooleanClause.Occur.SHOULD );
             }
 
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, true );
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
 
             if ( repositoryId != null )
             {

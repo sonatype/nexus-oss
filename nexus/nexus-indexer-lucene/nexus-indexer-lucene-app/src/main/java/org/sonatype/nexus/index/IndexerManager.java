@@ -169,7 +169,7 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from, Integer count,
-                                                   Integer hitLimit )
+                                                   Integer hitLimit, boolean uniqueRGA )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from, Integer count,
