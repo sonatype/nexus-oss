@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
 import org.restlet.Context;
+import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
@@ -45,6 +46,13 @@ public interface PlexusResource
      * @return
      */
     Object getPayloadInstance();
+
+    /**
+     * A factory method to create an instance of DTO per method.
+     * 
+     * @return
+     */
+    Object getPayloadInstance( Method method );
 
     /**
      * A Resource may add some configuration stuff to the XStream, and control the serialization of the payloads it

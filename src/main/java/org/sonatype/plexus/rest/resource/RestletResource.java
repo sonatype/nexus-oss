@@ -27,6 +27,7 @@ import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Context;
 import org.restlet.data.MediaType;
+import org.restlet.data.Method;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -45,7 +46,7 @@ import com.thoughtworks.xstream.XStreamException;
 
 /**
  * The delegating resource.
- *
+ * 
  * @author Jason van Zyl
  * @author cstamas
  */
@@ -114,7 +115,7 @@ public class RestletResource
     /**
      * For file uploads we are using commons-fileupload integration with restlet.org. We are storing one FileItemFactory
      * instance in context. This method simply encapsulates gettting it from Resource context.
-     *
+     * 
      * @return
      */
     protected FileItemFactory getFileItemFactory()
@@ -221,8 +222,8 @@ public class RestletResource
                 }
                 catch ( XStreamException e )
                 {
-                    this.getLogger().log(Level.WARNING, "Invalid XML, unable to parse using XStream", e );
-                    
+                    this.getLogger().log( Level.WARNING, "Invalid XML, unable to parse using XStream", e );
+
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                                                  "Invalid XML, unable to parse using XStream", e );
                 }
@@ -255,14 +256,14 @@ public class RestletResource
             return serialize( variant, payload );
         }
     }
-    
+
     // == mkcol
-    
+
     public boolean allowMkcol()
     {
-        return false; 
+        return false;
     }
-    
+
     // == mkcol
 
     @Override
@@ -284,7 +285,12 @@ public class RestletResource
         }
         else
         {
-            Object payload = deserialize( delegate.getPayloadInstance() );
+            Object payloadInstance = delegate.getPayloadInstance( Method.POST );
+            if ( payloadInstance == null )
+            {
+                payloadInstance = delegate.getPayloadInstance();
+            }
+            Object payload = deserialize( payloadInstance );
 
             Object result = null;
 
@@ -329,7 +335,12 @@ public class RestletResource
         }
         else
         {
-            Object payload = deserialize( delegate.getPayloadInstance() );
+            Object payloadInstance = delegate.getPayloadInstance( Method.PUT );
+            if ( payloadInstance == null )
+            {
+                payloadInstance = delegate.getPayloadInstance();
+            }
+            Object payload = deserialize( payloadInstance );
 
             Object result = null;
             try

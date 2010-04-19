@@ -143,4 +143,8 @@ public abstract class AbstractPlexusResource
         throw new ResourceException( Status.SERVER_ERROR_NOT_IMPLEMENTED );
     }
 
+    public Object getPayloadInstance( org.restlet.data.Method method )
+    {
+        return getPayloadInstance();
+    }
 }
