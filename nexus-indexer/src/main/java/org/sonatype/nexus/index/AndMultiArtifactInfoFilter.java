@@ -5,7 +5,7 @@ import java.util.List;
 import org.sonatype.nexus.index.context.IndexingContext;
 
 /**
- * This is a multi artifact info filter that performs AND operation (all filter has to accept the artifact info, if one
+ * This is a aggregated artifact info filter that performs AND operation (all filter has to accept the artifact info, if one
  * rejects, results is reject). It is implemented in "fail fast" way, as soon as some member ArtifactFilter rejects, it
  * will be rejected.
  * 

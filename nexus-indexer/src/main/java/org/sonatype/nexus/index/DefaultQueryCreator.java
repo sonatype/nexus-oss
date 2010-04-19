@@ -67,10 +67,24 @@ public class DefaultQueryCreator
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
+                    "Query parsing with query string only, we got ParseException from QueryParser: " + e.getMessage() );
             }
 
-            result = legacyConstructQuery( field, query );
+            try
+            {
+                result = qp.parse( query );
+            }
+            catch ( ParseException e1 )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug(
+                        "Query parsing with \"legacy\" method, we got ParseException from QueryParser: "
+                            + e.getMessage() );
+                }
+
+                result = legacyConstructQuery( field, query );
+            }
         }
 
         if ( getLogger().isDebugEnabled() )

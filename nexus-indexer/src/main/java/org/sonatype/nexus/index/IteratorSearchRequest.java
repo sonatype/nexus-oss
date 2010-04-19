@@ -6,6 +6,11 @@ import java.util.List;
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * A Search Request that will perform the new "iterator-like" type of search.
+ * 
+ * @author cstamas
+ */
 public class IteratorSearchRequest
     extends AbstractSearchRequest
 {
@@ -32,7 +37,7 @@ public class IteratorSearchRequest
     public IteratorSearchRequest( Query query, List<IndexingContext> contexts, ArtifactInfoFilter filter )
     {
         super( query, contexts );
-        
+
         setArtifactInfoFilter( filter );
     }
 }

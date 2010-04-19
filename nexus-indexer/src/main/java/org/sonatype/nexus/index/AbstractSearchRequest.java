@@ -29,8 +29,14 @@ public class AbstractSearchRequest
      */
     private int resultHitLimit;
 
+    /**
+     * The filter to be used while executing the search request.
+     */
     private ArtifactInfoFilter artifactInfoFilter;
 
+    /**
+     * The postprocessor to apply to hits while returning the,
+     */
     private ArtifactInfoPostprocessor artifactInfoPostprocessor;
 
     public AbstractSearchRequest( Query query )

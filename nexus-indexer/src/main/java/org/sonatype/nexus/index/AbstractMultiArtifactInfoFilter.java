@@ -6,6 +6,12 @@ import java.util.List;
 
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * An abstract helper class for implementing ArtifactInfoFilter that actually aggregates multiple filters into one. It
+ * is up to developer to implement how will be they behave ("fail-fast", or "one-vote-enough for passing", etc).
+ * 
+ * @author cstamas
+ */
 public abstract class AbstractMultiArtifactInfoFilter
     implements ArtifactInfoFilter
 {

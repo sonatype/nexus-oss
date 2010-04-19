@@ -10,11 +10,22 @@ import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusIndexSearcher;
 
+/**
+ * Default implementation of IteratorResultSet.
+ * 
+ * @author cstamas
+ */
 public class DefaultIteratorResultSet
     implements IteratorResultSet
 {
-    private static final int HARD_HIT_COUNT_LIMIT = 20000;
-    
+    /**
+     * This is "hard limit", a possible maximum count of hits that Nexus Indexer will _serve_ even if asked for more.
+     * Thus, it prevents some malicious attacks like forcing Nexus (or underlying IO to it's knees) but asking for huuge
+     * count of hits. If anyone needs more than 1000 of hits, it should download the index and use Indexer API instead
+     * to perform searches locally.
+     */
+    private static final int HARD_HIT_COUNT_LIMIT = 1000;
+
     private final ArtifactInfoFilter filter;
 
     private final ArtifactInfoPostprocessor postprocessor;
@@ -46,11 +57,13 @@ public class DefaultIteratorResultSet
 
         this.from = ( request.getStart() == AbstractSearchRequest.UNDEFINED ? 0 : request.getStart() );
 
-        this.count = ( request.getCount() == AbstractSearchRequest.UNDEFINED ? Integer.MAX_VALUE : request.getCount() );
+        this.count =
+            ( request.getCount() == AbstractSearchRequest.UNDEFINED ? HARD_HIT_COUNT_LIMIT : Math.min( request
+                .getCount(), HARD_HIT_COUNT_LIMIT ) );
 
         this.pointer = from;
 
-        this.maxRecPointer = ( request.getCount() == AbstractSearchRequest.UNDEFINED ? from + HARD_HIT_COUNT_LIMIT : from + count );
+        this.maxRecPointer = from + count;
 
         ai = createNextAi();
     }

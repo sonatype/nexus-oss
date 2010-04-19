@@ -5,8 +5,14 @@ import java.util.Set;
 
 import org.sonatype.nexus.index.context.IndexingContext;
 
+/**
+ * A special reusable filter, that filters the result set to unique Repository-GroupId-ArtifactId combination, leaving
+ * out Version. There is a switch to make the Indexer-wide unique by ignoring repositories too.
+ * 
+ * @author cstamas
+ */
 public class UniqueGAArtifactFilterPostprocessor
-    implements ArtifactInfoFilter, ArtifactInfoPostprocessor
+    implements ArtifactInfoFilter
 {
     private static final String VERSION_LATEST = "LATEST";
 
@@ -21,7 +27,7 @@ public class UniqueGAArtifactFilterPostprocessor
 
     public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
     {
-        String key = ai.groupId + ai.artifactId + ai.classifier;
+        String key = ai.groupId + ai.artifactId + ai.packaging + ai.classifier;
 
         if ( !repositoriesIgnored )
         {

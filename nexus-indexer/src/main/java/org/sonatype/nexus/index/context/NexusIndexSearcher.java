@@ -6,7 +6,7 @@ import org.apache.lucene.search.IndexSearcher;
 
 /**
  * An extended Searcher, that holds reference to the IndexingContext that is a searcher for. Needed to provide "extra"
- * data for search hits, that are not on index.
+ * data for search hits, that are not on index, and suppot ArtifactInfoPostprocessor's.
  * 
  * @author cstamas
  */
