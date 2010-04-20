@@ -54,37 +54,36 @@ public class DefaultQueryCreator
 
     public Query constructQuery( String field, String query )
     {
-        QueryParser qp = new QueryParser( ArtifactInfo.ARTIFACT_ID, new NexusAnalyzer() );
+        QueryParser qp = new QueryParser( field, new NexusAnalyzer() );
 
         Query result = null;
 
+        // small cheap trick
+        // if a query is not "exper" (does not contain field:val kind of expression)
+        // but it contains star and/or punctuation chars, example: "common-log*"
+        if ( !query.contains( ":" ) )
+        {
+            if ( query.contains( "*" ) && query.matches( ".*(\\.|-|_).*" ) )
+            {
+                query =
+                    query.toLowerCase().replaceAll( "\\*", "X" ).replaceAll( "\\.|-|_", " " ).replaceAll( "X",
+                            "*" );
+            }
+        }
+
         try
         {
-            result = qp.parse( field + ":" + query );
+            result = qp.parse( query );
         }
         catch ( ParseException e )
         {
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Query parsing with query string only, we got ParseException from QueryParser: " + e.getMessage() );
+                    "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
             }
 
-            try
-            {
-                result = qp.parse( query );
-            }
-            catch ( ParseException e1 )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Query parsing with \"legacy\" method, we got ParseException from QueryParser: "
-                            + e.getMessage() );
-                }
-
-                result = legacyConstructQuery( field, query );
-            }
+            result = legacyConstructQuery( field, query );
         }
 
         if ( getLogger().isDebugEnabled() )
