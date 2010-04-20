@@ -6,7 +6,7 @@ import org.codehaus.plexus.component.annotations.Component;
 public class RootContentClass
     extends AbstractIdContentClass
 {
-    public static final String ID = "Any Content";
+    public static final String ID = "any";
 
     public String getId()
     {
