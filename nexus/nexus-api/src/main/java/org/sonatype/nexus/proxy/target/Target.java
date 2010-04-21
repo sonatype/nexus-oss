@@ -71,8 +71,10 @@ public class Target
     public boolean isPathContained( ContentClass contentClass, String path )
     {
         // if is the same or is compatible
+        // make sure to check the inverse of the isCompatible too !!
         if ( StringUtils.equals( getContentClass().getId(), contentClass.getId() )
-            || getContentClass().isCompatible( contentClass ) )
+            || getContentClass().isCompatible( contentClass ) 
+            || contentClass.isCompatible( getContentClass() ) )
         {
             // look for pattern matching
             for ( Pattern pattern : patterns )
