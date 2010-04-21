@@ -18,6 +18,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.ArtifactInfoRecord;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.locator.JavadocLocator;
 import org.sonatype.nexus.index.locator.Locator;
@@ -189,43 +190,45 @@ public class MinimalArtifactInfoIndexCreator
     {
         String info =
             new StringBuilder().append( ai.packaging ).append( ArtifactInfo.FS ).append(
-                            Long.toString( ai.lastModified ) ).append( ArtifactInfo.FS ).append(
-                            Long.toString( ai.size ) ).append( ArtifactInfo.FS ).append( ai.sourcesExists.toString() )
-                            .append( ArtifactInfo.FS ).append( ai.javadocExists.toString() ).append( ArtifactInfo.FS )
-                            .append( ai.signatureExists.toString() ).append( ArtifactInfo.FS ).append( ai.fextension )
-                            .toString();
+                Long.toString( ai.lastModified ) ).append( ArtifactInfo.FS ).append( Long.toString( ai.size ) ).append(
+                ArtifactInfo.FS ).append( ai.sourcesExists.toString() ).append( ArtifactInfo.FS ).append(
+                ai.javadocExists.toString() ).append( ArtifactInfo.FS ).append( ai.signatureExists.toString() ).append(
+                ArtifactInfo.FS ).append( ai.fextension ).toString();
 
-        doc.add( new Field( ArtifactInfo.INFO, info, Field.Store.YES, Field.Index.NO ) );
+        doc.add( ArtifactInfoRecord.FLD_INFO.toField( info ) );
 
-        doc.add( new Field( ArtifactInfo.GROUP_ID, ai.groupId, Field.Store.NO, Field.Index.TOKENIZED ) );
+        doc.add( ArtifactInfoRecord.FLD_GROUP_ID_KW.toField( ai.groupId ) );
+        doc.add( ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.toField( ai.artifactId ) );
+        doc.add( ArtifactInfoRecord.FLD_VERSION_KW.toField( ai.version ) );
 
-        doc.add( new Field( ArtifactInfo.ARTIFACT_ID, ai.artifactId, Field.Store.NO, Field.Index.TOKENIZED ) );
-
-        doc.add( new Field( ArtifactInfo.VERSION, ai.version, Field.Store.NO, Field.Index.TOKENIZED ) );
+        // V3
+        doc.add( ArtifactInfoRecord.FLD_GROUP_ID.toField( ai.groupId ) );
+        doc.add( ArtifactInfoRecord.FLD_ARTIFACT_ID.toField( ai.artifactId ) );
+        doc.add( ArtifactInfoRecord.FLD_VERSION.toField( ai.version ) );
 
         if ( ai.name != null )
         {
-            doc.add( new Field( ArtifactInfo.NAME, ai.name, Field.Store.YES, Field.Index.NO ) );
+            doc.add( ArtifactInfoRecord.FLD_NAME.toField( ai.name ) );
         }
 
         if ( ai.description != null )
         {
-            doc.add( new Field( ArtifactInfo.DESCRIPTION, ai.description, Field.Store.YES, Field.Index.NO ) );
+            doc.add( ArtifactInfoRecord.FLD_DESCRIPTION.toField( ai.description ) );
         }
 
         if ( ai.packaging != null )
         {
-            doc.add( new Field( ArtifactInfo.PACKAGING, ai.packaging, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+            doc.add( ArtifactInfoRecord.FLD_PACKAGING.toField( ai.packaging ) );
         }
 
         if ( ai.classifier != null )
         {
-            doc.add( new Field( ArtifactInfo.CLASSIFIER, ai.classifier, Field.Store.NO, Field.Index.UN_TOKENIZED ) );
+            doc.add( ArtifactInfoRecord.FLD_CLASSIFIER.toField( ai.classifier ) );
         }
 
         if ( ai.sha1 != null )
         {
-            doc.add( new Field( ArtifactInfo.SHA1, ai.sha1, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+            doc.add( ArtifactInfoRecord.FLD_SHA1.toField( ai.sha1 ) );
         }
     }
 
@@ -242,7 +245,7 @@ public class MinimalArtifactInfoIndexCreator
         if ( ai.goals != null )
         {
             doc.add( new Field( ArtifactInfo.PLUGIN_GOALS, ArtifactInfo.lst2str( ai.goals ), Field.Store.YES,
-                Field.Index.NO ) );
+                                Field.Index.NO ) );
         }
 
         doc.removeField( ArtifactInfo.GROUP_ID );

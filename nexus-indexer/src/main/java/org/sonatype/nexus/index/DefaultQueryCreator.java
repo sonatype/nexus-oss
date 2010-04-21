@@ -51,39 +51,50 @@ public class DefaultQueryCreator
     }
 
     // ==
+    public Query constructQuery( IndexerField field, String query )
+    {
+        return constructQuery( field.getName(), query );
+    }
 
     public Query constructQuery( String field, String query )
     {
-        QueryParser qp = new QueryParser( field, new NexusAnalyzer() );
-
         Query result = null;
 
-        // small cheap trick
-        // if a query is not "exper" (does not contain field:val kind of expression)
-        // but it contains star and/or punctuation chars, example: "common-log*"
-        if ( !query.contains( ":" ) )
+        if ( ArtifactInfoRecord.FLD_GROUP_ID_KW.getName().equals( field )
+            || ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.getName().equals( field )
+            || ArtifactInfoRecord.FLD_VERSION_KW.getName().equals( field )
+            || ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( field ) )
         {
-            if ( query.contains( "*" ) && query.matches( ".*(\\.|-|_).*" ) )
-            {
-                query =
-                    query.toLowerCase().replaceAll( "\\*", "X" ).replaceAll( "\\.|-|_", " " ).replaceAll( "X",
-                            "*" );
-            }
-        }
-
-        try
-        {
-            result = qp.parse( query );
-        }
-        catch ( ParseException e )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
-            }
-
+            // these are special untokenized fields, kept for use cases like TreeView is (exact matching).
             result = legacyConstructQuery( field, query );
+        }
+        else
+        {
+            QueryParser qp = new QueryParser( field, new NexusAnalyzer() );
+
+            // small cheap trick
+            // if a query is not "exper" (does not contain field:val kind of expression)
+            // but it contains star and/or punctuation chars, example: "common-log*"
+            if ( !query.contains( ":" ) )
+            {
+                if ( query.contains( "*" ) && query.matches( ".*(\\.|-|_).*" ) )
+                {
+                    query =
+                        query.toLowerCase().replaceAll( "\\*", "X" ).replaceAll( "\\.|-|_", " " ).replaceAll( "X", "*" );
+                }
+            }
+
+            try
+            {
+                result = qp.parse( query );
+            }
+            catch ( ParseException e )
+            {
+                getLogger().info(
+                    "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
+
+                result = legacyConstructQuery( field, query );
+            }
         }
 
         if ( getLogger().isDebugEnabled() )
@@ -107,23 +118,23 @@ public class DefaultQueryCreator
 
         char h = query.charAt( 0 );
 
-        if ( field.equals( ArtifactInfo.NAMES ) )
+        if ( ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( field )
+            || ArtifactInfoRecord.FLD_CLASSNAMES.getName().equals( field ) )
         {
             q = q.replaceAll( "\\.", "/" );
-
-            String[] s = q.split( "/" );
-
-            // NexusAnalyzer nal = new NexusAnalyzer();
-
-            // nal.reusableTokenStream( field, new StringReader( q ) );
 
             if ( h == '^' )
             {
                 q = q.substring( 1 );
+
+                if ( q.charAt( 0 ) != '/' )
+                {
+                    q = '/' + q;
+                }
             }
             else if ( h != '*' )
             {
-                q = "*" + q;
+                q = "*/" + q;
             }
         }
         else

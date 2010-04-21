@@ -368,6 +368,8 @@ public interface NexusIndexer
      */
     Query constructQuery( String field, String query );
 
+    Query constructQuery( IndexerField field, String query );
+
     // ----------------------------------------------------------------------------
     // Identification
     // ----------------------------------------------------------------------------

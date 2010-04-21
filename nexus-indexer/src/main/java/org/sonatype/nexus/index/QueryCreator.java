@@ -21,4 +21,6 @@ public interface QueryCreator
     String ROLE = QueryCreator.class.getName();
 
     Query constructQuery( String field, String query );
+
+    Query constructQuery( IndexerField field, String query );
 }

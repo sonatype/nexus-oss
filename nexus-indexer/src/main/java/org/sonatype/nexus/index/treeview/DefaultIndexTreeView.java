@@ -22,6 +22,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.ArtifactInfoRecord;
 import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.NexusIndexer;
@@ -321,7 +322,7 @@ public class DefaultIndexTreeView
     protected Set<ArtifactInfo> getArtifactsByG( String g, IndexingContext indexingContext )
         throws IOException
     {
-        Query q = new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) );
+        Query q = new TermQuery( new Term( ArtifactInfoRecord.FLD_GROUP_ID_KW.getName(), g ) );
 
         FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
 
@@ -335,10 +336,11 @@ public class DefaultIndexTreeView
     {
         BooleanQuery q = new BooleanQuery();
 
-        q.add( new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfoRecord.FLD_GROUP_ID_KW.getName(), g ) ), BooleanClause.Occur.MUST );
 
         // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( ArtifactInfo.ARTIFACT_ID, a ) ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.getName(), a ) ),
+            BooleanClause.Occur.MUST );
 
         FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
 
@@ -352,13 +354,14 @@ public class DefaultIndexTreeView
     {
         BooleanQuery q = new BooleanQuery();
 
-        q.add( new TermQuery( new Term( ArtifactInfo.GROUP_ID, g ) ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfoRecord.FLD_GROUP_ID_KW.getName(), g ) ), BooleanClause.Occur.MUST );
 
         // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( ArtifactInfo.ARTIFACT_ID, a ) ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.getName(), a ) ),
+            BooleanClause.Occur.MUST );
 
         // q.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, "\"" + v + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( ArtifactInfo.VERSION, v ) ), BooleanClause.Occur.MUST );
+        q.add( new TermQuery( new Term( ArtifactInfoRecord.FLD_VERSION_KW.getName(), v ) ), BooleanClause.Occur.MUST );
 
         FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
 

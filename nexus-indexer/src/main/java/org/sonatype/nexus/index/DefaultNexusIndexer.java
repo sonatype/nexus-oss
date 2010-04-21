@@ -477,6 +477,11 @@ public class DefaultNexusIndexer
         return queryCreator.constructQuery( field, query );
     }
 
+    public Query constructQuery( IndexerField field, String query )
+    {
+        return queryCreator.constructQuery( field, query );
+    }
+
     // ----------------------------------------------------------------------------
     // Identification
     // ----------------------------------------------------------------------------
@@ -548,8 +553,7 @@ public class DefaultNexusIndexer
     public ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
         throws IOException
     {
-        IteratorSearchResponse result =
-            searcher.searchIteratorPaged( new IteratorSearchRequest( query ), contexts );
+        IteratorSearchResponse result = searcher.searchIteratorPaged( new IteratorSearchRequest( query ), contexts );
 
         if ( result.getTotalHits() == 1 )
         {

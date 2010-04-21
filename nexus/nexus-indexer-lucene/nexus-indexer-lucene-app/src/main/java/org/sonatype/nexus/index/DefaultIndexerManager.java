@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +61,7 @@ import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
+import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
@@ -1466,6 +1468,8 @@ public class DefaultIndexerManager
             IndexPackingRequest packReq = new IndexPackingRequest( mergedContext, targetDir );
             packReq.setCreateIncrementalChunks( true );
             packReq.setUseTargetProperties( true );
+            // not publishing legacy format anymore
+            packReq.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
             indexPacker.packIndex( packReq );
 
             File[] files = targetDir.listFiles();
@@ -1962,7 +1966,7 @@ public class DefaultIndexerManager
 
     // == NG stuff
 
-    protected Query createQuery( String field, String term )
+    protected Query createQuery( IndexerField field, String term )
     {
         return nexusIndexer.constructQuery( field, term );
     }
@@ -2068,11 +2072,11 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            Query q1 = createQuery( ArtifactInfo.GROUP_ID, term );
+            Query q1 = createQuery( ArtifactInfoRecord.FLD_GROUP_ID, term );
 
             q1.setBoost( 2.0f );
 
-            Query q2 = createQuery( ArtifactInfo.ARTIFACT_ID, term );
+            Query q2 = createQuery( ArtifactInfoRecord.FLD_ARTIFACT_ID, term );
 
             q2.setBoost( 2.0f );
 
@@ -2085,13 +2089,21 @@ public class DefaultIndexerManager
             // switch for "extended" keywords
             if ( false )
             {
-                Query q3 = createQuery( ArtifactInfo.VERSION, term );
+                Query q3 = createQuery( ArtifactInfoRecord.FLD_VERSION, term );
 
-                Query q4 = createQuery( ArtifactInfo.CLASSIFIER, term );
+                Query q4 = createQuery( ArtifactInfoRecord.FLD_CLASSIFIER, term );
+
+                Query q5 = createQuery( ArtifactInfoRecord.FLD_NAME, term );
+
+                Query q6 = createQuery( ArtifactInfoRecord.FLD_DESCRIPTION, term );
 
                 bq.add( q3, BooleanClause.Occur.SHOULD );
 
                 bq.add( q4, BooleanClause.Occur.SHOULD );
+
+                bq.add( q5, BooleanClause.Occur.SHOULD );
+
+                bq.add( q6, BooleanClause.Occur.SHOULD );
             }
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
@@ -2159,7 +2171,7 @@ public class DefaultIndexerManager
                 term = term.substring( 0, term.length() - 6 );
             }
 
-            Query q = createQuery( ArtifactInfo.NAMES, term );
+            Query q = createQuery( ArtifactInfoRecord.FLD_CLASSNAMES, term );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
 
@@ -2230,27 +2242,27 @@ public class DefaultIndexerManager
 
             if ( gTerm != null )
             {
-                bq.add( createQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( ArtifactInfoRecord.FLD_GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( createQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( ArtifactInfoRecord.FLD_ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( createQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( ArtifactInfoRecord.FLD_VERSION, vTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( pTerm != null )
             {
-                bq.add( createQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( ArtifactInfoRecord.FLD_PACKAGING, pTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )
             {
-                bq.add( createQuery( ArtifactInfo.CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( ArtifactInfoRecord.FLD_CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
             }
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false );

@@ -5,13 +5,13 @@
  */
 package org.sonatype.nexus.index.context;
 
-import java.io.IOException;
 import java.io.Reader;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
+import org.sonatype.nexus.index.ArtifactInfoRecord;
 
 /**
  * A Nexus specific analyzer. Only difference from Lucene's SimpleAnalyzer is that we use LetterOrDigitTokenizer instead
@@ -29,28 +29,30 @@ public class NexusAnalyzer
         return getTokenizer( fieldName, reader );
     }
 
-    public TokenStream reusableTokenStream( String fieldName, Reader reader )
-        throws IOException
+    protected Tokenizer getTokenizer( String fieldName, Reader reader )
     {
-        Tokenizer tokenizer = (Tokenizer) getPreviousTokenStream();
-
-        if ( tokenizer == null )
+        if ( ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( fieldName ) )
         {
-            tokenizer = getTokenizer( fieldName, reader );
+            // To keep "backward" compatibility, we have to use old flawed tokenizer.
+            return new CharTokenizer( reader )
+            {
+                @Override
+                protected boolean isTokenChar( char c )
+                {
+                    return c != '\n';
+                }
 
-            setPreviousTokenStream( tokenizer );
+                @Override
+                protected char normalize( char c )
+                {
+                    return Character.toLowerCase( c );
+                }
+            };
         }
         else
         {
-            tokenizer.reset( reader );
+            return new LetterOrDigitTokenizer( reader );
         }
-
-        return tokenizer;
-    }
-
-    protected Tokenizer getTokenizer( String fieldName, Reader reader )
-    {
-        return new LetterOrDigitTokenizer( reader );
     }
 
     // ==

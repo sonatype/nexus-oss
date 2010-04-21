@@ -39,6 +39,17 @@ public class NexusIndexerTest
 
     private IndexingContext context;
 
+    public void testQueryCreator()
+        throws Exception
+    {
+        NexusIndexer indexer = prepare();
+
+        Query q = indexer.constructQuery( ArtifactInfoRecord.FLD_GROUP_ID, "commons-loggin*" );
+
+        assertEquals( ArtifactInfoRecord.FLD_GROUP_ID.getName() + ":commons "
+            + ArtifactInfoRecord.FLD_GROUP_ID.getName() + ":loggin*", q.toString() );
+    }
+
     public void testSearchIterator()
         throws Exception
     {

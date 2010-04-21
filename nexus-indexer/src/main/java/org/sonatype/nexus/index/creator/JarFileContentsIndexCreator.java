@@ -16,6 +16,7 @@ import org.apache.lucene.document.Field;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.ArtifactInfoRecord;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
@@ -46,7 +47,8 @@ public class JarFileContentsIndexCreator
     {
         if ( ai.classNames != null )
         {
-            doc.add( new Field( ArtifactInfo.NAMES, ai.classNames, Field.Store.COMPRESS, Field.Index.TOKENIZED ) );
+            doc.add( ArtifactInfoRecord.FLD_CLASSNAMES_KW.toField( ai.classNames ) );
+            doc.add( ArtifactInfoRecord.FLD_CLASSNAMES.toField( ai.classNames ) );
         }
     }
 
