@@ -7,9 +7,13 @@ package org.sonatype.nexus.index.creator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.FileUtils;
@@ -18,7 +22,10 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.ArtifactAvailablility;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoRecord;
+import org.sonatype.nexus.index.IndexerField;
+import org.sonatype.nexus.index.IndexerFieldVersion;
+import org.sonatype.nexus.index.MAVEN;
+import org.sonatype.nexus.index.NEXUS;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.locator.JavadocLocator;
 import org.sonatype.nexus.index.locator.Locator;
@@ -40,6 +47,61 @@ public class MinimalArtifactInfoIndexCreator
     implements LegacyDocumentUpdater
 {
     public static final String ID = "min";
+
+    /**
+     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. Stored, not indexed.
+     */
+    public static final IndexerField FLD_INFO =
+        new IndexerField( NEXUS.INFO, IndexerFieldVersion.V1, "i", "Artifact INFO (not indexed, stored)", Store.YES,
+                          Index.NO );
+
+    public static final IndexerField FLD_GROUP_ID_KW =
+        new IndexerField( MAVEN.GROUP_ID, IndexerFieldVersion.V1, "g", "Artifact GroupID (as keyword)", Store.NO,
+                          Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_GROUP_ID =
+        new IndexerField( MAVEN.GROUP_ID, IndexerFieldVersion.V3, "groupId", "Artifact GroupID (tokenized)", Store.NO,
+                          Index.TOKENIZED );
+
+    public static final IndexerField FLD_ARTIFACT_ID_KW =
+        new IndexerField( MAVEN.ARTIFACT_ID, IndexerFieldVersion.V1, "a", "Artifact ArtifactID (as keyword)", Store.NO,
+                          Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_ARTIFACT_ID =
+        new IndexerField( MAVEN.ARTIFACT_ID, IndexerFieldVersion.V3, "artifactId", "Artifact ArtifactID (tokenized)",
+                          Store.NO, Index.TOKENIZED );
+
+    public static final IndexerField FLD_VERSION_KW =
+        new IndexerField( MAVEN.VERSION, IndexerFieldVersion.V1, "v", "Artifact Version (as keyword)", Store.NO,
+                          Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_VERSION =
+        new IndexerField( MAVEN.VERSION, IndexerFieldVersion.V3, "version", "Artifact Version (tokenized)", Store.NO,
+                          Index.TOKENIZED );
+
+    public static final IndexerField FLD_PACKAGING =
+        new IndexerField( MAVEN.PACKAGING, IndexerFieldVersion.V1, "p", "Artifact Packaging (as keyword)", Store.NO,
+                          Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_CLASSIFIER =
+        new IndexerField( MAVEN.CLASSIFIER, IndexerFieldVersion.V1, "l", "Artifact classifier (as keyword)", Store.NO,
+                          Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_NAME =
+        new IndexerField( MAVEN.NAME, IndexerFieldVersion.V1, "n", "Artifact name (tokenized, stored)", Store.YES,
+                          Index.TOKENIZED );
+
+    public static final IndexerField FLD_DESCRIPTION =
+        new IndexerField( MAVEN.DESCRIPTION, IndexerFieldVersion.V1, "d", "Artifact description (tokenized, stored)",
+                          Store.YES, Index.TOKENIZED );
+
+    public static final IndexerField FLD_LAST_MODIFIED =
+        new IndexerField( MAVEN.LAST_MODIFIED, IndexerFieldVersion.V1, "m",
+                          "Artifact last modified (not indexed, stored)", Store.YES, Index.NO );
+
+    public static final IndexerField FLD_SHA1 =
+        new IndexerField( MAVEN.SHA1, IndexerFieldVersion.V1, "1", "Artifact SHA1 checksum (as keyword, stored)",
+                          Store.YES, Index.UN_TOKENIZED );
 
     private Locator jl = new JavadocLocator();
 
@@ -195,40 +257,40 @@ public class MinimalArtifactInfoIndexCreator
                 ai.javadocExists.toString() ).append( ArtifactInfo.FS ).append( ai.signatureExists.toString() ).append(
                 ArtifactInfo.FS ).append( ai.fextension ).toString();
 
-        doc.add( ArtifactInfoRecord.FLD_INFO.toField( info ) );
+        doc.add( FLD_INFO.toField( info ) );
 
-        doc.add( ArtifactInfoRecord.FLD_GROUP_ID_KW.toField( ai.groupId ) );
-        doc.add( ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.toField( ai.artifactId ) );
-        doc.add( ArtifactInfoRecord.FLD_VERSION_KW.toField( ai.version ) );
+        doc.add( FLD_GROUP_ID_KW.toField( ai.groupId ) );
+        doc.add( FLD_ARTIFACT_ID_KW.toField( ai.artifactId ) );
+        doc.add( FLD_VERSION_KW.toField( ai.version ) );
 
         // V3
-        doc.add( ArtifactInfoRecord.FLD_GROUP_ID.toField( ai.groupId ) );
-        doc.add( ArtifactInfoRecord.FLD_ARTIFACT_ID.toField( ai.artifactId ) );
-        doc.add( ArtifactInfoRecord.FLD_VERSION.toField( ai.version ) );
+        doc.add( FLD_GROUP_ID.toField( ai.groupId ) );
+        doc.add( FLD_ARTIFACT_ID.toField( ai.artifactId ) );
+        doc.add( FLD_VERSION.toField( ai.version ) );
 
         if ( ai.name != null )
         {
-            doc.add( ArtifactInfoRecord.FLD_NAME.toField( ai.name ) );
+            doc.add( FLD_NAME.toField( ai.name ) );
         }
 
         if ( ai.description != null )
         {
-            doc.add( ArtifactInfoRecord.FLD_DESCRIPTION.toField( ai.description ) );
+            doc.add( FLD_DESCRIPTION.toField( ai.description ) );
         }
 
         if ( ai.packaging != null )
         {
-            doc.add( ArtifactInfoRecord.FLD_PACKAGING.toField( ai.packaging ) );
+            doc.add( FLD_PACKAGING.toField( ai.packaging ) );
         }
 
         if ( ai.classifier != null )
         {
-            doc.add( ArtifactInfoRecord.FLD_CLASSIFIER.toField( ai.classifier ) );
+            doc.add( FLD_CLASSIFIER.toField( ai.classifier ) );
         }
 
         if ( ai.sha1 != null )
         {
-            doc.add( ArtifactInfoRecord.FLD_SHA1.toField( ai.sha1 ) );
+            doc.add( FLD_SHA1.toField( ai.sha1 ) );
         }
     }
 
@@ -359,5 +421,12 @@ public class MinimalArtifactInfoIndexCreator
     public String toString()
     {
         return ID;
+    }
+
+    public Collection<IndexerField> getIndexerFields()
+    {
+        return Arrays.asList( FLD_INFO, FLD_GROUP_ID_KW, FLD_GROUP_ID, FLD_ARTIFACT_ID_KW, FLD_ARTIFACT_ID,
+            FLD_VERSION_KW, FLD_VERSION, FLD_PACKAGING, FLD_CLASSIFIER, FLD_NAME, FLD_DESCRIPTION, FLD_LAST_MODIFIED,
+            FLD_SHA1 );
     }
 }

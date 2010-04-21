@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.DefaultIndexPacker;
 import org.sonatype.nexus.index.search.grouping.GAGrouping;
 import org.sonatype.nexus.index.updater.DefaultIndexUpdater;
@@ -44,10 +45,10 @@ public class NexusIndexerTest
     {
         NexusIndexer indexer = prepare();
 
-        Query q = indexer.constructQuery( ArtifactInfoRecord.FLD_GROUP_ID, "commons-loggin*" );
+        Query q = indexer.constructQuery( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID, "commons-loggin*" );
 
-        assertEquals( ArtifactInfoRecord.FLD_GROUP_ID.getName() + ":commons "
-            + ArtifactInfoRecord.FLD_GROUP_ID.getName() + ":loggin*", q.toString() );
+        assertEquals( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID.getKey() + ":commons "
+            + MinimalArtifactInfoIndexCreator.FLD_GROUP_ID.getKey() + ":loggin*", q.toString() );
     }
 
     public void testSearchIterator()

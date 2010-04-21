@@ -19,9 +19,13 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
 /**
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
+ * Phasing out.
  * 
  * @author Jason van Zyl
  * @author Eugene Kuleshov
@@ -45,83 +49,82 @@ public class ArtifactInfo
 
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
-
     // ----------
 
     /**
      * Unique groupId, artifactId, version, classifier, extension (or packaging). Stored, indexed untokenized
      */
-    public static final String UINFO = FLD_UINFO.getName();
-
-    /**
-     * GroupId. Not stored, indexed untokenized
-     */
-    public static final String GROUP_ID = FLD_GROUP_ID_KW.getName();
-
-    /**
-     * ArtifactId. Not stored, indexed tokenized
-     */
-    public static final String ARTIFACT_ID = FLD_ARTIFACT_ID_KW.getName();
-
-    /**
-     * Version. Not stored, indexed tokenized
-     */
-    public static final String VERSION = FLD_VERSION_KW.getName();
-
-    /**
-     * Packaging. Not stored, indexed untokenized
-     */
-    public static final String PACKAGING = FLD_PACKAGING.getName();
-
-    /**
-     * Classifier. Not stored, indexed untokenized
-     */
-    public static final String CLASSIFIER = FLD_CLASSIFIER.getName();
-
-    /**
-     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. Stored, not indexed.
-     */
-    public static final String INFO = FLD_INFO.getName();
-
-    /**
-     * Name. Stored, not indexed
-     */
-    public static final String NAME = FLD_NAME.getName();
-
-    /**
-     * Description. Stored, not indexed
-     */
-    public static final String DESCRIPTION = FLD_DESCRIPTION.getName();
-
-    /**
-     * Last modified. Stored, not indexed
-     */
-    public static final String LAST_MODIFIED = FLD_LAST_MODIFIED.getName();
-
-    /**
-     * SHA1. Stored, indexed untokenized
-     */
-    public static final String SHA1 = FLD_SHA1.getName();
-
-    /**
-     * Class names Stored compressed, indexed tokeninzed
-     */
-    public static final String NAMES = FLD_CLASSNAMES_KW.getName();
-
-    /**
-     * Plugin prefix. Stored, not indexed
-     */
-    public static final String PLUGIN_PREFIX = FLD_PLUGIN_PREFIX.getName();
-
-    /**
-     * Plugin goals. Stored, not indexed
-     */
-    public static final String PLUGIN_GOALS = FLD_PLUGIN_GOALS.getName();
+    public static final String UINFO = FLD_UINFO.getKey();
 
     /**
      * Field that contains {@link #UINFO} value for deleted artifact
      */
-    public static final String DELETED = FLD_DELETED.getName();
+    public static final String DELETED = FLD_DELETED.getKey();
+
+    /**
+     * GroupId. Not stored, indexed untokenized
+     */
+    public static final String GROUP_ID = MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey();
+
+    /**
+     * ArtifactId. Not stored, indexed tokenized
+     */
+    public static final String ARTIFACT_ID = MinimalArtifactInfoIndexCreator.FLD_ARTIFACT_ID_KW.getKey();
+
+    /**
+     * Version. Not stored, indexed tokenized
+     */
+    public static final String VERSION = MinimalArtifactInfoIndexCreator.FLD_VERSION_KW.getKey();
+
+    /**
+     * Packaging. Not stored, indexed untokenized
+     */
+    public static final String PACKAGING = MinimalArtifactInfoIndexCreator.FLD_PACKAGING.getKey();
+
+    /**
+     * Classifier. Not stored, indexed untokenized
+     */
+    public static final String CLASSIFIER = MinimalArtifactInfoIndexCreator.FLD_CLASSIFIER.getKey();
+
+    /**
+     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. Stored, not indexed.
+     */
+    public static final String INFO = MinimalArtifactInfoIndexCreator.FLD_INFO.getKey();
+
+    /**
+     * Name. Stored, not indexed
+     */
+    public static final String NAME = MinimalArtifactInfoIndexCreator.FLD_NAME.getKey();
+
+    /**
+     * Description. Stored, not indexed
+     */
+    public static final String DESCRIPTION = MinimalArtifactInfoIndexCreator.FLD_DESCRIPTION.getKey();
+
+    /**
+     * Last modified. Stored, not indexed
+     */
+    public static final String LAST_MODIFIED = MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey();
+
+    /**
+     * SHA1. Stored, indexed untokenized
+     */
+    public static final String SHA1 = MinimalArtifactInfoIndexCreator.FLD_SHA1.getKey();
+
+    /**
+     * Class names Stored compressed, indexed tokeninzed
+     */
+    public static final String NAMES = JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey();
+
+    /**
+     * Plugin prefix. Stored, not indexed
+     */
+    public static final String PLUGIN_PREFIX = MavenPluginArtifactInfoIndexCreator.FLD_PLUGIN_PREFIX.getKey();
+
+    /**
+     * Plugin goals. Stored, not indexed
+     */
+    public static final String PLUGIN_GOALS = MavenPluginArtifactInfoIndexCreator.FLD_PLUGIN_GOALS.getKey();
 
     public static final Comparator<ArtifactInfo> VERSION_COMPARATOR = new VersionComparator();
 

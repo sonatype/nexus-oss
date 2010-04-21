@@ -1966,7 +1966,7 @@ public class DefaultIndexerManager
 
     // == NG stuff
 
-    protected Query createQuery( IndexerField field, String term )
+    protected Query createQuery( Field field, String term )
     {
         return nexusIndexer.constructQuery( field, term );
     }
@@ -2072,11 +2072,11 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            Query q1 = createQuery( ArtifactInfoRecord.FLD_GROUP_ID, term );
+            Query q1 = createQuery( MAVEN.GROUP_ID, term );
 
             q1.setBoost( 2.0f );
 
-            Query q2 = createQuery( ArtifactInfoRecord.FLD_ARTIFACT_ID, term );
+            Query q2 = createQuery( MAVEN.ARTIFACT_ID, term );
 
             q2.setBoost( 2.0f );
 
@@ -2089,13 +2089,13 @@ public class DefaultIndexerManager
             // switch for "extended" keywords
             if ( false )
             {
-                Query q3 = createQuery( ArtifactInfoRecord.FLD_VERSION, term );
+                Query q3 = createQuery( MAVEN.VERSION, term );
 
-                Query q4 = createQuery( ArtifactInfoRecord.FLD_CLASSIFIER, term );
+                Query q4 = createQuery( MAVEN.CLASSIFIER, term );
 
-                Query q5 = createQuery( ArtifactInfoRecord.FLD_NAME, term );
+                Query q5 = createQuery( MAVEN.NAME, term );
 
-                Query q6 = createQuery( ArtifactInfoRecord.FLD_DESCRIPTION, term );
+                Query q6 = createQuery( MAVEN.DESCRIPTION, term );
 
                 bq.add( q3, BooleanClause.Occur.SHOULD );
 
@@ -2171,7 +2171,7 @@ public class DefaultIndexerManager
                 term = term.substring( 0, term.length() - 6 );
             }
 
-            Query q = createQuery( ArtifactInfoRecord.FLD_CLASSNAMES, term );
+            Query q = createQuery( MAVEN.CLASSNAMES, term );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
 
@@ -2242,27 +2242,27 @@ public class DefaultIndexerManager
 
             if ( gTerm != null )
             {
-                bq.add( createQuery( ArtifactInfoRecord.FLD_GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( createQuery( ArtifactInfoRecord.FLD_ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( createQuery( ArtifactInfoRecord.FLD_VERSION, vTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.VERSION, vTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( pTerm != null )
             {
-                bq.add( createQuery( ArtifactInfoRecord.FLD_PACKAGING, pTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )
             {
-                bq.add( createQuery( ArtifactInfoRecord.FLD_CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
             }
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false );

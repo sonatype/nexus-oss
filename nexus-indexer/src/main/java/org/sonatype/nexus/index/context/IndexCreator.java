@@ -6,10 +6,12 @@
 package org.sonatype.nexus.index.context;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.apache.lucene.document.Document;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerField;
 import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
 import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
@@ -22,6 +24,13 @@ import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
  */
 public interface IndexCreator
 {
+    /**
+     * Returns the indexer fields that this IndexCreator introduces to index.
+     * 
+     * @return
+     */
+    public Collection<IndexerField> getIndexerFields();
+
     /**
      * Populate an <code>ArtifactContext</code> with information about corresponding artifact.
      */

@@ -11,7 +11,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.Tokenizer;
-import org.sonatype.nexus.index.ArtifactInfoRecord;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
 
 /**
  * A Nexus specific analyzer. Only difference from Lucene's SimpleAnalyzer is that we use LetterOrDigitTokenizer instead
@@ -31,7 +31,7 @@ public class NexusAnalyzer
 
     protected Tokenizer getTokenizer( String fieldName, Reader reader )
     {
-        if ( ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( fieldName ) )
+        if ( JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey().equals( fieldName ) )
         {
             // To keep "backward" compatibility, we have to use old flawed tokenizer.
             return new CharTokenizer( reader )

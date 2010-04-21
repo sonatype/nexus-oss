@@ -7,6 +7,8 @@ package org.sonatype.nexus.index.creator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -14,6 +16,7 @@ import org.apache.lucene.document.Document;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerField;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
@@ -80,14 +83,12 @@ public class MavenArchetypeArtifactInfoIndexCreator
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().info(
-                                  "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to exception:",
-                                  e );
+                    "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to exception:", e );
             }
             else
             {
                 getLogger().info(
-                                  "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to "
-                                      + e.getMessage() );
+                    "Failed to parse Maven artifact " + artifact.getAbsolutePath() + " due to " + e.getMessage() );
             }
         }
         finally
@@ -141,5 +142,11 @@ public class MavenArchetypeArtifactInfoIndexCreator
     public String toString()
     {
         return ID;
+    }
+
+    public Collection<IndexerField> getIndexerFields()
+    {
+        // it does not "add" any new field, it actually updates those already maintained by minimal creator.
+        return Collections.emptyList();
     }
 }

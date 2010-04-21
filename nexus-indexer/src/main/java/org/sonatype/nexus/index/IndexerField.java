@@ -11,29 +11,30 @@ import org.apache.lucene.document.Field.Store;
  * @author cstamas
  */
 public class IndexerField
+    extends org.sonatype.nexus.index.Field
 {
     private final IndexerFieldVersion version;
 
-    private final String name;
-
-    private final String description;
+    private final String key;
 
     private final Store storeMethod;
 
     private final Index indexMethod;
 
-    public IndexerField( final IndexerFieldVersion version, final String name, final String description,
-                         final Store storeMethod, final Index indexMethod )
+    public IndexerField( final org.sonatype.nexus.index.Field ontology, final IndexerFieldVersion version,
+                         final String key, final String description, final Store storeMethod, final Index indexMethod )
     {
+        super( ontology, ontology.getNamespace(), ontology.getFieldName(), ontology.getDescription() );
+
         this.version = version;
 
-        this.name = name;
-
-        this.description = description;
+        this.key = key;
 
         this.storeMethod = storeMethod;
 
         this.indexMethod = indexMethod;
+
+        ontology.addIndexerField( this );
     }
 
     public IndexerFieldVersion getVersion()
@@ -41,14 +42,9 @@ public class IndexerField
         return version;
     }
 
-    public String getName()
+    public String getKey()
     {
-        return name;
-    }
-
-    public String getDescription()
-    {
-        return description;
+        return key;
     }
 
     public Field.Store getStoreMethod()
@@ -66,6 +62,11 @@ public class IndexerField
         return !Index.NO.equals( indexMethod );
     }
 
+    public boolean isKeyword()
+    {
+        return isIndexed() && !Index.TOKENIZED.equals( indexMethod );
+    }
+
     public boolean isStored()
     {
         return !Store.NO.equals( storeMethod );
@@ -73,6 +74,6 @@ public class IndexerField
 
     public Field toField( String value )
     {
-        return new Field( name, value, storeMethod, indexMethod );
+        return new Field( getKey(), value, getStoreMethod(), getIndexMethod() );
     }
 }

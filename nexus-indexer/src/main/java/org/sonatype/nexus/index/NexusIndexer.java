@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
 import org.sonatype.nexus.index.cli.NexusIndexerCli;
@@ -365,10 +366,12 @@ public interface NexusIndexer
      * @param field a field name, one of the fields declared in {@link ArtifactInfo}
      * @param query a query text
      * @see DefaultQueryCreator
+     * @deprecated Use {@link #constructQuery(Field, String)} instead.
      */
     Query constructQuery( String field, String query );
 
-    Query constructQuery( IndexerField field, String query );
+    Query constructQuery( Field field, String query );
+    // throws ParseException;
 
     // ----------------------------------------------------------------------------
     // Identification

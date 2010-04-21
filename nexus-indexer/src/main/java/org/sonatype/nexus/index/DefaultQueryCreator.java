@@ -6,17 +6,23 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.Collection;
+
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.index.context.NexusAnalyzer;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
 /**
  * A default {@link QueryCreator} constructs Lucene query for provided query text.
@@ -51,19 +57,67 @@ public class DefaultQueryCreator
     }
 
     // ==
-    public Query constructQuery( IndexerField field, String query )
+
+    public Query constructQuery( Field field, String query )
     {
-        return constructQuery( field.getName(), query );
+        if ( field == null )
+        {
+            return null;
+        }
+        else if ( field instanceof IndexerField )
+        {
+            return constructQuery( (IndexerField) field, query );
+        }
+        else
+        {
+            Collection<IndexerField> indexerFields = field.getIndexerFields();
+
+            if ( indexerFields == null || indexerFields.isEmpty() )
+            {
+                return null;
+            }
+            else if ( indexerFields.size() == 1 )
+            {
+                return constructQuery( indexerFields.iterator().next(), query );
+            }
+            else
+            {
+                BooleanQuery bq = new BooleanQuery();
+
+                boolean hadClauses = false;
+
+                for ( IndexerField indexerField : indexerFields )
+                {
+                    Query q = constructQuery( indexerField, query );
+
+                    if ( q != null )
+                    {
+                        bq.add( q, Occur.SHOULD );
+
+                        hadClauses = true;
+                    }
+                }
+
+                if ( !hadClauses )
+                {
+                    return null;
+                }
+                else
+                {
+                    return bq;
+                }
+            }
+        }
     }
 
     public Query constructQuery( String field, String query )
     {
         Query result = null;
 
-        if ( ArtifactInfoRecord.FLD_GROUP_ID_KW.getName().equals( field )
-            || ArtifactInfoRecord.FLD_ARTIFACT_ID_KW.getName().equals( field )
-            || ArtifactInfoRecord.FLD_VERSION_KW.getName().equals( field )
-            || ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( field ) )
+        if ( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey().equals( field )
+            || MinimalArtifactInfoIndexCreator.FLD_ARTIFACT_ID_KW.getKey().equals( field )
+            || MinimalArtifactInfoIndexCreator.FLD_VERSION_KW.getKey().equals( field )
+            || JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey().equals( field ) )
         {
             // these are special untokenized fields, kept for use cases like TreeView is (exact matching).
             result = legacyConstructQuery( field, query );
@@ -105,6 +159,25 @@ public class DefaultQueryCreator
         return result;
     }
 
+    // ==
+
+    public Query constructQuery( IndexerField field, String query )
+    {
+        if ( !field.isIndexed() )
+        {
+            return null;
+        }
+
+        if ( field.isKeyword() )
+        {
+            return legacyConstructQuery( field.getKey(), query );
+        }
+        else
+        {
+            return constructQuery( field.getKey(), query );
+        }
+    }
+
     public Query legacyConstructQuery( String field, String query )
     {
         if ( query == null || query.length() == 0 )
@@ -118,8 +191,8 @@ public class DefaultQueryCreator
 
         char h = query.charAt( 0 );
 
-        if ( ArtifactInfoRecord.FLD_CLASSNAMES_KW.getName().equals( field )
-            || ArtifactInfoRecord.FLD_CLASSNAMES.getName().equals( field ) )
+        if ( JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey().equals( field )
+            || JarFileContentsIndexCreator.FLD_CLASSNAMES.getKey().equals( field ) )
         {
             q = q.replaceAll( "\\.", "/" );
 
