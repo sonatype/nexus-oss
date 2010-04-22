@@ -29,10 +29,19 @@ Sonatype.repoServer.SearchPanel = function(config) {
   if (this.searchTypes.length < 1) {
     return;
   }
+  
+  var defaultSearchTypeIndex = 0;
+  // find default
+  for ( var i = 0 ; i < this.searchTypes.length ; i++ ) {
+    if ( this.searchTypes[i].defaultQuickSearch ) {
+      defaultSearchTypeIndex = i;
+      break;
+    }
+  }
 
   this.searchTypeButton = new Ext.Button( {
-    text : this.searchTypes[0].text,
-    value : this.searchTypes[0].value,
+    text : this.searchTypes[defaultSearchTypeIndex].text,
+    value : this.searchTypes[defaultSearchTypeIndex].value,
     tooltip : 'Click for more search options',
     handler : this.switchSearchType,
     scope : this,
@@ -43,7 +52,7 @@ Sonatype.repoServer.SearchPanel = function(config) {
 
   this.searchToolbar = new Ext.Toolbar( {
     ctCls : 'search-all-tbar',
-    items : [ this.searchTypeButton, this.convertToFieldObject(this.searchTypes[0].panelItems[0]) ]
+    items : [ this.searchTypeButton, this.convertToFieldObject(this.searchTypes[defaultSearchTypeIndex].panelItems[0]) ]
   });
 
   this.artifactContainer = new Sonatype.repoServer.ArtifactContainer( {});
@@ -140,7 +149,6 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   // start the search
   startSearch : function(panel, updateHistory) {
-    this.bookmarkable = true;
     if (updateHistory) {
       // update history in address bar of browser
       Sonatype.utils.updateHistory(panel);
@@ -206,14 +214,9 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   // get the params to build bookmark
   getBookmark : function() {
-    if ( this.bookmarkable ) {
-	    var searchType = this.getSearchType(this.searchTypeButton.value);
-	
-	    return searchType.getBookmarkHandler.call(this, this);
-    }
-    else {
-      return null;
-    }
+    var searchType = this.getSearchType(this.searchTypeButton.value);
+
+    return searchType.getBookmarkHandler.call(this, this);
   }
 });
 
