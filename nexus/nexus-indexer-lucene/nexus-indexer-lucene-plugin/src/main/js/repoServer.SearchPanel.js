@@ -338,6 +338,10 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     if (data.length > 5) {
       panel.getTopToolbar().items.itemAt(14).setRawValue(data[5]);
     }
+    // extra params, comma seperated list of params
+    if ( data.length > 6) {
+      panel.gavExtras = data[6];
+    }
   }
 
   searchTypes.push( {
@@ -385,6 +389,23 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     v = panel.getTopToolbar().items.itemAt(14).getRawValue();
     if (v) {
       panel.grid.store.baseParams['c'] = v;
+    }
+    // special case for classifier
+    else {
+      panel.grid.store.baseParams['c'] = 'N/P';
+    }
+    
+    // go through the extras and process them.
+    if ( panel.gavExtras ) {
+      var extras = panel.gavExtras.split( ',' );
+      
+      for ( var i = 0 ; i < extras.length ; i++ ) {
+        if ( extras[i] == 'kw' ) {
+          panel.grid.store.baseParams['asKeywords'] = true;
+        }
+      }
+      
+      panel.gavExtras = null;
     }
 
     if (panel.grid.store.baseParams['g'] == null && panel.grid.store.baseParams['a'] == null && panel.grid.store.baseParams['v'] == null) {

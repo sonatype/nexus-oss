@@ -203,8 +203,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       var aid = record.get( 'artifactId' );
       var pac = record.get( 'packaging' );
       var clas = record.get( 'classifier' );
-//      return '<a class="pom-link" index="'+rowIndex+'" href="#nexus-search;gav~'+gid+'~'+aid+'~~'+clas+'~">Drill Down</a>';
-      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+clas+'" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
+      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+ clas + '~kw " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
     } else {
       return versionStr;
     }
