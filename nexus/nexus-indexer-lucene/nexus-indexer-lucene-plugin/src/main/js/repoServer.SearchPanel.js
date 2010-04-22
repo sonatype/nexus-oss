@@ -155,6 +155,11 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     }
 
     var searchType = this.getSearchType(this.searchTypeButton.value);
+    
+    if ( panel.grid.store.sortInfo ) {
+      panel.grid.store.sortInfo = null;
+      panel.grid.getView().updateHeaders();
+    }
 
     searchType.searchHandler.call(this, panel);
   },
