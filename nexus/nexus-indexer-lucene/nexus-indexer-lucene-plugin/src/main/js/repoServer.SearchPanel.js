@@ -140,6 +140,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   // start the search
   startSearch : function(panel, updateHistory) {
+    this.bookmarkable = true;
     if (updateHistory) {
       // update history in address bar of browser
       Sonatype.utils.updateHistory(panel);
@@ -205,9 +206,14 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
   // get the params to build bookmark
   getBookmark : function() {
-    var searchType = this.getSearchType(this.searchTypeButton.value);
-
-    return searchType.getBookmarkHandler.call(this, this);
+    if ( this.bookmarkable ) {
+	    var searchType = this.getSearchType(this.searchTypeButton.value);
+	
+	    return searchType.getBookmarkHandler.call(this, this);
+    }
+    else {
+      return null;
+    }
   }
 });
 
