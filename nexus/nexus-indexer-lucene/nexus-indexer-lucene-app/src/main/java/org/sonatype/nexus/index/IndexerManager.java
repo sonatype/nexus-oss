@@ -169,16 +169,16 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from, Integer count,
-                                                   Integer hitLimit, boolean uniqueRGA )
+                                                   Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from, Integer count,
-                                                        Integer hitLimit )
+                                                        Integer hitLimit, boolean kwSearch )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
                                                    String cTerm, String repositoryId, Integer from, Integer count,
-                                                   Integer hitLimit )
+                                                   Integer hitLimit, boolean kwSearch )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------

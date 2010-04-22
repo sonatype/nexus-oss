@@ -97,6 +97,7 @@ public abstract class AbstractIndexPlexusResource
         Integer from = null;
         Integer count = null;
         Boolean uniqueRGA = null;
+        Boolean asKeywords = null;
 
         if ( form.getFirstValue( "from" ) != null )
         {
@@ -127,6 +128,11 @@ public abstract class AbstractIndexPlexusResource
             uniqueRGA = Boolean.valueOf( form.getFirstValue( "uniqueRGA" ) );
         }
 
+        if ( form.getFirstValue( "asKeywords" ) != null )
+        {
+            asKeywords = Boolean.valueOf( form.getFirstValue( "asKeywords" ) );
+        }
+
         IteratorSearchResponse searchResult = null;
 
         NexusArtifact na = null;
@@ -147,7 +153,7 @@ public abstract class AbstractIndexPlexusResource
             }
             else
             {
-                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA );
+                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, asKeywords );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -208,19 +214,22 @@ public abstract class AbstractIndexPlexusResource
     }
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final Integer count, final Boolean uniqueRGA )
+                                                  final Integer from, final Integer count, final Boolean uniqueRGA,
+                                                  final Boolean asKeywords )
         throws NoSuchRepositoryException, ResourceException
     {
         // if uniqueRGA set, obey it, otherwise default it depending on query
         // keyword search does collapse, others do not
         boolean collapsed = uniqueRGA == null ? terms.containsKey( KeywordSearcher.TERM_KEYWORD ) : uniqueRGA;
 
+        boolean kwSearch = asKeywords == null ? false : asKeywords;
+
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
             {
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed );
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed, kwSearch );
 
                 if ( searchResponse != null )
                 {

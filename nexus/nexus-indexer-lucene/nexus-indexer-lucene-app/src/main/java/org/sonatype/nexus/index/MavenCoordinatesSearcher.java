@@ -89,7 +89,7 @@ public class MavenCoordinatesSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, boolean uniqueRGA )
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
@@ -98,7 +98,7 @@ public class MavenCoordinatesSearcher
         }
         return m_lucene.searchArtifactIterator( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ), terms
             .get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from, count,
-            hitLimit );
+            hitLimit, kwSearch );
     }
 
 }
