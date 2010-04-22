@@ -204,7 +204,7 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       var pac = record.get( 'packaging' );
       var clas = record.get( 'classifier' );
 //      return '<a class="pom-link" index="'+rowIndex+'" href="#nexus-search;gav~'+gid+'~'+aid+'~~'+clas+'~">Drill Down</a>';
-      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+clas+'">Drill Down</a>';
+      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+clas+'" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
     } else {
       return versionStr;
     }
@@ -266,3 +266,9 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.clearWarningLabel();
   }
 });
+
+cancel_bubble = function (e) {
+	if (!e) var e = window.event;
+	e.cancelBubble = true;
+	if (e.stopPropagation) e.stopPropagation(); 
+}
