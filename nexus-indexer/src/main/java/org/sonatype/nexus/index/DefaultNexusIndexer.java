@@ -477,9 +477,9 @@ public class DefaultNexusIndexer
         return queryCreator.constructQuery( field, query );
     }
 
-    public Query constructQuery( Field field, String query )
+    public Query constructQuery( Field field, String query, SearchType type )
     {
-        return queryCreator.constructQuery( field, query );
+        return queryCreator.constructQuery( field, query, type );
     }
 
     // ----------------------------------------------------------------------------

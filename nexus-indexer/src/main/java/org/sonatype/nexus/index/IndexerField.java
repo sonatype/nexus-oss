@@ -11,8 +11,9 @@ import org.apache.lucene.document.Field.Store;
  * @author cstamas
  */
 public class IndexerField
-    extends org.sonatype.nexus.index.Field
 {
+    private final org.sonatype.nexus.index.Field ontology;
+
     private final IndexerFieldVersion version;
 
     private final String key;
@@ -24,7 +25,7 @@ public class IndexerField
     public IndexerField( final org.sonatype.nexus.index.Field ontology, final IndexerFieldVersion version,
                          final String key, final String description, final Store storeMethod, final Index indexMethod )
     {
-        super( ontology, ontology.getNamespace(), ontology.getFieldName(), ontology.getDescription() );
+        this.ontology = ontology;
 
         this.version = version;
 
@@ -35,6 +36,11 @@ public class IndexerField
         this.indexMethod = indexMethod;
 
         ontology.addIndexerField( this );
+    }
+
+    public org.sonatype.nexus.index.Field getOntology()
+    {
+        return ontology;
     }
 
     public IndexerFieldVersion getVersion()

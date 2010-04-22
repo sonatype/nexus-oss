@@ -22,30 +22,16 @@ public interface QueryCreator
     String ROLE = QueryCreator.class.getName();
 
     /**
-     * Constructs query by parsing a (usually) "hand written" query string, using description of fields it gets. This
-     * method should not be used by applications constructing queries, but mere by "published" services, where humans
-     * write queries (like some search service with UI would be). Applications internally doing searches would do better
-     * if the assemble queries one by one, and use the {{@link #constructQuery(IndexerField, String)} method.
-     * 
-     * @param fields
-     * @param query
-     * @return
-     * @throws ParseException
-     */
-    // Query constructQuery( String query )
-    // throws ParseException;
-
-    /**
      * Constructs query by parsing the query string, using field as default field. This method should be use to
      * construct queries (single term or phrase queries) against <b>single field</b>.
      * 
      * @param field
      * @param query
+     * @param type
      * @return
      * @throws ParseException if query parsing is unsuccesful.
      */
-    Query constructQuery( Field field, String query );
-    // throws ParseException;
+    Query constructQuery( Field field, String query, SearchType type );
 
     /**
      * Deprecated. Avoid it's use! Constructs query against <b>single</b> field, using it's "best effort" approach to
@@ -55,7 +41,7 @@ public interface QueryCreator
      * @param query
      * @return query if successfully parsed, or null.
      * @deprecated Use {@link #constructQuery(Collection, String)} or
-     *             {@link QueryCreator#constructQuery(IndexerField, String)} methods instead!
+     *             {@link QueryCreator#constructQuery(IndexerField, String, SearchType)} methods instead!
      */
     Query constructQuery( String field, String query );
 

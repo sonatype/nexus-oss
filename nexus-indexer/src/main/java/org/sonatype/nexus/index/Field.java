@@ -7,8 +7,10 @@ import java.util.List;
 
 public class Field
 {
-    private final Field parent;
+    public static final String NOT_PRESENT = "N/P";
     
+    private final Field parent;
+
     private final String namespace;
 
     private final String fieldName;
@@ -20,7 +22,7 @@ public class Field
     public Field( final Field parent, final String namespace, final String name, final String description )
     {
         this.parent = parent;
-        
+
         this.namespace = namespace;
 
         this.fieldName = name;
@@ -63,5 +65,15 @@ public class Field
     public boolean removeIndexerField( IndexerField field )
     {
         return indexerFields.remove( field );
+    }
+
+    public String getFQN()
+    {
+        return getNamespace() + getFieldName();
+    }
+
+    public String toString()
+    {
+        return getFQN() + " (with " + getIndexerFields().size() + " registered index fields)";
     }
 }

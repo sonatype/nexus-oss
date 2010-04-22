@@ -6,8 +6,6 @@
  */
 package org.sonatype.nexus.index;
 
-import java.util.Collection;
-
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -58,55 +56,20 @@ public class DefaultQueryCreator
 
     // ==
 
-    public Query constructQuery( Field field, String query )
+    public Query constructQuery( Field field, String query, SearchType type )
     {
+        if ( type == null )
+        {
+            throw new NullPointerException( "Cannot construct query with type of \"null\"!" );
+        }
+
         if ( field == null )
         {
-            return null;
-        }
-        else if ( field instanceof IndexerField )
-        {
-            return constructQuery( (IndexerField) field, query );
+            throw new NullPointerException( "Cannot construct query for field \"null\"!" );
         }
         else
         {
-            Collection<IndexerField> indexerFields = field.getIndexerFields();
-
-            if ( indexerFields == null || indexerFields.isEmpty() )
-            {
-                return null;
-            }
-            else if ( indexerFields.size() == 1 )
-            {
-                return constructQuery( indexerFields.iterator().next(), query );
-            }
-            else
-            {
-                BooleanQuery bq = new BooleanQuery();
-
-                boolean hadClauses = false;
-
-                for ( IndexerField indexerField : indexerFields )
-                {
-                    Query q = constructQuery( indexerField, query );
-
-                    if ( q != null )
-                    {
-                        bq.add( q, Occur.SHOULD );
-
-                        hadClauses = true;
-                    }
-                }
-
-                if ( !hadClauses )
-                {
-                    return null;
-                }
-                else
-                {
-                    return bq;
-                }
-            }
+            return constructQuery( field, selectIndexerField( field, type ), query, type );
         }
     }
 
@@ -127,7 +90,7 @@ public class DefaultQueryCreator
             QueryParser qp = new QueryParser( field, new NexusAnalyzer() );
 
             // small cheap trick
-            // if a query is not "exper" (does not contain field:val kind of expression)
+            // if a query is not "expert" (does not contain field:val kind of expression)
             // but it contains star and/or punctuation chars, example: "common-log*"
             if ( !query.contains( ":" ) )
             {
@@ -161,20 +124,168 @@ public class DefaultQueryCreator
 
     // ==
 
-    public Query constructQuery( IndexerField field, String query )
+    public IndexerField selectIndexerField( Field field, SearchType type )
     {
-        if ( !field.isIndexed() )
+        IndexerField lastField = null;
+
+        for ( IndexerField indexerField : field.getIndexerFields() )
         {
+            lastField = indexerField;
+
+            if ( type.matchesIndexerField( indexerField ) )
+            {
+                return indexerField;
+            }
+        }
+
+        return lastField;
+    }
+
+    public Query constructQuery( final Field field, final IndexerField indexerField, final String query,
+                                 final SearchType type )
+    {
+        if ( indexerField == null || !indexerField.isIndexed() )
+        {
+            getLogger().warn(
+                "Querying for non-indexed field " + field.toString()
+                    + " was tried. Please review your code or consider adding this field to index!" );
+
             return null;
         }
 
-        if ( field.isKeyword() )
+        if ( SearchType.KEYWORD.equals( type ) )
         {
-            return legacyConstructQuery( field.getKey(), query );
+            if ( indexerField.isKeyword() )
+            {
+                if ( Field.NOT_PRESENT.equals( query ) )
+                {
+                    return new WildcardQuery( new Term( indexerField.getKey(), "*" ) );
+                }
+                else
+                {
+                    // exactly what callee wants
+                    return new TermQuery( new Term( indexerField.getKey(), query ) );
+                }
+
+            }
+            else if ( !indexerField.isKeyword() && indexerField.isStored() )
+            {
+                getLogger()
+                    .warn(
+                        type.toString()
+                            + " type of querying for non-keyword (but stored) field "
+                            + field.toString()
+                            + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is currently unsupported." );
+
+                // will never succeed (unless we supply him "filter" too, but that would kill performance)
+                // and is possible with stored fields only
+                return null;
+            }
+            else
+            {
+                getLogger()
+                    .warn(
+                        type.toString()
+                            + " type of querying for non-keyword (and not stored) field "
+                            + field.toString()
+                            + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is impossible." );
+
+                // not a keyword indexerField, nor stored. No hope at all. Impossible even with "filtering"
+                return null;
+            }
+        }
+        else if ( SearchType.SCORED.equals( type ) )
+        {
+            if ( indexerField.isKeyword() )
+            {
+                // no tokenization should happen against the field!
+                if ( query.contains( "*" ) || query.contains( "?" ) )
+                {
+                    return new WildcardQuery( new Term( indexerField.getKey(), query ) );
+                }
+                else
+                {
+                    BooleanQuery bq = new BooleanQuery();
+
+                    Term t = new Term( indexerField.getKey(), query );
+
+                    bq.add( new TermQuery( t ), Occur.SHOULD );
+                    bq.add( new PrefixQuery( t ), Occur.SHOULD );
+
+                    return bq;
+                }
+            }
+            else
+            {
+                // to save "original" query
+                String qpQuery = query;
+
+                // tokenization should happen against the field!
+                QueryParser qp = new QueryParser( indexerField.getKey(), new NexusAnalyzer() );
+
+                Query q1 = null;
+
+                // small cheap trick
+                // if a query is not "expert" (does not contain field:val kind of expression)
+                // but it contains star and/or punctuation chars, example: "common-log*"
+                // since Lucene does not support multi-terms WITH wildcards.
+                // So, here, we "mimic" NexusAnalyzer (this should be fixed!)
+                // but do this with PRESERVING original query!
+                if ( qpQuery.matches( ".*(\\.|-|_).*" ) )
+                {
+                    qpQuery =
+                        qpQuery.toLowerCase().replaceAll( "\\*", "X" ).replaceAll( "\\.|-|_", " " ).replaceAll( "X",
+                            "*" );
+                }
+
+                // "fix" it with trailing "*" if not there
+                if ( !qpQuery.endsWith( "*" ) )
+                {
+                    qpQuery += "*";
+                }
+
+                try
+                {
+                    q1 = qp.parse( qpQuery );
+
+                    Query q2 = null;
+
+                    IndexerField keywordField = selectIndexerField( field, SearchType.KEYWORD );
+
+                    if ( keywordField.isKeyword() )
+                    {
+                        q2 = constructQuery( field, keywordField, query, type );
+                    }
+
+                    if ( q2 == null )
+                    {
+                        return q1;
+                    }
+                    else
+                    {
+                        BooleanQuery bq = new BooleanQuery();
+
+                        // trick with order
+                        bq.add( q2, Occur.SHOULD );
+                        bq.add( q1, Occur.SHOULD );
+
+                        return bq;
+                    }
+                }
+                catch ( ParseException e )
+                {
+                    getLogger().info(
+                        "Query parsing with \"legacy\" method, we got ParseException from QueryParser: "
+                            + e.getMessage() );
+
+                    return legacyConstructQuery( indexerField.getKey(), query );
+                }
+            }
         }
         else
         {
-            return constructQuery( field.getKey(), query );
+            // what search type is this?
+            return null;
         }
     }
 
