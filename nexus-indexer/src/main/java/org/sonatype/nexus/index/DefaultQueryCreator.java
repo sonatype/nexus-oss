@@ -56,7 +56,7 @@ public class DefaultQueryCreator
 
     // ==
 
-    public Query constructQuery( Field field, String query, SearchType type )
+    public Query constructQuery( final Field field, final String query, final SearchType type )
     {
         if ( type == null )
         {
@@ -124,7 +124,7 @@ public class DefaultQueryCreator
 
     // ==
 
-    public IndexerField selectIndexerField( Field field, SearchType type )
+    public IndexerField selectIndexerField( final Field field, final SearchType type )
     {
         IndexerField lastField = null;
 
@@ -144,7 +144,17 @@ public class DefaultQueryCreator
     public Query constructQuery( final Field field, final IndexerField indexerField, final String query,
                                  final SearchType type )
     {
-        if ( indexerField == null || !indexerField.isIndexed() )
+        if ( indexerField == null )
+        {
+            getLogger()
+                .warn(
+                    "Querying for field \""
+                        + field.toString()
+                        + "\" without any indexer field was tried. Please review your code, and consider adding this field to index!" );
+
+            return null;
+        }
+        if ( !indexerField.isIndexed() )
         {
             getLogger().warn(
                 "Querying for non-indexed field " + field.toString()
@@ -153,20 +163,17 @@ public class DefaultQueryCreator
             return null;
         }
 
+        if ( Field.NOT_PRESENT.equals( query ) )
+        {
+            return new WildcardQuery( new Term( indexerField.getKey(), "*" ) );
+        }
+
         if ( SearchType.KEYWORD.equals( type ) )
         {
             if ( indexerField.isKeyword() )
             {
-                if ( Field.NOT_PRESENT.equals( query ) )
-                {
-                    return new WildcardQuery( new Term( indexerField.getKey(), "*" ) );
-                }
-                else
-                {
-                    // exactly what callee wants
-                    return new TermQuery( new Term( indexerField.getKey(), query ) );
-                }
-
+                // exactly what callee wants
+                return new TermQuery( new Term( indexerField.getKey(), query ) );
             }
             else if ( !indexerField.isKeyword() && indexerField.isStored() )
             {
@@ -174,7 +181,7 @@ public class DefaultQueryCreator
                     .warn(
                         type.toString()
                             + " type of querying for non-keyword (but stored) field "
-                            + field.toString()
+                            + indexerField.getOntology().toString()
                             + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is currently unsupported." );
 
                 // will never succeed (unless we supply him "filter" too, but that would kill performance)
@@ -187,7 +194,7 @@ public class DefaultQueryCreator
                     .warn(
                         type.toString()
                             + " type of querying for non-keyword (and not stored) field "
-                            + field.toString()
+                            + indexerField.getOntology().toString()
                             + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is impossible." );
 
                 // not a keyword indexerField, nor stored. No hope at all. Impossible even with "filtering"
@@ -250,11 +257,11 @@ public class DefaultQueryCreator
 
                     Query q2 = null;
 
-                    IndexerField keywordField = selectIndexerField( field, SearchType.KEYWORD );
+                    IndexerField keywordField = selectIndexerField( indexerField.getOntology(), SearchType.KEYWORD );
 
                     if ( keywordField.isKeyword() )
                     {
-                        q2 = constructQuery( field, keywordField, query, type );
+                        q2 = constructQuery( indexerField.getOntology(), keywordField, query, type );
                     }
 
                     if ( q2 == null )

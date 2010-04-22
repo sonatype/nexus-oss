@@ -115,6 +115,15 @@ public class DefaultIndexingContext
 
         this.indexCreators = indexCreators;
 
+        // eh?
+        // Guice does NOT initialize these, and we have to do manually?
+        // While in Plexus, all is well, but when in guice-shim,
+        // these objects are still LazyHintedBeans or what not and IndexerFields are NOT registered!
+        for ( IndexCreator indexCreator : indexCreators )
+        {
+            indexCreator.getIndexerFields();
+        }
+
         this.gavCalculator = new M2GavCalculator();
     }
 
