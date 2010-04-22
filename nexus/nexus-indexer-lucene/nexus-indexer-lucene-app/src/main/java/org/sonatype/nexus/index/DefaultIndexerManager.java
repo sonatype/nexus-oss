@@ -1974,6 +1974,12 @@ public class DefaultIndexerManager
     protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
                                                    boolean uniqueRGA )
     {
+        return createRequest( bq, from, count, hitLimit, uniqueRGA, null );
+    }
+
+    protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
+                                                   boolean uniqueRGA, List<ArtifactInfoFilter> extraFilters )
+    {
         IteratorSearchRequest req = new IteratorSearchRequest( bq );
 
         List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
@@ -1990,6 +1996,11 @@ public class DefaultIndexerManager
         if ( uniqueRGA )
         {
             filters.add( new UniqueGAArtifactFilterPostprocessor( false ) );
+        }
+
+        if ( extraFilters != null && extraFilters.size() > 0 )
+        {
+            filters.addAll( extraFilters );
         }
 
         req.setArtifactInfoFilter( new AndMultiArtifactInfoFilter( filters ) );
@@ -2270,11 +2281,22 @@ public class DefaultIndexerManager
 
             // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
             // to bq
+            ArtifactInfoFilter npFilter = null;
+
             if ( cTerm != null )
             {
                 if ( Field.NOT_PRESENT.equalsIgnoreCase( cTerm ) )
                 {
-                    bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, sType ), BooleanClause.Occur.MUST_NOT );
+                    // bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD ),
+                    // BooleanClause.Occur.MUST_NOT );
+                    // This above should work too! -- TODO: fixit!
+                    npFilter = new ArtifactInfoFilter()
+                    {
+                        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+                        {
+                            return StringUtils.isBlank( ai.classifier );
+                        }
+                    };
                 }
                 else
                 {
@@ -2282,7 +2304,16 @@ public class DefaultIndexerManager
                 }
             }
 
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false );
+            IteratorSearchRequest req = null;
+
+            if ( npFilter != null )
+            {
+                req = createRequest( bq, from, count, hitLimit, false, Arrays.asList( npFilter ) );
+            }
+            else
+            {
+                req = createRequest( bq, from, count, hitLimit, false );
+            }
 
             if ( repositoryId != null )
             {
