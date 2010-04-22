@@ -30,7 +30,9 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
+import org.restlet.data.Parameter;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -38,6 +40,7 @@ import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.restlet.util.Series;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -68,6 +71,7 @@ import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
+import com.noelios.restlet.http.HttpConstants;
 import com.noelios.restlet.http.HttpRequest;
 
 /**
@@ -84,6 +88,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
+    public static final String OVERRIDE_FILENAME_KEY = "override-filename";
+    
     public AbstractResourceStoreContentPlexusResource()
     {
         super();
@@ -332,6 +338,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 if ( file.getModified() > req.getConditions().getModifiedSince().getTime() )
                 {
                     result = new StorageFileItemRepresentation( file );
+                    this.setOverrideContentDisposition( res, file );
                 }
                 else
                 {
@@ -349,6 +356,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 if ( !file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
                 {
                     result = new StorageFileItemRepresentation( file );
+                    this.setOverrideContentDisposition( res, file );
                 }
                 else
                 {
@@ -358,6 +366,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else
             {
                 result = new StorageFileItemRepresentation( file );
+                this.setOverrideContentDisposition( res, file );
             }
         }
         else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
@@ -438,6 +447,29 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         return result;
+    }
+    
+    private void setOverrideContentDisposition( Response response, StorageFileItem fileItem )
+    {
+        String filename = fileItem.getName();
+        if ( fileItem.getItemContext().containsKey( OVERRIDE_FILENAME_KEY ) )
+        {
+            filename = fileItem.getItemContext().get( OVERRIDE_FILENAME_KEY ).toString();
+
+            Object oHeaders = fileItem.getAttributes().get( HttpConstants.ATTRIBUTE_HEADERS );
+            Series<Parameter> headers = null;
+            if ( oHeaders != null )
+            {
+                headers = (Series<Parameter>) oHeaders;
+            }
+            else
+            {
+                headers = new Form();
+            }
+
+            headers.add( new Parameter( "Content-Disposition", "inline; filename=\"" + filename + "\";" ) );
+            response.getAttributes().put(HttpConstants.ATTRIBUTE_HEADERS, headers);
+        }
     }
 
     protected Representation serialize( Context context, Request req, Variant variant, Object payload )
