@@ -35,17 +35,18 @@ public class JarFileContentsIndexCreator
 {
     public static final String ID = "jarContent";
 
+    public static final IndexerField FLD_CLASSNAMES =
+        new IndexerField( MAVEN.CLASSNAMES, IndexerFieldVersion.V3, "classnames", "Artifact Classes (tokenized)",
+                          Store.NO, Index.TOKENIZED );
+
     /**
      * NexusAnalyzer makes exception with this field only, to keep backward compatibility with old consumers of
-     * nexus-indexer.
+     * nexus-indexer. This field is here for "backward" compat only! The order is important too! FLD_CLASSNAMES must be
+     * registered BEFORE FLD_CLASSNAMES_KW!
      */
     public static final IndexerField FLD_CLASSNAMES_KW =
         new IndexerField( MAVEN.CLASSNAMES, IndexerFieldVersion.V1, "c",
                           "Artifact Classes (tokenized on newlines only)", Store.COMPRESS, Index.TOKENIZED );
-
-    public static final IndexerField FLD_CLASSNAMES =
-        new IndexerField( MAVEN.CLASSNAMES, IndexerFieldVersion.V3, "classnames", "Artifact Classes (tokenized)",
-                          Store.NO, Index.TOKENIZED );
 
     public void populateArtifactInfo( ArtifactContext artifactContext )
         throws IOException
