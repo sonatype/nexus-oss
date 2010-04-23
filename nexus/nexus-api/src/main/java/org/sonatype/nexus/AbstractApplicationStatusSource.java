@@ -161,19 +161,19 @@ public abstract class AbstractApplicationStatusSource
 
             lock.lock();
 
-            // maybe someone did the job, while we were blocked
-            if ( forced || ( currentTime - lastUpdate > 30000 ) )
+            try
             {
-                try
+                // maybe someone did the job, while we were blocked
+                if ( forced || ( currentTime - lastUpdate > 30000 ) )
                 {
                     renewSystemStatus( getSystemStatusInternal() );
 
                     lastUpdate = currentTime;
                 }
-                finally
-                {
-                    lock.unlock();
-                }
+            }
+            finally
+            {
+                lock.unlock();
             }
         }
     }
