@@ -119,7 +119,7 @@ public class DefaultRepositoryTypeRegistry
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        if ( d.getRepositoryMaxInstanceCount() < 0 )
+        if ( d.getRepositoryMaxInstanceCount() == RepositoryType.UNLIMITED_INSTANCES )
         {
             getLogger().info( "Registered Repository type " + d.toString() + "." );
         }

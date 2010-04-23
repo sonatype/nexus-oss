@@ -611,7 +611,7 @@ public class DefaultNexusConfiguration
 
         int maxCount;
 
-        if ( rtd.getRepositoryMaxInstanceCount() < 0 )
+        if ( rtd.getRepositoryMaxInstanceCount() != RepositoryType.UNLIMITED_INSTANCES )
         {
             maxCount = rtd.getRepositoryMaxInstanceCount();
         }
