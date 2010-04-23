@@ -9,9 +9,11 @@ public class PluginRepositoryType
 {
     private String componentContract;
 
+    private String componentName;
+
     private String pathPrefix;
 
-    public PluginRepositoryType( String componentContract, String pathPrefix )
+    public PluginRepositoryType( String componentContract, String componentName, String pathPrefix )
     {
         this.componentContract = componentContract;
 
@@ -26,6 +28,16 @@ public class PluginRepositoryType
     public void setComponentContract( String componentContract )
     {
         this.componentContract = componentContract;
+    }
+
+    public String getComponentName()
+    {
+        return componentName;
+    }
+
+    public void setComponentName( String componentName )
+    {
+        this.componentName = componentName;
     }
 
     public String getPathPrefix()

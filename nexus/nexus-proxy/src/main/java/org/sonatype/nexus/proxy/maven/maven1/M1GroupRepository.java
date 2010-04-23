@@ -25,11 +25,14 @@ import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 
-@Component( role = GroupRepository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
+@Component( role = GroupRepository.class, hint = M1GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven1 Repository Group" )
 public class M1GroupRepository
     extends AbstractMavenGroupRepository
 {
-    @Requirement( hint = "maven1" )
+    /** This "mimics" the @Named("maven1") */
+    public static final String ID = Maven1ContentClass.ID;
+    
+    @Requirement( hint = Maven1ContentClass.ID )
     private ContentClass contentClass;
 
     @Requirement( hint = "maven1" )

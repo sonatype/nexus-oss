@@ -76,13 +76,4 @@ public interface RepositoryTypeRegistry
      * @return the content class instance or null if repository does not exists.
      */
     ContentClass getRepositoryContentClass( String role, String hint );
-
-    /**
-     * Returns the repository description for the given Repository component.
-     * 
-     * @param role
-     * @param hint
-     * @return the description (will fallback to "" if no description found) or null if repository does not exists.
-     */
-    String getRepositoryDescription( String role, String hint );
 }

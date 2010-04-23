@@ -43,38 +43,38 @@ public class DefaultRepositoryTemplateProvider
         try
         {
             templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_RELEASE,
-                "Maven2 Hosted Release Repository", RepositoryPolicy.RELEASE ) );
+                "Maven2 (hosted, release)", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven2HostedRepositoryTemplate( this, DEFAULT_HOSTED_SNAPSHOT,
-                "Maven2 Hosted Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
+                "Maven2 (hosted, snapshot)", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_RELEASE,
-                "Maven2 Proxy Release Repository", RepositoryPolicy.RELEASE ) );
+                "Maven2 (proxy, release)", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven2ProxyRepositoryTemplate( this, DEFAULT_PROXY_SNAPSHOT,
-                "Maven2 Proxy Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
+                "Maven2 (proxy, snapshot)", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven1Maven2ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
-                "Maven1-to-Maven2 Virtual Repository" ) );
+                "Maven1-to-Maven2 (vitual)" ) );
 
             templates.add( new Maven2Maven1ShadowRepositoryTemplate( this, DEFAULT_VIRTUAL,
-                "Maven2-to-Maven1 Virtual Repository" ) );
+                "Maven2-to-Maven1 (virtual)" ) );
 
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_release",
-                "Maven1 Hosted Release Repository", RepositoryPolicy.RELEASE ) );
+                "Maven1 (hosted, release)", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven1HostedRepositoryTemplate( this, "maven1_hosted_snapshot",
-                "Maven1 Hosted Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
+                "Maven1 (hosted, snapshot)", RepositoryPolicy.SNAPSHOT ) );
 
             templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_release",
-                "Maven1 Proxy Release Repository", RepositoryPolicy.RELEASE ) );
+                "Maven1 (proxy, release)", RepositoryPolicy.RELEASE ) );
 
             templates.add( new Maven1ProxyRepositoryTemplate( this, "maven1_proxy_snapshot",
-                "Maven1 Proxy Snapshot Repository", RepositoryPolicy.SNAPSHOT ) );
+                "Maven1 (proxy, snapshot)", RepositoryPolicy.SNAPSHOT ) );
 
-            templates.add( new Maven1GroupRepositoryTemplate( this, "maven1_group", "Maven1 Group Repository" ) );
+            templates.add( new Maven1GroupRepositoryTemplate( this, "maven1_group", "Maven1 (group)" ) );
 
-            templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 Group Repository" ) );
+            templates.add( new Maven2GroupRepositoryTemplate( this, DEFAULT_GROUP, "Maven2 (group)" ) );
         }
         catch ( Exception e )
         {

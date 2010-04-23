@@ -23,6 +23,7 @@ import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
 import org.sonatype.nexus.proxy.maven.LayoutConverterShadowRepository;
+import org.sonatype.nexus.proxy.maven.maven1.Maven1ContentClass;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 
@@ -31,14 +32,17 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
  * 
  * @author cstamas
  */
-@Component( role = ShadowRepository.class, hint = "m1-m2-shadow", instantiationStrategy = "per-lookup", description = "Maven1 to Maven2" )
+@Component( role = ShadowRepository.class, hint = M2LayoutedM1ShadowRepository.ID, instantiationStrategy = "per-lookup", description = "Maven1 to Maven2" )
 public class M2LayoutedM1ShadowRepository
     extends LayoutConverterShadowRepository
 {
-    @Requirement( hint = "maven2" )
+    /** This "mimics" the @Named("m1-m2-shadow") */
+    public static final String ID = "m1-m2-shadow";
+
+    @Requirement( hint = Maven2ContentClass.ID )
     private ContentClass contentClass;
 
-    @Requirement( hint = "maven1" )
+    @Requirement( hint = Maven1ContentClass.ID )
     private ContentClass masterContentClass;
 
     @Requirement

@@ -56,10 +56,13 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
-@Component( role = GroupRepository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
+@Component( role = GroupRepository.class, hint = M2GroupRepository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository Group" )
 public class M2GroupRepository
     extends AbstractMavenGroupRepository
 {
+    /** This "mimics" the @Named("maven2") */
+    public static final String ID = Maven2ContentClass.ID;
+    
     /**
      * The GAV Calculator.
      */
@@ -69,7 +72,7 @@ public class M2GroupRepository
     /**
      * Content class.
      */
-    @Requirement( hint = "maven2" )
+    @Requirement( hint = Maven2ContentClass.ID )
     private ContentClass contentClass;
 
     @Requirement

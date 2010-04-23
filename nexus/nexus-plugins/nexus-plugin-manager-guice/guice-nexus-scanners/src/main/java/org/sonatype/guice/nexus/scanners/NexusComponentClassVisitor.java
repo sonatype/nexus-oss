@@ -169,8 +169,7 @@ final class NexusComponentClassVisitor
         final String role = getRole();
         if ( null != repositoryPathPrefix && null != role )
         {
-            // FIXME: repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix ) );
-            repositoryTypes.add( new RepositoryTypeDescriptor( className, repositoryPathPrefix ) );
+            repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix ) );
         }
     }
 

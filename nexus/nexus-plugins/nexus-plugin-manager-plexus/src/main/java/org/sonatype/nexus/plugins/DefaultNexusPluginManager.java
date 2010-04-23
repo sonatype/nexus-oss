@@ -245,11 +245,9 @@ public class DefaultNexusPluginManager
                 // unregister discovered repo types
                 for ( PluginRepositoryType repoType : pluginDescriptor.getPluginRepositoryTypes().values() )
                 {
-                    RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
-
-                    repoTypeDescriptor.setRole( repoType.getComponentContract() );
-
-                    repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
+                    RepositoryTypeDescriptor repoTypeDescriptor =
+                        new RepositoryTypeDescriptor( repoType.getComponentContract(), repoType.getComponentName(),
+                                                      repoType.getPathPrefix() );
 
                     repositoryTypeRegistry.unregisterRepositoryTypeDescriptors( repoTypeDescriptor );
                 }
@@ -402,7 +400,8 @@ public class DefaultNexusPluginManager
             }
             catch ( NoSuchPluginRepositoryArtifactException e )
             {
-                result.setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
+                result
+                    .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
 
@@ -426,7 +425,8 @@ public class DefaultNexusPluginManager
             }
             catch ( NoSuchPluginRepositoryArtifactException e )
             {
-                result.setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
+                result
+                    .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
 
@@ -478,14 +478,13 @@ public class DefaultNexusPluginManager
         // notifications
         if ( result.isSuccessful() )
         {
-            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent(
-                                                                                        this,
-                                                                                        discoveryContext.getPluginDescriptor() ) );
+            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, discoveryContext
+                .getPluginDescriptor() ) );
         }
         else
         {
-            applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginCoordinates,
-                                                                                       result.getThrowable() ) );
+            applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginCoordinates, result
+                .getThrowable() ) );
         }
 
         response.addPluginResponse( result );
@@ -685,8 +684,8 @@ public class DefaultNexusPluginManager
             if ( resourceName.startsWith( "static/" ) )
             {
                 PluginStaticResourceModel model =
-                    new PluginStaticResourceModel( resourceName, "/" + resourceName,
-                                                   mimeUtil.getMimeType( resourceName ) );
+                    new PluginStaticResourceModel( resourceName, "/" + resourceName, mimeUtil
+                        .getMimeType( resourceName ) );
 
                 result.add( model );
             }
@@ -705,8 +704,8 @@ public class DefaultNexusPluginManager
             if ( resourceName.startsWith( "documentation/" ) )
             {
                 PluginStaticResourceModel model =
-                    new PluginStaticResourceModel( resourceName, "/" + resourceName,
-                                                   mimeUtil.getMimeType( resourceName ) );
+                    new PluginStaticResourceModel( resourceName, "/" + resourceName, mimeUtil
+                        .getMimeType( resourceName ) );
 
                 result.add( model );
             }
@@ -726,10 +725,12 @@ public class DefaultNexusPluginManager
         {
             List<ComponentDescriptor<?>> discoveredComponentDescriptors = new ArrayList<ComponentDescriptor<?>>();
 
-            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm() ) );
+            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext
+                .getPluginDescriptor().getPluginRealm() ) );
 
             // collecting
-            for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor().getComponents() )
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor()
+                .getComponents() )
             {
                 discoveredComponentDescriptors.add( componentDescriptor );
             }
@@ -837,11 +838,11 @@ public class DefaultNexusPluginManager
                             (RepositoryType) response.getMarkerAnnotations().get( RepositoryType.class );
 
                         PluginRepositoryType pluginRepositoryType =
-                            new PluginRepositoryType( response.getComponentDescriptor().getRole(),
-                                                      repositoryTypeAnno.pathPrefix() );
+                            new PluginRepositoryType( response.getComponentDescriptor().getRole(), response
+                                .getComponentDescriptor().getRoleHint(), repositoryTypeAnno.pathPrefix() );
 
                         pd.getPluginRepositoryTypes().put( pluginRepositoryType.getComponentContract(),
-                                                           pluginRepositoryType );
+                            pluginRepositoryType );
                     }
 
                     pd.addComponentDescriptor( response.getComponentDescriptor() );
@@ -893,20 +894,17 @@ public class DefaultNexusPluginManager
                 }
                 catch ( CycleDetectedInComponentGraphException e )
                 {
-                    throw new InvalidPluginException(
-                                                      pluginDiscoveryContext.getPluginDescriptor().getPluginCoordinates(),
-                                                      e );
+                    throw new InvalidPluginException( pluginDiscoveryContext.getPluginDescriptor()
+                        .getPluginCoordinates(), e );
                 }
             }
 
             // register newly discovered repo types
             for ( PluginRepositoryType repoType : pluginDescriptor.getPluginRepositoryTypes().values() )
             {
-                RepositoryTypeDescriptor repoTypeDescriptor = new RepositoryTypeDescriptor();
-
-                repoTypeDescriptor.setRole( repoType.getComponentContract() );
-
-                repoTypeDescriptor.setPrefix( repoType.getPathPrefix() );
+                RepositoryTypeDescriptor repoTypeDescriptor =
+                    new RepositoryTypeDescriptor( repoType.getComponentContract(), repoType.getComponentName(),
+                                                  repoType.getPathPrefix() );
 
                 repositoryTypeRegistry.registerRepositoryTypeDescriptors( repoTypeDescriptor );
             }

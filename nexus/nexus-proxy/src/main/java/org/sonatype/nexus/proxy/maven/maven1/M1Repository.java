@@ -38,17 +38,20 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * 
  * @author cstamas
  */
-@Component( role = Repository.class, hint = "maven1", instantiationStrategy = "per-lookup", description = "Maven1 Repository" )
+@Component( role = Repository.class, hint = M1Repository.ID, instantiationStrategy = "per-lookup", description = "Maven1 Repository" )
 public class M1Repository
     extends AbstractMavenRepository
 {
+    /** This "mimics" the @Named("maven1") */
+    public static final String ID = Maven1ContentClass.ID;
+
     /**
      * The GAV Calculator.
      */
     @Requirement( hint = "maven1" )
     private GavCalculator gavCalculator;
 
-    @Requirement( hint = "maven1" )
+    @Requirement( hint = Maven1ContentClass.ID )
     private ContentClass contentClass;
 
     @Requirement
@@ -87,7 +90,7 @@ public class M1Repository
     {
         return m1RepositoryConfigurator;
     }
-    
+
     public boolean isMavenMetadataPath( String path )
     {
         return M1ArtifactRecognizer.isMetadata( path );
@@ -185,18 +188,18 @@ public class M1Repository
     {
         return false;
     }
-    
+
     @Override
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )
         throws IllegalRequestException
     {
         // allow updating of metadata
         // we also need to allow updating snapshots
-        if( !M1ArtifactRecognizer.isMetadata( request.getRequestPath() ) && 
-            !M1ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
+        if ( !M1ArtifactRecognizer.isMetadata( request.getRequestPath() )
+            && !M1ArtifactRecognizer.isSnapshot( request.getRequestPath() ) )
         {
             super.enforceWritePolicy( request, action );
         }
-    } 
-    
+    }
+
 }

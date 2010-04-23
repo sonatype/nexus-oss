@@ -57,17 +57,20 @@ import org.sonatype.nexus.util.AlphanumComparator;
  * 
  * @author cstamas
  */
-@Component( role = Repository.class, hint = "maven2", instantiationStrategy = "per-lookup", description = "Maven2 Repository" )
+@Component( role = Repository.class, hint = M2Repository.ID, instantiationStrategy = "per-lookup", description = "Maven2 Repository" )
 public class M2Repository
     extends AbstractMavenRepository
 {
+    /** This "mimics" the @Named("maven2") */
+    public static final String ID = Maven2ContentClass.ID;
+
     /**
      * The GAV Calculator.
      */
     @Requirement( hint = "maven2" )
     private GavCalculator gavCalculator;
 
-    @Requirement( hint = "maven2" )
+    @Requirement( hint = Maven2ContentClass.ID )
     private ContentClass contentClass;
 
     @Requirement
@@ -111,7 +114,7 @@ public class M2Repository
     {
         return M2ArtifactRecognizer.isMetadata( path );
     }
-    
+
     /**
      * Should serve by policies.
      * 

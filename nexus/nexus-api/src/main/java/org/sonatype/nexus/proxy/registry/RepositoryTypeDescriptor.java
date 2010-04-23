@@ -9,20 +9,17 @@ import org.codehaus.plexus.util.StringUtils;
  */
 public class RepositoryTypeDescriptor
 {
-    private String role;
+    private final String role;
+    
+    private final String hint;
 
-    private String prefix;
+    private final String prefix;
 
-    public RepositoryTypeDescriptor()
+    public RepositoryTypeDescriptor( String role, String hint, String prefix )
     {
-        // empty
-    }
-
-    public RepositoryTypeDescriptor( String role, String prefix )
-    {
-        this();
-
         this.role = role;
+        
+        this.hint = hint;
 
         this.prefix = prefix;
     }
@@ -32,19 +29,14 @@ public class RepositoryTypeDescriptor
         return role;
     }
 
-    public void setRole( String role )
+    public String getHint()
     {
-        this.role = role;
+        return hint;
     }
 
     public String getPrefix()
     {
         return prefix;
-    }
-
-    public void setPrefix( String prefix )
-    {
-        this.prefix = prefix;
     }
 
     public boolean equals( Object o )
@@ -61,7 +53,7 @@ public class RepositoryTypeDescriptor
 
         RepositoryTypeDescriptor other = (RepositoryTypeDescriptor) o;
 
-        return StringUtils.equals( getRole(), other.getRole() ) && StringUtils.equals( getPrefix(), other.getPrefix() );
+        return StringUtils.equals( getRole(), other.getRole() ) && StringUtils.equals( getHint(), other.getHint() ) && StringUtils.equals( getPrefix(), other.getPrefix() );
     }
 
     public int hashCode()
@@ -69,6 +61,8 @@ public class RepositoryTypeDescriptor
         int result = 7;
 
         result = 31 * result + ( role == null ? 0 : role.hashCode() );
+
+        result = 31 * result + ( hint == null ? 0 : hint.hashCode() );
 
         result = 31 * result + ( prefix == null ? 0 : prefix.hashCode() );
 

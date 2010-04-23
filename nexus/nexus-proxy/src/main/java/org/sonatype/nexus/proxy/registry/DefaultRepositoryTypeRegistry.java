@@ -16,7 +16,6 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,10 +27,18 @@ import org.codehaus.plexus.component.repository.exception.ComponentLifecycleExce
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
+import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
+import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepository;
+import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.proxy.repository.WebSiteRepository;
+
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
@@ -46,46 +53,69 @@ public class DefaultRepositoryTypeRegistry
 
     private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
 
-    private Set<RepositoryTypeDescriptor> repositoryTypeDescriptors;
+    private Multimap<String, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
 
-    protected Set<RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
+    protected Multimap<String, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
-        if ( repositoryTypeDescriptors == null )
+        if ( repositoryTypeDescriptorsMap == null )
         {
             synchronized ( this )
             {
                 // maybe the previous who was blocking us already did the job
-                if ( repositoryTypeDescriptors == null )
+                if ( repositoryTypeDescriptorsMap == null )
                 {
-                    Set<RepositoryTypeDescriptor> result = new HashSet<RepositoryTypeDescriptor>();
+                    Multimap<String, RepositoryTypeDescriptor> result = Multimaps.newArrayListMultimap();
 
                     // fill in the defaults
-                    result.add( new RepositoryTypeDescriptor( Repository.class.getName(), "repositories" ) );
-                    result.add( new RepositoryTypeDescriptor( ShadowRepository.class.getName(), "shadows" ) );
-                    result.add( new RepositoryTypeDescriptor( GroupRepository.class.getName(), "groups" ) );
-                    result.add( new RepositoryTypeDescriptor( WebSiteRepository.class.getName(), "sites" ) );
+                    String role = null;
 
-                    this.repositoryTypeDescriptors = result;
+                    role = Repository.class.getName();
+
+                    result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories" ) );
+
+                    role = ShadowRepository.class.getName();
+
+                    result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows" ) );
+
+                    role = GroupRepository.class.getName();
+
+                    result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2GroupRepository.ID, "groups" ) );
+
+                    // No implementation exists in core!
+                    // role = WebSiteRepository.class.getName();
+
+                    // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
+
+                    this.repositoryTypeDescriptorsMap = result;
                 }
             }
         }
 
-        return repositoryTypeDescriptors;
+        return repositoryTypeDescriptorsMap;
     }
 
     public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors()
     {
-        return Collections.unmodifiableSet( new HashSet<RepositoryTypeDescriptor>( getRepositoryTypeDescriptors() ) );
+        return Collections.unmodifiableSet( new HashSet<RepositoryTypeDescriptor>(
+            getRepositoryTypeDescriptors().values() ) );
     }
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        return getRepositoryTypeDescriptors().add( d );
+        return getRepositoryTypeDescriptors().put( d.getRole(), d );
     }
 
     public boolean unregisterRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        return getRepositoryTypeDescriptors().remove( d );
+        return getRepositoryTypeDescriptors().remove( d.getRole(), d );
+    }
+
+    public Map<String, ContentClass> getContentClasses()
+    {
+        return Collections.unmodifiableMap( new HashMap<String, ContentClass>( contentClasses ) );
     }
 
     public Set<String> getRepositoryRoles()
@@ -102,26 +132,18 @@ public class DefaultRepositoryTypeRegistry
         return Collections.unmodifiableSet( result );
     }
 
-    public Map<String, ContentClass> getContentClasses()
-    {
-        return Collections.unmodifiableMap( new HashMap<String, ContentClass>( contentClasses ) );
-    }
-
     public Set<String> getExistingRepositoryHints( String role )
     {
-        if ( !getRepositoryRoles().contains( role ) )
+        if ( !getRepositoryTypeDescriptors().containsKey( role ) )
         {
             return Collections.emptySet();
         }
 
-        List<ComponentDescriptor<Repository>> components =
-            container.getComponentDescriptorList( Repository.class, role );
+        HashSet<String> result = new HashSet<String>();
 
-        HashSet<String> result = new HashSet<String>( components.size() );
-
-        for ( ComponentDescriptor<Repository> component : components )
+        for ( RepositoryTypeDescriptor rtd : getRepositoryTypeDescriptors().get( role ) )
         {
-            result.add( component.getRoleHint() );
+            result.add( rtd.getHint() );
         }
 
         return result;
@@ -164,29 +186,6 @@ public class DefaultRepositoryTypeRegistry
                 {
                     getLogger().warn( "Could not release the component! Possible leak here.", e );
                 }
-
-                // ComponentDescriptor<Repository> descriptor =
-                // container.getComponentDescriptor( Repository.class, role, hint );
-                //
-                // String contentClassHint = null;
-                //
-                // for ( ComponentRequirement req : descriptor.getRequirements() )
-                // {
-                // if ( StringUtils.equals( ContentClass.class.getName(), req.getRole() ) )
-                // {
-                // // XXX: shadow has two of these!
-                // contentClassHint = req.getRoleHint();
-                // }
-                // }
-                //
-                // if ( contentClassHint != null )
-                // {
-                // return contentClasses.get( contentClassHint );
-                // }
-                // else
-                // {
-                // return null;
-                // }
             }
             else
             {
@@ -197,6 +196,8 @@ public class DefaultRepositoryTypeRegistry
         return result;
     }
 
+    @Deprecated
+    // still here, maybe we need to return this
     public String getRepositoryDescription( String role, String hint )
     {
         if ( !getRepositoryRoles().contains( role ) )

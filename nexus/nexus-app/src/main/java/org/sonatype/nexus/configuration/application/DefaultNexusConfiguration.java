@@ -208,16 +208,14 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            applicationEventMulticaster
-                .notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(), securitySystem
-                    .getSubject() ) );
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
+                securitySystem.getSubject() ) );
 
             return true;
         }
         else
         {
-            getLogger()
-                .info( vetoFormatter.format( new VetoFormatterRequest( prepare, getLogger().isDebugEnabled() ) ) );
+            getLogger().info( vetoFormatter.format( new VetoFormatterRequest( prepare, getLogger().isDebugEnabled() ) ) );
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationRollbackEvent( this ) );
 
@@ -458,9 +456,7 @@ public class DefaultNexusConfiguration
 
             if ( !repo.getProviderRole().equals( GroupRepository.class.getName() ) )
             {
-                Repository repository =
-                    runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
-                repositoryRegistry.addRepository( repository );
+                instantiateRepository( getConfigurationModel(), repo );
             }
         }
 
@@ -468,9 +464,7 @@ public class DefaultNexusConfiguration
         {
             if ( repo.getProviderRole().equals( GroupRepository.class.getName() ) )
             {
-                Repository repository =
-                    runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), repo );
-                repositoryRegistry.addRepository( repository );
+                instantiateRepository( getConfigurationModel(), repo );
             }
         }
     }
@@ -488,6 +482,19 @@ public class DefaultNexusConfiguration
                 // will not happen
             }
         }
+    }
+
+    protected Repository instantiateRepository( Configuration configuration, CRepository repositoryModel )
+        throws ConfigurationException
+    {
+        // create it, will do runtime validation
+        Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryModel );
+
+        // register with repoRegistry
+        repositoryRegistry.addRepository( repository );
+
+        // give it back
+        return repository;
     }
 
     // ------------------------------------------------------------------
@@ -547,14 +554,10 @@ public class DefaultNexusConfiguration
         validateRepository( settings, true );
 
         // create it, will do runtime validation
-        Repository repository =
-            runtimeConfigurationBuilder.createRepositoryFromModel( getConfigurationModel(), settings );
+        Repository repository = instantiateRepository( getConfigurationModel(), settings );
 
         // now add it to config, since it is validated and succesfully created
         getConfigurationModel().addRepository( settings );
-
-        // register with repoRegistry
-        repositoryRegistry.addRepository( repository );
 
         // save
         saveConfiguration();

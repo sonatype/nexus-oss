@@ -17,7 +17,6 @@
         <exclude>org.codehaus.plexus:plexus-container-default</exclude>
         <exclude>org.sonatype.appbooter.plexus-booters:plexus-jsw-app-booter</exclude>
         <exclude>com.google.code.atinject:atinject</exclude>
-        <exclude>com.google.code.google-collections:google-collect</exclude>
         <exclude>org.sonatype.nexus:nexus-plugin-api</exclude>
         <exclude>org.sonatype.nexus:nexus-plugin-manager</exclude>
         <exclude>org.sonatype.reflect:reflect-class-descriptor</exclude>
