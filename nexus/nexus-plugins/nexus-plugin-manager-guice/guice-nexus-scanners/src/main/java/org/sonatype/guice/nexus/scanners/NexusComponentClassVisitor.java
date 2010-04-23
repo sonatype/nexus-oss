@@ -81,6 +81,8 @@ final class NexusComponentClassVisitor
 
     String className;
 
+    String repositoryPathPrefix;
+
     // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
@@ -103,6 +105,7 @@ final class NexusComponentClassVisitor
                        final String superName, final String[] interfaces )
     {
         type = NexusComponentType.UNKNOWN;
+        repositoryPathPrefix = null;
 
         className = name.replace( '/', '.' );
         if ( null != exportedClassNames )
@@ -156,6 +159,19 @@ final class NexusComponentClassVisitor
     {
         super.setImplementation( implementation );
         skipClass = false;
+    }
+
+    @Override
+    public void visitEnd()
+    {
+        super.visitEnd();
+
+        final String role = getRole();
+        if ( null != repositoryPathPrefix && null != role )
+        {
+            // FIXME: repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix ) );
+            repositoryTypes.add( new RepositoryTypeDescriptor( className, repositoryPathPrefix ) );
+        }
     }
 
     // ----------------------------------------------------------------------
@@ -267,7 +283,7 @@ final class NexusComponentClassVisitor
         @Override
         public void visit( final String name, final Object value )
         {
-            repositoryTypes.add( new RepositoryTypeDescriptor( className, (String) value ) );
+            repositoryPathPrefix = (String) value;
         }
     }
 }
