@@ -22,11 +22,9 @@ import java.util.Set;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
@@ -42,9 +40,11 @@ import com.google.common.collect.Multimaps;
 
 @Component( role = RepositoryTypeRegistry.class )
 public class DefaultRepositoryTypeRegistry
-    extends AbstractLogEnabled
     implements RepositoryTypeRegistry
 {
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private PlexusContainer container;
 
@@ -54,6 +54,11 @@ public class DefaultRepositoryTypeRegistry
     private Map<String, ContentClass> repoCachedContentClasses = new HashMap<String, ContentClass>();
 
     private Multimap<String, RepositoryTypeDescriptor> repositoryTypeDescriptorsMap;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     protected Multimap<String, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
@@ -89,6 +94,8 @@ public class DefaultRepositoryTypeRegistry
 
                     // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
 
+                    getLogger().info( "Registered defalut repository types." );
+
                     this.repositoryTypeDescriptorsMap = result;
                 }
             }
@@ -105,11 +112,15 @@ public class DefaultRepositoryTypeRegistry
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
+        getLogger().info( "Registered repository type " + d.toString() );
+
         return getRepositoryTypeDescriptors().put( d.getRole(), d );
     }
 
     public boolean unregisterRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
+        getLogger().info( "Unregistered repository type " + d.toString() );
+
         return getRepositoryTypeDescriptors().remove( d.getRole(), d );
     }
 
@@ -149,6 +160,25 @@ public class DefaultRepositoryTypeRegistry
         return result;
     }
 
+    public RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint )
+    {
+        if ( !getRepositoryTypeDescriptors().containsKey( role ) )
+        {
+            return null;
+        }
+
+        for ( RepositoryTypeDescriptor rtd : getRepositoryTypeDescriptors().get( role ) )
+        {
+            if ( rtd.getHint().equals( hint ) )
+            {
+                return rtd;
+            }
+        }
+
+        return null;
+    }
+
+    // TODO: solve this single place to cease the requirement for PlexusContainer!
     public ContentClass getRepositoryContentClass( String role, String hint )
     {
         if ( !getRepositoryRoles().contains( role ) )
@@ -194,42 +224,5 @@ public class DefaultRepositoryTypeRegistry
         }
 
         return result;
-    }
-
-    @Deprecated
-    // still here, maybe we need to return this
-    public String getRepositoryDescription( String role, String hint )
-    {
-        if ( !getRepositoryRoles().contains( role ) )
-        {
-            return null;
-        }
-
-        if ( container.hasComponent( Repository.class, role, hint ) )
-        {
-            ComponentDescriptor<Repository> component = container.getComponentDescriptor( Repository.class, role, hint );
-
-            if ( component != null ) // but we asked for it with hasComponent()?
-            {
-                if ( !StringUtils.isEmpty( component.getDescription() ) )
-                {
-                    return component.getDescription();
-                }
-                else
-                {
-                    return "";
-                }
-            }
-            else
-            {
-                // component descriptor is null?
-                return null;
-            }
-        }
-        else
-        {
-            // component is not found
-            return null;
-        }
     }
 }

@@ -54,19 +54,28 @@ public interface RepositoryTypeRegistry
     Set<String> getRepositoryRoles();
 
     /**
-     * Returns the available content classes as unmodifiable map.
-     * 
-     * @return
-     */
-    Map<String, ContentClass> getContentClasses();
-
-    /**
      * Returns the set of hints for the given repository role.
      * 
      * @param role
      * @return a set of repository hints or empty set.
      */
     Set<String> getExistingRepositoryHints( String role );
+
+    /**
+     * Returns the type descriptor for the given role+hint combination.
+     * 
+     * @param role
+     * @param hint
+     * @return the type descriptor or null if there is none for this combination of role and hint.
+     */
+    RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint );
+
+    /**
+     * Returns the available content classes as unmodifiable map.
+     * 
+     * @return
+     */
+    Map<String, ContentClass> getContentClasses();
 
     /**
      * Returns the ContentClass for the given Repository component.

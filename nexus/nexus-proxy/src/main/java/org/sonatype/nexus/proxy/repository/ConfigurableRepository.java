@@ -63,6 +63,16 @@ public class ConfigurableRepository
         }
     }
 
+    public String getProviderRole()
+    {
+        return getCurrentConfiguration( false ).getProviderRole();
+    }
+
+    public String getProviderHint()
+    {
+        return getCurrentConfiguration( false ).getProviderHint();
+    }
+    
     public String getId()
     {
         return getCurrentConfiguration( false ).getId();

@@ -62,7 +62,7 @@ public interface NexusConfiguration
      * @param repository
      * @return
      * @throws ConfigurationException
-     * @deprecated Do not use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
+     * @deprecated Do NOT use this method! The MutableConfiguration.createRepository( CRepository settings ) should be
      *             used instead.
      */
     Repository createRepositoryFromModel( CRepository repository )

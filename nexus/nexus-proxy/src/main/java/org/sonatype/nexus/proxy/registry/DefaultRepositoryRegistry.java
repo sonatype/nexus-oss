@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -44,19 +44,29 @@ import org.sonatype.plexus.appevents.EventListener;
  * ProximityEvents: this component just "concentrates" the repositiry events of all known repositories by it. It can be
  * used as single point to access all repository events. TODO this is not a good place to keep group repository
  * management code
- *
+ * 
  * @author cstamas
  */
 @Component( role = RepositoryRegistry.class )
 public class DefaultRepositoryRegistry
-    extends AbstractLogEnabled
     implements RepositoryRegistry, Disposable
 {
     @Requirement
+    private Logger logger;
+
+    @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     /** The repo register, [Repository.getId, Repository] */
     private Map<String, Repository> repositories = new HashMap<String, Repository>();
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     /** The repo status checkrs */
     private Map<String, RepositoryStatusCheckerThread> repositoryStatusCheckers =
@@ -64,12 +74,16 @@ public class DefaultRepositoryRegistry
 
     public void addRepository( Repository repository )
     {
-        insertRepository( repository );
+        RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repository.getProviderRole(),
+                repository.getProviderHint() );
+
+        insertRepository( rtd, repository );
 
         getLogger().info(
-                          "Added repository ID='" + repository.getId() + "' (contentClass='"
-                              + repository.getRepositoryContentClass().getId() + "', mainFacet='"
-                              + repository.getRepositoryKind().getMainFacet().getName() + "')" );
+            "Added repository ID='" + repository.getId() + "' (contentClass='"
+                + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
     public void removeRepository( String repoId )
@@ -77,12 +91,16 @@ public class DefaultRepositoryRegistry
     {
         Repository repository = getRepository( repoId );
 
-        deleteRepository( repository, false );
+        RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repository.getProviderRole(),
+                repository.getProviderHint() );
+
+        deleteRepository( rtd, repository, false );
 
         getLogger().info(
-                          "Removed repository ID='" + repository.getId() + "' (contentClass='"
-                              + repository.getRepositoryContentClass().getId() + "', mainFacet='"
-                              + repository.getRepositoryKind().getMainFacet().getName() + "')" );
+            "Removed repository ID='" + repository.getId() + "' (contentClass='"
+                + repository.getRepositoryContentClass().getId() + "', mainFacet='"
+                + repository.getRepositoryKind().getMainFacet().getName() + "')" );
     }
 
     public void removeRepositorySilently( String repoId )
@@ -90,7 +108,11 @@ public class DefaultRepositoryRegistry
     {
         Repository repository = getRepository( repoId );
 
-        deleteRepository( repository, true );
+        RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repository.getProviderRole(),
+                repository.getProviderHint() );
+
+        deleteRepository( rtd, repository, true );
     }
 
     public List<Repository> getRepositories()
@@ -150,23 +172,18 @@ public class DefaultRepositoryRegistry
     {
         ArrayList<String> result = new ArrayList<String>();
 
-        for ( Repository repository : getRepositories() )
+        try
         {
-            if ( !repository.getId().equals( repositoryId )
-                && repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            Repository repository = getRepository( repositoryId );
+
+            for ( GroupRepository group : getGroupsOfRepository( repository ) )
             {
-                GroupRepository group = repository.adaptToFacet( GroupRepository.class );
-
-                for ( Repository member : group.getMemberRepositories() )
-                {
-                    if ( repositoryId.equals( member.getId() ) )
-                    {
-                        result.add( group.getId() );
-
-                        break;
-                    }
-                }
+                result.add( group.getId() );
             }
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // ignore, just return empty collection
         }
 
         return result;
@@ -201,7 +218,7 @@ public class DefaultRepositoryRegistry
     // priv
     //
 
-    private void insertRepository( Repository repository )
+    private void insertRepository( RepositoryTypeDescriptor rtd, Repository repository )
     {
         repositories.put( repository.getId(), repository );
 
@@ -223,10 +240,12 @@ public class DefaultRepositoryRegistry
             thread.start();
         }
 
+        rtd.instanceRegistered( this );
+
         applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventAdd( this, repository ) );
     }
 
-    private void deleteRepository( Repository repository, boolean silently )
+    private void deleteRepository( RepositoryTypeDescriptor rtd, Repository repository, boolean silently )
     {
         if ( !silently )
         {
@@ -236,8 +255,10 @@ public class DefaultRepositoryRegistry
         // dump the event listeners, as once deleted doesn't care about config changes any longer
         if ( repository instanceof EventListener )
         {
-            applicationEventMulticaster.removeEventListener( ( EventListener ) repository );
+            applicationEventMulticaster.removeEventListener( (EventListener) repository );
         }
+
+        rtd.instanceUnregistered( this );
 
         repositories.remove( repository.getId() );
 

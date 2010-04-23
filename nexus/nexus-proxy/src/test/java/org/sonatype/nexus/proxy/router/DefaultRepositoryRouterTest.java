@@ -262,6 +262,8 @@ public class DefaultRepositoryRouterTest
         repoConfig.setId( repoId );
         repoConfig.setExposed( exposed );
         repoConfig.setIndexable( false );
+        repoConfig.setProviderRole( Repository.class.getName() );
+        repoConfig.setProviderHint( "maven1" );
         repo.configure( repoConfig );
         this.repositoryRegistry.addRepository( repo );
         this.applicationConfiguration.getConfigurationModel().addRepository( repoConfig );

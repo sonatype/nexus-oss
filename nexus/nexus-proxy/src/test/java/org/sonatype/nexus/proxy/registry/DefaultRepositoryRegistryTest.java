@@ -67,6 +67,13 @@ public class DefaultRepositoryRegistryTest
         EasyMock.makeThreadSafe( repoC, true );
 
         // id will be called twice
+        expect( repoA.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoB.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoC.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoA.getProviderHint() ).andReturn( "maven2" ).anyTimes();
+        expect( repoB.getProviderHint() ).andReturn( "maven2" ).anyTimes();
+        expect( repoC.getProviderHint() ).andReturn( "maven2" ).anyTimes();
+        
         expect( repoA.getId() ).andReturn( "A" ).anyTimes();
         expect( repoB.getId() ).andReturn( "B" ).anyTimes();
         expect( repoC.getId() ).andReturn( "C" ).anyTimes();
@@ -75,12 +82,9 @@ public class DefaultRepositoryRegistryTest
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoC.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
 
-        expect( repoA.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoB.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
-        expect( repoC.getRepositoryKind() )
-            .andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoA.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoB.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
+        expect( repoC.getRepositoryKind() ).andReturn( new DefaultRepositoryKind( HostedRepository.class, null ) ).anyTimes();
 
         expect( repoA.adaptToFacet( HostedRepository.class ) ).andReturn( repoA ).anyTimes();
         expect( repoB.adaptToFacet( HostedRepository.class ) ).andReturn( repoB ).anyTimes();
@@ -118,8 +122,8 @@ public class DefaultRepositoryRegistryTest
 
         repositoryRegistry.addRepository( groupRepository );
 
-        List<Repository> repoMembers = repositoryRegistry
-            .getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
+        List<Repository> repoMembers =
+            repositoryRegistry.getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
 
         assertEquals( 3, repoMembers.size() );
 
@@ -142,8 +146,8 @@ public class DefaultRepositoryRegistryTest
 
         try
         {
-            repoMembers = repositoryRegistry
-                .getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
+            repoMembers =
+                repositoryRegistry.getRepositoryWithFacet( "ALL", GroupRepository.class ).getMemberRepositories();
 
             assertEquals( 0, repoMembers.size() );
         }

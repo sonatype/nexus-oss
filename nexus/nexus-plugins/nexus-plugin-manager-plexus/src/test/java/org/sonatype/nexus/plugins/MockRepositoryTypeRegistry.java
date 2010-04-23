@@ -63,4 +63,10 @@ public class MockRepositoryTypeRegistry
         return null;
     }
 
+    public RepositoryTypeDescriptor getRepositoryTypeDescriptor( String role, String hint )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

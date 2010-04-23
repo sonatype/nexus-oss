@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -51,6 +52,8 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -103,6 +106,9 @@ public class DefaultNexusConfiguration
     private ApplicationRuntimeConfigurationBuilder runtimeConfigurationBuilder;
 
     @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
+
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement( role = ScheduledTaskDescriptor.class )
@@ -128,6 +134,12 @@ public class DefaultNexusConfiguration
 
     /** Names of the conf files */
     private Map<String, String> configurationFiles;
+
+    /** The default maxInstance count */
+    private int defaultRepositoryMaxInstanceCountLimit = Integer.MAX_VALUE;
+
+    /** The map with per-repotype limitations */
+    private Map<RepositoryTypeDescriptor, Integer> repositoryMaxInstanceCountLimits;
 
     // ==
 
@@ -487,6 +499,8 @@ public class DefaultNexusConfiguration
     protected Repository instantiateRepository( Configuration configuration, CRepository repositoryModel )
         throws ConfigurationException
     {
+        checkRepositoryMaxInstanceCountForCreation( repositoryModel );
+
         // create it, will do runtime validation
         Repository repository = runtimeConfigurationBuilder.createRepositoryFromModel( configuration, repositoryModel );
 
@@ -524,6 +538,88 @@ public class DefaultNexusConfiguration
             {
                 context.getExistingRepositoryIds().add( repo.getId() );
             }
+        }
+    }
+
+    // ----------------------------------------------------------------------------------------------------------
+    // Repositories
+    // ----------------------------------------------------------------------------------------------------------
+
+    protected Map<RepositoryTypeDescriptor, Integer> getRepositoryMaxInstanceCountLimits()
+    {
+        if ( repositoryMaxInstanceCountLimits == null )
+        {
+            repositoryMaxInstanceCountLimits = new ConcurrentHashMap<RepositoryTypeDescriptor, Integer>();
+        }
+
+        return repositoryMaxInstanceCountLimits;
+    }
+
+    public void setDefaultRepositoryMaxInstanceCount( int count )
+    {
+        if ( count < 0 )
+        {
+            getLogger().info( "Default repository maximal instance limit set to UNLIMITED." );
+
+            this.defaultRepositoryMaxInstanceCountLimit = Integer.MAX_VALUE;
+        }
+        else
+        {
+            getLogger().info( "Default repository maximal instance limit set to " + count + "." );
+
+            this.defaultRepositoryMaxInstanceCountLimit = count;
+        }
+    }
+
+    public void setRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd, int count )
+    {
+        if ( count < 0 )
+        {
+            getLogger().info( "Repository type " + rtd.toString() + " maximal instance limit set to UNLIMITED." );
+
+            getRepositoryMaxInstanceCountLimits().remove( rtd );
+        }
+        else
+        {
+            getLogger().info( "Repository type " + rtd.toString() + " maximal instance limit set to " + count + "." );
+
+            getRepositoryMaxInstanceCountLimits().put( rtd, count );
+        }
+    }
+
+    public int getRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd )
+    {
+        Integer limit = getRepositoryMaxInstanceCountLimits().get( rtd );
+
+        if ( null != limit )
+        {
+            return limit;
+        }
+        else
+        {
+            return defaultRepositoryMaxInstanceCountLimit;
+        }
+    }
+
+    protected void checkRepositoryMaxInstanceCountForCreation( CRepository repositoryModel )
+        throws ConfigurationException
+    {
+        RepositoryTypeDescriptor rtd =
+            repositoryTypeRegistry.getRepositoryTypeDescriptor( repositoryModel.getProviderRole(),
+                repositoryModel.getProviderHint() );
+
+        int maxCount = getRepositoryMaxInstanceCount( rtd );
+
+        if ( rtd.getInstanceCount() >= maxCount )
+        {
+            String msg =
+                "Repository \"" + repositoryModel.getName() + "\" (id=" + repositoryModel.getId()
+                    + ") cannot be created. It's repository type " + rtd.toString() + " is limited to " + maxCount
+                    + " instances, and it already has " + String.valueOf( rtd.getInstanceCount() ) + " of them.";
+            
+            getLogger().warn( msg );
+
+            throw new ConfigurationException( msg );
         }
     }
 

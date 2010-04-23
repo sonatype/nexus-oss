@@ -47,6 +47,22 @@ public interface Repository
     extends ResourceStore, Configurable
 {
     /**
+     * Returns the repository's "provider" role. These are getters only, and application is NOT able to change these
+     * values runtime!
+     * 
+     * @return
+     */
+    String getProviderRole();
+
+    /**
+     * Returns the repository's "provider" hint. These are getters only, and application is NOT able to change these
+     * values runtime!
+     * 
+     * @return
+     */
+    String getProviderHint();
+
+    /**
      * Returns the ID of the resourceStore.
      * 
      * @return the id
@@ -196,7 +212,7 @@ public interface Repository
      */
     void maintainNotFoundCache( ResourceStoreRequest request )
         throws ItemNotFoundException;
-    
+
     /**
      * Adds path to NFC.
      * 
@@ -214,6 +230,7 @@ public interface Repository
      */
     @Deprecated
     void removeFromNotFoundCache( String path );
+
     /**
      * Adds path to NFC.
      * 
@@ -465,7 +482,7 @@ public interface Repository
 
     // Alternative content access
     // These will stay!
-    
+
     void storeItem( boolean fromTask, StorageItem item )
         throws UnsupportedStorageOperationException, IllegalOperationException, StorageException;
 

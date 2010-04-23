@@ -81,31 +81,43 @@ public class PathBasedRequestRepositoryMapperTest
         repoA = createMock( Repository.class );
         makeThreadSafe( repoA, true );
         expect( repoA.getId() ).andReturn( "repoA" ).anyTimes();
+        expect( repoA.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoA.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoA.isUserManaged() ).andReturn( true ).anyTimes();
 
         repoB = createMock( Repository.class );
         makeThreadSafe( repoB, true );
         expect( repoB.getId() ).andReturn( "repoB" ).anyTimes();
+        expect( repoB.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoB.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoB.isUserManaged() ).andReturn( true ).anyTimes();
 
         repoC = createMock( Repository.class );
         makeThreadSafe( repoC, true );
         expect( repoC.getId() ).andReturn( "repoC" ).anyTimes();
+        expect( repoC.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoC.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoC.isUserManaged() ).andReturn( true ).anyTimes();
 
         repoD = createMock( Repository.class );
         makeThreadSafe( repoD, true );
         expect( repoD.getId() ).andReturn( "repoD" ).anyTimes();
+        expect( repoD.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoD.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoD.isUserManaged() ).andReturn( true ).anyTimes();
 
         repoE = createMock( Repository.class );
         makeThreadSafe( repoE, true );
         expect( repoE.getId() ).andReturn( "repoE" ).anyTimes();
+        expect( repoE.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoE.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoE.isUserManaged() ).andReturn( true ).anyTimes();
 
         repoF = createMock( Repository.class );
         makeThreadSafe( repoF, true );
         expect( repoF.getId() ).andReturn( "repoF" ).anyTimes();
+        expect( repoF.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
+        expect( repoF.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();

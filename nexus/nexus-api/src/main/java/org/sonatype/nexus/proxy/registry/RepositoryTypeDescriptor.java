@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.registry;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.codehaus.plexus.util.StringUtils;
 
 /**
@@ -10,15 +12,17 @@ import org.codehaus.plexus.util.StringUtils;
 public class RepositoryTypeDescriptor
 {
     private final String role;
-    
+
     private final String hint;
 
     private final String prefix;
 
+    private AtomicInteger instanceCount = new AtomicInteger( 0 );
+
     public RepositoryTypeDescriptor( String role, String hint, String prefix )
     {
         this.role = role;
-        
+
         this.hint = hint;
 
         this.prefix = prefix;
@@ -39,6 +43,21 @@ public class RepositoryTypeDescriptor
         return prefix;
     }
 
+    public int getInstanceCount()
+    {
+        return instanceCount.get();
+    }
+
+    public int instanceRegistered( RepositoryRegistry registry )
+    {
+        return instanceCount.incrementAndGet();
+    }
+
+    public int instanceUnregistered( RepositoryRegistry registry )
+    {
+        return instanceCount.decrementAndGet();
+    }
+
     public boolean equals( Object o )
     {
         if ( this == o )
@@ -53,7 +72,8 @@ public class RepositoryTypeDescriptor
 
         RepositoryTypeDescriptor other = (RepositoryTypeDescriptor) o;
 
-        return StringUtils.equals( getRole(), other.getRole() ) && StringUtils.equals( getHint(), other.getHint() ) && StringUtils.equals( getPrefix(), other.getPrefix() );
+        return StringUtils.equals( getRole(), other.getRole() ) && StringUtils.equals( getHint(), other.getHint() )
+            && StringUtils.equals( getPrefix(), other.getPrefix() );
     }
 
     public int hashCode()
@@ -67,5 +87,10 @@ public class RepositoryTypeDescriptor
         result = 31 * result + ( prefix == null ? 0 : prefix.hashCode() );
 
         return result;
+    }
+
+    public String toString()
+    {
+        return "RepositoryType=(" + getRole() + ":" + getHint() + ")";
     }
 }

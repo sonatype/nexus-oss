@@ -22,13 +22,14 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.nexus.configuration.model.CRemoteNexusInstance;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
 
 public interface MutableConfiguration
 {
     // ----------------------------------------------------------------------------------------------------------
-    // Repositories
+    // Security (TODO: this should be removed, security has to be completely "paralell" and not interleaved!)
     // ----------------------------------------------------------------------------------------------------------
 
     boolean isSecurityEnabled();
@@ -64,11 +65,60 @@ public interface MutableConfiguration
 
     ScheduledTaskDescriptor getScheduledTaskDescriptor( String id );
 
+    // ----------------------------------------------------------------------------------------------------------
+    // Repositories
+    // ----------------------------------------------------------------------------------------------------------
+
+    /**
+     * Sets the default (applied to all that has no exceptions set with {
+     * {@link #setRepositoryMaxInstanceCount(RepositoryTypeDescriptor, int)} method) maxInstanceCount. Any positive
+     * integer limits the max count of live instances, any less then 0 integer removes the limitation. Note: setting
+     * limitations on already booted instance will not "enforce" the limitation!
+     * 
+     * @param count
+     */
+    void setDefaultRepositoryMaxInstanceCount( int count );
+
+    /**
+     * Limits the maxInstanceCount for the passed in repository type. Any positive integer limits the max count of live
+     * instances, any less then 0 integer removes the limitation. Note: setting limitations on already booted instance
+     * will not "enforce" the limitation!
+     * 
+     * @param rtd
+     * @param count
+     */
+    void setRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd, int count );
+
+    /**
+     * Returns the count limit for the passed in repository type.
+     * 
+     * @param rtd
+     * @return
+     */
+    int getRepositoryMaxInstanceCount( RepositoryTypeDescriptor rtd );
+
     // CRepository: CRUD
 
+    /**
+     * Creates a repository live instance out of the passed in model. It validates, registers it with repository
+     * registry and puts it into configuration. And finally saves configuration.
+     * 
+     * @return the repository instance.
+     * @throws ConfigurationException
+     * @throws IOException
+     */
     Repository createRepository( CRepository settings )
         throws ConfigurationException, IOException;
 
+    /**
+     * Removes repository from configuration, checks it's dependants too (ie shadows), updates groups and path mappings
+     * (Routes on UI) if needed.
+     * 
+     * @param id
+     * @throws NoSuchRepositoryException
+     * @throws IOException
+     * @throws ConfigurationException
+     */
     void deleteRepository( String id )
         throws NoSuchRepositoryException, IOException, ConfigurationException;
 

@@ -9,17 +9,31 @@ public class NexusCompat
 {
     public static CRepository getRepositoryRawConfiguration( Repository repository )
     {
-        return ((CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration()).getConfiguration( false );
-    }
-    
-    public static String getRepositoryProviderRole( Repository repository )
-    {
-        return getRepositoryRawConfiguration( repository ).getProviderRole();
+        return ( (CRepositoryCoreConfiguration) repository.getCurrentCoreConfiguration() ).getConfiguration( false );
     }
 
+    /**
+     * Returns repository's role.
+     * 
+     * @param repository
+     * @return
+     * @deprecated Use repository.getProviderRole() instead!
+     */
+    public static String getRepositoryProviderRole( Repository repository )
+    {
+        return repository.getProviderRole();
+    }
+
+    /**
+     * Returns repository's hint.
+     * 
+     * @param repository
+     * @return
+     * @deprecated Use Repository.getProviderHint() instead!
+     */
     public static String getRepositoryProviderHint( Repository repository )
     {
-        return getRepositoryRawConfiguration( repository ).getProviderHint();
+        return repository.getProviderHint();
     }
 
     public static String getRepositoryPolicy( Repository repository )
