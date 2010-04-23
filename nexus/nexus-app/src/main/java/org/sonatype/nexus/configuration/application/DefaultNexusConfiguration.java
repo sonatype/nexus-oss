@@ -48,6 +48,7 @@ import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationContext;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.VetoFormatter;
 import org.sonatype.nexus.proxy.events.VetoFormatterRequest;
@@ -608,7 +609,16 @@ public class DefaultNexusConfiguration
             repositoryTypeRegistry.getRepositoryTypeDescriptor( repositoryModel.getProviderRole(),
                 repositoryModel.getProviderHint() );
 
-        int maxCount = getRepositoryMaxInstanceCount( rtd );
+        int maxCount;
+
+        if ( rtd.getRepositoryMaxInstanceCount() < 0 )
+        {
+            maxCount = rtd.getRepositoryMaxInstanceCount();
+        }
+        else
+        {
+            maxCount = getRepositoryMaxInstanceCount( rtd );
+        }
 
         if ( rtd.getInstanceCount() >= maxCount )
         {
@@ -616,7 +626,7 @@ public class DefaultNexusConfiguration
                 "Repository \"" + repositoryModel.getName() + "\" (id=" + repositoryModel.getId()
                     + ") cannot be created. It's repository type " + rtd.toString() + " is limited to " + maxCount
                     + " instances, and it already has " + String.valueOf( rtd.getInstanceCount() ) + " of them.";
-            
+
             getLogger().warn( msg );
 
             throw new ConfigurationException( msg );

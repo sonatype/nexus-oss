@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.plugins.RepositoryType;
 import org.sonatype.nexus.proxy.maven.maven1.M1GroupRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1LayoutedM2ShadowRepository;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
@@ -76,25 +77,31 @@ public class DefaultRepositoryTypeRegistry
 
                     role = Repository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories" ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
 
                     role = ShadowRepository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows" ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
 
                     role = GroupRepository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups" ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2GroupRepository.ID, "groups" ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
+                    result.put( role, new RepositoryTypeDescriptor( role, M2GroupRepository.ID, "groups",
+                        RepositoryType.UNLIMITED_INSTANCES ) );
 
                     // No implementation exists in core!
                     // role = WebSiteRepository.class.getName();
 
                     // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
 
-                    getLogger().info( "Registered defalut repository types." );
+                    getLogger().info( "Registered default repository types." );
 
                     this.repositoryTypeDescriptorsMap = result;
                 }
@@ -112,7 +119,16 @@ public class DefaultRepositoryTypeRegistry
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        getLogger().info( "Registered repository type " + d.toString() );
+        if ( d.getRepositoryMaxInstanceCount() < 0 )
+        {
+            getLogger().info( "Registered Repository type " + d.toString() + "." );
+        }
+        else
+        {
+            getLogger().info(
+                "Registered Repository type " + d.toString() + " with maximal instance limit set to "
+                    + d.getRepositoryMaxInstanceCount() + "." );
+        }
 
         return getRepositoryTypeDescriptors().put( d.getRole(), d );
     }

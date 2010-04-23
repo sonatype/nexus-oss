@@ -12,12 +12,18 @@ public class PluginRepositoryType
     private String componentName;
 
     private String pathPrefix;
+    
+    private int repositoryMaxInstanceCount;
 
-    public PluginRepositoryType( String componentContract, String componentName, String pathPrefix )
+    public PluginRepositoryType( String componentContract, String componentName, String pathPrefix, int repositoryMaxInstanceCount )
     {
         this.componentContract = componentContract;
+        
+        this.componentName = componentName;
 
         this.pathPrefix = pathPrefix;
+        
+        this.repositoryMaxInstanceCount = repositoryMaxInstanceCount;
     }
 
     public String getComponentContract()
@@ -48,5 +54,15 @@ public class PluginRepositoryType
     public void setPathPrefix( String pathPrefix )
     {
         this.pathPrefix = pathPrefix;
+    }
+
+    public int getRepositoryMaxInstanceCount()
+    {
+        return repositoryMaxInstanceCount;
+    }
+
+    public void setRepositoryMaxInstanceCount( int repositoryMaxInstanceCount )
+    {
+        this.repositoryMaxInstanceCount = repositoryMaxInstanceCount;
     }
 }

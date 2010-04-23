@@ -17,15 +17,19 @@ public class RepositoryTypeDescriptor
 
     private final String prefix;
 
+    private final int repositoryMaxInstanceCount;
+
     private AtomicInteger instanceCount = new AtomicInteger( 0 );
 
-    public RepositoryTypeDescriptor( String role, String hint, String prefix )
+    public RepositoryTypeDescriptor( String role, String hint, String prefix, int repositoryMaxInstanceCount )
     {
         this.role = role;
 
         this.hint = hint;
 
         this.prefix = prefix;
+
+        this.repositoryMaxInstanceCount = repositoryMaxInstanceCount;
     }
 
     public String getRole()
@@ -41,6 +45,11 @@ public class RepositoryTypeDescriptor
     public String getPrefix()
     {
         return prefix;
+    }
+
+    public int getRepositoryMaxInstanceCount()
+    {
+        return repositoryMaxInstanceCount;
     }
 
     public int getInstanceCount()

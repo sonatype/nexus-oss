@@ -247,7 +247,7 @@ public class DefaultNexusPluginManager
                 {
                     RepositoryTypeDescriptor repoTypeDescriptor =
                         new RepositoryTypeDescriptor( repoType.getComponentContract(), repoType.getComponentName(),
-                                                      repoType.getPathPrefix() );
+                            repoType.getPathPrefix(), repoType.getRepositoryMaxInstanceCount() );
 
                     repositoryTypeRegistry.unregisterRepositoryTypeDescriptors( repoTypeDescriptor );
                 }
@@ -400,8 +400,7 @@ public class DefaultNexusPluginManager
             }
             catch ( NoSuchPluginRepositoryArtifactException e )
             {
-                result
-                    .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
+                result.setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
 
@@ -425,8 +424,7 @@ public class DefaultNexusPluginManager
             }
             catch ( NoSuchPluginRepositoryArtifactException e )
             {
-                result
-                    .setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
+                result.setThrowable( new DependencyNotFoundException( pluginArtifact.getCoordinate(), e.getCoordinate() ) );
 
                 response.addPluginResponse( result );
 
@@ -478,13 +476,13 @@ public class DefaultNexusPluginManager
         // notifications
         if ( result.isSuccessful() )
         {
-            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this, discoveryContext
-                .getPluginDescriptor() ) );
+            applicationEventMulticaster.notifyEventListeners( new PluginActivatedEvent( this,
+                discoveryContext.getPluginDescriptor() ) );
         }
         else
         {
-            applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginCoordinates, result
-                .getThrowable() ) );
+            applicationEventMulticaster.notifyEventListeners( new PluginRejectedEvent( this, pluginCoordinates,
+                result.getThrowable() ) );
         }
 
         response.addPluginResponse( result );
@@ -527,7 +525,7 @@ public class DefaultNexusPluginManager
             {
                 GAVCoordinate dependencyCoordinates =
                     new GAVCoordinate( dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(),
-                                       dependency.getClassifier(), dependency.getType() );
+                        dependency.getClassifier(), dependency.getType() );
 
                 PluginRepositoryArtifact dependencyArtifact =
                     pluginRepositoryManager.resolveDependencyArtifact( pluginArtifact, dependencyCoordinates );
@@ -684,8 +682,8 @@ public class DefaultNexusPluginManager
             if ( resourceName.startsWith( "static/" ) )
             {
                 PluginStaticResourceModel model =
-                    new PluginStaticResourceModel( resourceName, "/" + resourceName, mimeUtil
-                        .getMimeType( resourceName ) );
+                    new PluginStaticResourceModel( resourceName, "/" + resourceName,
+                        mimeUtil.getMimeType( resourceName ) );
 
                 result.add( model );
             }
@@ -704,8 +702,8 @@ public class DefaultNexusPluginManager
             if ( resourceName.startsWith( "documentation/" ) )
             {
                 PluginStaticResourceModel model =
-                    new PluginStaticResourceModel( resourceName, "/" + resourceName, mimeUtil
-                        .getMimeType( resourceName ) );
+                    new PluginStaticResourceModel( resourceName, "/" + resourceName,
+                        mimeUtil.getMimeType( resourceName ) );
 
                 result.add( model );
             }
@@ -725,12 +723,10 @@ public class DefaultNexusPluginManager
         {
             List<ComponentDescriptor<?>> discoveredComponentDescriptors = new ArrayList<ComponentDescriptor<?>>();
 
-            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext
-                .getPluginDescriptor().getPluginRealm() ) );
+            discoveredComponentDescriptors.addAll( plexusContainer.discoverComponents( pluginDiscoveryContext.getPluginDescriptor().getPluginRealm() ) );
 
             // collecting
-            for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor()
-                .getComponents() )
+            for ( ComponentDescriptor<?> componentDescriptor : pluginDiscoveryContext.getPluginDescriptor().getComponents() )
             {
                 discoveredComponentDescriptors.add( componentDescriptor );
             }
@@ -838,8 +834,9 @@ public class DefaultNexusPluginManager
                             (RepositoryType) response.getMarkerAnnotations().get( RepositoryType.class );
 
                         PluginRepositoryType pluginRepositoryType =
-                            new PluginRepositoryType( response.getComponentDescriptor().getRole(), response
-                                .getComponentDescriptor().getRoleHint(), repositoryTypeAnno.pathPrefix() );
+                            new PluginRepositoryType( response.getComponentDescriptor().getRole(),
+                                response.getComponentDescriptor().getRoleHint(), repositoryTypeAnno.pathPrefix(),
+                                repositoryTypeAnno.repositoryMaxInstanceCount() );
 
                         pd.getPluginRepositoryTypes().put( pluginRepositoryType.getComponentContract(),
                             pluginRepositoryType );
@@ -894,8 +891,8 @@ public class DefaultNexusPluginManager
                 }
                 catch ( CycleDetectedInComponentGraphException e )
                 {
-                    throw new InvalidPluginException( pluginDiscoveryContext.getPluginDescriptor()
-                        .getPluginCoordinates(), e );
+                    throw new InvalidPluginException(
+                        pluginDiscoveryContext.getPluginDescriptor().getPluginCoordinates(), e );
                 }
             }
 
@@ -904,7 +901,7 @@ public class DefaultNexusPluginManager
             {
                 RepositoryTypeDescriptor repoTypeDescriptor =
                     new RepositoryTypeDescriptor( repoType.getComponentContract(), repoType.getComponentName(),
-                                                  repoType.getPathPrefix() );
+                        repoType.getPathPrefix(), repoType.getRepositoryMaxInstanceCount() );
 
                 repositoryTypeRegistry.registerRepositoryTypeDescriptors( repoTypeDescriptor );
             }

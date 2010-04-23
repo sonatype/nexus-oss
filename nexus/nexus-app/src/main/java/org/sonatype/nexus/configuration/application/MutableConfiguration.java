@@ -68,7 +68,7 @@ public interface MutableConfiguration
     // ----------------------------------------------------------------------------------------------------------
     // Repositories
     // ----------------------------------------------------------------------------------------------------------
-
+    
     /**
      * Sets the default (applied to all that has no exceptions set with {
      * {@link #setRepositoryMaxInstanceCount(RepositoryTypeDescriptor, int)} method) maxInstanceCount. Any positive

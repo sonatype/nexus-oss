@@ -83,6 +83,8 @@ final class NexusComponentClassVisitor
 
     String repositoryPathPrefix;
 
+    int repositoryMaxInstanceCount;
+
     // ----------------------------------------------------------------------
     // Constructors
     // ----------------------------------------------------------------------
@@ -169,7 +171,8 @@ final class NexusComponentClassVisitor
         final String role = getRole();
         if ( null != repositoryPathPrefix && null != role )
         {
-            repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix ) );
+            repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix,
+                repositoryMaxInstanceCount ) );
         }
     }
 
@@ -282,7 +285,14 @@ final class NexusComponentClassVisitor
         @Override
         public void visit( final String name, final Object value )
         {
-            repositoryPathPrefix = (String) value;
+            if ( "pathPrefix".equals( name ) )
+            {
+                repositoryPathPrefix = (String) value;
+            }
+            else if ( "repositoryMaxInstanceCount".equals( name ) )
+            {
+                repositoryMaxInstanceCount = (Integer) value;
+            }
         }
     }
 }
