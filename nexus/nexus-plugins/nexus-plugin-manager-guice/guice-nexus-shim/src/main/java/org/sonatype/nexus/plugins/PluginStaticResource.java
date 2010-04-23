@@ -85,26 +85,21 @@ public final class PluginStaticResource
     {
         try
         {
-            URLConnection urlConn = resourceURL.openConnection();
-            if (! (urlConn instanceof JarURLConnection))
+            final URLConnection urlConn = resourceURL.openConnection();
+            if ( urlConn instanceof JarURLConnection )
             {
-                return urlConn.getLastModified();
-            }
-            
-            JarURLConnection jarUrlConn = (JarURLConnection) urlConn;
-            JarEntry jarEntry = jarUrlConn.getJarEntry();
-            if (jarEntry == null)
-            {
+                final JarEntry jarEntry = ( (JarURLConnection) urlConn ).getJarEntry();
+                if ( jarEntry != null )
+                {
+                    return Long.valueOf( jarEntry.getTime() );
+                }
                 // This is a jar, not an entry in a jar
-                return urlConn.getLastModified();
             }
-            
-            return jarEntry.getTime();
+            return Long.valueOf( urlConn.getLastModified() );
         }
         catch ( final Throwable e ) // NOPMD
         {
-            // default to unknown last modified time
-            return null;
+            return null; // default to unknown last modified time
         }
     }
 }
