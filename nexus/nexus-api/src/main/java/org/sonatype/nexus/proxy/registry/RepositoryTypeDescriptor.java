@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.registry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.plugins.RepositoryType;
 
 /**
  * A simple descriptor for all roles implementing a Nexus Repository.
@@ -20,6 +21,11 @@ public class RepositoryTypeDescriptor
     private final int repositoryMaxInstanceCount;
 
     private AtomicInteger instanceCount = new AtomicInteger( 0 );
+
+    public RepositoryTypeDescriptor( String role, String hint, String prefix )
+    {
+        this( role, hint, prefix, RepositoryType.UNLIMITED_INSTANCES );
+    }
 
     public RepositoryTypeDescriptor( String role, String hint, String prefix, int repositoryMaxInstanceCount )
     {
