@@ -612,6 +612,9 @@ public class DefaultNexus
 
         getLogger().info( sysInfoLog.toString() );
 
+        // EventInspectorHost
+        applicationEventMulticaster.addEventListener( eventInspectorHost );
+
         // load locally present plugins
         getLogger().info( "Activating locally installed plugins..." );
 
@@ -628,9 +631,6 @@ public class DefaultNexus
                 getLogger().warn( response.formatAsString( getLogger().isDebugEnabled() ) );
             }
         }
-
-        // EventInspectorHost
-        applicationEventMulticaster.addEventListener( eventInspectorHost );
 
         applicationStatusSource.setState( SystemState.STOPPED );
 

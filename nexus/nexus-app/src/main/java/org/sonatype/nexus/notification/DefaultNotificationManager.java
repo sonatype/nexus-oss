@@ -29,7 +29,7 @@ public class DefaultNotificationManager
 
     @Requirement( role = Carrier.class )
     private Map<String, Carrier> carriers;
-
+    
     // ==
 
     protected Logger getLogger()
@@ -92,7 +92,11 @@ public class DefaultNotificationManager
     // ==
     public boolean isEnabled()
     {
-        return getCurrentConfiguration( false ).isEnabled();
+        // TODO: this is needed, since events are happening even before configuration is loaded
+        // And the NotificationEventInspector will start relaying even before we know our config!
+        // This is actually chicken-egg problem: the EventInspector Hosts are wired in before we 
+        // load Nexus config.
+        return isConfigured() && getCurrentConfiguration( false ).isEnabled();
     }
 
     public void setEnabled( boolean val )

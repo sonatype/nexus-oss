@@ -24,6 +24,11 @@ public abstract class AbstractConfigurable
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
+    protected boolean isConfigured()
+    {
+        return coreConfiguration != null;
+    }
+
     public void initialize()
         throws InitializationException
     {
