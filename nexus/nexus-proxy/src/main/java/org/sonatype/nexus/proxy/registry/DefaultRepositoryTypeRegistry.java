@@ -63,52 +63,48 @@ public class DefaultRepositoryTypeRegistry
 
     protected Multimap<String, RepositoryTypeDescriptor> getRepositoryTypeDescriptors()
     {
-        if ( repositoryTypeDescriptorsMap == null )
+        synchronized ( this )
         {
-            synchronized ( this )
+            // maybe the previous who was blocking us already did the job
+            if ( repositoryTypeDescriptorsMap == null )
             {
-                // maybe the previous who was blocking us already did the job
-                if ( repositoryTypeDescriptorsMap == null )
-                {
-                    Multimap<String, RepositoryTypeDescriptor> result = Multimaps.newArrayListMultimap();
+                Multimap<String, RepositoryTypeDescriptor> result = Multimaps.newArrayListMultimap();
 
-                    // fill in the defaults
-                    String role = null;
+                // fill in the defaults
+                String role = null;
 
-                    role = Repository.class.getName();
+                role = Repository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M1Repository.ID, "repositories",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M2Repository.ID, "repositories",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
 
-                    role = ShadowRepository.class.getName();
+                role = ShadowRepository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M1LayoutedM2ShadowRepository.ID, "shadows",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M2LayoutedM1ShadowRepository.ID, "shadows",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
 
-                    role = GroupRepository.class.getName();
+                role = GroupRepository.class.getName();
 
-                    result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
-                    result.put( role, new RepositoryTypeDescriptor( role, M2GroupRepository.ID, "groups",
-                        RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M1GroupRepository.ID, "groups",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
+                result.put( role, new RepositoryTypeDescriptor( role, M2GroupRepository.ID, "groups",
+                    RepositoryType.UNLIMITED_INSTANCES ) );
 
-                    // No implementation exists in core!
-                    // role = WebSiteRepository.class.getName();
+                // No implementation exists in core!
+                // role = WebSiteRepository.class.getName();
 
-                    // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
+                // result.put( role, new RepositoryTypeDescriptor( role, XXX, "sites" ) );
 
-                    getLogger().info( "Registered default repository types." );
+                getLogger().info( "Registered default repository types." );
 
-                    this.repositoryTypeDescriptorsMap = result;
-                }
+                this.repositoryTypeDescriptorsMap = result;
             }
+            return repositoryTypeDescriptorsMap;
         }
-
-        return repositoryTypeDescriptorsMap;
     }
 
     public Set<RepositoryTypeDescriptor> getRegisteredRepositoryTypeDescriptors()
