@@ -1,6 +1,12 @@
 package com.sonatype.nexus.proxy.maven.site;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeDescriptor;
+import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.WebSiteRepository;
 import org.sonatype.nexus.templates.TemplateProvider;
 import org.sonatype.nexus.templates.TemplateSet;
 import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvider;
@@ -8,10 +14,14 @@ import org.sonatype.nexus.templates.repository.AbstractRepositoryTemplateProvide
 @Component( role = TemplateProvider.class, hint = MavenSiteTemplateProvider.PROVIDER_ID )
 public class MavenSiteTemplateProvider
     extends AbstractRepositoryTemplateProvider
+    implements Initializable
 {
     public static final String PROVIDER_ID = "site-repository";
 
     private static final String MAVEN_SITE_ID = "maven-site";
+
+    @Requirement
+    private RepositoryTypeRegistry repositoryTypeRegistry;
 
     public TemplateSet getTemplates()
     {
@@ -27,5 +37,12 @@ public class MavenSiteTemplateProvider
         }
 
         return templates;
+    }
+
+    public void initialize()
+        throws InitializationException
+    {
+        repositoryTypeRegistry.registerRepositoryTypeDescriptors( new RepositoryTypeDescriptor(
+            WebSiteRepository.class.getName(), "maven-site", "sites" ) );
     }
 }
