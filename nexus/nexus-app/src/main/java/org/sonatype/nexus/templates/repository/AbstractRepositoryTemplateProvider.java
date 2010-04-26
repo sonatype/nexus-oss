@@ -52,8 +52,8 @@ public abstract class AbstractRepositoryTemplateProvider
     {
         ContentClass contentClass =
             repositoryTypeRegistry.getRepositoryContentClass(
-                configuration.getConfiguration( false ).getProviderRole(), configuration.getConfiguration( false )
-                    .getProviderHint() );
+                configuration.getConfiguration( false ).getProviderRole(),
+                configuration.getConfiguration( false ).getProviderHint() );
 
         return new ManuallyConfiguredRepositoryTemplate( this, "manual", "Manually created template", contentClass,
             null, configuration );
