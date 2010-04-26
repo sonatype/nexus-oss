@@ -115,25 +115,35 @@ public class DefaultRepositoryTypeRegistry
 
     public boolean registerRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        if ( d.getRepositoryMaxInstanceCount() == RepositoryType.UNLIMITED_INSTANCES )
+        boolean added = getRepositoryTypeDescriptors().put( d.getRole(), d );
+
+        if ( added )
         {
-            getLogger().info( "Registered Repository type " + d.toString() + "." );
-        }
-        else
-        {
-            getLogger().info(
-                "Registered Repository type " + d.toString() + " with maximal instance limit set to "
-                    + d.getRepositoryMaxInstanceCount() + "." );
+            if ( d.getRepositoryMaxInstanceCount() == RepositoryType.UNLIMITED_INSTANCES )
+            {
+                getLogger().info( "Registered Repository type " + d.toString() + "." );
+            }
+            else
+            {
+                getLogger().info(
+                    "Registered Repository type " + d.toString() + " with maximal instance limit set to "
+                        + d.getRepositoryMaxInstanceCount() + "." );
+            }
         }
 
-        return getRepositoryTypeDescriptors().put( d.getRole(), d );
+        return added;
     }
 
     public boolean unregisterRepositoryTypeDescriptors( RepositoryTypeDescriptor d )
     {
-        getLogger().info( "Unregistered repository type " + d.toString() );
+        boolean removed = getRepositoryTypeDescriptors().remove( d.getRole(), d );
 
-        return getRepositoryTypeDescriptors().remove( d.getRole(), d );
+        if ( removed )
+        {
+            getLogger().info( "Unregistered repository type " + d.toString() );
+        }
+
+        return removed;
     }
 
     public Map<String, ContentClass> getContentClasses()
