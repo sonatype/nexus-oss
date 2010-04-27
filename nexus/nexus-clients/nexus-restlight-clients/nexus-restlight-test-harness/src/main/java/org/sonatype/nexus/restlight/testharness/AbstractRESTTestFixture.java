@@ -1,5 +1,7 @@
 package org.sonatype.nexus.restlight.testharness;
 
+import java.net.ServerSocket;
+
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -12,11 +14,6 @@ import org.mortbay.jetty.security.ConstraintMapping;
 import org.mortbay.jetty.security.HashUserRealm;
 import org.mortbay.jetty.security.SecurityHandler;
 
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.util.Random;
-
 /**
  * Base implementation for {@link RESTTestFixture} that supplies the methods for managing and retrieving information
  * about the test-harness HTTP {@link Server} instance, the debug flag, and basic expectations about the expected client
@@ -24,7 +21,7 @@ import java.util.Random;
  * if the client request validates.
  */
 public abstract class AbstractRESTTestFixture
-implements RESTTestFixture
+    implements RESTTestFixture
 {
 
     private static final int MAX_PORT_TRIES = 10;
@@ -100,7 +97,7 @@ implements RESTTestFixture
      * {@inheritDoc}
      */
     public void startServer()
-    throws Exception
+        throws Exception
     {
         setupLogging();
 
@@ -116,43 +113,15 @@ implements RESTTestFixture
         else
         {
             logger.info( "Randomly looking for an open port..." );
-            int tries = 0;
 
-            // loop until we can't connect to the given port.
-            while ( tries < MAX_PORT_TRIES )
+            ServerSocket ss = new ServerSocket( 0 );
+            try
             {
-                port = ( Math.abs( new Random().nextInt() ) % 63000 ) + 1024;
-
-                logger.info( "(try " + ( tries + 1 ) + "/" + MAX_PORT_TRIES + ") Checking whether port: " + port
-                             + " is available..." );
-
-                Socket sock = new Socket();
-                sock.setSoTimeout( 1 );
-                sock.setSoLinger( true, 1 );
-
-                try
-                {
-                    sock.connect( new InetSocketAddress( "127.0.0.1", port ) );
-                }
-                catch ( SocketException e )
-                {
-                    if ( e.getMessage().indexOf( "Connection refused" ) > -1 )
-                    {
-                        logger.info( "Port: " + port + " appears to be available!" );
-                        break;
-                    }
-                }
-                finally
-                {
-                    sock.close();
-                }
-
-                tries++;
+                port = ss.getLocalPort();
             }
-
-            if ( tries >= MAX_PORT_TRIES )
+            finally
             {
-                throw new IllegalStateException( "Cannot find open port after " + tries + " tries. Giving up." );
+                ss.close();
             }
         }
 
@@ -194,7 +163,7 @@ implements RESTTestFixture
      * {@inheritDoc}
      */
     public void stopServer()
-    throws Exception
+        throws Exception
     {
         LogManager.getLogger( getClass() ).info( "Stopping test server." );
 
