@@ -160,8 +160,12 @@ public class AbstractNexusIntegrationTest
         try
         {
             is = getClass().getResourceAsStream( "/log4j.properties" );
-            props.load( is );
-            PropertyConfigurator.configure( props );
+            
+            if ( is != null )
+            {
+                props.load( is );
+                PropertyConfigurator.configure( props );
+            }
         }
         catch ( IOException e )
         {
