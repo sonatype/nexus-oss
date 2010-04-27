@@ -28,10 +28,12 @@ import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.apache.maven.model.Model;
@@ -151,6 +153,24 @@ public class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
+        
+        InputStream is = null;
+        
+        Properties props = new Properties();
+        try
+        {
+            is = getClass().getResourceAsStream( "/log4j.properties" );
+            props.load( is );
+            PropertyConfigurator.configure( props );
+        }
+        catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            IOUtil.close( is );
+        }
 
         // configure the logging
         SLF4JBridgeHandler.install();
