@@ -70,18 +70,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>com.google.code.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
         <version>1.4.0</version>

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>12</version>
+    <version>14-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -62,19 +62,6 @@
         </plugin>
 
         <plugin>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.1.1</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>jar</goal>
-              </goals>
-              <phase>package</phase>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>com.google.code.maven-license-plugin</groupId>
           <artifactId>maven-license-plugin</artifactId>
           <version>1.4.0</version>
@@ -90,6 +77,12 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <developers>
