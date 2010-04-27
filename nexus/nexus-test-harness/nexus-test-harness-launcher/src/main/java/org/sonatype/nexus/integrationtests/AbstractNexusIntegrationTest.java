@@ -255,22 +255,22 @@ public class AbstractNexusIntegrationTest
             nexusLog.createNewFile();
         }
 
-        properties.put( "log4j.rootLogger", "DEBUG, logfile" );
+        properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
 
-        properties.put( "log4j.logger.org.apache.commons", "WARN" );
-        properties.put( "log4j.logger.httpclient", "WARN" );
-        properties.put( "log4j.logger.org.apache.http", "WARN" );
-        properties.put( "log4j.logger.org.sonatype.nexus", "INFO" );
-        properties.put( "log4j.logger.org.sonatype.nexus.rest.NexusApplication", "WARN" );
-        properties.put( "log4j.logger.org.restlet", "WARN" );
+        properties.putIfNew( "log4j.logger.org.apache.commons", "WARN" );
+        properties.putIfNew( "log4j.logger.httpclient", "WARN" );
+        properties.putIfNew( "log4j.logger.org.apache.http", "WARN" );
+        properties.putIfNew( "log4j.logger.org.sonatype.nexus", "INFO" );
+        properties.putIfNew( "log4j.logger.org.sonatype.nexus.rest.NexusApplication", "WARN" );
+        properties.putIfNew( "log4j.logger.org.restlet", "WARN" );
 
-        properties.put( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
-        properties.put( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
-        properties.put( "log4j.appender.logfile.Append", "true" );
-        properties.put( "log4j.appender.logfile.MaxBackupIndex", "30" );
-        properties.put( "log4j.appender.logfile.MaxFileSize", "10MB" );
-        properties.put( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
-        properties.put( "log4j.appender.logfile.layout.ConversionPattern",
+        properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
+        properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
+        properties.putIfNew( "log4j.appender.logfile.Append", "true" );
+        properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
+        properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
+        properties.putIfNew( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
+        properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
                         "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
         File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
@@ -280,14 +280,15 @@ public class AbstractNexusIntegrationTest
             testMigrationLog.createNewFile();
         }
 
-        properties.put( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
+        properties.putIfNew( "log4j.logger.org.sonatype.nexus.plugin.migration", "DEBUG, migrationlogfile" );
 
-        properties.put( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
-        properties.put( "log4j.appender.migrationlogfile.File", testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
-        properties.put( "log4j.appender.migrationlogfile.Append", "true" );
-        properties.put( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
-        properties.put( "log4j.appender.migrationlogfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
-        properties.put( "log4j.appender.migrationlogfile.layout.ConversionPattern",
+        properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
+        properties.putIfNew( "log4j.appender.migrationlogfile.File", testMigrationLog.getAbsolutePath().replace( '\\',
+                                                                                                                 '/' ) );
+        properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
+        properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
+        properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
+        properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
                         "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
     }
@@ -558,6 +559,7 @@ public class AbstractNexusIntegrationTest
         }
         catch ( Exception e )
         {
+            e.printStackTrace();
             log.fatal( e.getMessage(), e );
             if ( nexusLog.exists() )
             {

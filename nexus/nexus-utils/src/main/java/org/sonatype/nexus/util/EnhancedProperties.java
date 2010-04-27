@@ -40,6 +40,14 @@ public class EnhancedProperties
 
     public static final String BLANK_LINE_KEY_PREFIX = "#BLANK_LINE";
 
+    public void putIfNew( String key, String value )
+    {
+        if ( get( key ) == null )
+        {
+            put( key, value );
+        }
+    }
+
     public void load( InputStream inStream, String... filters )
         throws IOException
     {
