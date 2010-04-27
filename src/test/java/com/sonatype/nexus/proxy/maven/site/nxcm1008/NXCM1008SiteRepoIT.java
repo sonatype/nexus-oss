@@ -86,7 +86,9 @@ public class NXCM1008SiteRepoIT
         RepositoryMessageUtil messageUtil =
             new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
         // this also validates
-        RepositoryResource result = (RepositoryResource) messageUtil.createRepository( resource );
+        // TODO: No, it's not: it uses RepositoryTypeRegistry from _this_ plexus container,
+        // while Nexus (where the new repo type is registered) runs in Guice!
+        RepositoryResource result = (RepositoryResource) messageUtil.createRepository( resource, false );
 
         Assert.assertEquals( "maven-site", result.getProvider() );
         Assert.assertEquals( WebSiteRepository.class.getName(), result.getProviderRole() ); // not passed back
