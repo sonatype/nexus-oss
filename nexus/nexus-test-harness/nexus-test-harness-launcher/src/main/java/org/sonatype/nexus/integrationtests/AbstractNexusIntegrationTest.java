@@ -215,6 +215,9 @@ public class AbstractNexusIntegrationTest
 
                 this.copyConfigFiles();
 
+                // At this point we have the final log4j config for the IT, switch log4j to use it.
+                PropertyConfigurator.configure( WORK_CONF_DIR + "/log4j.properties" );
+
                 // we need to make sure the config is valid, so we don't need to hunt through log files
                 if ( this.verifyNexusConfigBeforeStart )
                 {
