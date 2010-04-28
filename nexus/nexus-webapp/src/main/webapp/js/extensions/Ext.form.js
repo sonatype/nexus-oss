@@ -231,9 +231,19 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
 
         result.errors = remainingErrors;
       }
-
+      
+      if ( result.errors.length == 1 
+      && result.errors[0].id == '*' ) {
+        Sonatype.MessageBox.show({
+                title : 'Configuration Error',
+                msg : result.errors[0].msg,
+                buttons : Sonatype.MessageBox.OK,
+                icon : Sonatype.MessageBox.ERROR
+              });
+        return;
+      }
+       
       this.form.markInvalid(result.errors);
-
       this.failureType = Ext.form.Action.SERVER_INVALID;
     }
     this.form.afterAction(this, false);
