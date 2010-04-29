@@ -247,10 +247,10 @@ public class AbstractNexusIntegrationTest
         throws IOException
     {
         File defaultLog4j = new File( TestProperties.getFile( "default-configs" ), "log4j.properties" );
-        File confLog4j = new File( nexusWorkDir, "conf/log4j.properties" );
+        // File confLog4j = new File( nexusWorkDir, "conf/log4j.properties" );
 
         updateLog4j( defaultLog4j );
-        updateLog4j( confLog4j );
+        // updateLog4j( confLog4j );
     }
 
     private void updateLog4j( File log4jFile )
@@ -266,10 +266,18 @@ public class AbstractNexusIntegrationTest
 
         attachPropertiesToLog( properties );
 
-        log4jFile.getParentFile().mkdirs();
-        FileOutputStream output = new FileOutputStream( log4jFile );
-        properties.store( output );
-        IOUtil.close( output );
+        String newFileName = this.getTestId() + "/test-config/log4j.properties";
+        File newLog4JFile = new File( TestProperties.getString( "test.resources.folder" ), newFileName );
+        newLog4JFile.getParentFile().mkdirs();
+        FileOutputStream output = new FileOutputStream( newLog4JFile );
+        try
+        {
+            properties.store( output );
+        }
+        finally
+        {
+            IOUtil.close( output );
+        }
     }
 
     protected void attachPropertiesToLog( EnhancedProperties properties )
