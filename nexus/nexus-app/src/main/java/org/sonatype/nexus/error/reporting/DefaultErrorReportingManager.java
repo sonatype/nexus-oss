@@ -44,6 +44,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
+import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
@@ -220,9 +221,31 @@ public class DefaultErrorReportingManager
         getCurrentConfiguration( true ).setJiraProject( pkey );
     }
 
+    /**
+     * the useGlobalProxy config is always ignored <br/>
+     * TODO: remove this config? <br/>
+     * always return true unless JIRA host is listed in global NonProxyHosts
+     */
     public boolean isUseGlobalProxy()
     {
-        return getCurrentConfiguration( false ).isUseGlobalProxy();
+        Configuration configuration = getApplicationConfiguration().getConfigurationModel();
+
+        if ( configuration.getGlobalHttpProxySettings() != null
+            && configuration.getGlobalHttpProxySettings().getNonProxyHosts() != null
+            && !configuration.getGlobalHttpProxySettings().getNonProxyHosts().isEmpty() )
+        {
+            String jiraUrl = getCurrentConfiguration( true ).getJiraUrl();
+
+            for ( String host : configuration.getGlobalHttpProxySettings().getNonProxyHosts() )
+            {
+                if ( jiraUrl.contains( host ) )
+                {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     public void setUseGlobalProxy( boolean val )
