@@ -56,7 +56,7 @@ Ext.app.SearchField = Ext.extend(Ext.form.TwinTriggerField, {
           return;
         }
         // var o = {start: 0};
-        this.searchPanel.startSearch(this.searchPanel);
+        this.searchPanel.startSearch(this.searchPanel, true);
       }
     });
 
