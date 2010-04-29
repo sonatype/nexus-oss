@@ -129,8 +129,11 @@ public class DefaultScanner
             }
             else
             {
-                // both are "same" (pom or not pom), let's default the order here
-                return o1.getName().compareTo( o2.getName() );
+                // both are "same" (pom or not pom)
+                // Use reverse order so that timestamped snapshots
+                // use latest - not first
+                return o2.getName().compareTo( o1.getName() );
+
             }
         }
     }

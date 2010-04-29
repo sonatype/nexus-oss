@@ -252,7 +252,7 @@ public class Nexus13NexusIndexerTest
 
         // Using a file
 
-        File artifact = new File( repo, "cisco/infra/dft/maven-dma-mgmt-plugin/1.0-SNAPSHOT/maven-dma-mgmt-plugin-1.0-20080409.021413-1.jar" );
+        File artifact = new File( repo, "cisco/infra/dft/maven-dma-mgmt-plugin/1.0-SNAPSHOT/maven-dma-mgmt-plugin-1.0-20080409.022326-2.jar" );
 
         ai = nexusIndexer.identify( artifact );
 
