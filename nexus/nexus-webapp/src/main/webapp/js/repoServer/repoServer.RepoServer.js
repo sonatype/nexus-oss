@@ -350,7 +350,7 @@
                     tabCode : Sonatype.repoServer.Documentation
                   }, {
                     title : 'Browse Issue Tracker',
-                    href : 'http://issues.sonatype.org/secure/CreateIssue.jspa?pid=10001&issuetype=1'
+                    href : 'https://issues.sonatype.org/browse/NEXUS/'
                   }]
             });
       },
