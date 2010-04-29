@@ -224,27 +224,9 @@ public class DefaultErrorReportingManager
     /**
      * the useGlobalProxy config is always ignored <br/>
      * TODO: remove this config? <br/>
-     * always return true unless JIRA host is listed in global NonProxyHosts
      */
     public boolean isUseGlobalProxy()
     {
-        Configuration configuration = getApplicationConfiguration().getConfigurationModel();
-
-        if ( configuration.getGlobalHttpProxySettings() != null
-            && configuration.getGlobalHttpProxySettings().getNonProxyHosts() != null
-            && !configuration.getGlobalHttpProxySettings().getNonProxyHosts().isEmpty() )
-        {
-            String jiraUrl = getCurrentConfiguration( true ).getJiraUrl();
-
-            for ( String host : configuration.getGlobalHttpProxySettings().getNonProxyHosts() )
-            {
-                if ( jiraUrl.contains( host ) )
-                {
-                    return false;
-                }
-            }
-        }
-
         return true;
     }
 
