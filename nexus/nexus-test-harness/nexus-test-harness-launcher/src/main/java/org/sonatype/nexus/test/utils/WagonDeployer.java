@@ -126,7 +126,7 @@ public class WagonDeployer
         Wagon wagon;
         try
         {
-            wagon = (Wagon) AbstractNexusIntegrationTest.getStaticContainer().lookup( Wagon.ROLE, protocol );
+            wagon = (Wagon) AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( Wagon.ROLE, protocol );
         }
         catch ( Exception e )
         {

@@ -59,7 +59,7 @@ public class Nexus1560LegacyAllowRulesIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        downloadFile( new URL( baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP
+        downloadFile( new URL( nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP
             + "/nexus1560/artifact/maven-metadata.xml" ), "./target/downloads/nexus1560/repo-maven-metadata.xml" );
     }
 
@@ -71,7 +71,7 @@ public class Nexus1560LegacyAllowRulesIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         File file =
-            downloadFile( new URL( baseNexusUrl + REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO
+            downloadFile( new URL( nexusBaseUrl + REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO
                 + "/nexus1560/artifact/maven-metadata.xml" ), "./target/downloads/nexus1560/repo-maven-metadata.xml" );
         Xpp3Dom dom = Xpp3DomBuilder.build( new FileReader( file ) );
         Xpp3Dom[] versions = dom.getChild( "versioning" ).getChild( "versions" ).getChildren( "version" );

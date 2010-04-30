@@ -48,7 +48,7 @@ public class Nexus652Beta5To10UpgradeIT
     {
         // if we made it this far the upgrade worked...
         
-        SecurityConfigurationSource securitySource = container.lookup( SecurityConfigurationSource.class, "file" );
+        SecurityConfigurationSource securitySource = lookup( SecurityConfigurationSource.class, "file" );
         SecurityConfiguration securityConfig = securitySource.loadConfiguration();
 
         Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
@@ -68,7 +68,7 @@ public class Nexus652Beta5To10UpgradeIT
 
         Assert.assertEquals( "http proxy:", true, nexusConfig.getHttpProxy().isEnabled() );
 
-        Assert.assertEquals( "Base url:", AbstractNexusIntegrationTest.baseNexusUrl,
+        Assert.assertEquals( "Base url:", AbstractNexusIntegrationTest.nexusBaseUrl,
                              nexusConfig.getRestApi().getBaseUrl() );
 
         // we will glance over the repos, because the unit tests cover this.

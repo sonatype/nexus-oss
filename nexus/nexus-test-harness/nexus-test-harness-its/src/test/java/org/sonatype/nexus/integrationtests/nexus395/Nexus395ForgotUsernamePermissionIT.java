@@ -32,21 +32,21 @@ public class Nexus395ForgotUsernamePermissionIT
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-forgotuser", "1", "2" /* login */, "6", "14", "17",
-                           "19", "44", "54", "55", "57", "58"/* forgotuser */, "59", "T1", "T2" );
+            "19", "44", "54", "55", "57", "58"/* forgotuser */, "59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to forgot my own username
-        Status status = ForgotUsernameUtils.recoverUsername( "nexus-dev2@sonatype.org" );
+        Status status = ForgotUsernameUtils.get( this ).recoverUsername( "nexus-dev2@sonatype.org" );
         Assert.assertTrue( status.isSuccess() );
 
         // Should not be able to forgot anonymous
-        status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
+        status = ForgotUsernameUtils.get( this ).recoverUsername( "changeme2@yourcompany.com" );
         Assert.assertFalse( status.isSuccess() );
 
         // should be able to forget someone else username
-        status = ForgotUsernameUtils.recoverUsername( "changeme1@yourcompany.com" );
+        status = ForgotUsernameUtils.get( this ).recoverUsername( "changeme1@yourcompany.com" );
         Assert.assertTrue( status.isSuccess() );
 
     }
@@ -56,17 +56,17 @@ public class Nexus395ForgotUsernamePermissionIT
         throws Exception
     {
         overwriteUserRole( TEST_USER_NAME, "anonymous-with-login-but-forgotuser", "1", "2" /* login */, "6", "14",
-                           "17", "19", "44", "54", "55", "57",/* "58" forgotuser, */"59", "T1", "T2" );
+            "17", "19", "44", "54", "55", "57",/* "58" forgotuser, */"59", "T1", "T2" );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // NOT Should be able to forgot anyone username
-        Status status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
+        Status status = ForgotUsernameUtils.get( this ).recoverUsername( "changeme2@yourcompany.com" );
         Assert.assertEquals( 403, status.getCode() );
 
         // NOT Should be able to forgot my own username
-        status = ForgotUsernameUtils.recoverUsername( "nexus-dev2@sonatype.org" );
+        status = ForgotUsernameUtils.get( this ).recoverUsername( "nexus-dev2@sonatype.org" );
         Assert.assertEquals( 403, status.getCode() );
 
     }

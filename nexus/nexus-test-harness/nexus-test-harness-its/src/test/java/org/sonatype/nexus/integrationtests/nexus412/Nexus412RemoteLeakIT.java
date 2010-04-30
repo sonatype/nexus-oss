@@ -35,6 +35,8 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 public class Nexus412RemoteLeakIT
     extends AbstractNexusIntegrationTest
 {
+    // TODO: This IT is not an IT and will newer work as such. This is actually an UT but was moved from there to ITs.
+    // As long as Nexus and IT runs in separate container, this IT will NEVER work. This is UT!
 
     // DISABLED: move to IT, it takes too long (no route to host + java)
     @Test
@@ -84,7 +86,7 @@ public class Nexus412RemoteLeakIT
         throws Exception
     {
 
-        ProxyRepository repo = (ProxyRepository) container.lookup( Repository.class, "maven2" );
+        ProxyRepository repo = (ProxyRepository) lookup( Repository.class, "maven2" );
 
         CRepository cRepo = NexusConfigUtil.getRepo( repoId );
         M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repoId );

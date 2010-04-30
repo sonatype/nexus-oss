@@ -48,9 +48,9 @@ public class Nexus725InitialRestClientIT
         throws Exception
     {
 
-        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         return client;
@@ -248,7 +248,7 @@ public class Nexus725InitialRestClientIT
         throws Exception
     {
 
-        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
         try
         {
             client.connect( "http://nexus.invalid.url/nexus", "", "" );
@@ -267,11 +267,11 @@ public class Nexus725InitialRestClientIT
     public void invalidPassword()
         throws Exception
     {
-        NexusClient client = (NexusClient) container.lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) lookup( NexusClient.ROLE );
 
         try
         {
-            client.connect( AbstractNexusIntegrationTest.baseNexusUrl, "admin", "wrong-password" );
+            client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, "admin", "wrong-password" );
             // the REST instance doesn't actually connect until you send a message
             client.getRepository( "nexus-test-harness-repo" );
             Assert.fail( "Expected NexusConnectionException" );

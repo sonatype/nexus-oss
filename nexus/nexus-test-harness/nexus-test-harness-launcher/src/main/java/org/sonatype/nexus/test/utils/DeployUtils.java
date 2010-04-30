@@ -31,7 +31,6 @@ import org.apache.maven.wagon.ResourceDoesNotExistException;
 import org.apache.maven.wagon.TransferFailedException;
 import org.apache.maven.wagon.authentication.AuthenticationException;
 import org.apache.maven.wagon.authorization.AuthorizationException;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.sonatype.nexus.artifact.Gav;
@@ -45,7 +44,7 @@ public class DeployUtils
 
     private static final Logger LOG = Logger.getLogger( DeployUtils.class );
 
-    public static void deployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
+    public static void deployWithWagon( AbstractNexusIntegrationTest test, String wagonHint, String repositoryUrl,
                                         File fileToDeploy, String artifactPath )
         throws Exception
     {
@@ -65,7 +64,7 @@ public class DeployUtils
         // artifactPath ).deploy();
     }
 
-    public static void forkDeployWithWagon( PlexusContainer container, String wagonHint, String repositoryUrl,
+    public static void forkDeployWithWagon( AbstractNexusIntegrationTest test, String wagonHint, String repositoryUrl,
                                             File fileToDeploy, String artifactPath )
         throws ComponentLookupException, ConnectionException, AuthenticationException, TransferFailedException,
         ResourceDoesNotExistException, AuthorizationException, InterruptedException, CommandLineException
@@ -73,14 +72,14 @@ public class DeployUtils
         // must fork due to bug: http://forums.sun.com/thread.jspa?threadID=567697&messageID=2805259
         new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
                            TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
-                           artifactPath ).forkDeploy( container );
+                           artifactPath ).forkDeploy( test.getITPlexusContainer() );
 
     }
 
     public static int deployUsingGavWithRest( String repositoryId, Gav gav, File fileToDeploy )
         throws HttpException, IOException
     {
-        return deployUsingGavWithRest( AbstractNexusIntegrationTest.baseNexusUrl
+        return deployUsingGavWithRest( AbstractNexusIntegrationTest.nexusBaseUrl
             + "service/local/artifact/maven/content", repositoryId, gav, fileToDeploy );
     }
 
@@ -108,7 +107,7 @@ public class DeployUtils
                                               String extention )
         throws HttpException, IOException
     {
-        return deployUsingPomWithRest( AbstractNexusIntegrationTest.baseNexusUrl
+        return deployUsingPomWithRest( AbstractNexusIntegrationTest.nexusBaseUrl
             + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
     }
 
@@ -116,7 +115,7 @@ public class DeployUtils
                                                                  String classifier, String extention )
         throws HttpException, IOException
     {
-        return deployUsingPomWithRestReturnResult( AbstractNexusIntegrationTest.baseNexusUrl
+        return deployUsingPomWithRestReturnResult( AbstractNexusIntegrationTest.nexusBaseUrl
             + "service/local/artifact/maven/content", repositoryId, fileToDeploy, pomFile, classifier, extention );
     }
 

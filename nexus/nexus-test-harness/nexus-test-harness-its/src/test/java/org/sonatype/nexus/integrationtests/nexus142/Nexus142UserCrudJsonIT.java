@@ -79,7 +79,7 @@ public class Nexus142UserCrudJsonIT
         this.messageUtil.createUser( resource );
 
         // validate password is correct
-        PasswordGenerator pwGenerator = this.getContainer().lookup( PasswordGenerator.class );
+        PasswordGenerator pwGenerator = lookup( PasswordGenerator.class );
         String hashedPassword = pwGenerator.hashPassword( password );
         CUser cUser = SecurityConfigUtil.getCUser( "createTestWithPassword" );
         Assert.assertEquals( "Expected hashed passwords to be the same.", hashedPassword, cUser.getPassword() );

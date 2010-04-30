@@ -43,7 +43,7 @@ public class Nexus507UserTimeoutIT
     public void checkHtmlRequest()
         throws Exception
     {
-        String loginURI = baseNexusUrl + "service/local/authentication/login";
+        String loginURI = nexusBaseUrl + "service/local/authentication/login";
 
         // accessUrl( serviceURI );
 
@@ -53,7 +53,7 @@ public class Nexus507UserTimeoutIT
         WebResponse resp = wc.getResponse( req );
         Assert.assertEquals( "Unable to login " + resp.getResponseMessage(), 200, resp.getResponseCode() );
 
-        String userURI = baseNexusUrl + "service/local/users/admin";
+        String userURI = nexusBaseUrl + "service/local/users/admin";
         req = new GetMethodWebRequest( userURI );
         resp = wc.getResponse( req );
         Assert.assertEquals( "Unable to access users " + resp.getResponseMessage(), 200, resp.getResponseCode() );

@@ -48,7 +48,7 @@ public class NexusConfigUtil
         NexusConfiguration config;
         try
         {
-            config = AbstractNexusIntegrationTest.getStaticContainer().lookup( NexusConfiguration.class );
+            config = AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( NexusConfiguration.class );
             config.loadConfiguration( true );
         }
         catch ( Exception e )
@@ -86,7 +86,7 @@ public class NexusConfigUtil
     public static void enableSecurity( boolean enabled )
         throws Exception
     {
-        AbstractNexusIntegrationTest.getStaticContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
+        AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
     public static M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
@@ -133,7 +133,7 @@ public class NexusConfigUtil
         throws Exception
     {
         ApplicationConfigurationValidator validator =
-            AbstractNexusIntegrationTest.getStaticContainer().lookup( ApplicationConfigurationValidator.class );
+            AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( ApplicationConfigurationValidator.class );
         ValidationResponse vResponse = validator.validateModel( new ValidationRequest( getNexusConfig() ) );
 
         if ( !vResponse.isValid() )

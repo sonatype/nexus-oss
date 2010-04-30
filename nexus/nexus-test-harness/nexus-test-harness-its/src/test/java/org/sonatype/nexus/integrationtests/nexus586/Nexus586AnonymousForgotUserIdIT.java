@@ -34,7 +34,7 @@ public class Nexus586AnonymousForgotUserIdIT
         {
             return;
         }
-         Status status = ForgotUsernameUtils.recoverUsername( "changeme2@yourcompany.com" );
+         Status status = ForgotUsernameUtils.get(this).recoverUsername( "changeme2@yourcompany.com" );
          Assert.assertEquals( 400, status.getCode() );
     }
 }

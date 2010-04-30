@@ -40,9 +40,9 @@ public class Nexus748MultipleStart
 
         StopWatch stopWatch = new StopWatch();
 
-        NexusClient client = (NexusClient) AbstractNexusIntegrationTest.getStaticContainer().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
-        client.connect( AbstractNexusIntegrationTest.baseNexusUrl, context.getAdminUsername(),
+        client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         // enable security

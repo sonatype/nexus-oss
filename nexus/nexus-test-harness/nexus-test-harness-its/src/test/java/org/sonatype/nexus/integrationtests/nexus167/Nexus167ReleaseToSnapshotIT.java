@@ -69,7 +69,7 @@ public class Nexus167ReleaseToSnapshotIT
         {
             // deploy it
             // this should fail
-            DeployUtils.deployWithWagon( this.getContainer(), "http", this.getNexusTestRepoUrl(), fileToDeploy, this
+            DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(), fileToDeploy, this
                 .getRelitiveArtifactPath( gav ) );
             Assert.fail( "Should not be able to deploy a releases artifact into a snapshot repo" );
         }

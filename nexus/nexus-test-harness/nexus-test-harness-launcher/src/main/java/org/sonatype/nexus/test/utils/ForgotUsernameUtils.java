@@ -16,22 +16,30 @@ package org.sonatype.nexus.test.utils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
 
 public class ForgotUsernameUtils
+    extends ITUtil
 {
+    private final XStream xstream;
 
-    private static XStream xstream;
-
-    static
+    public static ForgotUsernameUtils get( AbstractNexusIntegrationTest test )
     {
+        return new ForgotUsernameUtils( test );
+    }
+
+    public ForgotUsernameUtils( AbstractNexusIntegrationTest test )
+    {
+        super( test );
+
         xstream = XStreamFactory.getXmlXStream();
     }
 
-    public static Status recoverUsername( String email )
+    public Status recoverUsername( String email )
         throws Exception
     {
         String serviceURI = "service/local/users_forgotid/" + email;

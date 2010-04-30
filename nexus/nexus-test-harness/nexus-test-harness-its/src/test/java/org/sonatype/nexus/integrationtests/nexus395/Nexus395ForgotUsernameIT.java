@@ -29,7 +29,7 @@ public class Nexus395ForgotUsernameIT
     public void recoverUsername()
         throws Exception
     {
-        Status status = ForgotUsernameUtils.recoverUsername( "nexus-dev2@sonatype.org" );
+        Status status = ForgotUsernameUtils.get( this ).recoverUsername( "nexus-dev2@sonatype.org" );
 
         Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
 
@@ -42,7 +42,7 @@ public class Nexus395ForgotUsernameIT
     {
         String anonymousEmail = "changeme2@yourcompany.com";
 
-        Status status = ForgotUsernameUtils.recoverUsername( anonymousEmail );
+        Status status = ForgotUsernameUtils.get( this ).recoverUsername( anonymousEmail );
 
         Assert.assertEquals( Status.CLIENT_ERROR_BAD_REQUEST.getCode(), status.getCode() );
     }

@@ -32,7 +32,7 @@ public class Nexus597ForgotUserNameSharedEmailIT
         String anonymousEmail = "changeme2@yourcompany.com";
 
         // username should be recovered with anonymous being ignored
-        Status status = ForgotUsernameUtils.recoverUsername( anonymousEmail );
+        Status status = ForgotUsernameUtils.get( this ).recoverUsername( anonymousEmail );
 
         Assert.assertEquals( Status.SUCCESS_ACCEPTED.getCode(), status.getCode() );
 

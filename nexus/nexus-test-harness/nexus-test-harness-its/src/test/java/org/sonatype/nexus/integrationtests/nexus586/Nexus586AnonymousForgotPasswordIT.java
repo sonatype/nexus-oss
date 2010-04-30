@@ -20,7 +20,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 
 /**
- * Saving the Nexus config needs to validate the anonymous user information 
+ * Saving the Nexus config needs to validate the anonymous user information
  */
 public class Nexus586AnonymousForgotPasswordIT
     extends AbstractNexusIntegrationTest
@@ -31,7 +31,7 @@ public class Nexus586AnonymousForgotPasswordIT
         throws Exception
     {
         String username = "anonymous";
-        Response response = ForgotPasswordUtils.recoverUserPassword( username, "changeme2@yourcompany.com" );
+        Response response = ForgotPasswordUtils.get( this ).recoverUserPassword( username, "changeme2@yourcompany.com" );
         Assert.assertEquals( 400, response.getStatus().getCode() );
     }
 }

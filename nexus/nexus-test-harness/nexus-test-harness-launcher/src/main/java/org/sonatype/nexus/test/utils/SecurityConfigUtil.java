@@ -301,7 +301,7 @@ public class SecurityConfigUtil
             }
 
             List<StaticSecurityResource> resources =
-                AbstractNexusIntegrationTest.getStaticContainer().lookupList( StaticSecurityResource.class );
+                AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookupList( StaticSecurityResource.class );
             for ( StaticSecurityResource resource : resources )
             {
                 addStaticSecurity( configuration, resource.getConfiguration() );

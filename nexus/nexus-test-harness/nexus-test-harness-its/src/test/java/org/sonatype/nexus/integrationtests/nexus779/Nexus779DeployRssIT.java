@@ -49,10 +49,10 @@ public class Nexus779DeployRssIT
         File jarFile = getTestFile( artifactName + ".jar" );
         File pomFile = getTestFile( artifactName + ".pom" );
 
-        String deployUrl = baseNexusUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO;
-        DeployUtils.deployWithWagon( this.container, "http", deployUrl, jarFile, "nexus779/" + artifactName + "/1.0/"
+        String deployUrl = nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO;
+        DeployUtils.deployWithWagon( this, "http", deployUrl, jarFile, "nexus779/" + artifactName + "/1.0/"
             + artifactName + "-1.0.jar" );
-        DeployUtils.deployWithWagon( this.container, "http", deployUrl, pomFile, "nexus779/" + artifactName + "/1.0/"
+        DeployUtils.deployWithWagon( this, "http", deployUrl, pomFile, "nexus779/" + artifactName + "/1.0/"
             + artifactName + "-1.0.pom" );
 
     }

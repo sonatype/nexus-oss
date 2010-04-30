@@ -24,19 +24,21 @@ import org.sonatype.nexus.test.utils.ForgotPasswordUtils;
 import com.icegreen.greenmail.util.GreenMailUtil;
 
 /**
- * Test forgot password system.  Check if nexus is sending the e-mail. 
+ * Test forgot password system. Check if nexus is sending the e-mail.
  */
 public class Nexus394ForgotPasswordIT
     extends AbstractEmailServerNexusIT
 {
-    
+
     @Test
     public void recoverUserPassword()
         throws Exception
     {
-        Response response = ForgotPasswordUtils.recoverUserPassword( "test-user", "nexus-dev2@sonatype.org" );
-        Assert.assertEquals( "Status: "+response.getStatus() +"\n"+ response.getEntity().getText(), 202, response.getStatus().getCode() );
-        
+        Response response =
+            ForgotPasswordUtils.get( this ).recoverUserPassword( "test-user", "nexus-dev2@sonatype.org" );
+        Assert.assertEquals( "Status: " + response.getStatus() + "\n" + response.getEntity().getText(), 202,
+            response.getStatus().getCode() );
+
         // Need 1 message
         server.waitForIncomingEmail( 1000, 1 );
 
@@ -45,7 +47,7 @@ public class Nexus394ForgotPasswordIT
         String password = null;
         // Sample body: Your password has been reset. Your new password is: c1r6g4p8l7
         String body = GreenMailUtil.getBody( msgs[0] );
-        
+
         int index = body.indexOf( "Your new password is: " );
         int passwordStartIndex = index + "Your new password is: ".length();
         if ( index != -1 )

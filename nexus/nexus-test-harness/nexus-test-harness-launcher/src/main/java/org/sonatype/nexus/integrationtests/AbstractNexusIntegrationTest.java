@@ -78,7 +78,6 @@ import com.thoughtworks.xstream.XStream;
 // @RunWith(ConsoleLoggingRunner.class)
 public class AbstractNexusIntegrationTest
 {
-
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
 
     public static final String REPO_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
@@ -91,10 +90,6 @@ public class AbstractNexusIntegrationTest
 
     public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
 
-    protected PlexusContainer container;
-
-    protected static PlexusContainer staticContainer;
-
     private static boolean NEEDS_INIT = false;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
@@ -105,10 +100,12 @@ public class AbstractNexusIntegrationTest
 
     public static String nexusBaseDir;
 
-    @Deprecated
-    public static final String baseNexusUrl;
-
     public static final String nexusBaseUrl;
+
+    /**
+     * @deprecated Use nexusBaseUrl instead!
+     */
+    public static final String baseNexusUrl;
 
     public static final String nexusWorkDir;
 
@@ -143,6 +140,8 @@ public class AbstractNexusIntegrationTest
         baseNexusUrl = nexusBaseUrl;
     }
 
+    // == Constructors
+
     protected AbstractNexusIntegrationTest()
     {
         this( "nexus-test-harness-repo" );
@@ -153,14 +152,14 @@ public class AbstractNexusIntegrationTest
         // we also need to setup a couple fields, that need to be pulled out of a bundle
         this.testRepositoryId = testRepositoryId;
         // this.nexusTestRepoUrl = baseNexusUrl + REPOSITORY_RELATIVE_URL + testRepositoryId + "/";
-        
+
         InputStream is = null;
-        
+
         Properties props = new Properties();
         try
         {
             is = getClass().getResourceAsStream( "/log4j.properties" );
-            
+
             if ( is != null )
             {
                 props.load( is );
@@ -176,9 +175,25 @@ public class AbstractNexusIntegrationTest
             IOUtil.close( is );
         }
 
+        // this will trigger PlexusContainer creation when test is instantiated, but only if needed
+        getITPlexusContainer( getClass() );
+
         // configure the logging
         SLF4JBridgeHandler.install();
+    }
 
+    // == Test "lifecycle" (@Before/@After...)
+
+    @BeforeClass
+    public static void staticOncePerClassSetUp()
+        throws Exception
+    {
+        startProfiler();
+
+        log.debug( "staticOncePerClassSetUp" );
+
+        // hacky state machine
+        NEEDS_INIT = true;
     }
 
     /**
@@ -243,6 +258,37 @@ public class AbstractNexusIntegrationTest
         }
     }
 
+    @After
+    public void afterTest()
+        throws Exception
+    {
+        // reset this for each test
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    }
+
+    @AfterClass
+    public static void oncePerClassTearDown()
+        throws Exception
+    {
+        // turn off security, of the current IT with security on won't affect the next IT
+        TestContainer.getInstance().getTestContext().setSecureTest( false );
+
+        // stop nexus
+        stopNexus();
+
+        killITPlexusContainer();
+
+        takeSnapshot();
+    }
+
+    protected void runOnce()
+        throws Exception
+    {
+        // must override to happen something
+    }
+
+    // == below methods are NOT participating in @Before/@After stuff
+
     private void setupLog4j()
         throws IOException
     {
@@ -306,7 +352,7 @@ public class AbstractNexusIntegrationTest
         properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
         properties.putIfNew( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
         properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
-                        "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
         File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
         testMigrationLog.getParentFile().mkdirs();
@@ -319,12 +365,12 @@ public class AbstractNexusIntegrationTest
 
         properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
         properties.putIfNew( "log4j.appender.migrationlogfile.File", testMigrationLog.getAbsolutePath().replace( '\\',
-                                                                                                                 '/' ) );
+            '/' ) );
         properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
         properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
         properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
         properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
-                        "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
     }
 
@@ -358,12 +404,6 @@ public class AbstractNexusIntegrationTest
         this.copyConfigFile( "security-configuration.xml", WORK_CONF_DIR );
 
         this.copyConfigFile( "log4j.properties", WORK_CONF_DIR );
-    }
-
-    protected void runOnce()
-        throws Exception
-    {
-        // must override
     }
 
     protected static void cleanWorkDir()
@@ -496,7 +536,7 @@ public class AbstractNexusIntegrationTest
 
         Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                     new Date().getTime(), model.getName(), false, false, null, false, null );
+                new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // the Restlet Client does not support multipart forms:
         // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -520,58 +560,49 @@ public class AbstractNexusIntegrationTest
         {
             if ( artifactSha1.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactSha1,
-                                             this.getRelitiveArtifactPath( gav ) + ".sha1" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactSha1,
+                    this.getRelitiveArtifactPath( gav ) + ".sha1" );
             }
             if ( artifactMd5.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactMd5,
-                                             this.getRelitiveArtifactPath( gav ) + ".md5" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactMd5,
+                    this.getRelitiveArtifactPath( gav ) + ".md5" );
             }
             if ( artifactAsc.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactAsc,
-                                             this.getRelitiveArtifactPath( gav ) + ".asc" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactAsc,
+                    this.getRelitiveArtifactPath( gav ) + ".asc" );
             }
 
             if ( artifactFile.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, artifactFile,
-                                             this.getRelitiveArtifactPath( gav ) );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactFile,
+                    this.getRelitiveArtifactPath( gav ) );
             }
 
             if ( pomSha1.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomSha1,
-                                             this.getRelitivePomPath( gav ) + ".sha1" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomSha1, this.getRelitivePomPath( gav )
+                    + ".sha1" );
             }
             if ( pomMd5.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomMd5,
-                                             this.getRelitivePomPath( gav ) + ".md5" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomMd5, this.getRelitivePomPath( gav )
+                    + ".md5" );
             }
             if ( pomAsc.exists() )
             {
-                DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pomAsc,
-                                             this.getRelitivePomPath( gav ) + ".asc" );
+                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomAsc, this.getRelitivePomPath( gav )
+                    + ".asc" );
             }
 
-            DeployUtils.deployWithWagon( this.container, wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
+            DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
         }
         catch ( Exception e )
         {
             log.error( getTestId() + " Unable to deploy " + artifactFileName, e );
             throw e;
         }
-    }
-
-    @After
-    public void afterTest()
-        throws Exception
-    {
-        // reset this for each test
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-
     }
 
     private void startNexus()
@@ -715,58 +746,6 @@ public class AbstractNexusIntegrationTest
         return file;
     }
 
-    /**
-     * See oncePerClassSetUp.
-     * 
-     * @throws Exception
-     */
-    @BeforeClass
-    public static void staticOncePerClassSetUp()
-        throws Exception
-    {
-        startProfiler();
-
-        log.debug( "staticOncePerClassSetUp" );
-        // hacky state machine
-        NEEDS_INIT = true;
-    }
-
-    @Before
-    public void createContainer()
-    {
-        this.container = setupContainer( getClass() );
-    }
-
-    @AfterClass
-    public static void oncePerClassTearDown()
-        throws Exception
-    {
-        // turn off security, of the current IT with security on won't affect the next IT
-        TestContainer.getInstance().getTestContext().setSecureTest( false );
-
-        // stop nexus
-        stopNexus();
-
-        if ( staticContainer != null )
-        {
-            staticContainer.dispose();
-        }
-        staticContainer = null;
-
-        takeSnapshot();
-    }
-
-    @After
-    public void killContainer()
-        throws Exception
-    {
-        if ( container != null )
-        {
-            this.container.dispose();
-        }
-        this.container = null;
-    }
-
     // profiling with yourkit, activate using -P youtkit-profile
     private static Object profiler;
 
@@ -810,54 +789,6 @@ public class AbstractNexusIntegrationTest
         }
     }
 
-    protected static PlexusContainer setupContainer( Class<?> baseClass )
-    {
-        // ----------------------------------------------------------------------------
-        // Context Setup
-        // ----------------------------------------------------------------------------
-
-        Map<Object, Object> context = new HashMap<Object, Object>();
-
-        context.put( "basedir", getBasedir() );
-        context.putAll( TestProperties.getAll() );
-
-        boolean hasPlexusHome = context.containsKey( "plexus.home" );
-
-        if ( !hasPlexusHome )
-        {
-            File f = new File( getBasedir(), "target/plexus-home" );
-
-            if ( !f.isDirectory() )
-            {
-                f.mkdir();
-            }
-
-            context.put( "plexus.home", f.getAbsolutePath() );
-        }
-
-        // ----------------------------------------------------------------------------
-        // Configuration
-        // ----------------------------------------------------------------------------
-
-        ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
-                                                                                                                   baseClass.getName().replace(
-                                                                                                                                                '.',
-                                                                                                                                                '/' )
-                                                                                                                       + ".xml" );
-
-        try
-        {
-            return new DefaultPlexusContainer( containerConfiguration );
-        }
-        catch ( PlexusContainerException e )
-        {
-            e.printStackTrace();
-            fail( "Failed to create plexus container." );
-            return null;
-        }
-    }
-
     public static String getBasedir()
     {
         String basedir = System.getProperty( "basedir" );
@@ -871,27 +802,27 @@ public class AbstractNexusIntegrationTest
     }
 
     protected Object lookup( String role )
-        throws Exception
+        throws ComponentLookupException
     {
-        return container.lookup( role );
+        return getITPlexusContainer().lookup( role );
     }
 
     protected Object lookup( String role, String hint )
-        throws Exception
+        throws ComponentLookupException
     {
-        return container.lookup( role, hint );
+        return getITPlexusContainer().lookup( role, hint );
     }
 
     protected <E> E lookup( Class<E> role )
-        throws Exception
+        throws ComponentLookupException
     {
-        return container.lookup( role );
+        return getITPlexusContainer().lookup( role );
     }
 
     protected <E> E lookup( Class<E> role, String hint )
-        throws Exception
+        throws ComponentLookupException
     {
-        return container.lookup( role, hint );
+        return getITPlexusContainer().lookup( role, hint );
     }
 
     protected String getRelitivePomPath( Gav gav )
@@ -937,7 +868,7 @@ public class AbstractNexusIntegrationTest
         }
         Assert.assertEquals( "Snapshot download should redirect to a new file\n "
             + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
-                             status.getCode() );
+            status.getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
@@ -983,14 +914,13 @@ public class AbstractNexusIntegrationTest
         {
             IOUtil.close( stream );
         }
-
     }
 
     protected File downloadArtifact( Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+            gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
@@ -998,23 +928,23 @@ public class AbstractNexusIntegrationTest
         throws IOException
     {
         return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
-                                      targetDirectory );
+            targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId
+        return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
             + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
-                                      targetDirectory );
+            targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
-        return this.downloadArtifact( AbstractNexusIntegrationTest.baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL
+        return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
             + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+            gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
@@ -1074,12 +1004,12 @@ public class AbstractNexusIntegrationTest
 
     public String getBaseNexusUrl()
     {
-        return baseNexusUrl;
+        return nexusBaseUrl;
     }
 
     public String getNexusTestRepoUrl( String repo )
     {
-        return baseNexusUrl + REPOSITORY_RELATIVE_URL + repo + "/";
+        return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repo + "/";
     }
 
     public String getNexusTestRepoUrl()
@@ -1089,16 +1019,7 @@ public class AbstractNexusIntegrationTest
 
     public String getNexusTestRepoServiceUrl()
     {
-        return baseNexusUrl + "service/local/repositories/" + testRepositoryId + "/content/";
-    }
-
-    public PlexusContainer getContainer()
-    {
-        if ( this.container == null )
-        {
-            this.container = setupContainer( getClass() );
-        }
-        return this.container;
+        return nexusBaseUrl + "service/local/repositories/" + testRepositoryId + "/content/";
     }
 
     public String getNexusBaseDir()
@@ -1118,12 +1039,12 @@ public class AbstractNexusIntegrationTest
 
     public String getRepositoryUrl( String repoId )
     {
-        return baseNexusUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
+        return nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId + "/";
     }
 
     public String getGroupUrl( String groupId )
     {
-        return baseNexusUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
+        return nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL + groupId + "/";
     }
 
     protected boolean isVerifyNexusConfigBeforeStart()
@@ -1169,16 +1090,93 @@ public class AbstractNexusIntegrationTest
     public RepositoryTypeRegistry getRepositoryTypeRegistry()
         throws ComponentLookupException
     {
-        return getContainer().lookup( RepositoryTypeRegistry.class );
+        return getITPlexusContainer().lookup( RepositoryTypeRegistry.class );
     }
 
-    public static final PlexusContainer getStaticContainer()
+    // == IT Container management
+
+    private static PlexusContainer itPlexusContainer;
+
+    public PlexusContainer getITPlexusContainer()
     {
-        if ( staticContainer == null )
+        return getITPlexusContainer( getClass() );
+    }
+
+    public PlexusContainer getITPlexusContainer( Class<?> clazz )
+    {
+        if ( AbstractNexusIntegrationTest.itPlexusContainer == null )
         {
-            staticContainer = setupContainer( AbstractNexusIntegrationTest.class );
+            AbstractNexusIntegrationTest.itPlexusContainer = setupContainer( getClass() );
         }
-        return staticContainer;
+
+        return AbstractNexusIntegrationTest.itPlexusContainer;
+    }
+
+    /**
+     * The use of this method should be avoided! Better create Util classes that accepts AbstractNexusIntegrationTest
+     * instances, and then they get the stuff they need from that instance!
+     * 
+     * @return
+     * @deprecated Gonna dissapear! Better create methods that accepts AbstractNexusIntegrationTest instances!
+     */
+    public static PlexusContainer getStaticITPlexusContainer()
+    {
+        return AbstractNexusIntegrationTest.itPlexusContainer;
+    }
+
+    public static void killITPlexusContainer()
+    {
+        if ( AbstractNexusIntegrationTest.itPlexusContainer != null )
+        {
+            AbstractNexusIntegrationTest.itPlexusContainer.dispose();
+
+            AbstractNexusIntegrationTest.itPlexusContainer = null;
+        }
+    }
+
+    private static PlexusContainer setupContainer( Class<?> baseClass )
+    {
+        // ----------------------------------------------------------------------------
+        // Context Setup
+        // ----------------------------------------------------------------------------
+
+        Map<Object, Object> context = new HashMap<Object, Object>();
+
+        context.put( "basedir", getBasedir() );
+        context.putAll( TestProperties.getAll() );
+
+        boolean hasPlexusHome = context.containsKey( "plexus.home" );
+
+        if ( !hasPlexusHome )
+        {
+            File f = new File( getBasedir(), "target/plexus-home" );
+
+            if ( !f.isDirectory() )
+            {
+                f.mkdir();
+            }
+
+            context.put( "plexus.home", f.getAbsolutePath() );
+        }
+
+        // ----------------------------------------------------------------------------
+        // Configuration
+        // ----------------------------------------------------------------------------
+
+        ContainerConfiguration containerConfiguration =
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
+                baseClass.getName().replace( '.', '/' ) + ".xml" );
+
+        try
+        {
+            return new DefaultPlexusContainer( containerConfiguration );
+        }
+        catch ( PlexusContainerException e )
+        {
+            e.printStackTrace();
+            fail( "Failed to create plexus container." );
+            return null;
+        }
     }
 
 }

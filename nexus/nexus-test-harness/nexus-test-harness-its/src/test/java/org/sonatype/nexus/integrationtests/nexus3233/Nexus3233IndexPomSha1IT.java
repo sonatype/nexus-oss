@@ -46,8 +46,8 @@ public class Nexus3233IndexPomSha1IT
         final String repo = getRepositoryUrl( REPO_TEST_HARNESS_REPO );
         final Gav gav = GavUtil.newGav( "nexus3233", "wagon", "1.0.0", "pom" );
         final String path = getRelitiveArtifactPath( gav );
-        DeployUtils.deployWithWagon( container, "http", repo, pom, path );
-        DeployUtils.deployWithWagon( container, "http", repo, sha1, path + ".sha1" );
+        DeployUtils.deployWithWagon( this, "http", repo, pom, path );
+        DeployUtils.deployWithWagon( this, "http", repo, sha1, path + ".sha1" );
         searchFor( pom );
     }
 

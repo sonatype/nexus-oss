@@ -16,6 +16,7 @@ package org.sonatype.nexus.test.utils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.UserForgotPasswordRequest;
@@ -23,16 +24,30 @@ import org.sonatype.security.rest.model.UserForgotPasswordResource;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Example of simple conversion to "fluent" api from static stuff. This opens the gates to paralell ITs too! Currently,
+ * we cannot have them.
+ * 
+ * @author cstamas
+ */
 public class ForgotPasswordUtils
+    extends ITUtil
 {
-    private static XStream xstream;
+    private final XStream xstream;
 
-    static
+    public static ForgotPasswordUtils get( AbstractNexusIntegrationTest test )
     {
-        xstream = XStreamFactory.getXmlXStream();
+        return new ForgotPasswordUtils( test );
     }
 
-    public static Response recoverUserPassword( String username, String email )
+    public ForgotPasswordUtils( AbstractNexusIntegrationTest test )
+    {
+        super( test );
+
+        this.xstream = XStreamFactory.getXmlXStream();
+    }
+
+    public Response recoverUserPassword( String username, String email )
         throws Exception
     {
         String serviceURI = "service/local/users_forgotpw";
@@ -48,5 +63,4 @@ public class ForgotPasswordUtils
 
         return RequestFacade.sendMessage( serviceURI, Method.POST, representation );
     }
-
 }
