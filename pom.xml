@@ -34,7 +34,6 @@
 
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SNAPSHOT</version>
       </plugin>
 
       <plugin>
