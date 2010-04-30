@@ -25,7 +25,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SONATYPE-r939756</version>
+        <version>1.6-SONATYPE-r939819</version>
         <configuration>
           <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
           <extraArtifacts>
