@@ -1,7 +1,6 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -293,26 +292,8 @@ public class AbstractEnvironmentMojo
             }
             project.getProperties().put( "maven-basedir", getPath( new File( mavenLocation, mavenBaseDir ) ) );
 
-            File fakeRepository = new File( resourcesSourceLocation, "fake-central" );
             File fakeRepoDest = new File( mavenLocation, "fake-repo" );
             project.getProperties().put( "maven-repository", getPath( fakeRepoDest ) );
-            if ( fakeRepository.isDirectory() )
-            {
-                copyDirectory( fakeRepository, fakeRepoDest );
-            }
-            else
-            {
-                fakeRepoDest.mkdirs();
-            }
-
-            try
-            {
-                deleteHiddenFolders( fakeRepoDest, true );
-            }
-            catch ( IOException e )
-            {
-                getLog().error( "Unable to delete hidden folders from " + fakeRepoDest.getPath() );
-            }
         }
 
         if ( !resourcesDestinationLocation.isDirectory() )
@@ -445,38 +426,6 @@ public class AbstractEnvironmentMojo
                 {
                     IOUtil.close( out );
                     IOUtil.close( in );
-                }
-            }
-        }
-    }
-
-    private void deleteHiddenFolders( File directory, boolean recursive )
-        throws IOException
-    {
-        if ( directory != null && directory.isDirectory() && directory.exists() )
-        {
-            File[] files = directory.listFiles( new FileFilter()
-            {
-                public boolean accept( File pathname )
-                {
-                    if ( pathname.isDirectory() )
-                    {
-                        return true;
-                    }
-
-                    return false;
-                }
-            } );
-
-            for ( File file : files )
-            {
-                if ( file.getName().startsWith( "." ) )
-                {
-                    FileUtils.deleteDirectory( file );
-                }
-                else if ( recursive )
-                {
-                    deleteHiddenFolders( file, true );
                 }
             }
         }
@@ -644,22 +593,6 @@ public class AbstractEnvironmentMojo
         {
             throw new MojoExecutionException( "Unable to copy resouce " + sourceUrl + " to " + name + "." + extension,
                                               e );
-        }
-    }
-
-    private void copyDirectory( File sourceDir, File destinationDir )
-        throws MojoExecutionException
-    {
-        destinationDir.mkdirs();
-
-        getLog().debug( "Copying dir '" + sourceDir + "'" );
-        try
-        {
-            FileUtils.copyDirectoryStructure( sourceDir, destinationDir );
-        }
-        catch ( IOException e )
-        {
-            throw new MojoExecutionException( "Unable to copy dir " + sourceDir, e );
         }
     }
 
