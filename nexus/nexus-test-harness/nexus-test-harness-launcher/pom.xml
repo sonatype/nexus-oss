@@ -22,7 +22,6 @@
     </testResources>
 
     <plugins>
-
       <plugin>
         <artifactId>maven-invoker-plugin</artifactId>
         <version>1.6-SNAPSHOT</version>
@@ -53,6 +52,7 @@
           </execution>
         </executions>
       </plugin>
+      
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -73,7 +73,6 @@
           </execution>
         </executions>
         <configuration>
-
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
@@ -81,9 +80,7 @@
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
-
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>${project.groupId}</groupId>
@@ -140,10 +137,8 @@
             <exclude>**/Nexus758StatusService.*</exclude>
             <exclude>**/Nexus748MultipleStartTest.*</exclude>
             <!-- END This are start/stop tests, shouldn't be runned -->
-
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
-
           </excludes>
         </configuration>
       </plugin>
@@ -151,7 +146,6 @@
   </build>
 
   <dependencies>
-
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
@@ -286,7 +280,6 @@
       <scope>compile</scope>
     </dependency>
 
-
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -342,7 +335,6 @@
       <artifactId>nexus-plugin-console-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
-
   </dependencies>
 
   <profiles>
