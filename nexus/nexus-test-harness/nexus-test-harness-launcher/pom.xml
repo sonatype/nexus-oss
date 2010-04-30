@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -11,141 +12,8 @@
   <artifactId>nexus-test-harness-launcher</artifactId>
   <name>Nexus Test Harness Launcher</name>
 
-  <build>
-
-    <testResources>
-      <testResource>
-        <targetPath>${project.build.testOutputDirectory}</targetPath>
-        <filtering>true</filtering>
-        <directory>${basedir}/src/test/resources</directory>
-      </testResource>
-    </testResources>
-
-    <plugins>
-      <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>1.6-SNAPSHOT</version>
-        <configuration>
-          <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
-          <extraArtifacts>
-            <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
-            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
-          </extraArtifacts>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>initialize</phase>
-            <goals>
-              <goal>install</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.5-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>env</id>
-            <phase>initialize</phase>
-            <goals>
-              <goal>setup-environment</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>package</id>
-            <goals>
-              <goal>package</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
-          </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-          <nexusPluginsArtifacts>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-simple-memory-realm</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-exception-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.security.realms</groupId>
-              <artifactId>security-url-realm</artifactId>
-            </plugin>
-          </nexusPluginsArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.3</version>
-        <configuration>
-          <skipTests>true</skipTests>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <configuration>
-              <descriptors>
-                <descriptor>src/assemble/repo.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>failsafe-maven-plugin</artifactId>
-        <version>2.4.3-alpha-1</version>
-        <configuration>
-          <argLine>-Xmx512M</argLine>
-          <excludes>
-            <exclude>**Suite*</exclude>
-            <!-- START This are start/stop tests, shouldn't be runned -->
-            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
-            <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>**/Nexus748MultipleStartTest.*</exclude>
-            <!-- END This are start/stop tests, shouldn't be runned -->
-            <!-- inner classes -->
-            <exclude>**/*$*.*</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <dependencies>
+
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
@@ -187,6 +55,7 @@
       <artifactId>emma</artifactId>
       <version>2.1.5320</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>apache-maven</artifactId>
@@ -215,21 +84,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
       <version>${plexus-security.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -241,8 +98,14 @@
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
-      <version>2.0.0</version>
+      <version>2.1.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.appbooter</groupId>
+      <artifactId>plexus-forked-app-booter</artifactId>
+      <version>2.1.0</version>
+    </dependency>
+
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -266,12 +129,6 @@
           <artifactId>plexus-component-api</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.appbooter</groupId>
-      <artifactId>plexus-forked-app-booter</artifactId>
-      <version>2.0.0</version>
     </dependency>
 
     <dependency>
@@ -329,58 +186,6 @@
       <version>${plexus-security.version}</version>
     </dependency>
 
-    <!-- Nexus Core Plugins -->
-    <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>skip-test-harness-tests</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>failsafe-maven-plugin</artifactId>
-            <configuration>
-              <skip>true</skip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
-      <id>yourkit-profile</id>
-
-      <properties>
-        <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 8.0.13</yourkit.home>
-      </properties>
-
-      <dependencies>
-        <dependency>
-          <groupId>com.yourkit</groupId>
-          <artifactId>yjp</artifactId>
-          <version>8.0.13</version>
-          <scope>system</scope>
-          <systemPath>${yourkit.home}\lib\yjp.jar</systemPath>
-        </dependency>
-      </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <argLine>-agentpath:"${yourkit.home}\bin\win32\yjpagent.dll"</argLine>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

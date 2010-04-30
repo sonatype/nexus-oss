@@ -1,39 +1,40 @@
 package org.sonatype.nexus.test.utils.plugin;
 
-import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
-import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoListResponseDTO;
-import org.sonatype.nexus.plugins.plugin.console.api.dto.RestInfoDTO;
-import org.sonatype.plexus.rest.xstream.AliasingListConverter;
+import org.sonatype.nexus.test.utils.XStreamConfigurator;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * Plugin XStream factory, meant for Plugin ITs, that applies Nexus Core configuration, but also add preferred (usually
+ * plugin-specific) configuration too.
+ * 
+ * @author cstamas
+ */
 public class XStreamFactory
 {
-    public static XStream getXmlXStream()
+    public static XStream getXmlXStream( XStreamConfigurator configurator )
     {
         XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getXmlXStream();
-        configureXStream( xs );
+
+        configureXStream( xs, configurator );
+
         return xs;
     }
 
-    public static XStream getJsonXStream()
+    public static XStream getJsonXStream( XStreamConfigurator configurator )
     {
         XStream xs = org.sonatype.nexus.test.utils.XStreamFactory.getJsonXStream();
-        configureXStream( xs );
+
+        configureXStream( xs, configurator );
+
         return xs;
     }
 
-    private static void configureXStream( XStream xstream )
+    private static void configureXStream( XStream xstream, XStreamConfigurator configurator )
     {
-        xstream.processAnnotations( PluginInfoDTO.class );
-        xstream.processAnnotations( PluginInfoListResponseDTO.class );
-
-        xstream.registerLocalConverter( PluginInfoListResponseDTO.class, "data", new AliasingListConverter(
-            PluginInfoDTO.class,
-            "pluginInfo" ) );
-
-        xstream.registerLocalConverter( PluginInfoDTO.class, "restInfos", new AliasingListConverter(
-            RestInfoDTO.class,
-            "restInfo" ) );
+        if ( configurator != null )
+        {
+            configurator.configure( xstream );
+        }
     }
 }

@@ -21,6 +21,11 @@ import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
 
+/**
+ * XStream factory for Nexus Core. It gives away a preconfigured XStream to communicate with Core REST Resources.
+ * 
+ * @author cstamas
+ */
 public class XStreamFactory
 {
     public static XStream getXmlXStream()
@@ -30,7 +35,7 @@ public class XStreamFactory
         NexusApplication napp = new NexusApplication();
 
         napp.doConfigureXstream( xs );
-        
+
         XStreamInitializer.init( xs );
 
         return xs;
@@ -46,7 +51,7 @@ public class XStreamFactory
         NexusApplication napp = new NexusApplication();
 
         napp.doConfigureXstream( xs );
-        
+
         XStreamInitializer.init( xs );
 
         return xs;
