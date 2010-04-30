@@ -225,13 +225,4 @@ public class PluginEnvironmentMojo
         return plugins;
     }
 
-    @Override
-    protected Collection<MavenArtifact> getExtraResourcesArtifacts()
-    {
-        Collection<MavenArtifact> artifacts = new LinkedHashSet<MavenArtifact>();
-        artifacts.addAll( super.getExtraResourcesArtifacts() );
-        artifacts.add( new MavenArtifact( "org.sonatype.nexus", "nexus-test-harness-launcher", "repo", "zip",
-                                          "maven-repository" ) );
-        return artifacts;
-    }
 }
