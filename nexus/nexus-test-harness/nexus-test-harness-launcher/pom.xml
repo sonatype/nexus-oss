@@ -24,6 +24,36 @@
     <plugins>
 
       <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>1.6-SNAPSHOT</version>
+        <configuration>
+          <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
+          <extraArtifacts>
+            <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
+          </extraArtifacts>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
         <version>1.5-SNAPSHOT</version>
@@ -43,7 +73,7 @@
           </execution>
         </executions>
         <configuration>
-          
+
           <nexusBundleArtifact>
             <groupId>org.sonatype.nexus</groupId>
             <artifactId>nexus-oss-webapp</artifactId>
@@ -51,9 +81,9 @@
             <type>zip</type>
             <classifier>bundle</classifier>
           </nexusBundleArtifact>
-          
+
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-        
+
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>${project.groupId}</groupId>
@@ -201,7 +231,7 @@
       <artifactId>security-rest-api</artifactId>
       <version>${plexus-security.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
@@ -305,14 +335,14 @@
       <artifactId>security-url-realm</artifactId>
       <version>${plexus-security.version}</version>
     </dependency>
-    
+
     <!-- Nexus Core Plugins -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
+
   </dependencies>
 
   <profiles>
