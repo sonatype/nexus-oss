@@ -35,7 +35,7 @@ public class NXCM1312UploadExpiredLicenseIT
     {
         try
         {
-            DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "license" );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )

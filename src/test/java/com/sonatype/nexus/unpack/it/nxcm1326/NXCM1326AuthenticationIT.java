@@ -58,7 +58,7 @@ public class NXCM1326AuthenticationIT
 
         try
         {
-            DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
@@ -77,7 +77,7 @@ public class NXCM1326AuthenticationIT
         
         try
         {
-            DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
@@ -95,7 +95,7 @@ public class NXCM1326AuthenticationIT
 
         addPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO, "content-compressed" );
 
-        DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+        DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
             + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
     }
 

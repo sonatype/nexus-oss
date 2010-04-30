@@ -29,7 +29,7 @@ public class NXCM1312UploadCompressedBundleIT
     public void upload()
         throws Exception
     {
-        DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+        DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
             + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
 
         Assert.assertEquals( 1, SearchMessageUtil.searchFor( "nxcm1312", "artifact", "2.0" ).size() );
@@ -40,7 +40,7 @@ public class NXCM1312UploadCompressedBundleIT
     public void uploadWithPath()
         throws Exception
     {
-        DeployUtils.deployWithWagon( container, "http", nexusBaseUrl + "service/local/repositories/"
+        DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
             + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "some/path" );
 
         // Check for the parent folder, it should been created
