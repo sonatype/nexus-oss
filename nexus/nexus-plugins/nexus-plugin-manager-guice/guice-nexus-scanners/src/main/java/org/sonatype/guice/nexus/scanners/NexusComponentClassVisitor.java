@@ -107,7 +107,9 @@ final class NexusComponentClassVisitor
                        final String superName, final String[] interfaces )
     {
         type = NexusComponentType.UNKNOWN;
+
         repositoryPathPrefix = null;
+        repositoryMaxInstanceCount = RepositoryType.UNLIMITED_INSTANCES;
 
         className = name.replace( '/', '.' );
         if ( null != exportedClassNames )
@@ -172,7 +174,7 @@ final class NexusComponentClassVisitor
         if ( null != repositoryPathPrefix && null != role )
         {
             repositoryTypes.add( new RepositoryTypeDescriptor( role, getHint(), repositoryPathPrefix,
-                repositoryMaxInstanceCount ) );
+                                                               repositoryMaxInstanceCount ) );
         }
     }
 
