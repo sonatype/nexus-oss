@@ -222,7 +222,10 @@ public class RestletResource
                 }
                 catch ( XStreamException e )
                 {
-                    this.getLogger().log( Level.WARNING, "Invalid XML, unable to parse using XStream", e );
+                    this.getLogger().log(
+                                          Level.WARNING,
+                                          "Invalid XML, unable to parse using XStream "
+                                              + ( delegate == null ? "" : delegate.getClass() ), e );
 
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
                                                  "Invalid XML, unable to parse using XStream", e );
