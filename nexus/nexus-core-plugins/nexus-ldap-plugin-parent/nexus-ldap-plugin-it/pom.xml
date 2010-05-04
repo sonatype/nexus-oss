@@ -89,7 +89,7 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>1.1</version>
+      <version>${plexus-ldap-testsuite.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
