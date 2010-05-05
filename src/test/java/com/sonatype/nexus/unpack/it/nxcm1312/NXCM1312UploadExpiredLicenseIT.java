@@ -11,7 +11,6 @@ import java.util.prefs.Preferences;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 import com.sonatype.nexus.licensing.NexusLicenseBuilder;
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
@@ -35,7 +34,7 @@ public class NXCM1312UploadExpiredLicenseIT
     {
         try
         {
-            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
+            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "license" );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )

@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
@@ -35,9 +34,9 @@ public class NXCM1326AuthenticationIT
     {
         XStream xstream = this.getXMLXStream();
 
-        this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.privUtil = new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.privUtil = new PrivilegesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
     
     @Before
@@ -58,7 +57,7 @@ public class NXCM1326AuthenticationIT
 
         try
         {
-            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
+            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
@@ -77,7 +76,7 @@ public class NXCM1326AuthenticationIT
         
         try
         {
-            DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
+            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
                 + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
@@ -95,7 +94,7 @@ public class NXCM1326AuthenticationIT
 
         addPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO, "content-compressed" );
 
-        DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "service/local/repositories/"
+        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
             + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
     }
 
