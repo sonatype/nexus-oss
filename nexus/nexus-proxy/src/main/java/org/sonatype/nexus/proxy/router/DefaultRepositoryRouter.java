@@ -154,9 +154,7 @@ public class DefaultRepositoryRouter
 
         ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath() );
 
-        req.getRequestContext().putAll( link.getItemContext() );
-
-        req.getRequestContext().setParentContext( link.getItemContext().getParentContext() );
+        req.getRequestContext().setParentContext( link.getItemContext() );
 
         return link.getTarget().getRepository().retrieveItem( req );
     }

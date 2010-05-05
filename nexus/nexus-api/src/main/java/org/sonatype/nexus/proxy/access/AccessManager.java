@@ -43,6 +43,11 @@ public interface AccessManager
      * Key used to mark the request certificates of confidential channel (https).
      */
     String REQUEST_CERTIFICATES = "request.certificates";
+    
+    /**
+     * Key used to mark a request as already authorized, if set, no authorization will be performed
+     */
+    String REQUEST_AUTHORIZED = "request.authorized";
 
     /**
      * The implementation of this method should throw AccessDeniedException or any subclass if it denies access.
