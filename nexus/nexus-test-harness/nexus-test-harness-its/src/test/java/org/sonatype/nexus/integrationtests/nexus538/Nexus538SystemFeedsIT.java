@@ -52,7 +52,7 @@ public class Nexus538SystemFeedsIT
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         RepositoryBaseResource repo = repoUtil.getRepository( this.getTestRepositoryId() );
         String oldName = repo.getName();
@@ -74,7 +74,7 @@ public class Nexus538SystemFeedsIT
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );

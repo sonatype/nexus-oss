@@ -25,7 +25,6 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 
 /**
@@ -62,7 +61,7 @@ public class Nexus176DeployToInvalidRepoIT
         PostMethod filePost = new PostMethod( uploadURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_NOT_FOUND )
         {
@@ -107,7 +106,7 @@ public class Nexus176DeployToInvalidRepoIT
         PostMethod filePost = new PostMethod( uploadURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_NOT_FOUND )
         {
@@ -152,7 +151,7 @@ public class Nexus176DeployToInvalidRepoIT
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         
         if ( status != HttpStatus.SC_NOT_FOUND )
         {
@@ -196,7 +195,7 @@ public class Nexus176DeployToInvalidRepoIT
         PostMethod filePost = new PostMethod( uploadURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_NOT_FOUND )
         {
@@ -241,7 +240,7 @@ public class Nexus176DeployToInvalidRepoIT
         PostMethod filePost = new PostMethod( uploadURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_NOT_FOUND )
         {
@@ -286,7 +285,7 @@ public class Nexus176DeployToInvalidRepoIT
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         
         if ( status != HttpStatus.SC_NOT_FOUND )
         {

@@ -54,7 +54,7 @@ public class Nexus782UploadWithClassifierIT
         File pomFile = this.getTestFile( "same-pom/pom.xml" );
 
         // upload jar artifact
-        int result = DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, null );
+        int result = getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null, null );
         assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
         // make sure everything is cool so far
@@ -62,7 +62,7 @@ public class Nexus782UploadWithClassifierIT
 
         // upload jar artifact with classifier
         result =
-            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
+            getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
                                                 this.artifactClassifierGav.getClassifier(), null );
         assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
@@ -83,7 +83,7 @@ public class Nexus782UploadWithClassifierIT
 
         // upload jar artifact
         int result =
-            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null,
+            getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null,
                                                 this.artifactGav.getExtension() );
         assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );
 
@@ -92,7 +92,7 @@ public class Nexus782UploadWithClassifierIT
 
         // upload jar artifact with classifier
         result =
-            DeployUtils.deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
+            getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactClassifierFile, pomFile,
                                                 this.artifactClassifierGav.getClassifier(),
                                                 this.artifactClassifierGav.getExtension() );
         assertTrue( "Got error from server: " + result, Status.isSuccess( result ) );

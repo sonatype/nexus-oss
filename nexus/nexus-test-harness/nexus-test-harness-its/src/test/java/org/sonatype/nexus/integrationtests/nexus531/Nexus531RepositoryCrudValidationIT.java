@@ -41,7 +41,7 @@ public class Nexus531RepositoryCrudValidationIT
         throws ComponentLookupException
     {
         this.messageUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
     }
 
     @Test

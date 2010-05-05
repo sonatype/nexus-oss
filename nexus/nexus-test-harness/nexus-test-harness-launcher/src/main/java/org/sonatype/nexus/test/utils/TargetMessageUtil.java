@@ -29,6 +29,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
@@ -39,23 +40,23 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.thoughtworks.xstream.XStream;
 
 public class TargetMessageUtil
+    extends ITUtil
 {
-
     private XStream xstream;
 
     private MediaType mediaType;
 
     private static final Logger LOG = Logger.getLogger( TargetMessageUtil.class );
 
-    public TargetMessageUtil( XStream xstream, MediaType mediaType )
+    public TargetMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
-        super();
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-    
+
     public RepositoryTargetResource createTarget( RepositoryTargetResource target )
-        throws IOException 
+        throws IOException
     {
         return saveTarget( target, false );
     }
@@ -77,7 +78,7 @@ public class TargetMessageUtil
         Assert.assertTrue( StringUtils.isNotEmpty( responseResource.getId() ) );
         if ( update )
         {
-            Assert.assertEquals( target.getId(), responseResource.getId() );    
+            Assert.assertEquals( target.getId(), responseResource.getId() );
         }
 
         Assert.assertEquals( target.getContentClass(), responseResource.getContentClass() );
@@ -159,7 +160,7 @@ public class TargetMessageUtil
         throws IOException
     {
         // check the nexus.xml
-        Configuration config = NexusConfigUtil.getNexusConfig();
+        Configuration config = getTest().getNexusConfigUtil().getNexusConfig();
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
 
@@ -187,8 +188,8 @@ public class TargetMessageUtil
                     Assert.assertEquals( targetResource.getContentClass(), repositoryTarget.getContentClass() );
                     Assert.assertEquals( targetResource.getName(), repositoryTarget.getName() );
                     // order doesn't matter
-                    Assert.assertEquals( new HashSet<String>( targetResource.getPatterns() ),
-                                         new HashSet<String>( repositoryTarget.getPatterns() ) );
+                    Assert.assertEquals( new HashSet<String>( targetResource.getPatterns() ), new HashSet<String>(
+                        repositoryTarget.getPatterns() ) );
 
                     break;
                 }
@@ -207,7 +208,7 @@ public class TargetMessageUtil
         throws IOException
     {
         // check the nexus.xml
-        Configuration config = NexusConfigUtil.getNexusConfig();
+        Configuration config = getTest().getNexusConfigUtil().getNexusConfig();
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
         // check to see if the size matches

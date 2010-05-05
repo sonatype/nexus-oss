@@ -40,7 +40,7 @@ public class Nexus133TargetValidationIT
     public Nexus133TargetValidationIT()
     {
         this.messageUtil =
-            new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

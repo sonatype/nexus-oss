@@ -10,7 +10,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 public class ITUtil
 {
     protected final AbstractNexusIntegrationTest test;
-
+    
     public ITUtil( AbstractNexusIntegrationTest test )
     {
         super();

@@ -35,9 +35,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
@@ -100,29 +98,29 @@ public class Nexus537RepoTargetsIT
     {
         repo1BarArtifact =
             new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-bar-artifact", false, false, null, false, null );
+                "repo1-bar-artifact", false, false, null, false, null );
         repo1FooArtifact =
             new Gav( this.getTestId(), "repo1-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-foo-artifact", false, false, null, false, null );
+                "repo1-foo-artifact", false, false, null, false, null );
         repo2BarArtifact =
             new Gav( this.getTestId(), "repo2-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-bar-artifact", false, false, null, false, null );
+                "repo2-bar-artifact", false, false, null, false, null );
         repo2FooArtifact =
             new Gav( this.getTestId(), "repo2-foo-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-foo-artifact", false, false, null, false, null );
+                "repo2-foo-artifact", false, false, null, false, null );
 
         repo1BarArtifactDelete =
             new Gav( this.getTestId(), "repo1-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-bar-artifact-delete", false, false, null, false, null );
+                "repo1-bar-artifact-delete", false, false, null, false, null );
         repo1FooArtifactDelete =
             new Gav( this.getTestId(), "repo1-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo1-foo-artifact-delete", false, false, null, false, null );
+                "repo1-foo-artifact-delete", false, false, null, false, null );
         repo2BarArtifactDelete =
             new Gav( this.getTestId(), "repo2-bar-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-bar-artifact-delete", false, false, null, false, null );
+                "repo2-bar-artifact-delete", false, false, null, false, null );
         repo2FooArtifactDelete =
             new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
-                     "repo2-foo-artifact-delete", false, false, null, false, null );
+                "repo2-foo-artifact-delete", false, false, null, false, null );
     }
 
     @Override
@@ -142,7 +140,7 @@ public class Nexus537RepoTargetsIT
         // "6", "14","19","44","54","55","57","58","64","70"
         this.printUserPrivs( TEST_USER_NAME );
     }
-    
+
     @Override
     protected void overwriteUserRole( String userId, String newRoleName, String... permissions )
         throws Exception
@@ -155,7 +153,7 @@ public class Nexus537RepoTargetsIT
     public void doReadTest()
         throws Exception
     {
-        
+
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -209,7 +207,7 @@ public class Nexus537RepoTargetsIT
     @Test
     public void doCreateRepoTargetTest()
         throws Exception
-    {        
+    {
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -242,22 +240,25 @@ public class Nexus537RepoTargetsIT
         this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), false );
 
         // now give
-        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId, this.groupFooPrivCreateId );
+        this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivUpdateId", this.groupFooPrivUpdateId,
+            this.groupFooPrivCreateId );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.deploy( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct access
+        this.deploy( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct
+                                                                                                       // access
         this.deploy( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access from group
+        this.deploy( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access
+                                                                                                       // from group
 
     }
 
     @Test
     public void artifactUplaodTest()
         throws Exception
-    {        
+    {
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
@@ -299,25 +300,27 @@ public class Nexus537RepoTargetsIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         this.upload( repo1BarArtifact, REPO1_ID, this.getTestFile( "repo1-bar-artifact.jar" ), false );
-        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct access
+        this.upload( repo1FooArtifact, REPO1_ID, this.getTestFile( "repo1-foo-artifact.jar" ), true ); // has direct
+                                                                                                       // access
         this.upload( repo2BarArtifact, REPO2_ID, this.getTestFile( "repo2-bar-artifact.jar" ), false );
-        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access from group
+        this.upload( repo2FooArtifact, REPO2_ID, this.getTestFile( "repo2-foo-artifact.jar" ), true ); // has access
+                                                                                                       // from group
     }
 
     @Test
     public void doDeleteTest()
         throws Exception
-    {        
+    {
         // deploy the artifacts first, we need to use different once because i have no idea how to order the tests with
         // JUnit
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
-                                            this.getTestFile( "repo1-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
-                                            this.getTestFile( "repo1-foo-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
-                                            this.getTestFile( "repo2-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
-                                            this.getTestFile( "repo2-foo-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
+            this.getTestFile( "repo1-bar-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
+            this.getTestFile( "repo1-foo-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
+            this.getTestFile( "repo2-bar-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
+            this.getTestFile( "repo2-foo-artifact.jar" ) );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -348,21 +351,21 @@ public class Nexus537RepoTargetsIT
         this.delete( repo1FooArtifactDelete, REPO1_ID, false );
         this.delete( repo2BarArtifactDelete, REPO2_ID, false );
         this.delete( repo2FooArtifactDelete, REPO2_ID, false );
-        
+
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-        
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
+
+        getDeployUtils().deployUsingGavWithRest( REPO1_ID, repo1BarArtifactDelete,
             this.getTestFile( "repo1-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
-                    this.getTestFile( "repo1-foo-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
-                    this.getTestFile( "repo2-bar-artifact.jar" ) );
-        DeployUtils.deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
-                    this.getTestFile( "repo2-foo-artifact.jar" ) );
-        
+        getDeployUtils().deployUsingGavWithRest( REPO1_ID, repo1FooArtifactDelete,
+            this.getTestFile( "repo1-foo-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO2_ID, repo2BarArtifactDelete,
+            this.getTestFile( "repo2-bar-artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( REPO2_ID, repo2FooArtifactDelete,
+            this.getTestFile( "repo2-foo-artifact.jar" ) );
+
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
-        
+
         // now give
         this.overwriteUserRole( TEST_USER_NAME, "groupFooPrivDeleteId", this.groupFooPrivDeleteId );
 
@@ -402,7 +405,7 @@ public class Nexus537RepoTargetsIT
             // fileToDeploy, this.getRelitiveArtifactPath( gav ) );
             Verifier verifier =
                 MavenDeployer.deployAndGetVerifier( gav, this.getRepositoryUrl( repoId ), fileToDeploy,
-                                                    this.getOverridableFile( "settings.xml" ) );
+                    this.getOverridableFile( "settings.xml" ) );
 
             Assert.assertTrue( "Artifact upload should have thrown exception", shouldUpload );
         }
@@ -419,7 +422,7 @@ public class Nexus537RepoTargetsIT
     private void upload( Gav gav, String repoId, File fileToDeploy, boolean shouldUpload )
         throws InterruptedException, HttpException, IOException
     {
-        int status = DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy );
 
         Assert.assertTrue( "Artifact upload returned: " + status
             + ( shouldUpload ? " expected sucess" : " expected failure" ), ( 201 == status && shouldUpload )
@@ -508,17 +511,24 @@ public class Nexus537RepoTargetsIT
         {
             PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
+            if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 fooPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 fooPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 fooPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 fooPrivDeleteId = privilegeBaseStatusResource.getId();
             else
-                Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+                Assert.fail( "Unknown Privilege found, id: "
+                    + privilegeBaseStatusResource.getId()
+                    + " method: "
+                    + getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                        ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
         // now create a couple privs
@@ -539,17 +549,24 @@ public class Nexus537RepoTargetsIT
         {
             PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
+            if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 barPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 barPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 barPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 barPrivDeleteId = privilegeBaseStatusResource.getId();
             else
-                Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+                Assert.fail( "Unknown Privilege found, id: "
+                    + privilegeBaseStatusResource.getId()
+                    + " method: "
+                    + getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                        ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
         // now create a couple privs
@@ -573,17 +590,24 @@ public class Nexus537RepoTargetsIT
         {
             PrivilegeStatusResource privilegeBaseStatusResource = iter.next();
 
-            if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
+            if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "create,read" ) )
                 groupFooPrivCreateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "read" ) )
                 groupFooPrivReadId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "update,read" ) )
                 groupFooPrivUpdateId = privilegeBaseStatusResource.getId();
-            else if ( SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
+            else if ( getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                ApplicationPrivilegeMethodPropertyDescriptor.ID ).equals( "delete,read" ) )
                 groupFooPrivDeleteId = privilegeBaseStatusResource.getId();
             else
-                Assert.fail( "Unknown Privilege found, id: " + privilegeBaseStatusResource.getId() + " method: "
-                    + SecurityConfigUtil.getPrivilegeProperty( privilegeBaseStatusResource, ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
+                Assert.fail( "Unknown Privilege found, id: "
+                    + privilegeBaseStatusResource.getId()
+                    + " method: "
+                    + getSecurityConfigUtil().getPrivilegeProperty( privilegeBaseStatusResource,
+                        ApplicationPrivilegeMethodPropertyDescriptor.ID ) );
         }
 
     }

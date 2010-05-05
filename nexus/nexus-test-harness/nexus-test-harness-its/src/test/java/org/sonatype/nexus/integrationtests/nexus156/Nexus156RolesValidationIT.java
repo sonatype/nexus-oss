@@ -23,7 +23,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.rest.model.RoleResource;
 
 /**
@@ -37,7 +36,7 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
     public Nexus156RolesValidationIT()
     {
         this.messageUtil =
-            new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -250,7 +249,7 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
 
-        SecurityConfigUtil.verifyRole( resource );
+        getSecurityConfigUtil().verifyRole( resource );
 
 
         /*

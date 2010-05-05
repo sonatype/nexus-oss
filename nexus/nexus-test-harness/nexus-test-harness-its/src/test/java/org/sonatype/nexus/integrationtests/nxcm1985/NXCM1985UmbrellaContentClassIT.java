@@ -57,13 +57,13 @@ public class NXCM1985UmbrellaContentClassIT
         
         //create failure
         Gav gav = GavUtil.newGav( "nxcm1985", "artifact", "1.0" );
-        int status = DeployUtils.deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
+        int status = getDeployUtils().deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
         Assert.assertEquals( "Status", 403, status );   
         
         resetTestUserPrivs( true );
         
         //create success
-        status = DeployUtils.deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
+        status = getDeployUtils().deployUsingGavWithRest( getTestRepositoryId(), gav, getTestFile( "artifact.jar" ) );
         Assert.assertEquals( "Status", 201, status );
         
         resetTestUserPrivs( false );
@@ -130,7 +130,7 @@ public class NXCM1985UmbrellaContentClassIT
             Assert.fail( "Target not found!" );
         }
         
-        PrivilegesMessageUtil util = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        PrivilegesMessageUtil util = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         
         PrivilegeResource resource = new PrivilegeResource();
         

@@ -19,9 +19,9 @@ public class Nexus3011DeletePrivilegeIT
     private static final String ROLE_ID = "nexus3011-role";
 
     private PrivilegesMessageUtil privUtil =
-        new PrivilegesMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
+        new PrivilegesMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
 
-    private RoleMessageUtil roleUtil = new RoleMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
+    private RoleMessageUtil roleUtil = new RoleMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
 
     private static final String READ_PRIV_ID = "999a27d0bf1";
 

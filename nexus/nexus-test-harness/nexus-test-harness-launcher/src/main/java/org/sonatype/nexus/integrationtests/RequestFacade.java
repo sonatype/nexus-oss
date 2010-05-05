@@ -66,7 +66,6 @@ public class RequestFacade
     public static Response sendMessage( String serviceURIpart, Method method, Representation representation )
         throws IOException
     {
-
         String serviceURI = AbstractNexusIntegrationTest.nexusBaseUrl + serviceURIpart;
         return sendMessage( new URL( serviceURI ), method, representation );
     }

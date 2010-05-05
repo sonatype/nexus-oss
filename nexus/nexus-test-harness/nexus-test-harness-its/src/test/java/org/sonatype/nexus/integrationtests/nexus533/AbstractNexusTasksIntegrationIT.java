@@ -52,7 +52,7 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
     protected void assertTasks()
         throws IOException
     {
-        Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
+        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
 
         List<CScheduledTask> tasks = nexusConfig.getTasks();
         Assert.assertEquals( 1, tasks.size() );
@@ -134,7 +134,7 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         Assert.assertTrue( status.isSuccess() );
 
         // delete is not working, see NEXUS-572
-        Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
+        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
         Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
     }
 

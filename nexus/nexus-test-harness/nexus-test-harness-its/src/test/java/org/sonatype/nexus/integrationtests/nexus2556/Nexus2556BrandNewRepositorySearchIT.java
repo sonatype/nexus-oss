@@ -15,7 +15,6 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
@@ -31,7 +30,7 @@ public class Nexus2556BrandNewRepositorySearchIT
         throws ComponentLookupException
     {
         this.repoUtil =
-            new RepositoryMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
+            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
                                        getRepositoryTypeRegistry() );
     }
 
@@ -63,7 +62,7 @@ public class Nexus2556BrandNewRepositorySearchIT
         Assert.assertTrue( repo.isIndexable() );
 
         Gav gav = GavUtil.newGav( "nexus2556", "artifact", "1.0" );
-        DeployUtils.deployUsingGavWithRest( repoId, gav, getTestFile( "artifact.jar" ) );
+        getDeployUtils().deployUsingGavWithRest( repoId, gav, getTestFile( "artifact.jar" ) );
 
         List<NexusArtifact> result = SearchMessageUtil.searchFor( gav, repoId );
         Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );

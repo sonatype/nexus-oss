@@ -29,7 +29,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 /**
  * Test the privilege for CRUD operations.
@@ -57,7 +56,7 @@ public class Nexus477ArtifactsCrudIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
         this.resetTestUserPrivs();
 
-        int status = DeployUtils.deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( this.getTestRepositoryId(), gav, fileToDeploy );
         Assert.assertEquals( "Status", 201, status );
     }
 

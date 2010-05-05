@@ -36,7 +36,7 @@ public class Nexus1239PlexusUserResourceIT
         throws IOException
     {
 
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( "default", "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
@@ -58,7 +58,7 @@ public class Nexus1239PlexusUserResourceIT
         throws IOException
     {
 
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( null, "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
@@ -80,7 +80,7 @@ public class Nexus1239PlexusUserResourceIT
         throws IOException
     {
 
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         PlexusUserResource user = userUtil.getPlexusUser( "all", "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
@@ -101,7 +101,7 @@ public class Nexus1239PlexusUserResourceIT
     public void getUsersTest()
         throws IOException
     {
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         List<PlexusUserResource> users = userUtil.getPlexusUsers( "default" );
 
         List<String> userIds = new ArrayList<String>();
@@ -123,7 +123,7 @@ public class Nexus1239PlexusUserResourceIT
     public void getUsersTestAllSource()
         throws IOException
     {
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         List<PlexusUserResource> users = userUtil.getPlexusUsers( "all" );
 
         List<String> userIds = new ArrayList<String>();
@@ -150,7 +150,7 @@ public class Nexus1239PlexusUserResourceIT
         throws IOException
     {
 
-        UserMessageUtil userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        UserMessageUtil userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         List<PlexusUserResource> users = userUtil.getPlexusUsers( "VOID" );
         Assert.assertEquals( 0, users.size() );
     }

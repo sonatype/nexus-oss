@@ -16,7 +16,6 @@ package org.sonatype.nexus.integrationtests.nexus779;
 import java.io.File;
 
 import org.junit.Test;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 public class Nexus779DeployRssIT
     extends AbstractRssIT
@@ -50,9 +49,9 @@ public class Nexus779DeployRssIT
         File pomFile = getTestFile( artifactName + ".pom" );
 
         String deployUrl = nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO;
-        DeployUtils.deployWithWagon( this, "http", deployUrl, jarFile, "nexus779/" + artifactName + "/1.0/"
+        getDeployUtils().deployWithWagon( "http", deployUrl, jarFile, "nexus779/" + artifactName + "/1.0/"
             + artifactName + "-1.0.jar" );
-        DeployUtils.deployWithWagon( this, "http", deployUrl, pomFile, "nexus779/" + artifactName + "/1.0/"
+        getDeployUtils().deployWithWagon( "http", deployUrl, pomFile, "nexus779/" + artifactName + "/1.0/"
             + artifactName + "-1.0.pom" );
 
     }
@@ -63,7 +62,7 @@ public class Nexus779DeployRssIT
         File jarFile = getTestFile( artifactName + ".jar" );
         File pomFile = getTestFile( artifactName + ".pom" );
 
-        int status = DeployUtils.deployUsingPomWithRest( REPO_TEST_HARNESS_REPO, jarFile, pomFile, "", "jar" );
+        int status = getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO, jarFile, pomFile, "", "jar" );
         return status;
     }
 

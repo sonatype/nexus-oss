@@ -46,8 +46,8 @@ public class Nexus3233IndexPomSha1IT
         final String repo = getRepositoryUrl( REPO_TEST_HARNESS_REPO );
         final Gav gav = GavUtil.newGav( "nexus3233", "wagon", "1.0.0", "pom" );
         final String path = getRelitiveArtifactPath( gav );
-        DeployUtils.deployWithWagon( this, "http", repo, pom, path );
-        DeployUtils.deployWithWagon( this, "http", repo, sha1, path + ".sha1" );
+        getDeployUtils().deployWithWagon( "http", repo, pom, path );
+        getDeployUtils().deployWithWagon( "http", repo, sha1, path + ".sha1" );
         searchFor( pom );
     }
 
@@ -66,7 +66,7 @@ public class Nexus3233IndexPomSha1IT
         throws Exception
     {
         final File pom = getTestFile( "rest.pom" );
-        HttpMethod r = DeployUtils.deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
+        HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
         Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText(),
                            Status.isSuccess( r.getStatusCode() ) );
         searchFor( pom );

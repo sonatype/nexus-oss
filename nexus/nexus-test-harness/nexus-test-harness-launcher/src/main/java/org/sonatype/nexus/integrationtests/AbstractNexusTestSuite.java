@@ -21,6 +21,11 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
+/**
+ * What is this?
+ *
+ *@deprecated Do not use this, I don't know what is this
+ */
 public abstract class AbstractNexusTestSuite
 {
 
@@ -38,7 +43,7 @@ public abstract class AbstractNexusTestSuite
             new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
         FileTestingUtils.fileCopy( testConfigFile, outputFile );
 
-       NexusStatusUtil.doHardStart();
+       //NexusStatusUtil.doHardStart();
 
         // enable security
         TestContainer.getInstance().getTestContext().setSecureTest( true );
@@ -48,7 +53,7 @@ public abstract class AbstractNexusTestSuite
     public static void afterSuite()
         throws Exception
     {
-        NexusStatusUtil.doHardStop( false );
+        //NexusStatusUtil.doHardStop( false );
     }
 
 }

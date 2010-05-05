@@ -22,7 +22,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus969CacheEvictInteractionIT
@@ -43,21 +42,10 @@ public class Nexus969CacheEvictInteractionIT
         String id1 = createEvictTask( CACHE_EVICT ).getId();
         String id2 = createEvictTask( CACHE_EVICT + "2" ).getId();
         Assert.assertFalse( id1.equals( id2 ) );
-        restart();
+        restartNexus();
         String id3 = createEvictTask( CACHE_EVICT + "3" ).getId();
         Assert.assertFalse( "The new task ID should be different both are : " + id3, id1.equals( id3 ) );
         Assert.assertFalse( "The new task ID should be different both are: " + id3, id2.equals( id3 ) );
-    }
-
-    private void restart()
-        throws Exception
-    {
-        // soft restart isn't enought to catch the bug
-        // NexusStateUtil.doSoftRestart();
-
-        NexusStatusUtil.doHardStop();
-        NexusStatusUtil.doHardStart();
-
     }
 
     private ScheduledServiceListResource createEvictTask( String taskName )

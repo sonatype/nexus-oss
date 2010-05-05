@@ -37,7 +37,7 @@ public class Nexus448PrivilegeUrlIT extends AbstractNexusIntegrationTest
     public Nexus448PrivilegeUrlIT()
     {
         this.messageUtil =
-            new PrivilegesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+            new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @Test

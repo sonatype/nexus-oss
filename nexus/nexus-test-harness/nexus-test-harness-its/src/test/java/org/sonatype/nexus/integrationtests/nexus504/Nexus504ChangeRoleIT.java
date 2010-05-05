@@ -49,8 +49,8 @@ public class Nexus504ChangeRoleIT
     {
         XStream xstream = this.getXMLXStream();
 
-        this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
 
     @Test

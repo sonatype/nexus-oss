@@ -41,7 +41,7 @@ public class Nexus133TargetCrudJsonIT
     public Nexus133TargetCrudJsonIT()
     {
         this.messageUtil =
-            new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

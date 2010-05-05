@@ -29,7 +29,7 @@ public class Nexus1646DeployArtifactsIT
         Gav gav = GavUtil.newGav( "nexus1646", "artifact", "1.33.44" );
         File artifact = getTestFile( "artifact.jar" );
 
-        int code = DeployUtils.deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
+        int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
         Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
 
         File metadataFile =
@@ -53,7 +53,7 @@ public class Nexus1646DeployArtifactsIT
         Gav gav = GavUtil.newGav( "nexus1646", "artifact", "1.1.1-SNAPSHOT" );
 
         File artifact = getTestFile( "artifact.jar" );
-        int code = DeployUtils.deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
+        int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
 
         Assert.assertEquals( "Unable to deploy artifact " + code, 400, code );
     }
@@ -65,7 +65,7 @@ public class Nexus1646DeployArtifactsIT
         Gav gav = GavUtil.newGav( "nexus1646", "artifact", "1.1.1-SNAPSHOT" );
 
         File artifact = getTestFile( "artifact.jar" );
-        int code = DeployUtils.deployUsingGavWithRest( REPO_TEST_HARNESS_SNAPSHOT_REPO, gav, artifact );
+        int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_SNAPSHOT_REPO, gav, artifact );
 
         Assert.assertEquals( "Unable to deploy artifact " + code, 400, code );
     }
@@ -77,7 +77,7 @@ public class Nexus1646DeployArtifactsIT
         File artifact = getTestFile( "changelog-maven-plugin-2.0-beta-1.jar" );
         File pom = getTestFile( "changelog-maven-plugin-2.0-beta-1.pom" );
 
-        int code = DeployUtils.deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, artifact, pom, null, null );
+        int code = getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, artifact, pom, null, null );
         Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
 
         // validate group metadata

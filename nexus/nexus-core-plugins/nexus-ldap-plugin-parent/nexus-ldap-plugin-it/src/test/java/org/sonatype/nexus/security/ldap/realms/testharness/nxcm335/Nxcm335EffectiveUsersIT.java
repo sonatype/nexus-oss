@@ -61,7 +61,7 @@ public class Nxcm335EffectiveUsersIT
         Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2, users.size() );
 
         // map user to nexus role
-        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this.xstream, this.mediaType );
+        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this, this.xstream, this.mediaType );
         UserToRoleResource ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "cstamas" );
         ldapUser.setSource( "LDAP" );
@@ -111,7 +111,7 @@ public class Nxcm335EffectiveUsersIT
         Assert.assertEquals( "Users found: " + this.toUserIds( users ), defaultUserCount + 4, users.size() );
 
         // map user to nexus role
-        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this.xstream, this.mediaType );
+        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this, this.xstream, this.mediaType );
         UserToRoleResource ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "cstamas" );
         ldapUser.setSource( "LDAP" );

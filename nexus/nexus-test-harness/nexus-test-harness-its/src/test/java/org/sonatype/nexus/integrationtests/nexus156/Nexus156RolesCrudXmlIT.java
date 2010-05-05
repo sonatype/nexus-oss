@@ -28,7 +28,7 @@ public class Nexus156RolesCrudXmlIT
 
     public Nexus156RolesCrudXmlIT()
     {
-        this.messageUtil = new RoleMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new RoleMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @Test

@@ -34,7 +34,7 @@ public class Nexus532GroupsCrudValidationIT
 
     public Nexus532GroupsCrudValidationIT()
     {
-        this.messageUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test

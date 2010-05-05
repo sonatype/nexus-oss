@@ -13,10 +13,7 @@
  */
 package org.sonatype.nexus.integrationtests.client.nexus758;
 
-import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStart;
-import static org.sonatype.nexus.test.utils.NexusStatusUtil.doHardStop;
-
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -30,12 +27,12 @@ public class Nexus758ServiceStability
 {
     private static NexusClient client;
 
-    @BeforeClass
-    public static void init()
+    @Before
+    public void init()
         throws Exception
     {
         // TODO: This below will not work if test enabled! 
-        client = (NexusClient) getStaticITPlexusContainer().lookup( NexusClient.ROLE );
+        client = (NexusClient) getITPlexusContainer().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( nexusBaseUrl, context.getAdminUsername(), context.getAdminPassword() );
     }
@@ -47,44 +44,44 @@ public class Nexus758ServiceStability
 
         // this could be done using a for, but I wanna to know how may times it run just looking to stack trace
         // 1
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 2
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 3
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 4
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 5
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 6
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 7
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 8
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 9
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
         // 10
-        doHardStart();
-        doHardStop();
+        startNexus();
+        stopNexus();
 
     }
 

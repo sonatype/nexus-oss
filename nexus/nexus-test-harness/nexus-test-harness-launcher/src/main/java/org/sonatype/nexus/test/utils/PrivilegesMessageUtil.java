@@ -25,6 +25,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
@@ -38,17 +39,17 @@ import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
 import com.thoughtworks.xstream.XStream;
 
 public class PrivilegesMessageUtil
+    extends ITUtil
 {
-
     private XStream xstream;
 
     private MediaType mediaType;
 
     private Logger log = Logger.getLogger( getClass() );
 
-    public PrivilegesMessageUtil( XStream xstream, MediaType mediaType )
+    public PrivilegesMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
-        super();
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
@@ -65,7 +66,7 @@ public class PrivilegesMessageUtil
 
         // get the Resource object
         List<PrivilegeStatusResource> statusResources = this.getResourceListFromResponse( response );
-        SecurityConfigUtil.verifyPrivileges( statusResources );
+        getTest().getSecurityConfigUtil().verifyPrivileges( statusResources );
 
         return statusResources;
     }

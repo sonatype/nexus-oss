@@ -24,6 +24,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.StringRepresentation;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
@@ -37,16 +38,17 @@ import org.sonatype.security.rest.model.RoleResourceRequest;
 import com.thoughtworks.xstream.XStream;
 
 public class RoleMessageUtil
+    extends ITUtil
 {
-
     private XStream xstream;
 
     private MediaType mediaType;
 
     private static final Logger LOG = Logger.getLogger( RoleMessageUtil.class );
 
-    public RoleMessageUtil( XStream xstream, MediaType mediaType )
+    public RoleMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
@@ -64,9 +66,9 @@ public class RoleMessageUtil
 
         // get the Resource object
         RoleResource responseResource = this.getResourceFromResponse( responseString );
-        
+
         // make sure the id != null
-        Assert.assertNotNull( "Result:\n"+ this.xStream.toXML( responseResource ), responseResource.getId() );
+        Assert.assertNotNull( "Result:\n" + this.xStream.toXML( responseResource ), responseResource.getId() );
 
         if ( role.getId() != null )
         {
@@ -79,7 +81,7 @@ public class RoleMessageUtil
         Assert.assertEquals( role.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( role.getRoles(), responseResource.getRoles() );
 
-        SecurityConfigUtil.verifyRole( responseResource );
+        getTest().getSecurityConfigUtil().verifyRole( responseResource );
 
         return responseResource;
     }
@@ -128,7 +130,7 @@ public class RoleMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
+     * 
      * @return
      * @throws IOException
      */
@@ -136,13 +138,14 @@ public class RoleMessageUtil
     public List<RoleResource> getList()
         throws IOException
     {
-        
+
         Response response = RequestFacade.doGetRequest( "service/local/roles" );
-        
+
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Request failed: "+ response.getStatus() +"\n"+ responseText, response.getStatus().isSuccess() );
-        
+        Assert.assertTrue( "Request failed: " + response.getStatus() + "\n" + responseText,
+            response.getStatus().isSuccess() );
+
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
@@ -221,11 +224,11 @@ public class RoleMessageUtil
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
         Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-                           response.getStatus().isSuccess() );
+            response.getStatus().isSuccess() );
 
         ExternalRoleMappingResourceResponse result =
             (ExternalRoleMappingResourceResponse) this.parseResponseText( responseString,
-                                                                          new ExternalRoleMappingResourceResponse() );
+                new ExternalRoleMappingResourceResponse() );
 
         return result.getData();
     }
@@ -241,13 +244,13 @@ public class RoleMessageUtil
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
         Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-                           response.getStatus().isSuccess() );
+            response.getStatus().isSuccess() );
 
         LOG.debug( "response: " + responseString );
 
         PlexusRoleListResourceResponse result =
             (PlexusRoleListResourceResponse) this.parseResponseText( responseString,
-                                                                     new PlexusRoleListResourceResponse() );
+                new PlexusRoleListResourceResponse() );
 
         return result.getData();
     }

@@ -27,7 +27,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 
 /**
@@ -41,8 +40,7 @@ public class Nexus233PrivilegesValidationIT
 
     public Nexus233PrivilegesValidationIT()
     {
-        this.messageUtil =
-            new PrivilegesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -137,13 +135,13 @@ public class Nexus233PrivilegesValidationIT
         resource.setMethod( methods );
         resource.setName( "createNoTypeTest" );
         // resource.setType( "target" );
-//        resource.setRepositoryTargetId( "testTarget" );
+        // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
-        
-        if ( response.getStatus().isSuccess())
+
+        if ( response.getStatus().isSuccess() )
         {
-            Assert.fail( "No type, POST should've failed");
+            Assert.fail( "No type, POST should've failed" );
         }
     }
 
@@ -200,7 +198,7 @@ public class Nexus233PrivilegesValidationIT
 
         this.messageUtil.validateResponseErrorXml( responseText );
 
-        Assert.assertNull( SecurityConfigUtil.getCPrivilegeByName( "createWithInvalidAndValidMethodsTest - (read)" ) );
+        Assert.assertNull( getSecurityConfigUtil().getCPrivilegeByName( "createWithInvalidAndValidMethodsTest - (read)" ) );
     }
 
     @Test
@@ -211,7 +209,7 @@ public class Nexus233PrivilegesValidationIT
         resource.addMethod( "read" );
         resource.setName( "createApplicationResource" );
         resource.setType( ApplicationPrivilegeDescriptor.TYPE );
-        //resource.setRepositoryTargetId( "testTarget" );
+        // resource.setRepositoryTargetId( "testTarget" );
 
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();

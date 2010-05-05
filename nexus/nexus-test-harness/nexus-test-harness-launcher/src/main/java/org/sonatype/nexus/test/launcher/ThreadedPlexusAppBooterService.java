@@ -83,6 +83,7 @@ public class ThreadedPlexusAppBooterService
         {
             LOG.info( "Creating LauncherThread (" + launcher + ", " + controlPort + ")" );
             this.launcherThread = new LauncherThread( launcher, controlPort );
+            this.launcherThread.start();
         }
         else
         {
@@ -99,7 +100,12 @@ public class ThreadedPlexusAppBooterService
                 throw new AppBooterServiceException( "LauncherThread cannot be started: "
                     + launcherThreadException.getMessage(), launcherThreadException );
             }
-            this.launcherThread.start();
+            else
+            {
+                // it died off, without any exception
+                this.launcherThread = new LauncherThread( launcher, controlPort );
+                this.launcherThread.start();
+            }
         }
     }
 

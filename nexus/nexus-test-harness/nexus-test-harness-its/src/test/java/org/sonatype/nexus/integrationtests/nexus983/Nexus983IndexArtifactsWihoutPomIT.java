@@ -23,7 +23,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
@@ -47,7 +46,7 @@ public class Nexus983IndexArtifactsWihoutPomIT
         throws Exception
     {
         File artifactFile = getTestFile( "artifact.jar" );
-        DeployUtils.deployWithWagon( this, "http", nexusBaseUrl + "content/repositories/"
+        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "content/repositories/"
             + REPO_TEST_HARNESS_REPO, artifactFile, "nexus983/nexus983-artifact1/1.0.0/nexus983-artifact1-1.0.0.jar" );
         List<NexusArtifact> artifacts = messageUtil.searchFor( "nexus983-artifact1" );
         Assert.assertEquals( "Should find one artifact", 1, artifacts.size() );

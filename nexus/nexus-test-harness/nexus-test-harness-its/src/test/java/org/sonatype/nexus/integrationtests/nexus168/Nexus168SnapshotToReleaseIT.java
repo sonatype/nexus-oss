@@ -59,7 +59,7 @@ public class Nexus168SnapshotToReleaseIT
         {
             // deploy it
             // this should fail
-            DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(), fileToDeploy,
+            getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(), fileToDeploy,
                                          this.getRelitiveArtifactPath( gav ) );
             Assert.fail( "Should not be able to deploy a SNAPSHOT artifact into a RELEASE repo" );
         }
@@ -93,7 +93,7 @@ public class Nexus168SnapshotToReleaseIT
         PostMethod filePost = new PostMethod( uploadURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_BAD_REQUEST )
         {
@@ -136,7 +136,7 @@ public class Nexus168SnapshotToReleaseIT
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
 
         if ( status != HttpStatus.SC_BAD_REQUEST )
         {

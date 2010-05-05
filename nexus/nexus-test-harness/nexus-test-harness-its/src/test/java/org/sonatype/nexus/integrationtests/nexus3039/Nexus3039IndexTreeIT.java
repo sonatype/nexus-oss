@@ -25,7 +25,7 @@ public class Nexus3039IndexTreeIT
         Assert.assertEquals( 200, response.getStatus().getCode() );
         
         RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-            this.getXMLXStream(),
+            this, this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             this.getRepositoryTypeRegistry() );
 

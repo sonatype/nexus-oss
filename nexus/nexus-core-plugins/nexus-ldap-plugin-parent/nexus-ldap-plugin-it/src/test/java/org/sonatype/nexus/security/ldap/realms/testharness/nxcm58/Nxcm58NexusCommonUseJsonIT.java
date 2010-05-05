@@ -66,7 +66,7 @@ public class Nxcm58NexusCommonUseJsonIT
     {
         LdapConnMessageUtil connUtil = new LdapConnMessageUtil( this.xstream, this.mediaType );
         LdapUserGroupMessageUtil userGroupUtil = new LdapUserGroupMessageUtil( this.xstream, this.mediaType );
-        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this.xstream, this.mediaType );
+        LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this, this.xstream, this.mediaType );
 
         // get
         LdapConnectionInfoDTO dto = connUtil.getConnectionInfo();

@@ -32,7 +32,6 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 /**
@@ -48,7 +47,7 @@ public class Nexus531RepositoryCrudJsonIT
         throws ComponentLookupException
     {
         this.messageUtil =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -185,7 +184,7 @@ public class Nexus531RepositoryCrudJsonIT
         {
             Assert.fail( "Could not delete Repository: " + response.getStatus() );
         }
-        Assert.assertNull( NexusConfigUtil.getRepo( resource.getId() ) );
+        Assert.assertNull( getNexusConfigUtil().getRepo( resource.getId() ) );
     }
 
     @Test
@@ -234,11 +233,11 @@ public class Nexus531RepositoryCrudJsonIT
             }
 
             // now check all agaist the the cRepo
-            CRepository cRepo = NexusConfigUtil.getRepo( listRepo.getId() );
+            CRepository cRepo = getNexusConfigUtil().getRepo( listRepo.getId() );
 
             if ( cRepo != null )
             {
-                M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( listRepo.getId() );
+                M2RepositoryConfiguration cM2Repo = getNexusConfigUtil().getM2Repo( listRepo.getId() );
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
                 // Assert.assertEquals( cM2Repo.getType(), listRepo.getFormat() );
@@ -252,7 +251,7 @@ public class Nexus531RepositoryCrudJsonIT
             }
             else
             {
-                M2LayoutedM1ShadowRepositoryConfiguration cShadow = NexusConfigUtil.getRepoShadow( listRepo.getId() );
+                M2LayoutedM1ShadowRepositoryConfiguration cShadow = getNexusConfigUtil().getRepoShadow( listRepo.getId() );
 
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );

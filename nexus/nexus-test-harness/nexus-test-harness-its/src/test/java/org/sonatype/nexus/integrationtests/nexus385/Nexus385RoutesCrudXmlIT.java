@@ -41,7 +41,7 @@ public class Nexus385RoutesCrudXmlIT
 
     public Nexus385RoutesCrudXmlIT()
     {
-        this.messageUtil = new RoutesMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Before
@@ -191,7 +191,7 @@ public class Nexus385RoutesCrudXmlIT
             Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
         }
 
-        Assert.assertTrue( "Route was not deleted.", NexusConfigUtil.getRoute( resource.getId() ) == null );
+        Assert.assertTrue( "Route was not deleted.", getNexusConfigUtil().getRoute( resource.getId() ) == null );
 
     }
 

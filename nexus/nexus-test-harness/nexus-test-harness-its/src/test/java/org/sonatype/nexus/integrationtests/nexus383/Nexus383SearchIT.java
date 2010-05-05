@@ -55,7 +55,7 @@ public class Nexus383SearchIT
     {
         this.messageUtil = new SearchMessageUtil();
 
-        this.groupMessageUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Override
@@ -240,26 +240,26 @@ public class Nexus383SearchIT
                 new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // Multi repository deploy
-        DeployUtils.deployWithWagon( this, "http", deployUrl, fileToDeploy, this
+        getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this
             .getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl, pomFile, this.getRelitivePomPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl, pomFile, this.getRelitivePomPath( gav ) );
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_REPO2 ), pomFile, this.getRelitivePomPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        DeployUtils.deployWithWagon( this, "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
+        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
             NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,

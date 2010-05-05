@@ -24,7 +24,6 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.rest.model.RoleResource;
 
 /**
@@ -39,7 +38,7 @@ public class Nexus156RolesCrudJsonIT
     public Nexus156RolesCrudJsonIT()
     {
         this.messageUtil =
-            new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -94,7 +93,7 @@ public class Nexus156RolesCrudJsonIT
 
         // NEED to work around a GET problem with the REST client
         List<RoleResource> roles = this.messageUtil.getList();
-        SecurityConfigUtil.verifyRolesComplete( roles );
+        getSecurityConfigUtil().verifyRolesComplete( roles );
 
     }
 
@@ -163,7 +162,7 @@ public class Nexus156RolesCrudJsonIT
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
 
-        SecurityConfigUtil.verifyRole( resource );
+        getSecurityConfigUtil().verifyRole( resource );
     }
 
     @Test
@@ -190,7 +189,7 @@ public class Nexus156RolesCrudJsonIT
         }
 
         // TODO: check if deleted
-        Assert.assertNull( SecurityConfigUtil.getCRole( responseResource.getId() ) );
+        Assert.assertNull( getSecurityConfigUtil().getCRole( responseResource.getId() ) );
     }
 
 }

@@ -39,7 +39,7 @@ public class Nexus642SynchShadowTaskIT
     {
         // create shadow repo 'nexus-shadow-repo'
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
         String shadowRepoId = "nexus-shadow-repo";
         String taskName = "synchShadowTest";
 

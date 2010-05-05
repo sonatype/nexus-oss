@@ -74,8 +74,8 @@ public abstract class AbstractNexus1923
         super();
 
         this.repoUtils =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
-        this.groupUtils = new GroupMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+        this.groupUtils = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
 
         this.searchUtils = new SearchMessageUtil();
     }

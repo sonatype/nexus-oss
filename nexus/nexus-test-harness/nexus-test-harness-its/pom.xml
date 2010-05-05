@@ -10,6 +10,15 @@
 
   <artifactId>nexus-test-harness-its</artifactId>
   <name>Nexus Test Harness OSS ITs</name>
+  
+  <properties>
+    <!-- Below is the "product", the subject of the ITs -->
+    <product-groupId>org.sonatype.nexus</product-groupId>
+    <product-artifactId>nexus-oss-webapp</product-artifactId>
+    <product-version>${project.version}</product-version>
+    <product-classifier>bundle</product-classifier>
+    <product-type>zip</product-type>
+  </properties>
 
   <build>
 
@@ -74,11 +83,11 @@
         </executions>
         <configuration>
           <nexusBundleArtifact>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-oss-webapp</artifactId>
-            <version>${project.version}</version>
-            <type>zip</type>
-            <classifier>bundle</classifier>
+            <groupId>${product-groupId}</groupId>
+            <artifactId>${product-artifactId}</artifactId>
+            <version>${product-version}</version>
+            <classifier>${product-classifier}</classifier>
+            <type>${product-type}</type>
           </nexusBundleArtifact>
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>

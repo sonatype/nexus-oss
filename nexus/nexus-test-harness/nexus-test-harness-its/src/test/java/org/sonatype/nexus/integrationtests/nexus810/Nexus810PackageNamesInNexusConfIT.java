@@ -26,7 +26,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus810PackageNamesInNexusConfIT
@@ -59,7 +58,7 @@ public class Nexus810PackageNamesInNexusConfIT
         Assert.assertTrue( "Expected task to be created: ", TaskScheduleUtil.create( scheduledTask ).isSuccess() );
         
         // now check the conf
-        List<CScheduledTask> tasks = NexusConfigUtil.getNexusConfig().getTasks();
+        List<CScheduledTask> tasks = getNexusConfigUtil().getNexusConfig().getTasks();
         Assert.assertTrue( "Expected at least 1 task in nexus.xml", tasks.size() > 0 );
         
         for ( CScheduledTask task : tasks )

@@ -24,7 +24,6 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 
@@ -62,7 +61,7 @@ public class Nexus258ReleaseDeployIT
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
 
         if ( status != HttpStatus.SC_CREATED )
         {
@@ -101,7 +100,7 @@ public class Nexus258ReleaseDeployIT
         // url to upload to
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
             
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
 
         if ( status != HttpStatus.SC_CREATED )
         {

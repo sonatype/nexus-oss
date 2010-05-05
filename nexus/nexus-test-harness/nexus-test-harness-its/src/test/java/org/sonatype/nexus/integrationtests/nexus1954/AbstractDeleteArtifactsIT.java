@@ -17,7 +17,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -71,8 +70,8 @@ public abstract class AbstractDeleteArtifactsIT
         Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
         Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
 
-        DeployUtils.deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, artifact1v2, artifact );
-        DeployUtils.deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus1954", "artifact2", "1.0" ),
+        getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, artifact1v2, artifact );
+        getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus1954", "artifact2", "1.0" ),
                                             artifact );
 
         updateIndexes();

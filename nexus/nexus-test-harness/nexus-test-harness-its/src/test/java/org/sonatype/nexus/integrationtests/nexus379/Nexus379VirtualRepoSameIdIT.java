@@ -40,7 +40,7 @@ public class Nexus379VirtualRepoSameIdIT
         throws ComponentLookupException
     {
         this.messageUtil = new RepositoryMessageUtil(
-            this.getXMLXStream(),
+            this, this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             getRepositoryTypeRegistry() );
     }

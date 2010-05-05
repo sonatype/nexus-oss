@@ -31,7 +31,6 @@ import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CPrivilege;
@@ -98,14 +97,14 @@ public abstract class AbstractPrivilegeTest
 
         XStream xstream = this.getXMLXStream();
 
-        this.userUtil = new UserMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.privUtil = new PrivilegesMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.targetUtil = new TargetMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.privUtil = new PrivilegesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.targetUtil = new TargetMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        this.routeUtil = new RoutesMessageUtil( xstream, MediaType.APPLICATION_XML );
-        this.repoUtil = new RepositoryMessageUtil( xstream, MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
-        this.groupUtil = new GroupMessageUtil( xstream, MediaType.APPLICATION_XML );
+        this.routeUtil = new RoutesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.repoUtil = new RepositoryMessageUtil( this, xstream, MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+        this.groupUtil = new GroupMessageUtil( this,xstream, MediaType.APPLICATION_XML );
     }
 
     @Before
@@ -151,7 +150,7 @@ public abstract class AbstractPrivilegeTest
                 String privId = (String) roleIter.next();
                 // PrivilegeBaseStatusResource priv = this.privUtil.getPrivilegeResource( privId );
                 // privs.add( priv.getName() );
-                CPrivilege priv = SecurityConfigUtil.getCPrivilege( privId );
+                CPrivilege priv = getSecurityConfigUtil().getCPrivilege( privId );
                 if ( priv != null )
                 {
                     privs.add( priv.getName() );

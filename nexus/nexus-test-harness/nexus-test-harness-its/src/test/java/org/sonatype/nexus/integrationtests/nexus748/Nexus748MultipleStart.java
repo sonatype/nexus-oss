@@ -25,10 +25,8 @@ import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
-public class Nexus748MultipleStart
+public class Nexus748MultipleStart extends AbstractNexusIntegrationTest
 {
 
     protected static Logger logger = Logger.getLogger( Nexus748MultipleStart.class );
@@ -40,13 +38,13 @@ public class Nexus748MultipleStart
 
         StopWatch stopWatch = new StopWatch();
 
-        NexusClient client = (NexusClient) AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( NexusClient.ROLE );
+        NexusClient client = (NexusClient) getITPlexusContainer().lookup( NexusClient.ROLE );
         TestContext context = TestContainer.getInstance().getTestContext();
         client.connect( AbstractNexusIntegrationTest.nexusBaseUrl, context.getAdminUsername(),
                         context.getAdminPassword() );
 
         // enable security
-        NexusConfigUtil.enableSecurity( true );
+        getNexusConfigUtil().enableSecurity( true );
 
         List<Long> startTimes = new ArrayList<Long>();
 
@@ -57,7 +55,7 @@ public class Nexus748MultipleStart
             stopWatch.start();
 
             // start
-            NexusStatusUtil.doHardStart();
+            getNexusStatusUtil().start();
 
             Assert.assertTrue( client.isNexusStarted( true ) );
 
@@ -65,7 +63,7 @@ public class Nexus748MultipleStart
             stopWatch.stop();
 
             // stop
-            NexusStatusUtil.doHardStop();
+            getNexusStatusUtil().stop();
 
             startTimes.add( stopWatch.getTime() );
         }

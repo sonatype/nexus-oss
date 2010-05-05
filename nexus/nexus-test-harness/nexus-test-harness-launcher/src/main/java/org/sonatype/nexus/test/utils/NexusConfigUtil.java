@@ -36,11 +36,16 @@ import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.security.SecuritySystem;
 
 public class NexusConfigUtil
+    extends ITUtil
 {
+    public NexusConfigUtil( AbstractNexusIntegrationTest test )
+    {
+        super( test );
+    }
 
     private static Logger log = Logger.getLogger( NexusConfigUtil.class );
 
-    public static Configuration getNexusConfig()
+    public Configuration getNexusConfig()
         throws IOException
     {
         // TestContainer.getInstance().getContainer().addContextValue( "nexus-work",
@@ -48,7 +53,7 @@ public class NexusConfigUtil
         NexusConfiguration config;
         try
         {
-            config = AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( NexusConfiguration.class );
+            config = getTest().getITPlexusContainer().lookup( NexusConfiguration.class );
             config.loadConfiguration( true );
         }
         catch ( Exception e )
@@ -65,7 +70,7 @@ public class NexusConfigUtil
         return new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
     }
 
-    public static CPathMappingItem getRoute( String id )
+    public CPathMappingItem getRoute( String id )
         throws IOException
     {
         List<CPathMappingItem> routes = getNexusConfig().getRepositoryGrouping().getPathMappings();
@@ -83,13 +88,13 @@ public class NexusConfigUtil
         return null;
     }
 
-    public static void enableSecurity( boolean enabled )
+    public void enableSecurity( boolean enabled )
         throws Exception
     {
-        AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
+        getTest().getITPlexusContainer().lookup( SecuritySystem.class ).setSecurityEnabled( enabled );
     }
 
-    public static M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
+    public M2LayoutedM1ShadowRepositoryConfiguration getRepoShadow( String repoId )
         throws IOException
     {
         List<CRepository> repos = getNexusConfig().getRepositories();
@@ -111,7 +116,7 @@ public class NexusConfigUtil
         return null;
     }
 
-    public static CRepository getRepo( String repoId )
+    public CRepository getRepo( String repoId )
         throws IOException
     {
         List<CRepository> repos = getNexusConfig().getRepositories();
@@ -129,11 +134,11 @@ public class NexusConfigUtil
         return null;
     }
 
-    public static void validateConfig()
+    public void validateConfig()
         throws Exception
     {
         ApplicationConfigurationValidator validator =
-            AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( ApplicationConfigurationValidator.class );
+            getTest().getITPlexusContainer().lookup( ApplicationConfigurationValidator.class );
         ValidationResponse vResponse = validator.validateModel( new ValidationRequest( getNexusConfig() ) );
 
         if ( !vResponse.isValid() )
@@ -143,7 +148,7 @@ public class NexusConfigUtil
 
     }
 
-    public static M2GroupRepositoryConfiguration getGroup( String groupId )
+    public M2GroupRepositoryConfiguration getGroup( String groupId )
         throws IOException
     {
         List<CRepository> repos = getNexusConfig().getRepositories();
@@ -165,7 +170,7 @@ public class NexusConfigUtil
         return null;
     }
 
-    public static M2RepositoryConfiguration getM2Repo( String id )
+    public M2RepositoryConfiguration getM2Repo( String id )
         throws IOException
     {
         List<CRepository> repos = getNexusConfig().getRepositories();

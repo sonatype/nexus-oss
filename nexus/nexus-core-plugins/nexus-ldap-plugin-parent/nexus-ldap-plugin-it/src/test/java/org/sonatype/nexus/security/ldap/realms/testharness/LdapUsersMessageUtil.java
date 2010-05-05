@@ -15,11 +15,11 @@ import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserListResponse;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserResponseDTO;
-import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.nexus.test.utils.ITUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.rest.model.UserToRoleResource;
@@ -27,9 +27,8 @@ import org.sonatype.security.rest.model.UserToRoleResourceRequest;
 
 import com.thoughtworks.xstream.XStream;
 
-public class LdapUsersMessageUtil
+public class LdapUsersMessageUtil extends ITUtil
 {
-
     private static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "user_to_roles";
 
     private XStream xstream;
@@ -38,9 +37,9 @@ public class LdapUsersMessageUtil
 
     private static final Logger LOG = Logger.getLogger( LdapUsersMessageUtil.class );
 
-    public LdapUsersMessageUtil( XStream xstream, MediaType mediaType )
+    public LdapUsersMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
-        super();
+        super(test);
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
@@ -86,11 +85,10 @@ public class LdapUsersMessageUtil
         return RequestFacade.sendMessage( serviceURI, method, representation );
     }
 
-    @SuppressWarnings( "unchecked" )
     public void validateLdapConfig( UserToRoleResource userToRole )
         throws Exception
     {
-        List<CUserRoleMapping> mapping = SecurityConfigUtil.getSecurityConfig().getUserRoleMappings();
+        List<CUserRoleMapping> mapping = getTest().getSecurityConfigUtil().getSecurityConfig().getUserRoleMappings();
         for ( CUserRoleMapping userRoleMapping : mapping )
         {
             if( userToRole.getUserId().equals( userRoleMapping.getUserId() ))

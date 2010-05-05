@@ -241,7 +241,7 @@ public abstract class NexusMockTestCase
         throws ConnectionException, AuthenticationException, TransferFailedException, ResourceDoesNotExistException,
         AuthorizationException, ComponentLookupException
     {
-        new WagonDeployer( wagonHint, "admin", "admin123", deployUrl, fileToDeploy, artifactPath ).deploy();
+        new WagonDeployer( container, wagonHint, "admin", "admin123", deployUrl, fileToDeploy, artifactPath ).deploy();
     }
 
     @BeforeMethod

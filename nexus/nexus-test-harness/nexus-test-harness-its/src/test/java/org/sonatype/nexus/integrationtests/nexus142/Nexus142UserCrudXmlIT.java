@@ -28,7 +28,7 @@ public class Nexus142UserCrudXmlIT
 
     public Nexus142UserCrudXmlIT()
     {
-        this.messageUtil = new UserMessageUtil(this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new UserMessageUtil(this,this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     

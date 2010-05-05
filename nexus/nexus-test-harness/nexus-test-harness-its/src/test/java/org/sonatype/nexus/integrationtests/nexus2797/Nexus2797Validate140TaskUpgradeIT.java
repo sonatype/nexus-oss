@@ -7,7 +7,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus2797Validate140TaskUpgradeIT
@@ -20,8 +19,7 @@ public class Nexus2797Validate140TaskUpgradeIT
         doIt();
         
         // now stop and restart nexus, make sure still ok
-        NexusStatusUtil.stop();
-        NexusStatusUtil.start();
+        restartNexus();
         
         doIt();
     }

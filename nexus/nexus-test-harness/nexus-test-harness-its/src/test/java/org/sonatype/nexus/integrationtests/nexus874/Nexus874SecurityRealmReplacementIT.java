@@ -26,7 +26,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
@@ -51,12 +50,12 @@ public class Nexus874SecurityRealmReplacementIT
         throws ComponentLookupException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-        groupUtil = new GroupMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        groupUtil = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         repoUtil =
-            new RepositoryMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
         // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        roleUtil = new RoleMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        userUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        roleUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -66,17 +65,17 @@ public class Nexus874SecurityRealmReplacementIT
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
 
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
 
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
     }
 
     @Test
@@ -141,7 +140,7 @@ public class Nexus874SecurityRealmReplacementIT
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
         TargetMessageUtil.getList();
@@ -150,14 +149,14 @@ public class Nexus874SecurityRealmReplacementIT
         TestContainer.getInstance().getTestContext().setUsername( "deployment" );
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
 
         TestContainer.getInstance().getTestContext().setUsername( "anonymous" );
         TestContainer.getInstance().getTestContext().setPassword( "anonymous" );
 
-        NexusStatusUtil.getNexusStatus();
+        getNexusStatusUtil().getNexusStatus();
         groupUtil.getList();
         repoUtil.getList();
     }

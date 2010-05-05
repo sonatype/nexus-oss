@@ -24,8 +24,8 @@ public class Nexus1563ExternalRealmsIT
     @Before
     public void init()
     {
-        this.userUtil = new UserMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
+        this.userUtil = new UserMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test

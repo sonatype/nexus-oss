@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 
 /**
@@ -44,7 +43,7 @@ public class Nexus260MultipleDeployIT
         File fileToDeploy = this.getTestFile( "singleDeployTest.xml" );
 
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy, "org/sonatype/nexus-integration-tests/multiple-deploy-test/singleDeployTest/1/singleDeployTest-1.xml" );
 
         // download it
@@ -67,14 +66,14 @@ public class Nexus260MultipleDeployIT
         String deployPath = "org/sonatype/nexus-integration-tests/multiple-deploy-test/deploySameFileMultipleTimesTest/1/deploySameFileMultipleTimesTest-1.xml";
 
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy, deployPath );
 
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy, deployPath );
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy, deployPath );
 
         // download it
@@ -100,14 +99,14 @@ public class Nexus260MultipleDeployIT
         String deployPath = "org/sonatype/nexus-integration-tests/multiple-deploy-test/deployChangedFileMultipleTimesTest/1/deployChangedFileMultipleTimesTest-1.xml";
 
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy1, deployPath );
 
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy2, deployPath );
         // deploy it
-        DeployUtils.deployWithWagon( this, "http", this.getNexusTestRepoUrl(),
+        getDeployUtils().deployWithWagon( "http", this.getNexusTestRepoUrl(),
                                      fileToDeploy3, deployPath );
 
         // download it

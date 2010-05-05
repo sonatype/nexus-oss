@@ -24,6 +24,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupListResourceResponse;
@@ -35,6 +36,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.thoughtworks.xstream.XStream;
 
 public class GroupMessageUtil
+    extends ITUtil
 {
     public static final String SERVICE_PART = "service/local/repo_groups";
 
@@ -44,9 +46,9 @@ public class GroupMessageUtil
 
     private static final Logger LOG = Logger.getLogger( GroupMessageUtil.class );
 
-    public GroupMessageUtil( XStream xstream, MediaType mediaType )
+    public GroupMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
-        super();
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
@@ -151,7 +153,7 @@ public class GroupMessageUtil
         LOG.debug( "responseText: \n" + responseText );
 
         Assert.assertTrue( "Failed to return Group: " + groupId + "\nResponse:\n" + responseText,
-                           response.getStatus().isSuccess() );
+            response.getStatus().isSuccess() );
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =
@@ -214,7 +216,7 @@ public class GroupMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     *
+     * 
      * @return
      * @throws IOException
      */
@@ -251,13 +253,13 @@ public class GroupMessageUtil
     private void validateRepoInNexusConfig( RepositoryGroupResource group )
         throws IOException
     {
-        CRepository cGroup = NexusConfigUtil.getRepo( group.getId() );
+        CRepository cGroup = getTest().getNexusConfigUtil().getRepo( group.getId() );
 
         Assert.assertEquals( group.getId(), cGroup.getId() );
         Assert.assertEquals( group.getName(), cGroup.getName() );
 
         List expectedRepos = group.getRepositories();
-        List<String> actualRepos = NexusConfigUtil.getGroup( group.getId() ).getMemberRepositoryIds();
+        List<String> actualRepos = getTest().getNexusConfigUtil().getGroup( group.getId() ).getMemberRepositoryIds();
 
         this.validateRepoLists( expectedRepos, actualRepos );
     }

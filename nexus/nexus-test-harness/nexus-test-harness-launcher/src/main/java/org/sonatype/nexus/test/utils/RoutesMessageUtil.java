@@ -28,6 +28,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CPathMappingItem;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteListResourceResponse;
@@ -41,6 +42,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import com.thoughtworks.xstream.XStream;
 
 public class RoutesMessageUtil
+    extends ITUtil
 {
     public static final String SERVICE_PART = RequestFacade.SERVICE_LOCAL + "repo_routes";
 
@@ -50,9 +52,9 @@ public class RoutesMessageUtil
 
     private static final Logger LOG = Logger.getLogger( RoutesMessageUtil.class );
 
-    public RoutesMessageUtil( XStream xstream, MediaType mediaType )
+    public RoutesMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType )
     {
-        super();
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
@@ -144,7 +146,7 @@ public class RoutesMessageUtil
         throws IOException
     {
 
-        CPathMappingItem cRoute = NexusConfigUtil.getRoute( resource.getId() );
+        CPathMappingItem cRoute = getTest().getNexusConfigUtil().getRoute( resource.getId() );
 
         String msg =
             "Should be the same route. \n Expected:\n" + new XStream().toXML( resource ) + " \n \n Got: \n"
@@ -187,7 +189,7 @@ public class RoutesMessageUtil
 
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), response.getEntity().getText(),
-                                       MediaType.APPLICATION_XML );
+                MediaType.APPLICATION_XML );
 
         RepositoryRouteListResourceResponse resourceResponse =
             (RepositoryRouteListResourceResponse) representation.getPayload( new RepositoryRouteListResourceResponse() );

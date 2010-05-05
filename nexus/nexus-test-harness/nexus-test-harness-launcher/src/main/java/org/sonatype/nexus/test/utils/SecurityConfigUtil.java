@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -42,8 +43,14 @@ import org.sonatype.security.rest.model.UserResource;
 import com.thoughtworks.xstream.XStream;
 
 public class SecurityConfigUtil
+    extends ITUtil
 {
-    public static void verifyRole( RoleResource role )
+    public SecurityConfigUtil( AbstractNexusIntegrationTest test )
+    {
+        super( test );
+    }
+
+    public void verifyRole( RoleResource role )
         throws IOException
     {
         List<RoleResource> roles = new ArrayList<RoleResource>();
@@ -56,7 +63,7 @@ public class SecurityConfigUtil
      * 
      * @param roles
      */
-    public static void verifyRolesComplete( List<RoleResource> roles )
+    public void verifyRolesComplete( List<RoleResource> roles )
         throws IOException
     {
         for ( CRole cRole : getSecurityConfig().getRoles() )
@@ -78,17 +85,21 @@ public class SecurityConfigUtil
         }
     }
 
-    public static void assertRoleEquals( CRole roleA, CRole roleB )
+    public void assertRoleEquals( CRole roleA, CRole roleB )
     {
+        // sort them, to not fail on same set but different order
+        Collections.sort( roleA.getPrivileges() );
+        Collections.sort( roleB.getPrivileges() );
+        
         XStream xStream = new XStream();
         String roleStringA = xStream.toXML( roleA );
         String roleStringB = xStream.toXML( roleB );
 
-        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n" + roleStringA,
-                           new RoleComparator().compare( roleA, roleB ) == 0 );
+        Assert.assertTrue( "Role A:\n" + roleStringB + "\nRole B:\n" + roleStringA, new RoleComparator().compare(
+            roleA, roleB ) == 0 );
     }
 
-    private static RoleResource getRoleResource( String id, List<RoleResource> roles )
+    private RoleResource getRoleResource( String id, List<RoleResource> roles )
     {
         for ( RoleResource role : roles )
         {
@@ -101,7 +112,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static void verifyRolesExistInCore( List<RoleResource> roles )
+    public  void verifyRolesExistInCore( List<RoleResource> roles )
         throws IOException
     {
         for ( RoleResource roleResource : roles )
@@ -114,7 +125,7 @@ public class SecurityConfigUtil
         }
     }
 
-    public static void verifyUser( UserResource user )
+    public  void verifyUser( UserResource user )
         throws IOException
     {
         List<UserResource> users = new ArrayList<UserResource>();
@@ -122,7 +133,7 @@ public class SecurityConfigUtil
         verifyUsers( users );
     }
 
-    public static void verifyUsers( List<UserResource> users )
+    public  void verifyUsers( List<UserResource> users )
         throws IOException
     {
 
@@ -141,7 +152,7 @@ public class SecurityConfigUtil
         }
     }
 
-    public static String getPrivilegeProperty( PrivilegeStatusResource priv, String key )
+    public  String getPrivilegeProperty( PrivilegeStatusResource priv, String key )
     {
         for ( PrivilegeProperty prop : priv.getProperties() )
         {
@@ -154,7 +165,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static void verifyPrivileges( List<PrivilegeStatusResource> privs )
+    public  void verifyPrivileges( List<PrivilegeStatusResource> privs )
         throws IOException
     {
         for ( Iterator<PrivilegeStatusResource> iter = privs.iterator(); iter.hasNext(); )
@@ -176,7 +187,7 @@ public class SecurityConfigUtil
         }
     }
 
-    public static CRole getCRole( String roleId )
+    public  CRole getCRole( String roleId )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
@@ -194,7 +205,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static CPrivilege getCPrivilege( String privilegeId )
+    public  CPrivilege getCPrivilege( String privilegeId )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
@@ -212,7 +223,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static CPrivilege getCPrivilegeByName( String privilegeName )
+    public  CPrivilege getCPrivilegeByName( String privilegeName )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
@@ -230,7 +241,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static CUser getCUser( String userId )
+    public  CUser getCUser( String userId )
         throws IOException
     {
         Configuration securityConfig = getSecurityConfig();
@@ -248,7 +259,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    public static Configuration getSecurityConfig()
+    public  Configuration getSecurityConfig()
         throws IOException
     {
         File secConfigFile = new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "security.xml" );
@@ -276,7 +287,7 @@ public class SecurityConfigUtil
 
             fr =
                 new InputStreamReader(
-                                       SecurityConfigUtil.class.getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
+                    SecurityConfigUtil.class.getResourceAsStream( "/META-INF/nexus/static-security.xml" ) );
 
             try
             {
@@ -301,7 +312,7 @@ public class SecurityConfigUtil
             }
 
             List<StaticSecurityResource> resources =
-                AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookupList( StaticSecurityResource.class );
+                getTest().getITPlexusContainer().lookupList( StaticSecurityResource.class );
             for ( StaticSecurityResource resource : resources )
             {
                 addStaticSecurity( configuration, resource.getConfiguration() );
@@ -322,7 +333,7 @@ public class SecurityConfigUtil
         return configuration;
     }
 
-    private static void addStaticSecurity( Configuration configuration, SecurityConfigurationXpp3Reader reader,
+    private  void addStaticSecurity( Configuration configuration, SecurityConfigurationXpp3Reader reader,
                                            String securityFile )
         throws IOException, XmlPullParserException
     {
@@ -348,7 +359,7 @@ public class SecurityConfigUtil
         addStaticSecurity( configuration, staticConfiguration );
     }
 
-    private static void addStaticSecurity( Configuration configuration, Configuration staticConfiguration )
+    private void addStaticSecurity( Configuration configuration, Configuration staticConfiguration )
     {
         for ( CPrivilege priv : staticConfiguration.getPrivileges() )
         {
@@ -389,7 +400,7 @@ public class SecurityConfigUtil
         }
     }
 
-    private static CRole getRole( String id, List<CRole> roles )
+    private  CRole getRole( String id, List<CRole> roles )
     {
         for ( CRole role : roles )
         {
@@ -402,7 +413,7 @@ public class SecurityConfigUtil
         return null;
     }
 
-    private static CPrivilege getPrivilege( String id, List<CPrivilege> privs )
+    private  CPrivilege getPrivilege( String id, List<CPrivilege> privs )
     {
         for ( CPrivilege priv : privs )
         {

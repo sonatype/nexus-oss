@@ -51,7 +51,7 @@ public class Nexus652Beta5To10UpgradeIT
         SecurityConfigurationSource securitySource = lookup( SecurityConfigurationSource.class, "file" );
         SecurityConfiguration securityConfig = securitySource.loadConfiguration();
 
-        Configuration nexusConfig = NexusConfigUtil.getNexusConfig();
+        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
 
         Assert.assertEquals( "Smtp host:", "foo.org", nexusConfig.getSmtpConfiguration().getHostname() );
         Assert.assertEquals( "Smtp password:", "now", nexusConfig.getSmtpConfiguration().getPassword() );
@@ -74,12 +74,12 @@ public class Nexus652Beta5To10UpgradeIT
         // we will glance over the repos, because the unit tests cover this.
         Assert.assertEquals( "Repository Count:", 9, nexusConfig.getRepositories().size() );
 
-        Assert.assertNotNull( "repo: central", NexusConfigUtil.getRepo( "central" ) );
-        Assert.assertNotNull( "repo: apache-snapshots", NexusConfigUtil.getRepo( "apache-snapshots" ) );
-        Assert.assertNotNull( "repo: codehaus-snapshots", NexusConfigUtil.getRepo( "codehaus-snapshots" ) );
-        Assert.assertNotNull( "repo: releases", NexusConfigUtil.getRepo( "releases" ) );
-        Assert.assertNotNull( "repo: snapshots", NexusConfigUtil.getRepo( "snapshots" ) );
-        Assert.assertNotNull( "repo: thirdparty", NexusConfigUtil.getRepo( "thirdparty" ) );
+        Assert.assertNotNull( "repo: central", getNexusConfigUtil().getRepo( "central" ) );
+        Assert.assertNotNull( "repo: apache-snapshots", getNexusConfigUtil().getRepo( "apache-snapshots" ) );
+        Assert.assertNotNull( "repo: codehaus-snapshots", getNexusConfigUtil().getRepo( "codehaus-snapshots" ) );
+        Assert.assertNotNull( "repo: releases", getNexusConfigUtil().getRepo( "releases" ) );
+        Assert.assertNotNull( "repo: snapshots", getNexusConfigUtil().getRepo( "snapshots" ) );
+        Assert.assertNotNull( "repo: thirdparty", getNexusConfigUtil().getRepo( "thirdparty" ) );
 
         // everything else including everything above should be covered by unit tests.
 
@@ -90,7 +90,7 @@ public class Nexus652Beta5To10UpgradeIT
     public void checkSecurityConfig()
         throws IOException
     {
-        org.sonatype.security.model.Configuration secConfig = SecurityConfigUtil.getSecurityConfig();
+        org.sonatype.security.model.Configuration secConfig = getSecurityConfigUtil().getSecurityConfig();
 
         Assert.assertEquals( "User Count:", 7, secConfig.getUsers().size());
         List<String> roleIds = new ArrayList<String>();

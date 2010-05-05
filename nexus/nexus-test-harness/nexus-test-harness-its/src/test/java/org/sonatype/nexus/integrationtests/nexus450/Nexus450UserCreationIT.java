@@ -54,7 +54,7 @@ public class Nexus450UserCreationIT
     public void init()
     {
         userUtil =
-            new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+            new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

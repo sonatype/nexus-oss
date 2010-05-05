@@ -21,7 +21,6 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 
 @RunWith( Suite.class )
 @SuiteClasses( { IntegrationTestSuiteClasses.class/*, IntegrationTestSuiteClassesSecurity.class*/ } )
@@ -37,7 +36,7 @@ public class IntegrationTestSuite
         File outputFile = new File( AbstractNexusIntegrationTest.WORK_CONF_DIR, "nexus.xml" );
         FileUtils.copyFile( testConfigFile, outputFile );
 
-        NexusStatusUtil.doHardStart();
+        // NexusStatusUtil.doHardStart();
 
     }
 
@@ -45,7 +44,7 @@ public class IntegrationTestSuite
     public static void afterSuite()
         throws Exception
     {
-        NexusStatusUtil.doHardStop( false );
+        // NexusStatusUtil.doHardStop( false );
     }
 
 }

@@ -25,7 +25,6 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.rest.model.UserResource;
@@ -41,7 +40,7 @@ public class Nexus142UserCrudJsonIT
 
     public Nexus142UserCrudJsonIT()
     {
-        this.messageUtil = new UserMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test
@@ -81,7 +80,7 @@ public class Nexus142UserCrudJsonIT
         // validate password is correct
         PasswordGenerator pwGenerator = lookup( PasswordGenerator.class );
         String hashedPassword = pwGenerator.hashPassword( password );
-        CUser cUser = SecurityConfigUtil.getCUser( "createTestWithPassword" );
+        CUser cUser = getSecurityConfigUtil().getCUser( "createTestWithPassword" );
         Assert.assertEquals( "Expected hashed passwords to be the same.", hashedPassword, cUser.getPassword() );
 
     }
@@ -105,7 +104,7 @@ public class Nexus142UserCrudJsonIT
 
         // NEED to work around a GET problem with the REST client
         List<UserResource> users = this.messageUtil.getList();
-        SecurityConfigUtil.verifyUsers( users );
+        getSecurityConfigUtil().verifyUsers( users );
 
     }
 
@@ -193,7 +192,7 @@ public class Nexus142UserCrudJsonIT
             Assert.fail( "Could not delete User: " + response.getStatus() );
         }
 
-        SecurityConfigUtil.verifyUsers( new ArrayList<UserResource>() );
+        getSecurityConfigUtil().verifyUsers( new ArrayList<UserResource>() );
     }
 
 }

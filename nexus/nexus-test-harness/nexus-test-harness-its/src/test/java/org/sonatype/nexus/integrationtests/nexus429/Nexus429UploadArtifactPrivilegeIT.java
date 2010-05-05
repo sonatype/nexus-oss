@@ -60,7 +60,7 @@ public class Nexus429UploadArtifactPrivilegeIT
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // with pom should fail
-        int status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         Assert.assertEquals( "Status should have been 403", 403, status );
                 
         // give deployment role
@@ -72,7 +72,7 @@ public class Nexus429UploadArtifactPrivilegeIT
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
         
-        status = DeployUtils.deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
         Assert.assertEquals( "Status should have been 201", 201, status );
     }
     
@@ -97,7 +97,7 @@ public class Nexus429UploadArtifactPrivilegeIT
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // with gav should fail
-        int status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
         Assert.assertEquals( "Status should have been 403", 403, status );
         
         // give deployment role
@@ -109,7 +109,7 @@ public class Nexus429UploadArtifactPrivilegeIT
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
         
-        status = DeployUtils.deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
+        status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
         Assert.assertEquals( "Status should have been 201", 201, status );
 
     }

@@ -24,6 +24,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -45,6 +46,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.thoughtworks.xstream.XStream;
 
 public class RepositoryMessageUtil
+    extends ITUtil
 {
     public static final String ALL_SERVICE_PART = RequestFacade.SERVICE_LOCAL + "all_repositories";
 
@@ -58,9 +60,10 @@ public class RepositoryMessageUtil
 
     private static final Logger LOG = Logger.getLogger( RepositoryMessageUtil.class );
 
-    public RepositoryMessageUtil( XStream xstream, MediaType mediaType, RepositoryTypeRegistry registry )
+    public RepositoryMessageUtil( AbstractNexusIntegrationTest test, XStream xstream, MediaType mediaType,
+                                  RepositoryTypeRegistry registry )
     {
-        super();
+        super( test );
         this.xstream = xstream;
         this.mediaType = mediaType;
         this.repositoryTypeRegistry = registry;
@@ -130,15 +133,15 @@ public class RepositoryMessageUtil
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(), actual
-                    .getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
+                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
+                    actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
             }
             // NOTE one of these blocks should be removed
             else
             {
                 Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(), actual
-                    .getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
+                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(),
+                    actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
             }
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
@@ -150,8 +153,8 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), actual.getRemoteStorage()
-                    .getRemoteStorageUrl() );
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
+                    actual.getRemoteStorage().getRemoteStorageUrl() );
             }
 
             Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
@@ -312,8 +315,9 @@ public class RepositoryMessageUtil
         {
             // check mirror
             RepositoryShadowResource expected = (RepositoryShadowResource) repo;
-            CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
-            M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo = NexusConfigUtil.getRepoShadow( repo.getId() );
+            CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
+            M2LayoutedM1ShadowRepositoryConfiguration cShadowRepo =
+                getTest().getNexusConfigUtil().getRepoShadow( repo.getId() );
 
             Assert.assertEquals( expected.getShadowOf(), cShadowRepo.getMasterRepositoryId() );
             Assert.assertEquals( expected.getId(), cRepo.getId() );
@@ -328,7 +332,7 @@ public class RepositoryMessageUtil
         else
         {
             RepositoryResource expected = (RepositoryResource) repo;
-            CRepository cRepo = NexusConfigUtil.getRepo( repo.getId() );
+            CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
 
             Assert.assertEquals( expected.getId(), cRepo.getId() );
 
@@ -344,18 +348,17 @@ public class RepositoryMessageUtil
 
             if ( expected.getOverrideLocalStorageUrl() == null )
             {
-                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.", cRepo
-                    .getLocalStorage().getUrl() );
+                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
+                    cRepo.getLocalStorage().getUrl() );
             }
             else
             {
                 String actualLocalStorage =
-                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl() : cRepo
-                        .getLocalStorage().getUrl()
-                        + "/";
+                    cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl()
+                        : cRepo.getLocalStorage().getUrl() + "/";
                 String overridLocalStorage =
                     expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
-                                    : expected.getOverrideLocalStorageUrl() + "/";
+                        : expected.getOverrideLocalStorageUrl() + "/";
                 Assert.assertEquals( overridLocalStorage, actualLocalStorage );
             }
 
@@ -365,14 +368,14 @@ public class RepositoryMessageUtil
             }
             else
             {
-                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(), cRepo.getRemoteStorage()
-                    .getUrl() );
+                Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
+                    cRepo.getRemoteStorage().getUrl() );
             }
 
             // check maven repo props (for not just check everything that is a Repository
             if ( expected.getProvider().matches( "maven[12]" ) )
             {
-                M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repo.getId() );
+                M2RepositoryConfiguration cM2Repo = getTest().getNexusConfigUtil().getM2Repo( repo.getId() );
 
                 if ( expected.getChecksumPolicy() != null )
                 {

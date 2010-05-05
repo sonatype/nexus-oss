@@ -33,14 +33,13 @@ import com.thoughtworks.xstream.XStream;
  */
 public class NexusStatusUtil
 {
-
     protected static Logger log = Logger.getLogger( NexusStatusUtil.class );
 
     private static final String STATUS_STARTED = "STARTED";
 
-    private static ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
+    private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
-    public static StatusResourceResponse getNexusStatus()
+    public StatusResourceResponse getNexusStatus()
         throws NexusIllegalStateException
     {
         Response response;
@@ -68,35 +67,15 @@ public class NexusStatusUtil
         catch ( IOException e )
         {
             throw new NexusIllegalStateException( "Unable to retrieve nexus status " + new XStream().toXML( response ),
-                                                  e );
+                e );
         }
 
         StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML( entityText );
+
         return status;
     }
 
-    @Deprecated
-    public static void doSoftStart()
-        throws Exception
-    {
-        start();
-    }
-
-    @Deprecated
-    public static void doSoftStop()
-        throws Exception
-    {
-        stop();
-    }
-
-    @Deprecated
-    public static void doHardStart()
-        throws Exception
-    {
-        start();
-    }
-
-    public static void start()
+    public void start()
         throws Exception
     {
         int totalWaitCycles = 200 * 5; // 200 sec
@@ -148,21 +127,7 @@ public class NexusStatusUtil
 
     }
 
-    @Deprecated
-    public static void doHardStop()
-        throws Exception
-    {
-        stop();
-    }
-
-    @Deprecated
-    public static void doHardStop( boolean checkStarted )
-        throws Exception
-    {
-        stop();
-    }
-
-    public static void stop()
+    public void stop()
         throws Exception
     {
         if ( APP_BOOTER_SERVICE == null )
@@ -205,18 +170,18 @@ public class NexusStatusUtil
         }
     }
 
-    public static boolean isNexusAlive()
+    public boolean isNexusAlive()
     {
         return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort,
             AbstractNexusIntegrationTest.nexusApplicationPort } );
     }
 
-    public static boolean isNexusControllerPortAlive()
+    public boolean isNexusControllerPortAlive()
     {
         return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort } );
     }
 
-    public static boolean isNexusAlive( int[] ports )
+    public boolean isNexusAlive( int[] ports )
     {
         ServerSocket ss = null;
         for ( int i = 0; i < ports.length; i++ )
@@ -250,19 +215,19 @@ public class NexusStatusUtil
         return false;
     }
 
-    public static boolean isNexusRunning()
+    public boolean isNexusRunning()
         throws NexusIllegalStateException
     {
         return isNexusAlive() && ( STATUS_STARTED.equals( getNexusStatus().getData().getState() ) );
     }
 
-    public static boolean isNexusStopped()
+    public boolean isNexusStopped()
         throws NexusIllegalStateException
     {
         return !isNexusAlive();
     }
 
-    public static boolean waitForStop()
+    public boolean waitForStop()
         throws NexusIllegalStateException
     {
         log.info( "wait for Nexus stop" );
@@ -293,13 +258,11 @@ public class NexusStatusUtil
         return false;
     }
 
-    private static ThreadedPlexusAppBooterService getAppBooterService()
+    private ThreadedPlexusAppBooterService getAppBooterService()
         throws Exception
     {
-
         if ( APP_BOOTER_SERVICE == null )
         {
-
             final File f = new File( "target/plexus-home" );
 
             if ( !f.isDirectory() )
@@ -336,6 +299,7 @@ public class NexusStatusUtil
 
             APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort );
         }
+
         return APP_BOOTER_SERVICE;
     }
 

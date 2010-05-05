@@ -2,28 +2,19 @@ package org.sonatype.nexus.integrationtests.nexus166;
 
 import javax.swing.JOptionPane;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Test;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public class StartStopLeak
+    extends AbstractNexusIntegrationTest
 {
-
-    @BeforeClass
-    public static void start()
+    @After
+    public void stop()
         throws Exception
     {
-        //JOptionPane.showConfirmDialog( null, "Start" );
-        NexusStatusUtil.start();
-    }
-
-    @AfterClass
-    public static void stop()
-        throws Exception
-    {
-        //JOptionPane.showConfirmDialog( null, "Stop" );
-        NexusStatusUtil.stop();
+        // JOptionPane.showConfirmDialog( null, "Stop" );
+        getNexusStatusUtil().stop();
         System.gc();
         JOptionPane.showConfirmDialog( null, "Stoped" );
     }

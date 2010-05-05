@@ -29,7 +29,7 @@ public class Nexus133TargetCrudXmlIT
     public Nexus133TargetCrudXmlIT()
     {
         this.messageUtil =
-            new TargetMessageUtil( this.getXMLXStream(),
+            new TargetMessageUtil( this, this.getXMLXStream(),
                                  MediaType.APPLICATION_XML );
     }
     

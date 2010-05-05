@@ -47,7 +47,7 @@ public class Nexus421PlainNotificationTest
     {
         // set up repo message util
         this.repoMessageUtil =
-            new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
 
         // CONFIG CHANGES (using Nexus factory-defaults!)
         // set up SMTP to use our mailServer

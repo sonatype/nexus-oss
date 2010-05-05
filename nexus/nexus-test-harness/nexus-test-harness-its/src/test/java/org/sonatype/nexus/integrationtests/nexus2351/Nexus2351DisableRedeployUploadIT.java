@@ -19,7 +19,6 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -34,7 +33,7 @@ public class Nexus2351DisableRedeployUploadIT
         throws ComponentLookupException
     {
         this.repoUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML,
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
                                        this.getRepositoryTypeRegistry() );
     }
 
@@ -100,13 +99,13 @@ public class Nexus2351DisableRedeployUploadIT
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
-        Assert.assertEquals( 201, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         Metadata metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date firstDeployDate = this.getLastDeployTimeStamp( metadata );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
 
-        Assert.assertEquals( 201, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
         Assert.assertTrue( "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: "
@@ -114,7 +113,7 @@ public class Nexus2351DisableRedeployUploadIT
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
 
-        Assert.assertEquals( 201, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
         Assert.assertTrue( "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
@@ -134,8 +133,8 @@ public class Nexus2351DisableRedeployUploadIT
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
-        Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
-        Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
     }
 
     @Test
@@ -164,9 +163,9 @@ public class Nexus2351DisableRedeployUploadIT
 
         File fileToDeploy = getTestFile( "artifact.jar" );
 
-        Assert.assertEquals( 201, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
-        Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
-        Assert.assertEquals( 400, DeployUtils.deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
     }
 
     @Test

@@ -32,7 +32,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.cli.CommandLineException;
 import org.codehaus.plexus.util.cli.Commandline;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.plexus.classworlds.io.ClassworldsConfWriter;
@@ -52,7 +51,8 @@ import org.sonatype.plexus.classworlds.validator.ClassworldsValidationResult;
  */
 public class WagonDeployer
 {
-
+    private PlexusContainer plexusContainer;
+    
     private String protocol = "http";
 
     private String username;
@@ -67,10 +67,11 @@ public class WagonDeployer
 
     private static final Logger LOG = Logger.getLogger( WagonDeployer.class );
 
-    public WagonDeployer( String protocol, String username, String password, String repositoryUrl, File fileToDeploy,
-                          String artifactPath )
+    public WagonDeployer( PlexusContainer plexusContainer, String protocol, String username, String password,
+                          String repositoryUrl, File fileToDeploy, String artifactPath )
     {
-        super();
+        super( );
+        this.plexusContainer = plexusContainer;
         this.protocol = protocol;
         this.username = username;
         this.password = password;
@@ -81,7 +82,7 @@ public class WagonDeployer
         // so the RequestFacade will still work
         if ( StringUtils.isNotBlank( username ) )
         {
-        	//FIXME
+            // FIXME
             TestContainer.getInstance().getTestContext().setSecureTest( true );
             TestContainer.getInstance().getTestContext().setUsername( this.username );
             TestContainer.getInstance().getTestContext().setPassword( this.password );
@@ -126,7 +127,7 @@ public class WagonDeployer
         Wagon wagon;
         try
         {
-            wagon = (Wagon) AbstractNexusIntegrationTest.getStaticITPlexusContainer().lookup( Wagon.ROLE, protocol );
+            wagon = (Wagon) plexusContainer.lookup( Wagon.ROLE, protocol );
         }
         catch ( Exception e )
         {
@@ -152,7 +153,7 @@ public class WagonDeployer
             // warn people that this does not work. I would like to make something like this work later... but for now.
             // I need to move on...
             throw new NotImplementedException(
-                                               "This method does not work due to some classworlds problem, most likely its my fault." );
+                "This method does not work due to some classworlds problem, most likely its my fault." );
         }
 
         String classPath = System.getProperty( "java.class.path" );
@@ -279,7 +280,7 @@ public class WagonDeployer
         // {
         try
         {
-            new WagonDeployer( args[0], args[1], args[2], args[3], new File( args[4] ), args[5] ).deploy();
+            new WagonDeployer( null, args[0], args[1], args[2], args[3], new File( args[4] ), args[5] ).deploy();
         }
         catch ( ConnectionException e )
         {

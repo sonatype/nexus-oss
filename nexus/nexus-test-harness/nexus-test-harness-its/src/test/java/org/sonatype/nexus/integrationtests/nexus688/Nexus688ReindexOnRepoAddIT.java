@@ -46,7 +46,7 @@ public class Nexus688ReindexOnRepoAddIT
         throws ComponentLookupException
     {
         messageUtil =
-            new RepositoryMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
     }
 
     @Test

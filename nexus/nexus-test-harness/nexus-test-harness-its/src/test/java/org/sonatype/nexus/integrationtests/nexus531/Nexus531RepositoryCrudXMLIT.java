@@ -24,6 +24,7 @@ public class Nexus531RepositoryCrudXMLIT
         throws ComponentLookupException
     {
         this.messageUtil = new RepositoryMessageUtil(
+            this,
             this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             getRepositoryTypeRegistry() );

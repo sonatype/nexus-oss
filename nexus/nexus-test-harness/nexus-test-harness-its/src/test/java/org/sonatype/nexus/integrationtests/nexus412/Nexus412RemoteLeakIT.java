@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
 public class Nexus412RemoteLeakIT
     extends AbstractNexusIntegrationTest
@@ -88,8 +87,8 @@ public class Nexus412RemoteLeakIT
 
         ProxyRepository repo = (ProxyRepository) lookup( Repository.class, "maven2" );
 
-        CRepository cRepo = NexusConfigUtil.getRepo( repoId );
-        M2RepositoryConfiguration cM2Repo = NexusConfigUtil.getM2Repo( repoId );
+        CRepository cRepo = getNexusConfigUtil().getRepo( repoId );
+        M2RepositoryConfiguration cM2Repo = getNexusConfigUtil().getM2Repo( repoId );
 
         repo.setId( cRepo.getId() );
         repo.setItemMaxAge( cM2Repo.getArtifactMaxAge() );

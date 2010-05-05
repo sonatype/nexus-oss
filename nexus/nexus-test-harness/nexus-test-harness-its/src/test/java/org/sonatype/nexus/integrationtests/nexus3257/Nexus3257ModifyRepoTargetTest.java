@@ -21,8 +21,8 @@ public class Nexus3257ModifyRepoTargetTest
     
     public Nexus3257ModifyRepoTargetTest()
     {
-        targetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        privUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        targetUtil = new TargetMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
     
     @Test

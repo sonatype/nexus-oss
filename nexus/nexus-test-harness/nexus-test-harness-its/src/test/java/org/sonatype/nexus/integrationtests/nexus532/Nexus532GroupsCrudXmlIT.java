@@ -30,7 +30,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 
 /**
  * CRUD tests for XML request/response.
@@ -43,7 +42,7 @@ public class Nexus532GroupsCrudXmlIT
 
     public Nexus532GroupsCrudXmlIT()
     {
-        this.messageUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test
@@ -157,7 +156,7 @@ public class Nexus532GroupsCrudXmlIT
         {
             Assert.fail( "Could not delete Repository: " + response.getStatus() );
         }
-        Assert.assertNull( NexusConfigUtil.getRepo( resource.getId() ) );
+        Assert.assertNull( getNexusConfigUtil().getRepo( resource.getId() ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -186,7 +185,7 @@ public class Nexus532GroupsCrudXmlIT
         for ( Iterator<RepositoryGroupListResource> iter = groups.iterator(); iter.hasNext(); )
         {
             RepositoryGroupListResource group = iter.next();
-            M2GroupRepositoryConfiguration cGroup = NexusConfigUtil.getGroup( group.getId() );
+            M2GroupRepositoryConfiguration cGroup = getNexusConfigUtil().getGroup( group.getId() );
 
             Assert.assertNotNull( "CRepositoryGroup", cGroup );
         }

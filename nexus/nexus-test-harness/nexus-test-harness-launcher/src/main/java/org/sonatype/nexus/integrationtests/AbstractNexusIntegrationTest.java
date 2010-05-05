@@ -64,6 +64,7 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
@@ -76,7 +77,7 @@ import com.thoughtworks.xstream.XStream;
  * issues, this should be refactored a little, but it might be ok, if we switch to TestNg
  */
 // @RunWith(ConsoleLoggingRunner.class)
-public class AbstractNexusIntegrationTest
+public abstract class AbstractNexusIntegrationTest
 {
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
 
@@ -113,13 +114,13 @@ public class AbstractNexusIntegrationTest
 
     public static final String WORK_CONF_DIR;
 
-    protected static final String nexusLogDir;
-
-    protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
-
     public static final Integer nexusControlPort;
 
     public static final int nexusApplicationPort;
+
+    protected static final String nexusLogDir;
+
+    protected static Logger log = Logger.getLogger( AbstractNexusIntegrationTest.class );
 
     /**
      * Flag that says if we should verify the config before startup, we do not want to do this for upgrade tests.
@@ -138,6 +139,56 @@ public class AbstractNexusIntegrationTest
         nexusLogDir = TestProperties.getString( "nexus.log.dir" );
         nexusBaseUrl = TestProperties.getString( "nexus.base.url" );
         baseNexusUrl = nexusBaseUrl;
+    }
+
+    // == instance utils
+
+    private NexusConfigUtil nexusConfigUtil;
+
+    public NexusConfigUtil getNexusConfigUtil()
+    {
+        if ( nexusConfigUtil == null )
+        {
+            nexusConfigUtil = new NexusConfigUtil( this );
+        }
+
+        return nexusConfigUtil;
+    }
+
+    private SecurityConfigUtil securityConfigUtil;
+
+    public SecurityConfigUtil getSecurityConfigUtil()
+    {
+        if ( securityConfigUtil == null )
+        {
+            securityConfigUtil = new SecurityConfigUtil( this );
+        }
+
+        return securityConfigUtil;
+    }
+
+    private static NexusStatusUtil nexusStatusUtil;
+
+    public static NexusStatusUtil getNexusStatusUtil()
+    {
+        if ( nexusStatusUtil == null )
+        {
+            nexusStatusUtil = new NexusStatusUtil();
+        }
+
+        return nexusStatusUtil;
+    }
+
+    private DeployUtils deployUtils;
+
+    public DeployUtils getDeployUtils()
+    {
+        if ( deployUtils == null )
+        {
+            deployUtils = new DeployUtils( this );
+        }
+
+        return deployUtils;
     }
 
     // == Constructors
@@ -174,9 +225,6 @@ public class AbstractNexusIntegrationTest
         {
             IOUtil.close( is );
         }
-
-        // this will trigger PlexusContainer creation when test is instantiated, but only if needed
-        getITPlexusContainer( getClass() );
 
         // configure the logging
         SLF4JBridgeHandler.install();
@@ -216,39 +264,48 @@ public class AbstractNexusIntegrationTest
             if ( NEEDS_INIT )
             {
                 // tell the console what we are doing, now that there is no output its
-                log.info( "Running Test: " + this.getClass().getSimpleName() );
+                log.info( "Running Test: " + getClass().getSimpleName() );
 
-                this.setupLog4j();
+                setupLog4j();
+
+                // this will trigger PlexusContainer creation when test is instantiated, but only if needed
+                getITPlexusContainer( getClass() );
 
                 // clean common work dir
-                this.beforeStartClean();
+                beforeStartClean();
 
-                this.copyTestResources();
+                copyTestResources();
 
                 HashMap<String, String> variables = new HashMap<String, String>();
-                variables.put( "test-harness-id", this.getTestId() );
+                variables.put( "test-harness-id", getTestId() );
 
                 this.copyConfigFiles();
 
                 // At this point we have the final log4j config for the IT, switch log4j to use it.
                 PropertyConfigurator.configure( WORK_CONF_DIR + "/log4j.properties" );
 
+                // TODO: Below, Nexus configuration upgrade happens! But this is insane, since it is the IT that
+                // upgrades
+                // nexus config, not the tested product! If, by any chance, we start to test another product, that is
+                // not in this buildtree (hence, the configuration classes will not be equal like currently), this is
+                // make hell loose!
+
                 // we need to make sure the config is valid, so we don't need to hunt through log files
                 if ( this.verifyNexusConfigBeforeStart )
                 {
-                    NexusConfigUtil.validateConfig();
+                    getNexusConfigUtil().validateConfig();
                 }
 
                 // the validation needs to happen before we enable security it triggers an upgrade.
-
-                NexusConfigUtil.enableSecurity( TestContainer.getInstance().getTestContext().isSecureTest()
-                    || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
+                getNexusConfigUtil().enableSecurity(
+                    TestContainer.getInstance().getTestContext().isSecureTest()
+                        || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
 
                 // start nexus
-                this.startNexus();
+                startNexus();
 
                 // deploy artifacts
-                this.deployArtifacts();
+                deployArtifacts();
 
                 runOnce();
 
@@ -264,6 +321,8 @@ public class AbstractNexusIntegrationTest
     {
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
+
+        killITPlexusContainer();
     }
 
     @AfterClass
@@ -275,8 +334,6 @@ public class AbstractNexusIntegrationTest
 
         // stop nexus
         stopNexus();
-
-        killITPlexusContainer();
 
         takeSnapshot();
     }
@@ -560,43 +617,41 @@ public class AbstractNexusIntegrationTest
         {
             if ( artifactSha1.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactSha1,
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactSha1,
                     this.getRelitiveArtifactPath( gav ) + ".sha1" );
             }
             if ( artifactMd5.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactMd5,
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactMd5,
                     this.getRelitiveArtifactPath( gav ) + ".md5" );
             }
             if ( artifactAsc.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactAsc,
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactAsc,
                     this.getRelitiveArtifactPath( gav ) + ".asc" );
             }
 
             if ( artifactFile.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, artifactFile,
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactFile,
                     this.getRelitiveArtifactPath( gav ) );
             }
 
             if ( pomSha1.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomSha1, this.getRelitivePomPath( gav )
-                    + ".sha1" );
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomSha1,
+                    this.getRelitivePomPath( gav ) + ".sha1" );
             }
             if ( pomMd5.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomMd5, this.getRelitivePomPath( gav )
-                    + ".md5" );
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomMd5, this.getRelitivePomPath( gav ) + ".md5" );
             }
             if ( pomAsc.exists() )
             {
-                DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pomAsc, this.getRelitivePomPath( gav )
-                    + ".asc" );
+                getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomAsc, this.getRelitivePomPath( gav ) + ".asc" );
             }
 
-            DeployUtils.deployWithWagon( this, wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
+            getDeployUtils().deployWithWagon( wagonHint, deployUrl, pom, this.getRelitivePomPath( gav ) );
         }
         catch ( Exception e )
         {
@@ -605,7 +660,7 @@ public class AbstractNexusIntegrationTest
         }
     }
 
-    private void startNexus()
+    protected void startNexus()
         throws Exception
     {
 
@@ -613,15 +668,9 @@ public class AbstractNexusIntegrationTest
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
 
-        log.info( "***************************" );
-        log.info( "*\n*" );
-        log.info( "*  DOING A HARD START OF NEXUS." );
-        log.info( "*\n*" );
-        log.info( "***************************" );
-
         try
         {
-            NexusStatusUtil.doSoftStart();
+            getNexusStatusUtil().start();
         }
         catch ( Exception e )
         {
@@ -637,12 +686,20 @@ public class AbstractNexusIntegrationTest
         }
     }
 
-    private static void stopNexus()
+    protected static void stopNexus()
         throws Exception
     {
         log.info( "stopping Nexus" );
 
-        NexusStatusUtil.doSoftStop();
+        getNexusStatusUtil().stop();
+    }
+
+    protected void restartNexus()
+        throws Exception
+    {
+        log.info( "RESTARTING Nexus" );
+        stopNexus();
+        startNexus();
     }
 
     protected File getOverridableFile( String file )
@@ -1095,7 +1152,7 @@ public class AbstractNexusIntegrationTest
 
     // == IT Container management
 
-    private static PlexusContainer itPlexusContainer;
+    private PlexusContainer itPlexusContainer;
 
     public PlexusContainer getITPlexusContainer()
     {
@@ -1104,33 +1161,21 @@ public class AbstractNexusIntegrationTest
 
     public PlexusContainer getITPlexusContainer( Class<?> clazz )
     {
-        if ( AbstractNexusIntegrationTest.itPlexusContainer == null )
+        if ( itPlexusContainer == null )
         {
-            AbstractNexusIntegrationTest.itPlexusContainer = setupContainer( getClass() );
+            itPlexusContainer = setupContainer( getClass() );
         }
 
-        return AbstractNexusIntegrationTest.itPlexusContainer;
+        return itPlexusContainer;
     }
 
-    /**
-     * The use of this method should be avoided! Better create Util classes that accepts AbstractNexusIntegrationTest
-     * instances, and then they get the stuff they need from that instance!
-     * 
-     * @return
-     * @deprecated Gonna dissapear! Better create methods that accepts AbstractNexusIntegrationTest instances!
-     */
-    public static PlexusContainer getStaticITPlexusContainer()
+    public void killITPlexusContainer()
     {
-        return AbstractNexusIntegrationTest.itPlexusContainer;
-    }
-
-    public static void killITPlexusContainer()
-    {
-        if ( AbstractNexusIntegrationTest.itPlexusContainer != null )
+        if ( itPlexusContainer != null )
         {
-            AbstractNexusIntegrationTest.itPlexusContainer.dispose();
+            itPlexusContainer.dispose();
 
-            AbstractNexusIntegrationTest.itPlexusContainer = null;
+            itPlexusContainer = null;
         }
     }
 
