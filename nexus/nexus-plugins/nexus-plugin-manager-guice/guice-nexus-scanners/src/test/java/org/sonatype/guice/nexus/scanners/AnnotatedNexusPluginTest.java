@@ -172,43 +172,43 @@ public class AnnotatedNexusPluginTest
         // non-extension so no automatic hinting...
         assertEquals( BeanA.class, components.get(
                                                    new ComponentImpl( HostInterface0.class, Hints.DEFAULT_HINT,
-                                                                      "singleton", "" ) ).get() );
+                                                                      "singleton", "" ) ).load() );
         assertEquals( BeanB.class, components.get(
                                                    new ComponentImpl( HostInterface1.class, BeanB.class.getName(),
-                                                                      "per-lookup", "" ) ).get() );
+                                                                      "per-lookup", "" ) ).load() );
         assertEquals( BeanC.class, components.get(
                                                    new ComponentImpl( HostInterface2.class, BeanC.class.getName(),
-                                                                      "singleton", "" ) ).get() );
+                                                                      "singleton", "" ) ).load() );
         // non-component so API @Singleton ignored...
         assertEquals( BeanD.class, components.get(
                                                    new ComponentImpl( UserInterface0.class, Hints.DEFAULT_HINT,
-                                                                      "per-lookup", "" ) ).get() );
+                                                                      "per-lookup", "" ) ).load() );
         assertEquals( BeanE.class, components.get(
                                                    new ComponentImpl( UserInterface1.class, Hints.DEFAULT_HINT,
-                                                                      "per-lookup", "" ) ).get() );
+                                                                      "per-lookup", "" ) ).load() );
         final Class<?> duplicate =
-            components.get( new ComponentImpl( UserInterface2.class, Hints.DEFAULT_HINT, "singleton", "" ) ).get();
+            components.get( new ComponentImpl( UserInterface2.class, Hints.DEFAULT_HINT, "singleton", "" ) ).load();
 
         // duplicate binding, first-one wins... result may vary on different machines/OS's
         assertTrue( duplicate.equals( BeanF.class ) || duplicate.equals( NamedBeanD.class ) );
 
         assertEquals( NamedBeanA.class, components.get(
                                                         new ComponentImpl( HostInterface1.class, "BeanA", "per-lookup",
-                                                                           "" ) ).get() );
+                                                                           "" ) ).load() );
         assertEquals( NamedBeanB.class, components.get(
                                                         new ComponentImpl( HostInterface2.class, Hints.DEFAULT_HINT,
-                                                                           "singleton", "" ) ).get() );
+                                                                           "singleton", "" ) ).load() );
         assertEquals( NamedBeanC.class, components.get(
                                                         new ComponentImpl( UserInterface1.class, "BeanC", "per-lookup",
-                                                                           "" ) ).get() );
+                                                                           "" ) ).load() );
 
         assertEquals( ComponentBeanA.class, components.get(
                                                             new ComponentImpl( SubHostInterface1.class,
                                                                                ComponentBeanA.class.getName(),
-                                                                               "per-lookup", "" ) ).get() );
+                                                                               "per-lookup", "" ) ).load() );
         assertEquals(
                       ComponentBeanB.class,
-                      components.get( new ComponentImpl( SubUserInterface1.class, Hints.DEFAULT_HINT, "per-lookup", "" ) ).get() );
+                      components.get( new ComponentImpl( SubUserInterface1.class, Hints.DEFAULT_HINT, "per-lookup", "" ) ).load() );
     }
 
     public void testBadClassFile()
