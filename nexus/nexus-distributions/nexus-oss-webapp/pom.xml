@@ -90,7 +90,7 @@
     <dependency>
       <groupId>org.sonatype.runtime.bars</groupId>
       <artifactId>bar-jsw</artifactId>
-      <version>3.2.3-v0001</version>
+      <version>3.2.3-v0002-SNAPSHOT</version>
       <type>zip</type>
     </dependency>
     <dependency>
