@@ -382,6 +382,14 @@
         <pattern>.*maven-metadata\.xml.*</pattern>
       </patterns>
     </repositoryTarget>
+    <repositoryTarget>
+      <id>any</id>
+      <name>All (Any Repository)</name>
+      <contentClass>any</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
   </repositoryTargets>
   <smtpConfiguration>
     <hostname>smtp-host</hostname>

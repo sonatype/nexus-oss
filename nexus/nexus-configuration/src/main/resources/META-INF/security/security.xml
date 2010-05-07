@@ -43,7 +43,7 @@
 			<source>default</source>
 			<roles>
 				<role>deployment</role>
-                <role>repo-all-full</role>
+                <role>repository-any-full</role>
 			</roles>
 		</userRoleMapping>
 		<userRoleMapping>
@@ -51,7 +51,7 @@
 			<source>default</source>
 			<roles>
 				<role>anonymous</role>
-                <role>repo-all-read</role>
+                <role>repository-any-read</role>
 			</roles>
 		</userRoleMapping>
 	</userRoleMappings>
