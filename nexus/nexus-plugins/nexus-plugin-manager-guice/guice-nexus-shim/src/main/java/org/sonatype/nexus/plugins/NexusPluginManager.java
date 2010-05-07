@@ -20,12 +20,9 @@ import java.util.Map;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 
-import com.google.inject.ImplementedBy;
-
 /**
  * Manages Nexus plugins, including both system and user types.
  */
-@ImplementedBy( DefaultNexusPluginManager.class )
 public interface NexusPluginManager
 {
     /**

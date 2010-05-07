@@ -24,19 +24,23 @@ import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
+import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.guice.bean.inject.PropertyBinding;
+import org.sonatype.guice.bean.reflect.BeanProperty;
 import org.sonatype.guice.bean.reflect.ClassSpace;
+import org.sonatype.guice.bean.reflect.DeferredClass;
 import org.sonatype.guice.bean.reflect.URLClassSpace;
 import org.sonatype.guice.nexus.scanners.AnnotatedNexusBeanSource;
 import org.sonatype.guice.nexus.scanners.AnnotatedNexusComponentScanner;
 import org.sonatype.guice.plexus.binders.PlexusBeanManager;
 import org.sonatype.guice.plexus.binders.PlexusBindingModule;
 import org.sonatype.guice.plexus.config.PlexusBeanSource;
+import org.sonatype.guice.plexus.config.Roles;
 import org.sonatype.guice.plexus.locators.GuiceBeanLocator;
 import org.sonatype.guice.plexus.scanners.XmlPlexusBeanSource;
 import org.sonatype.nexus.mime.MimeUtil;
@@ -63,7 +67,7 @@ import com.google.inject.util.Jsr330;
 /**
  * Default {@link NexusPluginManager} implementation backed by a {@link PluginRepositoryManager}.
  */
-@Singleton
+@Component( role = NexusPluginManager.class )
 public final class DefaultNexusPluginManager
     implements NexusPluginManager
 {
@@ -90,7 +94,7 @@ public final class DefaultNexusPluginManager
     private GuiceBeanLocator beanLocator;
 
     @Inject
-    private PlexusBeanManager beanManager;
+    private NexusBeanManager beanManager;
 
     @Inject
     private Injector rootInjector;
@@ -312,7 +316,7 @@ public final class DefaultNexusPluginManager
         final ClassSpace annSpace = new URLClassSpace( pluginRealm, scanList.toArray( new URL[scanList.size()] ) );
         final PlexusBeanSource annSource = new AnnotatedNexusBeanSource( annSpace, variables, scanner );
 
-        final Module pluginBindings = new PlexusBindingModule( beanManager.manageChild(), xmlSource, annSource );
+        final Module pluginBindings = new PlexusBindingModule( beanManager, xmlSource, annSource );
         final Injector pluginInjector = rootInjector.createChildInjector( pluginBindings, resourceBindings );
 
         descriptor.setExportedClassnames( exportedClassNames );
@@ -387,5 +391,47 @@ public final class DefaultNexusPluginManager
         pluginResponses.put( gav, result );
 
         eventMulticaster.notifyEventListeners( pluginEvent );
+    }
+
+    private static final class NexusBeanManager
+        implements PlexusBeanManager
+    {
+        @Inject
+        private PlexusBeanManager originalManager;
+
+        @Inject
+        private Injector rootInjector;
+
+        public boolean manage( final Component component, final DeferredClass<?> clazz )
+        {
+            originalManager.manage( component, clazz );
+
+            return null == rootInjector.getExistingBinding( Roles.componentKey( component ) );
+        }
+
+        public boolean manage( final Class<?> clazz )
+        {
+            return originalManager.manage( clazz );
+        }
+
+        public PropertyBinding manage( final BeanProperty<?> property )
+        {
+            return originalManager.manage( property );
+        }
+
+        public boolean manage( final Object bean )
+        {
+            return originalManager.manage( bean );
+        }
+
+        public boolean unmanage( final Object bean )
+        {
+            return originalManager.unmanage( bean );
+        }
+
+        public boolean unmanage()
+        {
+            return originalManager.unmanage();
+        }
     }
 }
