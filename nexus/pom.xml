@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>14</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -142,10 +142,10 @@
     <plexus-security.version>1.1.8</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <maven.version>2.1.0</maven.version>
-    <nexus.indexer.version>2.0.6-SNAPSHOT</nexus.indexer.version>
+    <nexus.indexer.version>2.0.6</nexus.indexer.version>
     <nexus.repository.metadata.version>1.0.2</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
-    <plexus.restlet.bridge.version>1.15-SNAPSHOT</plexus.restlet.bridge.version>
+    <plexus.restlet.bridge.version>1.15</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
     <mercury.version>1.0-alpha-6</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>

@@ -20,7 +20,7 @@
     <dependency>
       <groupId>org.sonatype.buup</groupId>
       <artifactId>buup-invoker</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0</version>
       <exclusions>
         <exclusion>
           <groupId>org.slf4j</groupId>
