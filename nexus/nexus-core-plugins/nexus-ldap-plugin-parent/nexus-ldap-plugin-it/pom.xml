@@ -3,7 +3,7 @@
   <parent>
     <artifactId>nexus-ldap-plugin-parent</artifactId>
     <groupId>org.sonatype.nexus.plugins.ldap</groupId>
-    <version>1.6.1</version>
+    <version>1.6.2-SNAPSHOT</version>
   </parent>
   <groupId>org.sonatype.nexus.plugins.ldap</groupId>
   <artifactId>nexus-ldap-plugin-it</artifactId>
