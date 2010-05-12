@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-test-harness</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
   </parent>
 
   <artifactId>nexus-test-harness-its</artifactId>
@@ -206,8 +206,7 @@
       <!--
         This is the path on Velo's machine ;) <properties>
         <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler
-        8.0.13</yourkit.home> </properties
-      -->
+        8.0.13</yourkit.home> </properties -->
 
       <dependencies>
         <dependency>

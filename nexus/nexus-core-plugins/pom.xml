@@ -16,7 +16,7 @@
   <parent>
     <artifactId>nexus</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
   </parent>
 
   <groupId>org.sonatype.nexus.plugins</groupId>

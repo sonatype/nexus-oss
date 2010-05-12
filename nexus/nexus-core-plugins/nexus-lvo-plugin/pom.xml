@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.sonatype.nexus.plugins</groupId>
 		<artifactId>nexus-core-plugins</artifactId>
-		<version>1.6.1-SNAPSHOT</version>
+		<version>1.6.1</version>
 	</parent>
 
 	<artifactId>nexus-lvo-plugin</artifactId>
@@ -12,9 +12,9 @@
 	<description>Nexus LVO Plugin (Extras).</description>
 
 	<scm>
-		<url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</url>
-		<connection>scm:svn:http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</connection>
-		<developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</developerConnection>
+		<url>http://svn.sonatype.org/nexus-plugins/tags/nexus-1.6.1</url>
+		<connection>scm:svn:http://svn.sonatype.org/nexus-plugins/tags/nexus-1.6.1</connection>
+		<developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/tags/nexus-1.6.1</developerConnection>
 	</scm>
 
 	<developers>

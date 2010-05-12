@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.nexus.restlight</groupId>
     <artifactId>nexus-restlight-clients</artifactId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.1</version>
   </parent>
 
   <artifactId>nexus-restlight-test-harness</artifactId>
