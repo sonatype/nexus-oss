@@ -3,25 +3,30 @@ package org.sonatype.security.usermanagement;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A UserSearchCriteria defines searchble fields. Null or empty fields will be ignored.
+ * 
+ * @author Brian Demers
+ */
 public class UserSearchCriteria
 {
     private String userId;
 
     private Set<String> oneOfRoleIds = new HashSet<String>();
-    
+
     private String source;
-    
+
     private String email;
 
     public UserSearchCriteria()
     {
     }
-    
+
     public UserSearchCriteria( String userId )
     {
         this.userId = userId;
     }
-    
+
     public UserSearchCriteria( String userId, Set<String> oneOfRoleIds, String source )
     {
         this.userId = userId;
@@ -68,7 +73,5 @@ public class UserSearchCriteria
     {
         this.email = email;
     }
-    
-    
 
 }

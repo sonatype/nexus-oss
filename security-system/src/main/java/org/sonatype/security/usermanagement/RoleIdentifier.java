@@ -3,13 +3,18 @@ package org.sonatype.security.usermanagement;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Identifies a role and what source it comes from. Its basically a just a complex key for a role.
+ * 
+ * @author Brian Demers
+ */
 public class RoleIdentifier
 {
 
     private String source;
 
     private String roleId;
-    
+
     /**
      * @param source
      * @param roleId
@@ -80,25 +85,25 @@ public class RoleIdentifier
     public static Set<RoleIdentifier> getRoleIdentifiersForSource( String source, Set<RoleIdentifier> roleIdentifiers )
     {
         Set<RoleIdentifier> sourceRoleIdentifiers = new HashSet<RoleIdentifier>();
-        
-        if( roleIdentifiers != null)
+
+        if ( roleIdentifiers != null )
         {
             for ( RoleIdentifier roleIdentifier : roleIdentifiers )
             {
-                if( roleIdentifier.getSource().equals( source ) )
+                if ( roleIdentifier.getSource().equals( source ) )
                 {
                     sourceRoleIdentifiers.add( roleIdentifier );
                 }
             }
         }
-        
+
         return sourceRoleIdentifiers;
     }
 
     @Override
     public String toString()
     {
-        return "source: "+ this.source + ", roleId: "+ this.roleId;
+        return "source: " + this.source + ", roleId: " + this.roleId;
     }
-    
+
 }

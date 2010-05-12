@@ -12,6 +12,11 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
+/**
+ * Componentize the Shiro DefaultSecurityManager, and sets up caching.
+ * @author Brian Demers
+ *
+ */
 @Component( role = PlexusSecurityManager.class )
 public class DefaultPlexusSecurityManager
     extends DefaultSecurityManager

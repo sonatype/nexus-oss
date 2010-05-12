@@ -12,9 +12,27 @@
  */
 package org.sonatype.security.usermanagement;
 
+/**
+ * Generates passwords for users.
+ * 
+ * @author Brian Demers
+ */
 public interface PasswordGenerator
 {
+    /**
+     * Generates a password.
+     * 
+     * @param minChars the minimum number of characters in the password.
+     * @param maxChars the maximum number of characters in the password.
+     * @return
+     */
     String generatePassword( int minChars, int maxChars );
 
+    /**
+     * Hash a password String.
+     * 
+     * @param password to be hashed.
+     * @return the hash password String.
+     */
     String hashPassword( String password );
 }

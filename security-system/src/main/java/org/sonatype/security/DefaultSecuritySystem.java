@@ -17,8 +17,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.DelegatingSubject;
-import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -56,7 +54,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
 /**
- * This implementation wraps a jsecurity/Ki SecurityManager, and adds user management.
+ * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
 @Component( role = SecuritySystem.class )
 public class DefaultSecuritySystem

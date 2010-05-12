@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.apache.shiro.authz.AuthorizationException;
 
 /**
- * A implementation of the jsecurity ModularRealmAuthorizer, that catches exceptions caused by individual realms and
+ * A implementation of the Shiro ModularRealmAuthorizer, that catches exceptions caused by individual realms and
  * ignores them. For example if a JDBC realm throws an exception while getting the list of users Roles (and is not
  * caught, the system should continue looking for permissions in other realms).
  */

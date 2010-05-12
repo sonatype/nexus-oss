@@ -13,7 +13,7 @@
 package org.sonatype.security.usermanagement;
 
 /**
- * Thrown if the password isn't correct on reset password
+ * Thrown if the password isn't correct on reset password.
  * 
  * @author cstamas
  */

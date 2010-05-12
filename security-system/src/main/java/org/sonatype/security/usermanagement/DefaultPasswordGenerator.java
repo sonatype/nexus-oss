@@ -16,6 +16,9 @@ import java.util.Random;
 
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * Default implementation of PasswordGenerator.
+ */
 @Component( role = PasswordGenerator.class )
 public class DefaultPasswordGenerator
     implements PasswordGenerator

@@ -3,6 +3,11 @@ package org.sonatype.security.authorization;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A simple bean that represents a Role.
+ * @author Brian Demers
+ *
+ */
 public class Role implements Comparable<Role>
 {
     private String roleId;

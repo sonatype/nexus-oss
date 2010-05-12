@@ -7,6 +7,12 @@ import java.util.Set;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 
+/**
+ * An abstract UserManager that handles filtering UserSearchCriteria in memory, this can be used in addition to an
+ * external query ( if all the parameters can not be pased to the external source).
+ * 
+ * @author Brian Demers
+ */
 public abstract class AbstractUserManager
     implements UserManager
 {
@@ -42,7 +48,7 @@ public abstract class AbstractUserManager
     }
 
     protected boolean matchesCriteria( String userId, String userSource, Collection<String> usersRoles,
-        UserSearchCriteria criteria )
+                                       UserSearchCriteria criteria )
     {
         if ( StringUtils.isNotEmpty( criteria.getUserId() )
             && !userId.toLowerCase().startsWith( criteria.getUserId().toLowerCase() ) )

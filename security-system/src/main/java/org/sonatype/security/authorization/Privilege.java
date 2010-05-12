@@ -3,6 +3,11 @@ package org.sonatype.security.authorization;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A simple bean that represents a privilge.
+ * 
+ * @author Brian Demers
+ */
 public class Privilege
 {
 
@@ -30,7 +35,7 @@ public class Privilege
      * Field properties
      */
     private Map<String, String> properties = new HashMap<String, String>();
-    
+
     private boolean readOnly;
 
     public String getId()
@@ -77,8 +82,8 @@ public class Privilege
     {
         return properties;
     }
-    
-    public void addProperty( String key, String value)
+
+    public void addProperty( String key, String value )
     {
         this.properties.put( key, value );
     }
@@ -97,10 +102,10 @@ public class Privilege
     {
         this.readOnly = readOnly;
     }
-    
+
     public String getPrivilegeProperty( String key )
     {
         return this.properties.get( key );
     }
-    
+
 }

@@ -14,11 +14,33 @@ package org.sonatype.security.email;
 
 import java.util.List;
 
+/**
+ * A Component use to notify a user when his/her password is changed or reset.
+ */
 public interface SecurityEmailer
 {
+    /**
+     * Send an email to the user telling them they have a new account.
+     * 
+     * @param email
+     * @param userid
+     * @param password
+     */
     void sendNewUserCreated( String email, String userid, String password );
-    
+
+    /**
+     * Send an email to the user telling them their password has changed.
+     * 
+     * @param email
+     * @param password
+     */
     void sendResetPassword( String email, String password );
-    
+
+    /**
+     * Send an email to the user reminding them of their username.
+     * 
+     * @param email
+     * @param userIds
+     */
     void sendForgotUsername( String email, List<String> userIds );
 }

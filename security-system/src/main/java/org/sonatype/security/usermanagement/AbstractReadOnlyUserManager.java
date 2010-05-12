@@ -4,6 +4,12 @@ import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 
+/**
+ * An abstract UserManager, that just throws exceptions for all the write methods. Any call to theses methods should be
+ * checked by the <code>supportsWrite()</code> method, so this should never be called.
+ * 
+ * @author Brian Demers
+ */
 public abstract class AbstractReadOnlyUserManager
     extends AbstractUserManager
 {
@@ -32,17 +38,13 @@ public abstract class AbstractReadOnlyUserManager
         this.throwException();
     }
 
-
-
     public void setUsersRoles( String userId, Set<RoleIdentifier> roleIdentifiers )
-        throws UserNotFoundException,
-            InvalidConfigurationException
-    {        
+        throws UserNotFoundException, InvalidConfigurationException
+    {
     }
 
     public User updateUser( User user )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         this.throwException();
         return null;

@@ -2,6 +2,12 @@ package org.sonatype.security.authorization;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 
+/**
+ * An abstract AuthorizationManager, that just throws exceptions for all the write methods. Any call to theses methods
+ * should be checked by the <code>supportsWrite()</code> method, so this should never be called.
+ * 
+ * @author Brian Demers
+ */
 public abstract class AbstractReadOnlyAuthorizationManager
     implements AuthorizationManager
 {
@@ -38,16 +44,14 @@ public abstract class AbstractReadOnlyAuthorizationManager
     }
 
     public Privilege updatePrivilege( Privilege privilege )
-        throws NoSuchPrivilegeException,
-            InvalidConfigurationException
+        throws NoSuchPrivilegeException, InvalidConfigurationException
     {
         this.throwException();
         return null;
     }
 
     public Role updateRole( Role role )
-        throws NoSuchRoleException,
-            InvalidConfigurationException
+        throws NoSuchRoleException, InvalidConfigurationException
     {
         this.throwException();
         return null;
@@ -55,7 +59,8 @@ public abstract class AbstractReadOnlyAuthorizationManager
 
     private void throwException()
     {
-        throw new IllegalStateException( "AuthorizationManager: '" + this.getSource() + "' does not support write operations." );
+        throw new IllegalStateException( "AuthorizationManager: '" + this.getSource()
+            + "' does not support write operations." );
     }
 
 }

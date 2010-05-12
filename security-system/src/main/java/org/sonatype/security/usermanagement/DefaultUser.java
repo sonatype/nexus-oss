@@ -4,6 +4,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Default implementation of a User.
+ * 
+ * @author Brian Demers
+ */
 public class DefaultUser
     implements User, Comparable<User>
 {
@@ -15,9 +20,9 @@ public class DefaultUser
     private String emailAddress;
 
     private String source;
-    
+
     private UserStatus status;
-    
+
     private boolean readOnly;
 
     private Set<RoleIdentifier> roleIdentifiers = new HashSet<RoleIdentifier>();
@@ -69,9 +74,9 @@ public class DefaultUser
 
     public void addRole( RoleIdentifier roleIdentifier )
     {
-        this.roleIdentifiers.add( roleIdentifier ); 
+        this.roleIdentifiers.add( roleIdentifier );
     }
-    
+
     public boolean removeRole( RoleIdentifier roleIdentifier )
     {
         return this.roleIdentifiers.remove( roleIdentifier );
@@ -81,7 +86,7 @@ public class DefaultUser
     {
         this.roleIdentifiers.addAll( roleIdentifiers );
     }
-    
+
     public void setRoles( Set<RoleIdentifier> roles )
     {
         this.roleIdentifiers = roles;
