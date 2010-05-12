@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.jsecurity.web.WebUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RequestContext;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 
@@ -88,7 +89,11 @@ public class NexusTargetMappingAuthorizationFilter
 
     protected ResourceStoreRequest getResourceStoreRequest( ServletRequest request, boolean localOnly )
     {
-        return new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
+        ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
+        
+        rsr.getRequestContext().put( RequestContext.CTX_AUTH_CHECK_ONLY, true );
+        
+        return rsr;
     }
 
     @Override

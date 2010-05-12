@@ -31,6 +31,11 @@ public class RequestContext
 
     /** Context key for condition "if-none-match" */
     public static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
+    
+    /** Context key to mark request as used for auth check only, so repo impl will know there is no
+     *  work required (i.e. interpolation, etc.)
+     */
+    public static final String CTX_AUTH_CHECK_ONLY = "request.auth.check.only";
 
     private RequestContext parent;
 
