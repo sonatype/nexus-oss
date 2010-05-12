@@ -8,9 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.support.DelegatingSubject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -19,17 +29,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.SecurityUtils;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.cache.Cache;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.DelegatingSubject;
-import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.Subject;
-import org.jsecurity.util.ThreadContext;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
@@ -66,15 +65,8 @@ public class DefaultSecuritySystem
     @Requirement
     private SecurityConfigurationManager securityConfiguration;
 
-    // TODO: we should get this value from the config, (not plexus)
-    @Configuration( value = "web" )
-    private String applicationSecurityManagerHint;
-
-    @Configuration( value = "default" )
-    private String runAsSecurityManagerHint;
-
-    @Requirement( role = PlexusSecurityManager.class )
-    private Map<String, PlexusSecurityManager> securityManagerMap;
+    @Requirement
+    private PlexusSecurityManager applicationSecurityManager;
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
@@ -103,9 +95,14 @@ public class DefaultSecuritySystem
     {
         try
         {
-            return this.getApplicationSecurityManager().login( token );
+            Subject subject = new Subject.Builder( this.applicationSecurityManager ).buildSubject();
+            // TODO: consider doing something else here, read the javadoc for the login method
+            subject.login( token );
+//            Subject subject = this.getApplicationSecurityManager().login( null, token );
+//            ThreadContext.bind( subject );
+            return subject;
         }
-        catch ( org.jsecurity.authc.AuthenticationException e )
+        catch ( org.apache.shiro.authc.AuthenticationException e )
         {
             throw new AuthenticationException( e.getMessage(), e );
         }
@@ -118,27 +115,24 @@ public class DefaultSecuritySystem
         {
             return this.getApplicationSecurityManager().authenticate( token );
         }
-        catch ( org.jsecurity.authc.AuthenticationException e )
+        catch ( org.apache.shiro.authc.AuthenticationException e )
         {
             throw new AuthenticationException( e.getMessage(), e );
         }
     }
 
-    public Subject runAs( PrincipalCollection principal )
-    {
-        PlexusSecurityManager securityManager = this.getRunAsSecurityManager();
-        // TODO: we might need to bind this to the ThreadContext for this thread
-        // however if we do this we would need to unbind it so it doesn't leak
-        // ThreadContext.bind( securityManager );
-
-        DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null, securityManager );
-
-        // fake the login
-        ThreadContext.bind( fakeLoggedInSubject );
-        // this is un-bind when the user logs out.
-
-        return fakeLoggedInSubject;
-    }
+//    public Subject runAs( PrincipalCollection principal )
+//    {
+//        // TODO: we might need to bind this to the ThreadContext for this thread
+//        // however if we do this we would need to unbind it so it doesn't leak
+//        DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null, this.getApplicationSecurityManager() );
+//
+//        // fake the login
+//        ThreadContext.bind( fakeLoggedInSubject );
+//        // this is un-bind when the user logs out.
+//
+//        return fakeLoggedInSubject;
+//    }
 
     public Subject getSubject()
     {
@@ -146,9 +140,9 @@ public class DefaultSecuritySystem
         return SecurityUtils.getSubject();
     }
 
-    public void logout( PrincipalCollection principal )
+    public void logout( Subject subject )
     {
-        this.getApplicationSecurityManager().logout( principal );
+        subject.logout();
     }
 
     public boolean isPermitted( PrincipalCollection principal, String permission )
@@ -169,7 +163,7 @@ public class DefaultSecuritySystem
         {
             this.getApplicationSecurityManager().checkPermission( principal, permission );
         }
-        catch ( org.jsecurity.authz.AuthorizationException e )
+        catch ( org.apache.shiro.authz.AuthorizationException e )
         {
             throw new AuthorizationException( e.getMessage(), e );
         }
@@ -184,7 +178,7 @@ public class DefaultSecuritySystem
             this.getApplicationSecurityManager().checkPermissions( principal,
                 permissions.toArray( new String[permissions.size()] ) );
         }
-        catch ( org.jsecurity.authz.AuthorizationException e )
+        catch ( org.apache.shiro.authz.AuthorizationException e )
         {
             throw new AuthorizationException( e.getMessage(), e );
         }
@@ -659,7 +653,7 @@ public class DefaultSecuritySystem
                 throw new InvalidCredentialsException();
             }
         }
-        catch ( org.jsecurity.authc.AuthenticationException e )
+        catch ( org.apache.shiro.authc.AuthenticationException e )
         {
             this.logger.debug( "User failed to change password reason: " + e.getMessage(), e );
             throw new InvalidCredentialsException();
@@ -796,10 +790,7 @@ public class DefaultSecuritySystem
         this.securityConfiguration.save();
 
         // update the realms in the security manager
-        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
-        {
-            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
-        }
+        this.setSecurityManagerRealms();
     }
 
     public void setAnonymousAccessEnabled( boolean enabled )
@@ -840,23 +831,23 @@ public class DefaultSecuritySystem
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
 
-        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
-        {
-            securityManager.start();            
-            securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
-        }
+        this.applicationSecurityManager.start();
+        this.setSecurityManagerRealms();
+        
     }
 
     public void stop()
         throws StoppingException
     {
         // we need to kill caches on stop
-        for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
-        {
-            securityManager.stop();
-        }
+        this.applicationSecurityManager.stop();
     }
 
+    private void setSecurityManagerRealms()
+    {
+        this.applicationSecurityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+    }
+    
     private void clearRealmCaches()
     {
         // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
@@ -892,10 +883,7 @@ public class DefaultSecuritySystem
             this.clearRealmCaches();
             this.securityConfiguration.clearCache();
 
-            for ( PlexusSecurityManager securityManager : this.securityManagerMap.values() )
-            {
-                securityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
-            }
+            this.setSecurityManagerRealms();
         }
     }
 
@@ -909,11 +897,6 @@ public class DefaultSecuritySystem
 
     private PlexusSecurityManager getApplicationSecurityManager()
     {
-        return this.securityManagerMap.get( this.applicationSecurityManagerHint );
-    }
-
-    private PlexusSecurityManager getRunAsSecurityManager()
-    {
-        return this.securityManagerMap.get( this.runAsSecurityManagerHint );
+        return this.applicationSecurityManager;
     }
 }

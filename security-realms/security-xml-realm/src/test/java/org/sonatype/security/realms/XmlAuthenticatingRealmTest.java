@@ -14,12 +14,12 @@ package org.sonatype.security.realms;
 
 import java.io.File;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.realm.Realm;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;

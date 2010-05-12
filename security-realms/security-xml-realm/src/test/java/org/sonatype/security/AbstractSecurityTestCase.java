@@ -19,10 +19,10 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.jsecurity.realm.Realm;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.model.Configuration;

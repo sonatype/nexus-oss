@@ -1,0 +1,19 @@
+<plexus>
+	<components>
+
+		<component>
+      <role>org.sonatype.security.PlexusSecurityManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.sonatype.security.web.WebPlexusSecurityManager</implementation>
+      <isolated-realm>false</isolated-realm>
+      <requirements>
+        <requirement>
+          <role>org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper</role>
+          <role-hint>default</role-hint>
+          <field-name>cacheWrapper</field-name>
+        </requirement>
+      </requirements>
+    </component>
+
+	</components>
+</plexus>

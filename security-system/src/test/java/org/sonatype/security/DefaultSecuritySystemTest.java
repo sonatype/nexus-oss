@@ -6,13 +6,13 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.SimplePrincipalCollection;
-import org.jsecurity.subject.Subject;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
-import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -28,9 +28,9 @@ public class DefaultSecuritySystemTest
     {
 
         SecuritySystem securitySystem = this.getSecuritySystem();
-
+        
         // bind to a servlet request/response
-        this.setupLoginContext( "test" );
+//        this.setupLoginContext( "test" );
         
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
@@ -53,9 +53,10 @@ public class DefaultSecuritySystemTest
     {
 
         SecuritySystem securitySystem = this.getSecuritySystem();
+        securitySystem.start();
 
         // bind to a servlet request/response
-        this.setupLoginContext( "test" );
+//        this.setupLoginContext( "test" );
         
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
@@ -64,13 +65,16 @@ public class DefaultSecuritySystemTest
 
         // check the logged in user
         Subject loggedinSubject = securitySystem.getSubject();
-        Assert.assertEquals( subject.getSession().getId(), loggedinSubject.getSession().getId() );
-
+//        Assert.assertEquals( subject.getSession().getId(), loggedinSubject.getSession().getId() );
+        Assert.assertTrue( subject.isAuthenticated() );
+        Assert.assertTrue( "Subject principal: " +loggedinSubject.getPrincipal() + " is not logged in", loggedinSubject.isAuthenticated() );
         // now logout
-        securitySystem.logout( new SimplePrincipalCollection( "jcoder", "ANYTHING" ) );
+        securitySystem.logout( loggedinSubject );
 
         // the current user should be null
-        Assert.assertNull( securitySystem.getSubject() );
+        subject = securitySystem.getSubject();
+        Assert.assertFalse( subject.isAuthenticated() );
+        Assert.assertFalse( loggedinSubject.isAuthenticated() );
     }
 
     public void testAuthorization()
@@ -157,4 +161,15 @@ public class DefaultSecuritySystemTest
         Assert.assertNotNull( securitySystem.addUser( user ) );
     }
 
+    @Override
+    protected void tearDown()
+        throws Exception
+    {
+        this.getSecuritySystem().stop();
+        
+        super.tearDown();
+    }
+
+    
+    
 }

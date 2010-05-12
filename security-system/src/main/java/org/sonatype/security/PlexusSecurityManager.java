@@ -2,13 +2,12 @@ package org.sonatype.security;
 
 import java.util.Collection;
 
+import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.jsecurity.mgt.SecurityManager;
-import org.jsecurity.realm.Realm;
 
 public interface PlexusSecurityManager
-    extends SecurityManager
+    extends org.apache.shiro.mgt.SecurityManager
 {
     void start()
         throws StartingException;

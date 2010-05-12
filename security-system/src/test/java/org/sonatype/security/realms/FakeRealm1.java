@@ -14,19 +14,19 @@ package org.sonatype.security.realms;
 
 import java.util.Collections;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.SimpleAuthorizationInfo;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 
 @Component( role = Realm.class, hint = "FakeRealm1" )
 public class FakeRealm1

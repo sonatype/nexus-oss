@@ -12,11 +12,11 @@
  */
 package org.sonatype.security.realms.tools;
 
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.credential.CredentialsMatcher;
-import org.jsecurity.authc.credential.Md5CredentialsMatcher;
-import org.jsecurity.authc.credential.Sha1CredentialsMatcher;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authc.credential.Md5CredentialsMatcher;
+import org.apache.shiro.authc.credential.Sha1CredentialsMatcher;
 
 /**
  * For users migrated from Artifactory, their password is encrypted with md5, while users' password is enrypted

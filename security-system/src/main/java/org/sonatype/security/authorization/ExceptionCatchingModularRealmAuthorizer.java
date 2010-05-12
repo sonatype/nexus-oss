@@ -3,13 +3,13 @@ package org.sonatype.security.authorization;
 import java.util.Collection;
 import java.util.List;
 
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.ModularRealmAuthorizer;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
+import org.apache.shiro.authz.ModularRealmAuthorizer;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.apache.shiro.authz.AuthorizationException;
 
 /**
  * A implementation of the jsecurity ModularRealmAuthorizer, that catches exceptions caused by individual realms and

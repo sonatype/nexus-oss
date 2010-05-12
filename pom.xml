@@ -1,9 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.spice</groupId>
+    <artifactId>spice-parent</artifactId>
+    <version>15</version>
+  </parent>
   <groupId>org.sonatype.security</groupId>
-  <artifactId>security-aggregator</artifactId>
-  <packaging>pom</packaging>  
-  <version>1.1.9-SNAPSHOT</version>
+  <artifactId>security-parent</artifactId>
+  <packaging>pom</packaging>
+  <version>2.0.0-SNAPSHOT</version>
   <name>Plexus Security Aggregator</name>
 
   <scm>
@@ -11,23 +17,284 @@
     <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
     <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
   </scm>
-  
-  <modules>
-  	<module>security-model</module>
-  	<module>security-model-xml</module>
-  	<module>security-rest-api</module>
-  	<module>security-realms</module>
-  	<module>security-system</module>
-  	<module>security-configuration</module>
-  	<module>security-legacy-adapter</module>
-  </modules>
-  
+
   <distributionManagement>
-      <repository>
-        <id>localhost</id>
-        <name>dumping to target</name>
-        <url>file://${basedir}/target/repo/</url>
-      </repository>
-    </distributionManagement>
-  
+    <repository>
+      <id>localhost</id>
+      <name>dumping to target</name>
+      <url>file://${basedir}/target/repo/</url>
+    </repository>
+  </distributionManagement>
+
+  <properties>
+    <plexus.version>1.0-beta-3.0.5</plexus.version>
+    <plexus-maven-plugin.version>1.3.8</plexus-maven-plugin.version>
+    <shiro.version>1.0-incubating-SNAPSHOT</shiro.version>
+    <plexus-component-annotations.version>1.0-alpha-17</plexus-component-annotations.version>
+    <plexus-ehcache.version>1.0.1</plexus-ehcache.version>
+    <plexus-events.version>1.0.0</plexus-events.version>
+    <base-configuration.version>1.0</base-configuration.version>
+    <plexus-cipher.version>1.5</plexus-cipher.version>
+    <plugin-host-api.version>1.0.0</plugin-host-api.version>
+  </properties>
+
+
+  <modules>
+    <module>security-model</module>
+    <module>security-model-xml</module>
+    <module>security-rest-api</module>
+    <module>security-realms</module>
+    <module>security-system</module>
+    <module>security-configuration</module>
+    <module>security-web</module>
+    <module>security-web-sample</module>
+  </modules>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-ehcache</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${shiro.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-container-default</artifactId>
+        <version>${plexus.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>1.5.8</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>plexus-ehcache</artifactId>
+        <version>${plexus-ehcache.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus.appevents</groupId>
+        <artifactId>plexus-app-events-api</artifactId>
+        <version>${plexus-events.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus.appevents</groupId>
+        <artifactId>simple-event-multicaster</artifactId>
+        <version>${plexus-events.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.configuration</groupId>
+        <artifactId>base-configuration</artifactId>
+        <version>${base-configuration.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-cipher</artifactId>
+        <version>${plexus-cipher.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>1.5.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.5.6</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-host-api</artifactId>
+        <version>${plugin-host-api.version}</version>
+      </dependency>
+
+      <!-- TESTING -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.plexus</groupId>
+        <artifactId>plexus-jetty-testsuite</artifactId>
+        <version>1.3</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- Provide a backend for JUnit tests purposes -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.5.6</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-metadata</artifactId>
+          <version>${plexus.version}</version>
+          <executions>
+            <execution>
+              <id>process-classes</id>
+              <goals>
+                <goal>generate-metadata</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>process-test-classes</id>
+              <goals>
+                <goal>generate-test-metadata</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!--
+          <plugin> <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-maven-plugin</artifactId>
+          <version>1.3.8</version> <executions> <execution> <goals>
+          <goal>descriptor</goal> </goals> </execution> </executions>
+          </plugin>
+        -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <executions>
+            <execution>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.maven.ide.eclipse</groupId>
+            <artifactId>lifecycle-mapping</artifactId>
+            <version>0.9.9</version>
+            <configuration>
+              <mappingId>customizable</mappingId>
+              <configurators>
+                <configurator
+                  id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator
+                  id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator
+                  id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
+                <configurator
+                  id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+              </configurators>
+              <mojoExecutions>
+                <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>
+                <!--
+                  <mojoExecution>org.sonatype.plugins:yuicompressor-maven-plugin::</mojoExecution>
+                -->
+              </mojoExecutions>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>

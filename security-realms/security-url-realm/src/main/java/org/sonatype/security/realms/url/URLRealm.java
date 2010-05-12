@@ -18,28 +18,29 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.shiro.authc.AccountException;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.crypto.hash.Sha1Hash;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.jsecurity.authc.AccountException;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authc.credential.AllowAllCredentialsMatcher;
-import org.jsecurity.authc.credential.CredentialsMatcher;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.SimpleAuthorizationInfo;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.cache.Cache;
-import org.jsecurity.crypto.hash.Sha1Hash;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -178,7 +179,7 @@ public class URLRealm
         {
             this.logger.debug( "No cache implementation set.  Checking cacheManager..." );
 
-            org.jsecurity.cache.CacheManager cacheManager = getCacheManager();
+            CacheManager cacheManager = getCacheManager();
 
             if ( cacheManager != null )
             {

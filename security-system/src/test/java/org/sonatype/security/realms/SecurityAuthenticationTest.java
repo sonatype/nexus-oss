@@ -12,23 +12,12 @@
  */
 package org.sonatype.security.realms;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
-
 import java.util.Collection;
 
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.easymock.EasyMock;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.subject.SimplePrincipalCollection;
-import org.jsecurity.subject.Subject;
-import org.jsecurity.web.WebUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.sonatype.security.AbstractSecurityTest;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
@@ -63,7 +52,7 @@ public class SecurityAuthenticationTest
     {
         UsernamePasswordToken upToken = new UsernamePasswordToken( "username", "password" );
 
-        this.setupLoginContext( "test" );
+//        this.setupLoginContext( "test" );
         
         Subject ai = security.login( upToken );
        

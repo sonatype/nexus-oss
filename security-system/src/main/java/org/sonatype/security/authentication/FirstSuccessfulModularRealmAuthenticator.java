@@ -2,12 +2,10 @@ package org.sonatype.security.authentication;
 
 import java.util.Collection;
 
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
-import org.jsecurity.authc.pam.ModularRealmAuthenticator;
-import org.jsecurity.realm.Realm;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.pam.ModularRealmAuthenticator;
+import org.apache.shiro.realm.Realm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +69,7 @@ public class FirstSuccessfulModularRealmAuthenticator
                     + "].  Skipping realm." );
             }
         }
-        throw new AuthenticationException( "Authentication token of type [" + token.getClass() + "] "
+        throw new org.apache.shiro.authc.AuthenticationException( "Authentication token of type [" + token.getClass() + "] "
             + "could not be authenticated by any configured realms.  Please ensure that at least one realm can "
             + "authenticate these tokens." );
     }

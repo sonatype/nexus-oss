@@ -18,11 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.SecurityUtils;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.subject.Subject;
 import org.restlet.data.Request;
 import org.restlet.resource.ResourceException;
 import org.sonatype.security.authorization.Privilege;

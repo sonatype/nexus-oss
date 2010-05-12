@@ -3,7 +3,6 @@ package org.sonatype.security.usermanagement;
 import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.security.authorization.Role;
 
 public abstract class AbstractReadOnlyUserManager
     extends AbstractUserManager

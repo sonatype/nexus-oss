@@ -15,12 +15,13 @@ package org.sonatype.security.realms;
 import java.io.File;
 import java.util.Collection;
 
+import junit.framework.Assert;
+
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
@@ -79,26 +80,22 @@ public class XmlAuthorizingRealmTest
         
         // Fails because the configuration requirement in SecurityXmlRealm isn't initialized
         // thus NPE
-        AuthorizationInfo ai = realm.getAuthorizationInfo( new SimplePrincipalCollection( "username", realm.getName() ) );
+        SimplePrincipalCollection principal = new SimplePrincipalCollection( "username", realm.getName() );
         
-        assertEquals( ai.getRoles().size(), 1 );
-        
-        assertEquals( ai.getRoles().iterator().next(), "role" );
-        
-        Collection<Permission> permissions = ai.getObjectPermissions();
+        Assert.assertTrue( realm.hasRole( principal, "role" ) );
         
         // Verify the permission
-        assertImplied( new WildcardPermission( "app:config:read" ), permissions );
+        Assert.assertTrue( realm.isPermitted( principal, new WildcardPermission( "app:config:read" ) ) );
         // Verify other method not allowed
-        assertNotImplied( new WildcardPermission( "app:config:create" ), permissions );
-        assertNotImplied( new WildcardPermission( "app:config:update" ), permissions );
-        assertNotImplied( new WildcardPermission( "app:config:delete" ), permissions );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:config:delete" ) ) );
         
         // Verify other permission not allowed
-        assertNotImplied( new WildcardPermission( "app:ui:read" ), permissions );
-        assertNotImplied( new WildcardPermission( "app:ui:create" ), permissions );
-        assertNotImplied( new WildcardPermission( "app:ui:update" ), permissions );
-        assertNotImplied( new WildcardPermission( "app:ui:delete" ), permissions );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:read" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:create" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:update" ) ) );
+        Assert.assertFalse( realm.isPermitted( principal,new WildcardPermission( "app:ui:delete" ) ) );
     }
     
     private void buildTestAuthorizationConfig() throws InvalidConfigurationException
@@ -152,7 +149,7 @@ public class XmlAuthorizingRealmTest
                 return;
             }
         }
-        fail( "Expected " + testPermission + " to be implied by " + assignedPermissions );
+        Assert.fail( "Expected " + testPermission + " to be implied by " + assignedPermissions );
     }
 
     public static void assertNotImplied( Permission testPermission, Collection<Permission> assignedPermissions )
@@ -161,7 +158,7 @@ public class XmlAuthorizingRealmTest
         {
             if ( assignedPermission.implies( testPermission ) )
             {
-                fail( "Expected " + testPermission + " not to be implied by " + assignedPermission );
+                Assert.fail( "Expected " + testPermission + " not to be implied by " + assignedPermission );
             }
         }
     }

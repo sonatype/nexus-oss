@@ -1,13 +1,13 @@
 package org.sonatype.security;
 
+import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
+import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.jsecurity.authc.pam.FirstSuccessfulAuthenticationStrategy;
-import org.jsecurity.cache.CacheManager;
-import org.jsecurity.cache.ehcache.EhCacheManager;
-import org.jsecurity.mgt.DefaultSecurityManager;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
@@ -21,19 +21,12 @@ public class DefaultPlexusSecurityManager
     @Requirement
     private PlexusEhCacheWrapper cacheWrapper;
 
-    @Override
-    protected CacheManager createCacheManager()
-    {
-        // this is called from the constructor, we want to use the initialize() method.
-        return null;
-    }
-
     public void start()
         throws StartingException
     {
         // set the realm authenticator, that will automatically deligate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
-        realmAuthenticator.setModularAuthenticationStrategy( new FirstSuccessfulAuthenticationStrategy() );
+        realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
 
         // Authenticator
         this.setAuthenticator( realmAuthenticator );
@@ -49,10 +42,8 @@ public class DefaultPlexusSecurityManager
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
         
-        ensureCacheManager();
-        ensureAuthenticator();
-        ensureAuthorizer();
-        ensureSessionManager();
+        // if we call stop then the SessionManager gets destroyed, so we need to set it again
+        this.setSessionManager( new DefaultSessionManager() );
     }
     
     public void stop()

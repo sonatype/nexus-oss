@@ -3,13 +3,12 @@ package org.sonatype.security;
 import java.util.List;
 import java.util.Set;
 
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.Subject;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
@@ -44,14 +43,14 @@ public interface SecuritySystem //extends Startable
     public AuthenticationInfo authenticate( AuthenticationToken token )
         throws AuthenticationException;
     
-    /**
-     * This method sets the current thread to use the <code>principal</code> passed in.
-     * You must log the user out subject.logout() when your done.
-     * 
-     * @param principal The account to login in as.
-     * @return The subject that was created as a result of the principal.
-     */
-    public Subject runAs( PrincipalCollection principal );
+//    /**
+//     * This method sets the current thread to use the <code>principal</code> passed in.
+//     * You must log the user out subject.logout() when your done.
+//     * 
+//     * @param principal The account to login in as.
+//     * @return The subject that was created as a result of the principal.
+//     */
+//    public Subject runAs( PrincipalCollection principal );
 
     /**
      * Finds the current logged in user.
@@ -60,7 +59,7 @@ public interface SecuritySystem //extends Startable
      */
     public Subject getSubject();
 
-    public void logout( PrincipalCollection principal );
+    public void logout( Subject subject );
 
     // *********************
     // * authorization
@@ -206,5 +205,4 @@ public interface SecuritySystem //extends Startable
 
     void stop()
     throws StoppingException;
-
 }

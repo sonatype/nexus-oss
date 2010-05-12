@@ -14,13 +14,14 @@ package org.sonatype.security.realms.url;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.AccountException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
-import org.jsecurity.authc.AccountException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.usermanagement.UserManager;
@@ -80,8 +81,7 @@ public class URLRealmTest
 
         try
         {
-            Assert.assertNull( "Should not have returned an auth info.", urlRealm
-                .getAuthorizationInfo( new SimplePrincipalCollection( "bob", urlRealm.getName() ) ) );
+            urlRealm.isPermitted( new SimplePrincipalCollection( "bob", urlRealm.getName() ), new WildcardPermission( "*" ) );
             Assert.fail( "Expected AuthorizationException" );
         }
         catch ( AuthorizationException e )

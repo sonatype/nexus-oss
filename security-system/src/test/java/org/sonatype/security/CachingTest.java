@@ -2,8 +2,8 @@ package org.sonatype.security;
 
 import junit.framework.Assert;
 
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.SimplePrincipalCollection;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.sonatype.security.mock.realms.MockRealmB;
 import org.sonatype.security.usermanagement.User;
 
