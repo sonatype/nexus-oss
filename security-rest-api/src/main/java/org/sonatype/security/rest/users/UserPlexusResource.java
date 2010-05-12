@@ -20,11 +20,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.SecurityUtils;
-import org.jsecurity.subject.Subject;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
