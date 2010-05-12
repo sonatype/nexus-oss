@@ -213,7 +213,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
 
 // Add the quick search
 Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
-  searchTypes.push( {
+  //keyword is the default, we always want first in list
+  searchTypes.splice( 0, 0, {
     value : 'quick',
     text : 'Keyword Search',
     scope : panel,
