@@ -15,6 +15,7 @@ package org.sonatype.security.web;
 import java.util.Map;
 
 import org.apache.shiro.config.Ini;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.WebSecurityManager;
 import org.apache.shiro.web.filter.mgt.FilterChainResolver;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
@@ -22,7 +23,6 @@ import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.security.PlexusSecurityManager;
 import org.sonatype.security.SecuritySystem;
 
 /**
@@ -77,7 +77,7 @@ public class ShiroSecurityFilter
         // start up security
         this.getSecuritySystem().start();
         this.securityManager =
-            (WebSecurityManager) this.getPlexusContainer().lookup( PlexusSecurityManager.class );
+            (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class );
 
         // call super
         super.configure();

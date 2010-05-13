@@ -4,9 +4,9 @@
 	<components>
 
 		<component>
-      <role>org.sonatype.security.PlexusSecurityManager</role>
+      <role>org.apache.shiro.mgt.RealmSecurityManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.sonatype.security.web.WebPlexusSecurityManager</implementation>
+      <implementation>org.sonatype.security.web.WebRealmSecurityManager</implementation>
       <isolated-realm>false</isolated-realm>
       <requirements>
         <requirement>

@@ -13,8 +13,11 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.cache.Cache;
+import org.apache.shiro.mgt.RealmSecurityManager;
+import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.PlexusContainer;
@@ -64,7 +67,7 @@ public class DefaultSecuritySystem
     private SecurityConfigurationManager securityConfiguration;
 
     @Requirement
-    private PlexusSecurityManager applicationSecurityManager;
+    private RealmSecurityManager applicationSecurityManager;
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
@@ -828,17 +831,19 @@ public class DefaultSecuritySystem
         // reload the config
         this.securityConfiguration.clearCache();
         this.clearRealmCaches();
-
-        this.applicationSecurityManager.start();
-        this.setSecurityManagerRealms();
         
+        if( org.apache.shiro.util.Initializable.class.isInstance( this.getApplicationSecurityManager()) )
+        {
+            ((org.apache.shiro.util.Initializable) this.getApplicationSecurityManager()).init();
+        }
+        this.setSecurityManagerRealms();
     }
 
     public void stop()
         throws StoppingException
     {
         // we need to kill caches on stop
-        this.applicationSecurityManager.stop();
+        this.applicationSecurityManager.destroy();
     }
 
     private void setSecurityManagerRealms()
@@ -893,7 +898,7 @@ public class DefaultSecuritySystem
 
     }
 
-    private PlexusSecurityManager getApplicationSecurityManager()
+    private RealmSecurityManager getApplicationSecurityManager()
     {
         return this.applicationSecurityManager;
     }

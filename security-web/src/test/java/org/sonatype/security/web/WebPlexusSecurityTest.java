@@ -16,10 +16,10 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.realm.CachingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
-import org.sonatype.security.PlexusSecurityManager;
 import org.sonatype.security.SecuritySystem;
 
 public class WebPlexusSecurityTest
@@ -32,7 +32,7 @@ public class WebPlexusSecurityTest
         // Start up security
         SecuritySystem securitySystem = this.lookup( SecuritySystem.class );
         securitySystem.start();
-        PlexusSecurityManager plexusSecurityManager = this.lookup( PlexusSecurityManager.class, "default" );
+        RealmSecurityManager plexusSecurityManager = this.lookup( RealmSecurityManager.class, "default" );
                 
         List<String> realms = securitySystem.getRealms();
         realms.clear();

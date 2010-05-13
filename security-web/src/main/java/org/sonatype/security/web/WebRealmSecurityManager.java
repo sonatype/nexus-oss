@@ -1,16 +1,15 @@
 package org.sonatype.security.web;
 
+import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.DefaultWebSecurityManager;
-import org.apache.shiro.web.session.ServletContainerSessionManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
-import org.sonatype.security.PlexusSecurityManager;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
@@ -20,20 +19,17 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * configuration into the SecuritySystem. The downside to that is we would need to expose an accessor for it. ( This
  * component is loaded from a servelet ), but that might be cleaner then what we are doing now.
  */
-@Component( role = PlexusSecurityManager.class, hint = "web" )
-public class WebPlexusSecurityManager
+@Component( role = RealmSecurityManager.class, hint = "web" )
+public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
-    implements PlexusSecurityManager
+    implements Initializable
 {
-
     @Requirement
     private PlexusEhCacheWrapper cacheWrapper;
 
-    // Plexus Lifecycle
-    public void start()
-        throws StartingException
+    public WebRealmSecurityManager()
     {
-        // set the realm authenticator, that will automatically delegate the authentication to all the realms.
+        // set the realm authenticator, that will automatically deligate the authentication to all the realms.
         FirstSuccessfulModularRealmAuthenticator realmAuthenticator = new FirstSuccessfulModularRealmAuthenticator();
         realmAuthenticator.setAuthenticationStrategy( new FirstSuccessfulStrategy() );
 
@@ -42,25 +38,21 @@ public class WebPlexusSecurityManager
 
         // Authorizer
         this.setAuthorizer( new ExceptionCatchingModularRealmAuthorizer( this.getRealms() ) );
+    }
 
-        // setRememberMeManager( rememberMeLocator.getRememberMeManager() );
-
+    public void initialize()
+        throws InitializationException
+    {
         // setup the CacheManager
         // The plexus wrapper can interpolate the config
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.setCacheManager( ehCacheManager );
-
-        // if we call stop then the SessionManager gets destroyed, so we need to set it again
-        this.setSessionManager( new DefaultSessionManager() );
-        
-        // need to set this in the start, because the stop nulls it
-        setSessionManager(new ServletContainerSessionManager());
     }
-    
-    public void stop()
-        throws StoppingException
+
+    public void init()
+        throws ShiroException
     {
-        destroy();
+        this.setSessionManager( new WebRealmSecurityManager() );
     }
 }
