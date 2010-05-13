@@ -62,7 +62,7 @@ public class M2GroupRepository
 {
     /** This "mimics" the @Named("maven2") */
     public static final String ID = Maven2ContentClass.ID;
-    
+
     /**
      * The GAV Calculator.
      */
@@ -202,10 +202,9 @@ public class M2GroupRepository
                         "IOException during parse of metadata UID=\"" + fileItem.getRepositoryItemUid().toString()
                             + "\", will be skipped from aggregation!", e );
 
-                    getFeedRecorder()
-                        .addNexusArtifactEvent(
-                            newMetadataFailureEvent( fileItem,
-                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                    getFeedRecorder().addNexusArtifactEvent(
+                        newMetadataFailureEvent( fileItem,
+                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
                 catch ( MetadataException e )
                 {
@@ -213,10 +212,9 @@ public class M2GroupRepository
                         "Metadata exception during parse of metadata from UID=\""
                             + fileItem.getRepositoryItemUid().toString() + "\", will be skipped from aggregation!", e );
 
-                    getFeedRecorder()
-                        .addNexusArtifactEvent(
-                            newMetadataFailureEvent( fileItem,
-                                "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
+                    getFeedRecorder().addNexusArtifactEvent(
+                        newMetadataFailureEvent( fileItem,
+                            "Invalid metadata served by repository. If repository is proxy, please check out what is it serving!" ) );
                 }
             }
 
@@ -323,6 +321,22 @@ public class M2GroupRepository
             new DefaultStorageCompositeFileItem( this, request, true, false, contentLocator, sources );
 
         result.setLength( content.length );
+
+        result.setCreated( getNewestCreatedDate( sources ) );
+
+        result.setModified( result.getCreated() );
+
+        return result;
+    }
+
+    private long getNewestCreatedDate( List<StorageItem> sources )
+    {
+        long result = 0;
+
+        for ( StorageItem source : sources )
+        {
+            result = Math.max( result, source.getCreated() );
+        }
 
         return result;
     }
