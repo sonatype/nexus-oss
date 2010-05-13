@@ -122,8 +122,8 @@ public abstract class AbstractProxyRepository
     @Override
     protected AbstractProxyRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractProxyRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
-            .getConfiguration( forModification );
+        return (AbstractProxyRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
+            forModification );
     }
 
     @Override
@@ -235,6 +235,19 @@ public abstract class AbstractProxyRepository
 
     public void setAutoBlockActive( boolean val )
     {
+        // NEXUS-3516: if user disables autoblock, and repo is auto-blocked, unblock it
+        if ( !val && ProxyMode.BLOCKED_AUTO.equals( getProxyMode() ) )
+        {
+            getLogger().warn(
+                "Repository \""
+                    + getName()
+                    + "\" (id="
+                    + getId()
+                    + ") was auto-blocked, but user disabled this feature. Unblocking repository, but this MAY cause Nexus to leak connections (if remote repository is still down)!" );
+
+            setProxyMode( ProxyMode.ALLOW );
+        }
+
         getExternalConfiguration( true ).setAutoBlockActive( val );
     }
 
@@ -320,7 +333,7 @@ public abstract class AbstractProxyRepository
                 // this one should be fired _always_
                 getApplicationEventMulticaster().notifyEventListeners(
                     new RepositoryEventProxyModeSet( this, oldProxyMode, proxyMode, cause ) );
-                
+
                 if ( !proxyMode.equals( oldProxyMode ) )
                 {
                     // this one should be fired on _transition_ only
@@ -365,9 +378,8 @@ public abstract class AbstractProxyRepository
 
         if ( autoBlockActive )
         {
-            sb
-                .append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
-                    + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
+            sb.append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
+                + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
         }
 
         // log the event
@@ -440,10 +452,8 @@ public abstract class AbstractProxyRepository
         }
         catch ( IOException e )
         {
-            getLogger()
-                .warn(
-                    "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
-                        + ")", e );
+            getLogger().warn(
+                "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId() + ")", e );
         }
     }
 
@@ -985,11 +995,10 @@ public abstract class AbstractProxyRepository
                 // we dont have neither one, NotFoundException
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "Item "
-                                + request.toString()
-                                + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
+                    getLogger().debug(
+                        "Item "
+                            + request.toString()
+                            + " does not exist in local storage neither in remote storage, throwing ItemNotFoundException." );
                 }
 
                 throw new ItemNotFoundException( request, this );
@@ -1022,10 +1031,8 @@ public abstract class AbstractProxyRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "Item " + request.toString()
-                                + " does exist locally and cannot go remote, returning local one." );
+                    getLogger().debug(
+                        "Item " + request.toString() + " does exist locally and cannot go remote, returning local one." );
                 }
 
                 item = localItem;
