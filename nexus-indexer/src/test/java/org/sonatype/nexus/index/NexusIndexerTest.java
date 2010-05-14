@@ -6,9 +6,11 @@
  */
 package org.sonatype.nexus.index;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -255,9 +257,23 @@ public class NexusIndexerTest
 
         pw.println( line );
 
-        // compare results!
-        String shouldBe = FileUtils.fileRead( expectedResults, "UTF-8" );
+        // compare results! Load up the reference file, but avoid line ending issues, so just read it line by line. and
+        // produce it in very same fashion that previous one was
+        StringWriter ressw = new StringWriter();
+        PrintWriter respw = new PrintWriter( ressw );
+
+        BufferedReader reader = new BufferedReader( new FileReader( expectedResults ) );
+        String currentline = null;
+
+        while ( ( currentline = reader.readLine() ) != null )
+        {
+            respw.println( currentline );
+        }
+
+        String shouldBe = ressw.toString();
         String whatWeHave = sw.toString();
+
+        // we compare those two
         assertEquals( "Search results inconsistent!", shouldBe, whatWeHave );
     }
 
