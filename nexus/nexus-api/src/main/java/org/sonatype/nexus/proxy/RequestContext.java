@@ -61,10 +61,22 @@ public class RequestContext
 
     public void setParentContext( RequestContext context )
     {
-        if ( this == context )
+        if ( context != null )
         {
-            throw new IllegalArgumentException(
-                "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
+            if ( this == context )
+            {
+                throw new IllegalArgumentException(
+                                                    "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
+            }
+            RequestContext otherParentContext = context.getParentContext();
+            while ( otherParentContext != null )
+            {
+                if ( this == otherParentContext )
+                {
+                    throw new IllegalArgumentException( "The context cannot be parent of itself! Cycle detected!" );
+                }
+                otherParentContext = otherParentContext.getParentContext();
+            }
         }
 
         this.parent = context;
