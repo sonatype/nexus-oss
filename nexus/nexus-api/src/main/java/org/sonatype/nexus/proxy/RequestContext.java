@@ -31,9 +31,10 @@ public class RequestContext
 
     /** Context key for condition "if-none-match" */
     public static final String CTX_CONDITION_IF_NONE_MATCH = "request.condition.ifNoneMatch";
-    
-    /** Context key to mark request as used for auth check only, so repo impl will know there is no
-     *  work required (i.e. interpolation, etc.)
+
+    /**
+     * Context key to mark request as used for auth check only, so repo impl will know there is no work required (i.e.
+     * interpolation, etc.)
      */
     public static final String CTX_AUTH_CHECK_ONLY = "request.auth.check.only";
 
@@ -50,7 +51,7 @@ public class RequestContext
     {
         this();
 
-        this.parent = parent;
+        setParentContext( parent );
     }
 
     public RequestContext getParentContext()
@@ -60,6 +61,12 @@ public class RequestContext
 
     public void setParentContext( RequestContext context )
     {
+        if ( this == context )
+        {
+            throw new IllegalArgumentException(
+                "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
+        }
+
         this.parent = context;
     }
 
@@ -72,7 +79,7 @@ public class RequestContext
     {
         boolean result = super.containsKey( key );
 
-        if ( fallBackToParent && !result && getParentContext() != null )
+        if ( fallBackToParent && !result && getParentContext() != null && getParentContext() != this )
         {
             result = getParentContext().containsKey( key );
         }
@@ -91,7 +98,7 @@ public class RequestContext
         {
             return super.get( key );
         }
-        else if ( fallBackToParent && getParentContext() != null )
+        else if ( fallBackToParent && getParentContext() != null && getParentContext() != this )
         {
             return getParentContext().get( key );
         }
