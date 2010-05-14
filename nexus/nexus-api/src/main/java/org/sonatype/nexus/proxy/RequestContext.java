@@ -73,7 +73,7 @@ public class RequestContext
             {
                 if ( this == otherParentContext )
                 {
-                    throw new IllegalArgumentException( "The context cannot be parent of itself! Cycle detected!" );
+                    throw new IllegalArgumentException( "The context cannot be an ancestor of itself! Cycle detected!" );
                 }
                 otherParentContext = otherParentContext.getParentContext();
             }
