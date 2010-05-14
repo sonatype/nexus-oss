@@ -11,11 +11,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
@@ -23,6 +26,9 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerField;
+import org.sonatype.nexus.index.IndexerFieldVersion;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
@@ -39,6 +45,14 @@ public class MavenPluginArtifactInfoIndexCreator
     public static final String ID = "maven-plugin";
 
     private static final String MAVEN_PLUGIN_PACKAGING = "maven-plugin";
+
+    public static final IndexerField FLD_PLUGIN_PREFIX =
+        new IndexerField( MAVEN.PLUGIN_PREFIX, IndexerFieldVersion.V1, "px", "MavenPlugin prefix (as keyword, stored)",
+                          Store.YES, Index.UN_TOKENIZED );
+
+    public static final IndexerField FLD_PLUGIN_GOALS =
+        new IndexerField( MAVEN.PLUGIN_GOALS, IndexerFieldVersion.V1, "gx", "MavenPlugin goals (as keyword, stored)",
+                          Store.YES, Index.TOKENIZED );
 
     public void populateArtifactInfo( ArtifactContext ac )
     {
@@ -105,13 +119,12 @@ public class MavenPluginArtifactInfoIndexCreator
     {
         if ( ai.prefix != null )
         {
-            doc.add( new Field( ArtifactInfo.PLUGIN_PREFIX, ai.prefix, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
+            doc.add( FLD_PLUGIN_PREFIX.toField( ai.prefix ) );
         }
 
         if ( ai.goals != null )
         {
-            doc.add( new Field( ArtifactInfo.PLUGIN_GOALS, ArtifactInfo.lst2str( ai.goals ), Field.Store.YES,
-                Field.Index.NO ) );
+            doc.add( FLD_PLUGIN_GOALS.toField( ArtifactInfo.lst2str( ai.goals ) ) );
         }
     }
 
@@ -156,4 +169,8 @@ public class MavenPluginArtifactInfoIndexCreator
         return ID;
     }
 
+    public Collection<IndexerField> getIndexerFields()
+    {
+        return Arrays.asList( FLD_PLUGIN_GOALS, FLD_PLUGIN_PREFIX );
+    }
 }

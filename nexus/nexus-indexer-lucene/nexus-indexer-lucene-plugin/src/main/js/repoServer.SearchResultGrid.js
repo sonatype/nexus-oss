@@ -23,10 +23,6 @@ Sonatype.SearchStore = function(config) {
   Ext.apply(this, config, defaultConfig);
   
   Sonatype.SearchStore.superclass.constructor.call(this, {
-    sortInfo: {
-      field: 'groupId',
-      direction: 'ASC'
-    },
     proxy: new Ext.data.HttpProxy({
       url: this.searchUrl,
       method: 'GET'
@@ -123,7 +119,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
         id: 'version',
         header: "Version",
         dataIndex: 'version',
-        sortable:true
+        sortable:true,
+        renderer: this.formatVersionLink
       },
       {
         id: 'packaging',
@@ -199,6 +196,19 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
+  formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
+    var versionStr = record.get( 'version' );
+    if ( 'LATEST' == versionStr ) {
+      var gid = record.get( 'groupId' );
+      var aid = record.get( 'artifactId' );
+      var pac = record.get( 'packaging' );
+      var clas = record.get( 'classifier' );
+      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+ clas + '~kw " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
+    } else {
+      return versionStr;
+    }
+  },
+  
   switchStore : function( grid, store ) {
     if ( store == null ) {
       store = grid.defaultStore;
@@ -255,3 +265,9 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     this.clearWarningLabel();
   }
 });
+
+cancel_bubble = function (e) {
+	if (!e) var e = window.event;
+	e.cancelBubble = true;
+	if (e.stopPropagation) e.stopPropagation(); 
+}

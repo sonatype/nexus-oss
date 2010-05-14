@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.lucene.index.Term;
@@ -37,7 +36,7 @@ import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
 
 /**
  * A default {@link NexusIndexer} implementation.
- *
+ * 
  * @author Tamas Cservenak
  * @author Eugene Kuleshov
  */
@@ -216,7 +215,7 @@ public class DefaultNexusIndexer
      * Uses {@link Scanner} to scan repository content. A {@link ArtifactScanningListener} is used to process found
      * artifacts and to add them to the index using
      * {@link NexusIndexer#artifactDiscovered(ArtifactContext, IndexingContext)}.
-     *
+     * 
      * @see DefaultScannerListener
      * @see #artifactDiscovered(ArtifactContext, IndexingContext)
      */
@@ -393,6 +392,19 @@ public class DefaultNexusIndexer
         }
     }
 
+    public IteratorSearchResponse searchIterator( IteratorSearchRequest request )
+        throws IOException
+    {
+        if ( request.getContexts().isEmpty() )
+        {
+            return searcher.searchIteratorPaged( request, indexingContexts.values() );
+        }
+        else
+        {
+            return searcher.forceSearchIteratorPaged( request, request.getContexts() );
+        }
+    }
+
     /**
      * @deprecated use {@link #searchGrouped(GroupedSearchRequest)
 
@@ -425,7 +437,7 @@ public class DefaultNexusIndexer
         throws IOException
     {
         return searcher.searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-                                       indexingContexts.values() ).getResults();
+            indexingContexts.values() ).getResults();
     }
 
     /**
@@ -438,7 +450,7 @@ public class DefaultNexusIndexer
         throws IOException
     {
         return searcher.searchGrouped( new GroupedSearchRequest( query, grouping, groupKeyComparator ),
-                                       Arrays.asList( new IndexingContext[] { context } ) ).getResults();
+            Arrays.asList( new IndexingContext[] { context } ) ).getResults();
     }
 
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request )
@@ -463,6 +475,11 @@ public class DefaultNexusIndexer
     public Query constructQuery( String field, String query )
     {
         return queryCreator.constructQuery( field, query );
+    }
+
+    public Query constructQuery( Field field, String query, SearchType type )
+    {
+        return queryCreator.constructQuery( field, query, type );
     }
 
     // ----------------------------------------------------------------------------
@@ -536,13 +553,11 @@ public class DefaultNexusIndexer
     public ArtifactInfo identify( Query query, Collection<IndexingContext> contexts )
         throws IOException
     {
-        Set<ArtifactInfo> result =
-            searcher.searchFlatPaged( new FlatSearchRequest( query, ArtifactInfo.VERSION_COMPARATOR ), contexts )
-                .getResults();
+        IteratorSearchResponse result = searcher.searchIteratorPaged( new IteratorSearchRequest( query ), contexts );
 
-        if ( result.size() == 1 )
+        if ( result.getTotalHits() == 1 )
         {
-            return result.iterator().next();
+            return result.getResults().next();
         }
         return null;
     }

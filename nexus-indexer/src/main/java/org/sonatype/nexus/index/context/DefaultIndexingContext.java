@@ -35,7 +35,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 
 /**
  * The default {@link IndexingContext} implementation.
- *
+ * 
  * @author Jason van Zyl
  * @author Tamas Cservenak
  */
@@ -75,11 +75,9 @@ public class DefaultIndexingContext
 
     private String indexUpdateUrl;
 
-    private Analyzer analyzer;
-
     private IndexReader indexReader;
 
-    private IndexSearcher indexSearcher;
+    private NexusIndexSearcher indexSearcher;
 
     private NexusIndexWriter indexWriter;
 
@@ -111,13 +109,20 @@ public class DefaultIndexingContext
 
         this.indexUpdateUrl = indexUpdateUrl;
 
-        this.analyzer = new NexusAnalyzer();
-
         this.indexReader = null;
 
         this.indexWriter = null;
 
         this.indexCreators = indexCreators;
+
+        // eh?
+        // Guice does NOT initialize these, and we have to do manually?
+        // While in Plexus, all is well, but when in guice-shim,
+        // these objects are still LazyHintedBeans or what not and IndexerFields are NOT registered!
+        for ( IndexCreator indexCreator : indexCreators )
+        {
+            indexCreator.getIndexerFields();
+        }
 
         this.gavCalculator = new M2GavCalculator();
     }
@@ -236,7 +241,7 @@ public class DefaultIndexingContext
         }
 
         // create empty idx and store descriptor
-        new NexusIndexWriter( indexDirectory, analyzer, true ).close();
+        new NexusIndexWriter( getIndexDirectory(), new NexusAnalyzer(), true ).close();
 
         storeDescriptor();
     }
@@ -295,7 +300,9 @@ public class DefaultIndexingContext
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
-        hdr.add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES, Field.Index.NO ) );
+        hdr
+            .add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES,
+                             Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
 
@@ -392,7 +399,7 @@ public class DefaultIndexingContext
 
     public Analyzer getAnalyzer()
     {
-        return analyzer;
+        return new NexusAnalyzer();
     }
 
     public IndexWriter getIndexWriter()
@@ -402,11 +409,11 @@ public class DefaultIndexingContext
         {
             if ( indexWriter == null || indexWriter.isClosed() )
             {
-                indexWriter = new NexusIndexWriter( indexDirectory, analyzer, false );
+                indexWriter = new NexusIndexWriter( getIndexDirectory(), new NexusAnalyzer(), false );
 
                 indexWriter.setRAMBufferSizeMB( 2 );
-                
-                indexWriter.setMergeScheduler(new SerialMergeScheduler());
+
+                indexWriter.setMergeScheduler( new SerialMergeScheduler() );
             }
 
             return indexWriter;
@@ -447,7 +454,7 @@ public class DefaultIndexingContext
                     indexSearcher.getIndexReader().close();
                 }
 
-                indexSearcher = new IndexSearcher( getIndexReader() );
+                indexSearcher = new NexusIndexSearcher( this );
             }
 
             return indexSearcher;

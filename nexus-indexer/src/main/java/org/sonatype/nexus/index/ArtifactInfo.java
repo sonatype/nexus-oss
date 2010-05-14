@@ -6,14 +6,12 @@
  */
 package org.sonatype.nexus.index;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -21,25 +19,23 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 
 /**
  * ArtifactInfo holds the values known about an repository artifact. This is a simple Value Object kind of stuff.
+ * Phasing out.
  * 
  * @author Jason van Zyl
  * @author Eugene Kuleshov
  */
 public class ArtifactInfo
-    implements Serializable
+    extends ArtifactInfoRecord
 {
     private static final long serialVersionUID = 6028843453477511104L;
 
-    /** Field separator */
-    public static final String FS = "|";
-
-    public static final Pattern FS_PATTERN = Pattern.compile( Pattern.quote( FS ) );
-
-    /** Non available value */
-    public static final String NA = "NA";
+    // --
 
     public static final String ROOT_GROUPS = "rootGroups";
 
@@ -53,94 +49,82 @@ public class ArtifactInfo
 
     public static final String ALL_GROUPS_LIST = "allGroupsList";
 
-    /**
-     * Unique groupId, artifactId, version, classifier, extension (or packaging). 
-     * Stored, indexed untokenized
-     */
-    public static final String UINFO = "u";
+    // ----------
 
     /**
-     * GroupId.
-     * Not stored, indexed untokenized
+     * Unique groupId, artifactId, version, classifier, extension (or packaging). Stored, indexed untokenized
      */
-    public static final String GROUP_ID = "g";
-
-    /**
-     * ArtifactId.
-     * Not stored, indexed tokenized
-     */
-    public static final String ARTIFACT_ID = "a";
-
-    /**
-     * Version.
-     * Not stored, indexed tokenized
-     */
-    public static final String VERSION = "v";
-
-    /**
-     * Packaging.
-     * Not stored, indexed untokenized
-     */
-    public static final String PACKAGING = "p";
-
-    /**
-     * Classifier.
-     * Not stored, indexed untokenized
-     */
-    public static final String CLASSIFIER = "l";
-    
-    /**
-     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. 
-     * Stored, not indexed.
-     */
-    public static final String INFO = "i";
-
-    /**
-     * Name.
-     * Stored, not indexed
-     */
-    public static final String NAME = "n";
-
-    /**
-     * Description.
-     * Stored, not indexed
-     */
-    public static final String DESCRIPTION = "d";
-
-    /**
-     * Last modified.
-     * Stored, not indexed
-     */
-    public static final String LAST_MODIFIED = "m";
-
-    /**
-     * SHA1. 
-     * Stored, indexed untokenized
-     */
-    public static final String SHA1 = "1";
-
-    /**
-     * Class names
-     * Stored compressed, indexed tokeninzed
-     */
-    public static final String NAMES = "c";
-
-    /**
-     * Plugin prefix.
-     * Stored, not indexed
-     */
-    public static final String PLUGIN_PREFIX = "px";
-
-    /**
-     * Plugin goals.
-     * Stored, not indexed
-     */
-    public static final String PLUGIN_GOALS = "gx";
+    public static final String UINFO = FLD_UINFO.getKey();
 
     /**
      * Field that contains {@link #UINFO} value for deleted artifact
      */
-    public static final String DELETED = "del";
+    public static final String DELETED = FLD_DELETED.getKey();
+
+    /**
+     * GroupId. Not stored, indexed untokenized
+     */
+    public static final String GROUP_ID = MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey();
+
+    /**
+     * ArtifactId. Not stored, indexed tokenized
+     */
+    public static final String ARTIFACT_ID = MinimalArtifactInfoIndexCreator.FLD_ARTIFACT_ID_KW.getKey();
+
+    /**
+     * Version. Not stored, indexed tokenized
+     */
+    public static final String VERSION = MinimalArtifactInfoIndexCreator.FLD_VERSION_KW.getKey();
+
+    /**
+     * Packaging. Not stored, indexed untokenized
+     */
+    public static final String PACKAGING = MinimalArtifactInfoIndexCreator.FLD_PACKAGING.getKey();
+
+    /**
+     * Classifier. Not stored, indexed untokenized
+     */
+    public static final String CLASSIFIER = MinimalArtifactInfoIndexCreator.FLD_CLASSIFIER.getKey();
+
+    /**
+     * Info: packaging, lastModified, size, sourcesExists, javadocExists, signatureExists. Stored, not indexed.
+     */
+    public static final String INFO = MinimalArtifactInfoIndexCreator.FLD_INFO.getKey();
+
+    /**
+     * Name. Stored, not indexed
+     */
+    public static final String NAME = MinimalArtifactInfoIndexCreator.FLD_NAME.getKey();
+
+    /**
+     * Description. Stored, not indexed
+     */
+    public static final String DESCRIPTION = MinimalArtifactInfoIndexCreator.FLD_DESCRIPTION.getKey();
+
+    /**
+     * Last modified. Stored, not indexed
+     */
+    public static final String LAST_MODIFIED = MinimalArtifactInfoIndexCreator.FLD_LAST_MODIFIED.getKey();
+
+    /**
+     * SHA1. Stored, indexed untokenized
+     */
+    public static final String SHA1 = MinimalArtifactInfoIndexCreator.FLD_SHA1.getKey();
+
+    /**
+     * Class names Stored compressed, indexed tokeninzed
+     */
+    public static final String NAMES = JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey();
+
+    /**
+     * Plugin prefix. Stored, not indexed
+     */
+    public static final String PLUGIN_PREFIX = MavenPluginArtifactInfoIndexCreator.FLD_PLUGIN_PREFIX.getKey();
+
+    /**
+     * Plugin goals. Stored, not indexed
+     */
+    public static final String PLUGIN_GOALS = MavenPluginArtifactInfoIndexCreator.FLD_PLUGIN_GOALS.getKey();
 
     public static final Comparator<ArtifactInfo> VERSION_COMPARATOR = new VersionComparator();
 
@@ -204,8 +188,8 @@ public class ArtifactInfo
     public List<String> goals;
 
     private String uinfo = null;
-    
-    private final Map<String,String> attributes = new HashMap<String,String>();
+
+    private final Map<String, String> attributes = new HashMap<String, String>();
 
     public ArtifactInfo()
     {
@@ -229,22 +213,22 @@ public class ArtifactInfo
         return artifactVersion;
     }
 
-    public String getUinfo() 
+    public String getUinfo()
     {
-        if( uinfo == null )
+        if ( uinfo == null )
         {
             uinfo = new StringBuilder() //
-            .append( groupId ).append( FS ) //
-            .append( artifactId ).append( FS ) //
-            .append( version ).append( FS ) //
-            .append( nvl( classifier ) ) //
-            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
-            .toString();  // extension is stored in the packaging field when classifier is not used
+                .append( groupId ).append( FS ) //
+                .append( artifactId ).append( FS ) //
+                .append( version ).append( FS ) //
+                .append( nvl( classifier ) ) //
+                .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
+                .toString(); // extension is stored in the packaging field when classifier is not used
         }
-        
-        return uinfo;    
+
+        return uinfo;
     }
-    
+
     public String getRootGroup()
     {
         int n = groupId.indexOf( '.' );
@@ -254,37 +238,30 @@ public class ArtifactInfo
         }
         return groupId;
     }
-    
+
     public Gav calculateGav()
         throws IllegalArtifactCoordinateException
     {
-        return new Gav( 
-            groupId, 
-            artifactId, 
-            version, 
-            classifier, 
-            fextension,
-            null,  // snapshotBuildNumber
-            null,  // snapshotTimeStamp 
-            fname,  // name
-            VersionUtils.isSnapshot( version ),  // isSnapshot
-            false,  // hash
-            null,   // hashType
-            false,  // signature
-            null ); // signatureType
+        return new Gav( groupId, artifactId, version, classifier, fextension, null, // snapshotBuildNumber
+                        null, // snapshotTimeStamp
+                        fname, // name
+                        VersionUtils.isSnapshot( version ), // isSnapshot
+                        false, // hash
+                        null, // hashType
+                        false, // signature
+                        null ); // signatureType
     }
-    
+
     public Map<String, String> getAttributes()
     {
         return attributes;
     }
-    
+
     @Override
     public String toString()
     {
-        return new StringBuilder( groupId )
-            .append( ':' ).append( artifactId )  //
-            .append( ':' ).append( version )  //
+        return new StringBuilder( groupId ).append( ':' ).append( artifactId ) //
+            .append( ':' ).append( version ) //
             .append( ':' ).append( classifier ) //
             .append( ':' ).append( packaging ).toString();
     }
@@ -310,9 +287,9 @@ public class ArtifactInfo
         {
             sb.append( s ).append( ArtifactInfo.FS );
         }
-        return sb.length()==0 ? sb.toString() : sb.substring( 0, sb.length() - 1 );
+        return sb.length() == 0 ? sb.toString() : sb.substring( 0, sb.length() - 1 );
     }
-    
+
     public static List<String> str2lst( String str )
     {
         return Arrays.asList( ArtifactInfo.FS_PATTERN.split( str ) );
@@ -324,7 +301,7 @@ public class ArtifactInfo
     static class VersionComparator
         implements Comparator<ArtifactInfo>
     {
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         public int compare( ArtifactInfo f1, ArtifactInfo f2 )
         {
             int n = f1.groupId.compareTo( f2.groupId );

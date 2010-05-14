@@ -29,10 +29,19 @@ Sonatype.repoServer.SearchPanel = function(config) {
   if (this.searchTypes.length < 1) {
     return;
   }
+  
+  var defaultSearchTypeIndex = 0;
+  // find default
+  for ( var i = 0 ; i < this.searchTypes.length ; i++ ) {
+    if ( this.searchTypes[i].defaultQuickSearch ) {
+      defaultSearchTypeIndex = i;
+      break;
+    }
+  }
 
   this.searchTypeButton = new Ext.Button( {
-    text : this.searchTypes[0].text,
-    value : this.searchTypes[0].value,
+    text : this.searchTypes[defaultSearchTypeIndex].text,
+    value : this.searchTypes[defaultSearchTypeIndex].value,
     tooltip : 'Click for more search options',
     handler : this.switchSearchType,
     scope : this,
@@ -43,7 +52,7 @@ Sonatype.repoServer.SearchPanel = function(config) {
 
   this.searchToolbar = new Ext.Toolbar( {
     ctCls : 'search-all-tbar',
-    items : [ this.searchTypeButton, this.convertToFieldObject(this.searchTypes[0].panelItems[0]) ]
+    items : [ this.searchTypeButton, this.convertToFieldObject(this.searchTypes[defaultSearchTypeIndex].panelItems[0]) ]
   });
 
   this.artifactContainer = new Sonatype.repoServer.ArtifactContainer( {});
@@ -146,6 +155,11 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     }
 
     var searchType = this.getSearchType(this.searchTypeButton.value);
+    
+    if ( panel.grid.store.sortInfo ) {
+      panel.grid.store.sortInfo = null;
+      panel.grid.getView().updateHeaders();
+    }
 
     searchType.searchHandler.call(this, panel);
   },
@@ -330,6 +344,10 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     if (data.length > 5) {
       panel.getTopToolbar().items.itemAt(14).setRawValue(data[5]);
     }
+    // extra params, comma seperated list of params
+    if ( data.length > 6) {
+      panel.gavExtras = data[6];
+    }
   }
 
   searchTypes.push( {
@@ -377,6 +395,23 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     v = panel.getTopToolbar().items.itemAt(14).getRawValue();
     if (v) {
       panel.grid.store.baseParams['c'] = v;
+    }
+    // special case for classifier
+    else {
+      panel.grid.store.baseParams['c'] = 'N/P';
+    }
+    
+    // go through the extras and process them.
+    if ( panel.gavExtras ) {
+      var extras = panel.gavExtras.split( ',' );
+      
+      for ( var i = 0 ; i < extras.length ; i++ ) {
+        if ( extras[i] == 'kw' ) {
+          panel.grid.store.baseParams['asKeywords'] = true;
+        }
+      }
+      
+      panel.gavExtras = null;
     }
 
     if (panel.grid.store.baseParams['g'] == null && panel.grid.store.baseParams['a'] == null && panel.grid.store.baseParams['v'] == null) {

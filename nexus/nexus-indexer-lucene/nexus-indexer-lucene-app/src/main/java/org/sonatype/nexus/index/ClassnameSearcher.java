@@ -61,4 +61,15 @@ public class ClassnameSearcher
         return m_lucene.searchArtifactClassFlat( terms.get( TERM_CLASSNAME ), repositoryId, from, count, hitLimit );
     }
 
+    public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
+        throws NoSuchRepositoryException
+    {
+        if ( !canHandle( terms ) )
+        {
+            return new IteratorSearchResponse( null, 0, null );
+        }
+        return m_lucene.searchArtifactClassIterator( terms.get( TERM_CLASSNAME ), repositoryId, from, count, hitLimit, kwSearch );
+    }
+
 }

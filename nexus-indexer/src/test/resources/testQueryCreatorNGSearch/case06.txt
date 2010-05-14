@@ -1,0 +1,12 @@
+### Searched for field urn:maven#version (with 2 registered index fields) using query "1.0" (QC create LQL "v:1.0")
+test :: proptest:proptest-archetype:1.0:null:maven-archetype
+test :: org.apache.maven.plugins:maven-core-it-plugin:1.0:null:maven-plugin
+test :: org.apache.maven.plugins:maven-core-it-plugin:1.0:sources:jar
+test :: org.apache.maven.plugins:maven-core-it-plugin:1.0:javadoc:jar
+test :: missingpom:missingpom:1.0:null:jar
+test :: commons-logging:commons-logging:1.0:null:jar
+test :: commons-logging:commons-logging:1.0:javadoc:jar
+test :: commons-cli:commons-cli:1.0:null:jar
+test :: commons-cli:commons-cli:1.0:sources:jar
+test :: brokenjar:brokenjar:1.0:null:jar
+### TOTAL:10 (response said 10)

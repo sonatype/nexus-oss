@@ -7,15 +7,21 @@ package org.sonatype.nexus.index.creator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
+import org.apache.lucene.document.Field.Index;
+import org.apache.lucene.document.Field.Store;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.index.ArtifactContext;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.IndexerField;
+import org.sonatype.nexus.index.IndexerFieldVersion;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
@@ -28,6 +34,19 @@ public class JarFileContentsIndexCreator
     implements LegacyDocumentUpdater
 {
     public static final String ID = "jarContent";
+
+    public static final IndexerField FLD_CLASSNAMES =
+        new IndexerField( MAVEN.CLASSNAMES, IndexerFieldVersion.V3, "classnames", "Artifact Classes (tokenized)",
+                          Store.NO, Index.TOKENIZED );
+
+    /**
+     * NexusAnalyzer makes exception with this field only, to keep backward compatibility with old consumers of
+     * nexus-indexer. This field is here for "backward" compat only! The order is important too! FLD_CLASSNAMES must be
+     * registered BEFORE FLD_CLASSNAMES_KW!
+     */
+    public static final IndexerField FLD_CLASSNAMES_KW =
+        new IndexerField( MAVEN.CLASSNAMES, IndexerFieldVersion.V1, "c",
+                          "Artifact Classes (tokenized on newlines only)", Store.COMPRESS, Index.TOKENIZED );
 
     public void populateArtifactInfo( ArtifactContext artifactContext )
         throws IOException
@@ -46,7 +65,8 @@ public class JarFileContentsIndexCreator
     {
         if ( ai.classNames != null )
         {
-            doc.add( new Field( ArtifactInfo.NAMES, ai.classNames, Field.Store.COMPRESS, Field.Index.TOKENIZED ) );
+            doc.add( FLD_CLASSNAMES_KW.toField( ai.classNames ) );
+            doc.add( FLD_CLASSNAMES.toField( ai.classNames ) );
         }
     }
 
@@ -70,13 +90,13 @@ public class JarFileContentsIndexCreator
                 classNames = sb.toString();
             }
 
-            doc.add( new Field( ArtifactInfo.NAMES, classNames, Field.Store.COMPRESS, Field.Index.TOKENIZED ) );
+            doc.add( FLD_CLASSNAMES_KW.toField( classNames ) );
         }
     }
 
     public boolean updateArtifactInfo( Document doc, ArtifactInfo artifactInfo )
     {
-        String names = doc.get( ArtifactInfo.NAMES );
+        String names = doc.get( FLD_CLASSNAMES_KW.getKey() );
 
         if ( names != null )
         {
@@ -172,4 +192,8 @@ public class JarFileContentsIndexCreator
         return ID;
     }
 
+    public Collection<IndexerField> getIndexerFields()
+    {
+        return Arrays.asList( FLD_CLASSNAMES, FLD_CLASSNAMES_KW );
+    }
 }

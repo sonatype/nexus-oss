@@ -61,11 +61,12 @@ public abstract class AbstractNexusIndexerTest
 
         Term term = new Term( ArtifactInfo.GROUP_ID, group );
         PrefixQuery pq = new PrefixQuery( term );
+        
         // new WildcardQuery( //
         // SpanTermQuery pq = new SpanTermQuery( term );
         // PhraseQuery pq = new PhraseQuery();
         // pq.add( new Term( ArtifactInfo.UINFO, group + "*" ) );
-
+        
         FlatSearchResponse response = nexusIndexer.searchFlat( new FlatSearchRequest( pq, context ) );
         Collection<ArtifactInfo> artifacts = response.getResults();
         assertEquals( artifacts.toString(), expected, artifacts.size() );

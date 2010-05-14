@@ -157,15 +157,28 @@ public interface IndexerManager
     // ----------------------------------------------------------------------------
 
     FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+                                           Integer hitLimit )
         throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+                                                Integer hitLimit )
         throws NoSuchRepositoryException;
 
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, Integer from, Integer count, Integer hitLimit )
+                                           String repositoryId, Integer from, Integer count, Integer hitLimit )
+        throws NoSuchRepositoryException;
+
+    IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from, Integer count,
+                                                   Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
+        throws NoSuchRepositoryException;
+
+    IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from, Integer count,
+                                                        Integer hitLimit, boolean kwSearch )
+        throws NoSuchRepositoryException;
+
+    IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
+                                                   String cTerm, String repositoryId, Integer from, Integer count,
+                                                   Integer hitLimit, boolean kwSearch )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------

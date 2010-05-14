@@ -53,6 +53,18 @@ public class DefaultIndexerManagerTest
         assertTemporatyContexts( releases );
     }
 
+    public void testRepoKeywordSearch()
+        throws Exception
+    {
+        fillInRepo();
+
+        indexerManager.reindexAllRepositories( "/", false );
+        
+        searchForKeywordNG( "org.sonatype.nexus", 15 );
+
+        assertTemporatyContexts( releases );
+    }
+
     public void testInvalidRemoteUrl()
         throws Exception
     {

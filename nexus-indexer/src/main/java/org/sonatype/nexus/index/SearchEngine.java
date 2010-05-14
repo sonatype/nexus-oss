@@ -42,6 +42,12 @@ public interface SearchEngine
     /**
      * Do the search only on searchable contexts
      */
+    public IteratorSearchResponse searchIteratorPaged( IteratorSearchRequest request, Collection<IndexingContext> indexingContexts )
+        throws IOException;
+
+    /**
+     * Do the search only on searchable contexts
+     */
     public GroupedSearchResponse searchGrouped( GroupedSearchRequest request,
                                                 Collection<IndexingContext> indexingContexts )
         throws IOException;
@@ -50,6 +56,13 @@ public interface SearchEngine
      * Do the search in all contexts, no matter if the context is searchable or not
      */
     public FlatSearchResponse forceSearchFlatPaged( FlatSearchRequest request,
+                                                    Collection<IndexingContext> indexingContexts )
+        throws IOException;
+
+    /**
+     * Do the search in all contexts, no matter if the context is searchable or not
+     */
+    public IteratorSearchResponse forceSearchIteratorPaged( IteratorSearchRequest request,
                                                     Collection<IndexingContext> indexingContexts )
         throws IOException;
 

@@ -1,0 +1,15 @@
+### Searched for field urn:maven#groupId (with 2 registered index fields) using query "log" (QC create LQL "(g:log g:log*) groupId:log*")
+test :: commons-logging:commons-logging:1.1:null:jar
+test :: commons-logging:commons-logging:1.1:sources:jar
+test :: commons-logging:commons-logging:1.0.4:null:jar
+test :: commons-logging:commons-logging:1.0.4:sources:jar
+test :: commons-logging:commons-logging:1.0.4:javadoc:jar
+test :: commons-logging:commons-logging:1.0.3:null:jar
+test :: commons-logging:commons-logging:1.0.3:javadoc:jar
+test :: commons-logging:commons-logging:1.0.2:null:jar
+test :: commons-logging:commons-logging:1.0.2:javadoc:jar
+test :: commons-logging:commons-logging:1.0.1:null:jar
+test :: commons-logging:commons-logging:1.0.1:javadoc:jar
+test :: commons-logging:commons-logging:1.0:null:jar
+test :: commons-logging:commons-logging:1.0:javadoc:jar
+### TOTAL:13 (response said 13)

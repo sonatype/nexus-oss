@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +61,7 @@ import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.index.packer.IndexPacker;
 import org.sonatype.nexus.index.packer.IndexPackingRequest;
+import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
@@ -578,7 +580,7 @@ public class DefaultIndexerManager
     }
 
     protected void addItemToIndex( Repository repository, StorageItem item, List<Repository> processedRepositories,
-        ArtifactContext ac )
+                                   ArtifactContext ac )
         throws IOException
     {
         // is indexing supported at all on this repository?
@@ -719,7 +721,7 @@ public class DefaultIndexerManager
     }
 
     protected void removeItemFromIndex( Repository repository, StorageItem item,
-        List<Repository> processedRepositories, ArtifactContext ac )
+                                        List<Repository> processedRepositories, ArtifactContext ac )
         throws IOException
     {
         // is indexing supported at all on this repository?
@@ -1230,7 +1232,7 @@ public class DefaultIndexerManager
                 }
             }
         } );
-        
+
         IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
 
         return result.getTimestamp() != null;
@@ -1466,6 +1468,8 @@ public class DefaultIndexerManager
             IndexPackingRequest packReq = new IndexPackingRequest( mergedContext, targetDir );
             packReq.setCreateIncrementalChunks( true );
             packReq.setUseTargetProperties( true );
+            // not publishing legacy format anymore
+            packReq.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
             indexPacker.packIndex( packReq );
 
             File[] files = targetDir.listFiles();
@@ -1539,7 +1543,8 @@ public class DefaultIndexerManager
 
                 // FileUtils.copyStreamToFile closes the stream!
                 FileUtils.copyStreamToFile( new RawInputStreamFacade( is ), new File( tempDir,
-                    IndexingContext.INDEX_FILE + ".properties" ) );
+                                                                                      IndexingContext.INDEX_FILE
+                                                                                          + ".properties" ) );
             }
         }
         catch ( Exception e )
@@ -1612,7 +1617,7 @@ public class DefaultIndexerManager
     // ----------------------------------------------------------------------------
 
     public FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+                                                  Integer hitLimit )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -1705,7 +1710,7 @@ public class DefaultIndexerManager
     }
 
     public FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+                                                       Integer hitLimit )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -1795,7 +1800,7 @@ public class DefaultIndexerManager
     }
 
     public FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
-        String repositoryId, Integer from, Integer count, Integer hitLimit )
+                                                  String repositoryId, Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException
     {
         if ( gTerm == null && aTerm == null && vTerm == null )
@@ -1959,6 +1964,396 @@ public class DefaultIndexerManager
         return result;
     }
 
+    // == NG stuff
+
+    protected Query createQuery( Field field, String term, SearchType type )
+    {
+        return nexusIndexer.constructQuery( field, term, type );
+    }
+
+    protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
+                                                   boolean uniqueRGA )
+    {
+        return createRequest( bq, from, count, hitLimit, uniqueRGA, null );
+    }
+
+    protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
+                                                   boolean uniqueRGA, List<ArtifactInfoFilter> extraFilters )
+    {
+        IteratorSearchRequest req = new IteratorSearchRequest( bq );
+
+        List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+
+        // security filter
+        filters.add( new ArtifactInfoFilter()
+        {
+            public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+            {
+                return indexArtifactFilter.filterArtifactInfo( ai );
+            }
+        } );
+
+        if ( uniqueRGA )
+        {
+            filters.add( new UniqueGAArtifactFilterPostprocessor( false ) );
+        }
+
+        if ( extraFilters != null && extraFilters.size() > 0 )
+        {
+            filters.addAll( extraFilters );
+        }
+
+        req.setArtifactInfoFilter( new AndMultiArtifactInfoFilter( filters ) );
+
+        req.setArtifactInfoPostprocessor( new ArtifactInfoPostprocessor()
+        {
+            public void postprocess( IndexingContext ctx, ArtifactInfo ai )
+            {
+                String result = ai.context;
+
+                try
+                {
+                    Repository sourceRepository = repositoryRegistry.getRepository( ai.repository );
+
+                    if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
+                    {
+                        if ( sourceRepository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                        {
+                            result = sourceRepository.getName() + " (Cache)";
+                        }
+                        else
+                        {
+                            result = sourceRepository.getName() + " (Local)";
+                        }
+                    }
+                    else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
+                    {
+                        result = sourceRepository.getName() + " (Remote)";
+                    }
+
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    // nothing
+                }
+
+                ai.context = result;
+            }
+        } );
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setCount( count );
+        }
+        else
+        {
+            // protect UI from break-down ;)
+            req.setCount( 500 );
+        }
+
+        if ( hitLimit != null )
+        {
+            req.setResultHitLimit( hitLimit );
+        }
+
+        return req;
+    }
+
+    public IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from,
+                                                          Integer count, Integer hitLimit, boolean uniqueRGA,
+                                                          boolean kwSearch )
+        throws NoSuchRepositoryException
+    {
+        IndexingContext localContext = null;
+        IndexingContext remoteContext = null;
+
+        Lock lock = null;
+        try
+        {
+            if ( repositoryId != null )
+            {
+                lock = getLock( repositoryId ).readLock();
+                lock.lock();
+
+                localContext = getRepositoryLocalIndexContext( repositoryId );
+                remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+            }
+
+            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
+
+            Query q1 = createQuery( MAVEN.GROUP_ID, term, sType );
+
+            q1.setBoost( 2.0f );
+
+            Query q2 = createQuery( MAVEN.ARTIFACT_ID, term, sType );
+
+            q2.setBoost( 2.0f );
+
+            BooleanQuery bq = new BooleanQuery();
+
+            bq.add( q1, BooleanClause.Occur.SHOULD );
+
+            bq.add( q2, BooleanClause.Occur.SHOULD );
+
+            // switch for "extended" keywords
+            if ( false )
+            {
+                Query q3 = createQuery( MAVEN.VERSION, term, sType );
+
+                Query q4 = createQuery( MAVEN.CLASSIFIER, term, sType );
+
+                Query q5 = createQuery( MAVEN.NAME, term, sType );
+
+                Query q6 = createQuery( MAVEN.DESCRIPTION, term, sType );
+
+                bq.add( q3, BooleanClause.Occur.SHOULD );
+
+                bq.add( q4, BooleanClause.Occur.SHOULD );
+
+                bq.add( q5, BooleanClause.Occur.SHOULD );
+
+                bq.add( q6, BooleanClause.Occur.SHOULD );
+            }
+
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
+
+            if ( repositoryId != null )
+            {
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
+            }
+
+            try
+            {
+                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
+
+                return result;
+            }
+            catch ( BooleanQuery.TooManyClauses e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Too many clauses exception caught:", e );
+                }
+
+                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+                return new IteratorSearchResponse( req.getQuery(), -1, null );
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+                return new IteratorSearchResponse( req.getQuery(), 0, null );
+            }
+        }
+        finally
+        {
+            if ( lock != null )
+            {
+                lock.unlock();
+            }
+        }
+    }
+
+    public IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from,
+                                                               Integer count, Integer hitLimit, boolean kwSearch )
+        throws NoSuchRepositoryException
+    {
+        IndexingContext localContext = null;
+        IndexingContext remoteContext = null;
+
+        Lock lock = null;
+        try
+        {
+            if ( repositoryId != null )
+            {
+                lock = getLock( repositoryId ).readLock();
+                lock.lock();
+
+                localContext = getRepositoryLocalIndexContext( repositoryId );
+                remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+            }
+
+            if ( term.endsWith( ".class" ) )
+            {
+                term = term.substring( 0, term.length() - 6 );
+            }
+
+            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
+
+            Query q = createQuery( MAVEN.CLASSNAMES, term, sType );
+
+            IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
+
+            if ( repositoryId != null )
+            {
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
+            }
+
+            try
+            {
+                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
+
+                return result;
+            }
+            catch ( BooleanQuery.TooManyClauses e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Too many clauses exception caught:", e );
+                }
+
+                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+                return new IteratorSearchResponse( req.getQuery(), -1, null );
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
+
+                return new IteratorSearchResponse( req.getQuery(), 0, null );
+            }
+        }
+        finally
+        {
+            if ( lock != null )
+            {
+                lock.unlock();
+            }
+        }
+    }
+
+    public IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
+                                                          String cTerm, String repositoryId, Integer from,
+                                                          Integer count, Integer hitLimit, boolean kwSearch )
+        throws NoSuchRepositoryException
+    {
+        if ( gTerm == null && aTerm == null && vTerm == null )
+        {
+            return new IteratorSearchResponse( null, -1, null );
+        }
+
+        IndexingContext localContext = null;
+        IndexingContext remoteContext = null;
+
+        Lock lock = null;
+        try
+        {
+            if ( repositoryId != null )
+            {
+                lock = getLock( repositoryId ).readLock();
+                lock.lock();
+
+                localContext = getRepositoryLocalIndexContext( repositoryId );
+                remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+            }
+
+            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
+
+            BooleanQuery bq = new BooleanQuery();
+
+            if ( gTerm != null )
+            {
+                bq.add( createQuery( MAVEN.GROUP_ID, gTerm, sType ), BooleanClause.Occur.MUST );
+            }
+
+            if ( aTerm != null )
+            {
+                bq.add( createQuery( MAVEN.ARTIFACT_ID, aTerm, sType ), BooleanClause.Occur.MUST );
+            }
+
+            if ( vTerm != null )
+            {
+                bq.add( createQuery( MAVEN.VERSION, vTerm, sType ), BooleanClause.Occur.MUST );
+            }
+
+            if ( pTerm != null )
+            {
+                bq.add( createQuery( MAVEN.PACKAGING, pTerm, sType ), BooleanClause.Occur.MUST );
+            }
+
+            // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
+            // to bq
+            ArtifactInfoFilter npFilter = null;
+
+            if ( cTerm != null )
+            {
+                if ( Field.NOT_PRESENT.equalsIgnoreCase( cTerm ) )
+                {
+                    // bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD ),
+                    // BooleanClause.Occur.MUST_NOT );
+                    // This above should work too! -- TODO: fixit!
+                    npFilter = new ArtifactInfoFilter()
+                    {
+                        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+                        {
+                            return StringUtils.isBlank( ai.classifier );
+                        }
+                    };
+                }
+                else
+                {
+                    bq.add( createQuery( MAVEN.CLASSIFIER, cTerm, sType ), BooleanClause.Occur.MUST );
+                }
+            }
+
+            IteratorSearchRequest req = null;
+
+            if ( npFilter != null )
+            {
+                req = createRequest( bq, from, count, hitLimit, false, Arrays.asList( npFilter ) );
+            }
+            else
+            {
+                req = createRequest( bq, from, count, hitLimit, false );
+            }
+
+            if ( repositoryId != null )
+            {
+                req.getContexts().add( localContext );
+
+                req.getContexts().add( remoteContext );
+            }
+
+            try
+            {
+                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
+
+                return result;
+            }
+            catch ( BooleanQuery.TooManyClauses e )
+            {
+                if ( getLogger().isDebugEnabled() )
+                {
+                    getLogger().debug( "Too many clauses exception caught:", e );
+                }
+
+                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+                return new IteratorSearchResponse( req.getQuery(), -1, null );
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+                return new IteratorSearchResponse( req.getQuery(), 0, null );
+            }
+        }
+        finally
+        {
+            if ( lock != null )
+            {
+                lock.unlock();
+            }
+        }
+    }
+
     // ----------------------------------------------------------------------------
     // Query construction
     // ----------------------------------------------------------------------------
@@ -2026,13 +2421,13 @@ public class DefaultIndexerManager
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                baseContext.getRepositoryId(), //
-                baseContext.getRepository(), //
-                directory, //
-                baseContext.getRepositoryUrl(), //
-                baseContext.getIndexUpdateUrl(), //
-                baseContext.getIndexCreators(), //
-                true );
+                                                     baseContext.getRepositoryId(), //
+                                                     baseContext.getRepository(), //
+                                                     directory, //
+                                                     baseContext.getRepositoryUrl(), //
+                                                     baseContext.getIndexUpdateUrl(), //
+                                                     baseContext.getIndexCreators(), //
+                                                     true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {

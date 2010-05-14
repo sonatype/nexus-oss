@@ -14,36 +14,32 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 
 /**
- * An extension of <a href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/index/IndexWriter.html">Lucene IndexWriter</a>
- * to allow to track if writer is closed 
+ * An extension of <a
+ * href="http://lucene.apache.org/java/2_4_0/api/core/org/apache/lucene/index/IndexWriter.html">Lucene IndexWriter</a>
+ * to allow to track if writer is closed
  */
 public class NexusIndexWriter
     extends IndexWriter
 {
     private boolean closed;
 
-    public NexusIndexWriter( Directory d, Analyzer a, boolean create )
-        throws CorruptIndexException,
-            LockObtainFailedException,
-            IOException
+    public NexusIndexWriter( final Directory directory, final Analyzer analyzer, boolean create )
+        throws CorruptIndexException, LockObtainFailedException, IOException
     {
-        this( d, a, create, true /* autoCommit */);
+        this( directory, analyzer, create, true /* autoCommit */);
     }
 
-    public NexusIndexWriter( Directory d, Analyzer a, boolean create, boolean autoCommit )
-        throws CorruptIndexException,
-            LockObtainFailedException,
-            IOException
+    public NexusIndexWriter( final Directory directory, final Analyzer analyzer, boolean create, boolean autoCommit )
+        throws CorruptIndexException, LockObtainFailedException, IOException
     {
-        super( d, autoCommit, a, create );
+        super( directory, autoCommit, analyzer, create );
 
         this.closed = false;
     }
 
     @Override
     public void close()
-        throws CorruptIndexException,
-            IOException
+        throws CorruptIndexException, IOException
     {
         super.close();
 
@@ -54,5 +50,4 @@ public class NexusIndexWriter
     {
         return closed;
     }
-
 }

@@ -28,7 +28,6 @@ public class DefaultIndexArtifactFilter
     extends AbstractLogEnabled
     implements IndexArtifactFilter
 {
-
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 

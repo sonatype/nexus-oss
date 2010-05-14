@@ -7,6 +7,7 @@
 package org.sonatype.nexus.index;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Map;
@@ -16,7 +17,10 @@ import java.util.TreeSet;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.codehaus.plexus.component.annotations.Component;
@@ -92,8 +96,9 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                int hitCount = searchFlat( request, result, ctx, request.getQuery(), request.getStart(), request.getCount() );
-                
+                int hitCount =
+                    searchFlat( request, result, ctx, request.getQuery(), request.getStart(), request.getCount() );
+
                 if ( hitCount == AbstractSearchResponse.LIMIT_EXCEEDED )
                 {
                     totalHits = hitCount;
@@ -104,8 +109,7 @@ public class DefaultSearchEngine
                 }
             }
 
-            if ( request.isHitLimited() 
-                && ( totalHits > request.getResultHitLimit() ) 
+            if ( request.isHitLimited() && ( totalHits > request.getResultHitLimit() )
                 || totalHits == AbstractSearchResponse.LIMIT_EXCEEDED )
             {
                 totalHits = AbstractSearchResponse.LIMIT_EXCEEDED;
@@ -145,7 +149,7 @@ public class DefaultSearchEngine
             if ( ignoreContext || ctx.isSearchable() )
             {
                 int hitCount = searchGrouped( request, result, request.getGrouping(), ctx, request.getQuery() );
-                
+
                 if ( hitCount == AbstractSearchResponse.LIMIT_EXCEEDED )
                 {
                     totalHits = hitCount;
@@ -155,9 +159,8 @@ public class DefaultSearchEngine
                     totalHits += hitCount;
                 }
             }
-            
-            if ( request.isHitLimited() 
-                && ( totalHits > request.getResultHitLimit() ) 
+
+            if ( request.isHitLimited() && ( totalHits > request.getResultHitLimit() )
                 || totalHits == AbstractSearchResponse.LIMIT_EXCEEDED )
             {
                 totalHits = AbstractSearchResponse.LIMIT_EXCEEDED;
@@ -174,8 +177,7 @@ public class DefaultSearchEngine
         throws IOException
     {
         Hits hits =
-            context.getIndexSearcher()
-                .search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
         if ( hits == null || hits.length() == 0 )
         {
@@ -222,8 +224,7 @@ public class DefaultSearchEngine
         throws IOException
     {
         Hits hits =
-            context.getIndexSearcher()
-                .search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
+            context.getIndexSearcher().search( query, new Sort( new SortField( ArtifactInfo.UINFO, SortField.STRING ) ) );
 
         if ( hits != null && hits.length() != 0 )
         {
@@ -246,12 +247,12 @@ public class DefaultSearchEngine
                     }
                 }
             }
-            
+
             if ( req.isHitLimited() && hits.length() > req.getResultHitLimit() )
             {
                 return AbstractSearchResponse.LIMIT_EXCEEDED;
             }
-            
+
             return hitCount;
         }
         else
@@ -260,4 +261,57 @@ public class DefaultSearchEngine
         }
     }
 
+    // == NG Search
+
+    public IteratorSearchResponse searchIteratorPaged( IteratorSearchRequest request,
+                                                       Collection<IndexingContext> indexingContexts )
+        throws IOException
+    {
+        return searchIteratorPaged( request, indexingContexts, false );
+    }
+
+    public IteratorSearchResponse forceSearchIteratorPaged( IteratorSearchRequest request,
+                                                            Collection<IndexingContext> indexingContexts )
+        throws IOException
+    {
+        return searchIteratorPaged( request, indexingContexts, true );
+    }
+
+    private IteratorSearchResponse searchIteratorPaged( IteratorSearchRequest request,
+                                                        Collection<IndexingContext> indexingContexts,
+                                                        boolean ignoreContext )
+        throws IOException
+    {
+        // manage defaults!
+        if ( request.getStart() < 0 )
+        {
+            request.setStart( IteratorSearchRequest.UNDEFINED );
+        }
+        if ( request.getCount() < 0 )
+        {
+            request.setCount( IteratorSearchRequest.UNDEFINED );
+        }
+
+        ArrayList<IndexSearcher> contextsToSearch = new ArrayList<IndexSearcher>( indexingContexts.size() );
+
+        for ( IndexingContext ctx : indexingContexts )
+        {
+            if ( ignoreContext || ctx.isSearchable() )
+            {
+                contextsToSearch.add( ctx.getIndexSearcher() );
+            }
+        }
+
+        MultiSearcher multiSearcher =
+            new MultiSearcher( contextsToSearch.toArray( new Searchable[contextsToSearch.size()] ) );
+
+        // NEXUS-3482 made us to NOT use reverse ordering (it is a fix I wanted to implement, but user contributed patch
+        // did come in faster! -- Thanks)
+        Hits hits =
+            multiSearcher.search( request.getQuery(), new Sort( new SortField[] { SortField.FIELD_SCORE,
+                new SortField( null, SortField.DOC, false ) } ) );
+
+        return new IteratorSearchResponse( request.getQuery(), hits.length(), new DefaultIteratorResultSet( request,
+            multiSearcher, hits ) );
+    }
 }

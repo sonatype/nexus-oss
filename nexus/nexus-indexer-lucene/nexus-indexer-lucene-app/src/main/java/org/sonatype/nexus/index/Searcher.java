@@ -48,4 +48,18 @@ public interface Searcher
         Integer hitLimit )
         throws NoSuchRepositoryException;
 
+    /**
+     * Searches for artifacts based on available terms.
+     * 
+     * @param terms search terms
+     * @param repositoryId repository id of the repository to be searched ir null if the search should be performed on
+     *            all repositories that suports indexing
+     * @param from offset of first search result
+     * @param count number of search results to be retrieved
+     * @return search results
+     * @throws NoSuchRepositoryException - If there is no repository with specified repository id
+     */
+    IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
+        Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
+        throws NoSuchRepositoryException;
 }

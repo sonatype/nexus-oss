@@ -24,9 +24,9 @@ public abstract class AbstractIndexerManagerTest
         throws Exception
     {
         super.setUp();
-        
+
         nexusConfiguration.setSecurityEnabled( false );
-        
+
         nexusConfiguration.saveConfiguration();
 
         indexerManager = lookup( IndexerManager.class );
@@ -47,6 +47,16 @@ public abstract class AbstractIndexerManagerTest
         assertEquals( result.toString(), expected, result.size() );
     }
 
+    protected IteratorSearchResponse searchForKeywordNG( String term, int expected )
+        throws Exception
+    {
+        IteratorSearchResponse result = indexerManager.searchArtifactIterator( term, null, null, null, null, false, false );
+
+        assertEquals( "Unexpected result set size!", expected, result.getTotalHits() );
+
+        return result;
+    }
+
     protected void searchFor( String groupId, int expected, String repoId )
         throws IOException, Exception
     {
@@ -58,7 +68,8 @@ public abstract class AbstractIndexerManagerTest
         assertEquals( result.toString(), expected, result.size() );
     }
 
-    protected void assertTemporatyContexts( final Repository repo ) throws Exception
+    protected void assertTemporatyContexts( final Repository repo )
+        throws Exception
     {
         IndexingContext context = indexerManager.getRepositoryLocalIndexContext( repo.getId() );
         File dir = context.getIndexDirectoryFile().getParentFile();

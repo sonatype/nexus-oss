@@ -14,7 +14,9 @@
 package org.sonatype.nexus.proxy.item;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -131,6 +133,11 @@ public class DefaultRepositoryItemUidFactory
             throw new IllegalArgumentException( uidStr
                 + " is malformed RepositoryItemUid! The proper format is '<repoId>:/path/to/something'." );
         }
+    }
+
+    public Map<String, RepositoryItemUid> getActiveUidMapSnapshot()
+    {
+        return Collections.emptyMap();
     }
 
     /**
