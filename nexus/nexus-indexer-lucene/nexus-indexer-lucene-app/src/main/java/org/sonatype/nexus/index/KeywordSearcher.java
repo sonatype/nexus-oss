@@ -22,7 +22,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**
- * Searches Lucene index wor artifacts that matches the provided keyword.
+ * Searches Lucene index wor artifacts that matches the provided keyword. This search is wrongly named, it should be
+ * more "quick search".
  * 
  * @author Alin Dreghiciu
  */
@@ -47,6 +48,11 @@ public class KeywordSearcher
         return terms.containsKey( TERM_KEYWORD ) && !StringUtils.isEmpty( terms.get( TERM_KEYWORD ) );
     }
 
+    public SearchType getDefaultSearchType()
+    {
+        return SearchType.SCORED;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -62,14 +68,16 @@ public class KeywordSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA,
+                                                      SearchType searchType )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
         {
             return new IteratorSearchResponse( null, 0, null );
         }
-        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit, uniqueRGA, kwSearch );
+        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit,
+            uniqueRGA, searchType );
     }
 
 }

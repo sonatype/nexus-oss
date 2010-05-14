@@ -2066,7 +2066,7 @@ public class DefaultIndexerManager
 
     public IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from,
                                                           Integer count, Integer hitLimit, boolean uniqueRGA,
-                                                          boolean kwSearch )
+                                                          SearchType searchType )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -2084,13 +2084,11 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
-
-            Query q1 = createQuery( MAVEN.GROUP_ID, term, sType );
+            Query q1 = createQuery( MAVEN.GROUP_ID, term, searchType );
 
             q1.setBoost( 2.0f );
 
-            Query q2 = createQuery( MAVEN.ARTIFACT_ID, term, sType );
+            Query q2 = createQuery( MAVEN.ARTIFACT_ID, term, searchType );
 
             q2.setBoost( 2.0f );
 
@@ -2103,13 +2101,13 @@ public class DefaultIndexerManager
             // switch for "extended" keywords
             if ( false )
             {
-                Query q3 = createQuery( MAVEN.VERSION, term, sType );
+                Query q3 = createQuery( MAVEN.VERSION, term, searchType );
 
-                Query q4 = createQuery( MAVEN.CLASSIFIER, term, sType );
+                Query q4 = createQuery( MAVEN.CLASSIFIER, term, searchType );
 
-                Query q5 = createQuery( MAVEN.NAME, term, sType );
+                Query q5 = createQuery( MAVEN.NAME, term, searchType );
 
-                Query q6 = createQuery( MAVEN.DESCRIPTION, term, sType );
+                Query q6 = createQuery( MAVEN.DESCRIPTION, term, searchType );
 
                 bq.add( q3, BooleanClause.Occur.SHOULD );
 
@@ -2162,7 +2160,7 @@ public class DefaultIndexerManager
     }
 
     public IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from,
-                                                               Integer count, Integer hitLimit, boolean kwSearch )
+                                                               Integer count, Integer hitLimit, SearchType searchType )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -2185,9 +2183,7 @@ public class DefaultIndexerManager
                 term = term.substring( 0, term.length() - 6 );
             }
 
-            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
-
-            Query q = createQuery( MAVEN.CLASSNAMES, term, sType );
+            Query q = createQuery( MAVEN.CLASSNAMES, term, searchType );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
 
@@ -2232,7 +2228,7 @@ public class DefaultIndexerManager
 
     public IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
                                                           String cTerm, String repositoryId, Integer from,
-                                                          Integer count, Integer hitLimit, boolean kwSearch )
+                                                          Integer count, Integer hitLimit, SearchType searchType )
         throws NoSuchRepositoryException
     {
         if ( gTerm == null && aTerm == null && vTerm == null )
@@ -2255,28 +2251,26 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            SearchType sType = kwSearch ? SearchType.KEYWORD : SearchType.SCORED;
-
             BooleanQuery bq = new BooleanQuery();
 
             if ( gTerm != null )
             {
-                bq.add( createQuery( MAVEN.GROUP_ID, gTerm, sType ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.GROUP_ID, gTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( createQuery( MAVEN.ARTIFACT_ID, aTerm, sType ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.ARTIFACT_ID, aTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( createQuery( MAVEN.VERSION, vTerm, sType ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.VERSION, vTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( pTerm != null )
             {
-                bq.add( createQuery( MAVEN.PACKAGING, pTerm, sType ), BooleanClause.Occur.MUST );
+                bq.add( createQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
@@ -2300,7 +2294,7 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    bq.add( createQuery( MAVEN.CLASSIFIER, cTerm, sType ), BooleanClause.Occur.MUST );
+                    bq.add( createQuery( MAVEN.CLASSIFIER, cTerm, searchType ), BooleanClause.Occur.MUST );
                 }
             }
 

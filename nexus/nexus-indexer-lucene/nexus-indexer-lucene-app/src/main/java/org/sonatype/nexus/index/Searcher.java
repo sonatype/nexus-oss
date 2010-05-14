@@ -34,6 +34,14 @@ public interface Searcher
     boolean canHandle( Map<String, String> terms );
 
     /**
+     * Returns the default "search type", that this Searcher wants. Naturally, this is overridable, see
+     * flatIteratorSearch() method.
+     * 
+     * @return
+     */
+    SearchType getDefaultSearchType();
+
+    /**
      * Searches for artifacts based on available terms.
      * 
      * @param terms search terms
@@ -45,7 +53,7 @@ public interface Searcher
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
     FlatSearchResponse flatSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
-        Integer hitLimit )
+                                   Integer hitLimit )
         throws NoSuchRepositoryException;
 
     /**
@@ -59,7 +67,7 @@ public interface Searcher
      * @return search results
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
-    IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
-        Integer hitLimit, boolean uniqueRGA, boolean kwSearch )
+    IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
+                                               Integer count, Integer hitLimit, boolean uniqueRGA, SearchType searchType )
         throws NoSuchRepositoryException;
 }

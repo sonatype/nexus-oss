@@ -35,6 +35,7 @@ import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
 import org.sonatype.nexus.index.KeywordSearcher;
+import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -148,7 +149,7 @@ public abstract class AbstractIndexPlexusResource
                 catch ( IOException e )
                 {
                     throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                                                 "IOException during configuration retrieval!", e );
+                        "IOException during configuration retrieval!", e );
                 }
             }
             else
@@ -222,14 +223,26 @@ public abstract class AbstractIndexPlexusResource
         // keyword search does collapse, others do not
         boolean collapsed = uniqueRGA == null ? terms.containsKey( KeywordSearcher.TERM_KEYWORD ) : uniqueRGA;
 
-        boolean kwSearch = asKeywords == null ? false : asKeywords;
-
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
             {
+                SearchType searchType = searcher.getDefaultSearchType();
+
+                if ( asKeywords != null )
+                {
+                    if ( asKeywords )
+                    {
+                        searchType = SearchType.KEYWORD;
+                    }
+                    else
+                    {
+                        searchType = SearchType.SCORED;
+                    }
+                }
+
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed, kwSearch );
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed, searchType );
 
                 if ( searchResponse != null )
                 {
