@@ -131,7 +131,8 @@ public class XmlAuthorizingRealmTest
         
         SecurityUser user = new SecurityUser();
         user.setEmail( "dummyemail@foo" );
-        user.setName( "dummyname" );
+        user.setFirstName( "dummyFirstName" );
+        user.setLastName( "dummyLastName" );
         user.setStatus( SecurityUser.STATUS_ACTIVE );
         user.setId( "username" );
         user.setPassword( "password" );

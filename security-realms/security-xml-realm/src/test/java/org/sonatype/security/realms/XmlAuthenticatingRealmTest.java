@@ -90,7 +90,8 @@ public class XmlAuthenticatingRealmTest
         
         SecurityUser user = new SecurityUser();
         user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
-        user.setName( "testCreateWithPassowrdEmail" );
+        user.setFirstName( "testCreateWithPassowrdEmail" );
+        user.setLastName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setId( "testCreateWithPassowrdEmailUserId" );
         user.addRole( "role" );
@@ -174,7 +175,8 @@ public class XmlAuthenticatingRealmTest
         
         SecurityUser user = new SecurityUser();
         user.setEmail( "dummyemail@somewhere" );
-        user.setName( "dummyname" );
+        user.setFirstName( "dummyFirstName" );
+        user.setLastName( "dummyLastName" );
         user.setStatus( status );
         user.setId( "username" );
         user.setPassword( StringDigester.getSha1Digest( "password" ) );

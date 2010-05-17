@@ -40,7 +40,8 @@ public class UserRoleMappingTest
         SecurityUser user = config.readUser( "test-user" );
         Assert.assertEquals( user.getId(), "test-user" );
         Assert.assertEquals( user.getEmail(), "changeme1@yourcompany.com" );
-        Assert.assertEquals( user.getName(), "Test User" );
+        Assert.assertEquals( user.getFirstName(), "Test" );
+        Assert.assertEquals( user.getLastName(), "User" );
         Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
         Assert.assertEquals( user.getStatus(), "active" );
 

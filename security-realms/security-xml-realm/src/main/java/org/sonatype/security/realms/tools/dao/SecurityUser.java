@@ -22,6 +22,8 @@ public class SecurityUser
     extends CUser
         implements SecurityItem
 {
+    private static final long serialVersionUID = 1456110919079349633L;
+
     boolean readOnly;
     
     private Set<String> roles = new HashSet<String>();
@@ -43,7 +45,8 @@ public class SecurityUser
     public SecurityUser( CUser user, boolean readOnly, List<String> roles )
     {
         setEmail( user.getEmail() );
-        setName( user.getName() );
+        setFirstName( user.getFirstName() );
+        setLastName( user.getLastName() );
         setPassword( user.getPassword() );
         setStatus( user.getStatus() );
         setId( user.getId() );

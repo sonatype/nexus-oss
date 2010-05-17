@@ -110,7 +110,8 @@ public class UserManagerTest
         SecurityUser secUser = config.readUser( user.getUserId() );
         Assert.assertEquals( secUser.getId(), user.getUserId() );
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
-        Assert.assertEquals( secUser.getName(), user.getName() );
+        Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
+        Assert.assertEquals( secUser.getLastName(), user.getLastName() );
         Assert.assertEquals( secUser.getPassword(), StringDigester.getSha1Digest( "my-password" ) );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
@@ -156,7 +157,8 @@ public class UserManagerTest
         SecurityUser secUser = config.readUser( user.getUserId() );
         Assert.assertEquals( secUser.getId(), user.getUserId() );
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
-        Assert.assertEquals( secUser.getName(), user.getName() );
+        Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
+        Assert.assertEquals( secUser.getLastName(), user.getLastName() );
         Assert.assertEquals( secUser.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );

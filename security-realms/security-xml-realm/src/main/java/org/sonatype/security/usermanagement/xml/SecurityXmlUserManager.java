@@ -70,7 +70,8 @@ public class SecurityXmlUserManager
         SecurityUser secUser = new SecurityUser();
 
         secUser.setId( user.getUserId() );
-        secUser.setName( user.getName() );
+        secUser.setFirstName( user.getFirstName() );
+        secUser.setLastName( user.getLastName() );
         secUser.setEmail( user.getEmailAddress() );
         secUser.setStatus( user.getStatus().name() );
         secUser.setReadOnly( user.isReadOnly() );
@@ -94,7 +95,8 @@ public class SecurityXmlUserManager
         DefaultUser user = new DefaultUser();
 
         user.setUserId( cUser.getId() );
-        user.setName( cUser.getName() );
+        user.setFirstName( cUser.getFirstName() );
+        user.setLastName( cUser.getLastName() );
         user.setEmailAddress( cUser.getEmail() );
         user.setSource( SOURCE );
         user.setStatus( UserStatus.valueOf( cUser.getStatus() ) );

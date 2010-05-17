@@ -2,39 +2,44 @@
 
 
 <security>
-    <version>2.0.2</version>
+    <version>2.0.4</version>
     <users>
         <user>
             <id>user1</id>
-            <name>user1</name>
+            <firstName>first1</firstName>
+            <lastName>last1</lastName>
             <password>user1</password>
             <status>active</status>
             <email>email</email>
         </user>
         <user>
             <id>user2</id>
-            <name>user2</name>
+            <firstName>first2</firstName>
+            <lastName>last2</lastName>
             <password>user2</password>
             <status>active</status>
             <email>email</email>
         </user>
         <user>
             <id>user3</id>
-            <name>user3</name>
+            <firstName>first3</firstName>
+            <lastName>last3</lastName>
             <password>user3</password>
             <status>active</status>
             <email>email</email>
         </user>
         <user>
             <id>user4</id>
-            <name>user4</name>
+            <firstName>first4</firstName>
+            <lastName>last4</lastName>
             <password>user4</password>
             <status>active</status>
             <email>email</email>
         </user>
         <user>
             <id>user5</id>
-            <name>user5</name>
+            <firstName>first5</firstName>
+            <lastName>last5</lastName>
             <password>user5</password>
             <status>active</status>
             <email>email</email>

@@ -23,14 +23,14 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.security.model.v2_0_3.CUser;
-import org.sonatype.security.model.v2_0_3.CUserRoleMapping;
-import org.sonatype.security.model.v2_0_3.Configuration;
-import org.sonatype.security.model.v2_0_2.io.xpp3.SecurityConfigurationXpp3Reader;
-import org.sonatype.security.model.v2_0_3.upgrade.BasicVersionUpgrade;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.v2_0_3.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.v2_0_4.upgrade.BasicVersionUpgrade;
 
-@Component( role = SecurityUpgrader.class, hint = "2.0.2" )
-public class Upgrade202to203
+@Component( role = SecurityUpgrader.class, hint = "2.0.3" )
+public class Upgrade203to204
     implements SecurityUpgrader
 {
     private static String DEFAULT_SOURCE = "default";
@@ -69,38 +69,37 @@ public class Upgrade202to203
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.security.model.v2_0_2.Configuration oldc = ( org.sonatype.security.model.v2_0_2.Configuration ) message.getConfiguration();
+        org.sonatype.security.model.v2_0_3.Configuration oldc = ( org.sonatype.security.model.v2_0_3.Configuration ) message.getConfiguration();
 
-        org.sonatype.security.model.v2_0_3.Configuration newc = new BasicVersionUpgrade().upgradeConfiguration( oldc );
-
-        // now strip out all the unused role mappings
+        org.sonatype.security.model.Configuration newc = new SecurityVersionUpgrade().upgradeConfiguration( oldc );
         
-        for ( Iterator<CUserRoleMapping> iter = newc.getUserRoleMappings().iterator(); iter.hasNext() ;  )
-        {
-            CUserRoleMapping roleMapping = iter.next();
-            
-            if( DEFAULT_SOURCE.equalsIgnoreCase( roleMapping.getSource() ) && !this.hasUser( roleMapping.getUserId(), newc ) )
-            {
-                logger.info( "Removing orphaned user role mapping for user: '"+ roleMapping.getUserId() + "'." );
-                iter.remove();
-            }
-        }
-        
-        newc.setVersion( org.sonatype.security.model.v2_0_3.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.security.model.v2_0_3.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
     
-    private boolean hasUser( String userId, Configuration configuration )
+    class SecurityVersionUpgrade extends BasicVersionUpgrade
     {
-        for ( CUser user : configuration.getUsers() )
-        {
-            if( user.getId().equals( userId ))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
 
+        @Override
+        public CUser upgradeCUser( org.sonatype.security.model.v2_0_3.CUser cUser, CUser value )
+        {
+            CUser upgradedUser =  super.upgradeCUser( cUser, value );
+            
+            // get the old users name
+            String name = cUser.getName();
+            String[] nameParts = name.trim().split( " ", 2 );
+            
+            // the first name is everything to the left of the first space
+            upgradedUser.setFirstName( nameParts[0] );
+            
+            // last name is everything else ( if it exists )
+            if( nameParts.length > 1 )
+            {
+                upgradedUser.setLastName( nameParts[1] );
+            }
+            
+            return upgradedUser;
+        }
+    }
 }

@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.codehaus.plexus.util.StringUtils;
+
 /**
  * Default implementation of a User.
  * 
@@ -15,7 +17,9 @@ public class DefaultUser
 
     private String userId;
 
-    private String name;
+    private String firstName;
+
+    private String lastName;
 
     private String emailAddress;
 
@@ -39,12 +43,46 @@ public class DefaultUser
 
     public String getName()
     {
+        String name = this.getFirstName() != null ? this.getFirstName() : "";
+        if ( StringUtils.isNotEmpty( this.getLastName() ) )
+        {
+            name += " " + this.getLastName();
+        }
         return name;
     }
 
     public void setName( String name )
     {
-        this.name = name;
+        // deprecated, but attempt to use
+        if ( StringUtils.isNotEmpty( name ) )
+        {
+            String[] nameParts = name.trim().split( " " );
+            this.setFirstName( nameParts[0] );
+            if ( nameParts.length > 1 )
+            {
+                this.setLastName( nameParts[1] );
+            }
+        }
+    }
+    
+    public String getFirstName()
+    {
+        return firstName;
+    }
+
+    public void setFirstName( String firstName )
+    {
+        this.firstName = firstName;
+    }
+
+    public String getLastName()
+    {
+        return lastName;
+    }
+
+    public void setLastName( String lastName )
+    {
+        this.lastName = lastName;
     }
 
     public String getEmailAddress()
@@ -115,7 +153,7 @@ public class DefaultUser
     @Override
     public String toString()
     {
-        return "UserId: " + this.userId + ", Name: " + this.name;
+        return "UserId: " + this.userId + ", Name: " + this.firstName + " " + this.lastName;
     }
 
     public int compareTo( User o )

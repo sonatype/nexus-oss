@@ -111,6 +111,12 @@
     public static final String MODEL_VERSION = "2.0.3";
 ]]></code>
                 </codeSegment>
+                <codeSegment>
+                    <version>2.0.4</version>
+                    <code><![CDATA[
+    public static final String MODEL_VERSION = "2.0.4";
+]]></code>
+                </codeSegment>
             </codeSegments>
         </class>
         
@@ -129,10 +135,24 @@
                 </field>
                 <field>
                     <name>name</name>
-                    <version>2.0.0+</version>
+                    <version>2.0.0/2.0.3</version>
                     <type>String</type>
                     <required>true</required>
                     <description>Users real life name.</description>
+                </field>
+                <field>
+                    <name>firstName</name>
+                    <version>2.0.4+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>Users first name.</description>
+                </field>
+                <field>
+                    <name>lastName</name>
+                    <version>2.0.4+</version>
+                    <type>String</type>
+                    <required>true</required>
+                    <description>Users last name.</description>
                 </field>
                 <field>
                     <name>password</name>

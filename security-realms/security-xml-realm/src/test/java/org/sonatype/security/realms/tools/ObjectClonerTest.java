@@ -33,7 +33,8 @@ public class ObjectClonerTest
         CUser user = new CUser();
         user.setEmail( "email" );
         user.setId( "id" );
-        user.setName( "name" );
+        user.setFirstName( "firstName" );
+        user.setLastName( "lastName" );
         user.setPassword( "password" );
         user.setStatus( "status" );
         
@@ -50,7 +51,8 @@ public class ObjectClonerTest
         assertTrue( cloned != user );
         assertTrue( cloned.getEmail().equals( user.getEmail() ) );
         assertTrue( cloned.getId().equals( user.getId() ) );
-        assertTrue( cloned.getName().equals( user.getName() ) );
+        assertTrue( cloned.getFirstName().equals( user.getFirstName() ) );
+        assertTrue( cloned.getLastName().equals( user.getLastName() ) );
         assertTrue( cloned.getPassword().equals( user.getPassword() ) );
         assertTrue( cloned.getStatus().equals( user.getStatus() ) );
         

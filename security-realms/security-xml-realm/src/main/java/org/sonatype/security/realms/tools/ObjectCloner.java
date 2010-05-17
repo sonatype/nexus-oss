@@ -35,7 +35,8 @@ public class ObjectCloner
         CUser cloned = new CUser();
         
         cloned.setEmail( user.getEmail() );
-        cloned.setName( user.getName() );
+        cloned.setFirstName( user.getFirstName() );
+        cloned.setLastName( user.getLastName() );
         cloned.setPassword( user.getPassword() );
         cloned.setStatus( user.getStatus() );
         cloned.setId( user.getId() );

@@ -439,12 +439,12 @@ public class DefaultConfigurationValidator
             response.addValidationError( message );
         }
 
-        if ( StringUtils.isEmpty( user.getName() ) )
+        if ( StringUtils.isEmpty( user.getFirstName() ) && StringUtils.isEmpty( user.getLastName() ) )
         {
             ValidationMessage message =
-                new ValidationMessage( "name",
+                new ValidationMessage( "firstName",
                                        "User ID '" + user.getId() + "' has no Name.  This is a required field.",
-                                       "Name is required." );
+                                       "A first name or last name is required." );
             response.addValidationError( message );
         }
 

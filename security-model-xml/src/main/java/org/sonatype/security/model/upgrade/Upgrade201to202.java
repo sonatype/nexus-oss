@@ -69,13 +69,13 @@ public class Upgrade201to202
     {
         Configuration oldc = (Configuration) message.getConfiguration();
 
-        org.sonatype.security.model.Configuration newc = new org.sonatype.security.model.Configuration();
+        org.sonatype.security.model.v2_0_2.Configuration newc = new org.sonatype.security.model.v2_0_2.Configuration();
 
         newc.setVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
 
         for ( CUser oldu : (List<CUser>) oldc.getUsers() )
         {
-            org.sonatype.security.model.CUser newu = new org.sonatype.security.model.CUser();
+            org.sonatype.security.model.v2_0_2.CUser newu = new org.sonatype.security.model.v2_0_2.CUser();
 
             newu.setEmail( oldu.getEmail() );
             newu.setId( oldu.getId() );
@@ -93,7 +93,7 @@ public class Upgrade201to202
 
         for ( CRole oldr : (List<CRole>) oldc.getRoles() )
         {
-                org.sonatype.security.model.CRole newr = new org.sonatype.security.model.CRole();
+                org.sonatype.security.model.v2_0_2.CRole newr = new org.sonatype.security.model.v2_0_2.CRole();
 
                 newr.setDescription( oldr.getDescription() );
                 newr.setId( oldr.getId() );
@@ -108,7 +108,7 @@ public class Upgrade201to202
 
         for ( CPrivilege oldp : (List<CPrivilege>) oldc.getPrivileges() )
         {
-                org.sonatype.security.model.CPrivilege newp = new org.sonatype.security.model.CPrivilege();
+                org.sonatype.security.model.v2_0_2.CPrivilege newp = new org.sonatype.security.model.v2_0_2.CPrivilege();
 
                 newp.setDescription( oldp.getDescription() );
                 newp.setId( oldp.getId() );
@@ -117,7 +117,7 @@ public class Upgrade201to202
 
                 for ( CProperty oldprop : (List<CProperty>) oldp.getProperties() )
                 {
-                    org.sonatype.security.model.CProperty newprop = new org.sonatype.security.model.CProperty();
+                    org.sonatype.security.model.v2_0_2.CProperty newprop = new org.sonatype.security.model.v2_0_2.CProperty();
                     newprop.setKey( oldprop.getKey() );
                     newprop.setValue( oldprop.getValue() );
                     newp.addProperty( newprop );
@@ -125,13 +125,13 @@ public class Upgrade201to202
                 newc.addPrivilege( newp );
         }
 
-        message.setModelVersion( org.sonatype.security.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.security.model.v2_0_2.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
     
-    private void migrateOldRolesToUserRoleMapping( String userId, String source, List<String> roles, org.sonatype.security.model.Configuration config)
+    private void migrateOldRolesToUserRoleMapping( String userId, String source, List<String> roles, org.sonatype.security.model.v2_0_2.Configuration config)
     {
-        org.sonatype.security.model.CUserRoleMapping roleMapping = new org.sonatype.security.model.CUserRoleMapping();
+        org.sonatype.security.model.v2_0_2.CUserRoleMapping roleMapping = new org.sonatype.security.model.v2_0_2.CUserRoleMapping();
         roleMapping.setRoles( roles );
         roleMapping.setSource( source );
         roleMapping.setUserId( userId );

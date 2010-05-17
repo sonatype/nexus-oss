@@ -3,16 +3,15 @@ package org.sonatype.security.model.upgrade;
 import java.util.List;
 
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
+import org.sonatype.security.model.v2_0_2.CUser;
+import org.sonatype.security.model.v2_0_2.CUserRoleMapping;
+import org.sonatype.security.model.v2_0_2.Configuration;
 
 public class MockSecurityDataUpgrader
     extends AbstractDataUpgrader<Configuration>
     implements SecurityDataUpgrader
 {
 
-    @SuppressWarnings("unchecked")
     @Override
     public void doUpgrade( Configuration configuration )
         throws ConfigurationIsCorruptedException
@@ -25,8 +24,6 @@ public class MockSecurityDataUpgrader
                 user.setId( "admin-user" );
             }
         }
-
-        
         
         for ( CUserRoleMapping roleMapping : (List<CUserRoleMapping>) configuration.getUserRoleMappings() )
         {

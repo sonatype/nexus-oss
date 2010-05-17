@@ -23,15 +23,45 @@ public interface User
 
     /**
      * @return the Users name.
+     * @deprecated use getFirstName, and getLastName
      */
+    @Deprecated
     public String getName();
 
     /**
      * Sets the users name.
      * 
      * @param name
+     * @deprecated use setFirstName, and setLastName
      */
+    @Deprecated
     public void setName( String name );
+
+    /**
+     * Gets the users first name.
+     * @return
+     */
+    public String getFirstName();
+
+    /**
+     * Sets the users first name.
+     * 
+     * @param firstName
+     */
+    public void setFirstName( String firstName );
+
+    /**
+     * Gets the users last name.
+     * @return
+     */
+    public String getLastName();
+
+    /**
+     * Sets the users last name.
+     * 
+     * @param lastName
+     */
+    public void setLastName( String lastName );
 
     /**
      * @return the users email address.
