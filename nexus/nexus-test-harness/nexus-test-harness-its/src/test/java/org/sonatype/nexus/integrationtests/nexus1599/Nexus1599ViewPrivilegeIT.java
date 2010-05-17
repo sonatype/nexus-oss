@@ -25,7 +25,6 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 /**
  * @author juven
@@ -36,8 +35,6 @@ public class Nexus1599ViewPrivilegeIT
 
     protected RepositoryMessageUtil repoMsgUtil;
 
-    protected SearchMessageUtil searchMsgUtil;
-
     public Nexus1599ViewPrivilegeIT()
         throws Exception
     {
@@ -47,8 +44,6 @@ public class Nexus1599ViewPrivilegeIT
             this, this.getJsonXStream(),
             MediaType.APPLICATION_JSON,
             getRepositoryTypeRegistry() );
-
-        this.searchMsgUtil = new SearchMessageUtil();
     }
 
     @BeforeClass
@@ -68,14 +63,14 @@ public class Nexus1599ViewPrivilegeIT
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Assert.assertEquals( 1, searchMsgUtil.searchFor( getTestId() ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchFor( getTestId() ).size() );
 
         // with view privilege
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
-        Assert.assertEquals( 1, searchMsgUtil.searchFor( getTestId() ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchFor( getTestId() ).size() );
 
         this.removePrivilege( TEST_USER_NAME, "T1" );
     }

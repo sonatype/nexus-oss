@@ -26,12 +26,11 @@ import org.junit.After;
 import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -47,14 +46,10 @@ public class Nexus383SearchIT
 
     private static final String NEXUS_TEST_HARNESS_REPO = "nexus-test-harness-repo";
 
-    protected SearchMessageUtil messageUtil;
-
     protected GroupMessageUtil groupMessageUtil;
 
     public Nexus383SearchIT()
     {
-        this.messageUtil = new SearchMessageUtil();
-
         this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
@@ -74,9 +69,9 @@ public class Nexus383SearchIT
     public void resetRepo()
         throws Exception
     {
-        messageUtil.allowSearch( NEXUS_TEST_HARNESS_REPO, true );
-        messageUtil.allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
-        messageUtil.allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
     @Test
@@ -87,34 +82,34 @@ public class Nexus383SearchIT
         TaskScheduleUtil.waitForAllTasksToStop();
 
         // groupId
-        List<NexusArtifact> results = messageUtil.searchFor( "nexus383" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "nexus383" );
         Assert.assertEquals( 2, results.size() );
 
         // 3. negative test
-        results = messageUtil.searchFor( "nexus-383" );
+        results = getSearchMessageUtil().searchFor( "nexus-383" );
         Assert.assertTrue( results.isEmpty() );
 
         // artifactId
-        results = messageUtil.searchFor( "know-artifact-1" );
+        results = getSearchMessageUtil().searchFor( "know-artifact-1", SearchType.KEYWORD );
         Assert.assertEquals( 1, results.size() );
 
         // artifactId
-        results = messageUtil.searchFor( "know-artifact-2" );
+        results = getSearchMessageUtil().searchFor( "know-artifact-2", SearchType.KEYWORD );
         Assert.assertEquals( 1, results.size() );
 
         // partial artifactId
-        results = messageUtil.searchFor( "know-artifact" );
+        results = getSearchMessageUtil().searchFor( "know-artifact" );
         Assert.assertEquals( 2, results.size() );
 
         // 3. negative test
-        results = messageUtil.searchFor( "unknow-artifacts" );
+        results = getSearchMessageUtil().searchFor( "unknow-artifacts" );
         Assert.assertTrue( results.isEmpty() );
 
         // NEXUS-2724: the member changes should propagate to it's groups too
         // has it propagated to group?
-        results = SearchMessageUtil.searchFor( "nexus383", "know-artifact-1", "1.0.0", "public" );
+        results = getSearchMessageUtil().searchForGav( "nexus383", "know-artifact-1", "1.0.0", "public" );
         Assert.assertEquals( 1, results.size() );
-        results = SearchMessageUtil.searchFor( "nexus383", "know-artifact-2", "1.0.0", "public" );
+        results = getSearchMessageUtil().searchForGav( "nexus383", "know-artifact-2", "1.0.0", "public" );
         Assert.assertEquals( 1, results.size() );
     }
 
@@ -124,15 +119,15 @@ public class Nexus383SearchIT
         throws Exception
     {
         // know-artifact-1
-        NexusArtifact result = messageUtil.searchForSHA1( "4ce1d96bd11b8959b32a75c1fa5b738d7b87d408" );
+        NexusArtifact result = getSearchMessageUtil().identify( "4ce1d96bd11b8959b32a75c1fa5b738d7b87d408" );
         Assert.assertNotNull( result );
 
         // know-artifact-2
-        result = messageUtil.searchForSHA1( "230377663ac3b19ad83c99b0afdb056dd580c5c8" );
+        result = getSearchMessageUtil().identify( "230377663ac3b19ad83c99b0afdb056dd580c5c8" );
         Assert.assertNotNull( result );
 
         // velo's picture
-        result = messageUtil.searchForSHA1( "612c17de73fdc8b9e3f6a063154d89946eb7c6f2" );
+        result = getSearchMessageUtil().identify( "612c17de73fdc8b9e3f6a063154d89946eb7c6f2" );
         Assert.assertNull( result );
     }
 
@@ -143,22 +138,22 @@ public class Nexus383SearchIT
     {
 
         // Disabling default repo
-        messageUtil.allowSearch( NEXUS_TEST_HARNESS_REPO, false );
+        getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, false );
 
         // groupId
-        List<NexusArtifact> results = messageUtil.searchFor( "nexus383" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "nexus383" );
         Assert.assertTrue( results.isEmpty() );
 
         // artifactId
-        results = messageUtil.searchFor( "know-artifact-1" );
+        results = getSearchMessageUtil().searchFor( "know-artifact-1" );
         Assert.assertTrue( results.isEmpty() );
 
         // artifactId
-        results = messageUtil.searchFor( "know-artifact-2" );
+        results = getSearchMessageUtil().searchFor( "know-artifact-2" );
         Assert.assertTrue( results.isEmpty() );
 
         // partial artifactId
-        results = messageUtil.searchFor( "know-artifact" );
+        results = getSearchMessageUtil().searchFor( "know-artifact" );
         Assert.assertTrue( results.isEmpty() );
 
     }
@@ -173,7 +168,7 @@ public class Nexus383SearchIT
         disableSearching();
 
         // Enabling default repo again
-        messageUtil.allowSearch( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, true );
 
         // All searchs should run ok
         searchFor();
@@ -185,7 +180,7 @@ public class Nexus383SearchIT
         throws Exception
     {
         // Enabling default repo again
-        messageUtil.allowBrowsing( NEXUS_TEST_HARNESS_REPO, false );
+        getSearchMessageUtil().allowBrowsing( NEXUS_TEST_HARNESS_REPO, false );
 
         // All searchs should run ok
         searchFor();
@@ -201,7 +196,7 @@ public class Nexus383SearchIT
         disableBrowsing();
 
         // Enabling default repo again
-        messageUtil.allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
 
         // All searchs should run ok
         searchFor();
@@ -213,12 +208,12 @@ public class Nexus383SearchIT
         throws Exception
     {
         // Enabling default repo again
-        messageUtil.allowDeploying( NEXUS_TEST_HARNESS_REPO, false );
+        getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, false );
 
         // All searchs should run ok
         searchFor();
 
-        messageUtil.allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
+        getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
     @Test
@@ -267,7 +262,7 @@ public class Nexus383SearchIT
 
         TaskScheduleUtil.waitForTasks();
 
-        List<NexusArtifact> results = messageUtil.searchFor( "crossArtifact" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "crossArtifact" );
         Assert.assertEquals( 3, results.size() );
 
     }

@@ -20,12 +20,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.index.SearchType;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -37,33 +40,30 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import com.thoughtworks.xstream.XStream;
 
 public class SearchMessageUtil
+    extends ITUtil
 {
-
     private static Logger log = Logger.getLogger( SearchMessageUtil.class );
 
-    private static XStream xstream;
+    private XStream xstream;
 
-    static
+    public SearchMessageUtil( AbstractNexusIntegrationTest test )
     {
-        xstream = XStreamFactory.getXmlXStream();
+        super( test );
+
+        this.xstream = XStreamFactory.getXmlXStream();
     }
 
-    public Response doSearchFor( String query )
-        throws Exception
-    {
-        String serviceURI = "service/local/data_index?q=" + query;
-
-        return RequestFacade.doGetRequest( serviceURI );
-    }
-
-    public Response doSearchFor( Map<String, String> queryArgs )
-        throws Exception
-    {
-        return doSearchFor( queryArgs, null );
-    }
-
-    public static Response doSearchFor( Map<String, String> queryArgs, String repositoryId )
-        throws Exception
+    /**
+     * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
+     * 
+     * @param queryArgs
+     * @param repositoryId
+     * @param asKeywords
+     * @return
+     * @throws Exception
+     */
+    private Response doSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+        throws IOException
     {
         StringBuffer serviceURI = null;
 
@@ -81,29 +81,41 @@ public class SearchMessageUtil
             serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
         }
 
+        if ( searchType != null )
+        {
+            // we have an override in place
+            // currently, REST API lacks search type (it is able to only ovveride isKeyword search happening, or not, of
+            // if
+            // not specified, rely on server side defaults)
+            if ( SearchType.KEYWORD.equals( searchType ) )
+            {
+                serviceURI.append( "asKeywords=true&" );
+            }
+            else if ( SearchType.SCORED.equals( searchType ) )
+            {
+                serviceURI.append( "asKeywords=false&" );
+            }
+        }
+
         log.info( "Search serviceURI " + serviceURI );
 
         return RequestFacade.doGetRequest( serviceURI.toString() );
     }
 
-    public List<NexusArtifact> searchFor( String query )
-        throws Exception
+    /**
+     * Uses XStream to unmarshall the DTOs.
+     * 
+     * @param queryArgs
+     * @param repositoryId
+     * @param asKeywords
+     * @return
+     * @throws IOException
+     */
+    private List<NexusArtifact> doSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+        throws IOException
     {
-        HashMap<String, String> queryArgs = new HashMap<String, String>();
-        queryArgs.put( "q", query );
-        return searchFor( queryArgs );
-    }
+        Response response = doSearchForR( queryArgs, repositoryId, searchType );
 
-    public static List<NexusArtifact> searchFor( Map<String, String> queryArgs )
-        throws Exception
-    {
-        return searchFor( queryArgs, null );
-    }
-
-    public static List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
-        throws Exception
-    {
-        Response response = doSearchFor( queryArgs, repositoryId );
         String responseText = response.getEntity().getText();
 
         Assert.assertTrue( "Search failure:\n" + responseText, response.getStatus().isSuccess() );
@@ -116,24 +128,140 @@ public class SearchMessageUtil
         return searchResponde.getData();
     }
 
-    public NexusArtifact searchForSHA1( String sha1 )
-        throws Exception
+    // LOW LEVEL METHODS
+
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs )
+        throws IOException
     {
-        // http://localhost:4495/nexus/service/local/data_index?_dc=1236186182435&from=0&count=50&sha1=2e4213cd44e95dd306a74ba002ed1fa1282f0a51
-        HashMap<String, String> queryArgs = new HashMap<String, String>();
-        queryArgs.put( "sha1", sha1 );
-        List<NexusArtifact> result = searchFor( queryArgs );
-
-        if ( result.size() == 1 )
-        {
-            return result.get( 0 );
-        }
-
-        return null;
+        return searchFor( queryArgs, null, null );
     }
 
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId )
+        throws IOException
+    {
+        return searchFor( queryArgs, repositoryId, null );
+    }
+
+    public List<NexusArtifact> searchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
+        throws IOException
+    {
+        return doSearchFor( queryArgs, repositoryId, searchType );
+    }
+
+    // QUICK ("simple" query)
+
+    /**
+     * Returns "low" Restlet response to access response HTTP Code.
+     */
+    public Response searchFor_response( String query )
+        throws IOException
+    {
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+
+        queryArgs.put( "q", query );
+
+        return doSearchForR( queryArgs, null, null );
+    }
+
+    public List<NexusArtifact> searchFor( String query )
+        throws IOException
+    {
+        return searchFor( query, null );
+    }
+
+    public List<NexusArtifact> searchFor( String query, SearchType type )
+        throws IOException
+    {
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+
+        queryArgs.put( "q", query );
+
+        return searchFor( queryArgs, null, type );
+    }
+
+    public List<NexusArtifact> searchFor( String query, String repositoryId, SearchType type )
+        throws IOException
+    {
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+
+        queryArgs.put( "q", query );
+
+        return searchFor( queryArgs, repositoryId, type );
+    }
+
+    // GAV
+
+    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version )
+        throws IOException
+    {
+        return searchForGav( groupId, artifactId, version, null );
+    }
+
+    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String repositoryId )
+        throws IOException
+    {
+        Map<String, String> args = new HashMap<String, String>();
+
+        if ( StringUtils.isNotBlank( groupId ) )
+        {
+            args.put( "g", groupId );
+        }
+        if ( StringUtils.isNotBlank( artifactId ) )
+        {
+            args.put( "a", artifactId );
+        }
+        if ( StringUtils.isNotBlank( version ) )
+        {
+            args.put( "v", version );
+        }
+
+        return doSearchFor( args, repositoryId, null );
+    }
+
+    public List<NexusArtifact> searchForGav( Gav gav, String repositoryId )
+        throws IOException
+    {
+        return searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), repositoryId );
+    }
+
+    // CLASSNAME
+
+    public List<NexusArtifact> searchForClassname( String classname )
+        throws IOException
+    {
+        Map<String, String> args = new HashMap<String, String>();
+
+        args.put( "cn", classname );
+
+        return doSearchFor( args, null, null );
+    }
+
+    // IDENTIFY/SHA1
+
+    public NexusArtifact identify( String sha1 )
+        throws IOException
+    {
+        // GET /identify/sha1/8b1b85d04eea979c33109ea42808b7d3f6d355ab (is log4j:log4j:1.2.13)
+
+        Response response = RequestFacade.doGetRequest( "service/local/identify/sha1/" + sha1 );
+
+        if ( response.getStatus().isSuccess() )
+        {
+            XStreamRepresentation representation =
+                new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
+
+            return (NexusArtifact) representation.getPayload( new NexusArtifact() );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    // SWITCHES ALLOW*
+
     public void allowBrowsing( String repositoryName, boolean allowBrowsing )
-        throws Exception
+        throws IOException
     {
         RepositoryResource repository = getRepository( repositoryName );
 
@@ -143,7 +271,7 @@ public class SearchMessageUtil
     }
 
     public void allowSearch( String repositoryName, boolean allowSearch )
-        throws Exception
+        throws IOException
     {
         RepositoryResource repository = getRepository( repositoryName );
 
@@ -151,6 +279,25 @@ public class SearchMessageUtil
 
         saveRepository( repository, repositoryName );
     }
+
+    public void allowDeploying( String repositoryName, boolean allowDeploying )
+        throws IOException
+    {
+        RepositoryResource repository = getRepository( repositoryName );
+
+        if ( allowDeploying )
+        {
+            repository.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
+        }
+        else
+        {
+            repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
+        }
+
+        saveRepository( repository, repositoryName );
+    }
+
+    // PRIVATE BELOW
 
     private RepositoryResource getRepository( String repositoryName )
         throws IOException
@@ -161,7 +308,7 @@ public class SearchMessageUtil
         if ( response.getStatus().isError() )
         {
             Assert.assertFalse( "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus(),
-                                response.getStatus().isError() );
+                response.getStatus().isError() );
         }
         String responseText = response.getEntity().getText();
 
@@ -182,68 +329,6 @@ public class SearchMessageUtil
         Status status = RequestFacade.sendMessage( serviceURI, Method.PUT, representation ).getStatus();
         Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
 
-    }
-
-    public void allowDeploying( String repositoryName, boolean allowDeploying )
-        throws Exception
-    {
-        RepositoryResource repository = getRepository( repositoryName );
-
-        if ( allowDeploying )
-        {
-            repository.setWritePolicy( RepositoryWritePolicy.ALLOW_WRITE.name() );
-        }
-        else
-        {
-            repository.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
-        }
-
-        saveRepository( repository, repositoryName );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public static List<NexusArtifact> searchClassname( String classname )
-        throws Exception
-    {
-        String responseText = doSearchForClassName( classname ).getEntity().getText();
-
-        XStreamRepresentation representation =
-            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
-
-        SearchResponse searchResponde = (SearchResponse) representation.getPayload( new SearchResponse() );
-
-        return searchResponde.getData();
-    }
-
-    private static Response doSearchForClassName( String classname )
-        throws IOException
-    {
-        String serviceURI = "service/local/data_index?cn=" + classname;
-
-        return RequestFacade.doGetRequest( serviceURI );
-    }
-
-    public static List<NexusArtifact> searchFor( String groupId, String artifactId, String version )
-        throws Exception
-    {
-        return searchFor( groupId, artifactId, version, null );
-    }
-
-    public static List<NexusArtifact> searchFor( String groupId, String artifactId, String version, String repositoryId )
-        throws Exception
-    {
-        Map<String, String> args = new HashMap<String, String>();
-        args.put( "g", groupId );
-        args.put( "a", artifactId );
-        args.put( "v", version );
-
-        return searchFor( args, repositoryId );
-    }
-
-    public static List<NexusArtifact> searchFor( Gav gav, String repositoryId )
-        throws Exception
-    {
-        return searchFor( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), repositoryId );
     }
 
 }

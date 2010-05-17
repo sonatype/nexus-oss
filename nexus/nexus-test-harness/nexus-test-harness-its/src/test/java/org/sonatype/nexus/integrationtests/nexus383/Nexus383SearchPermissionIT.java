@@ -21,7 +21,6 @@ import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 /**
  * Test the privilege for search operations.
@@ -29,13 +28,6 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public class Nexus383SearchPermissionIT
     extends AbstractPrivilegeTest
 {
-    protected SearchMessageUtil messageUtil;
-
-    public Nexus383SearchPermissionIT()
-    {
-        this.messageUtil = new SearchMessageUtil();
-    }
-
     @Test
     public void withPermission()
         throws Exception
@@ -52,7 +44,7 @@ public class Nexus383SearchPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // Should be able to find artifacts
-        List<NexusArtifact> results = messageUtil.searchFor( "nexus383" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "nexus383" );
         Assert.assertEquals( 2, results.size() );
     }
 
@@ -72,7 +64,7 @@ public class Nexus383SearchPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
 
         // NOT Should be able to find artifacts
-        Status status = messageUtil.doSearchFor( "nexus383" ).getStatus();
+        Status status = getSearchMessageUtil().searchFor_response( "nexus383" ).getStatus();
         Assert.assertEquals( 401, status.getCode() );
 
     }

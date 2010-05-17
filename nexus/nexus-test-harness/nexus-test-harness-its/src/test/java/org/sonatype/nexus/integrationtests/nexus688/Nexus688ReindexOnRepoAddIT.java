@@ -38,15 +38,18 @@ public class Nexus688ReindexOnRepoAddIT
 {
     private RepositoryMessageUtil messageUtil;
 
-    private static final String OLD_INDEX_FILE = ".index/nexus-maven-repository-index.zip";
+    // Indexer stopped publishing "old" index for good
+    // private static final String OLD_INDEX_FILE = ".index/nexus-maven-repository-index.zip";
     private static final String NEW_INDEX_FILE = ".index/nexus-maven-repository-index.gz";
+
     private static final String INDEX_PROPERTIES = ".index/nexus-maven-repository-index.properties";
 
     public Nexus688ReindexOnRepoAddIT()
         throws ComponentLookupException
     {
         messageUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
+                getRepositoryTypeRegistry() );
     }
 
     @Test
@@ -73,8 +76,8 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
-        
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+
         this.downloadIndexFromRepository( resource.getId(), true );
     }
 
@@ -102,7 +105,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         this.downloadIndexFromRepository( resource.getId(), false );
     }
@@ -135,7 +138,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -168,7 +171,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -201,7 +204,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop(ReindexTask.class);
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         this.downloadIndexFromRepository( resource.getId(), false );
     }
@@ -211,25 +214,28 @@ public class Nexus688ReindexOnRepoAddIT
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
         
-        URL url = new URL( repositoryUrl + OLD_INDEX_FILE );        
-        downloadFromRepository( url, "target/downloads/index.zip", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + OLD_INDEX_FILE + ".sha1" );        
-        downloadFromRepository( url, "target/downloads/index.zip.sha1", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + OLD_INDEX_FILE + ".md5" );        
-        downloadFromRepository( url, "target/downloads/index.zip.md5", repoId, shouldSucceed );
-        
-        url = new URL( repositoryUrl + NEW_INDEX_FILE );        
+        URL url = null;
+
+        // nexus does not publish old indexes anymore
+        // URL url = new URL( repositoryUrl + OLD_INDEX_FILE );
+        // downloadFromRepository( url, "target/downloads/index.zip", repoId, shouldSucceed );
+        // url = new URL( repositoryUrl + OLD_INDEX_FILE + ".sha1" );
+        // downloadFromRepository( url, "target/downloads/index.zip.sha1", repoId, shouldSucceed );
+        // url = new URL( repositoryUrl + OLD_INDEX_FILE + ".md5" );
+        // downloadFromRepository( url, "target/downloads/index.zip.md5", repoId, shouldSucceed );
+
+        url = new URL( repositoryUrl + NEW_INDEX_FILE );
         downloadFromRepository( url, "target/downloads/index.gz", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".sha1" );        
+        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".sha1" );
         downloadFromRepository( url, "target/downloads/index.gz.sha1", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".md5" );        
+        url = new URL( repositoryUrl + NEW_INDEX_FILE + ".md5" );
         downloadFromRepository( url, "target/downloads/index.gz.md5", repoId, shouldSucceed );
-        
-        url = new URL( repositoryUrl + INDEX_PROPERTIES );        
+
+        url = new URL( repositoryUrl + INDEX_PROPERTIES );
         downloadFromRepository( url, "target/downloads/index.properties", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".sha1" );        
+        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".sha1" );
         downloadFromRepository( url, "target/downloads/index.properties.sha1", repoId, shouldSucceed );
-        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".md5" );        
+        url = new URL( repositoryUrl + INDEX_PROPERTIES + ".md5" );
         downloadFromRepository( url, "target/downloads/index.properties.md5", repoId, shouldSucceed );
     }
 
@@ -251,7 +257,7 @@ public class Nexus688ReindexOnRepoAddIT
                 Assert.fail( e.getMessage() + "\n Found files:\n"
                     + Arrays.toString( new File( nexusWorkDir, "storage/" + repoId + "/.index" ).listFiles() ) );
             }
-        }    
+        }
     }
 
 }

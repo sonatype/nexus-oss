@@ -17,24 +17,15 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public class Nexus3233IndexPomSha1IT
     extends AbstractNexusIntegrationTest
 {
-    protected SearchMessageUtil messageUtil;
-
-    public Nexus3233IndexPomSha1IT()
-    {
-        this.messageUtil = new SearchMessageUtil();
-    }
-
     @Test
     public void wagonDeploy()
         throws Exception
@@ -115,7 +106,7 @@ public class Nexus3233IndexPomSha1IT
     private void doSearch( String sha1, String msg )
         throws Exception
     {
-        NexusArtifact result = messageUtil.searchForSHA1( sha1 );
+        NexusArtifact result = getSearchMessageUtil().identify( sha1 );
         Assert.assertNotNull( "Pom with " + sha1 + " not found " + msg, result );
     }
 }

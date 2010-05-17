@@ -20,7 +20,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 /**
  * Test class name search functionality.
@@ -30,7 +29,7 @@ public class Nexus598ClassnameSearchIT
 {
     public Nexus598ClassnameSearchIT()
     {
-//        TestContainer.getInstance().getTestContext().setSecureTest( true );
+        // TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -38,7 +37,8 @@ public class Nexus598ClassnameSearchIT
         throws Exception
     {
         List<NexusArtifact> artifacts =
-            SearchMessageUtil.searchClassname( "org.sonatype.nexus.test.classnamesearch.ClassnameSearchTestHelper" );
+            getSearchMessageUtil().searchForClassname(
+                "org.sonatype.nexus.test.classnamesearch.ClassnameSearchTestHelper" );
         Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
     }
 
@@ -46,7 +46,7 @@ public class Nexus598ClassnameSearchIT
     public void unqualifiedSearchDeployedArtifact()
         throws Exception
     {
-        List<NexusArtifact> artifacts = SearchMessageUtil.searchClassname( "ClassnameSearchTestHelper" );
+        List<NexusArtifact> artifacts = getSearchMessageUtil().searchForClassname( "ClassnameSearchTestHelper" );
         Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
     }
 
@@ -54,8 +54,15 @@ public class Nexus598ClassnameSearchIT
     public void searchUnexistentClass()
         throws Exception
     {
-        List<NexusArtifact> artifacts =
-            SearchMessageUtil.searchClassname( "I.hope.this.class.name.is.not.available.at.nexus.repo.for.test.issue.Nexus598" );
+        // This test is meaningless, since it does use tokens that appear in other class ("class", "nexus", "test"), so
+        // Index
+        // _will_ return it
+        // Fixed by removing the two problematic token, but this still makes this test meaningless and very UNSTABLE
+        // List<NexusArtifact> artifacts =
+        // SearchMessageUtil.searchForClassname(
+        // "I.hope.this.class.name.is.not.available.at.nexus.repo.for.test.issue.Nexus598" );
+
+        List<NexusArtifact> artifacts = getSearchMessageUtil().searchForClassname( "I.hope.this.name.is.not.available" );
         Assert.assertTrue( "The search found something, but it shouldn't.", artifacts.isEmpty() );
     }
 

@@ -17,7 +17,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -28,9 +27,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus2923SearchResultDownloadLinkIT
     extends AbstractNexusIntegrationTest
 {
-    private SearchMessageUtil messageUtil = new SearchMessageUtil();
-
-    public Nexus2923SearchResultDownloadLinkIT()
+     public Nexus2923SearchResultDownloadLinkIT()
     {
         super( "nexus2923" );
     }
@@ -56,7 +53,7 @@ public class Nexus2923SearchResultDownloadLinkIT
     public void testDownnloadLinks()
         throws Exception
     {
-        List<NexusArtifact> artifacts = messageUtil.searchFor( "xbean-server" );
+        List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "xbean-server" );
         Assert.assertEquals( "The artifact should be indexed", 3, artifacts.size() );
 
         for ( NexusArtifact artifact : artifacts )

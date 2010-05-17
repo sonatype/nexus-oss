@@ -64,6 +64,7 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
@@ -143,6 +144,18 @@ public abstract class AbstractNexusIntegrationTest
 
     // == instance utils
 
+    private static NexusStatusUtil nexusStatusUtil;
+
+    public static NexusStatusUtil getNexusStatusUtil()
+    {
+        if ( nexusStatusUtil == null )
+        {
+            nexusStatusUtil = new NexusStatusUtil();
+        }
+
+        return nexusStatusUtil;
+    }
+
     private NexusConfigUtil nexusConfigUtil;
 
     public NexusConfigUtil getNexusConfigUtil()
@@ -167,18 +180,6 @@ public abstract class AbstractNexusIntegrationTest
         return securityConfigUtil;
     }
 
-    private static NexusStatusUtil nexusStatusUtil;
-
-    public static NexusStatusUtil getNexusStatusUtil()
-    {
-        if ( nexusStatusUtil == null )
-        {
-            nexusStatusUtil = new NexusStatusUtil();
-        }
-
-        return nexusStatusUtil;
-    }
-
     private DeployUtils deployUtils;
 
     public DeployUtils getDeployUtils()
@@ -189,6 +190,18 @@ public abstract class AbstractNexusIntegrationTest
         }
 
         return deployUtils;
+    }
+
+    private SearchMessageUtil searchMessageUtil;
+
+    public SearchMessageUtil getSearchMessageUtil()
+    {
+        if ( searchMessageUtil == null )
+        {
+            searchMessageUtil = new SearchMessageUtil( this );
+        }
+
+        return searchMessageUtil;
     }
 
     // == Constructors

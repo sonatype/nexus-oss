@@ -20,7 +20,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 /**
  * Searches for artifact that has a '.' and a '-' in the artifact name.
@@ -28,29 +27,12 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 public class Nexus384DotAndDashSearchIT
     extends AbstractNexusIntegrationTest
 {
-
-    protected SearchMessageUtil messageUtil;
-
-    public Nexus384DotAndDashSearchIT()
-    {
-        this.messageUtil = new SearchMessageUtil();
-
-        // if( printKnownErrorButDoNotFail( Nexus384DotAndDashSearchTest.class, "searchDash", "searchDot",
-        // "searchDashAndDot",
-        // "searchGroupDashed", "searchGroupDoted", "searchGroupdDashedAndDoted",
-        // "searchMixed", "searchMixedNexus83" ))
-        // {
-        // return;
-        // }
-
-    }
-
     @Test
     public void searchAll()
         throws Exception
     {
         // groupId
-        List<NexusArtifact> results = messageUtil.searchFor( "nexus384" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "nexus384" );
         Assert.assertEquals( 9, results.size() );
     }
 
@@ -65,7 +47,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dash" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dash" );
         Assert.assertEquals( 5, results.size() );
     }
 
@@ -79,7 +61,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dot" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dot" );
         Assert.assertEquals( 5, results.size() );
     }
 
@@ -93,7 +75,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dot dash" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dot dash" );
         Assert.assertEquals( 3, results.size() );
     } // look on groupId
 
@@ -107,7 +89,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dashed" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dashed" );
         Assert.assertEquals( 2, results.size() );
     }
 
@@ -121,7 +103,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "doted" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "doted" );
         Assert.assertEquals( 2, results.size() );
     }
 
@@ -130,8 +112,8 @@ public class Nexus384DotAndDashSearchIT
         throws Exception
     { // both
         
-        List<NexusArtifact> results = messageUtil.searchFor( "dashed.doted" );
-        Assert.assertEquals( 1, results.size() );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dashed.doted" );
+        Assert.assertEquals( 4, results.size() );
     }
 
     @Test
@@ -144,7 +126,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "mixed" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "mixed" );
         Assert.assertEquals( 2, results.size() );
     }
 
@@ -158,7 +140,7 @@ public class Nexus384DotAndDashSearchIT
             return;
         }
         
-        List<NexusArtifact> results = messageUtil.searchFor( "mixed-" );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( "mixed-" );
         Assert.assertEquals( 2, results.size() );
     }
 

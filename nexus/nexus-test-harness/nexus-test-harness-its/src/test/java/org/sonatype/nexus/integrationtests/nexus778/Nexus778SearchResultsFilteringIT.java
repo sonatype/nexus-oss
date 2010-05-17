@@ -28,7 +28,6 @@ import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
@@ -40,14 +39,6 @@ import org.sonatype.security.rest.model.UserResource;
 public class Nexus778SearchResultsFilteringIT
     extends AbstractPrivilegeTest
 {
-
-    protected SearchMessageUtil searchUtil;
-
-    public Nexus778SearchResultsFilteringIT()
-    {
-        this.searchUtil = new SearchMessageUtil();
-    }
-
     @Test
     public void simpleSearch()
         throws Exception
@@ -135,7 +126,7 @@ public class Nexus778SearchResultsFilteringIT
         args.put( "a", artifactId );
         args.put( "g", "nexus778" );
 
-        List<NexusArtifact> results = searchUtil.searchFor( args );
+        List<NexusArtifact> results = getSearchMessageUtil().searchFor( args );
         return results;
     }
 

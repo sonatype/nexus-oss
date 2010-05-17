@@ -17,7 +17,6 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 
 public class Nexus2556BrandNewRepositorySearchIT
@@ -64,10 +63,10 @@ public class Nexus2556BrandNewRepositorySearchIT
         Gav gav = GavUtil.newGav( "nexus2556", "artifact", "1.0" );
         getDeployUtils().deployUsingGavWithRest( repoId, gav, getTestFile( "artifact.jar" ) );
 
-        List<NexusArtifact> result = SearchMessageUtil.searchFor( gav, repoId );
+        List<NexusArtifact> result = getSearchMessageUtil().searchForGav( gav, repoId );
         Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );
 
-        result = SearchMessageUtil.searchFor( Collections.singletonMap( "q", "nexus2556" ), repoId );
+        result = getSearchMessageUtil().searchFor( Collections.singletonMap( "q", "nexus2556" ), repoId );
         Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );
     }
 

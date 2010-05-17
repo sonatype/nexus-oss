@@ -28,7 +28,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractNexus1923
@@ -37,8 +36,6 @@ public abstract class AbstractNexus1923
     protected RepositoryMessageUtil repoUtils;
 
     protected GroupMessageUtil groupUtils;
-
-    protected SearchMessageUtil searchUtils;
 
     protected static final String HOSTED_REPO_ID = "incremental_repo";
 
@@ -74,10 +71,9 @@ public abstract class AbstractNexus1923
         super();
 
         this.repoUtils =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
+                getRepositoryTypeRegistry() );
         this.groupUtils = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-
-        this.searchUtils = new SearchMessageUtil();
     }
 
     private RepositoryResource createRepository()
@@ -124,7 +120,7 @@ public abstract class AbstractNexus1923
         resource.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
         resource.setDownloadRemoteIndexes( true );
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
-        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID +"/" );
+        remoteStorage.setRemoteStorageUrl( getBaseNexusUrl() + "content/repositories/" + HOSTED_REPO_ID + "/" );
         resource.setRemoteStorage( remoteStorage );
         resource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         resource.setChecksumPolicy( ChecksumPolicy.IGNORE.name() );
@@ -499,7 +495,7 @@ public abstract class AbstractNexus1923
         else
         {
             Assert.assertEquals( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ),
-                                 Integer.toString( current ) );
+                Integer.toString( current ) );
         }
     }
 
@@ -559,7 +555,7 @@ public abstract class AbstractNexus1923
             args.put( "a", "commons-io" );
         }
 
-        List<NexusArtifact> artifacts = SearchMessageUtil.searchFor( args, repositoryId );
+        List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( args, repositoryId );
 
         Assert.assertEquals( artifacts.size() > 0, shouldFind );
     }

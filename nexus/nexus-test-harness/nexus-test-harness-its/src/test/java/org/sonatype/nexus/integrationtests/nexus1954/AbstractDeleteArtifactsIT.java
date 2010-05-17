@@ -18,7 +18,6 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.GavUtil;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractDeleteArtifactsIT
@@ -67,44 +66,44 @@ public abstract class AbstractDeleteArtifactsIT
         throws Exception
     {
         updateIndexes();
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
 
         getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, artifact1v2, artifact );
         getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_REPO, GavUtil.newGav( "nexus1954", "artifact2", "1.0" ),
                                             artifact );
 
         updateIndexes();
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
 
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
 
         deleteArtifact( artifact1v2 );
 
         updateIndexes();
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
 
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
 
         deleteArtifact( artifact1v1 );
         deleteArtifact( artifact2v1 );
 
         updateIndexes();
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_REPO ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_REPO ).size() );
 
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
-        Assert.assertEquals( 0, SearchMessageUtil.searchFor( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v1, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact1v2, REPO_TEST_HARNESS_PROXY ).size() );
+        Assert.assertEquals( 0, getSearchMessageUtil().searchForGav( artifact2v1, REPO_TEST_HARNESS_PROXY ).size() );
     }
 
     private void deleteArtifact( Gav gav )
@@ -167,7 +166,7 @@ public abstract class AbstractDeleteArtifactsIT
         p.load( input );
         input.close();
 
-        return df.parse( p.getProperty( "nexus.index.time" ) ).getTime();
+        return df.parse( p.getProperty( IndexingContext.INDEX_TIMESTAMP ) ).getTime();
     }
 
 }
