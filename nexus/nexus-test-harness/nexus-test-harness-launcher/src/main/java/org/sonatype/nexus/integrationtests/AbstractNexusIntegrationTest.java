@@ -80,6 +80,8 @@ import com.thoughtworks.xstream.XStream;
 // @RunWith(ConsoleLoggingRunner.class)
 public abstract class AbstractNexusIntegrationTest
 {
+    public static final String REPO_NEXUS_TEST_HARNESS_RELEASE_GROUP = "nexus-test-harness-release-group";
+
     public static final String REPO_TEST_HARNESS_REPO = "nexus-test-harness-repo";
 
     public static final String REPO_TEST_HARNESS_REPO2 = "nexus-test-harness-repo2";
@@ -107,6 +109,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * @deprecated Use nexusBaseUrl instead!
      */
+    @Deprecated
     public static final String baseNexusUrl;
 
     public static final String nexusWorkDir;
