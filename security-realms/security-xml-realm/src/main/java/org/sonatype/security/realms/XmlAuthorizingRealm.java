@@ -12,11 +12,7 @@
  */
 package org.sonatype.security.realms;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -24,26 +20,15 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.credential.Sha1CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.usermanagement.RoleIdentifier;
-import org.sonatype.security.usermanagement.User;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 @Component( role = Realm.class, hint = XmlAuthorizingRealm.ROLE, description = "Xml Authorizing Realm" )
@@ -55,11 +40,6 @@ public class XmlAuthorizingRealm
     
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
-
-    @Requirement
-    private PlexusContainer container;
-
-    private SecuritySystem securitySystem;
 
     @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
@@ -96,121 +76,25 @@ public class XmlAuthorizingRealm
             throw new AuthorizationException( "Cannot authorize with no principals." );
         }
 
-        String username = (String) principals.iterator().next();
-
-        User user;
+        //TODO: We should check where this principal came from and only load the roles for it
+        String username = principals.getPrimaryPrincipal().toString();
+        SecurityUser user;
         try
         {
-            // https://issues.apache.org/jira/browse/KI-77 work around
-
-            user = this.getSecuritySystem().getUser( username );
+            user = this.configuration.readUser( username );
         }
         catch ( UserNotFoundException e )
         {
-            throw new AuthorizationException( "User '" + username + "' cannot be retrieved.", e );
+            throw new AuthorizationException( "User for principals: "+  principals.getPrimaryPrincipal() + " could not be found.", e );
         }
-        catch ( ComponentLookupException e )
-        {
-            throw new AuthorizationException( "Unable to lookup user in SecuritySystem", e );
-        }
-
-        // FIXME: This should use the RoleResolver, its to late in the release cycle to change it now,
-        // but it will be something simple like:
-        //
-        // for( String permission : roleResolver.resolvePermissions( user.getRoles() )
-        // {
-        // permissions.add( new WildcardPermission( permission );
-        // }
-        //
-
-        LinkedList<String> rolesToProcess = new LinkedList<String>();
-        Set<RoleIdentifier> roles = user.getRoles();
-
-        if ( roles != null )
-        {
-            for ( RoleIdentifier role : roles )
-            {
-                if ( role != null && StringUtils.isNotEmpty( role.getRoleId() ) )
-                {
-                    rolesToProcess.add( role.getRoleId() );
-                }
-            }
-        }
-
-        Set<String> roleIds = new LinkedHashSet<String>();
-        Set<Permission> permissions = new LinkedHashSet<Permission>();
-        while ( !rolesToProcess.isEmpty() )
-        {
-            String roleId = rolesToProcess.removeFirst();
-            if ( !roleIds.contains( roleId ) )
-            {
-                CRole role;
-                try
-                {
-                    role = configuration.readRole( roleId );
-                    roleIds.add( roleId );
-
-                    // process the roles this role has
-                    rolesToProcess.addAll( role.getRoles() );
-
-                    // add the permissions this role has
-                    List<String> privilegeIds = role.getPrivileges();
-                    for ( String privilegeId : privilegeIds )
-                    {
-                        Set<Permission> set = getPermissions( privilegeId );
-                        permissions.addAll( set );
-                    }
-                }
-                catch ( NoSuchRoleException e )
-                {
-                    // skip
-                }
-            }
-        }
-
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roleIds );
-        info.setObjectPermissions( permissions );
+        
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( user.getRoles() );
 
         return info;
-    }
-
-    protected Set<Permission> getPermissions( String privilegeId )
-    {
-        try
-        {
-            CPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
-
-            for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
-            {
-                String permission = descriptor.buildPermission( privilege );
-
-                if ( permission != null )
-                {
-                    return Collections.singleton( (Permission) new WildcardPermission( permission ) );
-                }
-            }
-
-            return Collections.emptySet();
-        }
-        catch ( NoSuchPrivilegeException e )
-        {
-            return Collections.emptySet();
-        }
     }
 
     protected ConfigurationManager getConfigurationManager()
     {
         return configuration;
     }
-
-    private SecuritySystem getSecuritySystem()
-        throws ComponentLookupException
-    {
-        if ( securitySystem == null )
-        {
-            this.securitySystem = container.lookup( SecuritySystem.class );
-        }
-        return securitySystem;
-    }
-
 }

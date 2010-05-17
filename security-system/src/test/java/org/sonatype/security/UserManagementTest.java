@@ -7,7 +7,6 @@ import java.util.Set;
 import junit.framework.Assert;
 
 import org.sonatype.security.usermanagement.User;
-import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class UserManagementTest

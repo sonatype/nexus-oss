@@ -26,7 +26,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.security.SecuritySystem;
 
 /**
- * Extension of JSecurityFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise
+ * Extension of ShiroFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise
  * it fallbacks to the standard stuff from JSecurityFilter.
  * 
  * @author cstamas

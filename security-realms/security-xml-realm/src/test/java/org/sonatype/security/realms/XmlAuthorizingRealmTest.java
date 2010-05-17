@@ -18,6 +18,7 @@ import java.util.Collection;
 import junit.framework.Assert;
 
 import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -63,6 +64,7 @@ public class XmlAuthorizingRealmTest
         super.setUp();
         
         realm = ( XmlAuthorizingRealm ) lookup( Realm.class, "XmlAuthorizingRealm" );
+        realm.setRolePermissionResolver( this.lookup( RolePermissionResolver.class) );
         
         configurationManager = ( DefaultConfigurationManager ) lookup( ConfigurationManager.class );
         

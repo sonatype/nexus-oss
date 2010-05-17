@@ -12,6 +12,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;

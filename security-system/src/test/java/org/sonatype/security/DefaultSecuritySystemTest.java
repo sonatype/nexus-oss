@@ -6,7 +6,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
@@ -28,10 +27,7 @@ public class DefaultSecuritySystemTest
     {
 
         SecuritySystem securitySystem = this.getSecuritySystem();
-        
-        // bind to a servlet request/response
-//        this.setupLoginContext( "test" );
-        
+                
         // login
         UsernamePasswordToken token = new UsernamePasswordToken( "jcoder", "jcoder" );
         Subject subject = securitySystem.login( token );

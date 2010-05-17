@@ -46,12 +46,6 @@ public class URLRealmTest
         URLRealm urlRealm = (URLRealm) this.lookup( Realm.class, "url" );
         urlRealm.setAuthenticationURL( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
 
-        // now set the cache
-        // PlexusEhCacheWrapper cacheWrapper = (PlexusEhCacheWrapper) this.lookup( PlexusEhCacheWrapper.class );
-        // EhCacheManager ehCacheManager = new EhCacheManager();
-        // ehCacheManager.setCacheManager( cacheWrapper.getEhCacheManager() );
-        // urlRealm.setCacheManager( ehCacheManager );
-
         return urlRealm;
     }
 

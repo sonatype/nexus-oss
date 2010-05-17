@@ -22,7 +22,7 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.realm.SimpleAccountRealm;
 import org.sonatype.security.SecuritySystem;
 
-public class WebPlexusSecurityTest
+public class WebRealmSecurityTest
     extends AbstractWebSecurityTest
 {
 
