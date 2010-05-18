@@ -25,7 +25,7 @@ import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-public class SecurityXmlPlexusUserLocatorTest
+public class SecurityXmlUserLocatorTest
     extends PlexusTestCase
 {
 

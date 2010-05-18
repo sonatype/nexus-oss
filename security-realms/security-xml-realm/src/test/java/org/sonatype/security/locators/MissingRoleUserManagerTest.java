@@ -23,7 +23,7 @@ import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 
-public class MissingRolePlexusUserManagerTest
+public class MissingRoleUserManagerTest
     extends AbstractSecurityTestCase
 {
 

@@ -17,7 +17,7 @@ import junit.framework.Assert;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.security.authorization.Role;
 
-public class PlexusRoleTest
+public class RoleTest
     extends PlexusTestCase
 {
 
