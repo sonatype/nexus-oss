@@ -389,7 +389,11 @@ public interface NexusIndexer
     ArtifactInfo identify( File artifact )
         throws IOException;
 
+    @Deprecated
     ArtifactInfo identify( String field, String query )
+        throws IOException;
+
+    ArtifactInfo identify( Field field, String query )
         throws IOException;
 
     ArtifactInfo identify( Query query )

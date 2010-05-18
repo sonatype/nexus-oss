@@ -400,7 +400,7 @@ public class NexusIndexerTest
 
         // Search using SHA1 to find qdox 1.5
 
-        ArtifactInfo ai = nexus.identify( ArtifactInfo.SHA1, "4d2db265eddf1576cb9d896abc90c7ba46b48d87" );
+        ArtifactInfo ai = nexus.identify( MAVEN.SHA1, "4d2db265eddf1576cb9d896abc90c7ba46b48d87" );
 
         assertNotNull( ai );
 

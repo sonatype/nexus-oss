@@ -77,7 +77,7 @@ public class DefaultNexusIndexer
     {
         IndexingContext context =
             new DefaultIndexingContext( id, repositoryId, repository, indexDirectory, repositoryUrl, indexUpdateUrl,
-                                        indexers, false );
+                indexers, false );
 
         indexingContexts.put( context.getId(), context );
 
@@ -95,7 +95,7 @@ public class DefaultNexusIndexer
         {
             context =
                 new DefaultIndexingContext( id, repositoryId, repository, indexDirectory, repositoryUrl,
-                                            indexUpdateUrl, indexers, true );
+                    indexUpdateUrl, indexers, true );
 
             indexingContexts.put( context.getId(), context );
         }
@@ -115,7 +115,7 @@ public class DefaultNexusIndexer
     {
         IndexingContext context =
             new DefaultIndexingContext( id, repositoryId, repository, indexDirectory, repositoryUrl, indexUpdateUrl,
-                                        indexers, reclaimIndexOwnership );
+                indexers, reclaimIndexOwnership );
 
         indexingContexts.put( context.getId(), context );
 
@@ -129,7 +129,7 @@ public class DefaultNexusIndexer
     {
         IndexingContext context =
             new DefaultIndexingContext( id, repositoryId, repository, directory, repositoryUrl, indexUpdateUrl,
-                                        indexers, false );
+                indexers, false );
 
         indexingContexts.put( context.getId(), context );
 
@@ -147,7 +147,7 @@ public class DefaultNexusIndexer
         {
             context =
                 new DefaultIndexingContext( id, repositoryId, repository, directory, repositoryUrl, indexUpdateUrl,
-                                            indexers, true );
+                    indexers, true );
 
             indexingContexts.put( context.getId(), context );
         }
@@ -167,7 +167,7 @@ public class DefaultNexusIndexer
     {
         IndexingContext context =
             new DefaultIndexingContext( id, repositoryId, repository, directory, repositoryUrl, indexUpdateUrl,
-                                        indexers, reclaimIndexOwnership );
+                indexers, reclaimIndexOwnership );
 
         indexingContexts.put( context.getId(), context );
 
@@ -255,17 +255,16 @@ public class DefaultNexusIndexer
             }
 
             tmpContext = new DefaultIndexingContext( context.getId() + "-tmp", //
-                                                     context.getRepositoryId(), //
-                                                     context.getRepository(), //
-                                                     directory, //
-                                                     context.getRepositoryUrl(), //
-                                                     context.getIndexUpdateUrl(), //
-                                                     context.getIndexCreators(), //
-                                                     true );
+                context.getRepositoryId(), //
+                context.getRepository(), //
+                directory, //
+                context.getRepositoryUrl(), //
+                context.getIndexUpdateUrl(), //
+                context.getIndexCreators(), //
+                true );
 
-            scanner
-                .scan( new ScanningRequest( tmpContext, //
-                                            new DefaultScannerListener( tmpContext, indexerEngine, update, listener ) ) );
+            scanner.scan( new ScanningRequest( tmpContext, //
+                new DefaultScannerListener( tmpContext, indexerEngine, update, listener ) ) );
 
             tmpContext.updateTimestamp( true );
             context.replace( tmpContext.getIndexDirectory() );
@@ -510,7 +509,7 @@ public class DefaultNexusIndexer
 
             // String sha1 = new Sha1Digester().calc( artifact );
 
-            return identify( ArtifactInfo.SHA1, encode( digest ) );
+            return identify( MAVEN.SHA1, encode( digest ) );
         }
         catch ( NoSuchAlgorithmException ex )
         {
@@ -538,10 +537,17 @@ public class DefaultNexusIndexer
         return new String( buff );
     }
 
+    @Deprecated
     public ArtifactInfo identify( String field, String query )
         throws IOException
     {
         return identify( new TermQuery( new Term( field, query ) ) );
+    }
+
+    public ArtifactInfo identify( Field field, String query )
+        throws IOException
+    {
+        return identify( queryCreator.constructQuery( field, query, SearchType.EXACT ) );
     }
 
     public ArtifactInfo identify( Query query )
@@ -559,6 +565,7 @@ public class DefaultNexusIndexer
         {
             return result.getResults().next();
         }
+
         return null;
     }
 
