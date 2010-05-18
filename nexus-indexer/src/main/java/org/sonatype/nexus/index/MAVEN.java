@@ -14,7 +14,7 @@ public interface MAVEN
 
     public static final Field GROUP_ID = new Field( null, MAVEN_NAMESPACE, "groupId", "Artifact Group ID." );
 
-    public static final Field ARTIFACT_ID = new Field( null, MAVEN_NAMESPACE, "artifactId", "Artifact Group ID." );
+    public static final Field ARTIFACT_ID = new Field( null, MAVEN_NAMESPACE, "artifactId", "Artifact ID." );
 
     public static final Field VERSION = new Field( null, MAVEN_NAMESPACE, "version", "Artifact Version ID." );
 

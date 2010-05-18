@@ -8,7 +8,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
 
 public class AbstractSearchRequest
 {
-    public static int UNDEFINED = -1;
+    public static final int UNDEFINED = -1;
 
     private Query query;
 
@@ -38,6 +38,11 @@ public class AbstractSearchRequest
      * The postprocessor to apply to hits while returning the,
      */
     private ArtifactInfoPostprocessor artifactInfoPostprocessor;
+
+    /**
+     * The highlighting requests, if any.
+     */
+    private List<MatchHighlightRequest> matchHighlightRequests;
 
     public AbstractSearchRequest( Query query )
     {
@@ -150,5 +155,20 @@ public class AbstractSearchRequest
     public void setArtifactInfoPostprocessor( ArtifactInfoPostprocessor artifactInfoPostprocessor )
     {
         this.artifactInfoPostprocessor = artifactInfoPostprocessor;
+    }
+
+    public List<MatchHighlightRequest> getMatchHighlightRequests()
+    {
+        if ( matchHighlightRequests == null )
+        {
+            matchHighlightRequests = new ArrayList<MatchHighlightRequest>();
+        }
+
+        return matchHighlightRequests;
+    }
+
+    public void setMatchHighlightRequests( List<MatchHighlightRequest> matchHighlightRequests )
+    {
+        this.matchHighlightRequests = matchHighlightRequests;
     }
 }

@@ -181,6 +181,13 @@
           <required>false</required>
           <description>URL that would give you the artifact file.</description>
         </field>
+        <field>
+          <name>highlightedFragment</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>A HTML highlighted fragment of the matched hit.</description>
+        </field>
       </fields>
     </class>
   </classes>

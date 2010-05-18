@@ -3,6 +3,7 @@ package org.sonatype.nexus.index;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.apache.lucene.document.Field.TermVector;
 
 /**
  * Holds basic information about Indexer field, how it is stored. To keep this centralized, and not spread across code.
@@ -22,8 +23,17 @@ public class IndexerField
 
     private final Index indexMethod;
 
+    private final TermVector termVector;
+
     public IndexerField( final org.sonatype.nexus.index.Field ontology, final IndexerFieldVersion version,
                          final String key, final String description, final Store storeMethod, final Index indexMethod )
+    {
+        this( ontology, version, key, description, storeMethod, indexMethod, null );
+    }
+
+    public IndexerField( final org.sonatype.nexus.index.Field ontology, final IndexerFieldVersion version,
+                         final String key, final String description, final Store storeMethod, final Index indexMethod,
+                         final TermVector termVector )
     {
         this.ontology = ontology;
 
@@ -34,6 +44,8 @@ public class IndexerField
         this.storeMethod = storeMethod;
 
         this.indexMethod = indexMethod;
+
+        this.termVector = termVector;
 
         ontology.addIndexerField( this );
     }
@@ -63,6 +75,11 @@ public class IndexerField
         return indexMethod;
     }
 
+    public Field.TermVector getTermVector()
+    {
+        return termVector;
+    }
+
     public boolean isIndexed()
     {
         return !Index.NO.equals( indexMethod );
@@ -75,11 +92,18 @@ public class IndexerField
 
     public boolean isStored()
     {
-        return !Store.NO.equals( storeMethod );
+        return !(Store.NO.equals( storeMethod ));
     }
 
     public Field toField( String value )
     {
-        return new Field( getKey(), value, getStoreMethod(), getIndexMethod() );
+        if ( getTermVector() != null )
+        {
+            return new Field( getKey(), value, getStoreMethod(), getIndexMethod(), getTermVector() );
+        }
+        else
+        {
+            return new Field( getKey(), value, getStoreMethod(), getIndexMethod() );
+        }
     }
 }

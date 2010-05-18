@@ -2143,6 +2143,9 @@ public class DefaultIndexerManager
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
 
+            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
+            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
+
             if ( repositoryId != null )
             {
                 req.getContexts().add( localContext );
@@ -2209,6 +2212,8 @@ public class DefaultIndexerManager
             Query q = createQuery( MAVEN.CLASSNAMES, term, searchType );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
+            
+            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.CLASSNAMES, q, MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
             {

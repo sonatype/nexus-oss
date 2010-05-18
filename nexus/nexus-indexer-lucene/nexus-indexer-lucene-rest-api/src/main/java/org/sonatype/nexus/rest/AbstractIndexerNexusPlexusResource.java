@@ -11,6 +11,7 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IteratorResultSet;
+import org.sonatype.nexus.index.MatchHighlight;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -108,6 +109,19 @@ public abstract class AbstractIndexerNexusPlexusResource
         a.setRepoId( ai.repository );
 
         a.setContextId( ai.context );
+
+        if ( ai.getMatchHighlights().size() > 0 )
+        {
+            StringBuilder sb = new StringBuilder();
+
+            for ( MatchHighlight mh : ai.getMatchHighlights() )
+            {
+                sb.append( "<P>" ).append( mh.getField().getDescription() ).append( "<BR/>" ).append(
+                    mh.getHighlightedMatch() ).append( "</P>" );
+            }
+
+            a.setHighlightedFragment( sb.toString() );
+        }
 
         if ( ai.repository != null )
         {

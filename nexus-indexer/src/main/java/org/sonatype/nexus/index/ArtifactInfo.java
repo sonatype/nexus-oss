@@ -6,6 +6,7 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -191,6 +192,8 @@ public class ArtifactInfo
 
     private final Map<String, String> attributes = new HashMap<String, String>();
 
+    private final List<MatchHighlight> matchHighlights = new ArrayList<MatchHighlight>();
+
     public ArtifactInfo()
     {
     }
@@ -218,12 +221,12 @@ public class ArtifactInfo
         if ( uinfo == null )
         {
             uinfo = new StringBuilder() //
-                .append( groupId ).append( FS ) //
-                .append( artifactId ).append( FS ) //
-                .append( version ).append( FS ) //
-                .append( nvl( classifier ) ) //
-                .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
-                .toString(); // extension is stored in the packaging field when classifier is not used
+            .append( groupId ).append( FS ) //
+            .append( artifactId ).append( FS ) //
+            .append( version ).append( FS ) //
+            .append( nvl( classifier ) ) //
+            .append( StringUtils.isEmpty( classifier ) || StringUtils.isEmpty( packaging ) ? "" : FS + packaging ) //
+            .toString(); // extension is stored in the packaging field when classifier is not used
         }
 
         return uinfo;
@@ -243,13 +246,13 @@ public class ArtifactInfo
         throws IllegalArtifactCoordinateException
     {
         return new Gav( groupId, artifactId, version, classifier, fextension, null, // snapshotBuildNumber
-                        null, // snapshotTimeStamp
-                        fname, // name
-                        VersionUtils.isSnapshot( version ), // isSnapshot
-                        false, // hash
-                        null, // hashType
-                        false, // signature
-                        null ); // signatureType
+            null, // snapshotTimeStamp
+            fname, // name
+            VersionUtils.isSnapshot( version ), // isSnapshot
+            false, // hash
+            null, // hashType
+            false, // signature
+            null ); // signatureType
     }
 
     public Map<String, String> getAttributes()
@@ -257,13 +260,18 @@ public class ArtifactInfo
         return attributes;
     }
 
+    public List<MatchHighlight> getMatchHighlights()
+    {
+        return matchHighlights;
+    }
+
     @Override
     public String toString()
     {
         return new StringBuilder( groupId ).append( ':' ).append( artifactId ) //
-            .append( ':' ).append( version ) //
-            .append( ':' ).append( classifier ) //
-            .append( ':' ).append( packaging ).toString();
+        .append( ':' ).append( version ) //
+        .append( ':' ).append( classifier ) //
+        .append( ':' ).append( packaging ).toString();
     }
 
     // ----------------------------------------------------------------------------

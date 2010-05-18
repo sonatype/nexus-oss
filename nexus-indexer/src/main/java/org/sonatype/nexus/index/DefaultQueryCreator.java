@@ -56,6 +56,23 @@ public class DefaultQueryCreator
 
     // ==
 
+    public IndexerField selectIndexerField( final Field field, final SearchType type )
+    {
+        IndexerField lastField = null;
+
+        for ( IndexerField indexerField : field.getIndexerFields() )
+        {
+            lastField = indexerField;
+
+            if ( type.matchesIndexerField( indexerField ) )
+            {
+                return indexerField;
+            }
+        }
+
+        return lastField;
+    }
+
     public Query constructQuery( final Field field, final String query, final SearchType type )
     {
         if ( type == null )
@@ -73,6 +90,7 @@ public class DefaultQueryCreator
         }
     }
 
+    @Deprecated
     public Query constructQuery( String field, String query )
     {
         Query result = null;
@@ -124,33 +142,15 @@ public class DefaultQueryCreator
 
     // ==
 
-    public IndexerField selectIndexerField( final Field field, final SearchType type )
-    {
-        IndexerField lastField = null;
-
-        for ( IndexerField indexerField : field.getIndexerFields() )
-        {
-            lastField = indexerField;
-
-            if ( type.matchesIndexerField( indexerField ) )
-            {
-                return indexerField;
-            }
-        }
-
-        return lastField;
-    }
-
     public Query constructQuery( final Field field, final IndexerField indexerField, final String query,
                                  final SearchType type )
     {
         if ( indexerField == null )
         {
-            getLogger()
-                .warn(
-                    "Querying for field \""
-                        + field.toString()
-                        + "\" without any indexer field was tried. Please review your code, and consider adding this field to index!" );
+            getLogger().warn(
+                "Querying for field \""
+                    + field.toString()
+                    + "\" without any indexer field was tried. Please review your code, and consider adding this field to index!" );
 
             return null;
         }
@@ -177,12 +177,11 @@ public class DefaultQueryCreator
             }
             else if ( !indexerField.isKeyword() && indexerField.isStored() )
             {
-                getLogger()
-                    .warn(
-                        type.toString()
-                            + " type of querying for non-keyword (but stored) field "
-                            + indexerField.getOntology().toString()
-                            + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is currently unsupported." );
+                getLogger().warn(
+                    type.toString()
+                        + " type of querying for non-keyword (but stored) field "
+                        + indexerField.getOntology().toString()
+                        + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is currently unsupported." );
 
                 // will never succeed (unless we supply him "filter" too, but that would kill performance)
                 // and is possible with stored fields only
@@ -190,12 +189,11 @@ public class DefaultQueryCreator
             }
             else
             {
-                getLogger()
-                    .warn(
-                        type.toString()
-                            + " type of querying for non-keyword (and not stored) field "
-                            + indexerField.getOntology().toString()
-                            + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is impossible." );
+                getLogger().warn(
+                    type.toString()
+                        + " type of querying for non-keyword (and not stored) field "
+                        + indexerField.getOntology().toString()
+                        + " was tried. Please review your code, or indexCreator involved, since this type of querying of this field is impossible." );
 
                 // not a keyword indexerField, nor stored. No hope at all. Impossible even with "filtering"
                 return null;

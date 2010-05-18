@@ -22,6 +22,15 @@ public interface QueryCreator
     String ROLE = QueryCreator.class.getName();
 
     /**
+     * Performs a selection of the appropriate IndexerField belonging to proper Field.
+     * 
+     * @param field
+     * @param type
+     * @return
+     */
+    IndexerField selectIndexerField( final Field field, final SearchType type );
+
+    /**
      * Constructs query by parsing the query string, using field as default field. This method should be use to
      * construct queries (single term or phrase queries) against <b>single field</b>.
      * 

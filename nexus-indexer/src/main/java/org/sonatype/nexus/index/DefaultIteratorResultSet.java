@@ -1,11 +1,20 @@
 package org.sonatype.nexus.index;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.lucene.analysis.CachingTokenFilter;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.highlight.Formatter;
+import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.QueryScorer;
+import org.apache.lucene.search.highlight.SimpleFragmenter;
+import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusIndexSearcher;
@@ -30,6 +39,8 @@ public class DefaultIteratorResultSet
 
     private final ArtifactInfoPostprocessor postprocessor;
 
+    private final List<MatchHighlightRequest> matchHighlightRequests;
+
     private final MultiSearcher searcher;
 
     private final Hits hits;
@@ -51,6 +62,8 @@ public class DefaultIteratorResultSet
 
         this.postprocessor = request.getArtifactInfoPostprocessor();
 
+        this.matchHighlightRequests = request.getMatchHighlightRequests();
+
         this.searcher = searcher;
 
         this.hits = hits;
@@ -58,8 +71,8 @@ public class DefaultIteratorResultSet
         this.from = ( request.getStart() == AbstractSearchRequest.UNDEFINED ? 0 : request.getStart() );
 
         this.count =
-            ( request.getCount() == AbstractSearchRequest.UNDEFINED ? HARD_HIT_COUNT_LIMIT : Math.min( request
-                .getCount(), HARD_HIT_COUNT_LIMIT ) );
+            ( request.getCount() == AbstractSearchRequest.UNDEFINED ? HARD_HIT_COUNT_LIMIT : Math.min(
+                request.getCount(), HARD_HIT_COUNT_LIMIT ) );
 
         this.pointer = from;
 
@@ -127,12 +140,152 @@ public class DefaultIteratorResultSet
                 {
                     postprocessor.postprocess( context, result );
                 }
+
+                if ( result != null && matchHighlightRequests.size() > 0 )
+                {
+                    calculateHighlights( context, doc, result );
+                }
             }
 
             pointer++;
         }
 
         return result;
+    }
+
+    /**
+     * Creates the MatchHighlights and adds them to ArtifactInfo if found/can.
+     * 
+     * @param context
+     * @param d
+     * @param ai
+     */
+    protected void calculateHighlights( IndexingContext context, Document d, ArtifactInfo ai )
+        throws IOException
+    {
+        IndexerField field = null;
+
+        String text = null;
+
+        String highlightFragment = null;
+
+        for ( MatchHighlightRequest hr : matchHighlightRequests )
+        {
+            field = selectStoredIndexerField( hr.getField() );
+
+            if ( field != null )
+            {
+                text = getText( d, ai, field );
+
+                if ( text != null )
+                {
+                    highlightFragment = highlightField( context, hr, field, text );
+
+                    if ( highlightFragment != null )
+                    {
+                        MatchHighlight matchHighlight = new MatchHighlight( hr.getField(), highlightFragment );
+
+                        ai.getMatchHighlights().add( matchHighlight );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Select a STORED IndexerField assigned to passed in Field.
+     * 
+     * @param field
+     * @return
+     */
+    protected IndexerField selectStoredIndexerField( Field field )
+    {
+        return field.getIndexerFields().isEmpty() ? null : field.getIndexerFields().iterator().next();
+    }
+
+    protected String getText( Document d, ArtifactInfo ai, IndexerField field )
+    {
+        if ( field.isStored() )
+        {
+            return d.get( field.getKey() );
+        }
+        else
+        {
+            if ( MAVEN.GROUP_ID.equals( field.getOntology() ) )
+            {
+                return ai.groupId;
+            }
+            else if ( MAVEN.ARTIFACT_ID.equals( field.getOntology() ) )
+            {
+                return ai.artifactId;
+            }
+            else if ( MAVEN.VERSION.equals( field.getOntology() ) )
+            {
+                return ai.version;
+            }
+            else if ( MAVEN.PACKAGING.equals( field.getOntology() ) )
+            {
+                return ai.packaging;
+            }
+            else if ( MAVEN.CLASSIFIER.equals( field.getOntology() ) )
+            {
+                return ai.classifier;
+            }
+            else if ( MAVEN.SHA1.equals( field.getOntology() ) )
+            {
+                return ai.sha1;
+            }
+            else if ( MAVEN.CLASSNAMES.equals( field.getOntology() ) )
+            {
+                return ai.classNames;
+            }
+
+            // no match
+            return null;
+        }
+    }
+
+    /**
+     * Returns a string that contains match fragment highlighted in style as user requested.
+     * 
+     * @param context
+     * @param hr
+     * @param field
+     * @param doc
+     * @return
+     * @throws IOException
+     */
+    protected String highlightField( IndexingContext context, MatchHighlightRequest hr, IndexerField field, String text )
+        throws IOException
+    {
+        Query rewrittenQuery = hr.getQuery().rewrite( context.getIndexReader() );
+
+        CachingTokenFilter tokenStream =
+            new CachingTokenFilter( context.getAnalyzer().tokenStream( field.getKey(), new StringReader( text ) ) );
+
+        Formatter formatter = null;
+
+        if ( MatchHighlightMode.HTML.equals( hr.getHighlightMode() ) )
+        {
+            formatter = new SimpleHTMLFormatter();
+        }
+        else
+        {
+            throw new UnsupportedOperationException( "Hightlight more \"" + hr.getHighlightMode().toString()
+                + "\" is not supported!" );
+        }
+
+        Highlighter highlighter =
+        // new Highlighter( formatter, new QueryScorer( rewrittenQuery, context.getIndexReader(), field.getKey() ) );
+            new Highlighter( formatter, new QueryScorer( rewrittenQuery ) );
+
+        highlighter.setTextFragmenter( new OneLineFragmenter() );
+
+        tokenStream.reset();
+
+        String rv = highlighter.getBestFragments( tokenStream, text, 1, "..." );
+
+        return rv.length() == 0 ? null : rv;
     }
 
     protected IndexingContext getIndexingContextForPointer( int docPtr )

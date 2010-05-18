@@ -175,8 +175,7 @@ public class FullIndexNexusIndexerTest
         {
             // exact class name
             Query q =
-                nexusIndexer
-                    .constructQuery( ArtifactInfo.NAMES, "org/apache/commons/logging/LogConfigurationException" );
+                nexusIndexer.constructQuery( ArtifactInfo.NAMES, "org/apache/commons/logging/LogConfigurationException" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
 
@@ -187,8 +186,7 @@ public class FullIndexNexusIndexerTest
         {
             // implicit class name pattern
             Query q =
-                nexusIndexer
-                    .constructQuery( ArtifactInfo.NAMES, "org.apache.commons.logging.LogConfigurationException" );
+                nexusIndexer.constructQuery( ArtifactInfo.NAMES, "org.apache.commons.logging.LogConfigurationException" );
             GroupedSearchRequest request = new GroupedSearchRequest( q, new GAGrouping() );
             GroupedSearchResponse response = nexusIndexer.searchGrouped( request );
 
@@ -350,7 +348,7 @@ public class FullIndexNexusIndexerTest
         newIndexDir = FSDirectory.getDirectory( newIndex );
 
         DefaultIndexUpdater.unpackIndexArchive( new ByteArrayInputStream( os.toByteArray() ), newIndexDir, context );
-        
+
         newContext =
             nexusIndexer.addIndexingContext( "test-new", "test", null, newIndexDir, null, null, DEFAULT_CREATORS );
 
@@ -428,4 +426,56 @@ public class FullIndexNexusIndexerTest
         assertNull( ai.classNames );
     }
 
+    // ==
+
+    protected IteratorSearchRequest createHighlightedRequest( Field field, String text, SearchType type )
+    {
+        Query q = nexusIndexer.constructQuery( field, text, type );
+
+        IteratorSearchRequest request = new IteratorSearchRequest( q );
+
+        request.getMatchHighlightRequests().add( new MatchHighlightRequest( field, q, MatchHighlightMode.HTML ) );
+
+        return request;
+    }
+
+    public void testClassnameSearchNgWithHighlighting()
+        throws Exception
+    {
+        IteratorSearchRequest request =
+            createHighlightedRequest( MAVEN.CLASSNAMES, "LogConfigurationException", SearchType.SCORED );
+
+        IteratorSearchResponse response = nexusIndexer.searchIterator( request );
+
+        for ( ArtifactInfo ai : response )
+        {
+            for ( MatchHighlight mh : ai.getMatchHighlights() )
+            {
+                assertTrue( "Class name should be highlighted", mh.getHighlightedMatch().contains(
+                    "<B>LogConfigurationException</B>" ) );
+            }
+        }
+
+        assertEquals( "found in jcl104-over-slf4j and commons-logging", 7, response.getTotalHits() );
+    }
+
+    public void testGAVSearchNgWithHighlighting()
+        throws Exception
+    {
+        IteratorSearchRequest request = createHighlightedRequest( MAVEN.GROUP_ID, "commons", SearchType.SCORED );
+
+        IteratorSearchResponse response = nexusIndexer.searchIterator( request );
+
+        for ( ArtifactInfo ai : response )
+        {
+            for ( MatchHighlight mh : ai.getMatchHighlights() )
+            {
+                assertTrue( "Group ID should be highlighted", mh.getHighlightedMatch().contains(
+                    "<B>commons</B>-logging" )
+                    || mh.getHighlightedMatch().contains( "<B>commons</B>-cli" ) );
+            }
+        }
+
+        assertEquals( "found in commons-logging and commons-cli", 15, response.getTotalHits() );
+    }
 }
