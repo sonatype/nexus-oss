@@ -42,7 +42,7 @@ public class ArtifactLocator
                 null, 
                 gav.getGroupId(), 
                 gav.getArtifactId(), 
-                gav.getVersion(), 
+                gav.getBaseVersion(), 
                 gav.getClassifier() );
             
             Term term = new Term( ArtifactInfo.UINFO, ai.getUinfo() );
