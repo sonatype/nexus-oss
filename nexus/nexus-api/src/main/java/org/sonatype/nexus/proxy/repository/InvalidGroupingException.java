@@ -36,4 +36,9 @@ public class InvalidGroupingException
     {
         super( "There is no repository group implementation that supports this content class '" + c1.getId() + "'!" );
     }
+
+    public InvalidGroupingException( String id, String path )
+    {
+        super( "The group '" + id + "' has a cyclic reference! Path to the cyclic reference: '" + path + "'." );
+    }
 }

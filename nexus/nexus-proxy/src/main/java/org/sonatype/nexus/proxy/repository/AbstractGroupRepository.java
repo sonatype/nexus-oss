@@ -286,6 +286,30 @@ public abstract class AbstractGroupRepository
         {
             throw new InvalidGroupingException( getRepositoryContentClass(), repo.getRepositoryContentClass() );
         }
+
+        checkForCyclicReference( getId(), getExternalConfiguration( true ).getMemberRepositoryIds(), getId() );
+    }
+
+    private void checkForCyclicReference( final String id, List<String> memberRepositoryIds, String path )
+        throws InvalidGroupingException
+    {
+        if ( memberRepositoryIds.contains( id ) )
+        {
+            throw new InvalidGroupingException( id, path );
+        }
+
+        for ( String memberId : memberRepositoryIds )
+        {
+            try
+            {
+                GroupRepository group = repoRegistry.getRepositoryWithFacet( memberId, GroupRepository.class );
+                checkForCyclicReference( id, group.getMemberRepositoryIds(), path + '/' + memberId );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // not a group repo, just ignore
+            }
+        }
     }
 
     public void removeMemberRepositoryId( String repositoryId )
