@@ -419,7 +419,7 @@ public class DefaultIndexUpdater
         {
             r = IndexReader.open( directory );
 
-            int numDocs = r.numDocs();
+            int numDocs = r.maxDoc();
 
             for( int i = 0; i < numDocs; i++ )
             {

@@ -445,7 +445,7 @@ public abstract class AbstractRepoNexusIndexerTest
     {
         IndexReader reader = context.getIndexReader();
 
-        for ( int i = 0; i < reader.numDocs(); i++ )
+        for ( int i = 0; i < reader.maxDoc(); i++ )
         {
             if ( !reader.isDeleted( i ) )
             {

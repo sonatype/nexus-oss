@@ -90,7 +90,7 @@ public class IndexDataWriter
 
         if ( docIndexes == null )
         {
-            for ( int i = 0; i < r.numDocs(); i++ )
+            for ( int i = 0; i < r.maxDoc(); i++ )
             {
                 if ( !r.isDeleted( i ) )
                 {

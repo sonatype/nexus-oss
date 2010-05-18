@@ -34,20 +34,7 @@ public class NexusAnalyzer
         if ( JarFileContentsIndexCreator.FLD_CLASSNAMES_KW.getKey().equals( fieldName ) )
         {
             // To keep "backward" compatibility, we have to use old flawed tokenizer.
-            return new CharTokenizer( reader )
-            {
-                @Override
-                protected boolean isTokenChar( char c )
-                {
-                    return c != '\n';
-                }
-
-                @Override
-                protected char normalize( char c )
-                {
-                    return Character.toLowerCase( c );
-                }
-            };
+            return new DeprecatedClassnamesTokenizer( reader );
         }
         else
         {
@@ -56,6 +43,42 @@ public class NexusAnalyzer
     }
 
     // ==
+
+    public static class NoopTokenizer
+        extends CharTokenizer
+    {
+        public NoopTokenizer( Reader in )
+        {
+            super( in );
+        }
+
+        @Override
+        protected boolean isTokenChar( char c )
+        {
+            return true;
+        }
+    }
+
+    public static class DeprecatedClassnamesTokenizer
+        extends CharTokenizer
+    {
+        public DeprecatedClassnamesTokenizer( Reader in )
+        {
+            super( in );
+        }
+
+        @Override
+        protected boolean isTokenChar( char c )
+        {
+            return c != '\n';
+        }
+
+        @Override
+        protected char normalize( char c )
+        {
+            return Character.toLowerCase( c );
+        }
+    }
 
     public static class LetterOrDigitTokenizer
         extends CharTokenizer
