@@ -462,11 +462,18 @@
           <description>The password of the user (write only).</description>
         </field>
         <field>
-          <name>name</name>
+          <name>firstName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The common name of the user.</description>
+          <description>The first name of the user.</description>
+        </field>
+        <field>
+          <name>lastName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The last name of the user.</description>
         </field>
         <field>
           <name>status</name>
@@ -628,11 +635,18 @@
           <description>The source of the role, i.e. what realm the user belongs to.</description>
         </field>
         <field>
-          <name>name</name>
+          <name>firstName</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The common name of the user.</description>
+          <description>The first name of the user.</description>
+        </field>
+        <field>
+          <name>lastName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The last name of the user.</description>
         </field>
         <field>
           <name>email</name>

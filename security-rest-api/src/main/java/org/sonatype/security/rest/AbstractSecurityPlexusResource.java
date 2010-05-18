@@ -106,7 +106,8 @@ public abstract class AbstractSecurityPlexusResource
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmailAddress() );
-        resource.setName( user.getName() );
+        resource.setFirstName( user.getFirstName() );
+        resource.setLastName( user.getLastName() );
         resource.setStatus( user.getStatus().name() );
         resource.setUserId( user.getUserId() );
 
@@ -137,7 +138,8 @@ public abstract class AbstractSecurityPlexusResource
         this.checkUsersStatus( resource.getStatus() );
 
         user.setEmailAddress( resource.getEmail() );
-        user.setName( resource.getName() );
+        user.setFirstName( resource.getFirstName() );
+        user.setLastName( resource.getLastName() );
         user.setStatus( UserStatus.valueOf( resource.getStatus() ) );
         user.setUserId( resource.getUserId() );
 
@@ -161,7 +163,8 @@ public abstract class AbstractSecurityPlexusResource
 
         resource.setUserId( user.getUserId() );
         resource.setSource( user.getSource() );
-        resource.setName( user.getName() );
+        resource.setFirstName( user.getFirstName() );
+        resource.setLastName( user.getLastName() );
         resource.setEmail( user.getEmailAddress() );
 
         for ( RoleIdentifier role : user.getRoles() )

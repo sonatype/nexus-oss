@@ -25,7 +25,7 @@ public class UserPRTest
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
         userResource.setEmail( "test@test.com" );
-        userResource.setName( "testAddUser" );
+        userResource.setFirstName( "firstAddUser" );
         userResource.setStatus( "active" );
         userResource.setUserId( "testAddUser" );
         userResource.addRole( "admin" );
@@ -57,7 +57,8 @@ public class UserPRTest
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
         userResource.setEmail( "testInvalidEmailAddUser" );
-        userResource.setName( "testInvalidEmailAddUser" );
+        userResource.setFirstName( "firstTestInvalidEmailAddUser" );
+        userResource.setLastName( "firstTestInvalidEmailAddUser" );
         userResource.setStatus( "active" );
         userResource.setUserId( "testInvalidEmailAddUser" );
         userResource.addRole( "admin" );
@@ -89,7 +90,8 @@ public class UserPRTest
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
         userResource.setEmail( "testUserIdWithSpace@testUserIdWithSpace.com" );
-        userResource.setName( "testUserIdWithSpace" );
+        userResource.setFirstName( "testUserIdWithSpace" );
+        userResource.setLastName( "Last Name testUserIdWithSpace" );
         userResource.setStatus( "active" );
         userResource.setUserId( "test User Id With Space" );
         userResource.addRole( "admin" );
@@ -129,7 +131,7 @@ public class UserPRTest
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
         userResource.setEmail( "testUpdateUserValidation@test.com" );
-        userResource.setName( "testUpdateUserValidation" );
+        userResource.setLastName( "testUpdateUserValidation" );
         userResource.setStatus( "active" );
         userResource.setUserId( "testUpdateUserValidation" );
         userResource.addRole( "admin" );
@@ -164,7 +166,7 @@ public class UserPRTest
         UserResource userResource = new UserResource();
         resourceRequest.setData( userResource );
         userResource.setEmail( "testInvalidEmailUpdateUserValidation@test.com" );
-        userResource.setName( "testInvalidEmailUpdateUserValidation" );
+        userResource.setLastName( "testInvalidEmailUpdateUserValidation" );
         userResource.setStatus( "active" );
         userResource.setUserId( "testInvalidEmailUpdateUserValidation" );
         userResource.addRole( "admin" );
