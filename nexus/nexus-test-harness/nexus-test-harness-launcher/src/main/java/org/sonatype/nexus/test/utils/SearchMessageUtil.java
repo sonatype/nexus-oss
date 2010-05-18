@@ -19,13 +19,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -42,7 +43,7 @@ import com.thoughtworks.xstream.XStream;
 public class SearchMessageUtil
     extends ITUtil
 {
-    private static Logger log = Logger.getLogger( SearchMessageUtil.class );
+    private static Logger log = LoggerFactory.getLogger( SearchMessageUtil.class );
 
     private XStream xstream;
 
