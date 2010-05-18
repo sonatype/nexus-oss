@@ -51,5 +51,12 @@ public class UniqueGAArtifactFilterPostprocessor
     public void postprocess( IndexingContext ctx, ArtifactInfo ai )
     {
         ai.version = VERSION_LATEST;
+
+        if ( repositoriesIgnored )
+        {
+            ai.context = null;
+            
+            ai.repository = null;
+        }
     }
 }

@@ -2003,7 +2003,7 @@ public class DefaultIndexerManager
 
         if ( uniqueRGA )
         {
-            filters.add( new UniqueGAArtifactFilterPostprocessor( false ) );
+            filters.add( new UniqueGAArtifactFilterPostprocessor( true ) );
         }
 
         if ( extraFilters != null && extraFilters.size() > 0 )
@@ -2013,41 +2013,56 @@ public class DefaultIndexerManager
 
         req.setArtifactInfoFilter( new AndMultiArtifactInfoFilter( filters ) );
 
-        req.setArtifactInfoPostprocessor( new ArtifactInfoPostprocessor()
+        if ( uniqueRGA )
         {
-            public void postprocess( IndexingContext ctx, ArtifactInfo ai )
+            req.setArtifactInfoPostprocessor( new ArtifactInfoPostprocessor()
             {
-                String result = ai.context;
-
-                try
+                public void postprocess( IndexingContext ctx, ArtifactInfo ai )
                 {
-                    Repository sourceRepository = repositoryRegistry.getRepository( ai.repository );
-
-                    if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
-                    {
-                        if ( sourceRepository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-                        {
-                            result = sourceRepository.getName() + " (Cache)";
-                        }
-                        else
-                        {
-                            result = sourceRepository.getName() + " (Local)";
-                        }
-                    }
-                    else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
-                    {
-                        result = sourceRepository.getName() + " (Remote)";
-                    }
-
+                    ai.context = "Aggregated";
                 }
-                catch ( NoSuchRepositoryException e )
+            } );
+        }
+        else
+        {
+            // we may do this only when !uniqueRGA, otherwise UniqueGAArtifactFilterPostprocessor nullifies
+            // ai.repository and ai.context
+            req.setArtifactInfoPostprocessor( new ArtifactInfoPostprocessor()
+            {
+                public void postprocess( IndexingContext ctx, ArtifactInfo ai )
                 {
-                    // nothing
-                }
+                    String result = ai.context;
 
-                ai.context = result;
-            }
-        } );
+                    try
+                    {
+                        Repository sourceRepository = repositoryRegistry.getRepository( ai.repository );
+
+                        if ( ai.context.endsWith( CTX_LOCAL_SUFIX ) )
+                        {
+                            if ( sourceRepository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                            {
+                                result = sourceRepository.getName() + " (Cache)";
+                            }
+                            else
+                            {
+                                result = sourceRepository.getName() + " (Local)";
+                            }
+                        }
+                        else if ( ai.context.endsWith( CTX_REMOTE_SUFIX ) )
+                        {
+                            result = sourceRepository.getName() + " (Remote)";
+                        }
+
+                    }
+                    catch ( NoSuchRepositoryException e )
+                    {
+                        // nothing
+                    }
+
+                    ai.context = result;
+                }
+            } );
+        }
 
         if ( from != null )
         {
@@ -2379,7 +2394,7 @@ public class DefaultIndexerManager
                 localContext = getRepositoryLocalIndexContext( repositoryId );
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
-            
+
             SearchType searchType = sha1Checksum.length() == 40 ? SearchType.EXACT : SearchType.SCORED;
 
             BooleanQuery bq = new BooleanQuery();

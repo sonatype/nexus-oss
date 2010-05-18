@@ -42,9 +42,9 @@ public abstract class AbstractIndexerNexusPlexusResource
         {
             return null;
         }
-        
+
         List<NexusArtifact> result = new ArrayList<NexusArtifact>();
-        
+
         for ( ArtifactInfo ai : aic )
         {
             NexusArtifact na = ai2Na( request, ai );
@@ -63,9 +63,9 @@ public abstract class AbstractIndexerNexusPlexusResource
         {
             return null;
         }
-        
+
         List<NexusArtifact> result = new ArrayList<NexusArtifact>();
-        
+
         for ( ArtifactInfo ai : aic )
         {
             NexusArtifact na = ai2Na( request, ai );
@@ -109,40 +109,43 @@ public abstract class AbstractIndexerNexusPlexusResource
 
         a.setContextId( ai.context );
 
-        a.setPomLink( createPomLink( request, ai ) );
-
-        a.setArtifactLink( createArtifactLink( request, ai ) );
-
-        try
+        if ( ai.repository != null )
         {
-            Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
+            a.setPomLink( createPomLink( request, ai ) );
 
-            if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+            a.setArtifactLink( createArtifactLink( request, ai ) );
+
+            try
             {
-                MavenRepository mavenRepository = (MavenRepository) repository;
+                Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
 
-                Gav gav =
-                    new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier, mavenRepository
-                        .getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ), null, null, null,
-                             VersionUtils.isSnapshot( ai.version ), false, null, false, null );
+                if ( MavenRepository.class.isAssignableFrom( repository.getClass() ) )
+                {
+                    MavenRepository mavenRepository = (MavenRepository) repository;
 
-                ResourceStoreRequest req =
-                    new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
+                    Gav gav =
+                        new Gav( ai.groupId, ai.artifactId, ai.version, ai.classifier,
+                            mavenRepository.getArtifactPackagingMapper().getExtensionForPackaging( ai.packaging ),
+                            null, null, null, VersionUtils.isSnapshot( ai.version ), false, null, false, null );
 
-                a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
+                    ResourceStoreRequest req =
+                        new ResourceStoreRequest( mavenRepository.getGavCalculator().gavToPath( gav ) );
+
+                    a.setResourceURI( createRepositoryReference( request, ai.repository, req.getRequestPath() ).toString() );
+                }
             }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().warn( "No such repository: '" + ai.repository + "'.", e );
+            catch ( NoSuchRepositoryException e )
+            {
+                getLogger().warn( "No such repository: '" + ai.repository + "'.", e );
 
-            return null;
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            getLogger().warn( "Illegal artifact coordinate.", e );
+                return null;
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                getLogger().warn( "Illegal artifact coordinate.", e );
 
-            return null;
+                return null;
+            }
         }
 
         return a;
