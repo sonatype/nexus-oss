@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.WebSecurityManager;
-import org.apache.shiro.web.filter.mgt.FilterChainResolver;
+import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.codehaus.plexus.PlexusConstants;
@@ -26,8 +26,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.security.SecuritySystem;
 
 /**
- * Extension of ShiroFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise
- * it fallbacks to the standard stuff from JSecurityFilter.
+ * Extension of ShiroFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise it
+ * fallbacks to the standard stuff from JSecurityFilter.
  * 
  * @author cstamas
  */
@@ -39,29 +39,21 @@ public class ShiroSecurityFilter
 
     private WebSecurityManager securityManager;
 
-    private PlexusPathMatchingFilterChainResolver plexusPathMatchingFilterChainResolver;
-
     @Override
     protected Map<String, ?> applySecurityManager( Ini ini )
     {
         // use this to customize loading of the securityManager.
         // we are just going to use the component from SecuritySystem, so we do not need it.
-        
+
         // bean map used to load custom filters
         // TODO: ( at least to think about ) we could inject filters using the container
-        return null; 
+        return null;
     }
 
     @Override
     public WebSecurityManager getSecurityManager()
     {
         return securityManager;
-    }
-
-    @Override
-    public FilterChainResolver getFilterChainResolver()
-    {
-        return this.plexusPathMatchingFilterChainResolver;
     }
 
     public PlexusContainer getPlexusContainer()
@@ -76,15 +68,21 @@ public class ShiroSecurityFilter
 
         // start up security
         this.getSecuritySystem().start();
-        this.securityManager =
-            (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class );
+        this.securityManager = (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class );
 
         // call super
         super.configure();
 
-        this.plexusPathMatchingFilterChainResolver = this.getPlexusContainer().lookup( PlexusPathMatchingFilterChainResolver.class );
-        this.plexusPathMatchingFilterChainResolver.setOriginalFilterChainResolver( (PathMatchingFilterChainResolver) super.getFilterChainResolver() );
+        FilterChainManager filterChainManager =
+            ( (PathMatchingFilterChainResolver) super.getFilterChainResolver() ).getFilterChainManager();
 
+        ProtectedPathManager protectedPathManager = this.getPlexusContainer().lookup( ProtectedPathManager.class );
+        // this cannot be injected as long as the configuration comes from the servlet config.
+        // TODO: push the ini config in its own file.
+        if ( FilterChainManagerAware.class.isInstance( protectedPathManager ) )
+        {
+            ( (FilterChainManagerAware) protectedPathManager ).setFilterChainManager( filterChainManager );
+        }
     }
 
     private SecuritySystem getSecuritySystem()

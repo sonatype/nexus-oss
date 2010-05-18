@@ -9,7 +9,7 @@ import org.codehaus.plexus.PlexusContainerException;
 import org.sonatype.plexus.rest.PlexusContainerContextListener;
 
 
-public class HackServletContextListener
+public class HackedPlexusContainerContextListener
     extends PlexusContainerContextListener
 {
 

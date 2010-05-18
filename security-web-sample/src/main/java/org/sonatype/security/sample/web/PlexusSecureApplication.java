@@ -7,7 +7,7 @@ import org.restlet.Router;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.web.PlexusPathMatchingFilterChainResolver;
+import org.sonatype.security.web.ProtectedPathManager;
 
 @Component( role = Application.class, hint = "secureApplication" )
 public class PlexusSecureApplication
@@ -15,14 +15,14 @@ public class PlexusSecureApplication
 {
 
     @Requirement
-    private PlexusPathMatchingFilterChainResolver plexusPathMatchingFilterChainResolver;
+    private ProtectedPathManager protectedPathManager;
 
     @Override
     protected void doCreateRoot( Router root, boolean isStarted )
     {
         super.doCreateRoot( root, isStarted );
 
-        this.plexusPathMatchingFilterChainResolver.addProtectedResource( "/**", "authcBasic,perms[sample:permToCatchAllUnprotecteds]" );
+        this.protectedPathManager.addProtectedResource( "/**", "authcBasic,perms[sample:permToCatchAllUnprotecteds]" );
     }
 
     @Override
@@ -35,7 +35,7 @@ public class PlexusSecureApplication
             return;
         }
 
-        this.plexusPathMatchingFilterChainResolver.addProtectedResource( descriptor
+        this.protectedPathManager.addProtectedResource( descriptor
                                                                          .getPathPattern(), descriptor.getFilterExpression() );
        
     }

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <!--
+        /* * Nexus: Maven Repository Manager * Copyright (C) 2008 Sonatype Inc. * * This file is part of Nexus. * * This program is free
+        software: you can redistribute it and/or modify * it under the terms of the GNU General Public License as published by * the Free
+        Software Foundation, either version 3 of the License, or * (at your option) any later version. * * This program is distributed in
+        the hope that it will be useful, * but WITHOUT ANY WARRANTY; without even the implied warranty of * MERCHANTABILITY or FITNESS FOR A
+        PARTICULAR PURPOSE. See the * GNU General Public License for more details. * * You should have received a copy of the GNU General
+        Public License * along with this program. If not, see http://www.gnu.org/licenses/. * */
+    -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>Sample Secure Application</display-name>
+
+    <!-- Booter -->
+    <listener>
+      <listener-class>org.sonatype.plexus.rest.PlexusContainerContextListener</listener-class>
+    </listener>
+
+    <!-- Security filter -->
+    <filter>
+      <filter-name>securityFilter</filter-name>
+      <filter-class>org.sonatype.security.web.ShiroSecurityFilter</filter-class>
+      <init-param>
+          <param-name>config</param-name>
+          <param-value>
+            [filters]
+            authcBasic = org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter
+            authcBasic.applicationName = Sample Application
+            #authcBasic.fakeAuthScheme = true
+            
+            perms = org.sonatype.security.web.filter.authz.HttpVerbMappingAuthorizationFilter
+          </param-value>
+        </init-param>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>securityFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <!-- Sample REST Application -->
+    <servlet>
+        <servlet-name>sampleApp</servlet-name>
+        <servlet-class>org.sonatype.plexus.rest.PlexusServerServlet</servlet-class>
+        <init-param>
+          <!-- This is the component hint -->
+          <param-name>sampleApp.roleHint</param-name>
+          <param-value>secureApplication</param-value>
+        </init-param>
+        <init-param>
+          <param-name>plexus.discoverResources</param-name>
+          <param-value>true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>sampleApp</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome File -->
+    <welcome-file-list>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

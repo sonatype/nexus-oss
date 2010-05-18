@@ -101,7 +101,7 @@ public class SampleAppTest
         File securityConfigXml = new File( baseName + "-security-configuration.xml" );
         FileUtils.copyFile( securityConfigXml, new File( CONF_DIR, "security-configuration.xml" ) );
         
-        new HackServletContextListener().setPlexusContainer( this.getContainer() );
+        new HackedPlexusContainerContextListener().setPlexusContainer( this.getContainer() );
 
         this.server = this.lookup( ServletServer.class );
         server.start();

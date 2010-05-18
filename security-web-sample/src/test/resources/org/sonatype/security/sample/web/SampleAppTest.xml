@@ -83,7 +83,7 @@
         <eventListenerInfos>
           <eventListenerInfo>
             <!-- ThreadLocal hack for using the same Plexus Container as the tests are running on  -->
-            <clazz>org.sonatype.security.sample.web.HackServletContextListener</clazz>
+            <clazz>org.sonatype.security.sample.web.HackedPlexusContainerContextListener</clazz>
             <!--<clazz>org.sonatype.plexus.rest.PlexusContainerContextListener</clazz>-->
           </eventListenerInfo>
         </eventListenerInfos>
