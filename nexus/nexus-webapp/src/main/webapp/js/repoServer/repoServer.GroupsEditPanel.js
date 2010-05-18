@@ -186,7 +186,7 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
       loadRepositories : function(arr, srcObject, fpanel) {
         var repoBox = fpanel.find('name', 'repositories')[0];
         this.repoStore.filterBy(function(rec, id) {
-              return rec.data.format == srcObject.format;
+              return rec.data.format == srcObject.format && rec.data.id != srcObject.id;
             });
 
         repoBox.setValue(arr);

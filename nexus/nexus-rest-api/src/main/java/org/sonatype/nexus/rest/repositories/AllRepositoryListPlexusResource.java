@@ -73,7 +73,7 @@ public class AllRepositoryListPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        return listRepositories( request, true, false );
+        return listRepositories( request, true, true );
     }
 
 }
