@@ -21,8 +21,8 @@
       <artifactId>plexus-utils</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
     </dependency>
 
     <dependency>
@@ -33,12 +33,23 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-cipher</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- TESTS -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-simple</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-tck</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

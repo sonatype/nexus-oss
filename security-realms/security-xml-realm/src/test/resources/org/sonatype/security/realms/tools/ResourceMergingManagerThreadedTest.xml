@@ -1,4 +1,4 @@
-<component-set>
+<plexus>
   <components>
     <component>
       <role>org.sonatype.security.realms.tools.StaticSecurityResource</role>
@@ -15,4 +15,4 @@
       </requirements>
     </component>
   </components>
-</component-set>
+</plexus>

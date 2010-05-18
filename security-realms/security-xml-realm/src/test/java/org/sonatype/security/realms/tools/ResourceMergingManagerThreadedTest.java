@@ -49,14 +49,13 @@ public class ResourceMergingManagerThreadedTest
             ComponentDescriptor templateDescriptor = this.getContainer().getComponentDescriptor( StaticSecurityResource.class.getName(), "UnitTestSecurityResource" );
             
             // now add it to the container
-            this.getContainer().addComponent( resource, StaticSecurityResource.class.getName() );
+            this.getContainer().addComponent( resource, StaticSecurityResource.class, "default" );
             
             ComponentDescriptor<StaticSecurityResource> descriptor = new ComponentDescriptor<StaticSecurityResource>();
             descriptor.setRole( StaticSecurityResource.class.getName() );
             descriptor.setRoleHint( "test-"+ii );
             descriptor.setImplementationClass( UnitTestSecurityResource.class);
-            descriptor.setIsolatedRealm( false );
-            descriptor.addRequirement( (ComponentRequirement) templateDescriptor.getRequirements().get( 0 ) );
+//            descriptor.addRequirement( (ComponentRequirement) templateDescriptor.getRequirements().get( 0 ) );
             
             this.getContainer().addComponentDescriptor( descriptor );
         }
