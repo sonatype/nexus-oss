@@ -27,7 +27,7 @@ import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 
 /**
- * Abstract class that encapsulates Modello model loading and saving with interpolation.
+ * Abstract class that encapsulates security modello model loading and saving with interpolation.
  * 
  * @author cstamas
  */

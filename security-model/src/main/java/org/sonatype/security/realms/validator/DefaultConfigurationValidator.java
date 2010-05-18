@@ -335,15 +335,6 @@ public class DefaultConfigurationValidator
             existingRoleNameMap.put( role.getId(), role.getName() );
         }
 
-        if ( 1 > role.getSessionTimeout() )
-        {
-            ValidationMessage message =
-                new ValidationMessage( "sessionTimeout", "Role ID '" + role.getId()
-                    + "' requires a Session Timeout greater than 0 minutes.",
-                                       "Enter a session timeout greater than 0 minutes." );
-            response.addValidationError( message );
-        }
-
         if ( context.getExistingPrivilegeIds() != null )
         {
             List<String> privIds = role.getPrivileges();

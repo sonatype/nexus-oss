@@ -23,7 +23,7 @@
     </privileges>    
     <roles>      
         <!-- invalid id of 0 -->
-        <!-- no session timeout -->
+        <!-- no session timeout --> <!-- No longer required, will be removed from model soon -->
         <role>      
             <id>0</id>
             <name>name</name>
@@ -31,7 +31,7 @@
         
         <!-- no id -->
         <!-- no name -->
-        <!-- invalid session timeout -->
+        <!-- invalid session timeout --> <!-- No longer required, will be removed from model soon -->
         <role>
           <sessionTimeout>0</sessionTimeout>
           <privileges>

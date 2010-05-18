@@ -17,6 +17,12 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 
+/**
+ * Default implementation of PrivilegeInheritanceManager which adds read to each action. The way we see it, if you can
+ * create/update/delete something then you automatically have access to 'read' it as well.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = PrivilegeInheritanceManager.class )
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager

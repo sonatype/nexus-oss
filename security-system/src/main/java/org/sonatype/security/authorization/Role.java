@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A simple bean that represents a Role.
+ * A simple bean that represents a security Role.
  * @author Brian Demers
  *
  */
@@ -19,10 +19,6 @@ public class Role implements Comparable<Role>
     private String source;
 
     private boolean readOnly;
-
-    // TODO: remove this, we don't use this
-    @Deprecated
-    private int sessionTimeout;
 
     private Set<String> roles = new HashSet<String>();
     
@@ -151,18 +147,6 @@ public class Role implements Comparable<Role>
         this.readOnly = readOnly;
     }
 
-    @Deprecated
-    public int getSessionTimeout()
-    {
-        return sessionTimeout;
-    }
-
-    @Deprecated
-    public void setSessionTimeout( int sessionTimeout )
-    {
-        this.sessionTimeout = sessionTimeout;
-    }
-
     @Override
     public int hashCode()
     {
@@ -174,7 +158,6 @@ public class Role implements Comparable<Role>
         result = prime * result + ( readOnly ? 1231 : 1237 );
         result = prime * result + ( ( roleId == null ) ? 0 : roleId.hashCode() );
         result = prime * result + ( ( roles == null ) ? 0 : roles.hashCode() );
-        result = prime * result + sessionTimeout;
         result = prime * result + ( ( source == null ) ? 0 : source.hashCode() );
         return result;
     }
@@ -251,10 +234,6 @@ public class Role implements Comparable<Role>
             }
         }
         else if ( !roles.equals( other.roles ) )
-        {
-            return false;
-        }
-        if ( sessionTimeout != other.sessionTimeout )
         {
             return false;
         }

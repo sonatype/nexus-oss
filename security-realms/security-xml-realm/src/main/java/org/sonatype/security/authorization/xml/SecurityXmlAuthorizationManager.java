@@ -34,7 +34,7 @@ import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
 import org.sonatype.security.realms.tools.dao.SecurityRole;
 
 /**
- * RoleLocator that wraps roles from security-xml-realm.
+ * AuthorizationManager that wraps roles from security-xml-realm.
  */
 @Component( role = AuthorizationManager.class )
 public class SecurityXmlAuthorizationManager
@@ -66,7 +66,6 @@ public class SecurityXmlAuthorizationManager
         role.setSource( SOURCE );
         role.setDescription( secRole.getDescription() );
         role.setReadOnly( secRole.isReadOnly() );
-        role.setSessionTimeout( secRole.getSessionTimeout() );
         role.setPrivileges( new HashSet<String>( secRole.getPrivileges() ) );
         role.setRoles( new HashSet<String>( secRole.getRoles() ) );
 
@@ -81,7 +80,6 @@ public class SecurityXmlAuthorizationManager
         secRole.setName( role.getName() );
         secRole.setDescription( role.getDescription() );
         secRole.setReadOnly( role.isReadOnly() );
-        secRole.setSessionTimeout( role.getSessionTimeout() );
         secRole.setPrivileges( new ArrayList<String>( role.getPrivileges() ) );
         secRole.setRoles( new ArrayList<String>( role.getRoles() ) );
 

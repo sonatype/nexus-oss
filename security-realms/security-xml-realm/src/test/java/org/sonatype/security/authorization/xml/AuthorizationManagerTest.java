@@ -76,7 +76,6 @@ public class AuthorizationManagerTest
         Assert.assertEquals( "role3", role3.getRoleId() );
         Assert.assertEquals( "RoleThree", role3.getName() );
         Assert.assertEquals( "Role Three", role3.getDescription() );
-        Assert.assertEquals( 60, role3.getSessionTimeout() );
         Assert.assertTrue( role3.getPrivileges().contains( "1" ) );
         Assert.assertTrue( role3.getPrivileges().contains( "4" ) );
         Assert.assertEquals( 2, role3.getPrivileges().size() );
@@ -92,7 +91,6 @@ public class AuthorizationManagerTest
         Assert.assertEquals( "role1", role1.getRoleId() );
         Assert.assertEquals( "RoleOne", role1.getName() );
         Assert.assertEquals( "Role One", role1.getDescription() );
-        Assert.assertEquals( 60, role1.getSessionTimeout() );
         Assert.assertTrue( role1.getPrivileges().contains( "1" ) );
         Assert.assertTrue( role1.getPrivileges().contains( "2" ) );
         Assert.assertEquals( 2, role1.getPrivileges().size() );
@@ -107,7 +105,6 @@ public class AuthorizationManagerTest
         role.setRoleId( "new-role" );
         role.setName( "new-name" );
         role.setDescription( "new-description" );
-        role.setSessionTimeout( 42 );
         role.addPrivilege( "2" );
         role.addPrivilege( "4" );
 
@@ -118,7 +115,6 @@ public class AuthorizationManagerTest
         Assert.assertEquals( role.getRoleId(), secRole.getId() );
         Assert.assertEquals( role.getName(), secRole.getName() );
         Assert.assertEquals( role.getDescription(), secRole.getDescription() );
-        Assert.assertEquals( role.getSessionTimeout(), secRole.getSessionTimeout() );
         Assert.assertTrue( secRole.getPrivileges().contains( "2" ) );
         Assert.assertTrue( secRole.getPrivileges().contains( "4" ) );
         Assert.assertEquals( 2, secRole.getPrivileges().size() );
@@ -133,7 +129,6 @@ public class AuthorizationManagerTest
         Role role2 = authzManager.getRole( "role2" );
         role2.setDescription( "new description" );
         role2.setName( "new name" );
-        role2.setSessionTimeout( 42 );
 
         Set<String> permissions = new HashSet<String>();
         permissions.add( "2" );
@@ -146,7 +141,6 @@ public class AuthorizationManagerTest
         Assert.assertEquals( role2.getRoleId(), secRole.getId() );
         Assert.assertEquals( role2.getName(), secRole.getName() );
         Assert.assertEquals( role2.getDescription(), secRole.getDescription() );
-        Assert.assertEquals( role2.getSessionTimeout(), secRole.getSessionTimeout() );
         Assert.assertTrue( secRole.getPrivileges().contains( "2" ) );
         Assert.assertEquals( 1, secRole.getPrivileges().size() );
     }
