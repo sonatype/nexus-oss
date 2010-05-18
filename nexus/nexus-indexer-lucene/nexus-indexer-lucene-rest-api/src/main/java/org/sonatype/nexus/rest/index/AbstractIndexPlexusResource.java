@@ -98,7 +98,7 @@ public abstract class AbstractIndexPlexusResource
         Integer from = null;
         Integer count = null;
         Boolean uniqueRGA = null;
-        Boolean asKeywords = null;
+        Boolean exact = null;
 
         if ( form.getFirstValue( "from" ) != null )
         {
@@ -129,9 +129,9 @@ public abstract class AbstractIndexPlexusResource
             uniqueRGA = Boolean.valueOf( form.getFirstValue( "uniqueRGA" ) );
         }
 
-        if ( form.getFirstValue( "asKeywords" ) != null )
+        if ( form.getFirstValue( "exact" ) != null )
         {
-            asKeywords = Boolean.valueOf( form.getFirstValue( "asKeywords" ) );
+            exact = Boolean.valueOf( form.getFirstValue( "exact" ) );
         }
 
         IteratorSearchResponse searchResult = null;
@@ -154,7 +154,7 @@ public abstract class AbstractIndexPlexusResource
             }
             else
             {
-                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, asKeywords );
+                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, exact );
             }
         }
         catch ( NoSuchRepositoryException e )
@@ -216,7 +216,7 @@ public abstract class AbstractIndexPlexusResource
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
                                                   final Integer from, final Integer count, final Boolean uniqueRGA,
-                                                  final Boolean asKeywords )
+                                                  final Boolean exact )
         throws NoSuchRepositoryException, ResourceException
     {
         // if uniqueRGA set, obey it, otherwise default it depending on query
@@ -229,11 +229,11 @@ public abstract class AbstractIndexPlexusResource
             {
                 SearchType searchType = searcher.getDefaultSearchType();
 
-                if ( asKeywords != null )
+                if ( exact != null )
                 {
-                    if ( asKeywords )
+                    if ( exact )
                     {
-                        searchType = SearchType.KEYWORD;
+                        searchType = SearchType.EXACT;
                     }
                     else
                     {

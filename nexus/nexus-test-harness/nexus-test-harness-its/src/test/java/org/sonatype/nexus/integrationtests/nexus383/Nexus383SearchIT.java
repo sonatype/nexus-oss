@@ -90,11 +90,11 @@ public class Nexus383SearchIT
         Assert.assertTrue( results.isEmpty() );
 
         // artifactId
-        results = getSearchMessageUtil().searchFor( "know-artifact-1", SearchType.KEYWORD );
+        results = getSearchMessageUtil().searchFor( "know-artifact-1", SearchType.EXACT );
         Assert.assertEquals( 1, results.size() );
 
         // artifactId
-        results = getSearchMessageUtil().searchFor( "know-artifact-2", SearchType.KEYWORD );
+        results = getSearchMessageUtil().searchFor( "know-artifact-2", SearchType.EXACT );
         Assert.assertEquals( 1, results.size() );
 
         // partial artifactId

@@ -60,12 +60,12 @@ public class NexusIndexerTest
             + MinimalArtifactInfoIndexCreator.FLD_GROUP_ID.getKey() + ":loggin*)", q.toString() );
 
         // keyword search against field stored in both ways (tokenized/untokenized)
-        q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-logging", SearchType.KEYWORD );
+        q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-logging", SearchType.EXACT );
 
         assertEquals( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey() + ":commons-logging", q.toString() );
 
         // keyword search against field having untokenized indexerField only
-        q = indexer.constructQuery( MAVEN.PACKAGING, "maven-archetype", SearchType.KEYWORD );
+        q = indexer.constructQuery( MAVEN.PACKAGING, "maven-archetype", SearchType.EXACT );
 
         assertEquals( MinimalArtifactInfoIndexCreator.FLD_PACKAGING.getKey() + ":maven-archetype", q.toString() );
 
@@ -85,7 +85,7 @@ public class NexusIndexerTest
             + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":pom*", q.toString() );
 
         // keyword search against field having tokenized IndexerField only (should be impossible).
-        q = indexer.constructQuery( MAVEN.NAME, "some artifact name from Pom", SearchType.KEYWORD );
+        q = indexer.constructQuery( MAVEN.NAME, "some artifact name from Pom", SearchType.EXACT );
 
         assertNull( q );
     }
@@ -168,7 +168,7 @@ public class NexusIndexerTest
         // case06: "the most usual" case (for apps), "selection":
         // explanation: exactly only those artifacts, that has version "1.0"
         qstr = "1.0";
-        q = indexer.constructQuery( MAVEN.VERSION, qstr, SearchType.KEYWORD );
+        q = indexer.constructQuery( MAVEN.VERSION, qstr, SearchType.EXACT );
 
         req = new IteratorSearchRequest( q );
 
@@ -182,11 +182,11 @@ public class NexusIndexerTest
         // explanation: see for yourself ;)
         BooleanQuery bq = new BooleanQuery();
 
-        Query g = indexer.constructQuery( MAVEN.GROUP_ID, "commons-logging", SearchType.KEYWORD );
-        Query a = indexer.constructQuery( MAVEN.ARTIFACT_ID, "commons-logging", SearchType.KEYWORD );
-        Query v = indexer.constructQuery( MAVEN.VERSION, "1.0.4", SearchType.KEYWORD );
-        Query p = indexer.constructQuery( MAVEN.PACKAGING, "jar", SearchType.KEYWORD );
-        Query c = indexer.constructQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD );
+        Query g = indexer.constructQuery( MAVEN.GROUP_ID, "commons-logging", SearchType.EXACT );
+        Query a = indexer.constructQuery( MAVEN.ARTIFACT_ID, "commons-logging", SearchType.EXACT );
+        Query v = indexer.constructQuery( MAVEN.VERSION, "1.0.4", SearchType.EXACT );
+        Query p = indexer.constructQuery( MAVEN.PACKAGING, "jar", SearchType.EXACT );
+        Query c = indexer.constructQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.EXACT );
 
         // so, I am looking up GAVP (for content of those look above) that _has no_ classifier
         bq.add( g, Occur.MUST );

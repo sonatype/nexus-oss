@@ -88,7 +88,7 @@ public class SearchMessageUtil
             // currently, REST API lacks search type (it is able to only ovveride isKeyword search happening, or not, of
             // if
             // not specified, rely on server side defaults)
-            if ( SearchType.KEYWORD.equals( searchType ) )
+            if ( SearchType.EXACT.equals( searchType ) )
             {
                 serviceURI.append( "asKeywords=true&" );
             }

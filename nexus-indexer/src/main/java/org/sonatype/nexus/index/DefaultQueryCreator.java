@@ -168,7 +168,7 @@ public class DefaultQueryCreator
             return new WildcardQuery( new Term( indexerField.getKey(), "*" ) );
         }
 
-        if ( SearchType.KEYWORD.equals( type ) )
+        if ( SearchType.EXACT.equals( type ) )
         {
             if ( indexerField.isKeyword() )
             {
@@ -257,7 +257,7 @@ public class DefaultQueryCreator
 
                     Query q2 = null;
 
-                    IndexerField keywordField = selectIndexerField( indexerField.getOntology(), SearchType.KEYWORD );
+                    IndexerField keywordField = selectIndexerField( indexerField.getOntology(), SearchType.EXACT );
 
                     if ( keywordField.isKeyword() )
                     {

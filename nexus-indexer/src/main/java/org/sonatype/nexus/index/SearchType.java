@@ -15,10 +15,10 @@ public enum SearchType
     SCORED,
 
     /**
-     * Keyword search types are usually meant for applications filtering index content for some exact filtering
+     * Exact search types are usually meant for applications filtering index content for some exact filtering
      * condition even in a "future proof" way (example with packaging "maven-archetype" vs "foo-archetype-maven").
      */
-    KEYWORD;
+    EXACT;
 
     public boolean matchesIndexerField( IndexerField field )
     {
@@ -27,7 +27,7 @@ public enum SearchType
             case SCORED:
                 return !field.isKeyword();
 
-            case KEYWORD:
+            case EXACT:
                 return field.isKeyword();
 
             default:

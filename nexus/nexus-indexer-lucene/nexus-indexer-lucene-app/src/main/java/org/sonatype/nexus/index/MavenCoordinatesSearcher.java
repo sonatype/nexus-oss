@@ -74,7 +74,7 @@ public class MavenCoordinatesSearcher
 
     public SearchType getDefaultSearchType()
     {
-        return SearchType.KEYWORD;
+        return SearchType.EXACT;
     }
 
     /**

@@ -407,7 +407,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
       
       for ( var i = 0 ; i < extras.length ; i++ ) {
         if ( extras[i] == 'kw' ) {
-          panel.grid.store.baseParams['asKeywords'] = true;
+          panel.grid.store.baseParams['exact'] = true;
         }
       }
       
