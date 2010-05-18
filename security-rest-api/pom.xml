@@ -11,7 +11,6 @@
 
   <properties>
     <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
-    <enunciate.version>1.18</enunciate.version>
   </properties>
 
   <dependencies>
