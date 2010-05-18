@@ -2357,11 +2357,10 @@ public class DefaultIndexerManager
     }
 
     public IteratorSearchResponse searchArtifactSha1ChecksumIterator( String sha1Checksum, String repositoryId,
-                                                                      Integer from, Integer count, Integer hitLimit,
-                                                                      SearchType searchType )
+                                                                      Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException
     {
-        if ( sha1Checksum == null )
+        if ( sha1Checksum == null || sha1Checksum.length() > 40 )
         {
             return new IteratorSearchResponse( null, -1, null );
         }
@@ -2380,6 +2379,8 @@ public class DefaultIndexerManager
                 localContext = getRepositoryLocalIndexContext( repositoryId );
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
+            
+            SearchType searchType = sha1Checksum.length() == 40 ? SearchType.EXACT : SearchType.SCORED;
 
             BooleanQuery bq = new BooleanQuery();
 

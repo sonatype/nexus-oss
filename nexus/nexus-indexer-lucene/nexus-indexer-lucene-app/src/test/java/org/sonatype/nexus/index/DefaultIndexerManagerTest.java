@@ -81,15 +81,15 @@ public class DefaultIndexerManagerTest
 
         IteratorSearchResponse response;
 
+        // this will be EXACT search, since we gave full SHA1 checksum of 40 chars
         response =
             indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021fa0be4ec809d4d2e08f07b80d4877", null, null,
-                null, null, SearchType.EXACT );
+                null, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
 
-        response =
-            indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021", null, null,
-                null, null, SearchType.SCORED );
+        // this will be SCORED search, since we have just part of the SHA1 checksum
+        response = indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021", null, null, null, null );
 
         assertEquals( "There should be still one hit!", 1, response.getTotalHits() );
     }

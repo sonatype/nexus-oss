@@ -189,7 +189,7 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactSha1ChecksumIterator( String sha1Checksum, String repositoryId, Integer from,
-                                                               Integer count, Integer hitLimit, SearchType searchType )
+                                                               Integer count, Integer hitLimit )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
