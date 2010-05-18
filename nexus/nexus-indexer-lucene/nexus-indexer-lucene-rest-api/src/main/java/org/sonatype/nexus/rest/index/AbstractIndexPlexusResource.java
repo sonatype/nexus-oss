@@ -31,10 +31,10 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
 import org.sonatype.nexus.index.KeywordSearcher;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -144,7 +144,7 @@ public abstract class AbstractIndexPlexusResource
             {
                 try
                 {
-                    na = ai2Na( request, indexerManager.identifyArtifact( ArtifactInfo.SHA1, sha1 ) );
+                    na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, sha1 ) );
                 }
                 catch ( IOException e )
                 {

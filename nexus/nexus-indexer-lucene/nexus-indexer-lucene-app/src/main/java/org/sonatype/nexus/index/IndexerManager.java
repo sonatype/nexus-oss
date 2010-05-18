@@ -149,21 +149,28 @@ public interface IndexerManager
     // Identify
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     ArtifactInfo identifyArtifact( String type, String checksum )
+        throws IOException;
+
+    ArtifactInfo identifyArtifact( Field field, String data )
         throws IOException;
 
     // ----------------------------------------------------------------------------
     // Combined searching
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     FlatSearchResponse searchArtifactFlat( String term, String repositoryId, Integer from, Integer count,
                                            Integer hitLimit )
         throws NoSuchRepositoryException;
 
+    @Deprecated
     FlatSearchResponse searchArtifactClassFlat( String term, String repositoryId, Integer from, Integer count,
                                                 Integer hitLimit )
         throws NoSuchRepositoryException;
 
+    @Deprecated
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
                                            String repositoryId, Integer from, Integer count, Integer hitLimit )
         throws NoSuchRepositoryException;
@@ -179,6 +186,10 @@ public interface IndexerManager
     IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
                                                    String cTerm, String repositoryId, Integer from, Integer count,
                                                    Integer hitLimit, SearchType searchType )
+        throws NoSuchRepositoryException;
+
+    IteratorSearchResponse searchArtifactSha1ChecksumIterator( String sha1Checksum, String repositoryId, Integer from,
+                                                               Integer count, Integer hitLimit, SearchType searchType )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------

@@ -59,10 +59,39 @@ public class DefaultIndexerManagerTest
         fillInRepo();
 
         indexerManager.reindexAllRepositories( "/", false );
-        
+
         searchForKeywordNG( "org.sonatype.nexus", 15 );
 
         assertTemporatyContexts( releases );
+    }
+
+    public void testRepoSha1Search()
+        throws Exception
+    {
+        fillInRepo();
+
+        indexerManager.reindexAllRepositories( "/", false );
+
+        // org.sonatype.nexus : nexus-indexer : 1.0-beta-4
+        // sha1: 86e12071021fa0be4ec809d4d2e08f07b80d4877
+
+        ArtifactInfo ai = indexerManager.identifyArtifact( MAVEN.SHA1, "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
+
+        assertNotNull( "The artifact has to be found!", ai );
+
+        IteratorSearchResponse response;
+
+        response =
+            indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021fa0be4ec809d4d2e08f07b80d4877", null, null,
+                null, null, SearchType.EXACT );
+
+        assertEquals( "There should be one hit!", 1, response.getTotalHits() );
+
+        response =
+            indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021", null, null,
+                null, null, SearchType.SCORED );
+
+        assertEquals( "There should be still one hit!", 1, response.getTotalHits() );
     }
 
     public void testInvalidRemoteUrl()
