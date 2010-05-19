@@ -2,6 +2,8 @@ package org.sonatype.nexus.integrationtests.nexus1923;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +74,7 @@ public abstract class AbstractNexus1923
 
         this.repoUtils =
             new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
-                getRepositoryTypeRegistry() );
+                                       getRepositoryTypeRegistry() );
         this.groupUtils = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
@@ -253,7 +255,7 @@ public abstract class AbstractNexus1923
         reindexRepository( taskId, SECOND_HOSTED_REINDEX_TASK_NAME );
     }
 
-    private File getRepositoryLocalIndexDirectory( String repositoryId )
+    protected File getRepositoryLocalIndexDirectory( String repositoryId )
     {
         return new File( AbstractNexusIntegrationTest.nexusWorkDir + "/indexer/" + repositoryId + "-local/" );
     }
@@ -283,7 +285,7 @@ public abstract class AbstractNexus1923
         return getRepositoryLocalIndexDirectory( GROUP_ID );
     }
 
-    private File getRepositoryRemoteIndexDirectory( String repositoryId )
+    protected File getRepositoryRemoteIndexDirectory( String repositoryId )
     {
         return new File( AbstractNexusIntegrationTest.nexusWorkDir + "/indexer/" + repositoryId + "-remote/" );
     }
@@ -495,7 +497,7 @@ public abstract class AbstractNexus1923
         else
         {
             Assert.assertEquals( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ),
-                Integer.toString( current ) );
+                                 Integer.toString( current ) );
         }
     }
 
@@ -610,5 +612,53 @@ public abstract class AbstractNexus1923
         throws Exception
     {
         cleanWorkDir();
+    }
+
+    protected void searchFor( String whereRepo, String... whatForArtifacts )
+        throws Exception
+    {
+        for ( String artifact : whatForArtifacts )
+        {
+            searchForArtifactInIndex( artifact, whereRepo, true );
+            searchForArtifactInIndex( artifact, GROUP_ID, true );
+        }
+
+        List<String> otherArtifacts = getArtifactBut( whatForArtifacts );
+
+        for ( String artifact : otherArtifacts )
+        {
+            searchForArtifactInIndex( artifact, whereRepo, false );
+        }
+
+        List<String> repos = getReposBut( whereRepo );
+        for ( String repoId : repos )
+        {
+            for ( String artifact : whatForArtifacts )
+            {
+                searchForArtifactInIndex( artifact, repoId, false );
+            }
+        }
+    }
+
+    protected List<String> getArtifactBut( String[] butArtifacts )
+    {
+        List<String> artifacts = new ArrayList<String>();
+        artifacts.add( FIRST_ARTIFACT );
+        artifacts.add( SECOND_ARTIFACT );
+        artifacts.add( THIRD_ARTIFACT );
+        artifacts.add( FOURTH_ARTIFACT );
+        artifacts.add( FIFTH_ARTIFACT );
+        artifacts.removeAll( Arrays.asList( butArtifacts ) );
+        return artifacts;
+    }
+
+    protected List<String> getReposBut( String butRepo )
+    {
+        List<String> repos = new ArrayList<String>();
+        repos.add( HOSTED_REPO_ID );
+        repos.add( SECOND_HOSTED_REPO_ID );
+        repos.add( THIRD_HOSTED_REPO_ID );
+        repos.remove( butRepo );
+        return repos;
     }
 }

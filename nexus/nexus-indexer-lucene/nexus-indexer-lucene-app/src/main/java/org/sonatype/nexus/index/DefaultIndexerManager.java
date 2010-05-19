@@ -297,7 +297,7 @@ public class DefaultIndexerManager
                 ctxLocal =
                     nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
                         repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
+                                                           null, indexCreators );
                 ctxLocal.setSearchable( repository.isSearchable() );
 
                 ctxRemote =
@@ -316,7 +316,7 @@ public class DefaultIndexerManager
                 ctxLocal =
                     nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
                         repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
+                                                           null, indexCreators );
                 ctxLocal.setSearchable( repository.isSearchable() );
 
                 ctxRemote =
@@ -605,8 +605,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
+                                   "Repository '" + repository.getId()
+                                       + "' is already processed in recursive calls, will not process it." );
             }
 
             return;
@@ -634,7 +634,7 @@ public class DefaultIndexerManager
                 {
                     gav =
                         ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
+                                                                                       item.getRepositoryItemUid().getPath() );
                 }
                 catch ( IllegalArtifactCoordinateException e )
                 {
@@ -746,8 +746,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
+                                   "Repository '" + repository.getId()
+                                       + "' is already processed in recursive calls, will not process it." );
             }
 
             return;
@@ -767,7 +767,7 @@ public class DefaultIndexerManager
                 {
                     gav =
                         ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
+                                                                                       item.getRepositoryItemUid().getPath() );
                 }
                 catch ( IllegalArtifactCoordinateException e )
                 {
@@ -784,7 +784,7 @@ public class DefaultIndexerManager
 
                 ArtifactInfo ai =
                     new ArtifactInfo( context.getRepositoryId(), gav.getGroupId(), gav.getArtifactId(),
-                        gav.getBaseVersion(), gav.getClassifier() );
+                                      gav.getBaseVersion(), gav.getClassifier() );
 
                 // store extension if classifier is not empty
                 if ( !StringUtils.isEmpty( ai.classifier ) )
@@ -806,8 +806,8 @@ public class DefaultIndexerManager
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                            + " from index (DELETE)." );
+                                       "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+                                           + " from index (DELETE)." );
                 }
             }
 
@@ -824,7 +824,7 @@ public class DefaultIndexerManager
                     getLogger().debug(
                         "NOT deleting artifact " + ac.getArtifactInfo().groupId + ":" + ac.getArtifactInfo().artifactId
                             + ":" + ac.getArtifactInfo().version
-                            + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                           + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
                 }
             }
         }
@@ -887,16 +887,30 @@ public class DefaultIndexerManager
         GroupRepository groupRepo =
             repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
+        reindexRepositoryGroup( fullReindex, groupRepo );
+    }
+
+    private void reindexRepositoryGroup( boolean fullReindex, GroupRepository groupRepo )
+        throws IOException, NoSuchRepositoryException
+    {
         if ( groupRepo.isIndexable() )
         {
             List<Repository> group = groupRepo.getMemberRepositories();
 
             for ( Repository repository : group )
             {
-                reindexRepository( repository, fullReindex );
+                if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                {
+                    reindexRepositoryGroup( fullReindex, repository.adaptToFacet( GroupRepository.class ) );
+                    mergeRepositoryGroupIndexWithMember( repository );
+                }
+                else
+                {
+                    reindexRepository( repository, fullReindex );
+                }
             }
 
-            publishRepositoryGroupIndex( repositoryGroupId );
+            publishRepositoryGroupIndex( groupRepo.getId() );
         }
     }
 
@@ -1317,8 +1331,8 @@ public class DefaultIndexerManager
 
                 String groupId = group.getId();
                 getLogger().info(
-                    "Cascading merge of group indexes for group \"" + groupId + "\", where repository \""
-                        + repository.getId() + "\" is member." );
+                                  "Cascading merge of group indexes for group \"" + groupId + "\", where repository \""
+                                      + repository.getId() + "\" is member." );
 
                 // get the groups target ctx
                 IndexingContext groupContext = getRepositoryLocalIndexContext( group );
@@ -2212,7 +2226,7 @@ public class DefaultIndexerManager
             Query q = createQuery( MAVEN.CLASSNAMES, term, searchType );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
-            
+
             req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.CLASSNAMES, q, MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
@@ -2517,13 +2531,13 @@ public class DefaultIndexerManager
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                baseContext.getRepositoryId(), //
-                baseContext.getRepository(), //
-                directory, //
-                baseContext.getRepositoryUrl(), //
-                baseContext.getIndexUpdateUrl(), //
-                baseContext.getIndexCreators(), //
-                true );
+                                                     baseContext.getRepositoryId(), //
+                                                     baseContext.getRepository(), //
+                                                     directory, //
+                                                     baseContext.getRepositoryUrl(), //
+                                                     baseContext.getIndexUpdateUrl(), //
+                                                     baseContext.getIndexCreators(), //
+                                                     true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
