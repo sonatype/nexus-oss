@@ -4,7 +4,7 @@ import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.codehaus.plexus.component.annotations.Component;
 
 /**
- * The default implementation requires a PathMatchingFilterChainResolver, so the configuration can be passed to it.
+ * The default implementation requires a FilterChainManager, so the configuration can be passed to it.
  * 
  * @author Brian Demers
  *

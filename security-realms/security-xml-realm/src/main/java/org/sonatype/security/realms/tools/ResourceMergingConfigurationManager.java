@@ -13,7 +13,6 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +38,11 @@ import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * ConfigurationManager that aggregates {@link StaticSecurityResource}s with default ConfigurationManager.
+ * @author Brian Demers
+ *
+ */
 @Component( role = ConfigurationManager.class, hint = "resourceMerging" )
 public class ResourceMergingConfigurationManager
     extends AbstractLogEnabled

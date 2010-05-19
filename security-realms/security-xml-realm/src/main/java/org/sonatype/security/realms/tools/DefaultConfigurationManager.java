@@ -52,8 +52,6 @@ public class DefaultConfigurationManager
     extends AbstractLogEnabled
     implements ConfigurationManager
 {
-//    @org.codehaus.plexus.component.annotations.Configuration( value = "${security-xml-file}" )
-//    private File securityConfiguration;
 
     @Requirement(hint="file")
     private SecurityModelConfigurationSource configurationSource;
@@ -74,7 +72,6 @@ public class DefaultConfigurationManager
 
     private ReentrantLock lock = new ReentrantLock();
 
-    @SuppressWarnings( "unchecked" )
     public List<SecurityPrivilege> listPrivileges()
     {
         List<SecurityPrivilege> list = new ArrayList<SecurityPrivilege>();
@@ -87,7 +84,6 @@ public class DefaultConfigurationManager
         return list;
     }
 
-    @SuppressWarnings( "unchecked" )
     public List<SecurityRole> listRoles()
     {
         List<SecurityRole> list = new ArrayList<SecurityRole>();
@@ -100,7 +96,6 @@ public class DefaultConfigurationManager
         return list;
     }
 
-    @SuppressWarnings( "unchecked" )
     public List<SecurityUser> listUsers()
     {
         List<SecurityUser> list = new ArrayList<SecurityUser>();
@@ -354,7 +349,6 @@ public class DefaultConfigurationManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public SecurityPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException
     {
@@ -369,7 +363,6 @@ public class DefaultConfigurationManager
         throw new NoSuchPrivilegeException( id );
     }
 
-    @SuppressWarnings( "unchecked" )
     public SecurityRole readRole( String id )
         throws NoSuchRoleException
     {
@@ -384,7 +377,6 @@ public class DefaultConfigurationManager
         throw new NoSuchRoleException( id );
     }
 
-    @SuppressWarnings( "unchecked" )
     public SecurityUser readUser( String id )
         throws UserNotFoundException
     {
@@ -504,7 +496,6 @@ public class DefaultConfigurationManager
         }
     }
 
-    @SuppressWarnings( "unchecked" )
     public String getPrivilegeProperty( SecurityPrivilege privilege, String key )
     {
         if ( privilege != null && privilege.getProperties() != null )
@@ -521,7 +512,6 @@ public class DefaultConfigurationManager
         return null;
     }
 
-    // TODO:
     public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException
     {
@@ -619,7 +609,6 @@ public class DefaultConfigurationManager
         getConfiguration().addUserRoleMapping( userRoleMapping );
     }
 
-    @SuppressWarnings( "unchecked" )
     public List<SecurityUserRoleMapping> listUserRoleMappings()
     {
         List<SecurityUserRoleMapping> list = new ArrayList<SecurityUserRoleMapping>();
@@ -632,7 +621,6 @@ public class DefaultConfigurationManager
         return list;
     }
 
-    @SuppressWarnings( "unchecked" )
     public void deleteUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {

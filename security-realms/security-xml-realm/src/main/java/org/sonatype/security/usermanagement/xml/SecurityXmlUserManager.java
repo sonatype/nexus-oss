@@ -43,9 +43,15 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.UserStatus;
 
+/**
+ * A UserManager backed by the security.xml file. This UserManger supports all User CRUD operations.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = UserManager.class, description = "Default" )
 public class SecurityXmlUserManager
-    extends AbstractUserManager implements RoleMappingUserManager
+    extends AbstractUserManager
+    implements RoleMappingUserManager
 {
     public static final String SOURCE = "default";
 
@@ -75,7 +81,7 @@ public class SecurityXmlUserManager
         secUser.setEmail( user.getEmailAddress() );
         secUser.setStatus( user.getStatus().name() );
         secUser.setReadOnly( user.isReadOnly() );
-        // secUser.setPassword( password )// FIXME
+        // secUser.setPassword( password )// DO NOT set the users password!
 
         for ( RoleIdentifier role : user.getRoles() )
         {
@@ -84,7 +90,7 @@ public class SecurityXmlUserManager
 
         return secUser;
     }
-    
+
     protected User toUser( CUser cUser )
     {
         if ( cUser == null )
@@ -126,8 +132,8 @@ public class SecurityXmlUserManager
         try
         {
             CRole role = configuration.readRole( roleId );
-            
-            RoleIdentifier roleIdentifier = new RoleIdentifier(SOURCE, role.getId());
+
+            RoleIdentifier roleIdentifier = new RoleIdentifier( SOURCE, role.getId() );
             return roleIdentifier;
         }
         catch ( NoSuchRoleException e )
@@ -167,8 +173,6 @@ public class SecurityXmlUserManager
         return user;
     }
 
-   
-
     public String getSource()
     {
         return SOURCE;
@@ -194,21 +198,20 @@ public class SecurityXmlUserManager
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException, InvalidConfigurationException
     {
-       SecurityUser secUser = this.configuration.readUser( userId );
-       secUser.setPassword( this.hashPassword( newPassword ) );
-       this.configuration.updateUser( secUser );
-       this.saveConfiguration();
+        SecurityUser secUser = this.configuration.readUser( userId );
+        secUser.setPassword( this.hashPassword( newPassword ) );
+        this.configuration.updateUser( secUser );
+        this.saveConfiguration();
     }
 
     public User updateUser( User user )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         // we need to pull the users password off off the old user object
         SecurityUser oldSecUser = this.configuration.readUser( user.getUserId() );
         SecurityUser newSecUser = this.toUser( user );
         newSecUser.setPassword( oldSecUser.getPassword() );
-        
+
         this.configuration.updateUser( newSecUser );
         this.saveConfiguration();
         return user;
@@ -267,11 +270,8 @@ public class SecurityXmlUserManager
         {
             if ( !SOURCE.equals( roleMapping.getSource() ) )
             {
-                if ( this.matchesCriteria(
-                    roleMapping.getUserId(),
-                    roleMapping.getSource(),
-                    roleMapping.getRoles(),
-                    criteria ) )
+                if ( this.matchesCriteria( roleMapping.getUserId(), roleMapping.getSource(), roleMapping.getRoles(),
+                                           criteria ) )
                 {
                     try
                     {
@@ -313,7 +313,7 @@ public class SecurityXmlUserManager
 
         return this.securitySystem;
     }
-    
+
     private String hashPassword( String clearPassword )
     {
         // set the password if its not null
@@ -321,16 +321,15 @@ public class SecurityXmlUserManager
         {
             return StringDigester.getSha1Digest( clearPassword );
         }
-        
+
         return clearPassword;
     }
 
     public void setUsersRoles( String userId, String userSource, Set<RoleIdentifier> roleIdentifiers )
-        throws UserNotFoundException,
-            InvalidConfigurationException
+        throws UserNotFoundException, InvalidConfigurationException
     {
         // delete if no roleIdentifiers
-        if( roleIdentifiers == null || roleIdentifiers.isEmpty())
+        if ( roleIdentifiers == null || roleIdentifiers.isEmpty() )
         {
             try
             {
@@ -338,7 +337,8 @@ public class SecurityXmlUserManager
             }
             catch ( NoSuchRoleMappingException e )
             {
-                this.logger.debug( "User role mapping for user: "+ userId +" source: "+ userSource + " could not be deleted because it does not exist." );
+                this.logger.debug( "User role mapping for user: " + userId + " source: " + userSource
+                    + " could not be deleted because it does not exist." );
             }
         }
         else
@@ -346,17 +346,17 @@ public class SecurityXmlUserManager
             SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
             roleMapping.setUserId( userId );
             roleMapping.setSource( userSource );
-            
+
             for ( RoleIdentifier roleIdentifier : roleIdentifiers )
             {
                 // make sure we only save roles that we manage
                 // TODO: although we shouldn't need to worry about this.
-                if( this.getSource().equals( roleIdentifier.getSource() ))
+                if ( this.getSource().equals( roleIdentifier.getSource() ) )
                 {
                     roleMapping.addRole( roleIdentifier.getRoleId() );
                 }
             }
-            
+
             // try to update first
             try
             {
@@ -365,14 +365,15 @@ public class SecurityXmlUserManager
             catch ( NoSuchRoleMappingException e )
             {
                 // update failed try create
-                this.logger.debug( "Update of user role mapping for user: "+ userId +" source: "+ userSource +" did not exist, creating new one.");
+                this.logger.debug( "Update of user role mapping for user: " + userId + " source: " + userSource
+                    + " did not exist, creating new one." );
                 this.configuration.createUserRoleMapping( roleMapping );
             }
         }
-        
+
         // save the config
         this.saveConfiguration();
-        
+
     }
 
     public String getAuthenticationRealmName()

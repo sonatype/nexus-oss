@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.realms;
 
-import java.util.List;
-
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -26,11 +24,16 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * An Authorizing Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
+ * privileges.  This realm ONLY handles authorization.
+ * @author Brian Demers
+ *
+ */
 @Component( role = Realm.class, hint = XmlAuthorizingRealm.ROLE, description = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
@@ -40,9 +43,6 @@ public class XmlAuthorizingRealm
     
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
-
-    @Requirement( role = PrivilegeDescriptor.class )
-    private List<PrivilegeDescriptor> privilegeDescriptors;
 
     public XmlAuthorizingRealm()
     {

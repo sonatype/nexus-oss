@@ -20,11 +20,11 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 
 /**
- * This class should really be doing an uber generic clone, but it is this for now
+ * This class should really be doing an uber generic clone, but it is this for now.
  */
+@Deprecated
 public class ObjectCloner
 {
-    @SuppressWarnings("unchecked")
     protected static final CUser clone( CUser user )
     {
         if ( user == null )
@@ -52,7 +52,6 @@ public class ObjectCloner
         return cloned;
     }
     
-    @SuppressWarnings("unchecked")
     protected static final CRole clone( CRole role )
     {
         if ( role == null )
@@ -86,7 +85,6 @@ public class ObjectCloner
         return cloned;
     }
     
-    @SuppressWarnings("unchecked")
     protected static final CPrivilege clone( CPrivilege privilege )
     {
         if ( privilege == null )

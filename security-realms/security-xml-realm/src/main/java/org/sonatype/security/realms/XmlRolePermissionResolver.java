@@ -18,14 +18,22 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.tools.StaticSecurityResource;
 
+/**
+ * The default implementation of the RolePermissionResolver which reads roles from {@link StaticSecurityResource}s to
+ * resolve a role into a collection of permissions. This class allows Realm implementations to no know what/how there
+ * roles are used.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = RolePermissionResolver.class )
-public class XmlRolePermissionResolver implements RolePermissionResolver
+public class XmlRolePermissionResolver
+    implements RolePermissionResolver
 {
-    
+
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
-    
 
     @Requirement( role = PrivilegeDescriptor.class )
     private List<PrivilegeDescriptor> privilegeDescriptors;
@@ -94,10 +102,10 @@ public class XmlRolePermissionResolver implements RolePermissionResolver
             return Collections.emptySet();
         }
     }
-    
+
     protected ConfigurationManager getConfigurationManager()
     {
         return configuration;
     }
-    
+
 }

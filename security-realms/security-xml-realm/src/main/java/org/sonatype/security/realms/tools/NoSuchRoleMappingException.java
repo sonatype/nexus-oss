@@ -12,13 +12,14 @@
  */
 package org.sonatype.security.realms.tools;
 
+/**
+ * Thrown when a Role Mapping cannot be found.
+ * 
+ * @author Brian Demers
+ */
 public class NoSuchRoleMappingException
     extends Exception
 {
-
-    /**
-     * Generated serial version UID.
-     */
     private static final long serialVersionUID = -8368148376838186349L;
 
     public NoSuchRoleMappingException()

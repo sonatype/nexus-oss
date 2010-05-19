@@ -32,13 +32,19 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.Sha1ThenMd5CredentialsMatcher;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * An Authentication Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
+ * privileges.  This realm ONLY handles authentication.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE, description = "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Initializable, Realm
 {
     public static final String ROLE = "XmlAuthenticatingRealm";
-    
+
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
     private ConfigurationManager configuration;
 

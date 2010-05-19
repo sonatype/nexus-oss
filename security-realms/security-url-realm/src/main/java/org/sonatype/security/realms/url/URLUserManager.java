@@ -30,6 +30,13 @@ import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 
+/**
+ * The UserManager for the URL Realm. The remote URL used by the URL Realm is NOT hit. When performing a search for a
+ * user the name in the search criteria is returned. <BR/>
+ * NOTE: This realm is typically used when trying to integrate with an existing system, and another directory is not available.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
 public class URLUserManager
     extends AbstractReadOnlyUserManager
@@ -76,11 +83,6 @@ public class URLUserManager
         }
 
         return null;
-    }
-
-    public boolean isPrimary()
-    {
-        return true;
     }
 
     public Set<User> listUsers()

@@ -12,10 +12,7 @@
  */
 package org.sonatype.security.realms.url;
 
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.shiro.authc.AccountException;
@@ -28,9 +25,7 @@ import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.crypto.hash.Sha1Hash;
@@ -49,15 +44,16 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
-import org.sonatype.security.authorization.NoSuchPrivilegeException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CRole;
-import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
+/**
+ * A Realm that connects to a remote URL to verify authorization.<BR/>
+ * All URL realm users are given the role defined by ${url-authentication-default-role}.<BR/>
+ * NOTE: Redirects are NOT followed.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = Realm.class, hint = "url", description = "URL Realm" )
 public class URLRealm
     extends AuthorizingRealm
@@ -71,19 +67,13 @@ public class URLRealm
     @Configuration( value = "default-authentication-cache" )
     private String authenticationCacheName;
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
-    private ConfigurationManager configuration;
-
     @Requirement( role = UserManager.class, hint = "url" )
     private UserManager userManager;
-
-    @Requirement( role = PrivilegeDescriptor.class )
-    private List<PrivilegeDescriptor> privilegeDescriptors;
 
     @Requirement
     private Logger logger;
 
-    private Cache authenticatingCache = null;
+    private Cache<Object, Object> authenticatingCache = null;
 
     private String DEFAULT_AUTHENTICATION_CACHE_POSTFIX = "-authentication";
 
@@ -172,7 +162,7 @@ public class URLRealm
         return username + "-" + h.toString() + "-" + this.getClass().getSimpleName();
     }
 
-    private Cache getAuthenticationCache()
+    private Cache<Object, Object> getAuthenticationCache()
     {
 
         if ( this.authenticatingCache == null )
@@ -276,79 +266,12 @@ public class URLRealm
 
         // we don't have a list of users for this realm, so the default role effects ALL users
 
-        LinkedList<String> rolesToProcess = new LinkedList<String>();
-        // add the defaultRole and resolve the privleges
-        rolesToProcess.add( this.defaultRole );
+        Set<String> roles = new HashSet<String>();
+        roles.add( this.defaultRole );
 
-        // this should be put into a component, or better yet at a higher level
-        // REFACTOR below (copied from XmlAuthorizingRealm) vvvv
-        Set<String> roleIds = new LinkedHashSet<String>();
-        Set<Permission> permissions = new LinkedHashSet<Permission>();
-        while ( !rolesToProcess.isEmpty() )
-        {
-            String roleId = rolesToProcess.removeFirst();
-            if ( !roleIds.contains( roleId ) )
-            {
-                CRole role;
-                try
-                {
-                    role = configuration.readRole( roleId );
-                    roleIds.add( roleId );
-
-                    // process the roles this role has
-                    rolesToProcess.addAll( role.getRoles() );
-
-                    // add the permissions this role has
-                    List<String> privilegeIds = role.getPrivileges();
-                    for ( String privilegeId : privilegeIds )
-                    {
-                        Set<Permission> set = getPermissions( privilegeId );
-                        permissions.addAll( set );
-                    }
-                }
-                catch ( NoSuchRoleException e )
-                {
-                    // skip the permissions, but we still want to add the role
-                    roleIds.add( roleId );
-                }
-            }
-        }
-
-        // end refactor ^^^
-
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roleIds );
-        info.setObjectPermissions( permissions );
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roles );
 
         return info;
-    }
-
-    private Set<Permission> getPermissions( String privilegeId )
-    {
-        try
-        {
-            CPrivilege privilege = getConfigurationManager().readPrivilege( privilegeId );
-
-            for ( PrivilegeDescriptor descriptor : privilegeDescriptors )
-            {
-                String permission = descriptor.buildPermission( privilege );
-
-                if ( permission != null )
-                {
-                    return Collections.singleton( (Permission) new WildcardPermission( permission ) );
-                }
-            }
-
-            return Collections.emptySet();
-        }
-        catch ( NoSuchPrivilegeException e )
-        {
-            return Collections.emptySet();
-        }
-    }
-
-    protected ConfigurationManager getConfigurationManager()
-    {
-        return configuration;
     }
 
     // we only need test to have access to this.

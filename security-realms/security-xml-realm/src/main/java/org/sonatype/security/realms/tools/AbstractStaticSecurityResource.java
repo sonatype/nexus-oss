@@ -25,6 +25,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 
+/**
+ * An abstract class that removes the boiler plate code of reading in the security configuration.
+ * 
+ * @author Brian Demers
+ */
 public abstract class AbstractStaticSecurityResource
     implements StaticSecurityResource
 {
@@ -78,7 +83,7 @@ public abstract class AbstractStaticSecurityResource
                 IOUtil.close( is );
             }
         }
-        
+
         // any other time just return null
         return null;
     }

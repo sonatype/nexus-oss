@@ -29,14 +29,18 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
+/**
+ * A user manger that returns all users that have roles defined in the security.xml file. This allows you to easily
+ * search for users that have added roles. For example if your users generally come from an external Realm (LDAP) you
+ * could see which users have had roles added to them.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = UserManager.class, hint = "allConfigured", description = "All Configured Users" )
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
@@ -47,7 +51,7 @@ public class ConfiguredUsersUserManager
 
     @Requirement
     private PlexusContainer container;
-    
+
     // @Requirement
     private SecuritySystem securitySystem;
 
@@ -80,7 +84,7 @@ public class ConfiguredUsersUserManager
             {
                 this.logger.warn( "User: '" + userRoleMapping.getUserId() + "' of source: '"
                     + userRoleMapping.getSource() + "' could not be found." );
-                
+
                 this.logger.debug( "Most likely caused by a user role mapping that is invalid.", e );
             }
             catch ( NoSuchUserManagerException e )
@@ -126,7 +130,7 @@ public class ConfiguredUsersUserManager
     public Set<User> searchUsers( UserSearchCriteria criteria )
     {
         // we only want to do this if the criteria is set to the source
-        if ( this.getSource().equals( criteria.getSource() ))
+        if ( this.getSource().equals( criteria.getSource() ) )
         {
             return this.filterListInMemeory( this.listUsers(), criteria );
         }
@@ -154,13 +158,13 @@ public class ConfiguredUsersUserManager
         return this.securitySystem;
     }
 
-
-    
-    /* (non-Javadoc)
-     * @see org.sonatype.security.usermanagement.AbstractUserManager#matchesCriteria(java.lang.String, java.lang.String, java.util.Collection, org.sonatype.security.usermanagement.UserSearchCriteria)
+    /*
+     * (non-Javadoc)
+     * @see org.sonatype.security.usermanagement.AbstractUserManager#matchesCriteria(java.lang.String, java.lang.String,
+     * java.util.Collection, org.sonatype.security.usermanagement.UserSearchCriteria)
      */
     protected boolean matchesCriteria( String userId, String userSource, Collection<String> usersRoles,
-        UserSearchCriteria criteria )
+                                       UserSearchCriteria criteria )
     {
         // basically the same as the super, but we don't want to check the source
         if ( StringUtils.isNotEmpty( criteria.getUserId() )
@@ -191,5 +195,5 @@ public class ConfiguredUsersUserManager
     {
         return null;
     }
-    
+
 }

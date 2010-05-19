@@ -15,13 +15,24 @@ package org.sonatype.security.realms.tools;
 import org.sonatype.plugin.ExtensionPoint;
 import org.sonatype.security.model.Configuration;
 
+/**
+ * A StaticSecurityResource all for other components/plugins to contributes users/roles/privileges to the security
+ * model.
+ * 
+ * @author Brian Demers
+ */
 @ExtensionPoint
 public interface StaticSecurityResource
 {
-
-    // String getResourcePath();
-
+    /**
+     * Gets the security configuration.
+     * @return
+     */
     Configuration getConfiguration();
 
+    /**
+     * Marks the Configuration dirty so it can be reloaded.
+     * @return
+     */
     boolean isDirty();
 }

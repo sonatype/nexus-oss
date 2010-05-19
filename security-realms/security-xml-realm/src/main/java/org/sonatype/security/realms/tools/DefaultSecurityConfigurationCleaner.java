@@ -20,16 +20,23 @@ import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 
+/**
+ * Removes dead references to roles and permissions in the security model. When a permission is removed all roles will
+ * be updated so the permission reference can removed. When a Role is removed references are removed from other roles
+ * and users.
+ * 
+ * @author Brian Demers
+ */
 @Component( role = SecurityConfigurationCleaner.class )
 public class DefaultSecurityConfigurationCleaner
     extends AbstractLogEnabled
     implements SecurityConfigurationCleaner
-{    
+{
     public void privilegeRemoved( Configuration configuration, String privilegeId )
     {
         getLogger().debug( "Cleaning privilege id " + privilegeId + " from roles." );
         List<CRole> roles = configuration.getRoles();
-        
+
         for ( CRole role : roles )
         {
             if ( role.getPrivileges().contains( privilegeId ) )
@@ -44,7 +51,7 @@ public class DefaultSecurityConfigurationCleaner
     {
         getLogger().debug( "Cleaning role id " + roleId + " from users and roles." );
         List<CRole> roles = configuration.getRoles();
-        
+
         for ( CRole role : roles )
         {
             if ( role.getRoles().contains( roleId ) )
@@ -53,9 +60,9 @@ public class DefaultSecurityConfigurationCleaner
                 role.getRoles().remove( roleId );
             }
         }
-        
+
         List<CUserRoleMapping> mappings = configuration.getUserRoleMappings();
-        
+
         for ( CUserRoleMapping mapping : mappings )
         {
             if ( mapping.getRoles().contains( roleId ) )
