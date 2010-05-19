@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<nexusConfiguration>
+  <version>1.0.8</version>
+
+  <smtpConfiguration>
+    <host>localhost</host>
+    <port>${email-server-port}</port>
+    <sslEnabled>false</sslEnabled>
+    <tlsEnabled>false</tlsEnabled>
+    <username>smtp-username</username>
+    <password>smtp-password</password>
+    <debugMode>false</debugMode>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+
+  <security>
+    <enabled>false</enabled>
+    <anonymousAccessEnabled>true</anonymousAccessEnabled>
+    <anonymousUsername>anonymous</anonymousUsername>
+    <anonymousPassword>anonymous</anonymousPassword>
+    <realms>
+      <realm>XmlAuthenticatingRealm</realm>
+      <realm>XmlAuthorizingRealm</realm>
+    </realms>
+  </security>
+  <globalConnectionSettings />
+  <restApi>
+    <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
+  </restApi>
+  <httpProxy>
+    <port>${nexus-proxy-port}</port>
+    <proxyPolicy>strict</proxyPolicy>
+  </httpProxy>
+  <routing>
+    <groups />
+  </routing>
+  <repositories>
+    <repository>
+      <id>r1</id>
+      <name>r1</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>r2</id>
+      <name>r2</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>r3</id>
+      <name>r3</name>
+      <allowWrite>true</allowWrite>
+      <repositoryPolicy>snapshot</repositoryPolicy>
+    </repository>
+    <repository>
+      <id>r4</id>
+      <name>r4</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+    <repository>
+      <id>r5</id>
+      <name>r5</name>
+      <allowWrite>true</allowWrite>
+    </repository>
+  </repositories>
+  <repositoryShadows>
+  </repositoryShadows>
+  <repositoryGrouping>
+    <repositoryGroups>
+      <repositoryGroup>
+        <groupId>g1</groupId>
+        <type>maven2</type>
+        <name>g1</name>
+        <repositories>
+          <repository>g2</repository>
+          <repository>r2</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>g2</groupId>
+        <type>maven2</type>
+        <name>g2</name>
+        <repositories>
+          <repository>r4</repository>
+          <repository>r1</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>g3</groupId>
+        <type>maven2</type>
+        <name>g3</name>
+        <repositories>
+          <repository>r5</repository>
+          <repository>r3</repository>
+        </repositories>
+      </repositoryGroup>
+      <repositoryGroup>
+        <groupId>g4</groupId>
+        <type>maven2</type>
+        <name>g4</name>
+        <repositories>
+          <repository>g3</repository>
+          <repository>g1</repository>
+        </repositories>
+      </repositoryGroup>
+    </repositoryGroups>
+  </repositoryGrouping>
+
+  <repositoryTargets>
+    <repositoryTarget>
+      <id>allRepos</id>
+      <name>All M2 Repositories</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+
+    <repositoryTarget>
+      <id>1</id>
+      <name>All (Maven2)</name>
+      <contentClass>maven2</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+    <repositoryTarget>
+      <id>2</id>
+      <name>All (Maven1)</name>
+      <contentClass>maven1</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
+
+
+  </repositoryTargets>
+
+</nexusConfiguration>
