@@ -90,11 +90,11 @@ public class SearchMessageUtil
             // not specified, rely on server side defaults)
             if ( SearchType.EXACT.equals( searchType ) )
             {
-                serviceURI.append( "asKeywords=true&" );
+                serviceURI.append( "exact=true&" );
             }
             else if ( SearchType.SCORED.equals( searchType ) )
             {
-                serviceURI.append( "asKeywords=false&" );
+                serviceURI.append( "exact=false&" );
             }
         }
 
