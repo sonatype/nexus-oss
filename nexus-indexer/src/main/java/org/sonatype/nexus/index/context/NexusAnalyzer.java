@@ -59,6 +59,7 @@ public class NexusAnalyzer
         }
     }
 
+    @Deprecated
     public static class DeprecatedClassnamesTokenizer
         extends CharTokenizer
     {

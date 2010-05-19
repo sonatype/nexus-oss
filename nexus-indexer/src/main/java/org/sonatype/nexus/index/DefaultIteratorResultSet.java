@@ -13,14 +13,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
-import org.apache.lucene.search.highlight.SimpleFragmenter;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusIndexSearcher;
 
 /**
- * Default implementation of IteratorResultSet.
+ * Default implementation of IteratorResultSet. TODO: there is too much of logic, refactor this!
  * 
  * @author cstamas
  */
@@ -283,7 +282,8 @@ public class DefaultIteratorResultSet
 
         tokenStream.reset();
 
-        String rv = highlighter.getBestFragments( tokenStream, text, 1, "..." );
+        // TODO: this is okay for now, since (see above) we "support" HTML mode only, but later...
+        String rv = highlighter.getBestFragments( tokenStream, text, 3, "<BR/>" );
 
         return rv.length() == 0 ? null : rv;
     }

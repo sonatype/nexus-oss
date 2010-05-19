@@ -176,7 +176,6 @@ public interface IndexingContext
      * creates a new instance of analyzer!
      * 
      * @return
-     * @deprecated Should not be used directly, since NexusAnalyzer is not thread-safe! Create a new instance if needed.
      */
     Analyzer getAnalyzer();
 
