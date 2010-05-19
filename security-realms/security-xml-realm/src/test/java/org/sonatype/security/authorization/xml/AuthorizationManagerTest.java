@@ -17,10 +17,10 @@ import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
+import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
 
 public class AuthorizationManagerTest
     extends AbstractSecurityTestCase
@@ -110,7 +110,7 @@ public class AuthorizationManagerTest
 
         authzManager.addRole(role );
 
-        SecurityRole secRole = this.getConfigurationManager().readRole( role.getRoleId() );
+        CRole secRole = this.getConfigurationManager().readRole( role.getRoleId() );
 
         Assert.assertEquals( role.getRoleId(), secRole.getId() );
         Assert.assertEquals( role.getName(), secRole.getName() );
@@ -136,7 +136,7 @@ public class AuthorizationManagerTest
 
         authzManager.updateRole( role2 );
 
-        SecurityRole secRole = this.getConfigurationManager().readRole( role2.getRoleId() );
+        CRole secRole = this.getConfigurationManager().readRole( role2.getRoleId() );
 
         Assert.assertEquals( role2.getRoleId(), secRole.getId() );
         Assert.assertEquals( role2.getName(), secRole.getName() );
@@ -263,7 +263,7 @@ public class AuthorizationManagerTest
 
         authzManager.addPrivilege( privilege );
 
-        SecurityPrivilege secPriv = this.getConfigurationManager().readPrivilege( privilege.getId() );
+        CPrivilege secPriv = this.getConfigurationManager().readPrivilege( privilege.getId() );
 
         Assert.assertEquals( privilege.getId(), secPriv.getId() );
         Assert.assertEquals( privilege.getName(), secPriv.getName() );
@@ -287,7 +287,7 @@ public class AuthorizationManagerTest
 
         authzManager.updatePrivilege( priv2 );
 
-        SecurityPrivilege secPriv = this.getConfigurationManager().readPrivilege( priv2.getId() );
+        CPrivilege secPriv = this.getConfigurationManager().readPrivilege( priv2.getId() );
 
         Assert.assertEquals( priv2.getId(), secPriv.getId() );
         Assert.assertEquals( priv2.getName(), secPriv.getName() );
@@ -351,7 +351,7 @@ public class AuthorizationManagerTest
     }
 
     @SuppressWarnings( "unchecked" )
-    private Map<String, String> getPropertyMap( SecurityPrivilege secPriv )
+    private Map<String, String> getPropertyMap( CPrivilege secPriv )
     {
         Map<String, String> props = new HashMap<String, String>();
 

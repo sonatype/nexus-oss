@@ -13,14 +13,16 @@
 package org.sonatype.security.realms.tools;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
 
 import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 
 public class UserRoleMappingTest
     extends PlexusTestCase
@@ -37,7 +39,7 @@ public class UserRoleMappingTest
     {
         ConfigurationManager config = this.getConfigManager();
 
-        SecurityUser user = config.readUser( "test-user" );
+        CUser user = config.readUser( "test-user" );
         Assert.assertEquals( user.getId(), "test-user" );
         Assert.assertEquals( user.getEmail(), "changeme1@yourcompany.com" );
         Assert.assertEquals( user.getFirstName(), "Test" );
@@ -45,9 +47,11 @@ public class UserRoleMappingTest
         Assert.assertEquals( user.getPassword(), "b2a0e378437817cebdf753d7dff3dd75483af9e0" );
         Assert.assertEquals( user.getStatus(), "active" );
 
-        Assert.assertTrue( user.getRoles().contains( "role1" ) );
-        Assert.assertTrue( user.getRoles().contains( "role2" ) );
-        Assert.assertEquals( 2, user.getRoles().size() );
+        CUserRoleMapping mapping = config.readUserRoleMapping( "test-user", "default" );
+
+        Assert.assertTrue( mapping.getRoles().contains( "role1" ) );
+        Assert.assertTrue( mapping.getRoles().contains( "role2" ) );
+        Assert.assertEquals( 2, mapping.getRoles().size() );
     }
 
     public void testUpdateUsersRoles()
@@ -57,16 +61,19 @@ public class UserRoleMappingTest
 
         // make sure we have exactly 4 user role mappings
         Assert.assertEquals( 4, config.listUserRoleMappings().size() );
-        
-//        get the test-user and add a role
-        SecurityUser user = config.readUser( "test-user" );
-        user.addRole( "role3" );
-        
+
+        // get the test-user and add a role
+        CUser user = config.readUser( "test-user" );
+
+        CUserRoleMapping roleMapping = config.readUserRoleMapping( "test-user", "default" );
+        List<String> roles = roleMapping.getRoles();
+        roles.add( "role3" );
+
         // update the user
-        config.updateUser( user );
-        
-     // make sure we have exactly 4 user role mappings
-        Assert.assertEquals( 4, config.listUserRoleMappings().size() ); 
+        config.updateUser( user, new HashSet<String>( roles ) );
+
+        // make sure we have exactly 4 user role mappings
+        Assert.assertEquals( 4, config.listUserRoleMappings().size() );
     }
 
     @Override
@@ -76,8 +83,8 @@ public class UserRoleMappingTest
         super.setUp();
 
         // copy the file to a different location because we are going to change it
-        FileUtils.copyFile( new File( "target/test-classes/org/sonatype/security/locators/security.xml" ), new File(
-            "target/test-classes/org/sonatype/security/locators/security-test.xml" ) );
+        FileUtils.copyFile( new File( "target/test-classes/org/sonatype/security/locators/security.xml" ),
+                            new File( "target/test-classes/org/sonatype/security/locators/security-test.xml" ) );
     }
 
     @Override

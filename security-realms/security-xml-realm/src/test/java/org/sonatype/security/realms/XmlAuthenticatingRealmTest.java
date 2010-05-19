@@ -13,6 +13,8 @@
 package org.sonatype.security.realms;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -21,13 +23,12 @@ import org.apache.shiro.realm.Realm;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityProperty;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.StringDigester;
 
 public class XmlAuthenticatingRealmTest
@@ -88,14 +89,17 @@ public class XmlAuthenticatingRealmTest
         
         String clearPassword = "default-password";
         
-        SecurityUser user = new SecurityUser();
+        CUser user = new CUser();
         user.setEmail( "testCreateWithPassowrdEmail@somewhere" );
         user.setFirstName( "testCreateWithPassowrdEmail" );
         user.setLastName( "testCreateWithPassowrdEmail" );
         user.setStatus( CUser.STATUS_ACTIVE );
         user.setId( "testCreateWithPassowrdEmailUserId" );
-        user.addRole( "role" );
-        configurationManager.createUser( user, clearPassword );
+        
+        Set<String> roles = new HashSet<String>();
+        roles.add( "role" );
+        
+        configurationManager.createUser( user, clearPassword, roles );
         
         UsernamePasswordToken upToken = new UsernamePasswordToken( "testCreateWithPassowrdEmailUserId", clearPassword );
         
@@ -146,25 +150,25 @@ public class XmlAuthenticatingRealmTest
     
     private void buildTestAuthenticationConfig( String status ) throws InvalidConfigurationException
     {
-        SecurityPrivilege priv = new SecurityPrivilege();
+        CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
         priv.setName( "name" );
         priv.setDescription( "desc" );
         priv.setType( "method" );
         
-        SecurityProperty prop = new SecurityProperty();
+        CProperty prop = new CProperty();
         prop.setKey( "method" );
         prop.setValue( "read" );
         priv.addProperty( prop );
         
-        prop = new SecurityProperty();
+        prop = new CProperty();
         prop.setKey( "permission" );
         prop.setValue( "somevalue" );
         priv.addProperty( prop );
         
         configurationManager.createPrivilege( priv );
         
-        SecurityRole role = new SecurityRole();
+        CRole role = new CRole();
         role.setName( "name" );
         role.setId( "role" );
         role.setDescription( "desc" );
@@ -173,17 +177,18 @@ public class XmlAuthenticatingRealmTest
         
         configurationManager.createRole( role );
         
-        SecurityUser user = new SecurityUser();
+        CUser user = new CUser();
         user.setEmail( "dummyemail@somewhere" );
         user.setFirstName( "dummyFirstName" );
         user.setLastName( "dummyLastName" );
         user.setStatus( status );
         user.setId( "username" );
         user.setPassword( StringDigester.getSha1Digest( "password" ) );
-        user.addRole( "role" );
         
-        configurationManager.createUser( user );
+        Set<String> roles = new HashSet<String>();
+        roles.add( "role" );
         
+        configurationManager.createUser( user, roles );
         configurationManager.save();
     }
 }

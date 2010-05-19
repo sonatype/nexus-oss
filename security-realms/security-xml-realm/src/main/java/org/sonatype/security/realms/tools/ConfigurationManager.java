@@ -13,15 +13,16 @@
 package org.sonatype.security.realms.tools;
 
 import java.util.List;
+import java.util.Set;
 
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -38,21 +39,21 @@ public interface ConfigurationManager
      * 
      * @return
      */
-    List<SecurityUser> listUsers();
+    List<CUser> listUsers();
 
     /**
      * Retrieve all roles
      * 
      * @return
      */
-    List<SecurityRole> listRoles();
+    List<CRole> listRoles();
 
     /**
      * Retrieve all privileges
      * 
      * @return
      */
-    List<SecurityPrivilege> listPrivileges();
+    List<CPrivilege> listPrivileges();
 
     /**
      * Retrieve all descriptors of available privileges
@@ -66,7 +67,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void createUser( SecurityUser user )
+    void createUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException;
 
     /**
@@ -75,7 +76,7 @@ public interface ConfigurationManager
      * @param user
      * @param password
      */
-    void createUser( SecurityUser user, String password )
+    void createUser( CUser user, String password, Set<String> roles )
         throws InvalidConfigurationException;
 
     /**
@@ -83,7 +84,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void createUser( SecurityUser user, SecurityValidationContext context )
+    void createUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException;
 
     /**
@@ -92,7 +93,7 @@ public interface ConfigurationManager
      * @param user
      * @param password
      */
-    void createUser( SecurityUser user, String password, SecurityValidationContext context )
+    void createUser( CUser user, String password, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException;
 
     /**
@@ -100,7 +101,7 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void createRole( SecurityRole role )
+    void createRole( CRole role )
         throws InvalidConfigurationException;
 
     /**
@@ -108,7 +109,7 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void createRole( SecurityRole role, SecurityValidationContext context )
+    void createRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException;
 
     /**
@@ -116,7 +117,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void createPrivilege( SecurityPrivilege privilege )
+    void createPrivilege( CPrivilege privilege )
         throws InvalidConfigurationException;
 
     /**
@@ -124,7 +125,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    void createPrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException;
 
     /**
@@ -133,7 +134,7 @@ public interface ConfigurationManager
      * @param id
      * @return
      */
-    SecurityUser readUser( String id )
+    CUser readUser( String id )
         throws UserNotFoundException;
 
     /**
@@ -142,7 +143,7 @@ public interface ConfigurationManager
      * @param id
      * @return
      */
-    SecurityRole readRole( String id )
+    CRole readRole( String id )
         throws NoSuchRoleException;
 
     /**
@@ -151,7 +152,7 @@ public interface ConfigurationManager
      * @param id
      * @return
      */
-    SecurityPrivilege readPrivilege( String id )
+    CPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException;
 
     /**
@@ -159,7 +160,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void updateUser( SecurityUser user )
+    void updateUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException, UserNotFoundException;
 
     /**
@@ -167,7 +168,7 @@ public interface ConfigurationManager
      * 
      * @param user
      */
-    void updateUser( SecurityUser user, SecurityValidationContext context )
+    void updateUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException, UserNotFoundException;
 
     /**
@@ -175,7 +176,7 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void updateRole( SecurityRole role )
+    void updateRole( CRole role )
         throws InvalidConfigurationException, NoSuchRoleException;
 
     /**
@@ -183,25 +184,25 @@ public interface ConfigurationManager
      * 
      * @param role
      */
-    void updateRole( SecurityRole role, SecurityValidationContext context )
+    void updateRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException, NoSuchRoleException;
 
-    void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    void createUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException;
 
-    void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    void createUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException;
 
-    void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    void updateUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException, NoSuchRoleMappingException;
 
-    void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    void updateUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException, NoSuchRoleMappingException;
 
-    SecurityUserRoleMapping readUserRoleMapping( String userId, String source )
+    CUserRoleMapping readUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException;
 
-    List<SecurityUserRoleMapping> listUserRoleMappings();
+    List<CUserRoleMapping> listUserRoleMappings();
 
     void deleteUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException;
@@ -211,7 +212,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void updatePrivilege( SecurityPrivilege privilege )
+    void updatePrivilege( CPrivilege privilege )
         throws InvalidConfigurationException, NoSuchPrivilegeException;
 
     /**
@@ -219,7 +220,7 @@ public interface ConfigurationManager
      * 
      * @param privilege
      */
-    void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    void updatePrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException, NoSuchPrivilegeException;
 
     /**
@@ -253,7 +254,7 @@ public interface ConfigurationManager
      * @param key
      * @return
      */
-    String getPrivilegeProperty( SecurityPrivilege privilege, String key );
+    String getPrivilegeProperty( CPrivilege privilege, String key );
 
     /**
      * Helper method to retrieve a property from the privilege

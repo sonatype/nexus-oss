@@ -2,7 +2,6 @@ package org.sonatype.security.usermanagement.xml;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -24,7 +23,6 @@ import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Writer;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.StringDigester;
@@ -107,7 +105,7 @@ public class UserManagerTest
 
         ConfigurationManager config = this.getConfigurationManager();
 
-        SecurityUser secUser = config.readUser( user.getUserId() );
+        CUser secUser = config.readUser( user.getUserId() );
         Assert.assertEquals( secUser.getId(), user.getUserId() );
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
@@ -116,9 +114,11 @@ public class UserManagerTest
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
-        Assert.assertTrue( secUser.getRoles().contains( "role1" ) );
-        Assert.assertTrue( secUser.getRoles().contains( "role3" ) );
-        Assert.assertEquals( 2, user.getRoles().size() );
+        CUserRoleMapping roleMapping = config.readUserRoleMapping( "testCreateUser", "default" );
+        
+        Assert.assertTrue( roleMapping.getRoles().contains( "role1" ) );
+        Assert.assertTrue( roleMapping.getRoles().contains( "role3" ) );
+        Assert.assertEquals( 2, roleMapping.getRoles().size() );
     }
 
     public void testSupportsWrite()
@@ -154,7 +154,7 @@ public class UserManagerTest
 
         ConfigurationManager config = this.getConfigurationManager();
 
-        SecurityUser secUser = config.readUser( user.getUserId() );
+        CUser secUser = config.readUser( user.getUserId() );
         Assert.assertEquals( secUser.getId(), user.getUserId() );
         Assert.assertEquals( secUser.getEmail(), user.getEmailAddress() );
         Assert.assertEquals( secUser.getFirstName(), user.getFirstName() );
@@ -163,8 +163,10 @@ public class UserManagerTest
 
         Assert.assertEquals( secUser.getStatus(), user.getStatus().name() );
 
-        Assert.assertTrue( secUser.getRoles().contains( "role3" ) );
-        Assert.assertEquals( "roles: " + user.getRoles(), 1, user.getRoles().size() );
+        CUserRoleMapping roleMapping = config.readUserRoleMapping( "test-user", "default" );
+        
+        Assert.assertTrue( roleMapping.getRoles().contains( "role3" ) );
+        Assert.assertEquals( "roles: " + roleMapping.getRoles(), 1, roleMapping.getRoles().size() );
     }
 
     public void testDeleteUser()

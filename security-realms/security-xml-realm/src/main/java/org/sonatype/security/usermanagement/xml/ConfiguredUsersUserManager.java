@@ -25,8 +25,8 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
 import org.sonatype.security.usermanagement.User;
@@ -69,8 +69,8 @@ public class ConfiguredUsersUserManager
     {
         Set<User> users = new HashSet<User>();
 
-        List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
-        for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
+        List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+        for ( CUserRoleMapping userRoleMapping : userRoleMappings )
         {
             try
             {
@@ -108,8 +108,8 @@ public class ConfiguredUsersUserManager
             userIds.add( user.getUserId() );
         }
 
-        List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
-        for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
+        List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+        for ( CUserRoleMapping userRoleMapping : userRoleMappings )
         {
             String userId = userRoleMapping.getUserId();
             if ( StringUtils.isNotEmpty( userId ) )

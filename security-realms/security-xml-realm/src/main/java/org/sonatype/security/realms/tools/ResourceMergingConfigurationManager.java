@@ -29,12 +29,9 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -70,13 +67,13 @@ public class ResourceMergingConfigurationManager
         lock.unlock();
     }
 
-    public void createPrivilege( SecurityPrivilege privilege )
+    public void createPrivilege( CPrivilege privilege )
         throws InvalidConfigurationException
     {
         manager.createPrivilege( privilege, initializeContext() );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    public void createPrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -88,13 +85,13 @@ public class ResourceMergingConfigurationManager
         manager.createPrivilege( privilege, context );
     }
 
-    public void createRole( SecurityRole role )
+    public void createRole( CRole role )
         throws InvalidConfigurationException
     {
         manager.createRole( role, initializeContext() );
     }
 
-    public void createRole( SecurityRole role, SecurityValidationContext context )
+    public void createRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -106,25 +103,25 @@ public class ResourceMergingConfigurationManager
         manager.createRole( role, context );
     }
 
-    public void createUser( SecurityUser user )
+    public void createUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException
     {
-        manager.createUser( user, initializeContext() );
+        manager.createUser( user, roles, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, String password )
+    public void createUser( CUser user, String password, Set<String> roles )
         throws InvalidConfigurationException
     {
-        manager.createUser( user, password, initializeContext() );
+        manager.createUser( user, password, roles, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, SecurityValidationContext context )
+    public void createUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
-        createUser( user, null, context );
+        createUser( user, null, roles, context );
     }
 
-    public void createUser( SecurityUser user, String password, SecurityValidationContext context )
+    public void createUser( CUser user, String password, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -133,7 +130,7 @@ public class ResourceMergingConfigurationManager
         }
 
         // The static config can't be updated, so delegate to xml file
-        manager.createUser( user, password, context );
+        manager.createUser( user, password, roles, context );
     }
 
     public void deletePrivilege( String id )
@@ -157,7 +154,7 @@ public class ResourceMergingConfigurationManager
         manager.deleteUser( id );
     }
 
-    public String getPrivilegeProperty( SecurityPrivilege privilege, String key )
+    public String getPrivilegeProperty( CPrivilege privilege, String key )
     {
         return manager.getPrivilegeProperty( privilege, key );
     }
@@ -207,25 +204,32 @@ public class ResourceMergingConfigurationManager
         return context;
     }
 
-    public List<SecurityPrivilege> listPrivileges()
+    public List<CPrivilege> listPrivileges()
     {
-        List<SecurityPrivilege> list = manager.listPrivileges();
+        List<CPrivilege> list = new ArrayList<CPrivilege>( manager.listPrivileges() );
 
         for ( CPrivilege item : (List<CPrivilege>) getConfiguration().getPrivileges() )
         {
-            list.add( new SecurityPrivilege( item, true ) );
+            // ALL privileges that come from StaticSecurityResources are NOT editable
+            // only roles defined in the security.xml can be updated.
+            item.setReadOnly( true );
+            list.add( item );
         }
 
         return list;
     }
 
-    public List<SecurityRole> listRoles()
+    public List<CRole> listRoles()
     {
-        List<SecurityRole> list = manager.listRoles();
+        List<CRole> list = new ArrayList<CRole>( manager.listRoles() );
 
         for ( CRole item : (List<CRole>) getConfiguration().getRoles() )
         {
-            list.add( new SecurityRole( item, true ) );
+            CRole role = item;
+            // ALL roles that come from StaticSecurityResources are NOT editable
+            // only roles defined in the security.xml can be updated.
+            item.setReadOnly( true );
+            list.add( role );
         }
 
         return list;
@@ -295,40 +299,40 @@ public class ResourceMergingConfigurationManager
         return newRole;
     }
     
-    public List<SecurityUser> listUsers()
+    public List<CUser> listUsers()
     {
-        List<SecurityUser> list = manager.listUsers();
-
-        for ( CUser item : (List<CUser>) getConfiguration().getUsers() )
-        {
-            list.add( new SecurityUser( item, true ) );
-        }
-
-        return list;
+        return manager.listUsers();
     }
 
-    public SecurityPrivilege readPrivilege( String id )
+    public CPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException
     {
         for ( CPrivilege privilege : (List<CPrivilege>) getConfiguration().getPrivileges() )
         {
             if ( privilege.getId().equals( id ) )
             {
-                return new SecurityPrivilege( privilege, true );
+             // ALL privileges that come from StaticSecurityResources are NOT editable
+                // only roles defined in the security.xml can be updated.
+                privilege.setReadOnly( true );
+                return privilege;
             }
         }
 
         return manager.readPrivilege( id );
     }
 
-    public SecurityRole readRole( String id )
+    public CRole readRole( String id )
         throws NoSuchRoleException
     {
         for ( CRole role : (List<CRole>) getConfiguration().getRoles() )
         {
             if ( role.getId().equals( id ) )
             {
-                return new SecurityRole( role, true );
+                // ALL roles that come from StaticSecurityResources are NOT editable
+                // only roles defined in the security.xml can be updated.
+                role.setReadOnly( true );
+                
+                return role;
             }
         }
 
@@ -336,21 +340,14 @@ public class ResourceMergingConfigurationManager
         return manager.readRole( id );
     }
 
-    public SecurityUser readUser( String id )
+    public CUser readUser( String id )
         throws UserNotFoundException
     {
-        for ( CUser user : (List<CUser>) getConfiguration().getUsers() )
-        {
-            if ( user.getId().equals( id ) )
-            {
-                return new SecurityUser( user, true );
-            }
-        }
-
+        // users can only come from the security.xml
         return manager.readUser( id );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    public void createUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -361,7 +358,7 @@ public class ResourceMergingConfigurationManager
         this.manager.createUserRoleMapping( userRoleMapping, context );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    public void createUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException
     {
         this.manager.createUserRoleMapping( userRoleMapping, this.initializeContext() );
@@ -373,18 +370,18 @@ public class ResourceMergingConfigurationManager
         this.manager.deleteUserRoleMapping( userId, source );
     }
 
-    public List<SecurityUserRoleMapping> listUserRoleMappings()
+    public List<CUserRoleMapping> listUserRoleMappings()
     {
         return this.manager.listUserRoleMappings();
     }
 
-    public SecurityUserRoleMapping readUserRoleMapping( String userId, String source )
+    public CUserRoleMapping readUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
         return this.manager.readUserRoleMapping( userId, source );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    public void updateUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
@@ -396,7 +393,7 @@ public class ResourceMergingConfigurationManager
         this.manager.updateUserRoleMapping( userRoleMapping, context );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    public void updateUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
@@ -503,14 +500,14 @@ public class ResourceMergingConfigurationManager
         manager.save();
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege )
+    public void updatePrivilege( CPrivilege privilege )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
         manager.updatePrivilege( privilege, initializeContext() );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    public void updatePrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
@@ -523,14 +520,14 @@ public class ResourceMergingConfigurationManager
         manager.updatePrivilege( privilege, context );
     }
 
-    public void updateRole( SecurityRole role )
+    public void updateRole( CRole role )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
         manager.updateRole( role, initializeContext() );
     }
 
-    public void updateRole( SecurityRole role, SecurityValidationContext context )
+    public void updateRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
@@ -543,14 +540,14 @@ public class ResourceMergingConfigurationManager
         manager.updateRole( role, context );
     }
 
-    public void updateUser( SecurityUser user )
+    public void updateUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException,
             UserNotFoundException
     {
-        manager.updateUser( user, initializeContext() );
+        manager.updateUser( user, roles, initializeContext() );
     }
 
-    public void updateUser( SecurityUser user, SecurityValidationContext context )
+    public void updateUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException,
             UserNotFoundException
     {
@@ -560,7 +557,7 @@ public class ResourceMergingConfigurationManager
         }
 
         // The static config can't be updated, so delegate to xml file
-        manager.updateUser( user, context );
+        manager.updateUser( user, roles, context );
     }
 
     public List<PrivilegeDescriptor> listPrivilegeDescriptors()

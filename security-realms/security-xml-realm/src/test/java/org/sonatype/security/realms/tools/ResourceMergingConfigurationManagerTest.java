@@ -17,9 +17,8 @@ import java.util.List;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
-import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
 
 public class ResourceMergingConfigurationManagerTest
     extends PlexusTestCase
@@ -46,9 +45,9 @@ public class ResourceMergingConfigurationManagerTest
     public void testRoleMerging()
     throws Exception
     {
-        List<SecurityRole> roles = manager.listRoles();
+        List<CRole> roles = manager.listRoles();
         
-        SecurityRole anon = manager.readRole( "anon" );
+        CRole anon = manager.readRole( "anon" );
         assertTrue( "roles: " + anon.getRoles(),  anon.getRoles().contains( "other" ));
         assertTrue( "roles: " + anon.getRoles(), anon.getRoles().contains( "role2" ));
         assertEquals("roles: " + anon.getRoles(), 2, anon.getRoles().size() );
@@ -61,7 +60,7 @@ public class ResourceMergingConfigurationManagerTest
         assertEquals( "Test Anon Role Description", anon.getDescription() );
         assertEquals( 60, anon.getSessionTimeout() );
         
-        SecurityRole other = manager.readRole( "other" );
+        CRole other = manager.readRole( "other" );
         assertTrue( other.getRoles().contains( "role2" ));
         assertEquals("roles: " + other.getRoles(), 1, other.getRoles().size() );
         
@@ -82,9 +81,9 @@ public class ResourceMergingConfigurationManagerTest
     public void testPrivsMerging()
         throws Exception
     {
-        List<SecurityPrivilege> privs = manager.listPrivileges();
+        List<CPrivilege> privs = manager.listPrivileges();
         
-        SecurityPrivilege priv = manager.readPrivilege( "1-test" );        
+        CPrivilege priv = manager.readPrivilege( "1-test" );        
         assertTrue( priv != null );
         
         priv = manager.readPrivilege( "2-test" );
@@ -108,11 +107,11 @@ public class ResourceMergingConfigurationManagerTest
         assertEquals( "privs: "+ this.privilegeListToStringList( privs ), 10, privs.size() );
     }
     
-    private List<String> privilegeListToStringList( List<SecurityPrivilege> privs )
+    private List<String> privilegeListToStringList( List<CPrivilege> privs )
     {
         List<String> ids = new ArrayList<String>();
         
-        for ( SecurityPrivilege priv : privs )
+        for ( CPrivilege priv : privs )
         {
             ids.add( priv.getId() );
         }

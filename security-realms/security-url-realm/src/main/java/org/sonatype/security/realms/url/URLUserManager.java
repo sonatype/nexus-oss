@@ -20,8 +20,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -89,9 +89,9 @@ public class URLUserManager
     {
         Set<User> users = new HashSet<User>();
 
-        List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+        List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
 
-        for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
+        for ( CUserRoleMapping userRoleMapping : userRoleMappings )
         {
             if ( SOURCE.equals( userRoleMapping.getSource() ) )
             {
@@ -120,8 +120,8 @@ public class URLUserManager
     {
         Set<String> userIds = new HashSet<String>();
 
-        List<SecurityUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
-        for ( SecurityUserRoleMapping userRoleMapping : userRoleMappings )
+        List<CUserRoleMapping> userRoleMappings = this.configuration.listUserRoleMappings();
+        for ( CUserRoleMapping userRoleMapping : userRoleMappings )
         {
             if ( SOURCE.equals( userRoleMapping.getSource() ) )
             {

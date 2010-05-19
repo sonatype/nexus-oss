@@ -29,8 +29,6 @@ import org.sonatype.security.model.CUser;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.usermanagement.AbstractUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.NoSuchUserManagerException;
@@ -66,27 +64,21 @@ public class SecurityXmlUserManager
     @Requirement
     private Logger logger;
 
-    protected SecurityUser toUser( User user )
+    protected CUser toUser( User user )
     {
         if ( user == null )
         {
             return null;
         }
 
-        SecurityUser secUser = new SecurityUser();
+        CUser secUser = new CUser();
 
         secUser.setId( user.getUserId() );
         secUser.setFirstName( user.getFirstName() );
         secUser.setLastName( user.getLastName() );
         secUser.setEmail( user.getEmailAddress() );
         secUser.setStatus( user.getStatus().name() );
-        secUser.setReadOnly( user.isReadOnly() );
         // secUser.setPassword( password )// DO NOT set the users password!
-
-        for ( RoleIdentifier role : user.getRoles() )
-        {
-            secUser.addRole( role.getRoleId() );
-        }
 
         return secUser;
     }
@@ -186,9 +178,9 @@ public class SecurityXmlUserManager
     public User addUser( User user, String password )
         throws InvalidConfigurationException
     {
-        SecurityUser secUser = this.toUser( user );
+        CUser secUser = this.toUser( user );
         secUser.setPassword( this.hashPassword( password ) );
-        this.configuration.createUser( secUser );
+        this.configuration.createUser( secUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
 
         // TODO: i am starting to feel we shouldn't return a user.
@@ -198,9 +190,19 @@ public class SecurityXmlUserManager
     public void changePassword( String userId, String newPassword )
         throws UserNotFoundException, InvalidConfigurationException
     {
-        SecurityUser secUser = this.configuration.readUser( userId );
+        CUser secUser = this.configuration.readUser( userId );
+        Set<String> roles = new HashSet<String>(); 
+        try
+        {
+            CUserRoleMapping userRoleMapping = this.configuration.readUserRoleMapping( userId, SOURCE );
+            roles.addAll( userRoleMapping.getRoles() );
+        }
+        catch ( NoSuchRoleMappingException e )
+        {
+            this.logger.debug( "User: "+ userId +" has no roles." );
+        }
         secUser.setPassword( this.hashPassword( newPassword ) );
-        this.configuration.updateUser( secUser );
+        this.configuration.updateUser( secUser, new HashSet<String>( roles ) );
         this.saveConfiguration();
     }
 
@@ -208,11 +210,11 @@ public class SecurityXmlUserManager
         throws UserNotFoundException, InvalidConfigurationException
     {
         // we need to pull the users password off off the old user object
-        SecurityUser oldSecUser = this.configuration.readUser( user.getUserId() );
-        SecurityUser newSecUser = this.toUser( user );
+        CUser oldSecUser = this.configuration.readUser( user.getUserId() );
+        CUser newSecUser = this.toUser( user );
         newSecUser.setPassword( oldSecUser.getPassword() );
 
-        this.configuration.updateUser( newSecUser );
+        this.configuration.updateUser( newSecUser, this.getRoleIdsFromUser( user ) );
         this.saveConfiguration();
         return user;
     }
@@ -265,8 +267,8 @@ public class SecurityXmlUserManager
 
         // we also need to search through the user role mappings.
 
-        List<SecurityUserRoleMapping> roleMappings = this.configuration.listUserRoleMappings();
-        for ( SecurityUserRoleMapping roleMapping : roleMappings )
+        List<CUserRoleMapping> roleMappings = this.configuration.listUserRoleMappings();
+        for ( CUserRoleMapping roleMapping : roleMappings )
         {
             if ( !SOURCE.equals( roleMapping.getSource() ) )
             {
@@ -343,7 +345,7 @@ public class SecurityXmlUserManager
         }
         else
         {
-            SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
+            CUserRoleMapping roleMapping = new CUserRoleMapping();
             roleMapping.setUserId( userId );
             roleMapping.setSource( userSource );
 
@@ -379,5 +381,17 @@ public class SecurityXmlUserManager
     public String getAuthenticationRealmName()
     {
         return "XmlAuthenticatingRealm";
+    }
+
+    private Set<String> getRoleIdsFromUser( User user )
+    {
+        Set<String> roles = new HashSet<String>();
+        for ( RoleIdentifier roleIdentifier : user.getRoles() )
+        {
+            // TODO: should we just grab the Default roles?
+            // these users are managed by this realm so they should ONLY have roles from it anyway.
+            roles.add( roleIdentifier.getRoleId() );
+        }
+        return roles;
     }
 }

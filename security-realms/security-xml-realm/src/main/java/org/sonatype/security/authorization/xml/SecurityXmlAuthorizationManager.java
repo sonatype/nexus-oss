@@ -28,10 +28,10 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.events.AuthorizationConfigurationChangedEvent;
+import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
 
 /**
  * AuthorizationManager that wraps roles from security-xml-realm.
@@ -57,7 +57,7 @@ public class SecurityXmlAuthorizationManager
         return SOURCE;
     }
 
-    protected Role toRole( SecurityRole secRole )
+    protected Role toRole( CRole secRole )
     {
         Role role = new Role();
 
@@ -72,9 +72,9 @@ public class SecurityXmlAuthorizationManager
         return role;
     }
 
-    protected SecurityRole toRole( Role role )
+    protected CRole toRole( Role role )
     {
-        SecurityRole secRole = new SecurityRole();
+        CRole secRole = new CRole();
 
         secRole.setId( role.getRoleId() );
         secRole.setName( role.getName() );
@@ -86,9 +86,9 @@ public class SecurityXmlAuthorizationManager
         return secRole;
     }
 
-    protected SecurityPrivilege toPrivilege( Privilege privilege )
+    protected CPrivilege toPrivilege( Privilege privilege )
     {
-        SecurityPrivilege secPriv = new SecurityPrivilege();
+        CPrivilege secPriv = new CPrivilege();
         secPriv.setId( privilege.getId() );
         secPriv.setName( privilege.getName() );
         secPriv.setDescription( privilege.getDescription() );
@@ -109,7 +109,7 @@ public class SecurityXmlAuthorizationManager
         return secPriv;
     }
 
-    protected Privilege toPrivilege( SecurityPrivilege secPriv )
+    protected Privilege toPrivilege( CPrivilege secPriv )
     {
         Privilege privilege = new Privilege();
         privilege.setId( secPriv.getId() );
@@ -136,11 +136,11 @@ public class SecurityXmlAuthorizationManager
     public Set<Role> listRoles()
     {
         Set<Role> roles = new HashSet<Role>();
-        List<SecurityRole> secRoles = this.configuration.listRoles();
+        List<CRole> secRoles = this.configuration.listRoles();
 
-        for ( SecurityRole securityRole : secRoles )
+        for ( CRole CRole : secRoles )
         {
-            roles.add( this.toRole( securityRole ) );
+            roles.add( this.toRole( CRole ) );
         }
 
         return roles;
@@ -156,7 +156,7 @@ public class SecurityXmlAuthorizationManager
         throws InvalidConfigurationException
     {
         // the roleId of the secRole might change, so we need to keep the reference
-        SecurityRole secRole = this.toRole( role );
+        CRole secRole = this.toRole( role );
 
         this.configuration.createRole( secRole );
         this.saveConfiguration();
@@ -168,7 +168,7 @@ public class SecurityXmlAuthorizationManager
         throws NoSuchRoleException,
             InvalidConfigurationException
     {
-        SecurityRole secRole = this.toRole( role );
+        CRole secRole = this.toRole( role );
 
         this.configuration.updateRole( secRole );
         this.saveConfiguration();
@@ -190,11 +190,11 @@ public class SecurityXmlAuthorizationManager
     public Set<Privilege> listPrivileges()
     {
         Set<Privilege> privileges = new HashSet<Privilege>();
-        List<SecurityPrivilege> secPrivs = this.configuration.listPrivileges();
+        List<CPrivilege> secPrivs = this.configuration.listPrivileges();
 
-        for ( SecurityPrivilege securityPrivilege : secPrivs )
+        for ( CPrivilege CPrivilege : secPrivs )
         {
-            privileges.add( this.toPrivilege( securityPrivilege ) );
+            privileges.add( this.toPrivilege( CPrivilege ) );
         }
 
         return privileges;
@@ -209,7 +209,7 @@ public class SecurityXmlAuthorizationManager
     public Privilege addPrivilege( Privilege privilege )
         throws InvalidConfigurationException
     {
-        SecurityPrivilege secPriv = this.toPrivilege( privilege );
+        CPrivilege secPriv = this.toPrivilege( privilege );
         // create implies read, so we need to add logic for that
         addInheritedPrivileges( secPriv ); 
         
@@ -223,7 +223,7 @@ public class SecurityXmlAuthorizationManager
         throws NoSuchPrivilegeException,
             InvalidConfigurationException
     {
-        SecurityPrivilege secPriv = this.toPrivilege( privilege );
+        CPrivilege secPriv = this.toPrivilege( privilege );
         this.configuration.updatePrivilege( secPriv );
         this.saveConfiguration();
 
@@ -251,7 +251,7 @@ public class SecurityXmlAuthorizationManager
     }
     
     
-    private void addInheritedPrivileges( SecurityPrivilege privilege )
+    private void addInheritedPrivileges( CPrivilege privilege )
     {
         CProperty methodProperty = null;
 

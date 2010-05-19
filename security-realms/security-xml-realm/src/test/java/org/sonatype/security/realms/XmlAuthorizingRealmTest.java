@@ -14,6 +14,8 @@ package org.sonatype.security.realms;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.Assert;
 
@@ -26,15 +28,16 @@ import org.codehaus.plexus.context.Context;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CProperty;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegePermissionPropertyDescriptor;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.DefaultConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityProperty;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.usermanagement.UserStatus;
 
 public class XmlAuthorizingRealmTest
     extends AbstractSecurityTestCase
@@ -102,15 +105,15 @@ public class XmlAuthorizingRealmTest
     
     private void buildTestAuthorizationConfig() throws InvalidConfigurationException
     {
-        SecurityProperty permissionProp = new SecurityProperty();
+        CProperty permissionProp = new CProperty();
         permissionProp.setKey( ApplicationPrivilegePermissionPropertyDescriptor.ID );
         permissionProp.setValue( "app:config" );
         
-        SecurityProperty methodProp = new SecurityProperty();
+        CProperty methodProp = new CProperty();
         methodProp.setKey( ApplicationPrivilegeMethodPropertyDescriptor.ID );
         methodProp.setValue( "read" );
         
-        SecurityPrivilege priv = new SecurityPrivilege();
+        CPrivilege priv = new CPrivilege();
         priv.setId( "priv" );
         priv.setName( "somepriv" );
         priv.setType( ApplicationPrivilegeDescriptor.TYPE );
@@ -120,7 +123,7 @@ public class XmlAuthorizingRealmTest
         
         configurationManager.createPrivilege( priv );
         
-        SecurityRole role = new SecurityRole();
+        CRole role = new CRole();
         role.setId( "role" );
         role.setName( "somerole" );
         role.setDescription( "somedescription" );
@@ -129,16 +132,18 @@ public class XmlAuthorizingRealmTest
         
         configurationManager.createRole( role );
         
-        SecurityUser user = new SecurityUser();
+        CUser user = new CUser();
         user.setEmail( "dummyemail@foo" );
         user.setFirstName( "dummyFirstName" );
         user.setLastName( "dummyLastName" );
-        user.setStatus( SecurityUser.STATUS_ACTIVE );
+        user.setStatus( UserStatus.active.toString() );
         user.setId( "username" );
         user.setPassword( "password" );
-        user.addRole( role.getId() );
         
-        configurationManager.createUser( user );
+        Set<String> roles = new HashSet<String>();
+        roles.add( role.getId());
+        
+        configurationManager.createUser( user, roles );
         
         configurationManager.save();
     }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -37,10 +38,6 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
-import org.sonatype.security.realms.tools.dao.SecurityUserRoleMapping;
 import org.sonatype.security.realms.validator.SecurityConfigurationValidator;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 import org.sonatype.security.usermanagement.StringDigester;
@@ -72,66 +69,28 @@ public class DefaultConfigurationManager
 
     private ReentrantLock lock = new ReentrantLock();
 
-    public List<SecurityPrivilege> listPrivileges()
+    public List<CPrivilege> listPrivileges()
     {
-        List<SecurityPrivilege> list = new ArrayList<SecurityPrivilege>();
-
-        for ( CPrivilege item : (List<CPrivilege>) getConfiguration().getPrivileges() )
-        {
-            list.add( new SecurityPrivilege( item ) );
-        }
-
-        return list;
+        return Collections.unmodifiableList( getConfiguration().getPrivileges() );
     }
 
-    public List<SecurityRole> listRoles()
+    public List<CRole> listRoles()
     {
-        List<SecurityRole> list = new ArrayList<SecurityRole>();
-
-        for ( CRole item : (List<CRole>) getConfiguration().getRoles() )
-        {
-            list.add( new SecurityRole( item ) );
-        }
-
-        return list;
+        return Collections.unmodifiableList( getConfiguration().getRoles() );
     }
 
-    public List<SecurityUser> listUsers()
+    public List<CUser> listUsers()
     {
-        List<SecurityUser> list = new ArrayList<SecurityUser>();
-
-        for ( CUser user : (List<CUser>) getConfiguration().getUsers() )
-        {
-            // see if we have a userRole mapping
-            List<String> roles = null;
-            try
-            {
-                SecurityUserRoleMapping roleMapping = this.readUserRoleMapping( user.getId(), null );
-                if ( roleMapping != null )
-                {
-                    roles = roleMapping.getRoles();
-                }
-            }
-            catch ( NoSuchRoleMappingException e )
-            {
-                // this really should never happen, but validation could change
-                // but its not going to hurt anything to keep going
-                this.getLogger().debug( e.getMessage() );
-            }
-
-            list.add( new SecurityUser( user, false, roles ) );
-        }
-
-        return list;
+        return Collections.unmodifiableList( getConfiguration().getUsers() );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege )
+    public void createPrivilege( CPrivilege privilege )
         throws InvalidConfigurationException
     {
         createPrivilege( privilege, initializeContext() );
     }
 
-    public void createPrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    public void createPrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -151,13 +110,13 @@ public class DefaultConfigurationManager
         }
     }
 
-    public void createRole( SecurityRole role )
+    public void createRole( CRole role )
         throws InvalidConfigurationException
     {
         createRole( role, initializeContext() );
     }
 
-    public void createRole( SecurityRole role, SecurityValidationContext context )
+    public void createRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -177,25 +136,25 @@ public class DefaultConfigurationManager
         }
     }
 
-    public void createUser( SecurityUser user )
+    public void createUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException
     {
-        createUser( user, null, initializeContext() );
+        createUser( user, null, roles, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, String password )
+    public void createUser( CUser user, String password, Set<String> roles )
         throws InvalidConfigurationException
     {
-        createUser( user, password, initializeContext() );
+        createUser( user, password, roles, initializeContext() );
     }
 
-    public void createUser( SecurityUser user, SecurityValidationContext context )
+    public void createUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
-        createUser( user, null, context );
+        createUser( user, null, roles, context );
     }
 
-    public void createUser( SecurityUser user, String password, SecurityValidationContext context )
+    public void createUser( CUser user, String password, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
         if ( context == null )
@@ -209,12 +168,12 @@ public class DefaultConfigurationManager
             user.setPassword( StringDigester.getSha1Digest( password ) );
         }
 
-        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), false );
+        ValidationResponse vr = validator.validateUser( context, user, roles, false );
 
         if ( vr.isValid() )
         {
             getConfiguration().addUser( user );
-            this.createOrUpdateUserRoleMapping( this.getRoleMappingFromUser( user ) );
+            this.createOrUpdateUserRoleMapping( this.buildUserRoleMapping( user.getId(), roles ) );
 
         }
         else
@@ -223,7 +182,7 @@ public class DefaultConfigurationManager
         }
     }
 
-    private void createOrUpdateUserRoleMapping( SecurityUserRoleMapping roleMapping )
+    private void createOrUpdateUserRoleMapping( CUserRoleMapping roleMapping )
     {
         // delete first, ask questions later
         // we are always updating, its possible that this object could have already existed, because we cannot fully
@@ -242,13 +201,13 @@ public class DefaultConfigurationManager
 
     }
 
-    private SecurityUserRoleMapping getRoleMappingFromUser( SecurityUser user )
+    private CUserRoleMapping buildUserRoleMapping( String userId, Set<String> roles )
     {
-        SecurityUserRoleMapping roleMapping = new SecurityUserRoleMapping();
+        CUserRoleMapping roleMapping = new CUserRoleMapping();
 
-        roleMapping.setUserId( user.getId() );
+        roleMapping.setUserId( userId );
         roleMapping.setSource( SecurityXmlUserManager.SOURCE );
-        roleMapping.setRoles( new ArrayList<String>( user.getRoles() ) );
+        roleMapping.setRoles( new ArrayList<String>( roles ) );
 
         return roleMapping;
 
@@ -349,73 +308,56 @@ public class DefaultConfigurationManager
         }
     }
 
-    public SecurityPrivilege readPrivilege( String id )
+    public CPrivilege readPrivilege( String id )
         throws NoSuchPrivilegeException
     {
         for ( CPrivilege privilege : (List<CPrivilege>) getConfiguration().getPrivileges() )
         {
             if ( privilege.getId().equals( id ) )
             {
-                return new SecurityPrivilege( privilege );
+                return privilege;
             }
         }
 
         throw new NoSuchPrivilegeException( id );
     }
 
-    public SecurityRole readRole( String id )
+    public CRole readRole( String id )
         throws NoSuchRoleException
     {
         for ( CRole role : (List<CRole>) getConfiguration().getRoles() )
         {
             if ( role.getId().equals( id ) )
             {
-                return new SecurityRole( role );
+                return role;
             }
         }
 
         throw new NoSuchRoleException( id );
     }
 
-    public SecurityUser readUser( String id )
+    public CUser readUser( String id )
         throws UserNotFoundException
     {
         for ( CUser user : (List<CUser>) getConfiguration().getUsers() )
         {
             if ( user.getId().equals( id ) )
             {
-                // see if we have a userRole mapping
-                List<String> roles = null;
-                try
-                {
-                    SecurityUserRoleMapping roleMapping = this.readUserRoleMapping( id, SecurityXmlUserManager.SOURCE );
-                    if ( roleMapping != null )
-                    {
-                        roles = roleMapping.getRoles();
-                    }
-                }
-                catch ( NoSuchRoleMappingException e )
-                {
-                    // this really should never happen, but validation could change
-                    // but its not going to hurt anything to keep going
-                    this.getLogger().debug( e.getMessage() );
-                }
-
-                return new SecurityUser( user, false, roles );
+                return user;
             }
         }
 
         throw new UserNotFoundException( id );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege )
+    public void updatePrivilege( CPrivilege privilege )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
         updatePrivilege( privilege, initializeContext() );
     }
 
-    public void updatePrivilege( SecurityPrivilege privilege, SecurityValidationContext context )
+    public void updatePrivilege( CPrivilege privilege, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchPrivilegeException
     {
@@ -437,14 +379,14 @@ public class DefaultConfigurationManager
         }
     }
 
-    public void updateRole( SecurityRole role )
+    public void updateRole( CRole role )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
         updateRole( role, initializeContext() );
     }
 
-    public void updateRole( SecurityRole role, SecurityValidationContext context )
+    public void updateRole( CRole role, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleException
     {
@@ -466,14 +408,14 @@ public class DefaultConfigurationManager
         }
     }
 
-    public void updateUser( SecurityUser user )
+    public void updateUser( CUser user, Set<String> roles )
         throws InvalidConfigurationException,
             UserNotFoundException
     {
-        updateUser( user, initializeContext() );
+        updateUser( user, roles, initializeContext() );
     }
 
-    public void updateUser( SecurityUser user, SecurityValidationContext context )
+    public void updateUser( CUser user, Set<String> roles, SecurityValidationContext context )
         throws InvalidConfigurationException,
             UserNotFoundException
     {
@@ -482,13 +424,13 @@ public class DefaultConfigurationManager
             context = initializeContext();
         }
 
-        ValidationResponse vr = validator.validateUser( context, user, user.getRoles(), true );
+        ValidationResponse vr = validator.validateUser( context, user, roles, true );
 
         if ( vr.isValid() )
         {
             deleteUser( user.getId() );
             getConfiguration().addUser( user );
-            this.createOrUpdateUserRoleMapping( this.getRoleMappingFromUser( user ) );
+            this.createOrUpdateUserRoleMapping( this.buildUserRoleMapping( user.getId(), roles ) );
         }
         else
         {
@@ -496,7 +438,7 @@ public class DefaultConfigurationManager
         }
     }
 
-    public String getPrivilegeProperty( SecurityPrivilege privilege, String key )
+    public String getPrivilegeProperty( CPrivilege privilege, String key )
     {
         if ( privilege != null && privilege.getProperties() != null )
         {
@@ -512,13 +454,13 @@ public class DefaultConfigurationManager
         return null;
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    public void createUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException
     {
         this.createUserRoleMapping( userRoleMapping, this.initializeContext() );
     }
 
-    public void createUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    public void createUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException
     {
 
@@ -567,20 +509,20 @@ public class DefaultConfigurationManager
     }
     
 
-    public SecurityUserRoleMapping readUserRoleMapping( String userId, String source )
+    public CUserRoleMapping readUserRoleMapping( String userId, String source )
         throws NoSuchRoleMappingException
     {
-        return new SecurityUserRoleMapping( this.readCUserRoleMapping( userId, source ) );
+        return this.readCUserRoleMapping( userId, source );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping )
+    public void updateUserRoleMapping( CUserRoleMapping userRoleMapping )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
         this.updateUserRoleMapping( userRoleMapping, this.initializeContext() );
     }
 
-    public void updateUserRoleMapping( SecurityUserRoleMapping userRoleMapping, SecurityValidationContext context )
+    public void updateUserRoleMapping( CUserRoleMapping userRoleMapping, SecurityValidationContext context )
         throws InvalidConfigurationException,
             NoSuchRoleMappingException
     {
@@ -609,16 +551,9 @@ public class DefaultConfigurationManager
         getConfiguration().addUserRoleMapping( userRoleMapping );
     }
 
-    public List<SecurityUserRoleMapping> listUserRoleMappings()
+    public List<CUserRoleMapping> listUserRoleMappings()
     {
-        List<SecurityUserRoleMapping> list = new ArrayList<SecurityUserRoleMapping>();
-
-        for ( CUserRoleMapping item : (List<CUserRoleMapping>) getConfiguration().getUserRoleMappings() )
-        {
-            list.add( new SecurityUserRoleMapping( item ) );
-        }
-
-        return list;
+        return Collections.unmodifiableList( getConfiguration().getUserRoleMappings() );
     }
 
     public void deleteUserRoleMapping( String userId, String source )

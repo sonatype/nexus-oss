@@ -263,6 +263,13 @@
                     </association>
                     <required>false</required>
                 </field>
+                <field>
+                    <name>readOnly</name>
+                    <version>2.0.4+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                    <description>Marks if this role is editable.</description>
+                </field>
             </fields>
         </class>
 
@@ -309,6 +316,13 @@
                     </association>
                     <required>false</required>
                     <description>Properties assigned to this privilege, used to define a permission</description>
+                </field>
+                <field>
+                    <name>readOnly</name>
+                    <version>2.0.4+</version>
+                    <type>boolean</type>
+                    <required>false</required>
+                    <description>Marks if this privilege is editable.</description>
                 </field>
             </fields>
         </class>

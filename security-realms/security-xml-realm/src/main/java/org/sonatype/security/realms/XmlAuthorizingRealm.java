@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.realms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -24,15 +27,15 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
 /**
  * An Authorizing Realm backed by an XML file see the security-model-xml module. This model defines users, roles, and
- * privileges.  This realm ONLY handles authorization.
+ * privileges. This realm ONLY handles authorization.
+ * 
  * @author Brian Demers
- *
  */
 @Component( role = Realm.class, hint = XmlAuthorizingRealm.ROLE, description = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
@@ -40,9 +43,9 @@ public class XmlAuthorizingRealm
     implements Realm
 {
     public static final String ROLE = "XmlAuthorizingRealm";
-    
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
-    private ConfigurationManager configuration;
+
+    @Requirement
+    private UserManager userManager;
 
     public XmlAuthorizingRealm()
     {
@@ -76,25 +79,25 @@ public class XmlAuthorizingRealm
             throw new AuthorizationException( "Cannot authorize with no principals." );
         }
 
-        //TODO: We should check where this principal came from and only load the roles for it
+        // TODO: We should check where this principal came from and only load the roles for it
         String username = principals.getPrimaryPrincipal().toString();
-        SecurityUser user;
+        Set<String> roles = new HashSet<String>();
         try
         {
-            user = this.configuration.readUser( username );
+            // get just the role Id from the user
+            for ( RoleIdentifier roleIdentifier : userManager.getUser( username ).getRoles() )
+            {
+                roles.add( roleIdentifier.getRoleId() );
+            }
         }
         catch ( UserNotFoundException e )
         {
-            throw new AuthorizationException( "User for principals: "+  principals.getPrimaryPrincipal() + " could not be found.", e );
+            throw new AuthorizationException( "User for principals: " + principals.getPrimaryPrincipal()
+                + " could not be found.", e );
         }
-        
-        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( user.getRoles() );
+
+        SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roles );
 
         return info;
-    }
-
-    protected ConfigurationManager getConfigurationManager()
-    {
-        return configuration;
     }
 }
