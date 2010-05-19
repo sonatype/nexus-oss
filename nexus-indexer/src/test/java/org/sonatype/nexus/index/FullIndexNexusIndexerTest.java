@@ -434,7 +434,7 @@ public class FullIndexNexusIndexerTest
 
         IteratorSearchRequest request = new IteratorSearchRequest( q );
 
-        request.getMatchHighlightRequests().add( new MatchHighlightRequest( field, q, MatchHighlightMode.HTML ) );
+        request.getMatchHighlightRequests().add( new MatchHighlightRequest( field, q, MatchHighlightMode.HTML, "..." ) );
 
         return request;
     }

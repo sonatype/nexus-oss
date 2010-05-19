@@ -112,12 +112,26 @@ public abstract class AbstractIndexerNexusPlexusResource
 
         if ( ai.getMatchHighlights().size() > 0 )
         {
+            // <blockquote>Artifact classes
+            // <ul>
+            // <li>aaaa</li>
+            // <li>bbbbb</li>
+            // </ul>
+            // </blockquote>
+
             StringBuilder sb = new StringBuilder();
 
             for ( MatchHighlight mh : ai.getMatchHighlights() )
             {
-                sb.append( "<P>" ).append( mh.getField().getDescription() ).append( "<BR/>" ).append(
-                    mh.getHighlightedMatch() ).append( "</P>" );
+                sb.append( "<blockquote>" ).append( mh.getField().getDescription() ).append( "<UL>" );
+
+                // TODO: fix this!
+                for ( String high : mh.getHighlightedMatch().split( "<BR/>" ) )
+                {
+                    sb.append( "<LI>" ).append( high ).append( "</LI>" );
+                }
+
+                sb.append( "</UL></blockquote>" );
             }
 
             a.setHighlightedFragment( sb.toString() );

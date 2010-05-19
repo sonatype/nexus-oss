@@ -283,7 +283,7 @@ public class DefaultIteratorResultSet
         tokenStream.reset();
 
         // TODO: this is okay for now, since (see above) we "support" HTML mode only, but later...
-        String rv = highlighter.getBestFragments( tokenStream, text, 3, "<BR/>" );
+        String rv = highlighter.getBestFragments( tokenStream, text, 3, hr.getHighlightSeparator() );
 
         return rv.length() == 0 ? null : rv;
     }

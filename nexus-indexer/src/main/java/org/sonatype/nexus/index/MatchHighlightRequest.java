@@ -9,14 +9,18 @@ public class MatchHighlightRequest
     private final Query query;
 
     private final MatchHighlightMode highlightMode;
+    
+    private final String highlightSeparator;
 
-    public MatchHighlightRequest( Field field, Query query, MatchHighlightMode highlightMode )
+    public MatchHighlightRequest( Field field, Query query, MatchHighlightMode highlightMode, String highlightSeparator )
     {
         this.field = field;
 
         this.query = query;
 
         this.highlightMode = highlightMode;
+        
+        this.highlightSeparator = highlightSeparator;
     }
 
     public Field getField()
@@ -32,5 +36,10 @@ public class MatchHighlightRequest
     public MatchHighlightMode getHighlightMode()
     {
         return highlightMode;
+    }
+
+    public String getHighlightSeparator()
+    {
+        return highlightSeparator;
     }
 }
