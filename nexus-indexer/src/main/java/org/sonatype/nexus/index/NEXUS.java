@@ -1,7 +1,10 @@
 package org.sonatype.nexus.index;
 
 /**
- * Ontology of Nexus.
+ * Ontology of Nexus. This is still Maven2 specific. Ideally, Nexus Ontology should contain three things only: path,
+ * sha1 and last_modified. And Indexer should index _everything_, and Maven should be just "topping" extending these
+ * informations. This would enable us to search and easily detect maven metadata files too, or to support non-maven
+ * repository indexing, like P2 is.
  * 
  * @author cstamas
  */
