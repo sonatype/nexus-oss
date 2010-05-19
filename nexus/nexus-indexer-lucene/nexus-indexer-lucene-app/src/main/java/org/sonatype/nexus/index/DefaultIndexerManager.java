@@ -887,10 +887,10 @@ public class DefaultIndexerManager
         GroupRepository groupRepo =
             repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
-        reindexRepositoryGroup( fullReindex, groupRepo );
+        reindexRepositoryGroup( groupRepo, fullReindex );
     }
 
-    private void reindexRepositoryGroup( boolean fullReindex, GroupRepository groupRepo )
+    private void reindexRepositoryGroup( GroupRepository groupRepo, boolean fullReindex )
         throws IOException, NoSuchRepositoryException
     {
         if ( groupRepo.isIndexable() )
@@ -901,7 +901,7 @@ public class DefaultIndexerManager
             {
                 if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
                 {
-                    reindexRepositoryGroup( fullReindex, repository.adaptToFacet( GroupRepository.class ) );
+                    reindexRepositoryGroup( repository.adaptToFacet( GroupRepository.class ), fullReindex );
                     mergeRepositoryGroupIndexWithMember( repository );
                 }
                 else
