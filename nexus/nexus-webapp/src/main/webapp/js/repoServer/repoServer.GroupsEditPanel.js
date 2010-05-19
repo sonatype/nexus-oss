@@ -157,7 +157,6 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
               name : 'repositories',
               valueField : 'id',
               store : this.repoStore,
-              required : true,
               validateLeftItems : true,
               validateLeftItemsText : 'Invalid Repository Found'
             }],

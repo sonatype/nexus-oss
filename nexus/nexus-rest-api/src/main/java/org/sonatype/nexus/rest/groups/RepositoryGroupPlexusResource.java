@@ -146,17 +146,6 @@ public class RepositoryGroupPlexusResource
         {
             RepositoryGroupResource resource = groupRequest.getData();
 
-            if ( resource.getRepositories() == null || resource.getRepositories().size() == 0 )
-            {
-                getLogger().info(
-                    "The repository group with ID=" + getGroupId( request ) + " have zero repository members!" );
-
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "The group cannot have zero repository members!",
-                    getNexusErrorResponse( "repositories", "The group cannot have zero repository members!" ) );
-            }
-
             if ( StringUtils.isEmpty( resource.getId() ) )
             {
                 getLogger().warn( "Repository group id is empty! " );

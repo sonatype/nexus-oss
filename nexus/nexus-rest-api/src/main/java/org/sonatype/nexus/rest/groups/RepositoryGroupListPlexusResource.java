@@ -146,17 +146,6 @@ public class RepositoryGroupListPlexusResource
         {
             RepositoryGroupResource resource = groupRequest.getData();
 
-            if ( resource.getRepositories() == null || resource.getRepositories().size() == 0 )
-            {
-                getLogger()
-                    .info( "The repository group with ID=" + resource.getId() + " have zero repository members!" );
-
-                throw new PlexusResourceException(
-                    Status.CLIENT_ERROR_BAD_REQUEST,
-                    "The group cannot have zero repository members!",
-                    getNexusErrorResponse( "repositories", "The group cannot have zero repository members!" ) );
-            }
-
             createOrUpdateRepositoryGroup( resource, true );
             
             try

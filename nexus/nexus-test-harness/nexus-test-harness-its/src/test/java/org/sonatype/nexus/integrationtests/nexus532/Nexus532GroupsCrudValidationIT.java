@@ -187,10 +187,8 @@ public class Nexus532GroupsCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Group should not have been created: " + response.getStatus() + "\n" + responseText,
+        Assert.assertTrue( "Group should have been created: " + response.getStatus() + "\n" + responseText,
                             response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
-            + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
     }
 
     @Test
@@ -242,10 +240,8 @@ public class Nexus532GroupsCrudValidationIT
         response = this.messageUtil.sendMessage( Method.PUT, resource );
         responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Group should not have been updated: " + response.getStatus() + "\n" + responseText,
+        Assert.assertTrue( "Group should have been updated: " + response.getStatus() + "\n" + responseText,
                             response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
-            + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
         resource.addRepository( member );
 
         // missing Id

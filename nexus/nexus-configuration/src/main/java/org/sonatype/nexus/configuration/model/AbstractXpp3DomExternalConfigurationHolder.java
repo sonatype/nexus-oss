@@ -35,7 +35,10 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
 
     public void apply( AbstractXpp3DomExternalConfigurationHolder configHolder )
     {
-        Xpp3Dom result = Xpp3Dom.mergeXpp3Dom( configHolder.getRootNode(), configuration );
+        //I took out the merge code here, as the incoming config will always contain what
+        //we want to store in config, there is no need to pull in stale data from the original
+        //config.  Below we simply clear the old config, and insert into it, the new config
+        Xpp3Dom newConfig = configHolder.getRootNode();
 
         // shave off config root node
         while ( configuration.getChildCount() > 0 )
@@ -44,9 +47,9 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
         }
 
         // and put beneath it the merge result
-        for ( int i = 0; i < result.getChildCount(); i++ )
+        for ( int i = 0; i < newConfig.getChildCount(); i++ )
         {
-            configuration.addChild( result.getChild( i ) );
+            configuration.addChild( newConfig.getChild( i ) );
         }
     }
 
@@ -196,26 +199,16 @@ public abstract class AbstractXpp3DomExternalConfigurationHolder
     {
         Xpp3Dom node = parent.getChild( name );
 
-        if ( node != null )
+        if ( node == null )
         {
-            for ( int i = 0; i < parent.getChildCount(); i++ )
-            {
-                Xpp3Dom existing = parent.getChild( i );
-
-                if ( StringUtils.equals( name, existing.getName() ) )
-                {
-                    parent.removeChild( i );
-
-                    break;
-                }
-            }
-
-            node = null;
+            node = new Xpp3Dom( name );
+            parent.addChild( node );
         }
-
-        node = new Xpp3Dom( name );
-
-        parent.addChild( node );
+        
+        for ( int i = node.getChildCount() - 1 ; i >= 0; i-- )
+        {
+            node.removeChild( i );
+        }
 
         String childName = Inflector.getInstance().singularize( name );
 
