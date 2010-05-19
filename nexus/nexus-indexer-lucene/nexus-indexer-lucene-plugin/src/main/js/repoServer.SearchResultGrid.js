@@ -43,7 +43,8 @@ Sonatype.SearchStore = function(config) {
         {name:'packaging'},
         {name:'extension'},
         {name:'pomLink'},
-        {name:'artifactLink'}
+        {name:'artifactLink'},
+        {name:'highlightedFragment'}
       ])
     ),
     listeners: {
@@ -172,30 +173,76 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
           getRowClass : this.applyRowClass
       },
       
-      listeners: { 
-        render: function(panel){
-          panel.body.on(
-            {
-              'mousedown': function(e, t){
-                var i = t.getAttribute('index');
-                this.toggleExtraInfo(parseInt(i, 10));
-                e.stopEvent();
-                return false;
-              },
-              'click' : function(e, t){
-                e.stopEvent();
-                return false;
-              },
-              delegate:'a.pom-link',
-              scope:panel
-            });
-        },
-        scope: this
-      }
+      listeners : {
+          render : {
+            fn : function(panel) {
+              panel.body.on({
+                    'mousedown' : function(e, t) {
+                      var i = t.getAttribute('index');
+                      this.toggleExtraInfo(parseInt(i, 10));
+                      e.stopEvent();
+                      return false;
+                    },
+                    'click' : function(e, t) {
+                      e.stopEvent();
+                      return false;
+                    },
+                    delegate : 'a.pom-link',
+                    scope : panel
+                  });
+            },
+            scope : this
+          },
+          mouseover : {
+            fn : this.mouseOverHandler,
+            scope : this
+          }
+        }
   });
 };
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
+  mouseOverHandler : function(e, t) {
+    var row = this.view.findRowIndex(t);
+
+    if (!(row === false) && !(this.tooltipShown))
+    {
+      var rec = this.store.getAt(row);
+      if (rec == null || rec == undefined)
+      {
+        return;
+      }
+      var highlightedFragment = rec.get('highlightedFragment');
+      if ( Ext.isEmpty( highlightedFragment ) )
+      {
+        return;
+      }
+
+      var tt = new Ext.ToolTip({
+        target : t,
+        title : 'Match Details',
+        headerAsText : true,
+        trackMouse : true,
+        showDelay : 100,
+        html : highlightedFragment,
+        autoWidth : true,
+        listeners : {
+          beforehide : {
+            fn : function(component) {
+              this.tooltipShown = false;
+            },
+            scope : this
+          },
+          beforeshow : {
+            fn : function(component) {
+              this.tooltipShown = true;
+            },
+            scope : this
+          }
+        }
+      });
+    }
+  },
   formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
     var versionStr = record.get( 'version' );
     if ( 'LATEST' == versionStr ) {
