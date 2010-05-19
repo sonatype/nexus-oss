@@ -235,34 +235,46 @@ public class Nexus383SearchIT
                 new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // Multi repository deploy
-        getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this
-            .getRelitiveArtifactPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this.getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy,
+            this.getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
+            this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http", deployUrl, pomFile, this.getRelitivePomPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_REPO2 ), pomFile, this.getRelitivePomPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), pomFile,
+            this.getRelitivePomPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
+            this.getRelitivePomPath( gav ) );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy, this.getRelitiveArtifactPath( gav ) );
-        getDeployUtils().deployWithWagon( "http", deployUrl.replace( NEXUS_TEST_HARNESS_REPO,
-            NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile, this.getRelitivePomPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
+            this.getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
+            this.getRelitivePomPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
+            this.getRelitiveArtifactPath( gav ) );
+        getDeployUtils().deployWithWagon( "http",
+            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
+            this.getRelitivePomPath( gav ) );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
             NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         TaskScheduleUtil.waitForTasks();
 
+        // Keyword search does collapse results, so we need _1_
         List<NexusArtifact> results = getSearchMessageUtil().searchFor( "crossArtifact" );
+        Assert.assertEquals( 1, results.size() );
+
+        // GAV search does not
+        results = getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion() );
         Assert.assertEquals( 3, results.size() );
 
     }
