@@ -16,9 +16,9 @@ import java.util.Map;
 
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.web.WebSecurityManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
 import org.apache.shiro.web.filter.mgt.PathMatchingFilterChainResolver;
+import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;

@@ -24,7 +24,7 @@ public class UserNotFoundException
     {
         super( buildMessage( userId, "" ) );
     }
-
+    
     private static String buildMessage( String userId, String message )
     {
         return "User: '" + userId + "' could not be found. " + message;

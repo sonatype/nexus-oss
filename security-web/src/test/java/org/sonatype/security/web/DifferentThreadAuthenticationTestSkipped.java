@@ -3,7 +3,6 @@ package org.sonatype.security.web;
 import junit.framework.Assert;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
