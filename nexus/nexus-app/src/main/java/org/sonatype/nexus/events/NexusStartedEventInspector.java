@@ -39,11 +39,7 @@ public class NexusStartedEventInspector
 
     public boolean accepts( Event<?> evt )
     {
-        if ( evt instanceof NexusStartedEvent )
-        {
-            return true;
-        }
-        return false;
+        return ( evt instanceof NexusStartedEvent );
     }
 
     public void inspect( Event<?> evt )
@@ -111,7 +107,7 @@ public class NexusStartedEventInspector
             {
                 return false;
             }
-            
+
             return true;
         }
         catch ( IOException e )

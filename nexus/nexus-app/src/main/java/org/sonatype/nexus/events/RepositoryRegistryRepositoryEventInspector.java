@@ -15,12 +15,11 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -51,31 +50,18 @@ public class RepositoryRegistryRepositoryEventInspector
 
     @Requirement
     private NexusScheduler nexusScheduler;
-
-    private boolean nexusStarted = false;
+    
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     public boolean accepts( Event<?> evt )
     {
         return ( evt instanceof RepositoryRegistryRepositoryEvent )
-            || ( evt instanceof RepositoryConfigurationUpdatedEvent ) || ( evt instanceof NexusStartedEvent )
-            || ( evt instanceof NexusStoppedEvent );
+            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
     }
 
     public void inspect( Event<?> evt )
     {
-        if ( evt instanceof NexusStartedEvent )
-        {
-            nexusStarted = true;
-
-            return;
-        }
-        else if ( evt instanceof NexusStoppedEvent )
-        {
-            nexusStarted = false;
-
-            return;
-        }
-
         Repository repository = null;
 
         if ( evt instanceof RepositoryRegistryRepositoryEvent )
@@ -106,7 +92,7 @@ public class RepositoryRegistryRepositoryEventInspector
     private void inspectForTimeline( Event<?> evt, Repository repository )
     {
         // we do not want RSS entries about boot and repo additions during boot
-        if ( nexusStarted )
+        if ( applicationStatusSource.getSystemStatus().isNexusStarted() )
         {
             StringBuffer sb = new StringBuffer();
 

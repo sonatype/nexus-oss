@@ -16,12 +16,11 @@ package org.sonatype.nexus.events;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.NexusStartedEvent;
-import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -56,7 +55,8 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
     @Requirement
     private NexusScheduler nexusScheduler;
 
-    private volatile boolean nexusStarted = false;
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
 
     protected IndexerManager getIndexerManager()
     {
@@ -66,27 +66,14 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
     public boolean accepts( Event<?> evt )
     {
         return ( evt instanceof RepositoryRegistryRepositoryEvent )
-            || ( evt instanceof RepositoryConfigurationUpdatedEvent ) || ( evt instanceof NexusStartedEvent )
-            || ( evt instanceof NexusStoppedEvent );
+            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
     }
 
     public void inspect( Event<?> evt )
     {
         Repository repository = null;
 
-        if ( evt instanceof NexusStartedEvent )
-        {
-            nexusStarted = true;
-
-            return;
-        }
-        else if ( evt instanceof NexusStoppedEvent )
-        {
-            nexusStarted = false;
-
-            return;
-        }
-        else if ( evt instanceof RepositoryRegistryRepositoryEvent )
+        if ( evt instanceof RepositoryRegistryRepositoryEvent )
         {
             repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
         }
@@ -126,7 +113,7 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
                 getIndexerManager().setRepositoryIndexContextSearchable( repository.getId(), repository.isSearchable() );
 
                 // create the initial index
-                if ( nexusStarted && repository.isIndexable() )
+                if ( applicationStatusSource.getSystemStatus().isNexusStarted() && repository.isIndexable() )
                 {
                     // Create the initial index for the repository
                     reindexRepo( repository, true, "Creating initial index, repositoryId=" + repository.getId() );

@@ -21,39 +21,34 @@ public class DefaultTargetRegistryEventInspector
 {
     @Requirement
     private RepositoryTypeRegistry repositoryTypeRegistry;
-    
+
     @Requirement
     private TargetRegistry targetRegistry;
-    
+
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
-    
+
     public boolean accepts( Event<?> evt )
     {
-        if ( evt instanceof NexusStartedEvent )
-        {
-            return true;
-        }
-        
-        return false;
+        return ( evt instanceof NexusStartedEvent );
     }
-    
+
     public void inspect( Event<?> evt )
     {
         try
         {
             boolean changed = false;
-            
-            Map<String,ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
-            
+
+            Map<String, ContentClass> contentClasses = repositoryTypeRegistry.getContentClasses();
+
             for ( String key : contentClasses.keySet() )
             {
                 boolean found = false;
-                
+
                 for ( Target target : targetRegistry.getTargetsForContentClass( contentClasses.get( key ) ) )
                 {
                     // create default target for each content class that doesn't already exist
-                    if ( target.getContentClass().equals( contentClasses.get( key ) ) 
+                    if ( target.getContentClass().equals( contentClasses.get( key ) )
                         && target.getPatternTexts().size() == 1
                         && target.getPatternTexts().iterator().next().equals( ".*" ) )
                     {
@@ -61,21 +56,18 @@ public class DefaultTargetRegistryEventInspector
                         break;
                     }
                 }
-                
+
                 if ( !found )
                 {
-                    Target newTarget = new Target(
-                        key,
-                        "All (" + key + ")",
-                        contentClasses.get( key ),
-                        Collections.singleton( ".*" ));
-                    
+                    Target newTarget =
+                        new Target( key, "All (" + key + ")", contentClasses.get( key ), Collections.singleton( ".*" ) );
+
                     targetRegistry.addRepositoryTarget( newTarget );
                     changed = true;
-                    getLogger().info( "Adding default target for " + key + " content class" );   
+                    getLogger().info( "Adding default target for " + key + " content class" );
                 }
             }
-            
+
             if ( changed )
             {
                 applicationConfiguration.saveConfiguration();

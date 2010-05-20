@@ -8,9 +8,11 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
@@ -49,24 +51,46 @@ public class NexusRepositoryMetadataEventInspector
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    public boolean accepts( Event evt )
+    @Requirement
+    private ApplicationStatusSource applicationStatusSource;
+
+    public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof RepositoryRegistryEventAdd ) || ( evt instanceof RepositoryConfigurationUpdatedEvent );
+        return ( evt instanceof RepositoryRegistryEventAdd ) || ( evt instanceof RepositoryConfigurationUpdatedEvent )
+            || ( evt instanceof NexusStartedEvent );
     }
 
-    public void inspect( Event evt )
+    public void inspect( Event<?> evt )
     {
-        Repository repository = null;
+        if ( evt instanceof NexusStartedEvent )
+        {
+            // on start, we batch process all of those
+            for ( Repository repository : repositoryRegistry.getRepositories() )
+            {
+                processRepository( repository );
+            }
+
+            return;
+        }
+
+        // stuff below should happen only if this is a RUNNING instance!
+        if ( !applicationStatusSource.getSystemStatus().isNexusStarted() )
+        {
+            return;
+        }
 
         if ( evt instanceof RepositoryRegistryEventAdd )
         {
-            repository = ( (RepositoryRegistryEventAdd) evt ).getRepository();
+            processRepository( ( (RepositoryRegistryEventAdd) evt ).getRepository() );
         }
-        else
+        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
         {
-            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+            processRepository( ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository() );
         }
+    }
 
+    protected void processRepository( Repository repository )
+    {
         if ( repository.getRepositoryContentClass().isCompatible( maven2ContentClass )
             || repository.getRepositoryContentClass().isCompatible( maven1ContentClass ) )
         {
@@ -164,7 +188,7 @@ public class NexusRepositoryMetadataEventInspector
                 StorageFileItem file = nrt.getLastWriteFile();
 
                 file.getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID,
-                                          "NexusRepositoryMetadataContentGenerator" );
+                    "NexusRepositoryMetadataContentGenerator" );
 
                 repository.getLocalStorage().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
             }

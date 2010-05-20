@@ -247,5 +247,9 @@ public class SystemStatus
     {
         this.configurationUpgraded = configurationUpgraded;
     }
-
+    
+    public boolean isNexusStarted()
+    {
+        return SystemState.STARTED.equals( getState() );
+    }
 }
