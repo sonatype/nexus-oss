@@ -185,6 +185,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
           if (empty || linkHtml.length == 0)
           {
             linkLabel.innerHTML = '';
+            linkDiv.innerHTML = '';
           }
           else
           {
