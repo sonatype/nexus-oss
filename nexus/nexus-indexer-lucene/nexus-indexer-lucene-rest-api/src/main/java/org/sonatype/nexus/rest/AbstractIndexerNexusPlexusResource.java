@@ -126,7 +126,7 @@ public abstract class AbstractIndexerNexusPlexusResource
                 sb.append( "<blockquote>" ).append( mh.getField().getDescription() ).append( "<UL>" );
 
                 // TODO: fix this!
-                for ( String high : mh.getHighlightedMatch().split( "<BR/>" ) )
+                for ( String high : mh.getHighlightedMatch() )
                 {
                     sb.append( "<LI>" ).append( high ).append( "</LI>" );
                 }

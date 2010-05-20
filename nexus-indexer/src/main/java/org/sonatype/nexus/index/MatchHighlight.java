@@ -1,12 +1,14 @@
 package org.sonatype.nexus.index;
 
+import java.util.List;
+
 public class MatchHighlight
 {
     private final Field field;
 
-    private final String highlightedMatch;
+    private final List<String> highlightedMatch;
 
-    public MatchHighlight( Field field, String highlightedMatch )
+    public MatchHighlight( Field field, List<String> highlightedMatch )
     {
         this.field = field;
 
@@ -18,7 +20,7 @@ public class MatchHighlight
         return field;
     }
 
-    public String getHighlightedMatch()
+    public List<String> getHighlightedMatch()
     {
         return highlightedMatch;
     }

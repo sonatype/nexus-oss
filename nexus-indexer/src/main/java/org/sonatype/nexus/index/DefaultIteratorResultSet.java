@@ -2,10 +2,12 @@ package org.sonatype.nexus.index;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.lucene.analysis.CachingTokenFilter;
+import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.MultiSearcher;
@@ -14,9 +16,11 @@ import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
+import org.apache.lucene.search.highlight.TextFragment;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.NexusIndexSearcher;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
 
 /**
  * Default implementation of IteratorResultSet. TODO: there is too much of logic, refactor this!
@@ -166,7 +170,7 @@ public class DefaultIteratorResultSet
 
         String text = null;
 
-        String highlightFragment = null;
+        List<String> highlightFragment = null;
 
         for ( MatchHighlightRequest hr : matchHighlightRequests )
         {
@@ -174,13 +178,13 @@ public class DefaultIteratorResultSet
 
             if ( field != null )
             {
-                text = getText( d, ai, field );
+                text = getText( ai, field.getOntology() );
 
                 if ( text != null )
                 {
                     highlightFragment = highlightField( context, hr, field, text );
 
-                    if ( highlightFragment != null )
+                    if ( highlightFragment != null && highlightFragment.size() > 0 )
                     {
                         MatchHighlight matchHighlight = new MatchHighlight( hr.getField(), highlightFragment );
 
@@ -199,49 +203,66 @@ public class DefaultIteratorResultSet
      */
     protected IndexerField selectStoredIndexerField( Field field )
     {
-        return field.getIndexerFields().isEmpty() ? null : field.getIndexerFields().iterator().next();
-    }
-
-    protected String getText( Document d, ArtifactInfo ai, IndexerField field )
-    {
-        if ( field.isStored() )
+        // hack here
+        if ( MAVEN.CLASSNAMES.equals( field ) )
         {
-            return d.get( field.getKey() );
+            return JarFileContentsIndexCreator.FLD_CLASSNAMES;
         }
         else
         {
-            if ( MAVEN.GROUP_ID.equals( field.getOntology() ) )
-            {
-                return ai.groupId;
-            }
-            else if ( MAVEN.ARTIFACT_ID.equals( field.getOntology() ) )
-            {
-                return ai.artifactId;
-            }
-            else if ( MAVEN.VERSION.equals( field.getOntology() ) )
-            {
-                return ai.version;
-            }
-            else if ( MAVEN.PACKAGING.equals( field.getOntology() ) )
-            {
-                return ai.packaging;
-            }
-            else if ( MAVEN.CLASSIFIER.equals( field.getOntology() ) )
-            {
-                return ai.classifier;
-            }
-            else if ( MAVEN.SHA1.equals( field.getOntology() ) )
-            {
-                return ai.sha1;
-            }
-            else if ( MAVEN.CLASSNAMES.equals( field.getOntology() ) )
-            {
-                return ai.classNames;
-            }
-
-            // no match
-            return null;
+            return field.getIndexerFields().isEmpty() ? null : field.getIndexerFields().iterator().next();
         }
+    }
+
+    /**
+     * This method will dissapear, once we drop ArtifactInfo.
+     * 
+     * @param d
+     * @param ai
+     * @param field
+     * @return
+     */
+    protected String getText( ArtifactInfo ai, Field field )
+    {
+        if ( MAVEN.GROUP_ID.equals( field ) )
+        {
+            return ai.groupId;
+        }
+        else if ( MAVEN.ARTIFACT_ID.equals( field ) )
+        {
+            return ai.artifactId;
+        }
+        else if ( MAVEN.VERSION.equals( field ) )
+        {
+            return ai.version;
+        }
+        else if ( MAVEN.PACKAGING.equals( field ) )
+        {
+            return ai.packaging;
+        }
+        else if ( MAVEN.CLASSIFIER.equals( field ) )
+        {
+            return ai.classifier;
+        }
+        else if ( MAVEN.SHA1.equals( field ) )
+        {
+            return ai.sha1;
+        }
+        else if ( MAVEN.NAME.equals( field ) )
+        {
+            return ai.name;
+        }
+        else if ( MAVEN.DESCRIPTION.equals( field ) )
+        {
+            return ai.description;
+        }
+        else if ( MAVEN.CLASSNAMES.equals( field ) )
+        {
+            return ai.classNames;
+        }
+
+        // no match
+        return null;
     }
 
     /**
@@ -254,7 +275,8 @@ public class DefaultIteratorResultSet
      * @return
      * @throws IOException
      */
-    protected String highlightField( IndexingContext context, MatchHighlightRequest hr, IndexerField field, String text )
+    protected List<String> highlightField( IndexingContext context, MatchHighlightRequest hr, IndexerField field,
+                                           String text )
         throws IOException
     {
         Query rewrittenQuery = hr.getQuery().rewrite( context.getIndexReader() );
@@ -274,18 +296,35 @@ public class DefaultIteratorResultSet
                 + "\" is not supported!" );
         }
 
-        Highlighter highlighter =
-        // new Highlighter( formatter, new QueryScorer( rewrittenQuery, context.getIndexReader(), field.getKey() ) );
-            new Highlighter( formatter, new QueryScorer( rewrittenQuery ) );
+        return getBestFragments( rewrittenQuery, formatter, tokenStream, text, 3 );
+    }
+
+    protected final List<String> getBestFragments( Query query, Formatter formatter, TokenStream tokenStream,
+                                                   String text, int maxNumFragments )
+        throws IOException
+    {
+        Highlighter highlighter = new Highlighter( formatter, new CleaningEncoder(), new QueryScorer( query ) );
 
         highlighter.setTextFragmenter( new OneLineFragmenter() );
 
         tokenStream.reset();
 
-        // TODO: this is okay for now, since (see above) we "support" HTML mode only, but later...
-        String rv = highlighter.getBestFragments( tokenStream, text, 3, hr.getHighlightSeparator() );
+        maxNumFragments = Math.max( 1, maxNumFragments ); // sanity check
 
-        return rv.length() == 0 ? null : rv;
+        TextFragment[] frag = highlighter.getBestTextFragments( tokenStream, text, false, maxNumFragments );
+
+        // Get text
+        ArrayList<String> fragTexts = new ArrayList<String>( maxNumFragments );
+
+        for ( int i = 0; i < frag.length; i++ )
+        {
+            if ( ( frag[i] != null ) && ( frag[i].getScore() > 0 ) )
+            {
+                fragTexts.add( frag[i].toString() );
+            }
+        }
+
+        return fragTexts;
     }
 
     protected IndexingContext getIndexingContextForPointer( int docPtr )

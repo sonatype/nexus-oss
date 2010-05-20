@@ -434,7 +434,7 @@ public class FullIndexNexusIndexerTest
 
         IteratorSearchRequest request = new IteratorSearchRequest( q );
 
-        request.getMatchHighlightRequests().add( new MatchHighlightRequest( field, q, MatchHighlightMode.HTML, "..." ) );
+        request.getMatchHighlightRequests().add( new MatchHighlightRequest( field, q, MatchHighlightMode.HTML ) );
 
         return request;
     }
@@ -442,21 +442,25 @@ public class FullIndexNexusIndexerTest
     public void testClassnameSearchNgWithHighlighting()
         throws Exception
     {
-        IteratorSearchRequest request =
-            createHighlightedRequest( MAVEN.CLASSNAMES, "LogConfigurationException", SearchType.SCORED );
+        IteratorSearchRequest request = createHighlightedRequest( MAVEN.CLASSNAMES, "Logger", SearchType.SCORED );
 
         IteratorSearchResponse response = nexusIndexer.searchIterator( request );
 
         for ( ArtifactInfo ai : response )
         {
+            String classnames = ai.classNames;
+
             for ( MatchHighlight mh : ai.getMatchHighlights() )
             {
-                assertTrue( "Class name should be highlighted", mh.getHighlightedMatch().contains(
-                    "<B>LogConfigurationException</B>" ) );
+                for ( String highlighted : mh.getHighlightedMatch() )
+                {
+                    // Logger and LoggerFactory
+                    assertTrue( "Class name should be highlighted", highlighted.contains( "<B>Logger" ) );
+                }
             }
         }
 
-        assertEquals( "found in jcl104-over-slf4j and commons-logging", 7, response.getTotalHits() );
+        assertEquals( "found in jcl104-over-slf4j and commons-logging", 5, response.getTotalHits() );
     }
 
     public void testGAVSearchNgWithHighlighting()
