@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.5-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
@@ -37,8 +37,7 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>failsafe-maven-plugin</artifactId>
+        <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
 
     </plugins>
@@ -98,8 +97,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>failsafe-maven-plugin</artifactId>
+            <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <skip>true</skip>
             </configuration>
