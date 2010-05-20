@@ -161,8 +161,7 @@
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>failsafe-maven-plugin</artifactId>
+        <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <!--
             workaround for a bug in apache LDAP server which leaks ~1M

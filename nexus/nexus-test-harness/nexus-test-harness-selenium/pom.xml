@@ -96,9 +96,8 @@
         <version>1.0</version>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>failsafe-maven-plugin</artifactId>
-        <version>2.4.3-alpha-1</version>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.5</version>
         <executions>
           <execution>
             <goals>
@@ -142,13 +141,6 @@
           <threadCount>${threads}</threadCount>
           <argLine>-Xmx512M</argLine>
         </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>org.apache.maven.surefire</groupId>
-            <artifactId>surefire-booter</artifactId>
-            <version>2.5</version>
-          </dependency>
-        </dependencies>
       </plugin>
 
       <plugin>
@@ -430,8 +422,7 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>failsafe-maven-plugin</artifactId>
+            <artifactId>maven-failsafe-plugin</artifactId>
             <configuration>
               <argLine>-agentpath:"${yourkit.home}\bin\win64\yjpagent.dll"</argLine>
             </configuration>
