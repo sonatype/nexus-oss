@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.ParallelMultiSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.Sort;
@@ -302,8 +302,8 @@ public class DefaultSearchEngine
             }
         }
 
-        MultiSearcher multiSearcher =
-            new MultiSearcher( contextsToSearch.toArray( new Searchable[contextsToSearch.size()] ) );
+        ParallelMultiSearcher multiSearcher =
+            new ParallelMultiSearcher( contextsToSearch.toArray( new Searchable[contextsToSearch.size()] ) );
 
         // NEXUS-3482 made us to NOT use reverse ordering (it is a fix I wanted to implement, but user contributed patch
         // did come in faster! -- Thanks)

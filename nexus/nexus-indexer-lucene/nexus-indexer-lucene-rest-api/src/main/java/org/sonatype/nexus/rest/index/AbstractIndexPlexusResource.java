@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.apache.lucene.store.AlreadyClosedException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -138,78 +139,108 @@ public abstract class AbstractIndexPlexusResource
 
         NexusArtifact na = null;
 
-        try
-        {
-            if ( !StringUtils.isEmpty( sha1 ) )
-            {
-                try
-                {
-                    na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, sha1 ) );
-                }
-                catch ( IOException e )
-                {
-                    throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                        "IOException during configuration retrieval!", e );
-                }
-            }
-            else
-            {
-                searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, exact );
-            }
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
-                + getRepositoryId( request ) + "' does not exists!", e );
-        }
+        boolean doingSha1Identify = !StringUtils.isBlank( sha1 );
 
         SearchResponse result = new SearchResponse();
 
-        if ( searchResult != null )
+        if ( doingSha1Identify )
         {
-            // non-identify search happened
-            boolean tooManyResults = searchResult.isHitLimitExceeded();
-
-            result.setTooManyResults( tooManyResults );
-
-            result.setTotalCount( searchResult.getTotalHits() );
-
-            result.setFrom( from == null ? -1 : from.intValue() );
-
-            result.setCount( count == null ? -1 : count );
-
-            if ( tooManyResults )
+            try
             {
-                result.setData( new ArrayList<NexusArtifact>() );
+                na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, sha1 ) );
+            }
+            catch ( IOException e )
+            {
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
+                    "IOException during configuration retrieval!", e );
+            }
+
+            if ( na != null )
+            {
+                // searhcResult is null and na is not, it is identify
+                result.setTotalCount( 1 );
+
+                result.setFrom( -1 );
+
+                result.setCount( 1 );
+
+                result.setData( new ArrayList<NexusArtifact>( Collections.singleton( na ) ) );
             }
             else
             {
-                result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+                // otherwise, we have no results (unsuccesful identify returns null!)
+                result.setTotalCount( 0 );
+
+                result.setFrom( -1 );
+
+                result.setCount( 1 );
+
+                result.setData( new ArrayList<NexusArtifact>() );
             }
-        }
-        else if ( na != null )
-        {
-            // searhcResult is null and na is not, it is identify
-            result.setTotalCount( 1 );
-
-            result.setFrom( -1 );
-
-            result.setCount( 1 );
-
-            result.setData( new ArrayList<NexusArtifact>( Collections.singleton( na ) ) );
         }
         else
         {
-            // otherwise, we have no results (unsuccesful identify returns null!)
-            result.setTotalCount( 0 );
+            // doing "plain search"
+            final int RETRIES = 3;
 
-            result.setFrom( -1 );
+            int runCount = 0;
 
-            result.setCount( 1 );
+            while ( runCount < RETRIES )
+            {
+                try
+                {
+                    searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, exact );
 
-            result.setData( new ArrayList<NexusArtifact>() );
+                    // non-identify search happened
+                    boolean tooManyResults = searchResult.isHitLimitExceeded();
+
+                    result.setTooManyResults( tooManyResults );
+
+                    result.setTotalCount( searchResult.getTotalHits() );
+
+                    result.setFrom( from == null ? -1 : from.intValue() );
+
+                    result.setCount( count == null ? -1 : count );
+
+                    if ( tooManyResults )
+                    {
+                        result.setData( new ArrayList<NexusArtifact>() );
+                    }
+                    else
+                    {
+                        result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+                    }
+
+                    // we came here, so we break the while-loop, we got what we need
+                    break;
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
+                        + getRepositoryId( request ) + "' does not exists!", e );
+                }
+                catch ( AlreadyClosedException e )
+                {
+                    // just keep it silent (DEBUG)
+                    getLogger().debug( "Got AlreadyClosedException exception!", e );
+
+                    result.setData( null );
+                }
+
+                runCount++;
+            }
+
+            if ( result.getData() == null )
+            {
+                result.setTooManyResults( true );
+
+                result.setData( new ArrayList<NexusArtifact>() );
+
+                getLogger().info(
+                    "Nexus BUG: Was unable to perform search " + RETRIES
+                        + " times, giving up, and lying about TooManyResults." );
+            }
         }
-        // filtering
 
         return result;
     }
