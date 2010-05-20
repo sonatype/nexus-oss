@@ -25,6 +25,8 @@ public class IndexerLuceneNexusIndexHtmlCustomizer
             getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus/nexus-indexer-lucene-plugin/pom.properties" );
 
         return "<script src=\"static/js/nexus-indexer-lucene-plugin-all.js" + ( version == null ? "" : "?" + version )
-            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>";
+            + "\" type=\"text/javascript\" charset=\"utf-8\"></script>"
+            + "<link rel=\"stylesheet\" href=\"static/style/indexer-lucene-styles.css" + ( version == null ? "" : "?" + version )
+            + "\" type=\"text/css\" media=\"screen\" title=\"no title\" charset=\"utf-8\">";
     }
 }

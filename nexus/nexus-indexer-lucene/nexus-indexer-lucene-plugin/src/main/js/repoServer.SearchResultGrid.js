@@ -217,30 +217,25 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       {
         return;
       }
-
-      var tt = new Ext.ToolTip({
-        target : t,
-        title : 'Match Details',
-        headerAsText : true,
-        trackMouse : true,
-        showDelay : 100,
-        html : highlightedFragment,
-        autoWidth : true,
-        listeners : {
-          beforehide : {
-            fn : function(component) {
-              this.tooltipShown = false;
-            },
-            scope : this
-          },
-          beforeshow : {
-            fn : function(component) {
-              this.tooltipShown = true;
-            },
-            scope : this
-          }
-        }
-      });
+      
+      // Init the singleton.  Any tag-based quick tips will start working.
+	  Ext.QuickTips.init();
+	  
+	  // Apply a set of config properties to the singleton
+	  Ext.apply(Ext.QuickTips.getQuickTip(), {
+	      maxWidth: 500,
+	      showDelay: 50,
+	      trackMouse: true
+	  });
+	  
+	  // Manually register a quick tip for a specific element
+	  Ext.QuickTips.register({
+	      target: t,
+	      title: 'Match Details',
+	      text: highlightedFragment,
+	      dismissDelay: 5000,
+          width: 'auto'
+	  });
     }
   },
   formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
