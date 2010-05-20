@@ -164,10 +164,16 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
     searchType.searchHandler.call(this, panel);
   },
   // get the records from the server using grid
-  fetchRecords : function(panel) {
+  fetchRecords : function(panel, reverse) {
     panel.artifactContainer.collapsePanel();
     panel.grid.totalRecords = 0;
     panel.grid.store.load();
+    
+    if ( reverse ) {
+      panel.grid.store.on( 'load', function( store, records, options ) {
+        store.sort( 'version', 'desc' );
+      }, this );
+    }
   },
   // start the quick search, we will look at all search types
   // and try to guess which type of search to use
@@ -421,7 +427,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
 
     panel.clearWarningLabel();
 
-    panel.fetchRecords(panel);
+    panel.fetchRecords(panel, true);
   },
   applyBookmarkHandler : function(panel, data) {
     gavPopulator(panel, data);
