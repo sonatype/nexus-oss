@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -20,15 +19,6 @@ public class AbstractGroupRepositoryConfiguration
     public AbstractGroupRepositoryConfiguration( Xpp3Dom configuration )
     {
         super( configuration );
-    }
-
-    public boolean membersChanged()
-    {
-        String oldConf = getCollection( getRootNode(), MEMBER_REPOSITORIES ).toString();
-
-        String newConf = getCollection( getRootNode(), MEMBER_REPOSITORIES ).toString();
-
-        return !StringUtils.equals( oldConf, newConf );
     }
 
     public List<String> getMemberRepositoryIds()
