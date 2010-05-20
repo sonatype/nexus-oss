@@ -29,6 +29,9 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
         exposed : Sonatype.utils.convert.stringContextToBool
       }
     },
+    validationModifiers : {
+      repositories : this.repositoriesValidationError.createDelegate(this),
+    },
     referenceData : Sonatype.repoServer.referenceData.group,
     uri : Sonatype.config.repos.urls.groups
   };
@@ -251,6 +254,10 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
           }
         }
         store.insert(insertIndex, [rec]);
+      },
+      repositoriesValidationError : function(error, fpanel) {
+        var repos = fpanel.find('name', 'repositories')[0];
+        repos.markTreeInvalid(null, error.msg);
       }
 
     });
