@@ -92,10 +92,11 @@ public class DefaultSnapshotRemover
         {
             Repository repository = getRepositoryRegistry().getRepository( request.getRepositoryId() );
 
-            if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class )
                 && repository.getRepositoryContentClass().isCompatible( contentClass ) )
             {
-                result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
+                result.addResult( removeSnapshotsFromMavenRepository( repository.adaptToFacet( MavenRepository.class ),
+                                                                      request ) );
             }
             else
             {
@@ -105,32 +106,45 @@ public class DefaultSnapshotRemover
         }
         else if ( request.getRepositoryGroupId() != null )
         {
-            for ( Repository repository : getRepositoryRegistry().getRepositoryWithFacet(
-                                                                                          request.getRepositoryGroupId(),
-                                                                                          GroupRepository.class ).getMemberRepositories() )
-            {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
-                    && repository.getRepositoryContentClass().isCompatible( contentClass ) )
-                {
-                    result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
-                }
-            }
+            process( request, result, getRepositoryRegistry().getRepositoryWithFacet( request.getRepositoryGroupId(),
+                                                                                      GroupRepository.class ) );
         }
         else
         {
             for ( Repository repository : getRepositoryRegistry().getRepositories() )
             {
-                // only from maven repositories, stay silent for others and simply skip
-                if ( MavenRepository.class.isAssignableFrom( repository.getClass() )
-                    && repository.getRepositoryContentClass().isCompatible( contentClass ) )
-                {
-                    result.addResult( removeSnapshotsFromMavenRepository( (MavenRepository) repository, request ) );
-                }
+                process( request, result, repository );
             }
         }
 
         return result;
+    }
+
+    private void process( SnapshotRemovalRequest request, SnapshotRemovalResult result, GroupRepository group )
+    {
+        for ( Repository repository : group.getMemberRepositories() )
+        {
+            process( request, result, repository );
+        }
+    }
+
+    private void process( SnapshotRemovalRequest request, SnapshotRemovalResult result, Repository repository )
+    {
+        // only from maven repositories, stay silent for others and simply skip
+        if ( !repository.getRepositoryContentClass().isCompatible( contentClass ) )
+        {
+            return;
+        }
+
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            process( request, result, repository.adaptToFacet( GroupRepository.class ) );
+        }
+        else if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+        {
+            result.addResult( removeSnapshotsFromMavenRepository( repository.adaptToFacet( MavenRepository.class ),
+                                                                  request ) );
+        }
     }
 
     /**
@@ -602,19 +616,15 @@ public class DefaultSnapshotRemover
                             {
                                 // "-SNAPSHOT" :== 9 chars
                                 releaseVersion =
-                                    snapshotGav.getBaseVersion().substring(
-                                                                            0,
-                                                                            snapshotGav.getBaseVersion().length()
-                                                                                - 9 );
+                                    snapshotGav.getBaseVersion().substring( 0,
+                                                                            snapshotGav.getBaseVersion().length() - 9 );
                             }
                             else
                             {
                                 // "SNAPSHOT" :== 8 chars
                                 releaseVersion =
-                                    snapshotGav.getBaseVersion().substring(
-                                                                            0,
-                                                                            snapshotGav.getBaseVersion().length()
-                                                                                - 8 );
+                                    snapshotGav.getBaseVersion().substring( 0,
+                                                                            snapshotGav.getBaseVersion().length() - 8 );
                             }
 
                             Gav releaseGav =
