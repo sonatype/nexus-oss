@@ -56,7 +56,7 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
     {
         String path = "nexus977tasks/project/1.0-SNAPSHOT/project-1.0-20100520.154534-88.jar";
         downloadFile( new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
-                      "target/downloads/nexus977tasks" );
+                      "target/downloads/nexus977tasks/project-1.0-20100520.154534-88.jar" );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
         keepSnapshotsProp.setId( "minSnapshotsToKeep" );
@@ -79,7 +79,7 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
         {
             downloadFile(
                           new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
-                          "target/downloads/nexus977tasks" );
+                          "target/downloads/nexus977tasks/project-1.0-20100520.154534-88-2.jar" );
             Assert.fail( "snapshot removal should have deleted this" );
         }
         catch ( FileNotFoundException e )
