@@ -1444,11 +1444,24 @@ public class DefaultIndexerManager
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
+        publishRepositoryGroupIndex( group );
+    }
+
+    protected void publishRepositoryGroupIndex( GroupRepository group )
+        throws IOException
+    {
         if ( group.isIndexable() )
         {
             for ( Repository repository : group.getMemberRepositories() )
             {
-                publishRepositoryIndex( repository );
+                if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                {
+                    publishRepositoryGroupIndex( repository.adaptToFacet( GroupRepository.class ) );
+                }
+                else
+                {
+                    publishRepositoryIndex( repository );
+                }
             }
 
             publishRepositoryIndex( group );
