@@ -73,12 +73,6 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
             TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,
                                       keepSnapshotsProp, ageProp );
         TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
-        TaskScheduleUtil.waitForAllTasksToStop();
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         try
