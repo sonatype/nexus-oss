@@ -296,14 +296,18 @@ public class DefaultIndexerManager
                 // the member reposes only, so it would duplicate results
                 ctxLocal =
                     nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                        repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
+                                                           repoRoot,
+                                                           new File( getWorkingDirectory(),
+                                                                     getLocalContextId( repository.getId() ) ), null,
+                                                           null, indexCreators );
                 ctxLocal.setSearchable( repository.isSearchable() );
 
                 ctxRemote =
                     nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ),
-                        repository.getId(), repoRoot, new File( getWorkingDirectory(),
-                            getRemoteContextId( repository.getId() ) ), null, null, indexCreators );
+                                                           repository.getId(), repoRoot,
+                                                           new File( getWorkingDirectory(),
+                                                                     getRemoteContextId( repository.getId() ) ), null,
+                                                           null, indexCreators );
                 ctxRemote.setSearchable( repository.isSearchable() );
             }
             else
@@ -315,14 +319,18 @@ public class DefaultIndexerManager
                 // add context for repository
                 ctxLocal =
                     nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                        repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
+                                                           repoRoot,
+                                                           new File( getWorkingDirectory(),
+                                                                     getLocalContextId( repository.getId() ) ), null,
+                                                           null, indexCreators );
                 ctxLocal.setSearchable( repository.isSearchable() );
 
                 ctxRemote =
                     nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ),
-                        repository.getId(), repoRoot, new File( getWorkingDirectory(),
-                            getRemoteContextId( repository.getId() ) ), null, null, indexCreators );
+                                                           repository.getId(), repoRoot,
+                                                           new File( getWorkingDirectory(),
+                                                                     getRemoteContextId( repository.getId() ) ), null,
+                                                           null, indexCreators );
                 ctxRemote.setSearchable( repository.isSearchable() );
             }
         }
@@ -512,7 +520,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Searching on repository ID='" + repositoryId + "' is set to: " + String.valueOf( searchable ) );
+                                   "Searching on repository ID='" + repositoryId + "' is set to: "
+                                       + String.valueOf( searchable ) );
             }
 
             ctx.setSearchable( searchable );
@@ -605,8 +614,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
+                                   "Repository '" + repository.getId()
+                                       + "' is already processed in recursive calls, will not process it." );
             }
 
             return;
@@ -634,7 +643,7 @@ public class DefaultIndexerManager
                 {
                     gav =
                         ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
+                                                                                       item.getRepositoryItemUid().getPath() );
                 }
                 catch ( IllegalArtifactCoordinateException e )
                 {
@@ -654,8 +663,10 @@ public class DefaultIndexerManager
                 if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
                 {
                     File file =
-                        ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
-                            new ResourceStoreRequest( item ) );
+                        ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase(
+                                                                                                            repository,
+                                                                                                            new ResourceStoreRequest(
+                                                                                                                                      item ) );
 
                     if ( file.exists() )
                     {
@@ -746,8 +757,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
+                                   "Repository '" + repository.getId()
+                                       + "' is already processed in recursive calls, will not process it." );
             }
 
             return;
@@ -767,7 +778,7 @@ public class DefaultIndexerManager
                 {
                     gav =
                         ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
+                                                                                       item.getRepositoryItemUid().getPath() );
                 }
                 catch ( IllegalArtifactCoordinateException e )
                 {
@@ -784,7 +795,7 @@ public class DefaultIndexerManager
 
                 ArtifactInfo ai =
                     new ArtifactInfo( context.getRepositoryId(), gav.getGroupId(), gav.getArtifactId(),
-                        gav.getBaseVersion(), gav.getClassifier() );
+                                      gav.getBaseVersion(), gav.getClassifier() );
 
                 // store extension if classifier is not empty
                 if ( !StringUtils.isEmpty( ai.classifier ) )
@@ -806,8 +817,8 @@ public class DefaultIndexerManager
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                            + " from index (DELETE)." );
+                                       "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+                                           + " from index (DELETE)." );
                 }
             }
 
@@ -822,9 +833,13 @@ public class DefaultIndexerManager
                 if ( getLogger().isDebugEnabled() )
                 {
                     getLogger().debug(
-                        "NOT deleting artifact " + ac.getArtifactInfo().groupId + ":" + ac.getArtifactInfo().artifactId
-                            + ":" + ac.getArtifactInfo().version
-                            + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
+                                       "NOT deleting artifact "
+                                           + ac.getArtifactInfo().groupId
+                                           + ":"
+                                           + ac.getArtifactInfo().artifactId
+                                           + ":"
+                                           + ac.getArtifactInfo().version
+                                           + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
                 }
             }
         }
@@ -1070,12 +1085,28 @@ public class DefaultIndexerManager
     public void downloadRepositoryGroupIndex( String repositoryGroupId )
         throws IOException, NoSuchRepositoryException
     {
-        List<Repository> group =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class ).getMemberRepositories();
+        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
+        downloadRepositoryGroupIndex( group );
+    }
 
-        for ( Repository repository : group )
+    protected void downloadRepositoryGroupIndex( GroupRepository group )
+        throws IOException
+    {
+        List<Repository> members = group.getMemberRepositories();
+
+        for ( Repository repository : members )
         {
-            if ( repository.isIndexable() && repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            if ( !repository.isIndexable() )
+            {
+                continue;
+            }
+
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                downloadRepositoryGroupIndex( repository.adaptToFacet( GroupRepository.class ) );
+            }
+
+            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
                 if ( downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
                 {
@@ -1134,7 +1165,8 @@ public class DefaultIndexerManager
                     else
                     {
                         getLogger().info(
-                            "Remote indexes unchanged (no update needed) for repository " + repository.getId() );
+                                          "Remote indexes unchanged (no update needed) for repository "
+                                              + repository.getId() );
                     }
                 }
                 catch ( Exception e )
@@ -1331,8 +1363,8 @@ public class DefaultIndexerManager
 
                 String groupId = group.getId();
                 getLogger().info(
-                    "Cascading merge of group indexes for group \"" + groupId + "\", where repository \""
-                        + repository.getId() + "\" is member." );
+                                  "Cascading merge of group indexes for group \"" + groupId + "\", where repository \""
+                                      + repository.getId() + "\" is member." );
 
                 // get the groups target ctx
                 IndexingContext groupContext = getRepositoryLocalIndexContext( group );
@@ -1432,8 +1464,8 @@ public class DefaultIndexerManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                    "Can't publish index on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId()
-                        + "\") since indexing is not supported on it!" );
+                                   "Can't publish index on repository \"" + repository.getName() + "\" (ID=\""
+                                       + repository.getId() + "\") since indexing is not supported on it!" );
             }
 
             return;
@@ -1554,7 +1586,8 @@ public class DefaultIndexerManager
 
                 // FileUtils.copyStreamToFile closes the stream!
                 FileUtils.copyStreamToFile( new RawInputStreamFacade( is ), new File( tempDir,
-                    IndexingContext.INDEX_FILE + ".properties" ) );
+                                                                                      IndexingContext.INDEX_FILE
+                                                                                          + ".properties" ) );
             }
         }
         catch ( Exception e )
@@ -1575,8 +1608,8 @@ public class DefaultIndexerManager
             fis = new FileInputStream( file );
 
             DefaultStorageFileItem fItem =
-                new DefaultStorageFileItem( repository, path, true, true, new PreparedContentLocator( fis,
-                    mimeUtil.getMimeType( file ) ) );
+                new DefaultStorageFileItem( repository, path, true, true,
+                                            new PreparedContentLocator( fis, mimeUtil.getMimeType( file ) ) );
 
             if ( context.getTimestamp() == null )
             {
@@ -2158,9 +2191,10 @@ public class DefaultIndexerManager
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
 
             req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
+                                                 new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
             req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
+                                                 new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2,
+                                                                            MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
             {
@@ -2230,7 +2264,8 @@ public class DefaultIndexerManager
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false );
 
             req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.CLASSNAMES, q, MatchHighlightMode.HTML ) );
+                                                 new MatchHighlightRequest( MAVEN.CLASSNAMES, q,
+                                                                            MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
             {
@@ -2534,13 +2569,13 @@ public class DefaultIndexerManager
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                baseContext.getRepositoryId(), //
-                baseContext.getRepository(), //
-                directory, //
-                baseContext.getRepositoryUrl(), //
-                baseContext.getIndexUpdateUrl(), //
-                baseContext.getIndexCreators(), //
-                true );
+                                                     baseContext.getRepositoryId(), //
+                                                     baseContext.getRepository(), //
+                                                     directory, //
+                                                     baseContext.getRepositoryUrl(), //
+                                                     baseContext.getIndexUpdateUrl(), //
+                                                     baseContext.getIndexCreators(), //
+                                                     true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {

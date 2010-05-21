@@ -1,29 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.0.8</version>
-
-  <smtpConfiguration>
-    <host>localhost</host>
-    <port>${email-server-port}</port>
-    <sslEnabled>false</sslEnabled>
-    <tlsEnabled>false</tlsEnabled>
-    <username>smtp-username</username>
-    <password>smtp-password</password>
-    <debugMode>false</debugMode>
-    <systemEmailAddress>system@nexus.org</systemEmailAddress>
-  </smtpConfiguration>
-
-  <security>
-    <enabled>false</enabled>
-    <anonymousAccessEnabled>true</anonymousAccessEnabled>
-    <anonymousUsername>anonymous</anonymousUsername>
-    <anonymousPassword>anonymous</anonymousPassword>
-    <realms>
-      <realm>XmlAuthenticatingRealm</realm>
-      <realm>XmlAuthorizingRealm</realm>
-    </realms>
-  </security>
-  <globalConnectionSettings />
+  <version>1.4.1</version>
+  <globalConnectionSettings>
+    <connectionTimeout>10000</connectionTimeout>
+    <retrievalRetryCount>3</retrievalRetryCount>
+    <queryString></queryString>
+  </globalConnectionSettings>
   <restApi>
     <baseUrl>http://localhost:${nexus-application-port}/nexus</baseUrl>
   </restApi>
@@ -32,85 +14,250 @@
     <proxyPolicy>strict</proxyPolicy>
   </httpProxy>
   <routing>
-    <groups />
+    <resolveLinks>true</resolveLinks>
   </routing>
   <repositories>
     <repository>
       <id>r1</id>
       <name>r1</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>r2</id>
       <name>r2</name>
-      <allowWrite>true</allowWrite>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>r3</id>
       <name>r3</name>
-      <allowWrite>true</allowWrite>
-      <repositoryPolicy>snapshot</repositoryPolicy>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>ALLOW_WRITE</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>false</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>snapshot</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>r4</id>
       <name>r4</name>
-      <proxyMode>allow</proxyMode>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}nexus977tasks/1</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
     </repository>
     <repository>
       <id>r5</id>
       <name>r5</name>
-      <proxyMode>allow</proxyMode>
+      <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>1440</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <searchable>true</searchable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
       <remoteStorage>
+        <provider>apacheHttpClient3x</provider>
         <url>${proxy-repo-base-url}nexus977tasks/2</url>
       </remoteStorage>
+      <externalConfiguration>
+        <proxyMode>ALLOW</proxyMode>
+        <artifactMaxAge>1440</artifactMaxAge>
+        <itemMaxAge>1440</itemMaxAge>
+        <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
+        <downloadRemoteIndex>true</downloadRemoteIndex>
+        <checksumPolicy>WARN</checksumPolicy>
+        <repositoryPolicy>release</repositoryPolicy>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>g1</id>
+      <name>g1</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>g2</memberRepository>
+          <memberRepository>r2</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>g2</id>
+      <name>g2</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>r4</memberRepository>
+          <memberRepository>r1</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>g3</id>
+      <name>g3</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>r5</memberRepository>
+          <memberRepository>r3</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
+    </repository>
+    <repository>
+      <id>g4</id>
+      <name>g4</name>
+      <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
+      <providerHint>maven2</providerHint>
+      <localStatus>IN_SERVICE</localStatus>
+      <notFoundCacheActive>true</notFoundCacheActive>
+      <notFoundCacheTTL>15</notFoundCacheTTL>
+      <userManaged>true</userManaged>
+      <exposed>true</exposed>
+      <browseable>true</browseable>
+      <writePolicy>READ_ONLY</writePolicy>
+      <indexable>true</indexable>
+      <localStorage>
+        <provider>file</provider>
+      </localStorage>
+      <externalConfiguration>
+        <mergeMetadata>true</mergeMetadata>
+        <memberRepositories>
+          <memberRepository>g3</memberRepository>
+          <memberRepository>g1</memberRepository>
+        </memberRepositories>
+      </externalConfiguration>
     </repository>
   </repositories>
-  <repositoryShadows>
-  </repositoryShadows>
-  <repositoryGrouping>
-    <repositoryGroups>
-      <repositoryGroup>
-        <groupId>g1</groupId>
-        <type>maven2</type>
-        <name>g1</name>
-        <repositories>
-          <repository>g2</repository>
-          <repository>r2</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>g2</groupId>
-        <type>maven2</type>
-        <name>g2</name>
-        <repositories>
-          <repository>r4</repository>
-          <repository>r1</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>g3</groupId>
-        <type>maven2</type>
-        <name>g3</name>
-        <repositories>
-          <repository>r5</repository>
-          <repository>r3</repository>
-        </repositories>
-      </repositoryGroup>
-      <repositoryGroup>
-        <groupId>g4</groupId>
-        <type>maven2</type>
-        <name>g4</name>
-        <repositories>
-          <repository>g3</repository>
-          <repository>g1</repository>
-        </repositories>
-      </repositoryGroup>
-    </repositoryGroups>
-  </repositoryGrouping>
-
+  <repositoryGrouping />
   <repositoryTargets>
     <repositoryTarget>
       <id>allRepos</id>
@@ -120,7 +267,6 @@
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
-
     <repositoryTarget>
       <id>1</id>
       <name>All (Maven2)</name>
@@ -137,8 +283,27 @@
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
-
-
+    <repositoryTarget>
+      <id>any</id>
+      <name>All (any)</name>
+      <contentClass>any</contentClass>
+      <patterns>
+        <pattern>.*</pattern>
+      </patterns>
+    </repositoryTarget>
   </repositoryTargets>
-
+  <tasks/>
+  <smtpConfiguration>
+    <hostname>localhost</hostname>
+    <port>${email-server-port}</port>
+    <username>smtp-username</username>
+    <password>{dlt0tjbySJMHt1DKE7jS5xp8K/4Diuuu73N0zB+4gcs=}</password>
+    <systemEmailAddress>system@nexus.org</systemEmailAddress>
+  </smtpConfiguration>
+  <errorReporting>
+    <jiraUrl>https://issues.sonatype.org</jiraUrl>
+    <jiraProject>PR</jiraProject>
+    <useGlobalProxy>true</useGlobalProxy>
+  </errorReporting>
+  <notification />
 </nexusConfiguration>
