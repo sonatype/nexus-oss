@@ -375,6 +375,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
       gavPopulator(panel, data);
     },
     searchHandler : function(panel) {
+      var reverseSortResults = false; 
       this.grid.store.baseParams = {};
 
       // groupId
@@ -414,6 +415,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
       for ( var i = 0 ; i < extras.length ; i++ ) {
         if ( extras[i] == 'kw' ) {
           panel.grid.store.baseParams['exact'] = true;
+          reverseSortResults = true;
         }
       }
       
@@ -427,7 +429,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
 
     panel.clearWarningLabel();
 
-    panel.fetchRecords(panel, true);
+    panel.fetchRecords(panel, reverseSortResults);
   },
   applyBookmarkHandler : function(panel, data) {
     gavPopulator(panel, data);
