@@ -175,26 +175,40 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       
       listeners : {
           render : {
-            fn : function(panel) {
-              panel.body.on({
-                    'mousedown' : function(e, t) {
-                      var i = t.getAttribute('index');
-                      this.toggleExtraInfo(parseInt(i, 10));
-                      e.stopEvent();
-                      return false;
-                    },
-                    'click' : function(e, t) {
-                      e.stopEvent();
-                      return false;
-                    },
-                    delegate : 'a.pom-link',
-                    scope : panel
-                  });
+            fn : function(grid) {
+              grid.body.on({
+                'mousedown' : function(e, t) {
+                  var i = t.getAttribute('index');
+                  this.toggleExtraInfo(parseInt(i, 10));
+                  e.stopEvent();
+                  return false;
+                },
+                'click' : function(e, t) {
+                  e.stopEvent();
+                  return false;
+                },
+                delegate : 'a.pom-link',
+                scope : grid
+              });
+                  
+              var store = grid.getStore ();
+			  var view = grid.getView ();
+			  grid.tip = new Ext.ToolTip ({
+			    target: view.mainBody,
+			    delegate: '.x-grid3-row',
+                maxWidth: 500,
+			    trackMouse: true,
+			    renderTo: document.body,
+			    listeners: {
+			      beforeshow: function (tip) {
+			        var rowIndex = view.findRowIndex (tip.triggerElement);
+                    var record = store.getAt( rowIndex );
+                    var highlightedFragment = record.get('highlightedFragment');
+			        tip.body.dom.innerHTML = highlightedFragment;
+			      }
+			    }
+			  });
             },
-            scope : this
-          },
-          mouseover : {
-            fn : this.mouseOverHandler,
             scope : this
           }
         }
@@ -202,42 +216,6 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
-  mouseOverHandler : function(e, t) {
-    var row = this.view.findRowIndex(t);
-
-    if (!(row === false) && !(this.tooltipShown))
-    {
-      var rec = this.store.getAt(row);
-      if (rec == null || rec == undefined)
-      {
-        return;
-      }
-      var highlightedFragment = rec.get('highlightedFragment');
-      if ( Ext.isEmpty( highlightedFragment ) )
-      {
-        return;
-      }
-      
-      // Init the singleton.  Any tag-based quick tips will start working.
-	  Ext.QuickTips.init();
-	  
-	  // Apply a set of config properties to the singleton
-	  Ext.apply(Ext.QuickTips.getQuickTip(), {
-	      maxWidth: 500,
-	      showDelay: 50,
-	      trackMouse: true
-	  });
-	  
-	  // Manually register a quick tip for a specific element
-	  Ext.QuickTips.register({
-	      target: t,
-	      title: 'Match Details',
-	      text: highlightedFragment,
-	      dismissDelay: 5000,
-          width: 'auto'
-	  });
-    }
-  },
   formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
     var versionStr = record.get( 'version' );
     if ( 'LATEST' == versionStr ) {
