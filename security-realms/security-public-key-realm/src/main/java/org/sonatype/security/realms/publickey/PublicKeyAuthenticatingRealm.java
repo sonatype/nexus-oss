@@ -23,6 +23,7 @@ import org.apache.shiro.subject.PrincipalCollection;
  * @see org.apache.shiro.realm.Realm
  *
  * @author hugo@josefson.org
+ * @author Brian Demers
  */
 public class PublicKeyAuthenticatingRealm extends AuthorizingRealm {
     protected static final Class<PublicKeyAuthenticationToken> AUTHENTICATION_TOKEN_CLASS = PublicKeyAuthenticationToken.class;

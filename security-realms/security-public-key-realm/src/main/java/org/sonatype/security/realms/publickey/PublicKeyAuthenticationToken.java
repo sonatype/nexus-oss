@@ -9,7 +9,7 @@ import java.security.PublicKey;
  *
  * @author hugo@josefson.org
  */
-class PublicKeyAuthenticationToken implements AuthenticationToken {
+public class PublicKeyAuthenticationToken implements AuthenticationToken {
     
     private static final long serialVersionUID = -784273150987377079L;
     private final Object principal;
