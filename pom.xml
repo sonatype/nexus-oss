@@ -185,7 +185,6 @@
                 <option>-keep public class * implements org.sonatype.nexus.plugins.rest.NexusResourceBundle { }</option>
                 <option>-dontusemixedcaseclassnames</option>
                 <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable</option>
-                <option>-renamesourcefileattribute SourceFile</option>
                 <option>-printmapping ${project.build.directory}/out.map</option>
                 <option>-dontoptimize</option>
                 <option>-dontshrink</option>
