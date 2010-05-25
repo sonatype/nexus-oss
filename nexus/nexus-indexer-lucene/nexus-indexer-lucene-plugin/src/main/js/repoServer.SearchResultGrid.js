@@ -204,6 +204,11 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 			        var rowIndex = view.findRowIndex (tip.triggerElement);
                     var record = store.getAt( rowIndex );
                     var highlightedFragment = record.get('highlightedFragment');
+                    
+                    if ( Ext.isEmpty( highlightedFragment ) ) {
+                      return false;
+                    }
+                    
 			        tip.body.dom.innerHTML = highlightedFragment;
 			      }
 			    }
