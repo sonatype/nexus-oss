@@ -44,7 +44,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.configuration.model.CErrorReporting;
 import org.sonatype.nexus.configuration.model.CErrorReportingCoreConfiguration;
-import org.sonatype.nexus.configuration.model.Configuration;
 import org.sonatype.nexus.configuration.model.ConfigurationHelper;
 import org.sonatype.nexus.error.report.ErrorReportBundleContentContributor;
 import org.sonatype.nexus.error.report.ErrorReportBundleEntry;
@@ -545,7 +544,14 @@ public class DefaultErrorReportingManager
 
             for ( File confFile : getConfigurationFiles() )
             {
-                addFileToZip( confFile, zStream, null );
+                if ( confFile.isDirectory() )
+                {
+                    addDirToZip( confFile, zStream, null );
+                }
+                else
+                {
+                    addFileToZip( confFile, zStream, null );   
+                }
             }
 
             for ( File logFile : getLogFiles() )
@@ -584,6 +590,29 @@ public class DefaultErrorReportingManager
         }
 
         return zipFile;
+    }
+    
+    private void addDirToZip( File directory, ZipOutputStream zStream, String path )
+        throws IOException
+    {
+        if ( directory != null 
+            && directory.isDirectory() )
+        {
+            File[] files = directory.listFiles();
+            
+            for ( File file : files )
+            {
+                String pathname = path != null ? ( path + "/" + file.getName() ) : directory.getName() + "/" + file.getName();
+                if ( file.isDirectory() )
+                {
+                    addDirToZip( file, zStream, pathname );
+                }
+                else
+                {
+                    addFileToZip( file, zStream, pathname );
+                }
+            }
+        }
     }
 
     private void addFileToZip( File file, ZipOutputStream zStream, String filename )

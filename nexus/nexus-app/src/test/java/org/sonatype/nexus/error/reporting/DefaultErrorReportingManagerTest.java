@@ -3,6 +3,7 @@ package org.sonatype.nexus.error.reporting;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -125,6 +126,8 @@ public class DefaultErrorReportingManagerTest
         throws Exception
     {
         addBackupFiles( getConfHomeDir() );
+        addDirectory( "test-directory", new String[] {"filename1.file", "filename2.file", "filename3.file"} );
+        addDirectory( "nested-test-directory/more-nested-test-directory", new String[] { "filename1.file", "filename2.file", "filename3.file" } );
 
         Exception exception;
 
@@ -161,7 +164,94 @@ public class DefaultErrorReportingManagerTest
         File[] files = unzipHomeDir.listFiles();
 
         assertNotNull( files );
-        assertEquals( 4, files.length ); // TODO: was five with the directory listing, but that was removed, as it OOM'd
+        assertEquals( 6, files.length ); // TODO: was seven with the directory listing, but that was removed, as it OOM'd
+        
+        files = unzipHomeDir.listFiles( new FileFilter(){
+            public boolean accept( File pathname )
+            {
+                if ( pathname.isDirectory()
+                    && pathname.getName().equals( "test-directory" ) )
+                {
+                    return true;
+                }
+                
+                return false;
+            }
+        });
+        
+        assertEquals( 1, files.length );
+        
+        files = files[0].listFiles();
+        
+        boolean file1found = false;
+        boolean file2found = false;
+        boolean file3found = false;
+        for ( File file : files )
+        {
+            if ( file.getName().equals( "filename1.file" ) )
+            {
+                file1found = true;
+            }
+            else if ( file.getName().equals( "filename2.file" ) )
+            {
+                file2found = true;
+            }
+            else if ( file.getName().equals( "filename3.file" ) )
+            {
+                file3found = true;
+            }
+        }
+        
+        assertTrue( file1found && file2found && file3found );
+        
+        files = unzipHomeDir.listFiles( new FileFilter(){
+            public boolean accept( File pathname )
+            {
+                if ( pathname.isDirectory()
+                    && pathname.getName().equals( "nested-test-directory" ) )
+                {
+                    return true;
+                }
+                
+                return false;
+            }
+        });
+        
+        files = files[0].listFiles( new FileFilter(){
+           public boolean accept( File pathname )
+            {
+               if ( pathname.isDirectory()
+                   && pathname.getName().equals( "more-nested-test-directory" ) )
+               {
+                   return true;
+               }
+               
+               return false;
+            } 
+        });
+        
+        files = files[0].listFiles();
+        
+        file1found = false;
+        file2found = false;
+        file3found = false;
+        for ( File file : files )
+        {
+            if ( file.getName().equals( "filename1.file" ) )
+            {
+                file1found = true;
+            }
+            else if ( file.getName().equals( "filename2.file" ) )
+            {
+                file2found = true;
+            }
+            else if ( file.getName().equals( "filename3.file" ) )
+            {
+                file3found = true;
+            }
+        }
+        
+        assertTrue( file1found && file2found && file3found );
     }
 
     private void addBackupFiles( File dir )
@@ -169,6 +259,19 @@ public class DefaultErrorReportingManagerTest
     {
         new File( dir, "nexus.xml.bak" ).createNewFile();
         new File( dir, "security.xml.bak" ).createNewFile();
+    }
+    
+    private void addDirectory( String path, String[] filenames )
+        throws Exception
+    {
+        File confDir = new File( getConfHomeDir(), path );
+        File unzipDir = new File( unzipHomeDir, path );
+        confDir.mkdirs();
+        unzipDir.mkdirs();
+        
+        for ( String filename : filenames ){
+            new File( confDir, filename ).createNewFile();
+        }
     }
 
     private void extractZipFile( File zipFile, File outputDirectory )
