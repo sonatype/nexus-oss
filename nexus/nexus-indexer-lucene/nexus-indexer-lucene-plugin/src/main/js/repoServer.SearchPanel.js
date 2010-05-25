@@ -74,7 +74,12 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   },
 
   displayArtifactInformation : function(selectionModel, index, rec) {
-    this.artifactContainer.updateArtifact(rec.data);
+    var searchType = this.getSearchType(this.searchTypeButton.value);
+    if ( typeof searchType.showArtifactContainer != 'function' 
+        || searchType.showArtifactContainer() )
+    {
+      this.artifactContainer.updateArtifact(rec.data);
+    }
   },
   // search type switched on the drop down button
   switchSearchType : function(button, event) {
@@ -242,6 +247,9 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     defaultQuickSearch : true,
     // use the default store
     store : null,
+    showArtifactContainer : function() {
+      return false;
+    },
     columnModel : new Ext.grid.ColumnModel({
       columns: [
         {
@@ -267,13 +275,15 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
           id: 'packaging',
           header: "Packaging",
           dataIndex: 'packaging',
-          sortable:true
+          sortable:true,
+          renderer: panel.grid.formatPackagingLink
         },
         {
           id: 'classifier',
           header: "Classifier",
           dataIndex: 'classifier',
-          sortable:true
+          sortable:true,
+          renderer: panel.grid.formatClassifierLink
         }
       ]
     }),

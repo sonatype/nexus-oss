@@ -127,13 +127,15 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
         id: 'packaging',
         header: "Packaging",
         dataIndex: 'packaging',
-        sortable:true
+        sortable:true,
+        renderer: this.formatPackagingLink
       },
       {
         id: 'classifier',
         header: "Classifier",
         dataIndex: 'classifier',
-        sortable:true
+        sortable:true,
+        renderer: this.formatClassifierLink
       }
     ]
   });
@@ -234,6 +236,25 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     } else {
       return versionStr;
     }
+  },
+  formatPackagingLink : function( value, p, record, rowIndex, colIndex, store) {
+    var packagingStr = record.get( 'packaging' );
+    //if ( 'ALL' == packagingStr ) {
+      
+    //}
+    //else {
+      return packagingStr;
+    //}
+  },
+  
+  formatClassifierLink : function( value, p, record, rowIndex, colIndex, store) {
+    var classifierStr = record.get( 'classifier' );
+    //if ( 'ALL' == classifierStr ) {
+      
+    //}
+    //else {
+      return classifierStr;
+    //}
   },
   
   switchStore : function( grid, store, columnModel ) {
