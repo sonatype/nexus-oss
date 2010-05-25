@@ -96,7 +96,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
   
   this.store = this.defaultStore;
   
-  this.colModel = new Ext.grid.ColumnModel({
+  this.defaultColumnModel = new Ext.grid.ColumnModel({
     columns: [
       {
         id: 'source',
@@ -137,6 +137,8 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
       }
     ]
   });
+  
+  this.colModel = this.defaultColumnModel;
 
   this.clearButton = new Ext.Button({
     text: 'Clear Results',
@@ -234,16 +236,20 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     }
   },
   
-  switchStore : function( grid, store ) {
+  switchStore : function( grid, store, columnModel ) {
     if ( store == null ) {
       store = grid.defaultStore;
+    }
+    
+    if ( columnModel == null ) {
+      columnModel = grid.defaultColumnModel;
     }
     
     if ( store ) {
       this.clearResults();
     }
     
-    grid.reconfigure( store, grid.colModel );
+    grid.reconfigure( store, columnModel );
   },
   toggleExtraInfo : function(rowIndex){
     var rowEl = new Ext.Element(this.getView().getRow(rowIndex));

@@ -123,7 +123,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   // different search types may have different stores
   switchStore : function() {
     var searchType = this.getSearchType(this.searchTypeButton.value);
-    this.grid.switchStore(this.grid, searchType.store);
+    this.grid.switchStore(this.grid, searchType.store, searchType.columnModel);
   },
   // retrieve the specified search type object
   getSearchType : function(value) {
@@ -242,6 +242,41 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     defaultQuickSearch : true,
     // use the default store
     store : null,
+    columnModel : new Ext.grid.ColumnModel({
+      columns: [
+        {
+          id: 'group',
+          header: "Group",
+          dataIndex: 'groupId',
+          sortable:true
+        },
+        {
+          id: 'artifact',
+          header: "Artifact",
+          dataIndex: 'artifactId',
+          sortable:true
+        },
+        {
+          id: 'version',
+          header: "Version",
+          dataIndex: 'version',
+          sortable:true,
+          renderer: panel.grid.formatVersionLink
+        },
+        {
+          id: 'packaging',
+          header: "Packaging",
+          dataIndex: 'packaging',
+          sortable:true
+        },
+        {
+          id: 'classifier',
+          header: "Classifier",
+          dataIndex: 'classifier',
+          sortable:true
+        }
+      ]
+    }),
     quickSearchCheckHandler : function(panel, value) {
       return true;
     },
