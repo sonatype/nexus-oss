@@ -178,7 +178,7 @@ public class DefaultIteratorResultSet
 
             if ( field != null )
             {
-                text = getText( ai, field.getOntology() );
+                text = ai.getFieldValue( field.getOntology() );
 
                 if ( text != null )
                 {
@@ -212,57 +212,6 @@ public class DefaultIteratorResultSet
         {
             return field.getIndexerFields().isEmpty() ? null : field.getIndexerFields().iterator().next();
         }
-    }
-
-    /**
-     * This method will dissapear, once we drop ArtifactInfo.
-     * 
-     * @param d
-     * @param ai
-     * @param field
-     * @return
-     */
-    protected String getText( ArtifactInfo ai, Field field )
-    {
-        if ( MAVEN.GROUP_ID.equals( field ) )
-        {
-            return ai.groupId;
-        }
-        else if ( MAVEN.ARTIFACT_ID.equals( field ) )
-        {
-            return ai.artifactId;
-        }
-        else if ( MAVEN.VERSION.equals( field ) )
-        {
-            return ai.version;
-        }
-        else if ( MAVEN.PACKAGING.equals( field ) )
-        {
-            return ai.packaging;
-        }
-        else if ( MAVEN.CLASSIFIER.equals( field ) )
-        {
-            return ai.classifier;
-        }
-        else if ( MAVEN.SHA1.equals( field ) )
-        {
-            return ai.sha1;
-        }
-        else if ( MAVEN.NAME.equals( field ) )
-        {
-            return ai.name;
-        }
-        else if ( MAVEN.DESCRIPTION.equals( field ) )
-        {
-            return ai.description;
-        }
-        else if ( MAVEN.CLASSNAMES.equals( field ) )
-        {
-            return ai.classNames;
-        }
-
-        // no match
-        return null;
     }
 
     /**

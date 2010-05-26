@@ -274,6 +274,135 @@ public class ArtifactInfo
         .append( ':' ).append( packaging ).toString();
     }
 
+    private static final List<Field> DEFAULT_FIELDS = new ArrayList<Field>();
+    static
+    {
+        DEFAULT_FIELDS.add( MAVEN.GROUP_ID );
+        DEFAULT_FIELDS.add( MAVEN.ARTIFACT_ID );
+        DEFAULT_FIELDS.add( MAVEN.VERSION );
+        DEFAULT_FIELDS.add( MAVEN.PACKAGING );
+        DEFAULT_FIELDS.add( MAVEN.CLASSIFIER );
+        DEFAULT_FIELDS.add( MAVEN.SHA1 );
+        DEFAULT_FIELDS.add( MAVEN.NAME );
+        DEFAULT_FIELDS.add( MAVEN.DESCRIPTION );
+        DEFAULT_FIELDS.add( MAVEN.CLASSNAMES );
+        DEFAULT_FIELDS.add( MAVEN.REPOSITORY_ID );
+    }
+
+    private List<Field> fields;
+
+    public Collection<Field> getFields()
+    {
+        if ( fields == null )
+        {
+            fields = new ArrayList<Field>( DEFAULT_FIELDS.size() );
+
+            fields.addAll( DEFAULT_FIELDS );
+        }
+
+        return fields;
+    }
+
+    /**
+     * This method will dissapear, once we drop ArtifactInfo.
+     * 
+     * @param field
+     * @return
+     */
+    public String getFieldValue( Field field )
+    {
+        if ( MAVEN.GROUP_ID.equals( field ) )
+        {
+            return groupId;
+        }
+        else if ( MAVEN.ARTIFACT_ID.equals( field ) )
+        {
+            return artifactId;
+        }
+        else if ( MAVEN.VERSION.equals( field ) )
+        {
+            return version;
+        }
+        else if ( MAVEN.PACKAGING.equals( field ) )
+        {
+            return packaging;
+        }
+        else if ( MAVEN.CLASSIFIER.equals( field ) )
+        {
+            return classifier;
+        }
+        else if ( MAVEN.SHA1.equals( field ) )
+        {
+            return sha1;
+        }
+        else if ( MAVEN.NAME.equals( field ) )
+        {
+            return name;
+        }
+        else if ( MAVEN.DESCRIPTION.equals( field ) )
+        {
+            return description;
+        }
+        else if ( MAVEN.CLASSNAMES.equals( field ) )
+        {
+            return classNames;
+        }
+        else if ( MAVEN.REPOSITORY_ID.equals( field ) )
+        {
+            return repository;
+        }
+
+        // no match
+        return null;
+    }
+
+    public ArtifactInfo setFieldValue( Field field, String value )
+    {
+        if ( MAVEN.GROUP_ID.equals( field ) )
+        {
+            groupId = value;
+        }
+        else if ( MAVEN.ARTIFACT_ID.equals( field ) )
+        {
+            artifactId = value;
+        }
+        else if ( MAVEN.VERSION.equals( field ) )
+        {
+            version = value;
+        }
+        else if ( MAVEN.PACKAGING.equals( field ) )
+        {
+            packaging = value;
+        }
+        else if ( MAVEN.CLASSIFIER.equals( field ) )
+        {
+            classifier = value;
+        }
+        else if ( MAVEN.SHA1.equals( field ) )
+        {
+            sha1 = value;
+        }
+        else if ( MAVEN.NAME.equals( field ) )
+        {
+            name = value;
+        }
+        else if ( MAVEN.DESCRIPTION.equals( field ) )
+        {
+            description = value;
+        }
+        else if ( MAVEN.CLASSNAMES.equals( field ) )
+        {
+            classNames = value;
+        }
+        else if ( MAVEN.REPOSITORY_ID.equals( field ) )
+        {
+            repository = value;
+        }
+
+        // no match
+        return this;
+    }
+
     // ----------------------------------------------------------------------------
     // Utils
     // ----------------------------------------------------------------------------
