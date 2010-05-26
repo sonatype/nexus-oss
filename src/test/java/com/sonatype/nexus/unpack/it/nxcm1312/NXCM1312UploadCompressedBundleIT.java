@@ -16,7 +16,6 @@ import org.restlet.data.Response;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.SearchMessageUtil;
 
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
@@ -31,8 +30,10 @@ public class NXCM1312UploadCompressedBundleIT
         getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
             + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
 
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( "nxcm1312", "artifact", "2.0" ).size() );
-        Assert.assertEquals( 1, SearchMessageUtil.searchFor( "org.nxcm1312", "maven-deploy-released", "1.0" ).size() );
+        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( "nxcm1312", "artifact", "2.0" ).size() );
+        Assert.assertEquals(
+                             1,
+                             getSearchMessageUtil().searchForGav( "org.nxcm1312", "maven-deploy-released", "1.0" ).size() );
     }
 
     @Test
