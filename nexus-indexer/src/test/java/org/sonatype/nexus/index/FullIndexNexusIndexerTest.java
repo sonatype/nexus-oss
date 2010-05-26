@@ -456,6 +456,9 @@ public class FullIndexNexusIndexerTest
                 {
                     // Logger and LoggerFactory
                     assertTrue( "Class name should be highlighted", highlighted.contains( "<B>Logger" ) );
+                    assertFalse( "Class name should not contain \"/\" alone (but okay within HTML, see above!)", highlighted.matches( "\\p{Lower}/\\p{Upper}" ) );
+                    assertFalse( "Class name should not begin with \".\" or \"/\"", highlighted.startsWith( "." )
+                        || highlighted.startsWith( "/" ) );
                 }
             }
         }

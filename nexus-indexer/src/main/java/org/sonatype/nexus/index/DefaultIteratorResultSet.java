@@ -279,6 +279,12 @@ public class DefaultIteratorResultSet
                                            String text )
         throws IOException
     {
+        // exception with classnames
+        if ( MAVEN.CLASSNAMES.equals( field.getOntology() ) )
+        {
+            text = text.replace( '/', '.' ).replaceAll( "^\\.", "" ).replaceAll( "\n\\.", "\n" );
+        }
+
         Query rewrittenQuery = hr.getQuery().rewrite( context.getIndexReader() );
 
         CachingTokenFilter tokenStream =
