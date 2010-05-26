@@ -448,6 +448,7 @@ public class FullIndexNexusIndexerTest
 
         for ( ArtifactInfo ai : response )
         {
+            // These are _all_ classnames
             String classnames = ai.classNames;
 
             for ( MatchHighlight mh : ai.getMatchHighlights() )
