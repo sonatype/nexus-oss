@@ -10,6 +10,7 @@ import org.sonatype.nexus.index.context.IndexingContext;
  * out Version. There is a switch to make the Indexer-wide unique by ignoring repositories too.
  * 
  * @author cstamas
+ * @deprecated Use {@link UniqueArtifactFilterPostprocessor} instead.
  */
 public class UniqueGAArtifactFilterPostprocessor
     implements ArtifactInfoFilter
