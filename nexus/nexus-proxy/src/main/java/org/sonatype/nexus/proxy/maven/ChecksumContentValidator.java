@@ -2,15 +2,10 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.NexusItemInfo;
-import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -30,24 +25,49 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
  */
 @Component( role = ItemContentValidator.class, hint = "ChecksumContentValidator" )
 public class ChecksumContentValidator
-    extends AbstractLogEnabled
+    extends AbstractChecksumContentValidator
     implements ItemContentValidator
 {
 
-    public boolean isRemoteItemContentValid( ProxyRepository proxy, ResourceStoreRequest req, String baseUrl,
-                                             AbstractStorageItem item, List<NexusArtifactEvent> events )
+    @Override
+    protected void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
         throws StorageException
+    {
+        if ( !contentValid && remoteHash.getHashItem() != null )
+        {
+            // TODO should we remove bad checksum if policy==WARN?
+            try
+            {
+                proxy.getLocalStorage().deleteItem(
+                                                    proxy,
+                                                    new ResourceStoreRequest(
+                                                                              remoteHash.getHashItem().getRepositoryItemUid().getPath(),
+                                                                              true ) );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                // huh?
+            }
+        }
+    }
+
+    @Override
+    protected ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
     {
         if ( isChecksum( item.getRepositoryItemUid().getPath() ) )
         {
             // do not validate checksum files
-            return true;
+            return null;
         }
 
         if ( !proxy.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {
             // we work only with maven proxy reposes, all others are neglected
-            return true;
+            return null;
         }
 
         MavenProxyRepository mpr = proxy.adaptToFacet( MavenProxyRepository.class );
@@ -58,18 +78,27 @@ public class ChecksumContentValidator
             || !( item instanceof DefaultStorageFileItem ) )
         {
             // there is either no need to validate or we can't validate the item content
-            return true;
+            return null;
         }
 
+        return checksumPolicy;
+    }
+
+    @Override
+    protected RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy )
+        throws StorageException
+    {
         RepositoryItemUid uid = item.getRepositoryItemUid();
 
         ResourceStoreRequest request = new ResourceStoreRequest( item );
 
         DefaultStorageFileItem hashItem = null;
 
+        String inspector;
         // we prefer SHA1 ...
         try
         {
+            inspector = DigestCalculatingInspector.DIGEST_SHA1_KEY;
             request.pushRequestPath( uid.getPath() + ".sha1" );
 
             hashItem = doRetriveRemoteChecksumItem( proxy, request );
@@ -77,6 +106,7 @@ public class ChecksumContentValidator
         catch ( ItemNotFoundException sha1e )
         {
             // ... but MD5 will do too
+            inspector = DigestCalculatingInspector.DIGEST_MD5_KEY;
             try
             {
                 request.popRequestPath();
@@ -118,81 +148,12 @@ public class ChecksumContentValidator
             }
         }
 
-        // let compiler make sure I did not forget to populate validation results
-        String msg;
-        boolean contentValid;
-
-        if ( remoteHash == null && ChecksumPolicy.STRICT.equals( checksumPolicy ) )
+        if ( remoteHash == null )
         {
-            msg =
-                "The artifact " + item.getPath() + " has no remote checksum in repository " + item.getRepositoryId()
-                    + "! The checksumPolicy of repository forbids downloading of it.";
-
-            contentValid = false;
-        }
-        else if ( hashItem == null )
-        {
-            msg =
-                "Warning, the artifact " + item.getPath() + " has no remote checksum in repository "
-                    + item.getRepositoryId() + "!";
-
-            contentValid = true; // policy is STRICT_IF_EXIST or WARN
-        }
-        else
-        {
-            String hashKey =
-                hashItem.getPath().endsWith( ".sha1" ) ? DigestCalculatingInspector.DIGEST_SHA1_KEY
-                                : DigestCalculatingInspector.DIGEST_MD5_KEY;
-
-            if ( remoteHash != null && remoteHash.equals( item.getAttributes().get( hashKey ) ) )
-            {
-                // remote hash exists and matches item content
-                return true;
-            }
-
-            if ( ChecksumPolicy.WARN.equals( checksumPolicy ) )
-            {
-                msg =
-                    "Warning, the artifact " + item.getPath()
-                        + " and it's remote checksums does not match in repository " + item.getRepositoryId() + "!";
-
-                contentValid = true;
-            }
-            else
-            // STRICT or STRICT_IF_EXISTS
-            {
-                msg =
-                    "The artifact " + item.getPath() + " and it's remote checksums does not match in repository "
-                        + item.getRepositoryId() + "! The checksumPolicy of repository forbids downloading of it.";
-
-                contentValid = false;
-            }
+            return null;
         }
 
-        events.add( newChechsumFailureEvent( item, msg ) );
-
-        if ( !contentValid && hashItem != null )
-        {
-            // TODO should we remove bad checksum if policy==WARN?
-            try
-            {
-                proxy.getLocalStorage().deleteItem(
-                                                    proxy,
-                                                    new ResourceStoreRequest(
-                                                                              hashItem.getRepositoryItemUid().getPath(),
-                                                                              true ) );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // ignore
-            }
-            catch ( UnsupportedStorageOperationException e )
-            {
-                // huh?
-            }
-        }
-
-        return contentValid;
+        return new RemoteHashResponse( inspector, remoteHash, hashItem );
     }
 
     private boolean isChecksum( String path )
@@ -215,30 +176,5 @@ public class ChecksumContentValidator
         {
             throw new ItemNotFoundException( request, proxy, e );
         }
-    }
-
-    private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
-    {
-        NexusArtifactEvent nae = new NexusArtifactEvent();
-
-        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-        nae.setEventDate( new Date() );
-
-        nae.setEventContext( item.getItemContext() );
-
-        nae.setMessage( msg );
-
-        NexusItemInfo ai = new NexusItemInfo();
-
-        ai.setPath( item.getPath() );
-
-        ai.setRepositoryId( item.getRepositoryId() );
-
-        ai.setRemoteUrl( item.getRemoteUrl() );
-
-        nae.setNexusItemInfo( ai );
-
-        return nae;
     }
 }
