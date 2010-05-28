@@ -43,7 +43,7 @@ public class DefaultDownloadMirrorsTest
     {
         DefaultDownloadMirrors mirrors = newDefaultDownloadMirrors( null );
 
-        DownloadMirrorSelector selector = mirrors.openSelector();
+        DownloadMirrorSelector selector = mirrors.openSelector( null );
 
         assertEquals( 0, mirrors.getMirrors().size() );
         assertEquals( 0, selector.getMirrors().size() );
@@ -94,7 +94,7 @@ public class DefaultDownloadMirrorsTest
 
         assertEquals( mirrors.length, dMirrors.getMirrors().size() );
 
-        DownloadMirrorSelector selector = dMirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector( null );
 
         List<Mirror> _mirrors = selector.getMirrors();
 
@@ -111,17 +111,17 @@ public class DefaultDownloadMirrorsTest
 
         DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = dMirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector( null );
 
         selector.feedbackFailure( mirrors[0] );
 
         selector.feedbackSuccess( mirrors[1] );
 
         // feedback has not been applied yet
-        assertEquals( mirrors[0], dMirrors.openSelector().getMirrors().get( 0 ) );
+        assertEquals( mirrors[0], dMirrors.openSelector( null ).getMirrors().get( 0 ) );
 
         selector.close();
-        assertEquals( mirrors[1], dMirrors.openSelector().getMirrors().get( 0 ) );
+        assertEquals( mirrors[1], dMirrors.openSelector( null ).getMirrors().get( 0 ) );
     }
 
     public void testBlacklistDecay()
@@ -135,7 +135,7 @@ public class DefaultDownloadMirrorsTest
 
         dMirrors.setBlacklistExpiration( blacklistTTL );
 
-        DownloadMirrorSelector selector = dMirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector( null );
 
         selector.feedbackFailure( mirrors[0] );
 
@@ -158,7 +158,7 @@ public class DefaultDownloadMirrorsTest
 
         DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = dMirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector( null );
 
         selector.feedbackFailure( mirrors[0] );
 
@@ -182,7 +182,7 @@ public class DefaultDownloadMirrorsTest
 
         DefaultDownloadMirrors dMirrors = newDefaultDownloadMirrors( mirrors );
 
-        DownloadMirrorSelector selector = dMirrors.openSelector();
+        DownloadMirrorSelector selector = dMirrors.openSelector( null );
 
         selector.feedbackFailure( mirrors[0] );
 

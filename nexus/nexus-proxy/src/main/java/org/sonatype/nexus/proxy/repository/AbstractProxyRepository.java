@@ -671,6 +671,11 @@ public abstract class AbstractProxyRepository
 
         return dMirrors;
     }
+    
+    protected DownloadMirrorSelector openDownloadMirrorSelector( ResourceStoreRequest request )
+    {
+        return this.getDownloadMirrors().openSelector( this.getRemoteUrl() );
+    }
 
     public AbstractStorageItem doCacheItem( AbstractStorageItem item )
         throws StorageException
@@ -1150,7 +1155,7 @@ public abstract class AbstractProxyRepository
 
         try
         {
-            DownloadMirrorSelector selector = getDownloadMirrors().openSelector();
+            DownloadMirrorSelector selector = this.openDownloadMirrorSelector( request );
 
             List<Mirror> mirrors = new ArrayList<Mirror>( selector.getMirrors() );
             if ( getLogger().isDebugEnabled() )
@@ -1158,7 +1163,7 @@ public abstract class AbstractProxyRepository
                 getLogger().debug( "Mirror count:" + mirrors.size() );
             }
 
-            mirrors.add( new Mirror( "default", getRemoteUrl() ) );
+            mirrors.add( new Mirror( "default", getRemoteUrl(), getRemoteUrl() ) );
 
             List<NexusArtifactEvent> events = new ArrayList<NexusArtifactEvent>();
 

@@ -7,11 +7,20 @@ public class Mirror
     private String id;
 
     private String url;
+    
+    private String mirrorOfUrl;
 
     public Mirror( String id, String url )
     {
         setId( id );
         setUrl( url );
+    }
+    
+    public Mirror( String id, String url, String mirrorOfUrl )
+    {
+        setId( id );
+        setUrl( url );
+        setMirrorOfUrl( mirrorOfUrl );
     }
 
     public String getId()
@@ -62,5 +71,15 @@ public class Mirror
         result = 31 * result + ( url == null ? 0 : url.hashCode() );
 
         return result;
+    }
+
+    public void setMirrorOfUrl( String mirrorOfUrl )
+    {
+        this.mirrorOfUrl = mirrorOfUrl;
+    }
+
+    public String getMirrorOfUrl()
+    {
+        return mirrorOfUrl;
     }
 }

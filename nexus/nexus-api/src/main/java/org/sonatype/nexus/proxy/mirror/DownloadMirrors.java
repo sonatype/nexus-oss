@@ -38,5 +38,5 @@ public interface DownloadMirrors
 
     boolean isBlacklisted( Mirror mirror );
 
-    DownloadMirrorSelector openSelector();
+    DownloadMirrorSelector openSelector( String requestPath );
 }

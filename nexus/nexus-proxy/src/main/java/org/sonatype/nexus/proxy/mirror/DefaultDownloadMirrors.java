@@ -77,7 +77,7 @@ public class DefaultDownloadMirrors
         }
     }
 
-    public DownloadMirrorSelector openSelector()
+    public DownloadMirrorSelector openSelector( String mirrorOfUrl )
     {
         return new DefaultDownloadMirrorSelector( this );
     }
