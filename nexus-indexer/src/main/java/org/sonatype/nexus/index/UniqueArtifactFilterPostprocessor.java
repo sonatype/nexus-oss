@@ -19,13 +19,14 @@ public class UniqueArtifactFilterPostprocessor
     private final Set<Field> uniqueFields = new HashSet<Field>();
 
     private final Set<String> gas = new HashSet<String>();
-
-    public UniqueArtifactFilterPostprocessor( Field... uniqueFields )
+    
+    public UniqueArtifactFilterPostprocessor()
     {
-        for ( Field field : uniqueFields )
-        {
-            this.uniqueFields.add( field );
-        }
+    }
+
+    public UniqueArtifactFilterPostprocessor( Set<Field> uniqueFields )
+    {
+        this.uniqueFields.addAll( uniqueFields );
     }
 
     public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
@@ -62,5 +63,10 @@ public class UniqueArtifactFilterPostprocessor
                 ai.setFieldValue( field, COLLAPSED );
             }
         }
+    }
+    
+    public void addField( Field field )
+    {
+        uniqueFields.add( field );
     }
 }

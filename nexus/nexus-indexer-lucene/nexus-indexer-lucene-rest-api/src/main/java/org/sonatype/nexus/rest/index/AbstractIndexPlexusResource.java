@@ -32,12 +32,13 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
-import org.sonatype.nexus.index.KeywordSearcher;
 import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
+import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -100,6 +101,10 @@ public abstract class AbstractIndexPlexusResource
         Integer count = null;
         Boolean uniqueRGA = null;
         Boolean exact = null;
+        Boolean expandVersion = null;
+        Boolean expandPackaging = null;
+        Boolean expandClassifier = null;
+        Boolean collapseResults = Boolean.FALSE;
 
         if ( form.getFirstValue( "from" ) != null )
         {
@@ -125,14 +130,26 @@ public abstract class AbstractIndexPlexusResource
             }
         }
 
-        if ( form.getFirstValue( "uniqueRGA" ) != null )
-        {
-            uniqueRGA = Boolean.valueOf( form.getFirstValue( "uniqueRGA" ) );
-        }
-
         if ( form.getFirstValue( "exact" ) != null )
         {
             exact = Boolean.valueOf( form.getFirstValue( "exact" ) );
+        }
+        
+        if ( form.getFirstValue( "versionexpand" ) != null )
+        {
+            expandVersion = Boolean.valueOf( form.getFirstValue( "versionexpand" ) );
+        }
+        if ( form.getFirstValue( "packagingexpand" ) != null )
+        {
+            expandPackaging = Boolean.valueOf( form.getFirstValue( "packagingexpand" ) );
+        }
+        if ( form.getFirstValue( "classifierexpand" ) != null )
+        {
+            expandClassifier = Boolean.valueOf( form.getFirstValue( "classifierexpand" ) );
+        }
+        if ( form.getFirstValue( "collapseresults" ) != null )
+        {
+            collapseResults = Boolean.valueOf( form.getFirstValue( "collapseresults" ) );
         }
 
         IteratorSearchResponse searchResult = null;
@@ -189,7 +206,9 @@ public abstract class AbstractIndexPlexusResource
             {
                 try
                 {
-                    searchResult = searchByTerms( terms, getRepositoryId( request ), from, count, uniqueRGA, exact );
+                    searchResult =
+                        searchByTerms( terms, getRepositoryId( request ), from, count, exact, expandVersion,
+                                       expandPackaging, expandClassifier, collapseResults );
 
                     // non-identify search happened
                     boolean tooManyResults = searchResult.isHitLimitExceeded();
@@ -246,14 +265,11 @@ public abstract class AbstractIndexPlexusResource
     }
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final Integer count, final Boolean uniqueRGA,
-                                                  final Boolean exact )
+                                                  final Integer from, final Integer count, final Boolean exact, 
+                                                  final Boolean expandVersion, final Boolean expandPackaging,
+                                                  final Boolean expandClassifier, final Boolean collapseResults )
         throws NoSuchRepositoryException, ResourceException
-    {
-        // if uniqueRGA set, obey it, otherwise default it depending on query
-        // keyword search does collapse, others do not
-        boolean collapsed = uniqueRGA == null ? terms.containsKey( KeywordSearcher.TERM_KEYWORD ) : uniqueRGA;
-
+    {        
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
@@ -271,9 +287,33 @@ public abstract class AbstractIndexPlexusResource
                         searchType = SearchType.SCORED;
                     }
                 }
-
+                
+                List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
+                
+                UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
+                filter.addField( MAVEN.GROUP_ID );
+                filter.addField( MAVEN.ARTIFACT_ID );
+                
+                if ( Boolean.TRUE.equals( expandVersion ) 
+                    || !collapseResults )
+                {
+                    filter.addField( MAVEN.VERSION );    
+                }
+                if ( Boolean.TRUE.equals( expandPackaging ) 
+                    || !collapseResults )
+                {
+                    filter.addField( MAVEN.PACKAGING );    
+                }
+                if ( Boolean.TRUE.equals( expandClassifier )
+                    || !collapseResults )
+                {
+                    filter.addField( MAVEN.CLASSIFIER );    
+                }
+                
+                filters.add( filter );
+                    
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, collapsed, searchType );
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, searchType, filters );
 
                 if ( searchResponse != null )
                 {

@@ -14,6 +14,7 @@
 package org.sonatype.nexus.index;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -68,8 +69,8 @@ public class KeywordSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, boolean uniqueRGA,
-                                                      SearchType searchType )
+                                                      Integer count, Integer hitLimit, SearchType searchType, 
+                                                      List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
@@ -77,7 +78,7 @@ public class KeywordSearcher
             return new IteratorSearchResponse( null, 0, null );
         }
         return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit,
-            uniqueRGA, searchType );
+            true, searchType, filters );
     }
 
 }

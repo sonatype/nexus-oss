@@ -2061,11 +2061,6 @@ public class DefaultIndexerManager
             }
         } );
 
-        if ( uniqueRGA )
-        {
-            filters.add( new UniqueGAArtifactFilterPostprocessor( true ) );
-        }
-
         if ( extraFilters != null && extraFilters.size() > 0 )
         {
             filters.addAll( extraFilters );
@@ -2080,6 +2075,7 @@ public class DefaultIndexerManager
                 public void postprocess( IndexingContext ctx, ArtifactInfo ai )
                 {
                     ai.context = "Aggregated";
+                    ai.repository = null;
                 }
             } );
         }
@@ -2149,7 +2145,7 @@ public class DefaultIndexerManager
 
     public IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from,
                                                           Integer count, Integer hitLimit, boolean uniqueRGA,
-                                                          SearchType searchType )
+                                                          SearchType searchType, List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException
     {
         IndexingContext localContext = null;
@@ -2201,7 +2197,7 @@ public class DefaultIndexerManager
                 bq.add( q6, BooleanClause.Occur.SHOULD );
             }
 
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA );
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
 
             req.getMatchHighlightRequests().add(
                                                  new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
@@ -2321,7 +2317,8 @@ public class DefaultIndexerManager
 
     public IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
                                                           String cTerm, String repositoryId, Integer from,
-                                                          Integer count, Integer hitLimit, SearchType searchType )
+                                                          Integer count, Integer hitLimit, boolean uniqueRGA,
+                                                          SearchType searchType, List<ArtifactInfoFilter> filters)
         throws NoSuchRepositoryException
     {
         if ( gTerm == null && aTerm == null && vTerm == null )
@@ -2384,6 +2381,8 @@ public class DefaultIndexerManager
                             return StringUtils.isBlank( ai.classifier );
                         }
                     };
+                    
+                    filters.add( npFilter );
                 }
                 else
                 {
@@ -2391,16 +2390,7 @@ public class DefaultIndexerManager
                 }
             }
 
-            IteratorSearchRequest req = null;
-
-            if ( npFilter != null )
-            {
-                req = createRequest( bq, from, count, hitLimit, false, Arrays.asList( npFilter ) );
-            }
-            else
-            {
-                req = createRequest( bq, from, count, hitLimit, false );
-            }
+            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
 
             if ( repositoryId != null )
             {

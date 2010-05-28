@@ -45,8 +45,9 @@ public class UniqueArtifactFilterTest
 
         Query q = indexer.constructQuery( MAVEN.GROUP_ID, "commons", SearchType.SCORED );
 
-        UniqueArtifactFilterPostprocessor filter =
-            new UniqueArtifactFilterPostprocessor( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID );
+        UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
+        filter.addField( MAVEN.GROUP_ID );
+        filter.addField( MAVEN.ARTIFACT_ID );
 
         IteratorSearchRequest request = new IteratorSearchRequest( q, filter );
 

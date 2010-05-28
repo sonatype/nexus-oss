@@ -197,8 +197,14 @@ public class SearchMessageUtil
     {
         return searchForGav( groupId, artifactId, version, null );
     }
-
+    
     public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String repositoryId )
+        throws IOException
+    {
+        return searchForGav( groupId, artifactId, version, null, repositoryId );
+    }
+
+    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String packaging, String repositoryId )
         throws IOException
     {
         Map<String, String> args = new HashMap<String, String>();
@@ -214,6 +220,10 @@ public class SearchMessageUtil
         if ( StringUtils.isNotBlank( version ) )
         {
             args.put( "v", version );
+        }
+        if ( StringUtils.isNotBlank( packaging ) )
+        {
+            args.put( "p", packaging );
         }
 
         return doSearchFor( args, repositoryId, null );

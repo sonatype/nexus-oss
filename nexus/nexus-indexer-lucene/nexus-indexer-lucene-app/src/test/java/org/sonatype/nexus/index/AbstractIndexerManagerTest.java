@@ -50,7 +50,7 @@ public abstract class AbstractIndexerManagerTest
     protected IteratorSearchResponse searchForKeywordNG( String term, int expected )
         throws Exception
     {
-        IteratorSearchResponse result = indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED );
+        IteratorSearchResponse result = indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED, null );
 
         assertEquals( "Unexpected result set size!", expected, result.getTotalHits() );
 

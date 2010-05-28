@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.List;
 import java.util.Map;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
@@ -68,6 +69,7 @@ public interface Searcher
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
      */
     IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                               Integer count, Integer hitLimit, boolean uniqueRGA, SearchType searchType )
+                                               Integer count, Integer hitLimit, SearchType searchType, 
+                                               List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException;
 }

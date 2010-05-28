@@ -76,7 +76,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   displayArtifactInformation : function(selectionModel, index, rec) {
     var searchType = this.getSearchType(this.searchTypeButton.value);
     if ( typeof searchType.showArtifactContainer != 'function' 
-        || searchType.showArtifactContainer() )
+        || searchType.showArtifactContainer( rec ) )
     {
       this.artifactContainer.updateArtifact(rec.data);
     }
@@ -156,6 +156,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   startSearch : function(panel, updateHistory) {
     if (updateHistory) {
       // update history in address bar of browser
+      panel.extraData = null;
       Sonatype.utils.updateHistory(panel);
     }
 
@@ -172,13 +173,18 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   fetchRecords : function(panel, reverse) {
     panel.artifactContainer.collapsePanel();
     panel.grid.totalRecords = 0;
+    panel.grid.store.removeAll();
     panel.grid.store.load();
     
     if ( reverse ) {
-      panel.grid.store.on( 'load', function( store, records, options ) {
-        store.sort( 'version', 'desc' );
-      }, this );
+      panel.grid.store.on( 'load', this.sortResults, this );
     }
+    else {
+      panel.grid.store.un( 'load', this.sortResults, this );
+    }
+  },
+  sortResults : function( store, records, options ) {
+    store.sort( 'version', 'desc' );
   },
   // start the quick search, we will look at all search types
   // and try to guess which type of search to use
@@ -231,8 +237,24 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
   // get the params to build bookmark
   getBookmark : function() {
     var searchType = this.getSearchType(this.searchTypeButton.value);
-
-    return searchType.getBookmarkHandler.call(this, this);
+    
+    var bookmark = searchType.getBookmarkHandler.call(this, this);
+    
+    if ( this.extraData ) {
+      var extras = this.extraData.split( ',' );
+      
+      if ( extras.length > 0 ) {
+        bookmark += '~';
+        for ( var i = 0 ; i < extras.length ; i++ ) {
+          if ( i > 0 ) {
+            bookmark += ',';
+          }
+          bookmark += extras[i];
+        }
+      }
+    }
+    
+    return bookmark;
   }
 });
 
@@ -247,9 +269,10 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     defaultQuickSearch : true,
     // use the default store
     store : null,
-    showArtifactContainer : function() {
+    showArtifactContainer : function( record ) {
       return false;
     },
+    //use new column model to hide the source column
     columnModel : new Ext.grid.ColumnModel({
       columns: [
         {
@@ -299,10 +322,12 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
       if (value) {
         panel.grid.store.baseParams = {};
         panel.grid.store.baseParams['q'] = value;
+        panel.grid.store.baseParams['collapseresults'] = true;
         panel.fetchRecords(panel);
       }
     },
     applyBookmarkHandler : function(panel, data) {
+      panel.extraData = null;
       panel.getTopToolbar().items.itemAt(1).setRawValue(data[1]);
       panel.startSearch(panel, false);
     },
@@ -310,7 +335,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
       var result = panel.searchTypeButton.value;
       result += '~';
       result += panel.getTopToolbar().items.itemAt(1).getRawValue();
-
       return result;
     },
     panelItems : [ {
@@ -375,6 +399,8 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
   };
 
   var gavPopulator = function(panel, data) {
+    panel.extraData = null;
+    
     // groupId
     if (data.length > 1) {
       panel.getTopToolbar().items.itemAt(2).setRawValue(data[1]);
@@ -397,7 +423,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     }
     // extra params, comma seperated list of params
     if ( data.length > 6) {
-      panel.gavExtras = data[6];
+      panel.extraData = data[6];
     }
   }
 
@@ -407,6 +433,14 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     scope : panel,
     // use the default store
     store : null,
+    showArtifactContainer : function( record ) {
+      if ( 'COLLAPSED' == record.get('version')
+        || 'COLLAPSED' == record.get('packaging') 
+        || 'COLLAPSED' == record.get('classifier') ) {
+        return false;
+      }
+      return true;
+    },
     handler : panel.switchSearchType,
     quickSearchCheckHandler : function(panel, value) {
       return value.indexOf(':') > -1;
@@ -448,23 +482,28 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     if (v) {
       panel.grid.store.baseParams['c'] = v;
     }
-    // special case for classifier
-    else {
-      panel.grid.store.baseParams['c'] = 'N/P';
-    }
+    
+    panel.grid.store.baseParams['collapseresults'] = true;
     
     // go through the extras and process them.
-    if ( panel.gavExtras ) {
-      var extras = panel.gavExtras.split( ',' );
+    if ( panel.extraData ) {
+      var extras = panel.extraData.split( ',' );
       
       for ( var i = 0 ; i < extras.length ; i++ ) {
+        // from keyword search
         if ( extras[i] == 'kw' ) {
-          panel.grid.store.baseParams['exact'] = true;
           reverseSortResults = true;
         }
+        else if ( extras[i] == 'versionexpand' ) {
+          panel.grid.store.baseParams['versionexpand'] = true;
+        }
+        else if ( extras[i] == 'packagingexpand' ) {
+          panel.grid.store.baseParams['packagingexpand'] = true;
+        }
+        else if ( extras[i] == 'classifierexpand' ) {
+          panel.grid.store.baseParams['classifierexpand'] = true;
+        }
       }
-      
-      panel.gavExtras = null;
     }
 
     if (panel.grid.store.baseParams['g'] == null && panel.grid.store.baseParams['a'] == null && panel.grid.store.baseParams['v'] == null) {
@@ -512,6 +551,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     if (v) {
       result += v;
     }
+    
     return result;
   },
   panelItems : [ 'Group:', {
@@ -680,3 +720,4 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
     });
   }
 });
+

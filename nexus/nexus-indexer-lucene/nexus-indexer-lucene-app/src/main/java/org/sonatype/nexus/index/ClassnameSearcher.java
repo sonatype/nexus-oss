@@ -14,6 +14,7 @@
 package org.sonatype.nexus.index;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -67,8 +68,8 @@ public class ClassnameSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, boolean uniqueRGA,
-                                                      SearchType searchType )
+                                                      Integer count, Integer hitLimit, SearchType searchType, 
+                                                      List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )

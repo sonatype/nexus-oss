@@ -207,6 +207,11 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 			      beforeshow: function (tip) {
 			        var rowIndex = view.findRowIndex (tip.triggerElement);
                     var record = store.getAt( rowIndex );
+                    
+                    if ( !record ) {
+                      return false;
+                    }
+                    
                     var highlightedFragment = record.get('highlightedFragment');
                     
                     if ( Ext.isEmpty( highlightedFragment ) ) {
@@ -225,36 +230,72 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
-  formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
-    var versionStr = record.get( 'version' );
-    if ( 'LATEST' == versionStr ) {
-      var gid = record.get( 'groupId' );
-      var aid = record.get( 'artifactId' );
-      var pac = record.get( 'packaging' );
-      var clas = record.get( 'classifier' );
-      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~~'+pac+'~'+ clas + '~kw " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
-    } else {
-      return versionStr;
+  formatCellLink : function( record, store, fieldName ) {
+    if ( 'COLLAPSED' != record.get( fieldName ) ) {
+      return record.get( fieldName );
+    }
+    
+    var ver = record.get( 'version' );
+    var gid = record.get( 'groupId' );
+    var aid = record.get( 'artifactId' );
+    var pac = record.get( 'packaging' );
+    var clas = record.get( 'classifier' );
+    
+    var extras = '~kw';
+    var aggregatedCount = 0;
+    if ( 'COLLAPSED' == ver ) {
+      aggregatedCount++;
+      if ( 'version' == fieldName ) {
+        extras += ',versionexpand';
+      }
+      ver = '';
+    }
+    else {
+      extras += ",versionexpand";
+    }
+    if ( 'COLLAPSED' == pac ) {
+      aggregatedCount++;
+      if ( 'packaging' == fieldName ) {
+        extras += ',packagingexpand';
+      }
+      pac = '';
+    }
+    else {
+      extras += ",packagingexpand";
+    }
+    if ( 'COLLAPSED' == clas ) {
+      aggregatedCount++;
+      if ( 'classifier' == fieldName ) {
+        extras += ',classifierexpand';
+      }
+      clas = '';
+    }
+    else {
+      extras += ",classifierexpand";
+      //special case for classifier, if the classifier is real value (NOT COLLAPSED) need to set that
+      //if empty, need to set N/P
+      if ( Ext.isEmpty( clas ) ) {
+        clas = 'N/P';
+      }
+    }
+    
+    // if 0 then is gav search being performed, so simply return string
+    if ( aggregatedCount == 0 ) {
+      return value;
+    }
+    // if anything is aggregated, add the drill down link
+    else {
+      return '<a href="#nexus-search;gav~'+gid+'~'+aid+'~'+ver+'~'+pac+'~'+clas+extras+' " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
     }
   },
-  formatPackagingLink : function( value, p, record, rowIndex, colIndex, store) {
-    var packagingStr = record.get( 'packaging' );
-    //if ( 'ALL' == packagingStr ) {
-      
-    //}
-    //else {
-      return packagingStr;
-    //}
+  formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
+    return store.grid.formatCellLink( record, store, 'version' );
   },
-  
+  formatPackagingLink : function( value, p, record, rowIndex, colIndex, store) {
+    return store.grid.formatCellLink( record, store, 'packaging' );
+  },  
   formatClassifierLink : function( value, p, record, rowIndex, colIndex, store) {
-    var classifierStr = record.get( 'classifier' );
-    //if ( 'ALL' == classifierStr ) {
-      
-    //}
-    //else {
-      return classifierStr;
-    //}
+    return store.grid.formatCellLink( record, store, 'classifier' );
   },
   
   switchStore : function( grid, store, columnModel ) {
@@ -313,6 +354,13 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
   clearResults: function() {
     this.store.baseParams = {};
     this.store.removeAll();
+    delete this.store.baseParams['dir'];
+    delete this.store.baseParams['sort'];
+    delete this.store.sortInfo;
+    delete this.view.sortState;
+    this.store.sortToggle = {};
+    this.view.mainHd.select('td').removeClass(this.sortClasses);
+    this.fireEvent('sortchange', this.grid, null);
     this.updateRowTotals( this );
     this.clearWarningLabel();
   }
