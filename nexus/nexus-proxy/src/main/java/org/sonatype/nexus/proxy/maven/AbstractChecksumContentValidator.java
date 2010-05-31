@@ -25,7 +25,7 @@ public abstract class AbstractChecksumContentValidator
         throws StorageException
     {
         ChecksumPolicy checksumPolicy = getChecksumPolicy( proxy, item );
-        if ( checksumPolicy == null )
+        if ( checksumPolicy == null || !checksumPolicy.shouldCheckChecksum() )
         {
             return true;
         }
@@ -52,7 +52,7 @@ public abstract class AbstractChecksumContentValidator
 
             contentValid = true; // policy is STRICT_IF_EXIST or WARN
         }
-        else if ( remoteHash.getRemoteHash().equals( item.getAttributes().get( remoteHash.getInspector() ) ) )
+        else if ( remoteHash.getRemoteHash().equals( retrieveLocalHash( item, remoteHash.getInspector() ) ) )
         {
             // remote hash exists and matches item content
             return true;
@@ -87,13 +87,19 @@ public abstract class AbstractChecksumContentValidator
         return contentValid;
     }
 
+    protected String retrieveLocalHash( AbstractStorageItem item, String inspector )
+    {
+        return item.getAttributes().get( inspector );
+    }
+
     protected abstract void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
         throws StorageException;
 
     protected abstract RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy )
         throws StorageException;
 
-    protected abstract ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item );
+    protected abstract ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
+        throws StorageException;
 
     private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
     {
