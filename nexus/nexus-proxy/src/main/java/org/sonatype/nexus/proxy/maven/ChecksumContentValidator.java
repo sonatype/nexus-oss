@@ -85,7 +85,7 @@ public class ChecksumContentValidator
     }
 
     @Override
-    protected RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy )
+    protected RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy, String baseUrl )
         throws StorageException
     {
         RepositoryItemUid uid = item.getRepositoryItemUid();

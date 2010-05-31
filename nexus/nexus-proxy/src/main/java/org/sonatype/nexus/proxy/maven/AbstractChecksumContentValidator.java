@@ -30,7 +30,7 @@ public abstract class AbstractChecksumContentValidator
             return true;
         }
 
-        RemoteHashResponse remoteHash = retrieveRemoteHash( item, proxy );
+        RemoteHashResponse remoteHash = retrieveRemoteHash( item, proxy, baseUrl );
 
         // let compiler make sure I did not forget to populate validation results
         String msg;
@@ -95,7 +95,8 @@ public abstract class AbstractChecksumContentValidator
     protected abstract void cleanup( ProxyRepository proxy, RemoteHashResponse remoteHash, boolean contentValid )
         throws StorageException;
 
-    protected abstract RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy )
+    protected abstract RemoteHashResponse retrieveRemoteHash( AbstractStorageItem item, ProxyRepository proxy,
+                                                              String baseUrl )
         throws StorageException;
 
     protected abstract ChecksumPolicy getChecksumPolicy( ProxyRepository proxy, AbstractStorageItem item )
