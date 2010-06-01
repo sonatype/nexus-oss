@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <artifactId>nexus-test-harness</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>1.6.1-SNAPSHOT</version>
+    <version>1.6.2-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-selenium</artifactId>
@@ -15,10 +16,11 @@
 
   <build>
     <plugins>
+      <!-- This is duplicated plugin configuration! See below, this is ILLEGAL (in Maven3.x)! -->
+      <!-- FIX THIS -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.0-beta-1</version>
         <configuration>
           <skip>true</skip>
         </configuration>
@@ -29,7 +31,7 @@
               <goal>enforce</goal>
             </goals>
             <configuration>
-          <skip>false</skip>
+              <skip>false</skip>
               <rules>
                 <requireMavenVersion>
                   <version>2.2.1</version>
