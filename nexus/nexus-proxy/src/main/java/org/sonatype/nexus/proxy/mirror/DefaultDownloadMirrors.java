@@ -92,8 +92,6 @@ public class DefaultDownloadMirrors
         }
         else
         {
-            maxMirrors = mirrors.size();
-
             List<CMirror> modelMirrors = new ArrayList<CMirror>( mirrors.size() );
 
             for ( Mirror mirror : mirrors )
