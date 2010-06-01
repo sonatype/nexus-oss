@@ -14,6 +14,9 @@ package org.sonatype.security.web;
 
 import java.util.Map;
 
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
@@ -85,6 +88,13 @@ public class ShiroSecurityFilter
         }
     }
 
+    @Override
+    protected boolean shouldNotFilter( ServletRequest request )
+        throws ServletException
+    {
+        return !this.getSecuritySystem().isSecurityEnabled();
+    }
+    
     private SecuritySystem getSecuritySystem()
     {
         // lazy load it using the container
@@ -102,5 +112,4 @@ public class ShiroSecurityFilter
 
         return this.securitySystem;
     }
-
 }

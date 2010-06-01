@@ -10,18 +10,18 @@ import org.apache.shiro.subject.PrincipalCollection;
 
 /**
  * Shiro {@link org.apache.shiro.realm.Realm} for authenticating {@link java.security.PublicKey}s.
- * Authorization is delegated to a Shiro
- * {@link org.apache.shiro.authz.Authorizer}, which can be a different
- * {@link org.apache.shiro.realm.Realm}.
- *
+ * 
  * Implement a {@link PublicKeyRepository} in which you consult your own
  * accounts backend, or use the
  * {@link com.sonatype.sshjgit.core.shiro.publickey.SimplePublicKeyRepository}
  * for testing purposes.
+ * <BR/>
+ *  Originally implemented for use with SSHD, this realm compares two public keys for equality. 
+ *  It does NOT handle any part of the TLS handshake.  For more info on that <a href="http://en.wikipedia.org/wiki/Transport_Layer_Security#Client-authenticated_TLS_handshake">see this wiki page.<a/>
  *
  * @see com.sonatype.sshjgit.core.shiro.publickey.PublicKeyRepository
  * @see org.apache.shiro.realm.Realm
- *
+ * 
  * @author hugo@josefson.org
  * @author Brian Demers
  */

@@ -37,8 +37,6 @@ public class HttpVerbMappingAuthorizationFilter
 {
     private final Logger logger = LoggerFactory.getLogger( this.getClass() );
     
-    public static final String REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
-    
     private Map<String, String> mapping = new HashMap<String, String>();
     {
         mapping.put( "head", "read" );
@@ -124,7 +122,6 @@ public class HttpVerbMappingAuthorizationFilter
     protected boolean onAccessDenied( ServletRequest request, ServletResponse response )
         throws IOException
     {
-        request.setAttribute( REQUEST_IS_AUTHZ_REJECTED, Boolean.TRUE );
         WebUtils.toHttp(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         return false;

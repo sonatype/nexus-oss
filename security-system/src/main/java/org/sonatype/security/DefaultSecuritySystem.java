@@ -14,6 +14,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.Cache;
+import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -35,6 +36,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -69,6 +71,9 @@ public class DefaultSecuritySystem
 
     @Requirement
     private RealmSecurityManager applicationSecurityManager;
+
+    @Requirement
+    private PlexusEhCacheWrapper cacheWrapper;
 
     @Requirement( role = UserManager.class )
     private Map<String, UserManager> userManagerMap;
@@ -831,7 +836,12 @@ public class DefaultSecuritySystem
     {
         // reload the config
         this.securityConfiguration.clearCache();
-        this.clearRealmCaches();
+        
+        // setup the CacheManager ( this could be injected if we where less coupled with ehcache)
+        // The plexus wrapper can interpolate the config
+        EhCacheManager ehCacheManager = new EhCacheManager();
+        ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
+        this.getApplicationSecurityManager().setCacheManager( ehCacheManager );
         
         if( org.apache.shiro.util.Initializable.class.isInstance( this.getApplicationSecurityManager()) )
         {
@@ -896,6 +906,7 @@ public class DefaultSecuritySystem
     {
         // add event handler
         this.eventMulticaster.addEventListener( this );
+        SecurityUtils.setSecurityManager( this.getApplicationSecurityManager() );
 
     }
 

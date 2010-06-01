@@ -5,15 +5,14 @@ import java.util.Map;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
-import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
@@ -28,8 +27,6 @@ public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
     implements Initializable
 {
-    @Requirement
-    private PlexusEhCacheWrapper cacheWrapper;
 
     @Requirement( role = RolePermissionResolver.class )
     private Map<String, RolePermissionResolver> rolePermissionResolverMap;
@@ -73,18 +70,11 @@ public class WebRealmSecurityManager
             logger.warn( "No RolePermissionResolver is set" );
         }
         this.setAuthorizer( authorizer );
-
-        // setup the CacheManager ( this could be injected if we where less coupled with ehcache)
-        // The plexus wrapper can interpolate the config
-        EhCacheManager ehCacheManager = new EhCacheManager();
-        ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
-        this.setCacheManager( ehCacheManager );
-
     }
 
     public void init()
         throws ShiroException
     {
-        this.setSessionManager( new WebRealmSecurityManager() );
+        this.setSessionManager( new DefaultWebSessionManager() );
     }
 }

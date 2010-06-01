@@ -56,7 +56,7 @@ public class DefaultUser
         // deprecated, but attempt to use
         if ( StringUtils.isNotEmpty( name ) )
         {
-            String[] nameParts = name.trim().split( " " );
+            String[] nameParts = name.trim().split( " ", 2 );
             this.setFirstName( nameParts[0] );
             if ( nameParts.length > 1 )
             {
