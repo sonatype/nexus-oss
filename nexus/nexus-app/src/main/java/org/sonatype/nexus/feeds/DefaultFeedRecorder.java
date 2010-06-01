@@ -32,6 +32,8 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.NexusTimeline;
 import org.sonatype.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineRecord;
+import org.sonatype.timeline.TimelineResult;
 
 /**
  * A feed recorder that uses DefaultNexus to record feeds.
@@ -123,12 +125,14 @@ public class DefaultFeedRecorder
         return new SimpleDateFormat( EVENT_DATE_FORMAT );
     }
 
-    protected List<NexusArtifactEvent> getAisFromMaps( List<Map<String, String>> data )
+    protected List<NexusArtifactEvent> getAisFromMaps( TimelineResult data )
     {
-        List<NexusArtifactEvent> result = new ArrayList<NexusArtifactEvent>( data.size() );
+        List<NexusArtifactEvent> result = new ArrayList<NexusArtifactEvent>();
 
-        for ( Map<String, String> map : data )
+        for ( TimelineRecord record : data )
         {
+            Map<String, String> map = record.getData();
+
             NexusArtifactEvent nae = new NexusArtifactEvent();
 
             NexusItemInfo ai = new NexusItemInfo();
@@ -174,12 +178,14 @@ public class DefaultFeedRecorder
         return this.feedArtifactEventFilter.filterArtifactEventList( result );
     }
 
-    protected List<SystemEvent> getSesFromMaps( List<Map<String, String>> data )
+    protected List<SystemEvent> getSesFromMaps( TimelineResult data )
     {
-        List<SystemEvent> result = new ArrayList<SystemEvent>( data.size() );
+        List<SystemEvent> result = new ArrayList<SystemEvent>();
 
-        for ( Map<String, String> map : data )
+        for ( TimelineRecord record : data )
         {
+            Map<String, String> map = record.getData();
+
             SystemEvent se = new SystemEvent( map.get( ACTION ), map.get( MESSAGE ) );
 
             try
@@ -209,12 +215,14 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<AuthcAuthzEvent> getAaesFromMaps( List<Map<String, String>> data )
+    protected List<AuthcAuthzEvent> getAaesFromMaps( TimelineResult data )
     {
-        List<AuthcAuthzEvent> result = new ArrayList<AuthcAuthzEvent>( data.size() );
+        List<AuthcAuthzEvent> result = new ArrayList<AuthcAuthzEvent>();
 
-        for ( Map<String, String> map : data )
+        for ( TimelineRecord record : data )
         {
+            Map<String, String> map = record.getData();
+
             AuthcAuthzEvent evt = new AuthcAuthzEvent( map.get( ACTION ), map.get( MESSAGE ) );
 
             try
@@ -245,12 +253,14 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    protected List<ErrorWarningEvent> getEwesFromMaps( List<Map<String, String>> data )
+    protected List<ErrorWarningEvent> getEwesFromMaps( TimelineResult data )
     {
-        List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>( data.size() );
+        List<ErrorWarningEvent> result = new ArrayList<ErrorWarningEvent>();
 
-        for ( Map<String, String> map : data )
+        for ( TimelineRecord record : data )
         {
+            Map<String, String> map = record.getData();
+
             ErrorWarningEvent evt = null;
 
             if ( StringUtils.isEmpty( map.get( STACK_TRACE ) ) )
@@ -289,8 +299,8 @@ public class DefaultFeedRecorder
         return result;
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+                                     TimelineFilter filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
@@ -304,8 +314,8 @@ public class DefaultFeedRecorder
         }
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Long ts, Integer count,
+                                     TimelineFilter filter )
     {
         int cnt = count != null ? count : DEFAULT_PAGE_SIZE;
 
@@ -320,13 +330,13 @@ public class DefaultFeedRecorder
     }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                            TimelineFilter filter )
     {
         return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
     public List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+                                                            TimelineFilter filter )
     {
         return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }
@@ -337,13 +347,13 @@ public class DefaultFeedRecorder
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                      TimelineFilter filter )
     {
         return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+                                                      TimelineFilter filter )
     {
         return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }
@@ -502,13 +512,13 @@ public class DefaultFeedRecorder
     }
 
     public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
-        TimelineFilter filter )
+                                                          TimelineFilter filter )
     {
         return getEwesFromMaps( getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter ) );
     }
 
     public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count,
-        TimelineFilter filter )
+                                                          TimelineFilter filter )
     {
         return getEwesFromMaps( getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, ts, count, filter ) );
     }

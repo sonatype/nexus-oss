@@ -14,11 +14,11 @@
 package org.sonatype.nexus.timeline;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.nexus.feeds.DefaultFeedRecorder;
 import org.sonatype.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineRecord;
 
 public class RepositoryIdTimelineFilter
     implements TimelineFilter
@@ -37,9 +37,9 @@ public class RepositoryIdTimelineFilter
         this.repositoryIds = repositoryIds;
     }
 
-    public boolean accept( Map<String, String> hit )
+    public boolean accept( TimelineRecord hit )
     {
-        return ( hit.containsKey( DefaultFeedRecorder.REPOSITORY ) && repositoryIds.contains( hit
-            .get( DefaultFeedRecorder.REPOSITORY ) ) );
+        return ( hit.getData().containsKey( DefaultFeedRecorder.REPOSITORY ) && repositoryIds.contains( hit.getData().get(
+            DefaultFeedRecorder.REPOSITORY ) ) );
     }
 }

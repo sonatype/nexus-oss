@@ -16,13 +16,13 @@ package org.sonatype.nexus.feeds;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineResult;
 
 @Component( role = FeedRecorder.class )
 public class SimpleFeedRecorder
@@ -69,10 +69,10 @@ public class SimpleFeedRecorder
 
     }
 
-    public List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
-                                                TimelineFilter filter )
+    public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+                                     TimelineFilter filter )
     {
-        return Collections.emptyList();
+        return TimelineResult.EMPTY_RESULT;
     }
 
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,

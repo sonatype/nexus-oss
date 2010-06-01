@@ -2,13 +2,13 @@ package org.sonatype.nexus.timeline;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.timeline.TimelineRecord;
 
 public class LegacyNexusTimelineTest
-    extends AbstractNexusTestCase
+    extends AbstractTimelineTest
 {
     public void testMoveLegacyTimeline()
         throws Exception
@@ -21,7 +21,7 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<Map<String, String>> result = nexusTimeline.retrieveNewest( 10, null );
+        List<TimelineRecord> result = asList( nexusTimeline.retrieveNewest( 10, null ) );
 
         assertTrue( !result.isEmpty() );
     }
@@ -43,7 +43,7 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<Map<String, String>> result = nexusTimeline.retrieveNewest( 10, null );
+        List<TimelineRecord> result = asList( nexusTimeline.retrieveNewest( 10, null ) );
 
         assertEquals( 4, result.size() );
     }

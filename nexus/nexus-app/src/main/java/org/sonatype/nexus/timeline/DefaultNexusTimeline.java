@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -19,6 +18,7 @@ import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineConfiguration;
 import org.sonatype.timeline.TimelineException;
 import org.sonatype.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineResult;
 
 @Component( role = NexusTimeline.class )
 public class DefaultNexusTimeline
@@ -59,7 +59,7 @@ public class DefaultNexusTimeline
             throw new InitializationException( "Unable to initialize Timeline!", e );
         }
     }
-    
+
     private void moveLegacyTimeline()
         throws TimelineException
     {
@@ -115,9 +115,8 @@ public class DefaultNexusTimeline
     {
         File timelineDir = applicationConfiguration.getWorkingDirectory( dirName );
 
-        TimelineConfiguration config = new TimelineConfiguration( new File( timelineDir, "persist" ), new File(
-            timelineDir,
-            "index" ) );
+        TimelineConfiguration config =
+            new TimelineConfiguration( new File( timelineDir, "persist" ), new File( timelineDir, "index" ) );
 
         configure( config );
     }
@@ -180,37 +179,35 @@ public class DefaultNexusTimeline
         return timeline.purgeOlderThan( timestamp, types, subTypes, filter );
     }
 
-    public List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types )
+    public TimelineResult retrieve( long fromTs, int count, Set<String> types )
     {
         return timeline.retrieve( fromTs, count, types );
     }
 
-    public List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types )
+    public TimelineResult retrieve( int fromItem, int count, Set<String> types )
     {
         return timeline.retrieve( fromItem, count, types );
     }
 
-    public List<Map<String, String>> retrieve( long fromTs, int count, Set<String> types, Set<String> subtypes,
-        TimelineFilter filter )
+    public TimelineResult retrieve( long fromTs, int count, Set<String> types, Set<String> subtypes,
+                                    TimelineFilter filter )
     {
         return timeline.retrieve( fromTs, count, types, subtypes, filter );
     }
 
-    public List<Map<String, String>> retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
-        TimelineFilter filter )
+    public TimelineResult retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
+                                    TimelineFilter filter )
     {
         return timeline.retrieve( fromItem, count, types, subtypes, filter );
     }
 
-    public List<Map<String, String>> retrieveNewest( int count, Set<String> types )
+    public TimelineResult retrieveNewest( int count, Set<String> types )
     {
         return timeline.retrieveNewest( count, types );
     }
 
-    public List<Map<String, String>> retrieveNewest( int count, Set<String> types, Set<String> subtypes,
-        TimelineFilter filter )
+    public TimelineResult retrieveNewest( int count, Set<String> types, Set<String> subtypes, TimelineFilter filter )
     {
         return timeline.retrieveNewest( count, types, subtypes, filter );
     }
-
 }

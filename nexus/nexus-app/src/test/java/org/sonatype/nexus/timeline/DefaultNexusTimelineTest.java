@@ -17,12 +17,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-import org.sonatype.nexus.AbstractNexusTestCase;
+import org.sonatype.timeline.TimelineRecord;
 
 public class DefaultNexusTimelineTest
-    extends AbstractNexusTestCase
+    extends AbstractTimelineTest
 {
     protected NexusTimeline nexusTimeline;
 
@@ -50,32 +49,27 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
 
-        List<Map<String, String>> res = nexusTimeline.retrieve(
-            System.currentTimeMillis() - 2L * 60L * 60L * 1000L,
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
-            null );
+        List<TimelineRecord> res =
+            asList( nexusTimeline.retrieve( System.currentTimeMillis() - 2L * 60L * 60L * 1000L, 10,
+                new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ), new HashSet<String>(
+                    Arrays.asList( new String[] { "1" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest(
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
-            null );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest(
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ),
-            null );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "2" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) ) );
 
         assertEquals( 2, res.size() );
     }
@@ -90,67 +84,58 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "2", data );
 
-        List<Map<String, String>> res = nexusTimeline.retrieve( 0, 10, new HashSet<String>( Arrays
-            .asList( new String[] { "TEST" } ) ), null, null );
+        List<TimelineRecord> res =
+            asList( nexusTimeline.retrieve( 0, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                null, null ) );
 
         assertEquals( 2, res.size() );
 
-        res = nexusTimeline.retrieve(
-            1,
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            null,
-            null );
+        res =
+            asList( nexusTimeline.retrieve( 1, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                null, null ) );
 
         assertEquals( 1, res.size() );
-        assertEquals( "b", res.get( 0 ).get( "b" ) );
+        assertEquals( "b", res.get( 0 ).getData().get( "b" ) );
 
-        res = nexusTimeline.retrieve(
-            2,
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            null,
-            null );
+        res =
+            asList( nexusTimeline.retrieve( 2, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                null, null ) );
 
         assertEquals( 0, res.size() );
 
-        res = nexusTimeline
-            .retrieve( 0, 1, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ), null, null );
+        res =
+            asList( nexusTimeline.retrieve( 0, 1, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                null, null ) );
 
         assertEquals( 1, res.size() );
-        assertEquals( "a", res.get( 0 ).get( "a" ) );
+        assertEquals( "a", res.get( 0 ).getData().get( "a" ) );
 
-        res = nexusTimeline
-            .retrieve( 0, 0, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ), null, null );
+        res =
+            asList( nexusTimeline.retrieve( 0, 0, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                null, null ) );
 
         assertEquals( 0, res.size() );
 
-        res = nexusTimeline.retrieve(
-            0,
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
-            null );
+        res =
+            asList( nexusTimeline.retrieve( 0, 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest(
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "1" } ) ),
-            null );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest(
-            10,
-            new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
-            new HashSet<String>( Arrays.asList( new String[] { "2" } ) ),
-            null );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "2" } ) ), null ) );
 
         assertEquals( 1, res.size() );
 
-        res = nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) );
+        res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ) ) );
 
         assertEquals( 2, res.size() );
     }
@@ -167,13 +152,14 @@ public class DefaultNexusTimelineTest
 
         nexusTimeline.add( System.currentTimeMillis() - 1L * 60L * 60L * 1000L, "TEST", "1", data );
 
-        List<Map<String, String>> res = nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays
-            .asList( new String[] { "TEST" } ) ), new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null );
+        List<TimelineRecord> res =
+            asList( nexusTimeline.retrieveNewest( 10, new HashSet<String>( Arrays.asList( new String[] { "TEST" } ) ),
+                new HashSet<String>( Arrays.asList( new String[] { "1" } ) ), null ) );
 
         assertEquals( 2, res.size() );
 
-        assertEquals( "1st", res.get( 0 ).get( "place" ) );
+        assertEquals( "1st", res.get( 0 ).getData().get( "place" ) );
 
-        assertEquals( "2nd", res.get( 1 ).get( "place" ) );
+        assertEquals( "2nd", res.get( 1 ).getData().get( "place" ) );
     }
 }

@@ -14,10 +14,10 @@
 package org.sonatype.nexus.feeds;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.sonatype.timeline.TimelineFilter;
+import org.sonatype.timeline.TimelineResult;
 
 /**
  * A recorder for events for later retrieval. The Actions are "generic" Nexus event related. For specific (Maven, P2)
@@ -132,7 +132,7 @@ public interface FeedRecorder
 
     // reading
 
-    List<Map<String, String>> getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
+    TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter );
 
     List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
