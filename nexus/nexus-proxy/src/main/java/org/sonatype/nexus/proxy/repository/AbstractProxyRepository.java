@@ -285,7 +285,23 @@ public abstract class AbstractProxyRepository
             // change configuration only if we have a transition
             if ( !oldProxyMode.equals( proxyMode ) )
             {
-                getExternalConfiguration( true ).setProxyMode( proxyMode );
+                // NEXUS-3552: Tricking the config framework, we are making this applied _without_ making configuration
+                // dirty
+                if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
+                {
+                    getExternalConfiguration( false ).setProxyMode( proxyMode );
+
+                    if ( isDirty() )
+                    {
+                        // we are dirty, then just set same value in the "changed" one too
+                        getExternalConfiguration( true ).setProxyMode( proxyMode );
+                    }
+                }
+                else
+                {
+                    // this makes it dirty if it was not dirty yet, but this is the intention too
+                    getExternalConfiguration( true ).setProxyMode( proxyMode );
+                }
             }
 
             // setting the time to retain remote status, depending on proxy mode
@@ -406,20 +422,22 @@ public abstract class AbstractProxyRepository
                     + ") repository by checking it's remote peer health will occur in "
                     + DurationFormatUtils.formatDurationWords( getRepositoryStatusCheckPeriod(), true, true ) + "." );
 
+            // NEXUS-3552: Do NOT save configuration, just make it applied (see setProxyMode() how it is done)
             // save configuration only if we made a transition, otherwise no save is needed
-            if ( oldProxyMode != null && !oldProxyMode.equals( ProxyMode.BLOCKED_AUTO ) )
-            {
-                try
-                {
-                    getApplicationConfiguration().saveConfiguration();
-                }
-                catch ( IOException e )
-                {
-                    getLogger().warn(
-                        "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
-                            + ")", e );
-                }
-            }
+            // if ( oldProxyMode != null && !oldProxyMode.equals( ProxyMode.BLOCKED_AUTO ) )
+            // {
+            // try
+            // {
+            // // NEXUS-3552: Do NOT save configuration, just make it applied
+            // getApplicationConfiguration().saveConfiguration();
+            // }
+            // catch ( IOException e )
+            // {
+            // getLogger().warn(
+            // "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId()
+            // + ")", e );
+            // }
+            // }
         }
     }
 
@@ -671,7 +689,7 @@ public abstract class AbstractProxyRepository
 
         return dMirrors;
     }
-    
+
     protected DownloadMirrorSelector openDownloadMirrorSelector( ResourceStoreRequest request )
     {
         return this.getDownloadMirrors().openSelector( this.getRemoteUrl() );
