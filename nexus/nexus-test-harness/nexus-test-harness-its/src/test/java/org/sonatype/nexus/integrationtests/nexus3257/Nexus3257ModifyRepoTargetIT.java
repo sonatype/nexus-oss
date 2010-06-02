@@ -13,13 +13,13 @@ import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
-public class Nexus3257ModifyRepoTargetTest
+public class Nexus3257ModifyRepoTargetIT
     extends AbstractNexusIntegrationTest
 {
     TargetMessageUtil targetUtil;
     PrivilegesMessageUtil privUtil;
     
-    public Nexus3257ModifyRepoTargetTest()
+    public Nexus3257ModifyRepoTargetIT()
     {
         targetUtil = new TargetMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );

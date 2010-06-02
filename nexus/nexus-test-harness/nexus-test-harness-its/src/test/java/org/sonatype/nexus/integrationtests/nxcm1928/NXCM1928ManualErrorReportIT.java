@@ -15,7 +15,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 
-public class NXCM1928ManualErrorReportTest
+public class NXCM1928ManualErrorReportIT
     extends AbstractNexusIntegrationTest
 {
 

@@ -11,12 +11,12 @@ import org.sonatype.nexus.test.utils.RepositoryTemplateMessageUtil;
 /**
  * @author juven
  */
-public class Nexus3162SnapshotProxyRepoTemplateTest
+public class Nexus3162SnapshotProxyRepoTemplateIT
     extends AbstractNexusIntegrationTest
 {
     protected RepositoryTemplateMessageUtil messageUtil;
 
-    public Nexus3162SnapshotProxyRepoTemplateTest()
+    public Nexus3162SnapshotProxyRepoTemplateIT()
         throws Exception
     {
         this.messageUtil = new RepositoryTemplateMessageUtil();
