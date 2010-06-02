@@ -22,6 +22,8 @@ import org.sonatype.plugin.ExtensionPoint;
 public interface ContentClass
 {
     String getId();
+    
+    String getName();
 
     boolean isCompatible( ContentClass contentClass );
     

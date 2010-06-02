@@ -76,6 +76,14 @@ public interface RepositoryTypeRegistry
      * @return
      */
     Map<String, ContentClass> getContentClasses();
+    
+    /**
+     * Returns a list of content class ids that are compatible with teh supplied content class
+     * 
+     * @param contentClass
+     * @return
+     */
+    Set<String> getCompatibleContentClasses( ContentClass contentClass );
 
     /**
      * Returns the ContentClass for the given Repository component.

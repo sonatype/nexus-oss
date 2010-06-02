@@ -30,7 +30,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
       }
     },
     validationModifiers : {
-      repositories : this.repositoriesValidationError.createDelegate(this),
+      repositories : this.repositoriesValidationError.createDelegate(this)
     },
     referenceData : Sonatype.repoServer.referenceData.group,
     uri : Sonatype.config.repos.urls.groups
@@ -61,6 +61,18 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
         },
         url : Sonatype.config.repos.urls.repoTypes + '?repoType=group'
       });
+      
+  this.contentClassStore = new Ext.data.JsonStore({
+    root : 'data',
+    id : 'contentClass',
+    fields :[
+      { name : 'contentClass' },
+      { name : 'name' },
+      { name : 'groupable' },
+      { name : 'compatibleTypes' }
+    ],
+    url : Sonatype.config.repos.urls.repoContentClasses
+  });
 
   this.repoStore = new Ext.data.JsonStore({
         root : 'data',
@@ -85,7 +97,7 @@ Sonatype.repoServer.RepositoryGroupEditor = function(config) {
   this.checkPayload();
 
   Sonatype.repoServer.RepositoryGroupEditor.superclass.constructor.call(this, {
-        dataStores : [this.providerStore, this.repoStore],
+        dataStores : [this.providerStore, this.repoStore, this.contentClassStore],
         items : [{
               xtype : 'textfield',
               fieldLabel : 'Group ID',
@@ -188,8 +200,22 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
       loadRepositories : function(arr, srcObject, fpanel) {
         var repoBox = fpanel.find('name', 'repositories')[0];
         this.repoStore.filterBy(function(rec, id) {
-              return rec.data.format == srcObject.format && rec.data.id != srcObject.id;
-            });
+              var contentClass = this.contentClassStore.getById( rec.data.format );
+              
+              // if we have the content class
+              // and the content class is compatible with the repo type
+              if ( contentClass
+                && rec.data.id != srcObject.id ) {
+                var compatibleClasses = contentClass.get( 'compatibleTypes' );
+                
+                for ( var i = 0 ; i < compatibleClasses.length ; i++ ) {
+                  if ( compatibleClasses[i] == srcObject.format ) {
+                    return true;
+                  }
+                }
+              }
+              return false;
+            }, this);
 
         repoBox.setValue(arr);
       },

@@ -3323,6 +3323,27 @@
           <required>true</required>
           <description>The name of the content class.</description>
         </field>
+        <field>
+          <name>groupable</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag stating if this content class can be placed in group.</description>
+        </field>
+        <field>
+          <name>compatibleTypes</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+          <description>The other content classes this content class is compatible with.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "compatibleTypes" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "compatibleType" )</annotation>
+          </annotations>
+        </field>
       </fields>
     </class>
 

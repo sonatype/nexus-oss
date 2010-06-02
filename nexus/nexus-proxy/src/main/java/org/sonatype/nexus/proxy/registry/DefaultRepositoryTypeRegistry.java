@@ -150,6 +150,22 @@ public class DefaultRepositoryTypeRegistry
     {
         return Collections.unmodifiableMap( new HashMap<String, ContentClass>( contentClasses ) );
     }
+    
+    public Set<String> getCompatibleContentClasses( ContentClass contentClass )
+    {
+        Set<String> compatibles = new HashSet<String>();
+        
+        for ( ContentClass cc : contentClasses.values() )
+        {
+            if ( cc.isCompatible( contentClass )
+                || contentClass.isCompatible( cc ) )
+            {
+                compatibles.add( cc.getId() );
+            }
+        }
+        
+        return compatibles;
+    }
 
     public Set<String> getRepositoryRoles()
     {

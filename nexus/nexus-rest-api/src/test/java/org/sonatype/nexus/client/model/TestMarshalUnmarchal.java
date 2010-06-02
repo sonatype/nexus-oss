@@ -1719,10 +1719,16 @@ public class TestMarshalUnmarchal
         RepositoryContentClassListResource item1 = new RepositoryContentClassListResource();
         item1.setContentClass( "ContentClass1" );
         item1.setName( "Name1" );
+        item1.addCompatibleType( "test1" );
+        item1.addCompatibleType( "test2" );
+        item1.setGroupable( true );
 
         RepositoryContentClassListResource item2 = new RepositoryContentClassListResource();
         item2.setContentClass( "ContentClass2" );
         item2.setName( "Name2" );
+        item2.addCompatibleType( "test3" );
+        item2.addCompatibleType( "test4" );
+        item2.setGroupable( false );
 
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );

@@ -68,5 +68,11 @@ public class MockRepositoryTypeRegistry
         // TODO Auto-generated method stub
         return null;
     }
+    
+    public Set<String> getCompatibleContentClasses( ContentClass contentClass )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
