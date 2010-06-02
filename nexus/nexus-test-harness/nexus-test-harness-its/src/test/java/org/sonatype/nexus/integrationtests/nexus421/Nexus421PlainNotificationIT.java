@@ -19,7 +19,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
-public class Nexus421PlainNotificationTest
+public class Nexus421PlainNotificationIT
     extends AbstractEmailServerNexusIT
 {
     protected RepositoryMessageUtil repoMessageUtil;
