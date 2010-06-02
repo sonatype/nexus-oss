@@ -83,7 +83,7 @@ Sonatype.repoServer.PrivilegeEditPanel = function(config) {
           field : 'name',
           direction : 'asc'
         },
-        url : Sonatype.config.repos.urls.repositories
+        url : Sonatype.config.repos.urls.allRepositories
       });
 
   this.targetStore = new Ext.data.JsonStore({
