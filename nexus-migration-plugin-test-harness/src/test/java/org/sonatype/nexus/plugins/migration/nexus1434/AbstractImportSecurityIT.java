@@ -66,19 +66,20 @@ public abstract class AbstractImportSecurityIT
     {
         // initialize the utils
         userUtil = new PlexusUserMessageUtil();
-        repoTargetUtil = new TargetMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        privilegeUtil = new PrivilegesMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        repoTargetUtil = new TargetMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        privilegeUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        roleUtil = new RoleMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         try
         {
             repoUtil =
-                new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+                new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML,
+                                           this.getRepositoryTypeRegistry() );
         }
         catch ( ComponentLookupException e )
         {
             Assert.fail( "Failed to lookup component: " + e.getMessage() );
         }
-        groupUtil = new GroupMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
+        groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     abstract protected void importSecurity()

@@ -31,10 +31,9 @@ public class Nexus1438UnwindVirtualRepositoriesIT
 
     public Nexus1438UnwindVirtualRepositoriesIT()
     {
-        this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Test
     public void importWindVirtualRepos()
         throws Exception

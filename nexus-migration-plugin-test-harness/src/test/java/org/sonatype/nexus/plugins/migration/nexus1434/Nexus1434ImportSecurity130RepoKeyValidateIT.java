@@ -20,7 +20,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.test.utils.SecurityConfigUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 
 public class Nexus1434ImportSecurity130RepoKeyValidateIT
@@ -47,9 +46,10 @@ public class Nexus1434ImportSecurity130RepoKeyValidateIT
         for ( PrivilegeStatusResource priv : privilegeList )
         {
             String repoId =
-                SecurityConfigUtil.getPrivilegeProperty( priv, TargetPrivilegeRepositoryPropertyDescriptor.ID );
+                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeRepositoryPropertyDescriptor.ID );
 
-            String groupId = SecurityConfigUtil.getPrivilegeProperty( priv, TargetPrivilegeGroupPropertyDescriptor.ID );
+            String groupId =
+                getSecurityConfigUtil().getPrivilegeProperty( priv, TargetPrivilegeGroupPropertyDescriptor.ID );
 
             if ( !StringUtils.isEmpty( repoId ) )
             {

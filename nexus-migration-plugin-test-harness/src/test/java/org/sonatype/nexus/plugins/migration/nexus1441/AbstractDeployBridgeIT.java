@@ -18,7 +18,6 @@ import org.junit.Assert;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 
@@ -49,7 +48,7 @@ public abstract class AbstractDeployBridgeIT
         }
         else
         {
-           DeployUtils. deployWithWagon( this.container, "http", deployUrl, artifact, path );
+            getDeployUtils().deployWithWagon( "http", deployUrl, artifact, path );
         }
 
         File deployedFile = new File( nexusWorkDir, "/storage/" + targetRepository + "/" + path );

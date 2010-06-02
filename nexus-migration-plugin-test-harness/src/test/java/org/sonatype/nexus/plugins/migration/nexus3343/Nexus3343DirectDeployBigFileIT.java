@@ -16,7 +16,6 @@ import java.io.File;
 
 import org.junit.Assert;
 import org.restlet.data.Status;
-import org.sonatype.nexus.test.utils.DeployUtils;
 
 public class Nexus3343DirectDeployBigFileIT
     extends AbstractBigFileIT
@@ -27,7 +26,7 @@ public class Nexus3343DirectDeployBigFileIT
         throws Exception
     {
 
-        int m = DeployUtils.deployUsingGavWithRest( "main-local-releases", GAV, getSourceFile() );
+        int m = getDeployUtils().deployUsingGavWithRest( "main-local-releases", GAV, getSourceFile() );
         Assert.assertTrue( Status.isSuccess( m ) );
 
         return new File( nexusWorkDir, "storage/main-local-releases/nexus3343/released/1.0/released-1.0.bin" );

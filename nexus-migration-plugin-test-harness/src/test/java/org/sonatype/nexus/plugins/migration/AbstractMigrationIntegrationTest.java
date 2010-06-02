@@ -38,7 +38,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
-import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
@@ -66,19 +65,20 @@ public abstract class AbstractMigrationIntegrationTest
         try
         {
             this.repositoryUtil =
-                new RepositoryMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML, this.getRepositoryTypeRegistry() );
+                new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML,
+                                           this.getRepositoryTypeRegistry() );
         }
         catch ( ComponentLookupException e )
         {
             Assert.fail( "Failed to lookup component: " + e.getMessage() );
         }
-        this.groupUtil = new GroupMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         this.searchUtil = new SearchMessageUtil();
-        this.userUtil = new UserMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        this.roleUtil = new RoleMessageUtil( getXMLXStream(), MediaType.APPLICATION_XML );
-        
+        this.userUtil = new UserMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        this.roleUtil = new RoleMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+
         this.migrationLogFile = new File( nexusLogDir, getTestId() + "/migration.log" );
-        
+
     }
 
     @BeforeClass
@@ -87,7 +87,7 @@ public abstract class AbstractMigrationIntegrationTest
     {
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 
-        NexusStatusUtil.stop();
+        getNexusStatusUtil().stop();
 
         cleanWorkDir();
     }

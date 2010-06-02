@@ -347,18 +347,18 @@ public class ArtifactoryFileLocationPlexusResource
             return null;
         }
 
-        Collection<Repository> repositories = repositoryRegistry.getRepositories();
-        for ( Repository repository : repositories )
+        if ( !url.endsWith( "/" ) )
         {
-            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-            {
-                ProxyRepository remote = repository.adaptToFacet( ProxyRepository.class );
-                if ( url.equals( remote.getRemoteUrl() ) )
-                {
-                    return repository.getId();
-                }
-            }
+            url = url + "/";
+        }
 
+        List<ProxyRepository> repositories = repositoryRegistry.getRepositoriesWithFacet( ProxyRepository.class );
+        for ( ProxyRepository repository : repositories )
+        {
+            if ( url.equals( repository.getRemoteUrl() ) )
+            {
+                return repository.getId();
+            }
         }
         return null;
     }
