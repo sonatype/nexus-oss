@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -75,12 +74,6 @@ public abstract class AbstractProxyRepository
 {
     /** The time while we do NOT check an already known remote status: 5 mins. This value is system default. */
     private static final long REMOTE_STATUS_RETAIN_TIME = 5L * 60L * 1000L;
-
-    /**
-     * The initial amount of time to have a repository in AUTOBlock status: 10 seconds. This value is system default,
-     * but it is used only as starting point, and it grows.
-     */
-    private static final long AUTO_BLOCK_STATUS_RETAIN_TIME = 10L * 1000L;
 
     /**
      * The maximum amount of time to have a repository in AUTOBlock status: 60 minutes (1hr). This value is system
@@ -287,7 +280,7 @@ public abstract class AbstractProxyRepository
             {
                 // NEXUS-3552: Tricking the config framework, we are making this applied _without_ making configuration
                 // dirty
-                if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
+                if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) || ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
                 {
                     getExternalConfiguration( false ).setProxyMode( proxyMode );
 
@@ -322,8 +315,11 @@ public abstract class AbstractProxyRepository
                 }
                 else
                 {
+                    // take the timeout * 2 as initial step
+                    long initialStep = getRemoteConnectionSettings().getConnectionTimeout();
+                    
                     // make it a fibonacci one
-                    this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( AUTO_BLOCK_STATUS_RETAIN_TIME );
+                    this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
 
                     // step it at once once, since it will repeat starting value twice
                     this.remoteStatusRetainTimeSequence.next();
@@ -464,15 +460,16 @@ public abstract class AbstractProxyRepository
 
         setProxyMode( ProxyMode.ALLOW, true, null );
 
-        try
-        {
-            getApplicationConfiguration().saveConfiguration();
-        }
-        catch ( IOException e )
-        {
-            getLogger().warn(
-                "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId() + ")", e );
-        }
+        // NEXUS-3552: Do NOT save configuration, just make it applied (see setProxyMode() how it is done)
+        // try
+        // {
+        // getApplicationConfiguration().saveConfiguration();
+        // }
+        // catch ( IOException e )
+        // {
+        // getLogger().warn(
+        // "Cannot save configuration after AutoBlocking repository \"" + getName() + "\" (id=" + getId() + ")", e );
+        // }
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()
