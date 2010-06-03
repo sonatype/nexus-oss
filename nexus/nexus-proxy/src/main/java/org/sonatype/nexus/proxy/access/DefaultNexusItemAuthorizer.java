@@ -79,6 +79,9 @@ public class DefaultNexusItemAuthorizer
                 TargetSet groupMatched = group.getTargetsForRequest( request );
 
                 targetSet.addTargetSet( groupMatched );
+                
+                // now that we have groups of groups, this needs to be a recursive check
+                targetSet.addTargetSet( getGroupsTargetSet( group, request ) );
             }
         }
 
