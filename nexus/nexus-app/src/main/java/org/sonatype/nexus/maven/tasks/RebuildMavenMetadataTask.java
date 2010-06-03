@@ -39,25 +39,29 @@ public class RebuildMavenMetadataTask
 
         // group wins if both given, repoId if group not given. Or null, if none given.
         String repoId = StringUtils.isNotBlank( getRepositoryGroupId() ) ? getRepositoryGroupId() : getRepositoryId();
-
-        Repository repository = getRepositoryRegistry().getRepository( repoId );
-
-        // is this a Maven repository at all?
-        if ( repoId != null && repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+        
+        // no repo id, then do all repos
+        if ( StringUtils.isEmpty( repoId ) )
         {
-            MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
-
-            mavenRepository.recreateMavenMetadata( req );
-        }
-        else if ( repoId != null )
-        {
-            getLogger().warn(
-                "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
-                    + ") is not a Maven repository. Skipping it." );
+            getNexus().rebuildMavenMetadataAllRepositories( req );   
         }
         else
         {
-            getNexus().rebuildMavenMetadataAllRepositories( req );
+            Repository repository = getRepositoryRegistry().getRepository( repoId );
+    
+            // is this a Maven repository at all?
+            if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+            {
+                MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
+    
+                mavenRepository.recreateMavenMetadata( req );
+            }
+            else
+            {
+                getLogger().debug(
+                    "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
+                        + ") is not a Maven repository. Will not rebuild maven metadata." );
+            }
         }
 
         return null;
