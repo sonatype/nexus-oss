@@ -58,7 +58,7 @@ public class DefaultIndexerEngine
             
             updateGroups( context, ac );
             
-            w.flush();
+            w.commit();
             
             context.updateTimestamp();
         }
@@ -99,7 +99,7 @@ public class DefaultIndexerEngine
             IndexWriter w = context.getIndexWriter();
             w.addDocument( doc );
             w.deleteDocuments( new Term( ArtifactInfo.UINFO, uinfo ) );
-            w.flush();
+            w.commit();
             context.updateTimestamp();
         }
     }

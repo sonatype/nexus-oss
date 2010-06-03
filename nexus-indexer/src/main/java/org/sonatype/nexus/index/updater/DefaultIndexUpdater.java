@@ -402,7 +402,7 @@ public class DefaultIndexUpdater
             }
 
             w.optimize();
-            w.flush();
+            w.commit();
         }
         finally
         {
@@ -449,7 +449,7 @@ public class DefaultIndexUpdater
 
             w.optimize();
 
-            w.flush();
+            w.commit();
         }
         finally
         {

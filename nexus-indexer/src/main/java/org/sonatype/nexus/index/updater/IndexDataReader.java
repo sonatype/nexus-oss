@@ -67,7 +67,7 @@ public class IndexDataReader
             n++;
         }
 
-        w.flush();
+        w.commit();
         w.optimize();
 
         IndexDataReadResult result = new IndexDataReadResult();

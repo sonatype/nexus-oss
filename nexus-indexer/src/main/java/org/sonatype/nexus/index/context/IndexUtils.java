@@ -196,7 +196,7 @@ public class IndexUtils
         setAllGroups( context, allGroups );
 
         context.getIndexWriter().optimize();
-        context.getIndexWriter().flush();
+        context.getIndexWriter().commit();
     }
 
     // ----------------------------------------------------------------------------
@@ -264,7 +264,7 @@ public class IndexUtils
             groupFieldValue,
             groupListField ) );
     
-        w.flush();
+        w.commit();
     }
     
     static Document createGroupsDocument( Collection<String> groups, String field, String fieldValue, String listField )

@@ -134,7 +134,7 @@ public abstract class AbstractIndexPlexusResource
         {
             exact = Boolean.valueOf( form.getFirstValue( "exact" ) );
         }
-        
+
         if ( form.getFirstValue( "versionexpand" ) != null )
         {
             expandVersion = Boolean.valueOf( form.getFirstValue( "versionexpand" ) );
@@ -208,7 +208,7 @@ public abstract class AbstractIndexPlexusResource
                 {
                     searchResult =
                         searchByTerms( terms, getRepositoryId( request ), from, count, exact, expandVersion,
-                                       expandPackaging, expandClassifier, collapseResults );
+                            expandPackaging, expandClassifier, collapseResults );
 
                     // non-identify search happened
                     boolean tooManyResults = searchResult.isHitLimitExceeded();
@@ -240,8 +240,14 @@ public abstract class AbstractIndexPlexusResource
                 }
                 catch ( AlreadyClosedException e )
                 {
-                    // just keep it silent (DEBUG)
-                    getLogger().debug( "Got AlreadyClosedException exception!", e );
+                    getLogger().info(
+                        "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        // just keep it silent (DEBUG)
+                        getLogger().debug( "Got AlreadyClosedException exception!", e );
+                    }
 
                     result.setData( null );
                 }
@@ -265,11 +271,11 @@ public abstract class AbstractIndexPlexusResource
     }
 
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
-                                                  final Integer from, final Integer count, final Boolean exact, 
+                                                  final Integer from, final Integer count, final Boolean exact,
                                                   final Boolean expandVersion, final Boolean expandPackaging,
                                                   final Boolean expandClassifier, final Boolean collapseResults )
         throws NoSuchRepositoryException, ResourceException
-    {        
+    {
         for ( Searcher searcher : m_searchers )
         {
             if ( searcher.canHandle( terms ) )
@@ -287,31 +293,28 @@ public abstract class AbstractIndexPlexusResource
                         searchType = SearchType.SCORED;
                     }
                 }
-                
+
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-                
+
                 UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
                 filter.addField( MAVEN.GROUP_ID );
                 filter.addField( MAVEN.ARTIFACT_ID );
-                
-                if ( Boolean.TRUE.equals( expandVersion ) 
-                    || !collapseResults )
+
+                if ( Boolean.TRUE.equals( expandVersion ) || !collapseResults )
                 {
-                    filter.addField( MAVEN.VERSION );    
+                    filter.addField( MAVEN.VERSION );
                 }
-                if ( Boolean.TRUE.equals( expandPackaging ) 
-                    || !collapseResults )
+                if ( Boolean.TRUE.equals( expandPackaging ) || !collapseResults )
                 {
-                    filter.addField( MAVEN.PACKAGING );    
+                    filter.addField( MAVEN.PACKAGING );
                 }
-                if ( Boolean.TRUE.equals( expandClassifier )
-                    || !collapseResults )
+                if ( Boolean.TRUE.equals( expandClassifier ) || !collapseResults )
                 {
-                    filter.addField( MAVEN.CLASSIFIER );    
+                    filter.addField( MAVEN.CLASSIFIER );
                 }
-                
+
                 filters.add( filter );
-                    
+
                 final IteratorSearchResponse searchResponse =
                     searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, searchType, filters );
 

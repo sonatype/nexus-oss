@@ -293,7 +293,7 @@ public class DefaultIndexPacker
             }
 
             w.optimize();
-            w.flush();
+            w.commit();
         }
         finally
         {

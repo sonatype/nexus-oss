@@ -2,6 +2,7 @@ package org.sonatype.nexus.index.context;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.IndexSearcher;
 
 /**
@@ -18,7 +19,13 @@ public class NexusIndexSearcher
     public NexusIndexSearcher( final IndexingContext indexingContext )
         throws IOException
     {
-        super( indexingContext.getIndexReader() );
+        this( indexingContext, indexingContext.getIndexReader() );
+    }
+
+    public NexusIndexSearcher( final IndexingContext indexingContext, final IndexReader reader )
+        throws IOException
+    {
+        super( reader );
 
         this.indexingContext = indexingContext;
     }

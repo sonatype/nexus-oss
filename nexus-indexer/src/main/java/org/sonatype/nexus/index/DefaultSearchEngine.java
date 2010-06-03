@@ -298,7 +298,7 @@ public class DefaultSearchEngine
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                contextsToSearch.add( ctx.getIndexSearcher() );
+                contextsToSearch.add( ctx.getReadOnlyIndexSearcher() );
             }
         }
 

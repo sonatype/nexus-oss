@@ -156,6 +156,16 @@ public interface IndexingContext
         throws IOException;
 
     /**
+     * Returns the ReadOnly IndexSearcher of this context. Warning! It is caller responsibility to close (manage
+     * lifecycle) or this searchr, otherwise you would end up with File leaks!
+     * 
+     * @return
+     * @throws IOException
+     */
+    IndexSearcher getReadOnlyIndexSearcher()
+        throws IOException;
+
+    /**
      * Returns the Lucene IndexWriter of this context.
      * 
      * @return indexWriter

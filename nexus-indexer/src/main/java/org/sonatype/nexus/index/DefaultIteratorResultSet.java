@@ -12,6 +12,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -151,6 +152,12 @@ public class DefaultIteratorResultSet
             }
 
             pointer++;
+        }
+
+        if ( result == null )
+        {
+            // we are done
+            close();
         }
 
         return result;
@@ -295,5 +302,37 @@ public class DefaultIteratorResultSet
     public Iterator<ArtifactInfo> iterator()
     {
         return this;
+    }
+
+    protected void close()
+    {
+        for ( Searchable searchable : searcher.getSearchables() )
+        {
+            try
+            {
+                ( (NexusIndexSearcher) searchable ).close();
+            }
+            catch ( IOException e )
+            {
+                // uh oh
+            }
+
+            try
+            {
+                ( (NexusIndexSearcher) searchable ).getIndexReader().close();
+            }
+            catch ( IOException e )
+            {
+                // uh oh
+            }
+        }
+    }
+
+    protected void finalize()
+        throws Throwable
+    {
+        super.finalize();
+
+        close();
     }
 }

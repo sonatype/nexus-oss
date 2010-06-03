@@ -300,15 +300,13 @@ public class DefaultIndexingContext
 
         hdr.add( new Field( FLD_DESCRIPTOR, FLD_DESCRIPTOR_CONTENTS, Field.Store.YES, Field.Index.UN_TOKENIZED ) );
 
-        hdr
-            .add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES,
-                             Field.Index.NO ) );
+        hdr.add( new Field( FLD_IDXINFO, VERSION + ArtifactInfo.FS + getRepositoryId(), Field.Store.YES, Field.Index.NO ) );
 
         IndexWriter w = getIndexWriter();
 
         w.updateDocument( DESCRIPTOR_TERM, hdr );
 
-        w.flush();
+        w.commit();
     }
 
     private void deleteIndexFiles()
@@ -461,6 +459,13 @@ public class DefaultIndexingContext
         }
     }
 
+    public IndexSearcher getReadOnlyIndexSearcher()
+        throws IOException
+    {
+        // just create it and pass over. Caller will close it.
+        return new NexusIndexSearcher( this, IndexReader.open( indexDirectory, true ) );
+    }
+
     public void optimize()
         throws CorruptIndexException, IOException
     {
@@ -470,7 +475,7 @@ public class DefaultIndexingContext
         {
             w.optimize();
 
-            w.flush();
+            w.commit();
         }
         finally
         {
