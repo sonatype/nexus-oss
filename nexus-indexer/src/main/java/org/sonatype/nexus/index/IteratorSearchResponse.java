@@ -32,4 +32,31 @@ public class IteratorSearchResponse
     {
         return getResults();
     }
+
+    // ==
+
+    public static final IteratorSearchResponse EMPTY_RESPONSE =
+        new IteratorSearchResponse( null, 0, new IteratorResultSet()
+        {
+            public boolean hasNext()
+            {
+                return false;
+            }
+
+            public ArtifactInfo next()
+            {
+                return null;
+            }
+
+            public void remove()
+            {
+                throw new UnsupportedOperationException( "Method not supported on " + getClass().getName() );
+            }
+
+            public Iterator<ArtifactInfo> iterator()
+            {
+                return this;
+            }
+        } );
+
 }

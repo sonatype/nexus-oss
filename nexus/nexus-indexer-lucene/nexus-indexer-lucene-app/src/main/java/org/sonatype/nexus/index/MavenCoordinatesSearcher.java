@@ -89,23 +89,23 @@ public class MavenCoordinatesSearcher
         {
             return new FlatSearchResponse( null, 0, Collections.<ArtifactInfo> emptySet() );
         }
-        return m_lucene.searchArtifactFlat( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ), terms
-            .get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from, count,
-            hitLimit );
+        return m_lucene.searchArtifactFlat( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ),
+            terms.get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from,
+            count, hitLimit );
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, SearchType searchType, 
+                                                      Integer count, Integer hitLimit, SearchType searchType,
                                                       List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException
     {
         if ( !canHandle( terms ) )
         {
-            return new IteratorSearchResponse( null, 0, null );
+            return IteratorSearchResponse.EMPTY_RESPONSE;
         }
-        
+
         boolean collapseRepos = true;
-        
+
         // if the user is querying against these fields, we want to return them properly
         if ( filters != null )
         {
@@ -113,8 +113,8 @@ public class MavenCoordinatesSearcher
             {
                 if ( filter instanceof UniqueArtifactFilterPostprocessor )
                 {
-                    UniqueArtifactFilterPostprocessor uFilter = ( UniqueArtifactFilterPostprocessor ) filter;
-                    
+                    UniqueArtifactFilterPostprocessor uFilter = (UniqueArtifactFilterPostprocessor) filter;
+
                     int found = 0;
                     if ( terms.containsKey( MavenCoordinatesSearcher.TERM_VERSION ) )
                     {
@@ -131,23 +131,23 @@ public class MavenCoordinatesSearcher
                         uFilter.addField( MAVEN.CLASSIFIER );
                         found++;
                     }
-                    
-                    //if we have matched against at least 2 of these, that means we are doing
-                    //full search, and NOT aggregation
+
+                    // if we have matched against at least 2 of these, that means we are doing
+                    // full search, and NOT aggregation
                     if ( found >= 2 )
                     {
                         uFilter.addField( MAVEN.REPOSITORY_ID );
                         collapseRepos = false;
                     }
-                    
+
                     break;
                 }
             }
         }
-        
-        return m_lucene.searchArtifactIterator( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ), terms
-            .get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from, count,
-            hitLimit, collapseRepos, searchType, filters );
+
+        return m_lucene.searchArtifactIterator( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ),
+            terms.get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from,
+            count, hitLimit, collapseRepos, searchType, filters );
     }
 
 }

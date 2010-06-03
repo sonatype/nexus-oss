@@ -29,8 +29,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -98,7 +98,7 @@ public class IdentifyHashPlexusResource
         {
             if ( "sha1".equalsIgnoreCase( alg ) )
             {
-                na = ai2Na( request, indexerManager.identifyArtifact( ArtifactInfo.SHA1, checksum ) );
+                na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, checksum ) );
             }
         }
         catch ( IOException e )

@@ -561,12 +561,16 @@ public class DefaultNexusIndexer
     {
         IteratorSearchResponse result = searcher.searchIteratorPaged( new IteratorSearchRequest( query ), contexts );
 
-        if ( result.getTotalHits() == 1 )
+        // TODO: this implementation is flakey: case a) 0 hits is okay, b) 1 hit is okay, c1) >1 hits and all same GAVs
+        // -- okay but which source repo will be used? c2) >1 hits, and different GAVs --- huh?
+        if ( result.getTotalHits() > 0 )
         {
             return result.getResults().next();
         }
-
-        return null;
+        else
+        {
+            return null;
+        }
     }
 
 }

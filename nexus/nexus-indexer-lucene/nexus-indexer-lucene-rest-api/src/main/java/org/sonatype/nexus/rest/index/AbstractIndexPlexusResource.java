@@ -13,9 +13,7 @@
  */
 package org.sonatype.nexus.rest.index;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +31,10 @@ import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
-import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
+import org.sonatype.nexus.index.KeywordSearcher;
 import org.sonatype.nexus.index.MAVEN;
+import org.sonatype.nexus.index.MavenCoordinatesSearcher;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
@@ -66,9 +65,6 @@ public abstract class AbstractIndexPlexusResource
     @Requirement
     private NexusScheduler nexusScheduler;
 
-    @Requirement
-    private IndexerManager indexerManager;
-
     @Requirement( role = Searcher.class )
     private List<Searcher> m_searchers;
 
@@ -95,11 +91,8 @@ public abstract class AbstractIndexPlexusResource
             terms.put( parameter.getName(), parameter.getValue() );
         }
 
-        String sha1 = form.getFirstValue( "sha1" );
-
         Integer from = null;
         Integer count = null;
-        Boolean uniqueRGA = null;
         Boolean exact = null;
         Boolean expandVersion = null;
         Boolean expandPackaging = null;
@@ -154,117 +147,75 @@ public abstract class AbstractIndexPlexusResource
 
         IteratorSearchResponse searchResult = null;
 
-        NexusArtifact na = null;
-
-        boolean doingSha1Identify = !StringUtils.isBlank( sha1 );
-
         SearchResponse result = new SearchResponse();
 
-        if ( doingSha1Identify )
+        // doing "plain search"
+        final int RETRIES = 3;
+
+        int runCount = 0;
+
+        while ( runCount < RETRIES )
         {
             try
             {
-                na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, sha1 ) );
-            }
-            catch ( IOException e )
-            {
-                throw new ResourceException( Status.SERVER_ERROR_INTERNAL,
-                    "IOException during configuration retrieval!", e );
-            }
+                searchResult =
+                    searchByTerms( terms, getRepositoryId( request ), from, count, exact, expandVersion,
+                        expandPackaging, expandClassifier, collapseResults );
 
-            if ( na != null )
-            {
-                // searhcResult is null and na is not, it is identify
-                result.setTotalCount( 1 );
+                // non-identify search happened
+                boolean tooManyResults = searchResult.isHitLimitExceeded();
 
-                result.setFrom( -1 );
+                result.setTooManyResults( tooManyResults );
 
-                result.setCount( 1 );
+                result.setTotalCount( searchResult.getTotalHits() );
 
-                result.setData( new ArrayList<NexusArtifact>( Collections.singleton( na ) ) );
-            }
-            else
-            {
-                // otherwise, we have no results (unsuccesful identify returns null!)
-                result.setTotalCount( 0 );
+                result.setFrom( from == null ? -1 : from.intValue() );
 
-                result.setFrom( -1 );
+                result.setCount( count == null ? -1 : count );
 
-                result.setCount( 1 );
-
-                result.setData( new ArrayList<NexusArtifact>() );
-            }
-        }
-        else
-        {
-            // doing "plain search"
-            final int RETRIES = 3;
-
-            int runCount = 0;
-
-            while ( runCount < RETRIES )
-            {
-                try
+                if ( tooManyResults )
                 {
-                    searchResult =
-                        searchByTerms( terms, getRepositoryId( request ), from, count, exact, expandVersion,
-                            expandPackaging, expandClassifier, collapseResults );
-
-                    // non-identify search happened
-                    boolean tooManyResults = searchResult.isHitLimitExceeded();
-
-                    result.setTooManyResults( tooManyResults );
-
-                    result.setTotalCount( searchResult.getTotalHits() );
-
-                    result.setFrom( from == null ? -1 : from.intValue() );
-
-                    result.setCount( count == null ? -1 : count );
-
-                    if ( tooManyResults )
-                    {
-                        result.setData( new ArrayList<NexusArtifact>() );
-                    }
-                    else
-                    {
-                        result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
-                    }
-
-                    // we came here, so we break the while-loop, we got what we need
-                    break;
+                    result.setData( new ArrayList<NexusArtifact>() );
                 }
-                catch ( NoSuchRepositoryException e )
+                else
                 {
-                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
-                        + getRepositoryId( request ) + "' does not exists!", e );
-                }
-                catch ( AlreadyClosedException e )
-                {
-                    getLogger().info(
-                        "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
-
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        // just keep it silent (DEBUG)
-                        getLogger().debug( "Got AlreadyClosedException exception!", e );
-                    }
-
-                    result.setData( null );
+                    result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
                 }
 
-                runCount++;
+                // we came here, so we break the while-loop, we got what we need
+                break;
             }
-
-            if ( result.getData() == null )
+            catch ( NoSuchRepositoryException e )
             {
-                result.setTooManyResults( true );
-
-                result.setData( new ArrayList<NexusArtifact>() );
-
+                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
+                    + getRepositoryId( request ) + "' does not exists!", e );
+            }
+            catch ( AlreadyClosedException e )
+            {
                 getLogger().info(
-                    "Nexus BUG: Was unable to perform search " + RETRIES
-                        + " times, giving up, and lying about TooManyResults." );
+                    "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
+
+                if ( getLogger().isDebugEnabled() )
+                {
+                    // just keep it silent (DEBUG)
+                    getLogger().debug( "Got AlreadyClosedException exception!", e );
+                }
+
+                result.setData( null );
             }
+
+            runCount++;
+        }
+
+        if ( result.getData() == null )
+        {
+            result.setTooManyResults( true );
+
+            result.setData( new ArrayList<NexusArtifact>() );
+
+            getLogger().info(
+                "Nexus BUG: Was unable to perform search " + RETRIES
+                    + " times, giving up, and lying about TooManyResults." );
         }
 
         return result;
@@ -294,26 +245,34 @@ public abstract class AbstractIndexPlexusResource
                     }
                 }
 
+                // filters should affect only Keyword and GAVSearch!
+                // TODO: maybe we should left this to the given Searcher implementation to handle (like kw and gav
+                // searcer is)
+                // Downside would be that REST query params would be too far away from incoming call (too spread)
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-
-                UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
-                filter.addField( MAVEN.GROUP_ID );
-                filter.addField( MAVEN.ARTIFACT_ID );
-
-                if ( Boolean.TRUE.equals( expandVersion ) || !collapseResults )
+                
+                if ( searcher instanceof KeywordSearcher || searcher instanceof MavenCoordinatesSearcher )
                 {
-                    filter.addField( MAVEN.VERSION );
-                }
-                if ( Boolean.TRUE.equals( expandPackaging ) || !collapseResults )
-                {
-                    filter.addField( MAVEN.PACKAGING );
-                }
-                if ( Boolean.TRUE.equals( expandClassifier ) || !collapseResults )
-                {
-                    filter.addField( MAVEN.CLASSIFIER );
-                }
+                    UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
+                    
+                    filter.addField( MAVEN.GROUP_ID );
+                    filter.addField( MAVEN.ARTIFACT_ID );
 
-                filters.add( filter );
+                    if ( Boolean.TRUE.equals( expandVersion ) || !collapseResults )
+                    {
+                        filter.addField( MAVEN.VERSION );
+                    }
+                    if ( Boolean.TRUE.equals( expandPackaging ) || !collapseResults )
+                    {
+                        filter.addField( MAVEN.PACKAGING );
+                    }
+                    if ( Boolean.TRUE.equals( expandClassifier ) || !collapseResults )
+                    {
+                        filter.addField( MAVEN.CLASSIFIER );
+                    }
+
+                    filters.add( filter );
+                }
 
                 final IteratorSearchResponse searchResponse =
                     searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, searchType, filters );

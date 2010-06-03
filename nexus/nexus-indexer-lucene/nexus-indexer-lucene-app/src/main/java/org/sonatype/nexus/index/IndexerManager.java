@@ -177,12 +177,13 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from, Integer count,
-                                                   Integer hitLimit, boolean uniqueRGA, SearchType searchType, 
+                                                   Integer hitLimit, boolean uniqueRGA, SearchType searchType,
                                                    List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactClassIterator( String term, String repositoryId, Integer from, Integer count,
-                                                        Integer hitLimit, SearchType searchType )
+                                                        Integer hitLimit, SearchType searchType,
+                                                        List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String gTerm, String aTerm, String vTerm, String pTerm,
@@ -192,7 +193,8 @@ public interface IndexerManager
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactSha1ChecksumIterator( String sha1Checksum, String repositoryId, Integer from,
-                                                               Integer count, Integer hitLimit )
+                                                               Integer count, Integer hitLimit,
+                                                               List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
