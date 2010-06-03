@@ -29,7 +29,7 @@ import org.sonatype.nexus.proxy.access.Action;
 
 /**
  * A filter that maps the targetId from the Request.
- *
+ * 
  * @author cstamas
  */
 public class NexusTargetMappingAuthorizationFilter
@@ -68,7 +68,7 @@ public class NexusTargetMappingAuthorizationFilter
                 // TODO: hardcoded currently
                 if ( path.contains( "@1" ) )
                 {
-                    path = path.replaceAll( "@1", Matcher.quoteReplacement(  m.group( 1 ) ) );
+                    path = path.replaceAll( "@1", Matcher.quoteReplacement( m.group( 1 ) ) );
                 }
 
                 if ( path.contains( "@2" ) )
@@ -90,9 +90,9 @@ public class NexusTargetMappingAuthorizationFilter
     protected ResourceStoreRequest getResourceStoreRequest( ServletRequest request, boolean localOnly )
     {
         ResourceStoreRequest rsr = new ResourceStoreRequest( getResourceStorePath( request ), localOnly );
-        
+
         rsr.getRequestContext().put( RequestContext.CTX_AUTH_CHECK_ONLY, true );
-        
+
         return rsr;
     }
 
@@ -107,7 +107,7 @@ public class NexusTargetMappingAuthorizationFilter
             // doing a LOCAL ONLY request to check is this exists?
             try
             {
-                getNexus(request).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
+                getNexus( request ).getRootRouter().retrieveItem( getResourceStoreRequest( request, true ) );
             }
             catch ( ItemNotFoundException e )
             {
@@ -152,6 +152,13 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        return this.getRepositoryRouter().authorizePath( getResourceStoreRequest( request, false ), getActionFromHttpVerb( request ) ) ;
+        Action action = getActionFromHttpVerb( request );
+
+        if ( null == action )
+        {
+            return false;
+        }
+
+        return this.getRepositoryRouter().authorizePath( getResourceStoreRequest( request, false ), action );
     }
 }

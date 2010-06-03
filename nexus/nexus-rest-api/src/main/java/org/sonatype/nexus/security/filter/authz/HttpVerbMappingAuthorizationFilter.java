@@ -52,11 +52,13 @@ public class HttpVerbMappingAuthorizationFilter
 
     private Map<String, String> mapping = new HashMap<String, String>();
     {
-        mapping.put( "head", "read" );
-        mapping.put( "get", "read" );
-        mapping.put( "put", "update" );
-        mapping.put( "post", "create" );
-        mapping.put( "mkcol", "create" );
+        mapping.put( "options", "read" ); // HTTP/1.1 "standard" method
+        mapping.put( "head", "read" ); // HTTP/1.1 "standard" method
+        mapping.put( "get", "read" ); // HTTP/1.1 "standard" method
+        mapping.put( "put", "update" ); // HTTP/1.1 "standard" method
+        mapping.put( "post", "create" ); // HTTP/1.1 "standard" method
+        mapping.put( "delete", "delete" ); // HTTP/1.1 "standard" method (to be explicit, mapping is actuall identity)
+        mapping.put( "mkcol", "create" ); // DAV method, to support Maven's DAV Wagon
     }
 
     protected Log getLogger()
@@ -88,6 +90,11 @@ public class HttpVerbMappingAuthorizationFilter
 
     protected Action getActionFromHttpVerb( String method )
     {
+        if ( null == method )
+        {
+            return null;
+        }
+
         method = method.toLowerCase();
 
         if ( mapping.containsKey( method ) )
@@ -95,7 +102,16 @@ public class HttpVerbMappingAuthorizationFilter
             method = mapping.get( method );
         }
 
-        return Action.valueOf( method );
+        try
+        {
+            return Action.valueOf( method );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            getLogger().info( "Unknown HTTP verb " + method + "! Only HTTP/1.1 standard verbs are supported!" );
+
+            return null;
+        }
     }
 
     protected Action getActionFromHttpVerb( ServletRequest request )
@@ -128,8 +144,7 @@ public class HttpVerbMappingAuthorizationFilter
                 }
 
                 getLogger().debug(
-                                   "MAPPED '" + action + "' action to permission: "
-                                       + sb.toString().substring( 0, sb.length() - 2 ) );
+                    "MAPPED '" + action + "' action to permission: " + sb.toString().substring( 0, sb.length() - 2 ) );
             }
 
             return mappedPerms;
@@ -146,8 +161,10 @@ public class HttpVerbMappingAuthorizationFilter
     {
         String[] perms = (String[]) mappedValue;
 
-        if ( getSubject( request, response ) != null
-            && super.isAccessAllowed( request, response, mapPerms( perms, getActionFromHttpVerb( request ) ) ) )
+        Action action = getActionFromHttpVerb( request );
+
+        if ( getSubject( request, response ) != null && action != null
+            && super.isAccessAllowed( request, response, mapPerms( perms, action ) ) )
         {
             // I wanted to record all successful authz events here, but found that, if we do record here, there would be
             // too many feed entries, that's a pollution
@@ -178,10 +195,14 @@ public class HttpVerbMappingAuthorizationFilter
             return;
         }
 
+        Action action = getActionFromHttpVerb( request );
+
+        String method = ( (HttpServletRequest) request ).getMethod();
+
         String msg =
-            "Unable to authorize user [" + subject.getPrincipal() + "] for " + getActionFromHttpVerb( request ).name()
-                + " to " + ( (HttpServletRequest) request ).getRequestURI() + " from IP Address "
-                + RemoteIPFinder.findIP( (HttpServletRequest) request );
+            "Unable to authorize user [" + subject.getPrincipal() + "] for " + String.valueOf( action )
+                + "(HTTP method \"" + method + "\") to " + ( (HttpServletRequest) request ).getRequestURI()
+                + " from IP Address " + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         if ( isSimilarEvent( msg ) )
         {
