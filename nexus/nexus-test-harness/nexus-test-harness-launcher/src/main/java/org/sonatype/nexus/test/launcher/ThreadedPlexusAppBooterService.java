@@ -165,7 +165,9 @@ public class ThreadedPlexusAppBooterService
     {
         this.launcherThread = null;
         
-        System.gc();
+        // TODO: this causes severe problems
+        // Maybe since not all the _isolated_ classloader threads are done yet?
+        // System.gc();
     }
 
 }
