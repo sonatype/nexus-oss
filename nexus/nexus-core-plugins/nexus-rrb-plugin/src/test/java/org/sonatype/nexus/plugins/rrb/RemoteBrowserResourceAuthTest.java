@@ -92,14 +92,15 @@ public class RemoteBrowserResourceAuthTest
         m2Repo.setRemoteUrl( remoteUrl );
         m2Repo.setRemoteAuthenticationSettings( new UsernamePasswordRemoteAuthenticationSettings( "admin", "admin" ) );
         m2Repo.commitChanges();
+        
+        Reference rootRef = new Reference( "http://localhost:8081/nexus/service/local/repositories/" + repoId + "" );
+        Reference resourceRef = new Reference( rootRef, "http://localhost:8081/nexus/service/local/repositories/" + repoId + "/" + remoteUrl );
 
         // now call the REST resource
         Request request = new Request();
-        request.setResourceRef( "/"+remoteUrl );
-        Reference rootRef = new Reference();
-        rootRef.setPath( "" );
         request.setRootRef( rootRef );
         request.setOriginalRef( rootRef );
+        request.setResourceRef( resourceRef );
         request.getAttributes().put( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY, repoId );
         Form form = new Form();
         form.add( "Accept", "application/json" );

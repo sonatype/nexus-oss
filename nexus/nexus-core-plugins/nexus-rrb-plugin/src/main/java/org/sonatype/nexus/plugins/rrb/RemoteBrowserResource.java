@@ -7,6 +7,7 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.restlet.Context;
+import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -104,10 +105,17 @@ public class RemoteBrowserResource
         }
         MavenRepositoryReader mr = new MavenRepositoryReader();
         MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-        data.setData( mr.extract( remoteUrl + prefix, request.getResourceRef().toString( false, false ),
+        data.setData( mr.extract( remoteUrl + prefix, createRemoteResourceReference( request, id, remoteUrl ).toString( false, false ),
                                   proxyRepository, id ) );
         logger.debug( "return value is {}", data.toString() );
         return data;
+    }
+    
+    protected Reference createRemoteResourceReference( Request request, String repoId, String remoteUrl )
+    {
+        Reference repoRootRef = createRepositoryReference( request, repoId );
+        
+        return createReference( repoRootRef, "remotebrowser/" + remoteUrl );
     }
 
     // TODO: if/when xxx is implemented the renderItem method might look something like:
