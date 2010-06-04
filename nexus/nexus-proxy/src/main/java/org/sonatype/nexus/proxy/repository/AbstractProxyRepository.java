@@ -316,7 +316,7 @@ public abstract class AbstractProxyRepository
                 else
                 {
                     // take the timeout * 2 as initial step
-                    long initialStep = getRemoteConnectionSettings().getConnectionTimeout();
+                    long initialStep = getRemoteConnectionSettings().getConnectionTimeout() * 2L;
                     
                     // make it a fibonacci one
                     this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
