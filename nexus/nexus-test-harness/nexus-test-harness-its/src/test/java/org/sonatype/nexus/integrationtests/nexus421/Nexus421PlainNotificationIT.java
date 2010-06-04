@@ -33,11 +33,14 @@ public class Nexus421PlainNotificationIT
         // make central auto-block itself (point it to bad URL)
         pointCentralToRemoteUrl( "http://repo1.maven.org/mavenFooBar/not-here/" );
 
+        // we have 3 recipients set
+        checkMails( 3, 0 );
+
         // make central unblock itself (point it to good URL)
         pointCentralToRemoteUrl( "http://repo1.maven.org/maven2/" );
 
         // we have 3 recipients set
-        checkMails( 3 );
+        checkMails( 0, 3 );
     }
 
     // --
@@ -105,39 +108,39 @@ public class Nexus421PlainNotificationIT
 
         repoMessageUtil.updateRepo( central );
 
-        // to "ping it" (and not wait for thread to check remote availability)
+        // to "ping it" (and wait for all the thread to check remote availability)
         RepositoryStatusResource res = repoMessageUtil.getStatus( "central", true );
 
         while ( RemoteStatus.UNKNOWN.name().equals( res.getRemoteStatus() ) )
         {
             res = repoMessageUtil.getStatus( "central", false );
 
-            Thread.sleep( 1000 );
+            Thread.sleep( 10000 );
         }
     }
 
-    protected void checkMails( int recipientCount )
+    protected void checkMails( int expectedBlockedMails, int expectedUnblockedMails )
         throws InterruptedException, MessagingException
     {
-        int expectedMailCount = recipientCount * 2;
-
         // expect total 2*count mails: once for auto-block, once for unblock, for admin user, for pipi1 and for pipi2.
         // Mail
         // should be about "unblocked"
-        server.waitForIncomingEmail( 10000, expectedMailCount );
+        // wait for long, since we really _dont_ know when the mail gonna be sent:
+        // See "fibonacci" calculation above!
+        server.waitForIncomingEmail( 440000, expectedBlockedMails + expectedUnblockedMails );
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
         Assert.assertNotNull( "Messages array should not be null!", msgs );
 
-        Assert.assertEquals( "We expect " + expectedMailCount + " mails, since we have " + recipientCount
-            + " recipients!", expectedMailCount, msgs.length );
+        Assert.assertEquals( "We expect " + ( expectedBlockedMails + expectedUnblockedMails ) + " mails!",
+            ( expectedBlockedMails + expectedUnblockedMails ), msgs.length );
 
         int blockedMails = 0;
 
         int unblockedMails = 0;
 
-        for ( int i = 0; i < expectedMailCount; i++ )
+        for ( int i = 0; i < msgs.length; i++ )
         {
             MimeMessage msg = msgs[i];
 
@@ -151,8 +154,10 @@ public class Nexus421PlainNotificationIT
             }
         }
 
-        Assert.assertEquals( "We should have equally " + recipientCount
-            + " for auto-blocked and unblocked mails! We have auto-blocked and unblocked!", blockedMails
-            + unblockedMails, expectedMailCount );
+        Assert.assertEquals( "We should have " + expectedBlockedMails + " auto-blocked mails!", expectedBlockedMails,
+            blockedMails );
+
+        Assert.assertEquals( "We should have " + expectedUnblockedMails + " auto-UNblocked mails!",
+            expectedUnblockedMails, unblockedMails );
     }
 }

@@ -29,7 +29,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
@@ -48,7 +47,6 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         assertTasks();
     }
 
-    @SuppressWarnings( "unchecked" )
     protected void assertTasks()
         throws IOException
     {
