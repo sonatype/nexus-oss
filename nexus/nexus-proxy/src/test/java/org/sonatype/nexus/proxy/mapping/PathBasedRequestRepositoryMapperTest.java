@@ -38,6 +38,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class PathBasedRequestRepositoryMapperTest
@@ -84,6 +85,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoA.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoA.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoA.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoA.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         repoB = createMock( Repository.class );
         makeThreadSafe( repoB, true );
@@ -91,6 +93,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoB.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoB.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoB.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoB.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         repoC = createMock( Repository.class );
         makeThreadSafe( repoC, true );
@@ -98,6 +101,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoC.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoC.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoC.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoC.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         repoD = createMock( Repository.class );
         makeThreadSafe( repoD, true );
@@ -105,6 +109,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoD.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoD.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoD.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoD.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         repoE = createMock( Repository.class );
         makeThreadSafe( repoE, true );
@@ -112,6 +117,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoE.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoE.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoE.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoE.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         repoF = createMock( Repository.class );
         makeThreadSafe( repoF, true );
@@ -119,6 +125,7 @@ public class PathBasedRequestRepositoryMapperTest
         expect( repoF.getProviderRole() ).andReturn( Repository.class.getName() ).anyTimes();
         expect( repoF.getProviderHint() ).andReturn( "maven2" ).anyTimes();
         expect( repoF.isUserManaged() ).andReturn( true ).anyTimes();
+        expect( repoF.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         expect( repoA.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();
         expect( repoB.getRepositoryContentClass() ).andReturn( new Maven2ContentClass() ).anyTimes();

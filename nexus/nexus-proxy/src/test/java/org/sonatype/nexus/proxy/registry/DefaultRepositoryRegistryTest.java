@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.maven.maven2.Maven2ContentClass;
 import org.sonatype.nexus.proxy.repository.DefaultRepositoryKind;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class DefaultRepositoryRegistryTest
@@ -89,6 +90,9 @@ public class DefaultRepositoryRegistryTest
         expect( repoA.adaptToFacet( HostedRepository.class ) ).andReturn( repoA ).anyTimes();
         expect( repoB.adaptToFacet( HostedRepository.class ) ).andReturn( repoB ).anyTimes();
         expect( repoC.adaptToFacet( HostedRepository.class ) ).andReturn( repoC ).anyTimes();
+        expect( repoA.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
+        expect( repoB.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
+        expect( repoC.adaptToFacet( ProxyRepository.class ) ).andReturn( null ).anyTimes();
 
         replay( repoA, repoB, repoC );
 
