@@ -286,7 +286,10 @@ public class RepositoryListPlexusResource
     {
         M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( (Xpp3Dom) target.getExternalConfiguration() );
 
-        exConf.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
+        if ( model.getProvider().equals( "maven2" ) )
+        {
+            exConf.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
+        }
 
         exConf.setDownloadRemoteIndex( model.isDownloadRemoteIndexes() );
 
