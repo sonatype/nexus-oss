@@ -204,7 +204,9 @@ public class MavenRepositoryReader
         }
 
         method.getParams().setParameter( HttpMethodParams.RETRY_HANDLER, new DefaultHttpMethodRetryHandler( 3, false ) );
-        client.getParams().setParameter( "http.protocol.max-redirects", new Integer( 1 ) );
+        
+        // allow a couple redirects
+        client.getParams().setParameter( "http.protocol.max-redirects", new Integer( 3 ) );
 
         StringBuilder result = new StringBuilder();
 
