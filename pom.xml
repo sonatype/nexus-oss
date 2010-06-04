@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.sonatype.nexus.plugins</groupId>
     <artifactId>nexus-plugins-parent</artifactId>
-    <version>6</version>
+    <version>7</version>
     <relativePath>../nexus-plugins-parent/pom.xml</relativePath>
   </parent>
 
