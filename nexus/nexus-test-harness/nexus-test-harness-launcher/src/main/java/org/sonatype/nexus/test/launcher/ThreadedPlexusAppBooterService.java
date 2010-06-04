@@ -164,6 +164,8 @@ public class ThreadedPlexusAppBooterService
     public void clean()
     {
         this.launcherThread = null;
+        
+        System.gc();
     }
 
 }
