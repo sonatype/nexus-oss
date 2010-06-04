@@ -18,8 +18,13 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.proxy.repository.LocalStatus;
+import org.sonatype.nexus.proxy.repository.RemoteStatus;
+import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 
 public class Nexus1329ChecksumIT
     extends AbstractMirrorIT

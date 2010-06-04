@@ -1103,13 +1103,22 @@ public abstract class AbstractProxyRepository
      */
     protected boolean doValidateRemoteItemContent( ResourceStoreRequest req, String baseUrl, AbstractStorageItem item,
                                                    List<NexusArtifactEvent> events )
-        throws StorageException
     {
         boolean isValid = true;
 
         for ( ItemContentValidator icv : getItemContentValidators().values() )
         {
-            isValid = isValid && icv.isRemoteItemContentValid( this, req, baseUrl, item, events );
+            try
+            {
+                isValid = isValid && icv.isRemoteItemContentValid( this, req, baseUrl, item, events );
+                // loop all 
+            }
+            catch ( StorageException e )
+            {
+                // TODO subclass StorageException with RemoteStorageException and RemoteStorageException
+                this.getLogger().warn( "Item: '" + item.getPath() + "' in repository: "+ this.getId() + "failed validation, cause: "+ e.getMessage(), e );
+                isValid = false;
+            }
         }
 
         return isValid;
@@ -1156,7 +1165,7 @@ public abstract class AbstractProxyRepository
      * 
      * InetNotFound         no            no
      * AccessDedied         no            yes
-     * InvalidContent       yes           yes
+     * InvalidContent       no            no
      * Other                yes           yes
      * </pre>
      */
@@ -1238,9 +1247,14 @@ public abstract class AbstractProxyRepository
                             }
                             else
                             {
-                                selector.feedbackFailure( mirror );
-
+                                // a file was bad, don't block the whole repo
+                                // TODO: we need to break up StorageException into Local and Remote
+                                // a validator could detect that the Remote repo is hosed, i.e. a jar 
+                                // gets returned as an html file, which would indicate that the mirror
+                                //is messed up, or a proxy is returning an html page
                                 lastException = new InvalidItemContentException( request, mirror );
+                                
+                                continue all_urls; // retry with next url
                             }
                         }
                         catch ( ItemNotFoundException e )
@@ -1319,7 +1333,11 @@ public abstract class AbstractProxyRepository
                 getLogger().warn( "Unexpected Exception", e );
             }
 
-            if ( lastException instanceof StorageException )
+            if( lastException instanceof InvalidItemContentException )
+            {
+                throw new ItemNotFoundException( request, this, lastException );
+            }
+            else if ( lastException instanceof StorageException )
             {
                 throw (StorageException) lastException;
             }
