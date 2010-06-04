@@ -68,10 +68,6 @@ public class DefaultRepositoryRegistry
         return logger;
     }
 
-    /** The repo status checkrs */
-    private Map<String, RepositoryStatusCheckerThread> repositoryStatusCheckers =
-        new HashMap<String, RepositoryStatusCheckerThread>();
-
     public void addRepository( Repository repository )
     {
         RepositoryTypeDescriptor rtd =
@@ -224,16 +220,17 @@ public class DefaultRepositoryRegistry
 
         if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
-            if ( repositoryStatusCheckers.containsKey( repository.getId() ) )
-            {
-                RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
+            ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
-                thread.interrupt();
-            }
+            killMonitorThread( proxy );
 
-            RepositoryStatusCheckerThread thread = new RepositoryStatusCheckerThread( (ProxyRepository) repository );
+            RepositoryStatusCheckerThread thread =
+                new RepositoryStatusCheckerThread( getLogger().getChildLogger( repository.getId() ),
+                    (ProxyRepository) repository );
 
-            repositoryStatusCheckers.put( repository.getId(), thread );
+            proxy.setRepositoryStatusCheckerThread( thread );
+
+            thread.setRunning( true );
 
             thread.setDaemon( true );
 
@@ -262,20 +259,36 @@ public class DefaultRepositoryRegistry
 
         repositories.remove( repository.getId() );
 
-        if ( repositoryStatusCheckers.containsKey( repository.getId() ) )
-        {
-            RepositoryStatusCheckerThread thread = repositoryStatusCheckers.remove( repository.getId() );
-
-            thread.interrupt();
-        }
+        killMonitorThread( repository.adaptToFacet( ProxyRepository.class ) );
     }
 
     public void dispose()
     {
         // kill the checker daemon threads
-        for ( Map.Entry<String, RepositoryStatusCheckerThread> entry : repositoryStatusCheckers.entrySet() )
+        for ( Repository repository : repositories.values() )
         {
-            entry.getValue().interrupt();
+            killMonitorThread( repository.adaptToFacet( ProxyRepository.class ) );
+        }
+    }
+
+    // ==
+
+    protected void killMonitorThread( ProxyRepository proxy )
+    {
+        if ( null == proxy )
+        {
+            return;
+        }
+
+        if ( null != proxy.getRepositoryStatusCheckerThread() )
+        {
+            RepositoryStatusCheckerThread thread =
+                (RepositoryStatusCheckerThread) proxy.getRepositoryStatusCheckerThread();
+
+            thread.setRunning( false );
+
+            // and now interrupt it to die
+            thread.interrupt();
         }
     }
 

@@ -80,7 +80,7 @@ public class RepositoryEventProxyModeMessage
         {
             sb.append( "Blocked (automatically by Nexus). Next attempt to check remote peer health will occur in " );
 
-            sb.append( DurationFormatUtils.formatDurationWords( revt.getRepository().getRepositoryStatusCheckPeriod(),
+            sb.append( DurationFormatUtils.formatDurationWords( revt.getRepository().getCurrentRemoteStatusRetainTime(),
                 true, true )
                 + "." );
         }

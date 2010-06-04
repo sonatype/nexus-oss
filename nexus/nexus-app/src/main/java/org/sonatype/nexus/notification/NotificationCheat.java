@@ -9,9 +9,7 @@ package org.sonatype.nexus.notification;
  */
 public class NotificationCheat
 {
-
     public static final String AUTO_BLOCK_NOTIFICATION_GROUP_ID = "autoBlockTarget";
 
     protected static final String CARRIER_KEY = EmailCarrier.KEY;
-
 }

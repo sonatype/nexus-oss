@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.commons.lang.time.DurationFormatUtils;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
@@ -96,6 +95,8 @@ public abstract class AbstractProxyRepository
     /** How much should be the last known remote status be retained. */
     private volatile NumberSequence remoteStatusRetainTimeSequence =
         new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
+
+    private Thread repositoryStatusCheckerThread;
 
     /** The remote storage. */
     private RemoteRepositoryStorage remoteStorage;
@@ -244,9 +245,34 @@ public abstract class AbstractProxyRepository
         getExternalConfiguration( true ).setAutoBlockActive( val );
     }
 
-    public long getRepositoryStatusCheckPeriod()
+    public Thread getRepositoryStatusCheckerThread()
     {
-        return remoteStatusRetainTimeSequence.peek();
+        return repositoryStatusCheckerThread;
+    }
+
+    public void setRepositoryStatusCheckerThread( Thread repositoryStatusCheckerThread )
+    {
+        this.repositoryStatusCheckerThread = repositoryStatusCheckerThread;
+    }
+
+    public long getCurrentRemoteStatusRetainTime()
+    {
+        return this.remoteStatusRetainTimeSequence.peek();
+    }
+
+    public long getNextRemoteStatusRetainTime()
+    {
+        // step it up, but topped
+        if ( this.remoteStatusRetainTimeSequence.peek() <= AUTO_BLOCK_STATUS_MAX_RETAIN_TIME )
+        {
+            // step it up
+            return this.remoteStatusRetainTimeSequence.next();
+        }
+        else
+        {
+            // it is topped, so just return current
+            return getCurrentRemoteStatusRetainTime();
+        }
     }
 
     public ProxyMode getProxyMode()
@@ -299,31 +325,29 @@ public abstract class AbstractProxyRepository
 
             // setting the time to retain remote status, depending on proxy mode
             // if not blocked_auto, just use default as it was the case before AutoBlock
-            if ( !ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
+            if ( ProxyMode.BLOCKED_AUTO.equals( proxyMode ) )
             {
-                this.remoteStatusRetainTimeSequence = new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
-            }
-            else
-            {
-                if ( this.remoteStatusRetainTimeSequence instanceof FibonacciNumberSequence )
-                {
-                    if ( this.remoteStatusRetainTimeSequence.peek() <= AUTO_BLOCK_STATUS_MAX_RETAIN_TIME )
-                    {
-                        // step it up
-                        this.remoteStatusRetainTimeSequence.next();
-                    }
-                }
-                else
+                if ( !( this.remoteStatusRetainTimeSequence instanceof FibonacciNumberSequence ) )
                 {
                     // take the timeout * 2 as initial step
                     long initialStep = getRemoteConnectionSettings().getConnectionTimeout() * 2L;
-                    
+
                     // make it a fibonacci one
                     this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
-
-                    // step it at once once, since it will repeat starting value twice
+                    
+                    // make it step one
                     this.remoteStatusRetainTimeSequence.next();
+
+                    // ping the monitor thread
+                    if ( this.repositoryStatusCheckerThread != null )
+                    {
+                        this.repositoryStatusCheckerThread.interrupt();
+                    }
                 }
+            }
+            else
+            {
+                this.remoteStatusRetainTimeSequence = new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
             }
 
             // if this is proxy
@@ -370,53 +394,68 @@ public abstract class AbstractProxyRepository
      */
     protected void autoBlockProxying( Throwable cause )
     {
+        // invalidate remote status
         setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
 
+        // do we need to do anything at all?
         boolean autoBlockActive = isAutoBlockActive();
 
-        StringBuilder sb = new StringBuilder();
+        // if yes, then do it
+        ProxyMode oldProxyMode = getProxyMode();
 
-        sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") throwed an "
-            + cause.getClass().getName() + " exception." );
-
-        if ( cause instanceof RemoteAccessException )
+        // nag only here
+        if ( !ProxyMode.BLOCKED_AUTO.equals( oldProxyMode ) )
         {
-            sb.append( " Please set up authorization information for this repository." );
-        }
-        else if ( cause instanceof StorageException )
-        {
-            sb.append( " Connection/transport problems occured while connecting to remote peer of the repository." );
+            StringBuilder sb = new StringBuilder();
+
+            sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") throwed an "
+                + cause.getClass().getName() + " exception." );
+
+            if ( cause instanceof RemoteAccessException )
+            {
+                sb.append( " Please set up authorization information for this repository." );
+            }
+            else if ( cause instanceof StorageException )
+            {
+                sb.append( " Connection/transport problems occured while connecting to remote peer of the repository." );
+            }
+
+            // nag about autoblock if needed
+            if ( autoBlockActive )
+            {
+                sb.append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
+                    + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
+            }
+
+            // log the event
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().warn( sb.toString(), cause );
+            }
+            else
+            {
+                sb.append( " - Cause(s): " ).append( cause.getMessage() );
+
+                Throwable c = cause.getCause();
+
+                while ( c != null )
+                {
+                    sb.append( " > " ).append( c.getMessage() );
+
+                    c = c.getCause();
+                }
+
+                getLogger().warn( sb.toString() );
+            }
         }
 
+        // autoblock if needed (above is all about nagging)
         if ( autoBlockActive )
         {
-            sb.append( " Auto-blocking this repository to prevent further connection-leaks and known-to-fail outbound"
-                + " connections until administrator fixes the problems, or Nexus detects remote repository as healthy." );
-        }
-
-        // log the event
-        if ( getLogger().isDebugEnabled() )
-        {
-            getLogger().warn( sb.toString(), cause );
-        }
-        else
-        {
-            getLogger().warn( sb.toString() + " - " + cause.getMessage() );
-        }
-
-        if ( autoBlockActive )
-        {
-            ProxyMode oldProxyMode = getProxyMode();
-
             if ( oldProxyMode != null )
             {
                 setProxyMode( ProxyMode.BLOCKED_AUTO, true, cause );
             }
-
-            getLogger().info(
-                "Next attempt to auto-unblock the \"" + getName() + "\" (id=" + getId()
-                    + ") repository by checking it's remote peer health will occur in "
-                    + DurationFormatUtils.formatDurationWords( getRepositoryStatusCheckPeriod(), true, true ) + "." );
 
             // NEXUS-3552: Do NOT save configuration, just make it applied (see setProxyMode() how it is done)
             // save configuration only if we made a transition, otherwise no save is needed
@@ -1111,12 +1150,14 @@ public abstract class AbstractProxyRepository
             try
             {
                 isValid = isValid && icv.isRemoteItemContentValid( this, req, baseUrl, item, events );
-                // loop all 
+                // loop all
             }
             catch ( StorageException e )
             {
                 // TODO subclass StorageException with RemoteStorageException and RemoteStorageException
-                this.getLogger().warn( "Item: '" + item.getPath() + "' in repository: "+ this.getId() + "failed validation, cause: "+ e.getMessage(), e );
+                this.getLogger().warn(
+                    "Item: '" + item.getPath() + "' in repository: " + this.getId() + "failed validation, cause: "
+                        + e.getMessage(), e );
                 isValid = false;
             }
         }
@@ -1249,11 +1290,11 @@ public abstract class AbstractProxyRepository
                             {
                                 // a file was bad, don't block the whole repo
                                 // TODO: we need to break up StorageException into Local and Remote
-                                // a validator could detect that the Remote repo is hosed, i.e. a jar 
+                                // a validator could detect that the Remote repo is hosed, i.e. a jar
                                 // gets returned as an html file, which would indicate that the mirror
-                                //is messed up, or a proxy is returning an html page
+                                // is messed up, or a proxy is returning an html page
                                 lastException = new InvalidItemContentException( request, mirror );
-                                
+
                                 continue all_urls; // retry with next url
                             }
                         }
@@ -1333,7 +1374,7 @@ public abstract class AbstractProxyRepository
                 getLogger().warn( "Unexpected Exception", e );
             }
 
-            if( lastException instanceof InvalidItemContentException )
+            if ( lastException instanceof InvalidItemContentException )
             {
                 throw new ItemNotFoundException( request, this, lastException );
             }

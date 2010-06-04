@@ -35,6 +35,25 @@ public interface ProxyRepository
      */
     RemoteStatus getRemoteStatus( ResourceStoreRequest request, boolean forceCheck );
 
+    Thread getRepositoryStatusCheckerThread();
+
+    void setRepositoryStatusCheckerThread(Thread thread);
+    
+    /**
+     * Returns the current remote status retain time. Does not change or step it's value.
+     * 
+     * @return
+     */
+    long getCurrentRemoteStatusRetainTime();
+
+    /**
+     * Steps and returns the new current remote status retain time. It does change the underlying NumberSequence (if
+     * needed). Also, this method tops the change, and will not increase the NumberSequence over some limit.
+     * 
+     * @return
+     */
+    long getNextRemoteStatusRetainTime();
+
     /**
      * Gets proxy mode.
      * 
@@ -76,13 +95,6 @@ public interface ProxyRepository
      * @param mode
      */
     void setRepositoryStatusCheckMode( RepositoryStatusCheckMode mode );
-
-    /**
-     * Returns in what time period (in milliseconds) should be the repository status be checked.
-     * 
-     * @return
-     */
-    long getRepositoryStatusCheckPeriod();
 
     /**
      * Returns true if this ProxyRepository should "auto block" itself when the remote repository has transport (or

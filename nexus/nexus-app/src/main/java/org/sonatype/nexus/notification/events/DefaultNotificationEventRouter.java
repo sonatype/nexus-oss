@@ -41,9 +41,9 @@ public class DefaultNotificationEventRouter
             HashSet<NotificationTarget> targets = new HashSet<NotificationTarget>();
 
             // send out email notification only if event is AutoBlocked and repo is blocked for at least
-            // 60secs
+            // 60secs TODO: 2 minutes, since we already see
             if ( ProxyMode.BLOCKED_AUTO.equals( rpmevt.getNewProxyMode() )
-                && rpmevt.getRepository().getRepositoryStatusCheckPeriod() >= 60000 )
+                && rpmevt.getRepository().getCurrentRemoteStatusRetainTime() >= 120000 )
             {
                 // notify only once
                 if ( !getAutoBlockedRepositoryIds().contains( rpmevt.getRepository().getId() ) )
