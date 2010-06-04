@@ -138,16 +138,9 @@ public interface FeedRecorder
     List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
         TimelineFilter filter );
     
-    List<NexusArtifactEvent> getNexusArtifactEvents( Set<String> subtypes, Long ts, Integer count, 
-        TimelineFilter filter );
-
     List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
 
     List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
     
-    List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter );
-    
     List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter );
-
-    List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Long ts, Integer count, TimelineFilter filter );
 }

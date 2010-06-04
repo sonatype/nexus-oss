@@ -101,19 +101,17 @@ public class PurgeTimeline
     {
         if ( getTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ) );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), null, null, null );
         }
         else if ( getSubTypes().size() == 0 )
         {
-            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes() );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(), null,
+                null );
         }
         else
         {
-            timeline.purgeOlderThan(
-                System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ),
-                getTypes(),
-                getSubTypes(),
-                null );
+            timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(),
+                getSubTypes(), null );
         }
 
         return null;

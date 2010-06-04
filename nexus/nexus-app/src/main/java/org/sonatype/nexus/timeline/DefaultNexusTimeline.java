@@ -3,14 +3,13 @@ package org.sonatype.nexus.timeline;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
@@ -22,25 +21,22 @@ import org.sonatype.timeline.TimelineResult;
 
 @Component( role = NexusTimeline.class )
 public class DefaultNexusTimeline
-    extends AbstractLogEnabled
     implements NexusTimeline, Initializable
 {
+    private static final String TIMELINE_BASEDIR = "timeline";
+
+    @Requirement
+    private Logger logger;
+
     @Requirement
     private Timeline timeline;
 
     @Requirement
     private ApplicationConfiguration applicationConfiguration;
 
-    private String dirName;
-
-    public DefaultNexusTimeline()
+    protected Logger getLogger()
     {
-        this.dirName = "timeline";
-    }
-
-    public DefaultNexusTimeline( String dirName )
-    {
-        this.dirName = dirName;
+        return logger;
     }
 
     public void initialize()
@@ -63,7 +59,7 @@ public class DefaultNexusTimeline
     private void moveLegacyTimeline()
         throws TimelineException
     {
-        File timelineDir = applicationConfiguration.getWorkingDirectory( dirName );
+        File timelineDir = applicationConfiguration.getWorkingDirectory( TIMELINE_BASEDIR );
 
         File legacyIndexDir = timelineDir;
 
@@ -113,10 +109,9 @@ public class DefaultNexusTimeline
     private void updateConfiguration()
         throws TimelineException
     {
-        File timelineDir = applicationConfiguration.getWorkingDirectory( dirName );
+        File timelineDir = applicationConfiguration.getWorkingDirectory( TIMELINE_BASEDIR );
 
-        TimelineConfiguration config =
-            new TimelineConfiguration( new File( timelineDir, "persist" ), new File( timelineDir, "index" ) );
+        TimelineConfiguration config = new TimelineConfiguration( timelineDir );
 
         configure( config );
     }
@@ -127,72 +122,9 @@ public class DefaultNexusTimeline
         timeline.configure( config );
     }
 
-    public void add( String type, String subType, Map<String, String> data )
-    {
-        timeline.add( type, subType, data );
-
-    }
-
     public void add( long timestamp, String type, String subType, Map<String, String> data )
     {
         timeline.add( timestamp, type, subType, data );
-    }
-
-    public void addAll( String type, String subType, Collection<Map<String, String>> datas )
-    {
-        timeline.addAll( type, subType, datas );
-
-    }
-
-    public void addAll( long timestamp, String type, String subType, Collection<Map<String, String>> datas )
-    {
-        timeline.addAll( timestamp, type, subType, datas );
-    }
-
-    public int purgeAll()
-    {
-        return timeline.purgeAll();
-    }
-
-    public int purgeAll( Set<String> types )
-    {
-        return timeline.purgeAll( types );
-    }
-
-    public int purgeAll( Set<String> types, Set<String> subTypes, TimelineFilter filter )
-    {
-        return timeline.purgeAll( types, subTypes, filter );
-    }
-
-    public int purgeOlderThan( long timestamp )
-    {
-        return timeline.purgeOlderThan( timestamp );
-    }
-
-    public int purgeOlderThan( long timestamp, Set<String> types )
-    {
-        return timeline.purgeOlderThan( timestamp, types );
-    }
-
-    public int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
-    {
-        return timeline.purgeOlderThan( timestamp, types, subTypes, filter );
-    }
-
-    public TimelineResult retrieve( long fromTs, int count, Set<String> types )
-    {
-        return timeline.retrieve( fromTs, count, types );
-    }
-
-    public TimelineResult retrieve( int fromItem, int count, Set<String> types )
-    {
-        return timeline.retrieve( fromItem, count, types );
-    }
-
-    public TimelineResult retrieve( long fromTs, int count, Set<String> types, Set<String> subtypes,
-                                    TimelineFilter filter )
-    {
-        return timeline.retrieve( fromTs, count, types, subtypes, filter );
     }
 
     public TimelineResult retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
@@ -201,13 +133,8 @@ public class DefaultNexusTimeline
         return timeline.retrieve( fromItem, count, types, subtypes, filter );
     }
 
-    public TimelineResult retrieveNewest( int count, Set<String> types )
+    public int purgeOlderThan( long timestamp, Set<String> types, Set<String> subTypes, TimelineFilter filter )
     {
-        return timeline.retrieveNewest( count, types );
-    }
-
-    public TimelineResult retrieveNewest( int count, Set<String> types, Set<String> subtypes, TimelineFilter filter )
-    {
-        return timeline.retrieveNewest( count, types, subtypes, filter );
+        return timeline.purgeOlderThan( timestamp, types, subTypes, filter );
     }
 }

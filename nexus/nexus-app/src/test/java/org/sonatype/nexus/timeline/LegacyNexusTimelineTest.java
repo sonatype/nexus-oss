@@ -21,7 +21,7 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<TimelineRecord> result = asList( nexusTimeline.retrieveNewest( 10, null ) );
+        List<TimelineRecord> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
         assertTrue( !result.isEmpty() );
     }
@@ -43,7 +43,7 @@ public class LegacyNexusTimelineTest
 
         NexusTimeline nexusTimeline = this.lookup( NexusTimeline.class );
 
-        List<TimelineRecord> result = asList( nexusTimeline.retrieveNewest( 10, null ) );
+        List<TimelineRecord> result = asList( nexusTimeline.retrieve( 0, 10, null, null, null ) );
 
         assertEquals( 4, result.size() );
     }
