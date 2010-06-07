@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer</artifactId>
-  <version>3.0.1-SNAPSHOT</version>
+  <version>3.0.1</version>
 
   <name>Sonatype Nexus: Indexer</name>
 
@@ -362,4 +362,10 @@
       <timezone>-5</timezone>
     </developer>
   </developers>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.1</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.1</developerConnection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.1</url>
+  </scm>
 </project>
