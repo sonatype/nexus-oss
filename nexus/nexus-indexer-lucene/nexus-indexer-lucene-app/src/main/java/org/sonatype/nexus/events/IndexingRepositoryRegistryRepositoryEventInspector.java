@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.events;
 
+import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -22,14 +24,17 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.ResetGroupIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -66,38 +71,46 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
     public boolean accepts( Event<?> evt )
     {
         return ( evt instanceof RepositoryRegistryRepositoryEvent )
-            || ( evt instanceof RepositoryConfigurationUpdatedEvent );
+            || ( evt instanceof RepositoryConfigurationUpdatedEvent )
+            || ( evt instanceof RepositoryGroupMembersChangedEvent );
     }
 
     public void inspect( Event<?> evt )
     {
-        Repository repository = null;
-
-        if ( evt instanceof RepositoryRegistryRepositoryEvent )
+        if ( evt instanceof RepositoryGroupMembersChangedEvent )
         {
-            repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
-        }
-        else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
-        {
-            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+            resetGroupIndex( ( ( RepositoryGroupMembersChangedEvent ) evt ).getGroupRepository() );
         }
         else
         {
-            // how did I get here at all?
-            return;
-        }
-
-        try
-        {
-            // check registry for existance, wont be able to do much
-            // if doesn't exist yet
-            repoRegistry.getRepositoryWithFacet( repository.getId(), MavenRepository.class );
-
-            inspectForIndexerManager( evt, repository );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            getLogger().debug( "Attempted to handle repository that isn't yet in registry" );
+            Repository repository = null;
+    
+            if ( evt instanceof RepositoryRegistryRepositoryEvent )
+            {
+                repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
+            }
+            else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
+            {
+                repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
+            } 
+            else
+            {
+                // how did I get here at all?
+                return;
+            }
+    
+            try
+            {
+                // check registry for existance, wont be able to do much
+                // if doesn't exist yet
+                repoRegistry.getRepositoryWithFacet( repository.getId(), MavenRepository.class );
+    
+                inspectForIndexerManager( evt, repository );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                getLogger().debug( "Attempted to handle repository that isn't yet in registry" );
+            }
         }
     }
 
@@ -121,8 +134,11 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
             {
-                getIndexerManager().removeRepositoryIndexContext(
-                    ( (RepositoryRegistryEventRemove) evt ).getRepository().getId(), true );
+                Repository repo = ( (RepositoryRegistryEventRemove) evt ).getRepository();
+                getIndexerManager().removeRepositoryIndexContext( repo.getId(), true );
+                
+                // now update the groups that contain this repo, need to reset and remerge the indexes
+                resetContainedGroups( repo );
             }
             else if ( evt instanceof RepositoryConfigurationUpdatedEvent )
             {
@@ -192,6 +208,22 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
         rt.setFullReindex( full );
 
         nexusScheduler.submit( taskName, rt );
+    }
+    
+    private void resetContainedGroups( Repository repo )
+    {
+        List<GroupRepository> groups = repoRegistry.getGroupsOfRepository( repo );
+        for ( GroupRepository group : groups )
+        {
+            resetGroupIndex( group );
+        }
+    }
+    
+    private void resetGroupIndex( GroupRepository group )
+    {
+        ResetGroupIndexTask task = nexusScheduler.createTaskInstance( ResetGroupIndexTask.class );
+        task.setRepositoryGroupId( group.getId() );
+        nexusScheduler.submit( "Reset group '" + group.getId() + "' index.", task );    
     }
 
     private String append( String message, String append )
