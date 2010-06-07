@@ -133,9 +133,6 @@ public class Nexus421PlainNotificationIT
 
         Assert.assertNotNull( "Messages array should not be null!", msgs );
 
-        Assert.assertEquals( "We expect " + ( expectedBlockedMails + expectedUnblockedMails ) + " mails!",
-            ( expectedBlockedMails + expectedUnblockedMails ), msgs.length );
-
         int blockedMails = 0;
 
         int unblockedMails = 0;
