@@ -39,8 +39,8 @@ public class Nexus421PlainNotificationIT
         // make central unblock itself (point it to good URL)
         pointCentralToRemoteUrl( "http://repo1.maven.org/maven2/" );
 
-        // we have 3 recipients set
-        checkMails( 0, 3 );
+        // we have 3 recipients set (but count with 3 "old" mails since Greenmail will _again_ return those too)
+        checkMails( 3, 3 );
     }
 
     // --
