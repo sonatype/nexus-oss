@@ -20,6 +20,12 @@
       <url>http://www.eclipse.org/org/documents/epl-v10.html</url>
     </license>
   </licenses>
+  
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-indexer</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-indexer</developerConnection>
+    <url>http://svn.sonatype.org/nexus/trunk/nexus-indexer</url>
+  </scm>
 
   <properties>
     <maven.version>2.2.1</maven.version>
