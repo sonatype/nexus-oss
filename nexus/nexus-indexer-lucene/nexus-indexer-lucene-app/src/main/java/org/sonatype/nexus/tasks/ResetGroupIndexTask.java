@@ -44,7 +44,7 @@ public class ResetGroupIndexTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            indexerManager.resetGroupIndex( getRepositoryGroupId() );
+            indexerManager.resetGroupIndex( getRepositoryGroupId(), false );
         }
 
         return null;

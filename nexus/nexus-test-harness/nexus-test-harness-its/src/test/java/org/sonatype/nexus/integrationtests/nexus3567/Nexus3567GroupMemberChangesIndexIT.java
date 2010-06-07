@@ -26,6 +26,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
@@ -37,6 +38,7 @@ public class Nexus3567GroupMemberChangesIndexIT
 {
     private RepositoryMessageUtil repoUtil = null;
     private GroupMessageUtil groupUtil = null;
+    private SearchMessageUtil searchUtil = null;
     
     private RepositoryResource repoResource = null;
     
@@ -45,6 +47,7 @@ public class Nexus3567GroupMemberChangesIndexIT
     {
         repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
         groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        searchUtil = new SearchMessageUtil( this );
     }
     
     @Test
@@ -62,9 +65,12 @@ public class Nexus3567GroupMemberChangesIndexIT
         
         //now delete the child repo and validate that there is no root node
         Response response = repoUtil.sendMessage( Method.DELETE, repoResource );
+        Assert.assertTrue( response.getStatus().isSuccess() );
         TaskScheduleUtil.waitForAllTasksToStop();
         
-        Assert.assertTrue( response.getStatus().isSuccess() );
+        //now reindex the repo
+        searchUtil.reindexGroup( "nexus3567_deleteandreindex", "nexus3567deletemembergroup", true );
+        TaskScheduleUtil.waitForAllTasksToStop();
         
         node = getIndexContent( "nexus3567deletemembergroup" );
         
@@ -92,7 +98,11 @@ public class Nexus3567GroupMemberChangesIndexIT
         groupUtil.updateGroup( group );
         TaskScheduleUtil.waitForAllTasksToStop();
         
-        node = getIndexContent( "nexus3567deletemembergroup" );
+        //now reindex the repo
+        searchUtil.reindexGroup( "nexus3567_removeandreindex", "nexus3567removemembergroup", true );
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        node = getIndexContent( "nexus3567removemembergroup" );
         
         children = node.getChildren();
         
@@ -119,7 +129,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         repoResource.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
         repoResource.setNotFoundCacheTTL( 1440 );
         repoResource.setDownloadRemoteIndexes( false );
-        repoUtil.createRepository( repoResource );
+        repoUtil.createRepository( repoResource, false );
         
         TaskScheduleUtil.waitForAllTasksToStop();
         

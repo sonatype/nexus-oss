@@ -117,7 +117,7 @@ public interface IndexerManager
     void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
         throws NoSuchRepositoryException, IOException;
 
-    void resetGroupIndex( String groupId )
+    void resetGroupIndex( String groupId, boolean purgeOnly )
         throws NoSuchRepositoryException, IOException;
 
     // ----------------------------------------------------------------------------

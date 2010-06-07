@@ -35,7 +35,12 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
+import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
+import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -340,6 +345,60 @@ public class SearchMessageUtil
         Status status = RequestFacade.sendMessage( serviceURI, Method.PUT, representation ).getStatus();
         Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
 
+    }
+    
+    public void reindexRepository( String taskName, String repoId, boolean force )
+        throws Exception
+    {
+        doReindex( taskName, repoId, force, false );
+    }
+    
+    public void reindexGroup( String taskName, String groupId, boolean force )
+        throws Exception
+    {
+        doReindex( taskName, groupId, force, true );
+    }
+    
+    private void doReindex( String taskName, String repoId, boolean force, boolean group ) 
+        throws Exception
+    {
+        ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
+        scheduledTask.setEnabled( true );
+        scheduledTask.setId( null );
+        scheduledTask.setName( taskName );
+        scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+        scheduledTask.setSchedule( "manual" );
+        
+        if ( repoId != null )
+        {
+            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+            prop.setId( RepositoryOrGroupPropertyDescriptor.ID );
+            if ( group )
+            {
+                prop.setValue( "group_" + repoId );
+            }
+            else
+            {
+                prop.setValue( "repo_" + repoId );
+            }
+            scheduledTask.addProperty( prop );
+        }
+        
+        if ( force )
+        {
+            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
+            prop.setId( ForceFullReindexPropertyDescriptor.ID );
+            prop.setValue( "true" );
+            
+            scheduledTask.addProperty( prop );
+        }
+        
+        
+        Status status = TaskScheduleUtil.create( scheduledTask );
+        Assert.assertTrue( status.isSuccess() );
+        
+        status = TaskScheduleUtil.run( TaskScheduleUtil.getTask( taskName ).getId() );
+        Assert.assertTrue( status.isSuccess() );
     }
 
 }

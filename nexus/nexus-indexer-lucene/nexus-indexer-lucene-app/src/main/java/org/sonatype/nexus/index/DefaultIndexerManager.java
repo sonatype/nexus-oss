@@ -895,6 +895,11 @@ public class DefaultIndexerManager
     {
         if ( groupRepo.isIndexable() )
         {
+            if ( fullReindex )
+            {
+                resetGroupIndex( groupRepo.getId(), true );
+            }
+            
             List<Repository> group = groupRepo.getMemberRepositories();
 
             for ( Repository repository : group )
@@ -914,7 +919,7 @@ public class DefaultIndexerManager
         }
     }
 
-    public void resetGroupIndex( String groupId )
+    public void resetGroupIndex( String groupId, boolean purgeOnly )
         throws NoSuchRepositoryException, IOException
     {
         GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
@@ -954,13 +959,15 @@ public class DefaultIndexerManager
             localContext.purge();
             remoteContext.purge();
 
-            for ( Repository repository : repositoriesList )
+            if ( !purgeOnly )
             {
-                getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
-                mergeRepositoryGroupIndexWithMember( repository );
+                for ( Repository repository : repositoriesList )
+                {
+                    getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
+                    mergeRepositoryGroupIndexWithMember( repository );
+                }
+                publishRepositoryGroupIndex( groupId );
             }
-
-            publishRepositoryGroupIndex( groupId );
         }
         finally
         {
