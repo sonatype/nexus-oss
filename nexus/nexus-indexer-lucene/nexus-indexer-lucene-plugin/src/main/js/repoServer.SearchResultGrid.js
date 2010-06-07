@@ -262,6 +262,9 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
     }
     else {
       extras += ",packagingexpand";
+      if ( Ext.isEmpty( pac ) ) {
+        pac = 'N/P';
+      }
     }
     if ( 'COLLAPSED' == clas ) {
       aggregatedCount++;
