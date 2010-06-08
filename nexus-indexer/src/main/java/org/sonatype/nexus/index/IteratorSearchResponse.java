@@ -35,28 +35,33 @@ public class IteratorSearchResponse
 
     // ==
 
-    public static final IteratorSearchResponse EMPTY_RESPONSE =
-        new IteratorSearchResponse( null, 0, new IteratorResultSet()
+    public static final IteratorResultSet EMPTY_ITERATOR_RESULT_SET = new IteratorResultSet()
+    {
+        public boolean hasNext()
         {
-            public boolean hasNext()
-            {
-                return false;
-            }
+            return false;
+        }
 
-            public ArtifactInfo next()
-            {
-                return null;
-            }
+        public ArtifactInfo next()
+        {
+            return null;
+        }
 
-            public void remove()
-            {
-                throw new UnsupportedOperationException( "Method not supported on " + getClass().getName() );
-            }
+        public void remove()
+        {
+            throw new UnsupportedOperationException( "Method not supported on " + getClass().getName() );
+        }
 
-            public Iterator<ArtifactInfo> iterator()
-            {
-                return this;
-            }
-        } );
+        public Iterator<ArtifactInfo> iterator()
+        {
+            return this;
+        }
+    };
+
+    public static final IteratorSearchResponse EMPTY_ITERATOR_SEARCH_RESPONSE =
+        new IteratorSearchResponse( null, 0, EMPTY_ITERATOR_RESULT_SET );
+
+    public static final IteratorSearchResponse TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE =
+        new IteratorSearchResponse( null, LIMIT_EXCEEDED, EMPTY_ITERATOR_RESULT_SET );
 
 }

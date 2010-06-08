@@ -60,22 +60,21 @@ public abstract class AbstractIndexerNexusPlexusResource
 
     protected Collection<NexusArtifact> ai2NaColl( Request request, IteratorResultSet aic )
     {
-        if ( aic == null )
-        {
-            return null;
-        }
-
         List<NexusArtifact> result = new ArrayList<NexusArtifact>();
 
-        for ( ArtifactInfo ai : aic )
+        if ( aic != null )
         {
-            NexusArtifact na = ai2Na( request, ai );
-
-            if ( na != null )
+            for ( ArtifactInfo ai : aic )
             {
-                result.add( na );
+                NexusArtifact na = ai2Na( request, ai );
+
+                if ( na != null )
+                {
+                    result.add( na );
+                }
             }
         }
+
         return result;
     }
 

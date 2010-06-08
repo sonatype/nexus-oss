@@ -2209,13 +2209,13 @@ public class DefaultIndexerManager
                 }
 
                 // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new IteratorSearchResponse( req.getQuery(), -1, null );
+                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
             }
             catch ( IOException e )
             {
                 getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
-                return new IteratorSearchResponse( req.getQuery(), 0, null );
+                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
             }
         }
         finally
@@ -2280,13 +2280,13 @@ public class DefaultIndexerManager
                 }
 
                 // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new IteratorSearchResponse( req.getQuery(), -1, null );
+                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
             }
             catch ( IOException e )
             {
                 getLogger().error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
 
-                return new IteratorSearchResponse( req.getQuery(), 0, null );
+                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
             }
         }
         finally
@@ -2306,7 +2306,7 @@ public class DefaultIndexerManager
     {
         if ( gTerm == null && aTerm == null && vTerm == null )
         {
-            return new IteratorSearchResponse( null, -1, null );
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
         }
 
         IndexingContext localContext = null;
@@ -2405,13 +2405,13 @@ public class DefaultIndexerManager
                 }
 
                 // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new IteratorSearchResponse( req.getQuery(), -1, null );
+                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
             }
             catch ( IOException e )
             {
                 getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
-                return new IteratorSearchResponse( req.getQuery(), 0, null );
+                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
             }
         }
         finally
@@ -2430,7 +2430,7 @@ public class DefaultIndexerManager
     {
         if ( sha1Checksum == null || sha1Checksum.length() > 40 )
         {
-            return new IteratorSearchResponse( null, -1, null );
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
         }
 
         IndexingContext localContext = null;
@@ -2480,13 +2480,13 @@ public class DefaultIndexerManager
                 }
 
                 // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new IteratorSearchResponse( req.getQuery(), -1, null );
+                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
             }
             catch ( IOException e )
             {
                 getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
 
-                return new IteratorSearchResponse( req.getQuery(), 0, null );
+                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
             }
         }
         finally

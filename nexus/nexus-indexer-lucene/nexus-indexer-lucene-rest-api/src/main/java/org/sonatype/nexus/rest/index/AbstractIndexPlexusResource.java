@@ -281,7 +281,7 @@ public abstract class AbstractIndexPlexusResource
                 {
                     if ( searchResponse.isHitLimitExceeded() )
                     {
-                        return new IteratorSearchResponse( null, -1, null );
+                        return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
                     }
 
                     return searchResponse;
