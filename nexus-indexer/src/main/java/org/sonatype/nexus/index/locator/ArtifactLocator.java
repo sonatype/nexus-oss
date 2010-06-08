@@ -38,6 +38,11 @@ public class ArtifactLocator
     {
         if ( context != null )
         {
+            // we store this full version, so we can use it below to retrieve the proper file
+            // this only matters in timestamped snapshot artifacts, where the baseVersion is 1.0-SNAPSHOT (for example)
+            // where the file is actaully named 1.0-200908081234 (again for example)
+            String fullVersion = gav.getVersion();
+            
             ArtifactInfo ai = new ArtifactInfo( 
                 null, 
                 gav.getGroupId(), 
@@ -73,14 +78,14 @@ public class ArtifactLocator
                         }
                         
                         if ( !StringUtils.isEmpty( ai.artifactId )
-                            && !StringUtils.isEmpty( ai.version )
+                            && !StringUtils.isEmpty( fullVersion )
                             && !StringUtils.isEmpty( ai.fextension ) )
                         {
                             return new File( 
                                 source.getParentFile(), 
                                 ai.artifactId 
                                     + "-" 
-                                    + ai.version 
+                                    + fullVersion 
                                     + ( StringUtils.isEmpty( ai.classifier ) ? "" : ( "-" + ai.classifier ) )
                                     + "." 
                                     + ai.fextension );

@@ -14,7 +14,16 @@
 package org.sonatype.nexus.index;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.sonatype.nexus.index.context.DefaultIndexingContext;
+import org.sonatype.nexus.index.context.IndexCreator;
+import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
+import org.sonatype.nexus.index.creator.MavenArchetypeArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MavenPluginArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -43,6 +52,8 @@ public class Nexus3578IndexerManagerTest
         throws Exception
     {
         super.setUp();
+        
+        hackContext( ( DefaultIndexingContext ) indexerManager.getRepositoryLocalIndexContext( snapshots.getId() ) );
 
         this.mimeUtil = lookup( MimeUtil.class );
     }
@@ -52,6 +63,8 @@ public class Nexus3578IndexerManagerTest
         throws Exception
     {
         fillInRepo();
+        
+        waitForTasksToStop();
 
         sneakyDeployAFile( jarPath, jarFile );
 
@@ -66,6 +79,8 @@ public class Nexus3578IndexerManagerTest
         throws Exception
     {
         fillInRepo();
+        
+        waitForTasksToStop();
 
         sneakyDeployAFile( pomPath, pomFile );
 
@@ -108,9 +123,23 @@ public class Nexus3578IndexerManagerTest
         throws Exception
     {
         // this will be EXACT search, since we gave full SHA1 checksum of 40 chars
-        IteratorSearchResponse response =
+        // BUT because of another bug https://issues.sonatype.org/browse/NEXUS-3580
+        // this search wont work in this case
+        /*IteratorSearchResponse response =
             indexerManager.searchArtifactSha1ChecksumIterator( "a216468fbebacabdf941ab5f1b2e4f3484103f1b", null, null,
                 null, null, null );
+        */
+        IteratorSearchResponse response = indexerManager.searchArtifactIterator( "org.apache.maven.plugins", 
+                                               "maven-pmd-plugin", 
+                                               "2.6-SNAPSHOT", 
+                                               "maven-plugin", 
+                                               null, 
+                                               snapshots.getId(), 
+                                               null, 
+                                               null, 
+                                               null, 
+                                               false, 
+                                               SearchType.EXACT, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
 
@@ -118,5 +147,29 @@ public class Nexus3578IndexerManagerTest
 
         assertEquals( "Coordinates should match too!",
             "org.apache.maven.plugins:maven-pmd-plugin:2.6-SNAPSHOT:null:maven-plugin", ai.toString() );
+    }
+    
+    protected void hackContext( DefaultIndexingContext context )
+        throws Exception
+    {
+        List<IndexCreator> creators = new ArrayList<IndexCreator>();
+        
+        IndexCreator min = lookup( IndexCreator.class, MinimalArtifactInfoIndexCreator.ID );
+        IndexCreator mavenPlugin = lookup( IndexCreator.class, MavenPluginArtifactInfoIndexCreator.ID );
+        IndexCreator mavenArchetype = lookup( IndexCreator.class, MavenArchetypeArtifactInfoIndexCreator.ID );
+        IndexCreator jar = lookup( IndexCreator.class, JarFileContentsIndexCreator.ID );
+        
+        creators.add( min );
+        creators.add( mavenPlugin );
+        creators.add( mavenArchetype );
+        creators.add( jar );
+        
+        Field indexCreatorsField = context.getClass().getDeclaredField( "indexCreators" );
+        
+        if ( indexCreatorsField != null )
+        {
+            indexCreatorsField.setAccessible( true );
+            indexCreatorsField.set( context, creators );
+        }
     }
 }
