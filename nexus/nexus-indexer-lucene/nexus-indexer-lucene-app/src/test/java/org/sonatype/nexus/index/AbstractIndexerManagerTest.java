@@ -14,7 +14,6 @@ import org.sonatype.nexus.scheduling.NexusScheduler;
 public abstract class AbstractIndexerManagerTest
     extends AbstractMavenRepoContentTests
 {
-
     protected IndexerManager indexerManager;
 
     protected NexusScheduler nexusScheduler;
@@ -84,5 +83,4 @@ public abstract class AbstractIndexerManagerTest
 
         assertEquals( 1, contextDirs.length );
     }
-
 }
