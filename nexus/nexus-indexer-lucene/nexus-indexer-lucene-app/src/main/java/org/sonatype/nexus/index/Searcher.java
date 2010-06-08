@@ -52,6 +52,7 @@ public interface Searcher
      * @param count number of search results to be retrieved
      * @return search results
      * @throws NoSuchRepositoryException - If there is no repository with specified repository id
+     * @deprecated use flatIteratorSearch() instead.
      */
     FlatSearchResponse flatSearch( Map<String, String> terms, String repositoryId, Integer from, Integer count,
                                    Integer hitLimit )

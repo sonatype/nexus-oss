@@ -74,7 +74,7 @@ public class ClassnameSearcher
     {
         if ( !canHandle( terms ) )
         {
-            return IteratorSearchResponse.EMPTY_RESPONSE;
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
 
         return m_lucene.searchArtifactClassIterator( terms.get( TERM_CLASSNAME ), repositoryId, from, count, hitLimit,

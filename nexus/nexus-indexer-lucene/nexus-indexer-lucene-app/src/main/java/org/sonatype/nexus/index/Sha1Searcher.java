@@ -43,7 +43,7 @@ public class Sha1Searcher
     {
         if ( !canHandle( terms ) )
         {
-            return IteratorSearchResponse.EMPTY_RESPONSE;
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
 
         return indexerManager.searchArtifactSha1ChecksumIterator( terms.get( TERM_SHA1 ), repositoryId, from, count,

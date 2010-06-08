@@ -101,7 +101,7 @@ public class MavenCoordinatesSearcher
     {
         if ( !canHandle( terms ) )
         {
-            return IteratorSearchResponse.EMPTY_RESPONSE;
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
 
         boolean collapseRepos = true;
