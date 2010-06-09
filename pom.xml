@@ -61,6 +61,20 @@
               </execution>
             </executions>
           </plugin>
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <configuration>
+              <filesets>
+                <fileset>
+                  <directory>${basedir}</directory>
+                  <includes>
+                    <include>/coverage.ec</include>
+                  </includes>
+                  <followSymlinks>true</followSymlinks>
+                </fileset>
+              </filesets>
+            </configuration>
+          </plugin>
         </plugins>
       </build>
     </profile>
