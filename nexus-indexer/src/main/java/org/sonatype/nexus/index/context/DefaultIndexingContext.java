@@ -79,6 +79,8 @@ public class DefaultIndexingContext
 
     private NexusIndexSearcher indexSearcher;
 
+    private NexusIndexSearcher readOnlyIndexSearcher;
+
     private NexusIndexWriter indexWriter;
 
     private Date timestamp;
@@ -462,8 +464,23 @@ public class DefaultIndexingContext
     public IndexSearcher getReadOnlyIndexSearcher()
         throws IOException
     {
-        // just create it and pass over. Caller will close it.
-        return new NexusIndexSearcher( this, IndexReader.open( indexDirectory, true ) );
+        synchronized ( indexLock )
+        {
+            if ( readOnlyIndexSearcher == null || !readOnlyIndexSearcher.getIndexReader().isCurrent() )
+            {
+                if ( readOnlyIndexSearcher != null )
+                {
+                    readOnlyIndexSearcher.close();
+
+                    // the reader was supplied explicitly
+                    readOnlyIndexSearcher.getIndexReader().close();
+                }
+
+                readOnlyIndexSearcher = new NexusIndexSearcher( this, IndexReader.open( indexDirectory, true ) );
+            }
+
+            return readOnlyIndexSearcher;
+        }
     }
 
     public void optimize()
@@ -668,6 +685,15 @@ public class DefaultIndexingContext
             indexReader.close();
 
             indexReader = null;
+        }
+        if ( readOnlyIndexSearcher != null )
+        {
+            readOnlyIndexSearcher.close();
+
+            // the reader was supplied explicitly
+            readOnlyIndexSearcher.getIndexReader().close();
+
+            readOnlyIndexSearcher = null;
         }
     }
 

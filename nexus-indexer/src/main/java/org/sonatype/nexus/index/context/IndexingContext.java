@@ -156,8 +156,8 @@ public interface IndexingContext
         throws IOException;
 
     /**
-     * Returns the ReadOnly IndexSearcher of this context. Warning! It is caller responsibility to close (manage
-     * lifecycle) or this searchr, otherwise you would end up with File leaks!
+     * Returns the ReadOnly IndexSearcher of this context. IndexingContext will manage this searcher in similar way as
+     * the RW readers.
      * 
      * @return
      * @throws IOException
