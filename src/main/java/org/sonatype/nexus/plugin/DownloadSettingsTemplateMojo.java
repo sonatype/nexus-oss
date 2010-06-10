@@ -271,6 +271,7 @@ public class DownloadSettingsTemplateMojo
         {
             try
             {
+                getLog().info("Retrieving Settings from:"+getUrl());
                 return client.getSettingsTemplateAbsolute( getUrl() );
             }
             catch ( RESTLightClientException e )
@@ -283,6 +284,7 @@ public class DownloadSettingsTemplateMojo
         {
             try
             {
+                getLog().info("Retrieving Settings from Template \""+templateId+"\" on server: \""+this.getNexusUrl()+"\"");
                 return client.getSettingsTemplate( templateId );
             }
             catch ( RESTLightClientException e )
