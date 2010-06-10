@@ -157,10 +157,11 @@ public interface IndexingContext
 
     /**
      * Returns the ReadOnly IndexSearcher of this context. IndexingContext will manage this searcher in similar way as
-     * the RW readers.
+     * the RW readers. -- THIS IS NOT YET FULLY DONE, DO NOT USE IT!
      * 
      * @return
      * @throws IOException
+     * @deprecated Do not use it yet! Not done!
      */
     IndexSearcher getReadOnlyIndexSearcher()
         throws IOException;

@@ -79,7 +79,8 @@ public class DefaultIndexingContext
 
     private NexusIndexSearcher indexSearcher;
 
-    private NexusIndexSearcher readOnlyIndexSearcher;
+    // disabled for now, see getReadOnlyIndexSearcher() method for explanation
+    // private NexusIndexSearcher readOnlyIndexSearcher;
 
     private NexusIndexWriter indexWriter;
 
@@ -461,26 +462,35 @@ public class DefaultIndexingContext
         }
     }
 
+    @Deprecated
     public IndexSearcher getReadOnlyIndexSearcher()
         throws IOException
     {
-        synchronized ( indexLock )
-        {
-            if ( readOnlyIndexSearcher == null || !readOnlyIndexSearcher.getIndexReader().isCurrent() )
-            {
-                if ( readOnlyIndexSearcher != null )
-                {
-                    readOnlyIndexSearcher.close();
+        return getIndexSearcher();
 
-                    // the reader was supplied explicitly
-                    readOnlyIndexSearcher.getIndexReader().close();
-                }
-
-                readOnlyIndexSearcher = new NexusIndexSearcher( this, IndexReader.open( indexDirectory, true ) );
-            }
-
-            return readOnlyIndexSearcher;
-        }
+        // using RO IndexReader in this way just causes to _double_ the file handles Nexus
+        // uses to read/maintain the Lucene Indexes (once for UPDATE, once for Searches).
+        // The performance gain (no lock contention) is currently too small for the price of
+        // doubled file handles. We will have to resolve this later.
+        
+        // disabled for now, see getReadOnlyIndexSearcher() method for explanation
+        // synchronized ( indexLock )
+        // {
+        // if ( readOnlyIndexSearcher == null || !readOnlyIndexSearcher.getIndexReader().isCurrent() )
+        // {
+        // if ( readOnlyIndexSearcher != null )
+        // {
+        // readOnlyIndexSearcher.close();
+        //
+        // // the reader was supplied explicitly
+        // readOnlyIndexSearcher.getIndexReader().close();
+        // }
+        //
+        // readOnlyIndexSearcher = new NexusIndexSearcher( this, IndexReader.open( indexDirectory, true ) );
+        // }
+        //
+        // return readOnlyIndexSearcher;
+        // }
     }
 
     public void optimize()
@@ -686,15 +696,16 @@ public class DefaultIndexingContext
 
             indexReader = null;
         }
-        if ( readOnlyIndexSearcher != null )
-        {
-            readOnlyIndexSearcher.close();
 
-            // the reader was supplied explicitly
-            readOnlyIndexSearcher.getIndexReader().close();
-
-            readOnlyIndexSearcher = null;
-        }
+        // if ( readOnlyIndexSearcher != null )
+        // {
+        // readOnlyIndexSearcher.close();
+        //
+        // // the reader was supplied explicitly
+        // readOnlyIndexSearcher.getIndexReader().close();
+        //
+        // readOnlyIndexSearcher = null;
+        // }
     }
 
     public GavCalculator getGavCalculator()
