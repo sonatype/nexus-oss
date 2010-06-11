@@ -288,42 +288,34 @@ public class DefaultIndexerManager
                 // group repository
                 // just to throw NoSuchRepositoryGroupException if not existing
                 repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
-
-                File repoRoot = getRepositoryLocalStorageAsFile( repository );
-
-                // add context for repository
-                // context do not take part in "search all" ops, since they contain
-                // the member reposes only, so it would duplicate results
-                ctxLocal =
-                    nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                        repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
-                ctxLocal.setSearchable( repository.isSearchable() );
-
-                ctxRemote =
-                    nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ),
-                        repository.getId(), repoRoot, new File( getWorkingDirectory(),
-                            getRemoteContextId( repository.getId() ) ), null, null, indexCreators );
-                ctxRemote.setSearchable( repository.isSearchable() );
             }
             else
             {
                 repositoryRegistry.getRepositoryWithFacet( repositoryId, Repository.class );
+            }
 
-                File repoRoot = getRepositoryLocalStorageAsFile( repository );
+            File repoRoot = getRepositoryLocalStorageAsFile( repository );
 
-                // add context for repository
-                ctxLocal =
-                    nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                        repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
-                        null, indexCreators );
-                ctxLocal.setSearchable( repository.isSearchable() );
+            // add context for repository
+            ctxLocal =
+                nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
+                    repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null, null,
+                    indexCreators );
+            ctxLocal.setSearchable( repository.isSearchable() );
 
-                ctxRemote =
-                    nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ),
-                        repository.getId(), repoRoot, new File( getWorkingDirectory(),
-                            getRemoteContextId( repository.getId() ) ), null, null, indexCreators );
-                ctxRemote.setSearchable( repository.isSearchable() );
+            ctxRemote =
+                nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
+                    repoRoot, new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ), null, null,
+                    indexCreators );
+            ctxRemote.setSearchable( repository.isSearchable() );
+
+            // this handles all legacy cases, when group used -remote context to hold merged data!
+            // They still sit in there, with OLD data.
+            // Since 1.6, groups are consistent, and their -local contexts holds the data (since all reposes are equal)
+            // -remote is used by proxy repositories only!
+            if ( !repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+            {
+                ctxRemote.purge();
             }
         }
         finally
@@ -899,7 +891,7 @@ public class DefaultIndexerManager
             {
                 resetGroupIndex( groupRepo.getId(), true );
             }
-            
+
             List<Repository> group = groupRepo.getMemberRepositories();
 
             for ( Repository repository : group )
@@ -1018,6 +1010,15 @@ public class DefaultIndexerManager
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
                 downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) );
+            }
+
+            {
+                // just optimize remote index, whatever happened above
+                // (with hosted repositories, this will lessen file handles)
+                // (with just updated proxy repositories will do nothing, since they will be already optimized)
+                IndexingContext remoteContext = getRepositoryRemoteIndexContext( repository );
+
+                remoteContext.optimize();
             }
 
             mergeRepositoryGroupIndexWithMember( repository );
@@ -1381,7 +1382,9 @@ public class DefaultIndexerManager
                     groupContext.rebuildGroups();
 
                     // committing changes
-                    groupContext.getIndexWriter().flush();
+                    groupContext.getIndexWriter().commit();
+
+                    groupContext.optimize();
 
                     groupContext.updateTimestamp();
                 }
@@ -2356,7 +2359,7 @@ public class DefaultIndexerManager
                 else
                 {
                     bq.add( createQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
-                }                
+                }
             }
 
             // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
