@@ -64,6 +64,7 @@ public class DefaultPluginConsoleManager
             result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":"
                 + pluginResponse.getPluginCoordinates().getArtifactId() );
         }
+        result.setDocumentation( pluginResponse.getPluginCoordinates().getArtifactId() );
 
         if ( !pluginResponse.isSuccessful() )
         {

@@ -1,20 +1,19 @@
 package org.sonatype.nexus.plugins.rest;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.FileUtils;
-import org.codehaus.plexus.util.IOUtil;
 
 public abstract class AbstractDocumentationNexusResourceBundle
     extends AbstractLogEnabled
@@ -45,12 +44,15 @@ public abstract class AbstractDocumentationNexusResourceBundle
     {
         List<StaticResource> resources = new LinkedList<StaticResource>();
 
-        ZipInputStream zip = null;
+        ZipFile zip = null;
         try
         {
-            zip = getJarInputStream();
-            for ( ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry() )
+            zip = getZipFile();
+            Enumeration<? extends ZipEntry> entries = zip.entries();
+            while ( entries.hasMoreElements() )
             {
+                ZipEntry entry = entries.nextElement();
+
                 if ( entry.isDirectory() )
                 {
                     continue;
@@ -63,10 +65,9 @@ public abstract class AbstractDocumentationNexusResourceBundle
 
                 name = "/" + name;
 
-                DefaultStaticResource resource =
-                    new DefaultStaticResource( getClass().getResource( name ), "/" + getPluginId() + name,
-                                               getContentType( name ) );
-                resources.add( resource );
+                URL url = new URL( "jar:file:/" + zip.getName() + "!" + name );
+                String path = "/" + getPluginId() + name;
+                resources.add( new DefaultStaticResource( url, path, getContentType( name ) ) );
             }
         }
         catch ( IOException e )
@@ -75,7 +76,17 @@ public abstract class AbstractDocumentationNexusResourceBundle
         }
         finally
         {
-            IOUtil.close( zip );
+            if ( zip != null )
+            {
+                try
+                {
+                    zip.close();
+                }
+                catch ( IOException e )
+                {
+                    getLogger().debug( e.getMessage(), e );
+                }
+            }
         }
 
         return resources;
@@ -88,14 +99,14 @@ public abstract class AbstractDocumentationNexusResourceBundle
         return MEDIA_TYPES.get( FileUtils.getExtension( name ) );
     }
 
-    protected ZipInputStream getJarInputStream()
+    protected ZipFile getZipFile()
         throws IOException
     {
         URL baseClass = getClass().getClassLoader().getResource( getClass().getName().replace( '.', '/' ) + ".class" );
         assert baseClass.getProtocol().equals( "jar" );
 
         String jarPath = baseClass.getPath().substring( 6, baseClass.getPath().indexOf( "!" ) );
-        return new ZipInputStream( new FileInputStream( URLDecoder.decode( jarPath, "UTF-8" ) ) );
+        return new ZipFile( URLDecoder.decode( jarPath, "UTF-8" ) );
     }
 
 }

@@ -108,6 +108,7 @@ public class PluginInfoListPlexusResource
         result.setVersion( pluginInfo.getVersion() );
         result.setDescription( pluginInfo.getDescription() );
         result.setSite( pluginInfo.getSite() );
+        result.setDocumentation( pluginInfo.getDocumentation() );
         result.setScmVersion( StringUtils.isEmpty( pluginInfo.getScmVersion() ) ? "N/A" : pluginInfo.getScmVersion() );
         result.setScmTimestamp( StringUtils.isEmpty( pluginInfo.getScmTimestamp() ) ? "N/A"
                         : pluginInfo.getScmTimestamp() );

@@ -2,7 +2,7 @@ package org.sonatype.nexus.plugins.rest;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.zip.ZipInputStream;
+import java.util.zip.ZipFile;
 
 import junit.framework.TestCase;
 
@@ -21,10 +21,10 @@ public class SimpleDocumentationNexusResourceBundleTest
             }
 
             @Override
-            protected ZipInputStream getJarInputStream()
+            protected ZipFile getZipFile()
                 throws IOException
             {
-                return new ZipInputStream( getClass().getResourceAsStream( "/docs.zip" ) );
+                return new ZipFile( getClass().getResource( "/docs.zip" ).getFile() );
             }
         };
 

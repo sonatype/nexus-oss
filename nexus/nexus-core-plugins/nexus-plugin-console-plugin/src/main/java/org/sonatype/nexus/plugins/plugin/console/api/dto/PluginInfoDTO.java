@@ -29,6 +29,8 @@ public class PluginInfoDTO
 
     private String site;
 
+    private String documentation;
+
     private List<RestInfoDTO> restInfos = new ArrayList<RestInfoDTO>();
 
     public String getSite()
@@ -127,4 +129,15 @@ public class PluginInfoDTO
     {
         this.restInfos.add( restInfo );
     }
+
+    public String getDocumentation()
+    {
+        return documentation;
+    }
+
+    public void setDocumentation( String documentation )
+    {
+        this.documentation = documentation;
+    }
+
 }

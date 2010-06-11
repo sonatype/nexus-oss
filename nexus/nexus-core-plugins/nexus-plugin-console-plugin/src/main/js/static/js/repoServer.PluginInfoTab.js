@@ -126,6 +126,23 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
       });
     }
     
+    var documentation = this.payload.data.documentation;
+    pluginPropertiesPanel.add({
+      xtype: 'label',
+      html: 'Documentation',
+      style: this.labelClass,
+      width: 120
+      });    
+    if ( documentation ) {
+      documentation = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation + '/docs/index.html';
+      pluginPropertiesPanel.add({
+        xtype: 'label',
+        name: 'site',
+        html: '<a href="' + documentation + '" target="_blank">' + documentation + '</a>',
+        style: this.textClass
+      });
+    }
+    
     var failureReason = this.payload.data.failureReason;
     if ( failureReason ) {
       var html = '<h4 style="color:red;">This plugin was not able to be activated</h4><br/>';

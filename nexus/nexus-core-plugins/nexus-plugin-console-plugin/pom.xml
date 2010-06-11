@@ -80,9 +80,6 @@
 						</goals>
 						<configuration>
 							<version>1.0.0</version>
-							<packagedVersions>
-								<packagedVersion>1.0.0</packagedVersion>
-							</packagedVersions>
 							<models>
 								<model>src/main/mdo/model.xml</model>
 							</models>
