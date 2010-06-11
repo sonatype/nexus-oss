@@ -84,12 +84,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
 {
     public static final String IS_LOCAL_PARAMETER = "isLocal";
 
+    public static final String IS_REMOTE_PARAMETER = "isRemote";
+
     public static final String IS_DESCRIBE_PARAMETER = "describe";
 
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
     public static final String OVERRIDE_FILENAME_KEY = "override-filename";
-    
+
     public AbstractResourceStoreContentPlexusResource()
     {
         super();
@@ -116,7 +118,16 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         // overriding isLocal is we know it will be a collection
         isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
+
         return isLocal;
+    }
+
+    protected boolean isRemote( Request request, String resourceStorePath )
+    {
+        // check do we need remote only access
+        boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst( IS_REMOTE_PARAMETER ) != null;
+
+        return isRemote;
     }
 
     protected boolean isDescribe( Request request )
@@ -256,16 +267,16 @@ public abstract class AbstractResourceStoreContentPlexusResource
      */
     protected ResourceStoreRequest getResourceStoreRequest( Request request, String resourceStorePath )
     {
-        ResourceStoreRequest result =
-            new ResourceStoreRequest( resourceStorePath, isLocal( request, resourceStorePath ) );
+        ResourceStoreRequest result = new ResourceStoreRequest( resourceStorePath );
 
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Created ResourceStore request for " + result.getRequestPath() );
         }
 
-        // honor the local only
+        // honor the local only and remote only
         result.setRequestLocalOnly( isLocal( request, resourceStorePath ) );
+        result.setRequestRemoteOnly( isRemote( request, resourceStorePath ) );
 
         // honor the describe, add timing
         if ( isDescribe( request ) )
@@ -423,10 +434,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
                     resource.setLastModified( new Date( child.getModified() ) );
 
-                    resource
-                        .setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child )
-                            .getLength()
-                                        : -1 );
+                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength()
+                        : -1 );
 
                     response.addData( resource );
 
@@ -448,7 +457,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
         return result;
     }
-    
+
     private void setOverrideContentDisposition( Response response, StorageFileItem fileItem )
     {
         String filename = fileItem.getName();
@@ -468,7 +477,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             }
 
             headers.add( new Parameter( "Content-Disposition", "inline; filename=\"" + filename + "\";" ) );
-            response.getAttributes().put(HttpConstants.ATTRIBUTE_HEADERS, headers);
+            response.getAttributes().put( HttpConstants.ATTRIBUTE_HEADERS, headers );
         }
     }
 
@@ -491,8 +500,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             // Load up the template, and pass in the data
             VelocityRepresentation representation =
-                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel, variant
-                    .getMediaType() );
+                new VelocityRepresentation( context, "/templates/repositoryContentHtml.vm", dataModel,
+                    variant.getMediaType() );
 
             return representation;
         }
@@ -600,8 +609,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             result.setOriginatingRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
 
-            result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind()
-                .getMainFacet().getName() );
+            result.setOriginatingRepositoryMainFacet( item.getRepositoryItemUid().getRepository().getRepositoryKind().getMainFacet().getName() );
         }
         else
         {
