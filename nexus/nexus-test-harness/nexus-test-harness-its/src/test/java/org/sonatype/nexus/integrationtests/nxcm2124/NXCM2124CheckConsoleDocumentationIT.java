@@ -16,7 +16,7 @@ public class NXCM2124CheckConsoleDocumentationIT
     public void checkDoc()
         throws IOException
     {
-        Response r = RequestFacade.doGetRequest( "pluginConsole/docs/index.html" );
+        Response r = RequestFacade.doGetRequest( "nexus-plugin-console-plugin/docs/index.html" );
         Assert.assertTrue( r.getStatus().isSuccess() );
     }
 
