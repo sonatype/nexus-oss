@@ -48,6 +48,11 @@ public interface FeedRecorder
     public static final String SYSTEM_REINDEX_ACTION = "REINDEX";
 
     /**
+     * System event action: optimize index
+     */
+    public static final String SYSTEM_OPTIMIZE_INDEX_ACTION = "OPTIMIZE_INDEX";
+
+    /**
      * System event action: publish indexes
      */
     public static final String SYSTEM_PUBLISHINDEX_ACTION = "PUBLISHINDEX";
