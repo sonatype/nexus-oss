@@ -42,7 +42,11 @@ public abstract class AbstractMirrorIT
     public void stop()
         throws Exception
     {
-        server.stop();
+        // @After will be called even if there is a failure in @Before, and server is null!
+        if ( server != null )
+        {
+            server.stop();
+        }
     }
 
 }

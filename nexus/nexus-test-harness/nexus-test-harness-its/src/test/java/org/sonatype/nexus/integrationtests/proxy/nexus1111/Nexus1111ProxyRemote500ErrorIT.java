@@ -68,20 +68,25 @@ public class Nexus1111ProxyRemote500ErrorIT
             // skip
         }
 
-        // stop the error server, start the healthy server
-        return500Server.stop();
-        server.start();
+        // This commented stuff below makes IT unpredictable
+        // By starting "healthy" server, repo will eventually unblock during ExpireCache task run (more than 20sec)
+        // So, I commented this out, we have NFC ITs anyway (that's what following fetch would test)
+        // -- cstamas
 
-        try
-        {
-            downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );
-            Assert.fail( "Still fails before a clear cache." );
-        }
-        catch ( Exception e )
-        {
-            // skip
-        }
-        
+        // // stop the error server, start the healthy server
+        // return500Server.stop();
+        // server.start();
+        //
+        // try
+        // {
+        // downloadArtifact( "nexus1111", "artifact", "1.1", "jar", null, "target/downloads" );
+        // Assert.fail( "Still fails before a clear cache." );
+        // }
+        // catch ( Exception e )
+        // {
+        // // skip
+        // }
+
         // clear cache, then download
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setId( "repositoryOrGroupId" );
@@ -103,11 +108,16 @@ public class Nexus1111ProxyRemote500ErrorIT
         // TODO: interestingly RepositoryMessageUtil.getStatus() neglects JSON here, so
         // not using it and switched back to XML as it is wired in it this util class.
         RepositoryMessageUtil util =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
+                getRepositoryTypeRegistry() );
 
         RepositoryStatusResource status = util.getStatus( this.testRepositoryId );
 
         Assert.assertEquals( "Repository should be auto-blocked", ProxyMode.BLOCKED_AUTO.name(), status.getProxyMode() );
+
+        // stop the error server, start the healthy server
+        return500Server.stop();
+        server.start();
 
         // unblock it manually
         status.setProxyMode( ProxyMode.ALLOW.name() );
