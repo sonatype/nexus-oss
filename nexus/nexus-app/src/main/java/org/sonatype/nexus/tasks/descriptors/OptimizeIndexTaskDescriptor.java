@@ -20,7 +20,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "OptimizeIndex", description = "Optimize Repositories Index" )
+@Component( role = ScheduledTaskDescriptor.class, hint = "OptimizeIndex", description = "Optimize Repository Index" )
 public class OptimizeIndexTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
@@ -36,7 +36,7 @@ public class OptimizeIndexTaskDescriptor
 
     public String getName()
     {
-        return "Optimize Index Repositories";
+        return "Optimize Repository Index";
     }
 
     public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()

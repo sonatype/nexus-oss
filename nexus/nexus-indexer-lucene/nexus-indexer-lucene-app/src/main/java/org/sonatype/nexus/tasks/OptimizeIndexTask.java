@@ -76,6 +76,7 @@ public class OptimizeIndexTask
             IndexingContext context = indexManager.getRepositoryLocalIndexContext( repoId );
             if ( context != null )
             {
+                getLogger().debug( "Optimizing local index context for repository: " + repoId );
                 context.optimize();
             }
 
@@ -83,6 +84,7 @@ public class OptimizeIndexTask
             context = indexManager.getRepositoryRemoteIndexContext( repoId );
             if ( context != null )
             {
+                getLogger().debug( "Optimizing remote index context for repository: " + repoId );
                 context.optimize();
             }
         }
@@ -101,17 +103,17 @@ public class OptimizeIndexTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Optimizing repository group index " + getRepositoryGroupName() + " from path "
+            return "Optimizing repository group " + getRepositoryGroupName() + " index from path "
                 + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Optimizing repository index " + getRepositoryName() + " from path " + getResourceStorePath()
+            return "Optimizing repository " + getRepositoryName() + " index from path " + getResourceStorePath()
                 + " and below.";
         }
         else
         {
-            return "Optimizing all registered repositories index";
+            return "Optimizing all maven repositories indexes";
         }
     }
 
