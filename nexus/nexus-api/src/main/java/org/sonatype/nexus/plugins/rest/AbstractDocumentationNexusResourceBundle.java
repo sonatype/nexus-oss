@@ -94,7 +94,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
         return resources;
     }
 
-    protected abstract String getPluginId();
+    public abstract String getPluginId();
 
     private String getContentType( String name )
     {

@@ -16,7 +16,7 @@ public class CoreDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-core-documentation-plugin";
     }

@@ -10,7 +10,7 @@ public class LdapDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-ldap-realm-plugin";
     }

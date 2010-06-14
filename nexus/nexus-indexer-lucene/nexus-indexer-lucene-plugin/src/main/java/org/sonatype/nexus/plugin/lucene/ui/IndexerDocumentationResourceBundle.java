@@ -16,7 +16,7 @@ public class IndexerDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-indexer-lucene-plugin";
     }

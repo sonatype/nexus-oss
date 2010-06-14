@@ -1,8 +1,10 @@
 package org.sonatype.nexus.plugins.plugin.console;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -10,10 +12,14 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.plugins.plugin.console.model.RestInfo;
+import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
@@ -23,13 +29,33 @@ import org.sonatype.plugin.metadata.GAVCoordinate;
 @Component( role = PluginConsoleManager.class )
 public class DefaultPluginConsoleManager
     extends AbstractLogEnabled
-    implements PluginConsoleManager
+    implements PluginConsoleManager, Initializable
 {
     @Requirement
     private NexusPluginManager pluginManager;
 
     @Requirement
     private PlexusContainer plexusContainer;
+
+    @Requirement( role = NexusResourceBundle.class )
+    private List<NexusResourceBundle> resourceBundles;
+
+    private Set<String> ids;
+
+    public void initialize()
+        throws InitializationException
+    {
+        ids = new HashSet<String>();
+
+        for ( NexusResourceBundle rb : resourceBundles )
+        {
+            if ( rb instanceof AbstractDocumentationNexusResourceBundle )
+            {
+                AbstractDocumentationNexusResourceBundle doc = (AbstractDocumentationNexusResourceBundle) rb;
+                ids.add( doc.getPluginId() );
+            }
+        }
+    }
 
     public List<PluginInfo> listPluginInfo()
     {
@@ -61,10 +87,13 @@ public class DefaultPluginConsoleManager
         }
         else
         {
-            result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":"
-                + pluginResponse.getPluginCoordinates().getArtifactId() );
+            result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":" + pluginResponse.getPluginCoordinates().getArtifactId() );
         }
-        result.setDocumentation( pluginResponse.getPluginCoordinates().getArtifactId() );
+
+        if ( ids.contains( pluginResponse.getPluginCoordinates().getArtifactId() ) )
+        {
+            result.setDocumentation( pluginResponse.getPluginCoordinates().getArtifactId() );
+        }
 
         if ( !pluginResponse.isSuccessful() )
         {
@@ -77,15 +106,13 @@ public class DefaultPluginConsoleManager
         {
             List<String> exportedClassnames = pluginResponse.getPluginDescriptor().getExportedClassnames();
 
-            for ( ComponentDescriptor<?> componentDescriptor : this.plexusContainer
-                .getComponentDescriptorList( PlexusResource.class.getName() ) )
+            for ( ComponentDescriptor<?> componentDescriptor : this.plexusContainer.getComponentDescriptorList( PlexusResource.class.getName() ) )
             {
                 if ( exportedClassnames.contains( componentDescriptor.getImplementation() ) )
                 {
                     try
                     {
-                        PlexusResource resource = plexusContainer.lookup( PlexusResource.class, componentDescriptor
-                            .getRoleHint() );
+                        PlexusResource resource = plexusContainer.lookup( PlexusResource.class, componentDescriptor.getRoleHint() );
 
                         RestInfo restInfo = new RestInfo();
                         restInfo.setUri( resource.getResourceUri() );
@@ -94,9 +121,7 @@ public class DefaultPluginConsoleManager
                     }
                     catch ( ComponentLookupException e )
                     {
-                        getLogger().warn(
-                            "Unable to find PlexusResource '" + componentDescriptor.getImplementation() + "'.",
-                            e );
+                        getLogger().warn( "Unable to find PlexusResource '" + componentDescriptor.getImplementation() + "'.", e );
                     }
                 }
             }

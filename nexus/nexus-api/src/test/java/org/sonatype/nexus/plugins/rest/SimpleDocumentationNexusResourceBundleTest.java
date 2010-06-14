@@ -15,7 +15,7 @@ public class SimpleDocumentationNexusResourceBundleTest
         {
 
             @Override
-            protected String getPluginId()
+            public String getPluginId()
             {
                 return "test";
             }

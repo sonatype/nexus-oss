@@ -10,7 +10,7 @@ public class RRBDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-rrb-plugin";
     }

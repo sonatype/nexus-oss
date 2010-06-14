@@ -10,7 +10,7 @@ public class LvoDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-lvo-plugin";
     }

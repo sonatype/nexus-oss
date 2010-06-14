@@ -10,7 +10,7 @@ public class PluginConsoleDocumentationResourceBundle
 {
 
     @Override
-    protected String getPluginId()
+    public String getPluginId()
     {
         return "nexus-plugin-console-plugin";
     }
