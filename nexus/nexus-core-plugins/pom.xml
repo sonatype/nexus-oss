@@ -29,6 +29,7 @@
     <module>nexus-plugin-console-plugin</module>
     <module>nexus-ldap-plugin-parent</module>
     <module>nexus-rrb-plugin</module>
+    <module>nexus-core-documentation-plugin</module>
   </modules>
 
 </project>

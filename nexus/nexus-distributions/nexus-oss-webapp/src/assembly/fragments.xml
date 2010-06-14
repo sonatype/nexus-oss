@@ -66,6 +66,17 @@
         </outputDirectory>
       </itar>
       <itar>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-core-documentation-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <virtual>true</virtual>
+        <unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository
+        </outputDirectory>
+      </itar>
+      <itar>
         <groupId>org.sonatype.runtime.itars</groupId>
         <artifactId>itar-work-dir</artifactId>
         <version>0.1.0</version>

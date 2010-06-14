@@ -37,6 +37,8 @@ public abstract class AbstractDocumentationNexusResourceBundle
         mediaTypes.put( "jar", "application/zip" );
         mediaTypes.put( "zip", "application/zip" );
         mediaTypes.put( "txt", "text/plain" );
+        mediaTypes.put( "css", "text/css" );
+        mediaTypes.put( "js", "text/javascript" );
         MEDIA_TYPES = Collections.unmodifiableMap( mediaTypes );
     }
 

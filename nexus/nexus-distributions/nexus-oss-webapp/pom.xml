@@ -53,6 +53,13 @@
       <type>zip</type>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-core-documentation-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>guice-nexus-shim</artifactId>
       <version>${project.version}</version>
