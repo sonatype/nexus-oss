@@ -26,8 +26,9 @@ public class NXCM2124CheckConsoleDocumentationIT
 
         PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus Plugin Console Plugin" );
         Assert.assertNotNull( pluginConsolePlugin.getDocumentation() );
+        Assert.assertFalse( pluginConsolePlugin.getDocumentation().isEmpty() );
 
-        Response r = RequestFacade.doGetRequest( pluginConsolePlugin.getDocumentation() + "/docs/index.html" );
+        Response r = RequestFacade.doGetRequest( pluginConsolePlugin.getDocumentation().get( 0 ) + "/docs/index.html" );
         Assert.assertTrue( r.getStatus().isSuccess() );
 
     }
