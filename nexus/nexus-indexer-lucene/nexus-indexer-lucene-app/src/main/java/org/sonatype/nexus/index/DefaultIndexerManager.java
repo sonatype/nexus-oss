@@ -35,6 +35,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -1470,9 +1471,8 @@ public class DefaultIndexerManager
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug(
-                    "Can't publish index on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId()
-                        + "\") since indexing is not supported on it!" );
+                getLogger().debug( "Can't publish index on repository \"" + repository.getName() + "\" (ID=\""
+                                       + repository.getId() + "\") since indexing is not supported on it!" );
             }
 
             return;
@@ -2186,10 +2186,9 @@ public class DefaultIndexerManager
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
 
-            req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
-            req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
+            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
+            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2,
+                                                                            MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
             {
@@ -2568,13 +2567,13 @@ public class DefaultIndexerManager
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                baseContext.getRepositoryId(), //
-                baseContext.getRepository(), //
-                directory, //
-                baseContext.getRepositoryUrl(), //
-                baseContext.getIndexUpdateUrl(), //
-                baseContext.getIndexCreators(), //
-                true );
+                                                     baseContext.getRepositoryId(), //
+                                                     baseContext.getRepository(), //
+                                                     directory, //
+                                                     baseContext.getRepositoryUrl(), //
+                                                     baseContext.getIndexUpdateUrl(), //
+                                                     baseContext.getIndexCreators(), //
+                                                     true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
@@ -2625,4 +2624,71 @@ public class DefaultIndexerManager
         return isAlreadyBeingIndexed( repository.getId() );
     }
 
+    public void optimizeRepositoryIndex( String repositoryId )
+        throws IOException
+    {
+        try
+        {
+            optimizeIndex( repositoryRegistry.getRepository( repositoryId ) );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // should never happen
+            getLogger().error( e.getMessage(), e );
+        }
+    }
+
+    public void optimizeGroupIndex( String groupId )
+        throws IOException
+    {
+        try
+        {
+            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
+            optimizeIndex( group );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // should never happen
+            getLogger().error( e.getMessage(), e );
+        }
+    }
+
+    public void optimizeAllRepositoriesIndex()
+        throws IOException
+    {
+        List<Repository> repos = repositoryRegistry.getRepositories();
+        for ( Repository repository : repos )
+        {
+            optimizeIndex( repository );
+        }
+    }
+
+    protected void optimizeIndex( Repository repo )
+        throws CorruptIndexException, IOException
+    {
+        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            GroupRepository group = repo.adaptToFacet( GroupRepository.class );
+            for ( Repository member : group.getMemberRepositories() )
+            {
+                optimizeIndex( member );
+            }
+        }
+
+        // local
+        IndexingContext context = getRepositoryLocalIndexContext( repo );
+        if ( context != null )
+        {
+            getLogger().debug( "Optimizing local index context for repository: " + repo.getId() );
+            context.optimize();
+        }
+
+        // remote
+        context = getRepositoryRemoteIndexContext( repo );
+        if ( context != null )
+        {
+            getLogger().debug( "Optimizing remote index context for repository: " + repo.getId() );
+            context.optimize();
+        }
+    }
 }

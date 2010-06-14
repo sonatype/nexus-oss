@@ -13,18 +13,10 @@
  */
 package org.sonatype.nexus.tasks;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.proxy.maven.MavenRepository;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
@@ -42,51 +34,21 @@ public class OptimizeIndexTask
     @Requirement
     private IndexerManager indexManager;
 
-    @Requirement
-    private RepositoryRegistry repositoryRegistry;
-
     @Override
     public Object doRun()
         throws Exception
     {
-        List<String> repoIds;
         if ( getRepositoryId() != null )
         {
-            repoIds = Collections.singletonList( getRepositoryId() );
+            indexManager.optimizeRepositoryIndex( getRepositoryId() );
         }
         else if ( getRepositoryGroupId() != null )
         {
-            repoIds = Collections.singletonList( getRepositoryGroupId() );
+            indexManager.optimizeGroupIndex( getRepositoryGroupId() );
         }
         else
         {
-            repoIds = new ArrayList<String>();
-            for ( Repository repo : repositoryRegistry.getRepositories() )
-            {
-                if ( repo.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
-                {
-                    repoIds.add( repo.getId() );
-                }
-            }
-        }
-
-        for ( String repoId : repoIds )
-        {
-            // local
-            IndexingContext context = indexManager.getRepositoryLocalIndexContext( repoId );
-            if ( context != null )
-            {
-                getLogger().debug( "Optimizing local index context for repository: " + repoId );
-                context.optimize();
-            }
-
-            // remote
-            context = indexManager.getRepositoryRemoteIndexContext( repoId );
-            if ( context != null )
-            {
-                getLogger().debug( "Optimizing remote index context for repository: " + repoId );
-                context.optimize();
-            }
+            indexManager.optimizeAllRepositoriesIndex();
         }
 
         return null;

@@ -209,4 +209,13 @@ public interface IndexerManager
 
     TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path );
 
+    void optimizeRepositoryIndex( String repositoryId )
+        throws IOException;;
+
+    void optimizeGroupIndex( String groupId )
+        throws IOException;
+
+    void optimizeAllRepositoriesIndex()
+        throws IOException;;
+
 }
