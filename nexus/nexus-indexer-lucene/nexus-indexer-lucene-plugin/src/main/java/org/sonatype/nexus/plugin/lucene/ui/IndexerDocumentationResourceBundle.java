@@ -22,13 +22,15 @@ public class IndexerDocumentationResourceBundle
     }
 
     @Override
+    public String getUrlSnippet()
+    {
+        return "indexer";
+    }
+
+    @Override
     protected ZipFile getZipFile()
         throws IOException
     {
-        URL baseClass = AbstractIndexerNexusPlexusResource.class.getClassLoader().getResource( AbstractIndexerNexusPlexusResource.class.getName().replace( '.', '/' ) + ".class" );
-        assert baseClass.getProtocol().equals( "jar" );
-
-        String jarPath = baseClass.getPath().substring( 6, baseClass.getPath().indexOf( "!" ) );
-        return new ZipFile( URLDecoder.decode( jarPath, "UTF-8" ) );
+        return getZipFile(AbstractIndexerNexusPlexusResource.class);
     }
 }

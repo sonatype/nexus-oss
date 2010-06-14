@@ -1,10 +1,9 @@
 package org.sonatype.nexus.plugins.plugin.console;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -23,6 +22,9 @@ import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+
 /**
  * @author juven
  */
@@ -40,19 +42,19 @@ public class DefaultPluginConsoleManager
     @Requirement( role = NexusResourceBundle.class )
     private List<NexusResourceBundle> resourceBundles;
 
-    private Set<String> ids;
+    private Multimap<String, String> ids;
 
     public void initialize()
         throws InitializationException
     {
-        ids = new HashSet<String>();
+        ids = new LinkedHashMultimap<String, String>();
 
         for ( NexusResourceBundle rb : resourceBundles )
         {
             if ( rb instanceof AbstractDocumentationNexusResourceBundle )
             {
                 AbstractDocumentationNexusResourceBundle doc = (AbstractDocumentationNexusResourceBundle) rb;
-                ids.add( doc.getPluginId() );
+                ids.put( doc.getPluginId(), doc.getUrlSnippet() );
             }
         }
     }
@@ -90,9 +92,10 @@ public class DefaultPluginConsoleManager
             result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":" + pluginResponse.getPluginCoordinates().getArtifactId() );
         }
 
-        if ( ids.contains( pluginResponse.getPluginCoordinates().getArtifactId() ) )
+        Collection<String> docs = ids.get( pluginResponse.getPluginCoordinates().getArtifactId() );
+        if ( docs != null && !docs.isEmpty() )
         {
-            result.setDocumentation( pluginResponse.getPluginCoordinates().getArtifactId() );
+            result.setDocumentation( new ArrayList<String>( docs ) );
         }
 
         if ( !pluginResponse.isSuccessful() )

@@ -127,21 +127,23 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
     }
     
     var documentation = this.payload.data.documentation;
-    pluginPropertiesPanel.add({
-      xtype: 'label',
-      html: 'Documentation',
-      style: this.labelClass,
-      width: 120
-      });    
-    if ( documentation ) {
-      documentation = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation + '/docs/index.html';
+	if(documentation) {
       pluginPropertiesPanel.add({
         xtype: 'label',
-        name: 'site',
-        html: '<a href="' + documentation + '" target="_blank">' + documentation + '</a>',
-        style: this.textClass
-      });
-    }
+        html: 'Documentation',
+        style: this.labelClass,
+        width: 120
+        });    
+      for (var i=0; i < documentation.length; i++){
+        var url = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation[i] + '/docs/index.html';
+        pluginPropertiesPanel.add({
+          xtype: 'label',
+          name: 'site',
+          html: '<a href="' + url + '" target="_blank">' + url + '</a>',
+          style: this.textClass
+        });
+      }
+	}
     
     var failureReason = this.payload.data.failureReason;
     if ( failureReason ) {

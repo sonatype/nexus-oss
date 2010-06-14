@@ -77,8 +77,10 @@
 					<name>documentation</name>
 					<version>1.0.0+</version>
 					<description>Enunciate documentation.</description>
-					<type>String</type>
-					<required>false</required>
+					<association>
+						<type>String</type>
+						<multiplicity>*</multiplicity>
+					</association>
 				</field>	
 				<field>
 					<name>restInfos</name>

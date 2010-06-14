@@ -15,4 +15,10 @@ public class LvoDocumentationResourceBundle
         return "nexus-lvo-plugin";
     }
 
+    @Override
+    public String getUrlSnippet()
+    {
+        return "lvo";
+    }
+
 }

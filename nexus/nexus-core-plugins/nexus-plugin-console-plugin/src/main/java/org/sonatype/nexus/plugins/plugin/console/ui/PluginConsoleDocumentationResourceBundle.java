@@ -15,4 +15,10 @@ public class PluginConsoleDocumentationResourceBundle
         return "nexus-plugin-console-plugin";
     }
 
+    @Override
+    public String getUrlSnippet()
+    {
+        return "pluginConsole";
+    }
+
 }

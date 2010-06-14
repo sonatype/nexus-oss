@@ -1,6 +1,7 @@
 package org.sonatype.nexus.plugins.rest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -68,7 +69,7 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 name = "/" + name;
 
                 URL url = new URL( "jar:file:/" + zip.getName() + "!" + name );
-                String path = "/" + getPluginId() + name;
+                String path = "/" + getUrlSnippet() + name;
                 resources.add( new DefaultStaticResource( url, path, getContentType( name ) ) );
             }
         }
@@ -96,6 +97,8 @@ public abstract class AbstractDocumentationNexusResourceBundle
 
     public abstract String getPluginId();
 
+    public abstract String getUrlSnippet();
+
     private String getContentType( String name )
     {
         return MEDIA_TYPES.get( FileUtils.getExtension( name ) );
@@ -104,7 +107,13 @@ public abstract class AbstractDocumentationNexusResourceBundle
     protected ZipFile getZipFile()
         throws IOException
     {
-        URL baseClass = getClass().getClassLoader().getResource( getClass().getName().replace( '.', '/' ) + ".class" );
+        return getZipFile( getClass() );
+    }
+
+    protected ZipFile getZipFile( final Class<?> clazz )
+        throws IOException, UnsupportedEncodingException
+    {
+        URL baseClass = clazz.getClassLoader().getResource( clazz.getName().replace( '.', '/' ) + ".class" );
         assert baseClass.getProtocol().equals( "jar" );
 
         String jarPath = baseClass.getPath().substring( 6, baseClass.getPath().indexOf( "!" ) );

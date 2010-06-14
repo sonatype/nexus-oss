@@ -26,6 +26,12 @@ public class SimpleDocumentationNexusResourceBundleTest
             {
                 return new ZipFile( getClass().getResource( "/docs.zip" ).getFile() );
             }
+
+            @Override
+            public String getUrlSnippet()
+            {
+                return "test";
+            }
         };
 
         List<StaticResource> resources = docBundle.getContributedResouces();

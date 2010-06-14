@@ -6,10 +6,10 @@ import java.util.zip.ZipFile;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
-import org.sonatype.nexus.rest.NexusApplication;
+import org.sonatype.security.rest.AbstractSecurityPlexusResource;
 
-@Component( role = NexusResourceBundle.class, hint = "CoreDocumentationResourceBundle" )
-public class CoreDocumentationResourceBundle
+@Component( role = NexusResourceBundle.class, hint = "SecurityDocumentationResourceBundle" )
+public class SecurityDocumentationResourceBundle
     extends AbstractDocumentationNexusResourceBundle
 {
 
@@ -20,16 +20,16 @@ public class CoreDocumentationResourceBundle
     }
 
     @Override
-    protected ZipFile getZipFile()
-        throws IOException
+    public String getUrlSnippet()
     {
-        return getZipFile( NexusApplication.class );
+        return "security";
     }
 
     @Override
-    public String getUrlSnippet()
+    protected ZipFile getZipFile()
+        throws IOException
     {
-        return "core";
+        return getZipFile( AbstractSecurityPlexusResource.class );
     }
 
 }

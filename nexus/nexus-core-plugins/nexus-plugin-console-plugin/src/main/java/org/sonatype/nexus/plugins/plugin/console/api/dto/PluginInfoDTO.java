@@ -29,7 +29,7 @@ public class PluginInfoDTO
 
     private String site;
 
-    private String documentation;
+    private List<String> documentation;
 
     private List<RestInfoDTO> restInfos = new ArrayList<RestInfoDTO>();
 
@@ -130,12 +130,12 @@ public class PluginInfoDTO
         this.restInfos.add( restInfo );
     }
 
-    public String getDocumentation()
+    public List<String> getDocumentation()
     {
         return documentation;
     }
 
-    public void setDocumentation( String documentation )
+    public void setDocumentation( List<String> documentation )
     {
         this.documentation = documentation;
     }

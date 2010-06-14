@@ -15,4 +15,10 @@ public class LdapDocumentationResourceBundle
         return "nexus-ldap-realm-plugin";
     }
 
+
+    @Override
+    public String getUrlSnippet()
+    {
+        return "ossLdap";
+    }
 }

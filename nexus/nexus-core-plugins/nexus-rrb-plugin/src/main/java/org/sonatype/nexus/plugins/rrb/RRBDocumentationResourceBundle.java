@@ -15,4 +15,10 @@ public class RRBDocumentationResourceBundle
         return "nexus-rrb-plugin";
     }
 
+    @Override
+    public String getUrlSnippet()
+    {
+        return "rrb";
+    }
+
 }
