@@ -15,4 +15,10 @@ public class UnpackDocumentationResourceBundle
         return "nexus-unpack-plugin";
     }
 
+    @Override
+    public String getUrlSnippet()
+    {
+        return "unpack";
+    }
+
 }
