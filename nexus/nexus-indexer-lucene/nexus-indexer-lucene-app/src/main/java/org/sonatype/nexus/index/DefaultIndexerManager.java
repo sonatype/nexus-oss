@@ -1471,8 +1471,9 @@ public class DefaultIndexerManager
         {
             if ( getLogger().isDebugEnabled() )
             {
-                getLogger().debug( "Can't publish index on repository \"" + repository.getName() + "\" (ID=\""
-                                       + repository.getId() + "\") since indexing is not supported on it!" );
+                getLogger().debug(
+                    "Can't publish index on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId()
+                        + "\") since indexing is not supported on it!" );
             }
 
             return;
@@ -1531,27 +1532,70 @@ public class DefaultIndexerManager
                     storeItem( repository, file, mergedContext );
                 }
             }
-
         }
         finally
         {
             lock.unlock();
 
-            if ( targetDir != null )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Cleanup of temp files..." );
-                }
-
-                FileUtils.deleteDirectory( targetDir );
-            }
+            Exception lastException = null;
 
             if ( mergedContext != null )
             {
-                mergedContext.close( true );
+                try
+                {
+                    mergedContext.close( true );
+                }
+                catch ( Exception e )
+                {
+                    lastException = e;
 
-                FileUtils.forceDelete( mergedContext.getIndexDirectoryFile() );
+                    getLogger().warn( "Could not close temporary indexing context!", e );
+                }
+
+                try
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Cleanup of temporary indexing context..." );
+                    }
+
+                    FileUtils.forceDelete( mergedContext.getIndexDirectoryFile() );
+                }
+                catch ( Exception e )
+                {
+                    lastException = e;
+
+                    getLogger().debug( "Cleanup of temporary indexing context FAILED...", e );
+                }
+            }
+
+            if ( targetDir != null )
+            {
+                try
+                {
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        getLogger().debug( "Cleanup of temp files..." );
+                    }
+
+                    FileUtils.deleteDirectory( targetDir );
+                }
+                catch ( IOException e )
+                {
+                    lastException = e;
+
+                    getLogger().warn( "Cleanup of temp files FAILED...", e );
+                }
+            }
+
+            if ( lastException != null )
+            {
+                // TODO: for god's sake, use Java6!
+                IOException eek = new IOException( lastException.getMessage() );
+
+                eek.initCause( lastException );
+
+                throw eek;
             }
         }
     }
@@ -1560,6 +1604,7 @@ public class DefaultIndexerManager
         throws IOException
     {
         IndexingContext mergedContext = null;
+
         for ( IndexingContext context : contexts )
         {
             if ( mergedContext == null )
@@ -2186,9 +2231,10 @@ public class DefaultIndexerManager
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
 
-            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
-            req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2,
-                                                                            MatchHighlightMode.HTML ) );
+            req.getMatchHighlightRequests().add(
+                new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
+            req.getMatchHighlightRequests().add(
+                new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
 
             if ( repositoryId != null )
             {
@@ -2542,18 +2588,29 @@ public class DefaultIndexerManager
         return repositoryId + CTX_REMOTE_SUFIX;
     }
 
+    /**
+     * Creates a temporary empty indexing context, based on passed in basecontext.
+     * 
+     * @param baseContext
+     * @return
+     * @throws IOException
+     */
     protected IndexingContext getTempContext( IndexingContext baseContext )
         throws IOException
     {
         File indexDir = baseContext.getIndexDirectoryFile();
+
         File dir = null;
+
         if ( indexDir != null )
         {
             dir = indexDir.getParentFile();
         }
 
         File tmpFile = File.createTempFile( baseContext.getId() + "-tmp", "", dir );
+
         File tmpDir = new File( tmpFile.getParentFile(), tmpFile.getName() + ".dir" );
+
         if ( !tmpDir.mkdirs() )
         {
             throw new IOException( "Cannot create temporary directory: " + tmpDir );
@@ -2562,23 +2619,30 @@ public class DefaultIndexerManager
         FileUtils.forceDelete( tmpFile );
 
         IndexingContext tmpContext = null;
+
         FSDirectory directory = FSDirectory.getDirectory( tmpDir );
 
         try
         {
             tmpContext = new DefaultIndexingContext( baseContext.getId() + "-tmp", //
-                                                     baseContext.getRepositoryId(), //
-                                                     baseContext.getRepository(), //
-                                                     directory, //
-                                                     baseContext.getRepositoryUrl(), //
-                                                     baseContext.getIndexUpdateUrl(), //
-                                                     baseContext.getIndexCreators(), //
-                                                     true );
+                baseContext.getRepositoryId(), //
+                baseContext.getRepository(), //
+                directory, //
+                baseContext.getRepositoryUrl(), //
+                baseContext.getIndexUpdateUrl(), //
+                baseContext.getIndexCreators(), //
+                true );
         }
         catch ( UnsupportedExistingLuceneIndexException e )
         {
             getLogger().error( e.getMessage(), e );
-            throw new IOException( e.getMessage() );
+
+            IOException eek = new IOException( e.getMessage() );
+
+            // TODO: For god sake, switch to Java6 ASAP!
+            eek.initCause( e );
+
+            throw eek;
         }
 
         return tmpContext;
