@@ -442,8 +442,8 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
       });
 
   var root = new Ext.tree.AsyncTreeNode({
-        text : this.payload.data[this.titleColumn],
-        id : this.getBrowsePath(this.payload.data.resourceURI),
+        text : (this.payload ? this.payload.get(this.titleColumn) : '/'),
+        id : (this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/'),
         singleClickExpand : true,
         expanded : true
       });
@@ -516,6 +516,11 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
         this.root.attributes.localStorageUpdated = false;
         this.root.id = this.getBrowsePath(this.payload.data.resourceURI);
         this.root.reload();
+      },
+      
+      updatePayload : function( payload ) {
+        this.payload = payload;
+        this.refreshHandler();
       },
 
       startSearch : function(p) {
