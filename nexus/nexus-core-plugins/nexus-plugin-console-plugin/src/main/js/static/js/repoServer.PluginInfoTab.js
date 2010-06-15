@@ -133,16 +133,22 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         html: 'Documentation',
         style: this.labelClass,
         width: 120
-        });    
-      for (var i=0; i < documentation.length; i++){
-        var url = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation[i] + '/docs/index.html';
-        pluginPropertiesPanel.add({
-          xtype: 'label',
-          name: 'site',
-          html: '<a href="' + url + '" target="_blank">' + url + '</a>',
-          style: this.textClass
         });
+
+      var html = '';
+      for (var i=0; i < documentation.length; i++){
+      	if(i != 0) {
+      		html += ', ';
+      	}
+        var url = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation[i] + '/docs/index.html';
+        html += '<a href="' + url + '" target="_blank">' + documentation[i] + '</a>';
       }
+      pluginPropertiesPanel.add({
+        xtype: 'label',
+        name: 'site',
+        html: html,
+        style: this.textClass
+      });
 	}
     
     var failureReason = this.payload.data.failureReason;

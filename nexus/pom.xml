@@ -305,7 +305,7 @@
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-rest-api</artifactId>
-        <version>${plexus-security.version}</version>
+        <version>${plexus-security.version}.1</version>
         <exclusions>
           <exclusion>
             <groupId>org.mortbay.jetty</groupId>
