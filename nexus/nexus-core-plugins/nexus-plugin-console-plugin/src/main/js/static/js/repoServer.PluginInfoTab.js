@@ -135,18 +135,18 @@ Ext.extend( Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         width: 120
         });
 
-      var html = '';
+      var link = '';
       for (var i=0; i < documentation.length; i++){
       	if(i != 0) {
-      		html += ', ';
+      		link += ', ';
       	}
         var url = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation[i] + '/docs/index.html';
-        html += '<a href="' + url + '" target="_blank">' + documentation[i] + '</a>';
+        link += '<a href="' + url + '" target="_blank">' + documentation[i] + '</a>';
       }
       pluginPropertiesPanel.add({
         xtype: 'label',
         name: 'site',
-        html: html,
+        html: link,
         style: this.textClass
       });
 	}
