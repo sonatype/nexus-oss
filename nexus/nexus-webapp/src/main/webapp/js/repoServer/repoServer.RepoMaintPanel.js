@@ -514,7 +514,7 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       refreshHandler : function(button, e) {
         this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
         this.root.attributes.localStorageUpdated = false;
-        this.root.id = this.getBrowsePath(this.payload.data.resourceURI);
+        this.root.id = this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/',
         this.root.reload();
       },
       
