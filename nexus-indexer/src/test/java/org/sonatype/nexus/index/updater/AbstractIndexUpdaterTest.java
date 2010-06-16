@@ -3,8 +3,6 @@ package org.sonatype.nexus.index.updater;
 import java.io.File;
 import java.io.IOException;
 
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.RAMDirectory;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
@@ -19,7 +17,11 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest;
 public abstract class AbstractIndexUpdaterTest
     extends AbstractIndexCreatorHelper
 {
-    File testBasedir ;
+    File testBasedir;
+ 
+    File repoDir;
+
+    File indexDir;
 
     String repositoryId = "test";
 
@@ -41,6 +43,12 @@ public abstract class AbstractIndexUpdaterTest
 
         testBasedir = new File( getBasedir() , "/target/indexUpdater" );
         testBasedir.mkdirs();
+        
+        repoDir =  new File( getBasedir() , "/target/indexUpdaterRepoDir" );
+        repoDir.mkdirs();
+
+        indexDir =  new File( getBasedir() , "/target/indexUpdaterIndexDir" );
+        indexDir.mkdirs();
 
         indexer = lookup( NexusIndexer.class );
 
@@ -48,13 +56,11 @@ public abstract class AbstractIndexUpdaterTest
 
         packer = lookup( IndexPacker.class );
 
-        Directory indexDirectory = new RAMDirectory();
-
         context = indexer.addIndexingContext(
             repositoryId,
             repositoryId,
-            null,
-            indexDirectory,
+            repoDir,
+            indexDir,
             repositoryUrl,
             null,
             MIN_CREATORS );
@@ -67,6 +73,10 @@ public abstract class AbstractIndexUpdaterTest
         super.tearDown();
 
         FileUtils.forceDelete( testBasedir );
+        
+        FileUtils.forceDelete( repoDir );
+
+        FileUtils.forceDelete( indexDir );
     }
     
     

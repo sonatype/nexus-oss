@@ -22,7 +22,7 @@ public class LocalIndexCacheTest
     private File remoteRepo;
 
     private File localCacheDir;
-
+    
     private File indexDir;
 
     private IndexingContext tempContext;
@@ -44,7 +44,6 @@ public class LocalIndexCacheTest
         indexDir = new File( "target/localcache/index" ).getCanonicalFile();
         FileUtils.deleteDirectory( indexDir );
         indexDir.mkdirs();
-
     }
 
     @Override
@@ -62,7 +61,7 @@ public class LocalIndexCacheTest
         removeTempContext();
 
         tempContext =
-            indexer.addIndexingContext( repositoryId + "temp", repositoryId, null, indexDir, repositoryUrl, null,
+            indexer.addIndexingContext( repositoryId + "temp", repositoryId, repoDir, indexDir, repositoryUrl, null,
                                         MIN_CREATORS );
 
         return tempContext;
