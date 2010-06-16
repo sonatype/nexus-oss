@@ -22,8 +22,6 @@ public abstract class AbstractDocumentationNexusResourceBundle
     @Requirement
     private MimeUtil mimeUtil;
 
-  
-
     public List<StaticResource> getContributedResouces()
     {
         List<StaticResource> resources = new LinkedList<StaticResource>();
@@ -49,14 +47,19 @@ public abstract class AbstractDocumentationNexusResourceBundle
 
                 name = "/" + name;
 
-                URL url = new URL( "jar:file:/" + zip.getName() + "!" + name );
+                URL url = new URL( "jar:file:" + zip.getName() + "!" + name );
                 String path = "/" + getUrlSnippet() + name;
                 resources.add( new DefaultStaticResource( url, path, mimeUtil.getMimeType( name ) ) );
+            }
+
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Discovered documentation for: '" + getPluginId() + "': " + resources.toString() );
             }
         }
         catch ( IOException e )
         {
-            getLogger().error( "Error discovering plugin documentation", e );
+            getLogger().error( "Error discovering plugin documentation " + getPluginId(), e );
         }
         finally
         {

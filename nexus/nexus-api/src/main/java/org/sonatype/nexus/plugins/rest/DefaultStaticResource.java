@@ -121,4 +121,25 @@ public class DefaultStaticResource
         }
         return null;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append( "DefaultStaticResource [" );
+        if ( path != null )
+        {
+            builder.append( "path=" );
+            builder.append( path );
+            builder.append( ", " );
+        }
+        if ( contentType != null )
+        {
+            builder.append( "contentType=" );
+            builder.append( contentType );
+        }
+        builder.append( "]" );
+        return builder.toString();
+    }
+
 }
