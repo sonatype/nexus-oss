@@ -71,6 +71,9 @@ public abstract class AbstractIndexUpdaterTest
         throws Exception
     {
         super.tearDown();
+        
+        // this one closes it too
+        indexer.removeIndexingContext( context, true );
 
         FileUtils.forceDelete( testBasedir );
         
