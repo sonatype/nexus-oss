@@ -270,8 +270,9 @@ public class Nexus383SearchIT
         TaskScheduleUtil.waitForTasks();
 
         // Keyword search does collapse results, so we need _1_
+        // Not since NEXUS-3595, because we have only 3 hits, collapse will be overridden
         List<NexusArtifact> results = getSearchMessageUtil().searchFor( "crossArtifact" );
-        Assert.assertEquals( 1, results.size() );
+        Assert.assertEquals( 3, results.size() );
 
         // GAV search does not
         results = getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), null );
