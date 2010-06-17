@@ -54,6 +54,8 @@ public abstract class AbstractIndexPlexusResource
 {
     private static final int HIT_LIMIT = 500;
 
+    private static final int COLLAPSE_OVERRIDE_TRESHOLD = 35;
+
     public static final String DOMAIN = "domain";
 
     public static final String DOMAIN_REPOSITORIES = "repositories";
@@ -245,33 +247,36 @@ public abstract class AbstractIndexPlexusResource
                     }
                 }
 
-                // filters should affect only Keyword and GAVSearch!
-                // TODO: maybe we should left this to the given Searcher implementation to handle (like kw and gav
-                // searcer is)
-                // Downside would be that REST query params would be too far away from incoming call (too spread)
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
-                
-                if ( searcher instanceof KeywordSearcher || searcher instanceof MavenCoordinatesSearcher )
+
+                if ( collapseResults )
                 {
-                    UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
-                    
-                    filter.addField( MAVEN.GROUP_ID );
-                    filter.addField( MAVEN.ARTIFACT_ID );
+                    // filters should affect only Keyword and GAVSearch!
+                    // TODO: maybe we should left this to the given Searcher implementation to handle (like kw and gav
+                    // searcer is)
+                    // Downside would be that REST query params would be too far away from incoming call (too spread)
+                    if ( searcher instanceof KeywordSearcher || searcher instanceof MavenCoordinatesSearcher )
+                    {
+                        UniqueArtifactFilterPostprocessor filter = new UniqueArtifactFilterPostprocessor();
 
-                    if ( Boolean.TRUE.equals( expandVersion ) || !collapseResults )
-                    {
-                        filter.addField( MAVEN.VERSION );
-                    }
-                    if ( Boolean.TRUE.equals( expandPackaging ) || !collapseResults )
-                    {
-                        filter.addField( MAVEN.PACKAGING );
-                    }
-                    if ( Boolean.TRUE.equals( expandClassifier ) || !collapseResults )
-                    {
-                        filter.addField( MAVEN.CLASSIFIER );
-                    }
+                        filter.addField( MAVEN.GROUP_ID );
+                        filter.addField( MAVEN.ARTIFACT_ID );
 
-                    filters.add( filter );
+                        if ( Boolean.TRUE.equals( expandVersion ) )
+                        {
+                            filter.addField( MAVEN.VERSION );
+                        }
+                        if ( Boolean.TRUE.equals( expandPackaging ) )
+                        {
+                            filter.addField( MAVEN.PACKAGING );
+                        }
+                        if ( Boolean.TRUE.equals( expandClassifier ) )
+                        {
+                            filter.addField( MAVEN.CLASSIFIER );
+                        }
+
+                        filters.add( filter );
+                    }
                 }
 
                 final IteratorSearchResponse searchResponse =
@@ -283,8 +288,17 @@ public abstract class AbstractIndexPlexusResource
                     {
                         return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
                     }
-
-                    return searchResponse;
+                    else if ( collapseResults && searchResponse.getTotalHits() < COLLAPSE_OVERRIDE_TRESHOLD )
+                    {
+                        // this was a "collapsed" search (probably initiated by UI), and we have less then treshold hits
+                        // override collapse
+                        return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, expandPackaging,
+                            expandClassifier, false );
+                    }
+                    else
+                    {
+                        return searchResponse;
+                    }
                 }
             }
         }
