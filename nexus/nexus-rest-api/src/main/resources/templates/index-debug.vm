@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="ext-2.2/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="ext-2.2/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/Sonatype.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
+  <link rel="stylesheet" href="style/Ext.ux.form.LovCombo.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
   <script src="ext-2.2/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
   <script src="ext-2.2/ext-all.js" type="text/javascript" charset="utf-8"></script>
@@ -60,6 +61,8 @@
   <script src="js/extensions/Sonatype.events.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Sonatype.navigation.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Sonatype.panels.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Ext.ux.form.LovCombo.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/Ext.ux.ThemeCombo.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/Sonatype.utils.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.config.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

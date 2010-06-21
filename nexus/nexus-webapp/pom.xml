@@ -381,6 +381,8 @@
                     <include>${compressed-dir}/js/extensions/Sonatype.events.js</include>
                     <include>${compressed-dir}/js/extensions/Sonatype.navigation.js</include>
                     <include>${compressed-dir}/js/extensions/Sonatype.panels.js</include>
+                    <include>${compressed-dir}/js/extensions/Ext.ux.form.LovCombo.js</include>
+                    <include>${compressed-dir}/js/extensions/Ext.ux.ThemeCombo.js</include>
                     <include>${compressed-dir}/js/Sonatype.utils.js</include>
                     <include>${compressed-dir}/js/Sonatype.config.js</include>
                     <include>${compressed-dir}/js/Sonatype.lib.js</include>
@@ -430,6 +432,7 @@
                   <output>${compressed-dir}/style/sonatype-all.css</output>
                   <!-- files to include, path relative to output's directory or absolute path-->
                   <includes>
+                    <include>${compressed-dir}/style/Ext.ux.form.LovCombo.css</include>
                     <include>${compressed-dir}/style/Sonatype.css</include>
                   </includes>
                 </aggregation>
