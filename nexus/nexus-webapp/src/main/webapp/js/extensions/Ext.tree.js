@@ -91,6 +91,10 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
         {
           var o = eval("(" + json + ")");
           o = o.data; // diff
+          if ( this.jsonRoot ) {
+          	o = o[this.jsonRoot];
+          }
+          
           node.beginUpdate();
           for (var i = 0, len = o.length; i < len; i++)
           {
@@ -117,6 +121,12 @@ Ext.extend(Ext.tree.SonatypeTreeLoader, Ext.tree.TreeLoader, {
         if (this.baseAttrs)
         {
           Ext.applyIf(attr, this.baseAttrs);
+        }
+        if (this.nodeTextAttribute){
+          attr.text = attr[this.nodeTextAttribute];
+        }
+        if (this.nodeForceLeaf){
+          attr.leaf = true;
         }
         if (!attr.id)
         { // diff
