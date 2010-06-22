@@ -105,6 +105,8 @@ public class RepositoryGroupListPlexusResource
 
                 resource.setExposed( group.isExposed() );
 
+                resource.setUserManaged( group.isUserManaged() );
+
                 resource.setFormat( getRepositoryRegistry()
                     .getRepositoryWithFacet( group.getId(), GroupRepository.class ).getRepositoryContentClass()
                     .getId() );

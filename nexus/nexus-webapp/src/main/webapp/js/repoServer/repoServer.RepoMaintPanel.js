@@ -46,6 +46,32 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
     scope : this
   };
 
+  this.browseTypeButton = new Ext.Button({
+        text : 'User Managed Repositories',
+        icon : Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
+        cls : 'x-btn-text-icon',
+        value : 'user',
+        tooltip : 'Click to browse other types of repositories.',
+        scope : this,
+        menu : {
+          items : [{
+                text : 'User Managed Repositories',
+                value : 'user',
+                checked : true,
+                group : 'repo-view-selector',
+                scope : this,
+                handler : this.switchBrowseType
+              }, {
+                text : 'Nexus Managed Repositories',
+                value : 'nexus',
+                checked : false,
+                group : 'repo-view-selector',
+                scope : this,
+                handler : this.switchBrowseType
+              }]
+        }
+      });
+
   this.groupStore = new Ext.data.JsonStore({
         root : 'data',
         id : 'resourceURI',
@@ -91,35 +117,22 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
         url : Sonatype.config.repos.urls.groups,
         listeners : {
           load : function(store, records, options) {
+            switch (this.browseTypeButton.value)
+            {
+              case 'nexus' :
+                store.filterBy(function(rec, id) {
+                      return !rec.get("userManaged");
+                    }, this);
+                break;
+              case 'user' :
+                store.filterBy(function(rec, id) {
+                      return rec.get("userManaged");
+                    }, this);
+                break;
+            }
             this.dataStore.insert(0, store.data.items);
           },
           scope : this
-        }
-      });
-
-  this.browseTypeButton = new Ext.Button({
-        text : 'User Managed Repositories',
-        icon : Sonatype.config.resourcePath + '/images/icons/page_white_stack.png',
-        cls : 'x-btn-text-icon',
-        value : 'user',
-        tooltip : 'Click to browse other types of repositories.',
-        scope : this,
-        menu : {
-          items : [{
-                text : 'User Managed Repositories',
-                value : 'user',
-                checked : true,
-                group : 'repo-view-selector',
-                scope : this,
-                handler : this.switchBrowseType
-              }, {
-                text : 'Nexus Managed Repositories',
-                value : 'nexus',
-                checked : false,
-                group : 'repo-view-selector',
-                scope : this,
-                handler : this.switchBrowseType
-              }]
         }
       });
 
@@ -514,11 +527,10 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       refreshHandler : function(button, e) {
         this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
         this.root.attributes.localStorageUpdated = false;
-        this.root.id = this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/',
-        this.root.reload();
+        this.root.id = this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/', this.root.reload();
       },
-      
-      updatePayload : function( payload ) {
+
+      updatePayload : function(payload) {
         this.payload = payload;
         this.refreshHandler();
       },

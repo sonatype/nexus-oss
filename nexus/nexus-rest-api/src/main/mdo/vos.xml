@@ -1339,6 +1339,13 @@
           <required>true</required>
           <description>Flag that states if the repository group is available over the content resource.</description>
         </field>
+        <field>
+          <name>userManaged</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if the repository is manageable by the user.</description>
+        </field>
       </fields>
     </class>
 
