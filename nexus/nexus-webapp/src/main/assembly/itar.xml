@@ -80,6 +80,7 @@
         <include>js/repoServer/*</include>
         <include>style/Sonatype.css</include>
         <include>style/Sonatype-content.css</include>
+        <include>style/Ext.ux.form.LovCombo.css</include>
         <include>images/**</include>
         <include>WEB-INF/*</include>
       </includes>
