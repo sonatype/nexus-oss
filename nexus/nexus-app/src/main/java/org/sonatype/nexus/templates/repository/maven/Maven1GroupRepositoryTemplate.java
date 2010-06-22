@@ -37,6 +37,9 @@ public class Maven1GroupRepositoryTemplate
         repo.setProviderRole( GroupRepository.class.getName() );
         repo.setProviderHint( "maven1" );
 
+        // groups should not participate in searches
+        repo.setSearchable( false );
+
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 

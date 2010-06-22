@@ -22,8 +22,8 @@ public class Maven2GroupRepositoryTemplate
 
     public M2GroupRepositoryConfiguration getExternalConfiguration( boolean forWrite )
     {
-        return (M2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration()
-            .getConfiguration( forWrite );
+        return (M2GroupRepositoryConfiguration) getCoreConfiguration().getExternalConfiguration().getConfiguration(
+            forWrite );
     }
 
     @Override
@@ -37,6 +37,9 @@ public class Maven2GroupRepositoryTemplate
         repo.setProviderRole( GroupRepository.class.getName() );
         repo.setProviderHint( "maven2" );
 
+        // groups should not participate in searches
+        repo.setSearchable( false );
+
         Xpp3Dom ex = new Xpp3Dom( DefaultCRepository.EXTERNAL_CONFIGURATION_NODE_NAME );
         repo.setExternalConfiguration( ex );
 
@@ -46,18 +49,14 @@ public class Maven2GroupRepositoryTemplate
         repo.setWritePolicy( RepositoryWritePolicy.READ_ONLY.name() );
 
         CRepositoryCoreConfiguration result =
-            new CRepositoryCoreConfiguration(
-                                              getTemplateProvider().getApplicationConfiguration(),
-                                              repo,
-                                              new CRepositoryExternalConfigurationHolderFactory<M2GroupRepositoryConfiguration>()
-                                              {
-                                                  public M2GroupRepositoryConfiguration createExternalConfigurationHolder(
-                                                                                                                           CRepository config )
-                                                  {
-                                                      return new M2GroupRepositoryConfiguration( (Xpp3Dom) config
-                                                          .getExternalConfiguration() );
-                                                  }
-                                              } );
+            new CRepositoryCoreConfiguration( getTemplateProvider().getApplicationConfiguration(), repo,
+                new CRepositoryExternalConfigurationHolderFactory<M2GroupRepositoryConfiguration>()
+                {
+                    public M2GroupRepositoryConfiguration createExternalConfigurationHolder( CRepository config )
+                    {
+                        return new M2GroupRepositoryConfiguration( (Xpp3Dom) config.getExternalConfiguration() );
+                    }
+                } );
 
         return result;
     }
