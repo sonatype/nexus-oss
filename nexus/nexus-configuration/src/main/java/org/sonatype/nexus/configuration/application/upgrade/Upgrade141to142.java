@@ -23,17 +23,15 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v1_4_1.CNotification;
-import org.sonatype.nexus.configuration.model.v1_4_1.upgrade.BasicVersionConverter;
-
+import org.sonatype.nexus.configuration.model.v1_4_2.upgrade.BasicVersionConverter;
 
 /**
- * Upgrades configuration model from version 1.4.0 to 1.4.1.
+ * Upgrades configuration model from version 1.4.1 to 1.4.2.
  * 
  * @author bdemers
  */
-@Component( role = SingleVersionUpgrader.class, hint = "1.4.0" )
-public class Upgrade140to141
+@Component( role = SingleVersionUpgrader.class, hint = "1.4.1" )
+public class Upgrade141to142
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
@@ -43,14 +41,15 @@ public class Upgrade140to141
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.v1_4_0.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v1_4_1.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.v1_4_0.io.xpp3.NexusConfigurationXpp3Reader reader = new org.sonatype.nexus.configuration.model.v1_4_0.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v1_4_1.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v1_4_1.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
@@ -72,23 +71,24 @@ public class Upgrade140to141
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.nexus.configuration.model.v1_4_0.Configuration oldc = (org.sonatype.nexus.configuration.model.v1_4_0.Configuration) message
-        .getConfiguration();
+        org.sonatype.nexus.configuration.model.v1_4_1.Configuration oldc =
+            (org.sonatype.nexus.configuration.model.v1_4_1.Configuration) message.getConfiguration();
 
-        org.sonatype.nexus.configuration.model.v1_4_1.Configuration newc = new BasicVersionConverter().convertConfiguration( oldc );
-        
-        // just add it, default is disabled
-        newc.setNotification( new CNotification() );
-        
-        // we don't allow user to change this field any longer
-        if ( newc.getErrorReporting() != null )
+        org.sonatype.nexus.configuration.model.Configuration newc =
+            new BasicVersionConverter().convertConfiguration( oldc );
+
+        // fix for NEXUS-3604
+        for ( org.sonatype.nexus.configuration.model.CRepository repository : newc.getRepositories() )
         {
-            newc.getErrorReporting().setUseGlobalProxy( true );
+            if ( "org.sonatype.nexus.proxy.repository.GroupRepository".equals( repository.getProviderRole() ) )
+            {
+                repository.setSearchable( false );
+            }
         }
-        
-        newc.setVersion( org.sonatype.nexus.configuration.model.v1_4_1.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_4_1.Configuration.MODEL_VERSION );
+
+        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
-    
+
 }
