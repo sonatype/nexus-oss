@@ -490,7 +490,7 @@
             js/repoServer/*,
             style/Sonatype.css,
             style/Sonatype-content.css,
-            style/Ext.ux.form.LovCombo.css
+            style/Ext.ux.form.LovCombo.css,
             WEB-INF/*,
             js/sonatype-all.js,
             style/sonatype-all.css
