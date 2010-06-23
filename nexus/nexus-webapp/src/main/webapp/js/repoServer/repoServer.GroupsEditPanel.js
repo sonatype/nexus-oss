@@ -334,6 +334,8 @@ Sonatype.Events.addListener('repositoryAddMenuInit', function(menu) {
               handler : function(container, rec, item, e) {
                 rec.beginEdit();
                 rec.set('repoType', 'group');
+                rec.set('exposed', true);
+                rec.set('userManaged', true);
                 rec.commit();
                 rec.endEdit();
               },
