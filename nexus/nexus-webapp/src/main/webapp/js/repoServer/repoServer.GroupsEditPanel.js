@@ -291,7 +291,7 @@ Ext.extend(Sonatype.repoServer.RepositoryGroupEditor, Sonatype.ext.FormPanel, {
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
       var sp = Sonatype.lib.Permissions;
 
-      if (rec.data.repoType == 'group' && sp.checkPermission('nexus:repogroups', sp.READ) && (sp.checkPermission('nexus:repogroups', sp.CREATE) || sp.checkPermission('nexus:repogroups', sp.EDIT)))
+      if (rec.data.repoType == 'group' && rec.data.userManaged && sp.checkPermission('nexus:repogroups', sp.READ) && (sp.checkPermission('nexus:repogroups', sp.CREATE) || sp.checkPermission('nexus:repogroups', sp.EDIT)))
       {
 
         var editor = new Sonatype.repoServer.RepositoryGroupEditor({
