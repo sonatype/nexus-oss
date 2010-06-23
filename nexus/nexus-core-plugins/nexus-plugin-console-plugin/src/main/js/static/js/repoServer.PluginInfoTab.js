@@ -229,13 +229,3 @@ Ext.extend( Sonatype.repoServer.RestInfoTab, Ext.grid.GridPanel, {
     }
   }
 });
-
-Sonatype.Events.addListener( 'pluginInfoInit', function( cardPanel, rec, gridPanel ) {
-  if(rec.data.restInfos && rec.data.restInfos.length > 0){
-    cardPanel.add( new Sonatype.repoServer.RestInfoTab( {
-      name: 'rest',
-      tabTitle: 'REST Services',
-      payload: rec 
-    } ) );
-  }
-} );
