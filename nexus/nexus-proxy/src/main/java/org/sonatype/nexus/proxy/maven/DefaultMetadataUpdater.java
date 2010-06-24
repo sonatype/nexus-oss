@@ -35,6 +35,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
@@ -122,7 +123,7 @@ public class DefaultMetadataUpdater
         }
         catch ( MetadataException e )
         {
-            throw new StorageException( "Not able to apply changes!", e );
+            throw new LocalStorageException( "Not able to apply changes!", e );
         }
     }
 
@@ -201,7 +202,7 @@ public class DefaultMetadataUpdater
         }
         catch ( MetadataException e )
         {
-            throw new StorageException( "Not able to apply changes!", e );
+            throw new LocalStorageException( "Not able to apply changes!", e );
         }
     }
 

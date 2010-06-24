@@ -42,6 +42,7 @@ import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHo
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
@@ -133,7 +134,7 @@ public class M2GroupRepository
             }
             catch ( UnsupportedStorageOperationException e )
             {
-                throw new StorageException( e );
+                throw new LocalStorageException( e );
             }
         }
 
@@ -272,15 +273,15 @@ public class M2GroupRepository
         }
         catch ( IOException e )
         {
-            throw new StorageException( "Got IOException during M2 metadata merging.", e );
+            throw new LocalStorageException( "Got IOException during M2 metadata merging.", e );
         }
         catch ( MetadataException e )
         {
-            throw new StorageException( "Got MetadataException during M2 metadata merging.", e );
+            throw new LocalStorageException( "Got MetadataException during M2 metadata merging.", e );
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw new StorageException( "Got NoSuchAlgorithmException during M2 metadata merging.", e );
+            throw new LocalStorageException( "Got NoSuchAlgorithmException during M2 metadata merging.", e );
         }
     }
 

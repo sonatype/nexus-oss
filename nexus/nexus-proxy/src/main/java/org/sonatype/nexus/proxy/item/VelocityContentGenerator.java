@@ -10,6 +10,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.velocity.VelocityComponent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
@@ -41,7 +42,7 @@ public class VelocityContentGenerator
         }
         catch ( Exception e )
         {
-            throw new StorageException( "Could not expand the template: " + item.getRepositoryItemUid().toString(), e );
+            throw new LocalStorageException( "Could not expand the template: " + item.getRepositoryItemUid().toString(), e );
         }
         finally
         {

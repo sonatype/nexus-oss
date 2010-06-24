@@ -17,6 +17,7 @@ import org.mortbay.jetty.HttpStatus;
 import org.mortbay.jetty.client.CachedExchange;
 import org.mortbay.util.DateCache;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -75,7 +76,7 @@ public abstract class AbstractNexusExchange
         }
         catch ( InterruptedException e )
         {
-            throw new StorageException( e );
+            throw new RemoteStorageException( e );
         }
 
         if ( getResponseStatus() == HttpStatus.ORDINAL_404_Not_Found )
@@ -85,7 +86,7 @@ public abstract class AbstractNexusExchange
 
         if ( !doValidate() )
         {
-            throw new StorageException( "Response to '" + toString() + "' exchange was not not expected: "
+            throw new RemoteStorageException( "Response to '" + toString() + "' exchange was not not expected: "
                 + HttpStatus.getResponseLine( getResponseStatus() ) );
         }
     }

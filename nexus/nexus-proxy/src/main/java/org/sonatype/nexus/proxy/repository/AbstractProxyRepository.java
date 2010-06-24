@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.Action;
@@ -559,7 +560,7 @@ public abstract class AbstractProxyRepository
         }
         else
         {
-            throw new StorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\"" + getId()
+            throw new RemoteStorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\"" + getId()
                 + "\"), cannot set remoteUrl!" );
         }
     }
@@ -970,7 +971,7 @@ public abstract class AbstractProxyRepository
                             }
 
                         }
-                        catch ( RemoteAccessException ex )
+                        catch ( RemoteStorageException ex )
                         {
                             autoBlockProxying( ex );
 
@@ -980,8 +981,6 @@ public abstract class AbstractProxyRepository
                         }
                         catch ( StorageException ex )
                         {
-                            autoBlockProxying( ex );
-
                             // do not go remote, but we did not mark it as "remote checked" also.
                             // let the user do proper setup and probably it will try again
                             shouldGetRemote = false;
@@ -1005,13 +1004,12 @@ public abstract class AbstractProxyRepository
                                 getLogger().debug( "Item " + request.toString() + " found in remote storage." );
                             }
                         }
-                        catch ( RemoteAccessException ex )
-                        {
-                            autoBlockProxying( ex );
-                        }
                         catch ( StorageException ex )
                         {
-                            autoBlockProxying( ex );
+                            if ( ex instanceof RemoteStorageException )
+                            {
+                                autoBlockProxying( ex );
+                            }
 
                             remoteItem = null;
 
@@ -1493,12 +1491,9 @@ public abstract class AbstractProxyRepository
                         }
                     }
                 }
-                catch ( RemoteAccessException e )
+                catch ( RemoteStorageException e )
                 {
-                    autoBlockProxying( e );
-                }
-                catch ( StorageException e )
-                {
+                    // autoblock only when remote problems occur
                     autoBlockProxying( e );
                 }
             }

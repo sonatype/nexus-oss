@@ -27,6 +27,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -213,12 +214,12 @@ public class DefaultFSWastebasket
         catch ( IOException e )
         {
             // yell
-            throw new StorageException( "Got IOException during wastebasket handling!", e );
+            throw new LocalStorageException( "Got IOException during wastebasket handling!", e );
         }
         catch ( UnsupportedStorageOperationException e )
         {
             // yell
-            throw new StorageException( "Deletion operation is unsupported!", e );
+            throw new LocalStorageException( "Deletion operation is unsupported!", e );
         }
     }
 

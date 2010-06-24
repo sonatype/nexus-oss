@@ -26,6 +26,7 @@ import org.sonatype.nexus.SystemStatus;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
@@ -105,7 +106,7 @@ public abstract class AbstractRemoteRepositoryStorage
         }
         catch ( MalformedURLException e )
         {
-            throw new StorageException( "The repository has broken URL!", e );
+            throw new RemoteStorageException( "The repository has broken URL!", e );
         }
 
     }

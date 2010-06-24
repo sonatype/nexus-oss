@@ -29,6 +29,7 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -79,7 +80,7 @@ public class ArtifactStoreHelper
             }
             catch ( IOException e )
             {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+                throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
             }
 
             StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem( false, request );
@@ -110,7 +111,7 @@ public class ArtifactStoreHelper
         }
         catch ( ItemNotFoundException e )
         {
-            throw new StorageException( "Storage inconsistency!", e );
+            throw new LocalStorageException( "Storage inconsistency!", e );
         }
         finally
         {
@@ -188,7 +189,7 @@ public class ArtifactStoreHelper
             }
             catch ( IOException e )
             {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+                throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
             }
 
             StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem(
@@ -223,7 +224,7 @@ public class ArtifactStoreHelper
         }
         catch ( ItemNotFoundException e )
         {
-            throw new StorageException( "Storage inconsistency!", e );
+            throw new LocalStorageException( "Storage inconsistency!", e );
         }
     }
 
@@ -335,7 +336,7 @@ public class ArtifactStoreHelper
         }
         catch ( IOException e )
         {
-            throw new StorageException( "Could not maintain metadata!", e );
+            throw new LocalStorageException( "Could not maintain metadata!", e );
         }
 
         StorageItem item = repository.retrieveItem( gavRequest );
@@ -346,7 +347,7 @@ public class ArtifactStoreHelper
         }
         else
         {
-            throw new StorageException( "The Artifact retrieval returned non-file, path:" + item.getRepositoryItemUid().toString() );
+            throw new LocalStorageException( "The Artifact retrieval returned non-file, path:" + item.getRepositoryItemUid().toString() );
         }
     }
 
@@ -374,7 +375,7 @@ public class ArtifactStoreHelper
         }
         catch ( IOException e )
         {
-            throw new StorageException( "Could not maintain metadata!", e );
+            throw new LocalStorageException( "Could not maintain metadata!", e );
         }
     }
 
@@ -475,7 +476,7 @@ public class ArtifactStoreHelper
             }
             catch ( IOException ex )
             {
-                throw new StorageException( "Could not maintain metadata!", ex );
+                throw new LocalStorageException( "Could not maintain metadata!", ex );
             }
 
         }
@@ -566,7 +567,7 @@ public class ArtifactStoreHelper
         }
         catch ( IOException e )
         {
-            throw new StorageException( "Could not maintain metadata!", e );
+            throw new LocalStorageException( "Could not maintain metadata!", e );
         }
 
         if ( deleteWholeGav )

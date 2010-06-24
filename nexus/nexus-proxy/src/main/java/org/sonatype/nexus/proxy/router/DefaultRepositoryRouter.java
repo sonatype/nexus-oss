@@ -35,6 +35,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -240,7 +241,7 @@ public class DefaultRepositoryRouter
                     catch ( IOException e )
                     {
                         // XXX: this is nonsense, to box IOException into subclass of IOException!
-                        throw new StorageException( e );
+                        throw new LocalStorageException( e );
                     }
                 }
                 else if ( item instanceof StorageCollectionItem )

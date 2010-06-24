@@ -42,6 +42,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -93,13 +94,13 @@ public class CommonsHttpClientRemoteStorage
 
             if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
             {
-                throw new StorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
+                throw new RemoteStorageException( "Unsupported protocol, only HTTP/HTTPS protocols are supported: "
                                             + u.getProtocol().toLowerCase() );
             }
         }
         catch ( MalformedURLException e )
         {
-            throw new StorageException( "Malformed URL", e );
+            throw new RemoteStorageException( "Malformed URL", e );
         }
     }
 
@@ -220,7 +221,7 @@ public class CommonsHttpClientRemoteStorage
             {
                 method.releaseConnection();
 
-                throw new StorageException( "IO Error during response stream handling [repositoryId=\""
+                throw new RemoteStorageException( "IO Error during response stream handling [repositoryId=\""
                                             + repository.getId() + "\", requestPath=\"" + request.getRequestPath()
                                             + "\", remoteUrl=\"" + remoteURL.toString() + "\"]!", ex );
             }
@@ -243,7 +244,7 @@ public class CommonsHttpClientRemoteStorage
             }
             else
             {
-                throw new StorageException( "The method execution returned result code " + response
+                throw new RemoteStorageException( "The method execution returned result code " + response
                                             + ". [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                             + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
                                             + "\"]" );
@@ -277,7 +278,7 @@ public class CommonsHttpClientRemoteStorage
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_CREATED
                  && response != HttpStatus.SC_NO_CONTENT && response != HttpStatus.SC_ACCEPTED )
             {
-                throw new StorageException( "Unexpected response code while executing " + method.getName()
+                throw new RemoteStorageException( "Unexpected response code while executing " + method.getName()
                                             + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                             + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
                                             + "\"]. Expected: \"any success (2xx)\". Received: " + response + " : "
@@ -286,7 +287,7 @@ public class CommonsHttpClientRemoteStorage
         }
         catch ( IOException e )
         {
-            throw new StorageException( e.getMessage() + " [repositoryId=\"" + repository.getId()
+            throw new RemoteStorageException( e.getMessage() + " [repositoryId=\"" + repository.getId()
                                         + "\", requestPath=\"" + request.getRequestPath() + "\", remoteUrl=\""
                                         + remoteURL.toString() + "\"]", e );
         }
@@ -310,7 +311,7 @@ public class CommonsHttpClientRemoteStorage
             if ( response != HttpStatus.SC_OK && response != HttpStatus.SC_NO_CONTENT
                  && response != HttpStatus.SC_ACCEPTED )
             {
-                throw new StorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
+                throw new RemoteStorageException( "The response to HTTP " + method.getName() + " was unexpected HTTP Code "
                                             + response + " : " + HttpStatus.getStatusText( response )
                                             + " [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                             + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
@@ -429,7 +430,7 @@ public class CommonsHttpClientRemoteStorage
         {
             method.releaseConnection();
 
-            throw new StorageException( "Protocol error while executing " + method.getName()
+            throw new RemoteStorageException( "Protocol error while executing " + method.getName()
                                         + " method. [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                         + request.getRequestPath() + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
@@ -437,7 +438,7 @@ public class CommonsHttpClientRemoteStorage
         {
             method.releaseConnection();
 
-            throw new StorageException( "Transport error while executing " + method.getName()
+            throw new RemoteStorageException( "Transport error while executing " + method.getName()
                                         + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                         + request.getRequestPath() + "\", remoteUrl=\"" + methodURI + "\"]", ex );
         }
@@ -570,7 +571,7 @@ public class CommonsHttpClientRemoteStorage
             }
             else
             {
-                throw new StorageException( "Unexpected response code while executing " + method.getName()
+                throw new RemoteStorageException( "Unexpected response code while executing " + method.getName()
                                             + " method [repositoryId=\"" + repository.getId() + "\", requestPath=\""
                                             + request.getRequestPath() + "\", remoteUrl=\"" + remoteURL.toString()
                                             + "\"]. Expected: \"SUCCESS (200)\". Received: " + response + " : "

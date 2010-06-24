@@ -31,6 +31,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -153,7 +154,7 @@ public class DefaultFSLocalRepositoryStorage
 
         if ( !result )
         {
-            throw new StorageException( "Invalid storage URL, not a file based one: " + url );
+            throw new LocalStorageException( "Invalid storage URL, not a file based one: " + url );
         }
     }
 
@@ -186,7 +187,7 @@ public class DefaultFSLocalRepositoryStorage
         {
             if ( file.isFile() )
             {
-                throw new StorageException( "The \"" + repository.getName() + "\" (ID=\"" + repository.getId()
+                throw new LocalStorageException( "The \"" + repository.getName() + "\" (ID=\"" + repository.getId()
                     + "\") repository's baseDir is not a directory, path: " + file.getAbsolutePath() );
             }
         }
@@ -194,7 +195,7 @@ public class DefaultFSLocalRepositoryStorage
         {
             if ( !file.mkdirs() )
             {
-                throw new StorageException( "Could not create the baseDir directory for repository \""
+                throw new LocalStorageException( "Could not create the baseDir directory for repository \""
                     + repository.getName() + "\" (ID=\"" + repository.getId() + "\") on path " + file.getAbsolutePath() );
             }
         }
@@ -241,7 +242,7 @@ public class DefaultFSLocalRepositoryStorage
         // to be foolproof, chrooting it
         if ( !result.getAbsolutePath().startsWith( getBaseDir( repository, request ).getAbsolutePath() ) )
         {
-            throw new StorageException( "getFileFromBase() method evaluated directory wrongly in repository \""
+            throw new LocalStorageException( "getFileFromBase() method evaluated directory wrongly in repository \""
                 + repository.getName() + "\" (id=\"" + repository.getId() + "\")! baseDir="
                 + getBaseDir( repository, request ).getAbsolutePath() + ", target=" + result.getAbsolutePath() );
         }
@@ -369,7 +370,7 @@ public class DefaultFSLocalRepositoryStorage
             // recheck is it really a "good" parent?
             if ( !target.getParentFile().isDirectory() )
             {
-                throw new StorageException( "Could not create the directory hiearchy in repository \""
+                throw new LocalStorageException( "Could not create the directory hiearchy in repository \""
                     + repository.getName() + "\" (id=\"" + repository.getId() + "\") to write "
                     + target.getAbsolutePath() );
             }
@@ -455,7 +456,7 @@ public class DefaultFSLocalRepositoryStorage
                     hiddenTarget.delete();
                 }
 
-                throw new StorageException( "Got exception during storing on path "
+                throw new LocalStorageException( "Got exception during storing on path "
                     + item.getRepositoryItemUid().toString(), e );
             }
         }
@@ -496,7 +497,7 @@ public class DefaultFSLocalRepositoryStorage
                     target.delete();
                 }
 
-                throw new StorageException( "Got exception during storing on path "
+                throw new LocalStorageException( "Got exception during storing on path "
                     + item.getRepositoryItemUid().toString(), ex );
             }
         }
@@ -592,7 +593,7 @@ public class DefaultFSLocalRepositoryStorage
                 }
                 catch ( IOException ex )
                 {
-                    throw new StorageException( "Could not delete File in repository \"" + repository.getName()
+                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
                         + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath(), ex );
                 }
             }
@@ -600,7 +601,7 @@ public class DefaultFSLocalRepositoryStorage
             {
                 if ( !target.delete() )
                 {
-                    throw new StorageException( "Could not delete File in repository \"" + repository.getName()
+                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
                         + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath() );
                 }
             }

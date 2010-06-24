@@ -17,9 +17,13 @@ import java.io.IOException;
 
 /**
  * Generic storage exception thrown by given storage implementation (like IOExceptions), and so. Denotes a (probably)
- * unrecoverable, serious system and/or IO error.
+ * unrecoverable, serious system and/or IO error. <b>This class is deprecated, and will be removed in future
+ * releases!</b> The StorageException was used in more then half of cases to "wrap" an IOException and that did not make
+ * any sense. IOException will replace the StorageException usage, but internally, two descendants of IOExceptions,
+ * LocalStorageException and RemoteStorageException should be used to "fine tune" Nexus Core behavior.
  * 
  * @author cstamas
+ * @deprecated Use {@link LocalStorageException} or {@link RemoteStorageException} respectively.
  */
 public class StorageException
     extends IOException

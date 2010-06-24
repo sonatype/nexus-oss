@@ -23,6 +23,7 @@ import org.mortbay.jetty.client.HttpClient;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteAuthenticationNeededException;
+import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -132,7 +133,7 @@ public class JettyClientRemoteRepositoryStorage
         }
         catch ( Exception e )
         {
-            throw new StorageException( "Could not configure Jetty HttpClient instance", e );
+            throw new RemoteStorageException( "Could not configure Jetty HttpClient instance", e );
         }
     }
 
@@ -207,7 +208,7 @@ public class JettyClientRemoteRepositoryStorage
         }
         catch ( ItemNotFoundException e )
         {
-            throw new StorageException( "Server responded with 404 to a " + store.getMethod() + " method!", e );
+            throw new RemoteStorageException( "Server responded with 404 to a " + store.getMethod() + " method!", e );
         }
     }
 
@@ -234,12 +235,12 @@ public class JettyClientRemoteRepositoryStorage
 
             if ( !"http".equals( u.getProtocol().toLowerCase() ) && !"https".equals( u.getProtocol().toLowerCase() ) )
             {
-                throw new StorageException( "Unsupported protocol: " + u.getProtocol().toLowerCase() );
+                throw new RemoteStorageException( "Unsupported protocol: " + u.getProtocol().toLowerCase() );
             }
         }
         catch ( MalformedURLException e )
         {
-            throw new StorageException( "Malformed URL", e );
+            throw new RemoteStorageException( "Malformed URL", e );
         }
     }
 
@@ -290,7 +291,7 @@ public class JettyClientRemoteRepositoryStorage
         }
         catch ( IOException e )
         {
-            throw new StorageException( "Could not send HttpExchange!", e );
+            throw new RemoteStorageException( "Could not send HttpExchange!", e );
         }
     }
 }

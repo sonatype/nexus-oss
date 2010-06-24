@@ -26,6 +26,7 @@ import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -196,7 +197,7 @@ public abstract class LayoutConverterShadowRepository
             }
             catch ( IOException e )
             {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+                throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
             }
 
             StorageFileItem storedFile = (StorageFileItem) retrieveItem( false, request );
@@ -223,7 +224,7 @@ public abstract class LayoutConverterShadowRepository
         }
         catch ( ItemNotFoundException e )
         {
-            throw new StorageException( "Storage inconsistency!", e );
+            throw new LocalStorageException( "Storage inconsistency!", e );
         }
         finally
         {
@@ -306,7 +307,7 @@ public abstract class LayoutConverterShadowRepository
             }
             catch ( IOException e )
             {
-                throw new StorageException( "Could not get the content from the ContentLocator!", e );
+                throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
             }
 
             StorageFileItem storedFile = (StorageFileItem) retrieveItem( fromTask, new ResourceStoreRequest( item ) );
@@ -335,7 +336,7 @@ public abstract class LayoutConverterShadowRepository
         }
         catch ( ItemNotFoundException e )
         {
-            throw new StorageException( "Storage inconsistency!", e );
+            throw new LocalStorageException( "Storage inconsistency!", e );
         }
     }
 

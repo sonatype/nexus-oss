@@ -8,10 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.RemoteAccessException;
-import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -88,13 +84,13 @@ public class MockRemoteStorage
             if( actualFailCount < expectedFailCount )
             {
                 this.valueUrlFailResultMap.put( requestUrl, actualFailCount + 1 );
-                throw new StorageException( "Mock Remote Storage is pretending to be down.");
+                throw new RemoteStorageException( "Mock Remote Storage is pretending to be down.");
             }
         }
         
         if ( this.downUrls.contains( baseUrl ) )
         {
-            throw new StorageException( "Mock " + baseUrl + " is expected to be down." );
+            throw new RemoteStorageException( "Mock " + baseUrl + " is expected to be down." );
         }
 
         if ( this.validUrlContentMap.containsKey( requestUrl ) )

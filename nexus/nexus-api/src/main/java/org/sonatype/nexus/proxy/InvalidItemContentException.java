@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy;
 import org.sonatype.nexus.proxy.repository.Mirror;
 
 public class InvalidItemContentException
-    extends StorageException
+    extends LocalStorageException
 {
     private static final long serialVersionUID = -1749678254941504279L;
 

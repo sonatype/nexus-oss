@@ -13,35 +13,29 @@
  */
 package org.sonatype.nexus.proxy;
 
-import org.sonatype.nexus.proxy.repository.ProxyRepository;
-
 /**
- * Top level class for all remote related auth/authz problems.
+ * Generic remote storage exception thrown by given storage implementation (more special than generic IOExceptions), and
+ * so. Denotes a (probably) unrecoverable, serious system and/or IO error that needs some Core action to manage it.
  * 
  * @author cstamas
  */
-public abstract class RemoteAccessException
-    extends RemoteStorageException
+public class RemoteStorageException
+    extends StorageException
 {
-    private static final long serialVersionUID = 391662938886542734L;
+    private static final long serialVersionUID = 6487865845745424470L;
 
-    private final ProxyRepository repository;
-
-    public RemoteAccessException( ProxyRepository repository, String message )
+    public RemoteStorageException( String msg )
     {
-        this( repository, message, null );
+        super( msg );
     }
 
-    public RemoteAccessException( ProxyRepository repository, String message, Throwable cause )
+    public RemoteStorageException( String msg, Throwable cause )
     {
-        super( message, cause );
-
-        this.repository = repository;
+        super( msg, cause );
     }
 
-    public ProxyRepository getRepository()
+    public RemoteStorageException( Throwable cause )
     {
-        return repository;
+        super( cause.getMessage(), cause );
     }
-
 }

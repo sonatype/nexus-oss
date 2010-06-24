@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.RepositoryNotAvailableException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
@@ -730,7 +731,7 @@ public abstract class AbstractRepository
                     }
                     catch ( Exception e )
                     {
-                        throw new StorageException( "Could not generate content:", e );
+                        throw new LocalStorageException( "Could not generate content:", e );
                     }
                 }
                 else
@@ -828,7 +829,7 @@ public abstract class AbstractRepository
                 }
                 catch ( IOException e )
                 {
-                    throw new StorageException( "Could not get the content of source file (is it file?)!", e );
+                    throw new LocalStorageException( "Could not get the content of source file (is it file?)!", e );
                 }
             }
         }

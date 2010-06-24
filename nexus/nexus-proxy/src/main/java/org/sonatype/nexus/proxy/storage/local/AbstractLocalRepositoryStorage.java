@@ -21,6 +21,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
@@ -97,7 +98,7 @@ public abstract class AbstractLocalRepositoryStorage
             }
             catch ( MalformedURLException e1 )
             {
-                throw new StorageException( "The local storage has a malformed URL as baseUrl!", e );
+                throw new LocalStorageException( "The local storage has a malformed URL as baseUrl!", e );
             }
         }
     }
