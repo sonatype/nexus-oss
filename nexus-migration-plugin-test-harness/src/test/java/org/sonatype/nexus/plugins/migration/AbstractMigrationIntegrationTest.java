@@ -73,7 +73,7 @@ public abstract class AbstractMigrationIntegrationTest
             Assert.fail( "Failed to lookup component: " + e.getMessage() );
         }
         this.groupUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        this.searchUtil = new SearchMessageUtil();
+        this.searchUtil = new SearchMessageUtil( this );
         this.userUtil = new UserMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
 
@@ -174,7 +174,7 @@ public abstract class AbstractMigrationIntegrationTest
     protected void checkIndex( String repoId, String groupId, String artifactId, String version )
         throws Exception
     {
-        List<NexusArtifact> artifacts = SearchMessageUtil.searchFor( groupId, artifactId, version, repoId );
+        List<NexusArtifact> artifacts = searchUtil.searchForGav( groupId, artifactId, version, repoId );
         Assert.assertEquals( "Expected to found only one artifact (" + artifactId + ") instead of " + artifacts.size()
             + "\n" + this.getXMLXStream().toXML( artifacts ), 1, artifacts.size() );
     }

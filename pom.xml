@@ -23,7 +23,7 @@
 
   <properties>
     <plexus.version>1.2.1</plexus.version>
-    <nexus.version>1.6.1</nexus.version>
+    <nexus.version>1.7.0</nexus.version>
   </properties>
 
   <dependencyManagement>
