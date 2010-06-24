@@ -60,11 +60,6 @@ Sonatype.repoServer.AbstractRepoPanel = function(config) {
       text : 'Block Proxy',
       scope : this,
       handler : this.blockProxyHandler
-    },
-    deleteRepoItem : {
-      text : 'Delete',
-      scope : this,
-      handler : this.deleteRepoItemHandler
     }
   };
 
@@ -335,66 +330,6 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         Sonatype.Events.fireEvent('nexusRepositoryStatus', status);
       },
 
-      restToContentUrl : function(node, repoRecord) {
-        return repoRecord.data.contentResourceURI + node.data.relativePath;
-      },
-
-      restToRemoteUrl : function(node, repoRecord) {
-        return repoRecord.data.remoteUri + node.data.relativePath;
-      },
-
-      downloadHandler : function(node, item, event) {
-        event.stopEvent();
-        window.open(this.restToContentUrl(node, node.attributes.repoRecord));
-      },
-
-      downloadFromRemoteHandler : function(node, item, event) {
-        event.stopEvent();
-        window.open(this.restToRemoteUrl(node, node.attributes.repoRecord));
-      },
-
-      deleteRepoItemHandler : function(node) {
-        var url = Sonatype.config.repos.urls.repositories + node.id.slice(Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length);
-        // make sure to provide /content path for repository root requests like
-        // ../repositories/central
-        if (/.*\/repositories\/[^\/]*$/i.test(url))
-        {
-          url += '/content';
-        }
-        Sonatype.MessageBox.show({
-              animEl : node.getOwnerTree().getEl(),
-              title : 'Delete Repository Item?',
-              msg : 'Delete the selected ' + (node.isLeaf() ? 'file' : 'folder') + '?',
-              buttons : Sonatype.MessageBox.YESNO,
-              scope : this,
-              icon : Sonatype.MessageBox.QUESTION,
-              fn : function(btnName) {
-                if (btnName == 'yes' || btnName == 'ok')
-                {
-                  Ext.Ajax.request({
-                        url : url,
-                        callback : this.deleteRepoItemCallback,
-                        scope : this,
-                        contentNode : node,
-                        method : 'DELETE'
-                      });
-                }
-              }
-            });
-      },
-
-      deleteRepoItemCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          options.contentNode.parentNode.removeChild(options.contentNode);
-        }
-        else
-        {
-          Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
-        }
-      },
-
       onRepositoryMenuInit : function(menu, repoRecord) {
         if (repoRecord.id.substring(0, 4) == 'new_' || !repoRecord.data.exposed || !repoRecord.data.userManaged)
           return;
@@ -443,70 +378,8 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
           }
           menu.add('-');
         }
-      },
-
-      onRepositoryContentMenuInit : function(menu, repoRecord, contentRecord) {
-        if (contentRecord.data.resourceURI == null)
-        {
-          contentRecord.data.resourceURI = contentRecord.data.id;
-        }
-
-        var isVirtual = repoRecord.data.repoType == 'virtual';
-        var isProxy = repoRecord.data.repoType == 'proxy';
-        var isHosted = repoRecord.data.repoType == 'hosted';
-        var isGroup = repoRecord.data.repoType == 'group';
-        var isMaven = repoRecord.get('format') == 'maven2' || repoRecord.get('format') == 'maven1';
-
-        if (repoRecord.data.userManaged)
-        {
-          if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && !isVirtual)
-          {
-            menu.add(this.repoActions.clearCache);
-          }
-          if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && isMaven && (isHosted || isGroup))
-          {
-            menu.add(this.repoActions.rebuildMetadata);
-          }
-        }
-
-        if (contentRecord.isLeaf())
-        {
-          menu.add('-');
-          if (isProxy)
-          {
-            menu.add({
-                  text : 'Download From Remote',
-                  scope : this,
-                  handler : this.downloadFromRemoteHandler,
-                  href : this.restToRemoteUrl(contentRecord, repoRecord)
-                });
-          }
-          menu.add({
-                text : 'Download',
-                scope : this,
-                handler : this.downloadHandler,
-                href : this.restToContentUrl(contentRecord, contentRecord.attributes.repoRecord)
-              });
-        }
-
-        if (!contentRecord.isRoot && !isGroup)
-        {
-          if (isProxy && !contentRecord.isLeaf())
-          {
-            menu.add({
-                  text : 'View Remote',
-                  scope : this,
-                  handler : this.downloadFromRemoteHandler,
-                  href : this.restToRemoteUrl(contentRecord, repoRecord)
-                });
-          }
-
-          menu.add('-');
-          menu.add(this.repoActions.deleteRepoItem);
-        }
       }
     });
 
 Sonatype.repoServer.DefaultRepoHandler = new Sonatype.repoServer.AbstractRepoPanel();
 Sonatype.Events.addListener('repositoryMenuInit', Sonatype.repoServer.DefaultRepoHandler.onRepositoryMenuInit, Sonatype.repoServer.DefaultRepoHandler);
-Sonatype.Events.addListener('repositoryContentMenuInit', Sonatype.repoServer.DefaultRepoHandler.onRepositoryContentMenuInit, Sonatype.repoServer.DefaultRepoHandler);
