@@ -393,102 +393,9 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
   };
   Ext.apply(this, config, defaultConfig);
 
-  this.sp = Sonatype.lib.Permissions;
-
   this.oldSearchText = '';
   this.searchTask = new Ext.util.DelayedTask(this.startSearch, this, [this]);
-
-  this.refreshButton = new Ext.Button({
-        text : 'Refresh',
-        icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
-        cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.refreshHandler
-      });
-
-  this.viewButton = new Ext.Button({
-        text : 'View',
-        icon : Sonatype.config.resourcePath + '/images/icons/add.png',
-        cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.viewHandler,
-        disabled : true
-      });
-
-  this.viewRemoteButton = new Ext.Button({
-        text : 'View on Remote',
-        icon : Sonatype.config.resourcePath + '/images/icons/add.png',
-        cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.viewRemoteHandler,
-        disabled : true
-      });
-
-  this.deleteButton = new Ext.Button({
-        text : 'Delete',
-        icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
-        cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.deleteHandler,
-        disabled : true
-      });
-
-  this.rebuildMetadataButton = new Ext.Button({
-        text : 'Rebuild Metadata',
-        // icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
-        // cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.rebuildMetadataHandler,
-        disabled : true
-      });
-
-  this.clearCacheButton = new Ext.Button({
-        text : 'Clear Cache',
-        // icon : Sonatype.config.resourcePath + '/images/icons/delete.png',
-        // cls : 'x-btn-text-icon',
-        scope : this,
-        handler : this.clearCacheHandler,
-        disabled : true
-      });
-
-  this.tbar = [];
-  this.tbar.push(this.refreshButton);
-  this.tbar.push('-');
-  this.tbar.push(this.viewButton);
-  this.tbar.push('-');
-  this.tbar.push(this.viewRemoteButton);
-  this.tbar.push('-');
-  this.tbar.push(this.deleteButton);
-  this.tbar.push('-');
-  this.tbar.push(this.clearCacheButton);
-  this.tbar.push('-');
-  this.tbar.push(this.rebuildMetadataButton);
-  this.tbar.push('-');
-  this.tbar.push(' ', 'Path Lookup:');
-  this.tbar.push({
-        xtype : 'nexussearchfield',
-        searchPanel : this,
-        width : 400,
-        enableKeyEvents : true,
-        listeners : {
-          'keyup' : {
-            fn : function(field, event) {
-              var key = event.getKey();
-              if (!event.isNavKeyPress())
-              {
-                this.searchTask.delay(200);
-              }
-            },
-            scope : this
-          },
-          'render' : function(c) {
-            Ext.QuickTips.register({
-                  target : c.getEl(),
-                  text : 'Enter a complete path to lookup, for example org/sonatype/nexus'
-                });
-          }
-        }
-      });
+  this.nodeContextMenuEvent = 'repositoryContentMenuInit';
 
   Sonatype.repoServer.RepositoryBrowsePanel.superclass.constructor.call(this, {
         anchor : '0 -2',
@@ -499,6 +406,36 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
         containerScroll : true,
         rootVisible : true,
         enableDD : false,
+        tbar : [{
+              text : 'Refresh',
+              icon : Sonatype.config.resourcePath + '/images/icons/arrow_refresh.png',
+              cls : 'x-btn-text-icon',
+              scope : this,
+              handler : this.refreshHandler
+            }, ' ', 'Path Lookup:', {
+              xtype : 'nexussearchfield',
+              searchPanel : this,
+              width : 400,
+              enableKeyEvents : true,
+              listeners : {
+                'keyup' : {
+                  fn : function(field, event) {
+                    var key = event.getKey();
+                    if (!event.isNavKeyPress())
+                    {
+                      this.searchTask.delay(200);
+                    }
+                  },
+                  scope : this
+                },
+                'render' : function(c) {
+                  Ext.QuickTips.register({
+                        target : c.getEl(),
+                        text : 'Enter a complete path to lookup, for example org/sonatype/nexus'
+                      });
+                }
+              }
+            }],
         loader : new Ext.tree.SonatypeTreeLoader({
               url : '',
               listeners : {
@@ -508,6 +445,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
             }),
         listeners : {
           click : this.nodeClickHandler,
+          contextMenu : this.nodeContextMenuHandler,
           scope : this
         }
       });
@@ -543,56 +481,46 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
         {
           Sonatype.Events.fireEvent(this.nodeClickEvent, node, this.nodeClickPassthru);
         }
+      },
 
-        if (node)
+      nodeContextMenuHandler : function(node, e) {
+        if (e.target.nodeName == 'A')
+          return; // no menu on links
+
+        if (!this.payload.data.showCtx)
         {
-          if (node.isRoot || this.payload.get('repoType') == 'group')
-          {
-            this.deleteButton.disable();
-          }
-          else
-          {
-            this.deleteButton.enable();
-          }
-
-          if (this.payload.get('repoType') == 'proxy')
-          {
-            this.viewRemoteButton.enable();
-          }
-          else
-          {
-            this.viewRemoteButton.disable();
-          }
-          this.viewButton.enable();
-
-          if (this.payload.get('userManaged'))
-          {
-            if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && this.payload.get('repoType') != 'virtual')
-            {
-              this.clearCacheButton.enable();
-            }
-            else
-            {
-              this.clearCacheButton.disable();
-            }
-
-            if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && (this.payload.get('format') == 'maven2' || this.payload.get('format') == 'maven1') && (this.payload.get('repoType') == 'hosted' || this.payload.get('repoType') == 'group'))
-            {
-              this.rebuildMetadataButton.enable();
-            }
-            else
-            {
-              this.rebuildMetadataButton.disable();
-            }
-          }
+          return;
         }
-        else
+
+        if (this.nodeContextMenuEvent)
         {
-          this.viewButton.disable();
-          this.viewRemoteButton.disable();
-          this.deleteButton.disable();
-          this.clearCacheButton.disable();
-          this.rebuildMetadataButton.disable();
+
+          node.attributes.repoRecord = this.payload;
+          node.data = node.attributes;
+
+          var menu = new Sonatype.menu.Menu({
+                id : 'repo-context-menu',
+                payload : node,
+                scope : this,
+                items : []
+              });
+
+          Sonatype.Events.fireEvent(this.nodeContextMenuEvent, menu, this.payload, node);
+
+          var item;
+          while ((item = menu.items.first()) && !item.text)
+          {
+            menu.remove(item); // clean up if the first element is a separator
+          }
+          while ((item = menu.items.last()) && !item.text)
+          {
+            menu.remove(item); // clean up if the last element is a separator
+          }
+          if (!menu.items.first())
+            return;
+
+          e.stopEvent();
+          menu.showAt(e.getXY());
         }
       },
 
@@ -600,149 +528,6 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
         this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
         this.root.attributes.localStorageUpdated = false;
         this.root.id = this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/', this.root.reload();
-        this.viewButton.disable();
-        this.viewRemoteButton.disable();
-        this.deleteButton.disable();
-        this.clearCacheButton.disable();
-        this.rebuildMetadataButton.disable();
-      },
-
-      viewHandler : function(button, e) {
-        var node = this.getSelectionModel().getSelectedNode();
-
-        if (node)
-        {
-          window.open(this.payload.get('contentResourceURI') + (node.attributes.relativePath ? node.attributes.relativePath : ''));
-        }
-      },
-
-      viewRemoteHandler : function(button, e) {
-        var node = this.getSelectionModel().getSelectedNode();
-
-        if (node)
-        {
-          window.open(this.payload.get('remoteUri') + (node.attributes.relativePath ? node.attributes.relativePath : ''));
-        }
-      },
-
-      deleteHandler : function(button, e) {
-        var node = this.getSelectionModel().getSelectedNode();
-
-        if (node)
-        {
-          var url = Sonatype.config.repos.urls.repositories + node.id.slice(Sonatype.config.host.length + Sonatype.config.repos.urls.repositories.length);
-          // make sure to provide /content path for repository root requests
-          // like
-          // ../repositories/central
-          if (/.*\/repositories\/[^\/]*$/i.test(url))
-          {
-            url += '/content';
-          }
-          Sonatype.MessageBox.show({
-                animEl : node.getOwnerTree().getEl(),
-                title : 'Delete Repository Item?',
-                msg : 'Delete the selected ' + (node.isLeaf() ? 'file' : 'folder') + '?',
-                buttons : Sonatype.MessageBox.YESNO,
-                scope : this,
-                icon : Sonatype.MessageBox.QUESTION,
-                fn : function(btnName) {
-                  if (btnName == 'yes' || btnName == 'ok')
-                  {
-                    Ext.Ajax.request({
-                          url : url,
-                          callback : this.deleteCallback,
-                          scope : this,
-                          contentNode : node,
-                          method : 'DELETE'
-                        });
-                  }
-                }
-              });
-        }
-      },
-
-      deleteCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-          options.contentNode.parentNode.removeChild(options.contentNode);
-        }
-        else
-        {
-          Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
-        }
-      },
-
-      clearCacheHandler : function(button, e) {
-        var node = this.getSelectionModel().getSelectedNode();
-
-        if (node)
-        {
-          var url = Sonatype.config.repos.urls.cache + node.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-
-          // make sure to provide /content path for repository root requests
-          // like
-          // ../repositories/central
-          if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url))
-          {
-            url += '/content';
-          }
-
-          Ext.Ajax.request({
-                url : url,
-                callback : this.clearCacheCallback,
-                scope : this,
-                method : 'DELETE'
-              });
-        }
-      },
-
-      clearCacheCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not clear the repository cache.');
-        }
-      },
-
-      rebuildMetadataHandler : function(button, e) {
-        var node = this.getSelectionModel().getSelectedNode();
-
-        if (node)
-        {
-          var url = Sonatype.config.repos.urls.metadata + node.id.slice(Sonatype.config.host.length + Sonatype.config.servicePath.length);
-
-          // make sure to provide /content path for repository root requests
-          // like
-          // ../repositories/central
-          if (/.*\/repositories\/[^\/]*$/i.test(url) || /.*\/repo_groups\/[^\/]*$/i.test(url))
-          {
-            url += '/content';
-          }
-
-          Ext.Ajax.request({
-                url : url,
-                callback : this.rebuildMetadataCallback,
-                scope : this,
-                method : 'DELETE'
-              });
-        }
-      },
-
-      rebuildMetadataCallback : function(options, isSuccess, response) {
-        // @todo: stop updating messaging here
-        if (isSuccess)
-        {
-
-        }
-        else
-        {
-          Sonatype.utils.connectionError(response, 'The server did not rebuild metadata in the repository.');
-        }
       },
 
       updatePayload : function(payload) {
