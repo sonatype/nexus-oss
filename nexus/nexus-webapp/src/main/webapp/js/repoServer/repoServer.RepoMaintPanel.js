@@ -455,29 +455,14 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
   this.tbar.push(this.refreshButton);
   this.tbar.push('-');
   this.tbar.push(this.viewButton);
-  if (this.payload.get('repoType') == 'proxy')
-  {
-    this.tbar.push('-');
-    this.tbar.push(this.viewRemoteButton);
-  }
-  if (this.payload.get('repoType') != 'group')
-  {
-    this.tbar.push('-');
-    this.tbar.push(this.deleteButton);
-  }
-  if (this.payload.get('userManaged'))
-  {
-    if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && this.payload.get('repoType') != 'virtual')
-    {
-      this.tbar.push('-');
-      this.tbar.push(this.clearCacheButton);
-    }
-    if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && (this.payload.get('format') == 'maven2' || this.payload.get('format') == 'maven1') && (this.payload.get('repoType') == 'hosted' || this.payload.get('repoType') == 'group'))
-    {
-      this.tbar.push('-');
-      this.tbar.push(this.rebuildMetadataButton);
-    }
-  }
+  this.tbar.push('-');
+  this.tbar.push(this.viewRemoteButton);
+  this.tbar.push('-');
+  this.tbar.push(this.deleteButton);
+  this.tbar.push('-');
+  this.tbar.push(this.clearCacheButton);
+  this.tbar.push('-');
+  this.tbar.push(this.rebuildMetadataButton);
   this.tbar.push('-');
   this.tbar.push(' ', 'Path Lookup:');
   this.tbar.push({
@@ -561,7 +546,7 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
 
         if (node)
         {
-          if (node.isRoot)
+          if (node.isRoot || this.payload.get('repoType') == 'group')
           {
             this.deleteButton.disable();
           }
@@ -569,10 +554,37 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
           {
             this.deleteButton.enable();
           }
+
+          if (this.payload.get('repoType') == 'proxy')
+          {
+            this.viewRemoteButton.enable();
+          }
+          else
+          {
+            this.viewRemoteButton.disable();
+          }
           this.viewButton.enable();
-          this.viewRemoteButton.enable();
-          this.clearCacheButton.enable();
-          this.rebuildMetadataButton.enable();
+
+          if (this.payload.get('userManaged'))
+          {
+            if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && this.payload.get('repoType') != 'virtual')
+            {
+              this.clearCacheButton.enable();
+            }
+            else
+            {
+              this.clearCacheButton.disable();
+            }
+
+            if (this.sp.checkPermission('nexus:metadata', this.sp.DELETE) && (this.payload.get('format') == 'maven2' || this.payload.get('format') == 'maven1') && (this.payload.get('repoType') == 'hosted' || this.payload.get('repoType') == 'group'))
+            {
+              this.rebuildMetadataButton.enable();
+            }
+            else
+            {
+              this.rebuildMetadataButton.disable();
+            }
+          }
         }
         else
         {
