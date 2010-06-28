@@ -336,7 +336,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
       },
 
       restToContentUrl : function(node, repoRecord) {
-        return repoRecord.data.contentResourceURI + node.data.relativePath;
+        return repoRecord.data.repositoryURI + '/content' + node.data.relativePath;
       },
 
       restToRemoteUrl : function(node, repoRecord) {
