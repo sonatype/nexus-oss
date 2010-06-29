@@ -20,6 +20,13 @@
  */
 package org.sonatype.nexus.restlight.stage;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -27,13 +34,6 @@ import org.jdom.Text;
 import org.jdom.xpath.XPath;
 import org.sonatype.nexus.restlight.common.AbstractRESTLightClient;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * REST client to access the functions of the nexus-staging-plugin, available in Nexus Professional.
@@ -365,10 +365,10 @@ extends AbstractRESTLightClient
                 {
                     repo.setUser( uid.getText().trim() );
                 }
-                else
-                {
-                    repoStubs.remove( key );
-                }
+                // else
+                // {
+                // repoStubs.remove( key );
+                // }
 
                 Element url = detail.getChild( REPO_URI_ELEMENT );
                 if ( url != null )
