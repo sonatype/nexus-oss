@@ -454,14 +454,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
         folderSort : true
       });
 
-  var root = new Ext.tree.AsyncTreeNode({
-        text : (this.payload ? this.payload.get(this.titleColumn) : '/'),
-        id : (this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/'),
-        singleClickExpand : true,
-        expanded : true
-      });
-
-  this.setRootNode(root);
+  this.refreshHandler();
 };
 
 Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
@@ -525,9 +518,34 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       },
 
       refreshHandler : function(button, e) {
-        this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
-        this.root.attributes.localStorageUpdated = false;
-        this.root.id = this.payload ? this.getBrowsePath(this.payload.data.resourceURI) : '/', this.root.reload();
+        if (this.root)
+        {
+          this.root.destroy();
+        }
+        if (this.payload)
+        {
+          this.setRootNode(new Ext.tree.AsyncTreeNode({
+                text : this.payload.get(this.titleColumn),
+                id : this.getBrowsePath(this.payload.data.resourceURI),
+                singleClickExpand : true,
+                expanded : true
+              }));
+        }
+        else
+        {
+          this.setRootNode(new Ext.tree.TreeNode({
+                text : '(Not Available)',
+                id : '/',
+                singleClickExpand : true,
+                expanded : true
+              }));
+        }
+
+        if (this.innerCt)
+        {
+          this.innerCt.update('');
+          this.afterRender();
+        }
       },
 
       updatePayload : function(payload) {
