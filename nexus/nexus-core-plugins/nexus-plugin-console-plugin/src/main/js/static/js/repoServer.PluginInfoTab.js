@@ -98,7 +98,7 @@ Ext.extend(Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         var pluginPropertiesPanel = this.items.get(0);
 
         var site = this.payload.data.site;
-        if (site && site != '')
+        if (!Ext.isEmpty(site))
         {
           pluginPropertiesPanel.add({
                 xtype : 'label',
@@ -115,7 +115,7 @@ Ext.extend(Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         }
 
         var documentation = this.payload.data.documentation;
-        if (documentation && documentation != '')
+        if (!Ext.isEmpty(documentation))
         {
           pluginPropertiesPanel.add({
                 xtype : 'label',
@@ -131,8 +131,7 @@ Ext.extend(Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
             {
               link += ', ';
             }
-            var url = Sonatype.config.host + Sonatype.config.resourcePath + '/' + documentation[i] + '/docs/index.html';
-            link += '<a href="' + url + '" target="_blank">' + documentation[i] + '</a>';
+            link += '<a href="' + documentation[i].url + '" target="_blank">' + documentation[i].label + '</a>';
           }
           pluginPropertiesPanel.add({
                 xtype : 'label',
