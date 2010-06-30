@@ -16,9 +16,9 @@ public class UnpackDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
     {
-        return "unpack";
+        return "Unpack Plugin API";
     }
 
 }
