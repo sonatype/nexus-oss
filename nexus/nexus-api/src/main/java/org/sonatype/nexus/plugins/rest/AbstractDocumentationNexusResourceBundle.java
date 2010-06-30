@@ -11,16 +11,22 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.sonatype.nexus.mime.MimeUtil;
 
 public abstract class AbstractDocumentationNexusResourceBundle
-    extends AbstractLogEnabled
-    implements NexusResourceBundle
+    implements NexusDocumentationBundle
 {
+    @Requirement
+    private Logger logger;
 
     @Requirement
     private MimeUtil mimeUtil;
+
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     public List<StaticResource> getContributedResouces()
     {
@@ -48,7 +54,12 @@ public abstract class AbstractDocumentationNexusResourceBundle
                 name = "/" + name;
 
                 URL url = new URL( "jar:file:" + zip.getName() + "!" + name );
-                String path = "/" + getUrlSnippet() + name;
+
+                // to lessen clash possibilities, this way only within single plugin may be clashes, but one
+                // plugin is usually developed by one team or one user so this is okay
+                // system-wide clashes are much harder to resolve
+                String path = "/" + getPluginId() + "/" + getUrlSnippet() + name;
+
                 resources.add( new DefaultStaticResource( url, path, mimeUtil.getMimeType( name ) ) );
             }
 
@@ -79,9 +90,26 @@ public abstract class AbstractDocumentationNexusResourceBundle
         return resources;
     }
 
+    public String getPathPrefix()
+    {
+        return getUrlSnippet();
+    }
+
+    public abstract String getDescription();
+
     public abstract String getPluginId();
 
-    public abstract String getUrlSnippet();
+    /**
+     * Deprecated, but left in place because old plugins still rely on this.
+     * 
+     * @return
+     * @deprecated use getPathPrefix() method.
+     */
+    @Deprecated
+    protected String getUrlSnippet()
+    {
+        return "default";
+    }
 
     protected ZipFile getZipFile()
         throws IOException

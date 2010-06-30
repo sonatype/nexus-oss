@@ -16,9 +16,9 @@ public class LvoDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
     {
-        return "lvo";
+        return "LatestVersionOf Plugin API";
     }
 
 }

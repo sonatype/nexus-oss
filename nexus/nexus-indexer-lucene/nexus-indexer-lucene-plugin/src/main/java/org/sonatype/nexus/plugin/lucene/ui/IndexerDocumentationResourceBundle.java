@@ -1,8 +1,6 @@
 package org.sonatype.nexus.plugin.lucene.ui;
 
 import java.io.IOException;
-import java.net.URL;
-import java.net.URLDecoder;
 import java.util.zip.ZipFile;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -22,9 +20,9 @@ public class IndexerDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
     {
-        return "indexer";
+        return "Lucene Indexer Plugin API";
     }
 
     @Override

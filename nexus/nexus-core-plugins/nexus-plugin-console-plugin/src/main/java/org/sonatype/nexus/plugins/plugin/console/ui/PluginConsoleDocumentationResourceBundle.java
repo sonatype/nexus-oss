@@ -16,9 +16,8 @@ public class PluginConsoleDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
     {
-        return "pluginConsole";
+        return "Plugin Console Plugin API";
     }
-
 }

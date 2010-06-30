@@ -15,9 +15,10 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.nexus.plugins.NexusPluginManager;
 import org.sonatype.nexus.plugins.PluginResponse;
+import org.sonatype.nexus.plugins.plugin.console.model.DocumentationLink;
 import org.sonatype.nexus.plugins.plugin.console.model.PluginInfo;
 import org.sonatype.nexus.plugins.plugin.console.model.RestInfo;
-import org.sonatype.nexus.plugins.rest.AbstractDocumentationNexusResourceBundle;
+import org.sonatype.nexus.plugins.rest.NexusDocumentationBundle;
 import org.sonatype.nexus.plugins.rest.NexusResourceBundle;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plugin.metadata.GAVCoordinate;
@@ -42,19 +43,20 @@ public class DefaultPluginConsoleManager
     @Requirement( role = NexusResourceBundle.class )
     private List<NexusResourceBundle> resourceBundles;
 
-    private Multimap<String, String> ids;
+    private Multimap<String, NexusDocumentationBundle> docBundles;
 
     public void initialize()
         throws InitializationException
     {
-        ids = new LinkedHashMultimap<String, String>();
+        docBundles = new LinkedHashMultimap<String, NexusDocumentationBundle>();
 
         for ( NexusResourceBundle rb : resourceBundles )
         {
-            if ( rb instanceof AbstractDocumentationNexusResourceBundle )
+            if ( rb instanceof NexusDocumentationBundle )
             {
-                AbstractDocumentationNexusResourceBundle doc = (AbstractDocumentationNexusResourceBundle) rb;
-                ids.put( doc.getPluginId(), doc.getUrlSnippet() );
+                NexusDocumentationBundle doc = (NexusDocumentationBundle) rb;
+
+                docBundles.put( doc.getPluginId(), doc );
             }
         }
     }
@@ -89,13 +91,23 @@ public class DefaultPluginConsoleManager
         }
         else
         {
-            result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":" + pluginResponse.getPluginCoordinates().getArtifactId() );
+            result.setName( pluginResponse.getPluginCoordinates().getGroupId() + ":"
+                + pluginResponse.getPluginCoordinates().getArtifactId() );
         }
 
-        Collection<String> docs = ids.get( pluginResponse.getPluginCoordinates().getArtifactId() );
+        Collection<NexusDocumentationBundle> docs =
+            docBundles.get( pluginResponse.getPluginCoordinates().getArtifactId() );
         if ( docs != null && !docs.isEmpty() )
         {
-            result.setDocumentation( new ArrayList<String>( docs ) );
+            for ( NexusDocumentationBundle bundle : docs )
+            {
+                // here, we (mis)use the documentation field, to store path segments only, the REST resource will create
+                // proper URLs out this these.
+                DocumentationLink link = new DocumentationLink();
+                link.setLabel( bundle.getDescription() );
+                link.setUrl( bundle.getPluginId() + "/" + bundle.getPathPrefix() );
+                result.addDocumentation( link );
+            }
         }
 
         if ( !pluginResponse.isSuccessful() )
@@ -115,7 +127,8 @@ public class DefaultPluginConsoleManager
                 {
                     try
                     {
-                        PlexusResource resource = plexusContainer.lookup( PlexusResource.class, componentDescriptor.getRoleHint() );
+                        PlexusResource resource =
+                            plexusContainer.lookup( PlexusResource.class, componentDescriptor.getRoleHint() );
 
                         RestInfo restInfo = new RestInfo();
                         restInfo.setUri( resource.getResourceUri() );
@@ -124,7 +137,8 @@ public class DefaultPluginConsoleManager
                     }
                     catch ( ComponentLookupException e )
                     {
-                        getLogger().warn( "Unable to find PlexusResource '" + componentDescriptor.getImplementation() + "'.", e );
+                        getLogger().warn(
+                            "Unable to find PlexusResource '" + componentDescriptor.getImplementation() + "'.", e );
                     }
                 }
             }

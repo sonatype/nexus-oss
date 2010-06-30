@@ -16,9 +16,8 @@ public class RRBDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
     {
-        return "rrb";
+        return "RRB Plugin API";
     }
-
 }

@@ -27,9 +27,14 @@ public class CoreDocumentationResourceBundle
     }
 
     @Override
-    public String getUrlSnippet()
+    public String getDescription()
+    {
+        return "Core API";
+    }
+
+    @Override
+    protected String getUrlSnippet()
     {
         return "core";
     }
-
 }

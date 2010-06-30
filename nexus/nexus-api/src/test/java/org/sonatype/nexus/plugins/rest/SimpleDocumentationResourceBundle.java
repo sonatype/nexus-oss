@@ -23,6 +23,12 @@ public class SimpleDocumentationResourceBundle
     }
 
     @Override
+    public String getDescription()
+    {
+        return "Simple Test";
+    }
+
+    @Override
     public String getUrlSnippet()
     {
         return "test";

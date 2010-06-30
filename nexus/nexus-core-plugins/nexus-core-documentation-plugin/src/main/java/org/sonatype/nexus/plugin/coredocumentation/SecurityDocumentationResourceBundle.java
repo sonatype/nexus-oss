@@ -26,6 +26,12 @@ public class SecurityDocumentationResourceBundle
     }
 
     @Override
+    public String getDescription()
+    {
+        return "Security API";
+    }
+
+    @Override
     protected ZipFile getZipFile()
         throws IOException
     {
