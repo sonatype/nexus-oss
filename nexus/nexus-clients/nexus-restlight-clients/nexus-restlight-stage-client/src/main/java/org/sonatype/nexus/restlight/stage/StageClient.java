@@ -39,7 +39,7 @@ import org.sonatype.nexus.restlight.common.RESTLightClientException;
  * REST client to access the functions of the nexus-staging-plugin, available in Nexus Professional.
  */
 public class StageClient
-extends AbstractRESTLightClient
+    extends AbstractRESTLightClient
 {
 
     public static final String PROFILES_PATH = SVC_BASE + "/staging/profiles";
@@ -61,7 +61,7 @@ extends AbstractRESTLightClient
     private static final String REPO_ID_ELEMENT = "repositoryId";
 
     private static final String REPO_URI_ELEMENT = "repositoryURI";
-    
+
     private static final String REPO_DESCRIPTION_ELEMENT = "description";
 
     private static final String USER_ID_ELEMENT = "userId";
@@ -77,7 +77,7 @@ extends AbstractRESTLightClient
     private static final String STAGE_REPO_DETAIL_XPATH = "//stagingProfileRepository";
 
     public StageClient( final String baseUrl, final String user, final String password )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         super( baseUrl, user, password, "stage/" );
     }
@@ -89,11 +89,11 @@ extends AbstractRESTLightClient
      * @return details about each open repository
      */
     public List<StageRepository> getOpenStageRepositoriesForUser()
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         Document doc = get( PROFILES_PATH );
 
-        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, true );
+        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, true, true );
     }
 
     /**
@@ -111,7 +111,7 @@ extends AbstractRESTLightClient
 
         Document doc = get( PROFILES_PATH, params );
 
-        return parseStageRepositories( doc, STAGE_REPO_XPATH, true );
+        return parseStageRepositories( doc, STAGE_REPO_XPATH, true, true );
     }
 
     /**
@@ -120,15 +120,16 @@ extends AbstractRESTLightClient
      * staging repositories for the given user and GAV, this call will return details for the FIRST repository in that
      * list.
      */
-    public StageRepository getOpenStageRepositoryForUser( final String groupId, final String artifactId, final String version )
-    throws RESTLightClientException
+    public StageRepository getOpenStageRepositoryForUser( final String groupId, final String artifactId,
+                                                          final String version )
+        throws RESTLightClientException
     {
         Map<String, String> params = new HashMap<String, String>();
         mapCoord( groupId, artifactId, version, params );
 
         Document doc = get( PROFILES_PATH, params );
 
-        List<StageRepository> ids = parseStageRepositories( doc, STAGE_REPO_XPATH, true );
+        List<StageRepository> ids = parseStageRepositories( doc, STAGE_REPO_XPATH, true, true );
         if ( ids == null || ids.isEmpty() )
         {
             return null;
@@ -146,11 +147,11 @@ extends AbstractRESTLightClient
      * @return details about each closed repository
      */
     public List<StageRepository> getClosedStageRepositoriesForUser()
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         Document doc = get( PROFILES_PATH );
 
-        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, false );
+        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, false, true );
     }
 
     /**
@@ -159,15 +160,16 @@ extends AbstractRESTLightClient
      * 
      * @return details about each closed repository
      */
-    public List<StageRepository> getClosedStageRepositoriesForUser( final String groupId, final String artifactId, final String version )
-    throws RESTLightClientException
+    public List<StageRepository> getClosedStageRepositoriesForUser( final String groupId, final String artifactId,
+                                                                    final String version )
+        throws RESTLightClientException
     {
         Map<String, String> params = new HashMap<String, String>();
         mapCoord( groupId, artifactId, version, params );
 
         Document doc = get( PROFILES_PATH, params );
 
-        return parseStageRepositories( doc, STAGE_REPO_XPATH, false );
+        return parseStageRepositories( doc, STAGE_REPO_XPATH, false, true );
     }
 
     /**
@@ -178,7 +180,7 @@ extends AbstractRESTLightClient
      */
     public void finishRepositoryForUser( final String groupId, final String artifactId, final String version,
                                          final String description )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         StageRepository repo = getOpenStageRepositoryForUser( groupId, artifactId, version );
 
@@ -191,11 +193,11 @@ extends AbstractRESTLightClient
      * This will make the artifacts in the repository available for use in Maven, etc.
      */
     public void finishRepository( final StageRepository repo, final String description )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         String descElementName =
             getVocabulary().getProperty( VocabularyKeys.PROMOTE_STAGE_REPO_DESCRIPTION_ELEMENT,
-                                         VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
+                VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
 
         List<Element> extras;
         if ( !VocabularyKeys.SUPPRESS_ELEMENT_VALUE.equals( descElementName ) )
@@ -216,7 +218,7 @@ extends AbstractRESTLightClient
      * repository), submit those details to Nexus to drop the repository.
      */
     public void dropRepository( final StageRepository repo )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         performStagingAction( repo, STAGE_REPO_DROP_ACTION, null );
     }
@@ -227,7 +229,7 @@ extends AbstractRESTLightClient
      * specified targetRepositoryId.
      */
     public void promoteRepository( final StageRepository repo, final String targetRepositoryId )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         Element target = new Element( "targetRepositoryId" ).setText( targetRepositoryId );
 
@@ -235,8 +237,9 @@ extends AbstractRESTLightClient
     }
 
     @SuppressWarnings( "unchecked" )
-    private List<StageRepository> parseStageRepositories( final Document doc, final String profileXpath, final Boolean findOpen )
-    throws RESTLightClientException
+    private List<StageRepository> parseStageRepositories( final Document doc, final String profileXpath,
+                                                          final Boolean findOpen, boolean filterUser )
+        throws RESTLightClientException
     {
         // System.out.println( new XMLOutputter().outputString( doc ) );
 
@@ -250,7 +253,7 @@ extends AbstractRESTLightClient
         catch ( JDOMException e )
         {
             throw new RESTLightClientException( "XPath selection failed: '" + profileXpath + "' (Root node: "
-                                                 + doc.getRootElement().getName() + ").", e );
+                + doc.getRootElement().getName() + ").", e );
         }
 
         List<StageRepository> result = new ArrayList<StageRepository>();
@@ -266,7 +269,7 @@ extends AbstractRESTLightClient
 
                 String profileId = profile.getChild( PROFILE_ID_ELEMENT ).getText();
                 String profileName = profile.getChild( PROFILE_NAME_ELEMENT ).getText();
-                
+
                 Map<String, StageRepository> matchingRepoStubs = new LinkedHashMap<String, StageRepository>();
 
                 if ( !Boolean.FALSE.equals( findOpen ) )
@@ -278,15 +281,15 @@ extends AbstractRESTLightClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put( profileId + "/" + txt.getText(),
-                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
+                                    txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
                     catch ( JDOMException e )
                     {
                         throw new RESTLightClientException( "XPath selection failed: '" + OPEN_STAGE_REPOS_XPATH
-                                                             + "' (Node: " + profile.getName() + ").", e );
+                            + "' (Node: " + profile.getName() + ").", e );
                     }
                 }
 
@@ -299,21 +302,21 @@ extends AbstractRESTLightClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put( profileId + "/" + txt.getText(),
-                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
+                                    txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
                     catch ( JDOMException e )
                     {
                         throw new RESTLightClientException( "XPath selection failed: '" + CLOSED_STAGE_REPOS_XPATH
-                                                             + "' (Node: " + profile.getName() + ").", e );
+                            + "' (Node: " + profile.getName() + ").", e );
                     }
                 }
 
                 if ( !matchingRepoStubs.isEmpty() )
                 {
-                    parseStageRepositoryDetails( profileId, matchingRepoStubs );
+                    parseStageRepositoryDetails( profileId, matchingRepoStubs, filterUser );
 
                     result.addAll( matchingRepoStubs.values() );
                 }
@@ -324,8 +327,9 @@ extends AbstractRESTLightClient
     }
 
     @SuppressWarnings( "unchecked" )
-    private void parseStageRepositoryDetails( final String profileId, final Map<String, StageRepository> repoStubs )
-    throws RESTLightClientException
+    private void parseStageRepositoryDetails( final String profileId, final Map<String, StageRepository> repoStubs,
+                                              boolean filterUser )
+        throws RESTLightClientException
     {
         // System.out.println( repoStubs );
 
@@ -342,8 +346,7 @@ extends AbstractRESTLightClient
         }
         catch ( JDOMException e )
         {
-            throw new RESTLightClientException( "Failed to select detail sections for staging-profile repositories.",
-                                                 e );
+            throw new RESTLightClientException( "Failed to select detail sections for staging-profile repositories.", e );
         }
 
         if ( repoDetails != null && !repoDetails.isEmpty() )
@@ -365,17 +368,20 @@ extends AbstractRESTLightClient
                 {
                     repo.setUser( uid.getText().trim() );
                 }
-                // else
-                // {
-                // repoStubs.remove( key );
-                // }
+                else
+                {
+                    if ( filterUser )
+                    {
+                        repoStubs.remove( key );
+                    }
+                }
 
                 Element url = detail.getChild( REPO_URI_ELEMENT );
                 if ( url != null )
                 {
                     repo.setUrl( url.getText() );
                 }
-                
+
                 Element desc = detail.getChild( REPO_DESCRIPTION_ELEMENT );
                 if ( desc != null )
                 {
@@ -386,7 +392,7 @@ extends AbstractRESTLightClient
     }
 
     private XPath newXPath( final String xpath )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         try
         {
@@ -398,13 +404,14 @@ extends AbstractRESTLightClient
         }
     }
 
-    private void performStagingAction( final StageRepository repo, final String actionSubpath, final List<Element> extraData )
-    throws RESTLightClientException
+    private void performStagingAction( final StageRepository repo, final String actionSubpath,
+                                       final List<Element> extraData )
+        throws RESTLightClientException
     {
         if ( repo == null )
         {
             throw new RESTLightClientException(
-                                                 "No staging-repository details specified. Please provide a valid StageRepository instance." );
+                "No staging-repository details specified. Please provide a valid StageRepository instance." );
         }
 
         Map<String, String> params = new HashMap<String, String>();
@@ -427,6 +434,22 @@ extends AbstractRESTLightClient
         }
 
         post( PROFILES_PATH + "/" + repo.getProfileId() + actionSubpath, null, body );
+    }
+
+    public List<StageRepository> getOpenStageRepositories()
+        throws RESTLightClientException
+    {
+        Document doc = get( PROFILES_PATH );
+
+        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, true, false );
+    }
+
+    public List<StageRepository> getClosedStageRepositories()
+        throws RESTLightClientException
+    {
+        Document doc = get( PROFILES_PATH );
+
+        return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, false, false );
     }
 
 }

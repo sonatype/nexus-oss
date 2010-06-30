@@ -24,6 +24,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jdom.JDOMException;
 import org.junit.Test;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
@@ -33,16 +37,43 @@ import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 
 public class StageClientTest
     extends AbstractRESTTest
 {
 
     private final ConversationalFixture fixture = new ConversationalFixture( getExpectedUser(), getExpectedPassword() );
+
+    @Test
+    public void queryAllOpenRepositories()
+        throws JDOMException, IOException, RESTLightClientException
+    {
+        setupOpenReposConversation();
+
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+
+        List<StageRepository> repositories = client.getOpenStageRepositories();
+
+        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
+        if ( unused != null && !unused.isEmpty() )
+        {
+            System.out.println( unused );
+            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
+        }
+
+        assertNotNull( repositories );
+
+        assertEquals( 3, repositories.size() );
+
+        assertEquals( "tp1-001", repositories.get( 0 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-001", repositories.get( 0 ).getUrl() );
+
+        assertEquals( "tp1-002", repositories.get( 1 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repositories.get( 1 ).getUrl() );
+
+        assertEquals( "tp1-003", repositories.get( 2 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repositories.get( 2 ).getUrl() );
+    }
 
     @Test
     public void queryAllOpenRepositoriesForUser()
@@ -162,6 +193,36 @@ public class StageClientTest
 
         assertEquals( "tp1-003", repos.get( 1 ).getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repos.get( 1 ).getUrl() );
+    }
+
+    @Test
+    public void queryAllClosedRepository()
+        throws JDOMException, IOException, RESTLightClientException
+    {
+        setupClosedReposConversation();
+
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+
+        List<StageRepository> repos = client.getClosedStageRepositories();
+
+        List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
+        if ( unused != null && !unused.isEmpty() )
+        {
+            System.out.println( unused );
+            fail( "Conversation was not finished. Didn't traverse:\n" + unused );
+        }
+
+        assertNotNull( repos );
+        assertEquals( 3, repos.size() );
+
+        assertEquals( "tp1-001", repos.get( 0 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-001", repos.get( 0 ).getUrl() );
+
+        assertEquals( "tp1-002", repos.get( 1 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repos.get( 1 ).getUrl() );
+
+        assertEquals( "tp1-003", repos.get( 2 ).getRepositoryId() );
+        assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repos.get( 2 ).getUrl() );
     }
 
     @Test
