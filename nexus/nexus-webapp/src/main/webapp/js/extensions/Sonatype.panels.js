@@ -940,14 +940,18 @@ Sonatype.panels.TreePanel = function(config) {
         folderSort : true
       });
 
-  var root = new Ext.tree.AsyncTreeNode({
-        text : this.payload ? this.payload.get(this.titleColumn) : '/',
-        path : '/',
-        singleClickExpand : true,
-        expanded : this.autoExpandRoot
-      });
+  if (!this.getRootNode())
+  {
 
-  this.setRootNode(root);
+    var root = new Ext.tree.AsyncTreeNode({
+          text : this.payload ? this.payload.get(this.titleColumn) : '/',
+          path : '/',
+          singleClickExpand : true,
+          expanded : this.autoExpandRoot
+        });
+
+    this.setRootNode(root);
+  }
 };
 
 Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
@@ -994,7 +998,10 @@ Ext.extend(Sonatype.panels.TreePanel, Ext.tree.TreePanel, {
           this.root.setText(this.payload ? this.payload.get(this.titleColumn) : '/');
         }
         this.root.attributes.localStorageUpdated = false;
-        this.root.reload();
+        if (this.root.reload)
+        {
+          this.root.reload();
+        }
       },
 
       treeLoadExceptionHandler : function(treeLoader, node, response) {
