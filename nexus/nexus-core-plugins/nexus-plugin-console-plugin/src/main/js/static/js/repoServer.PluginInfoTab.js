@@ -115,7 +115,7 @@ Ext.extend(Sonatype.repoServer.PluginInfoTab, Ext.Panel, {
         }
 
         var documentation = this.payload.data.documentation;
-        if (!Ext.isEmpty(documentation))
+        if (!Ext.isEmpty(documentation) && documentation.length != 0)
         {
           pluginPropertiesPanel.add({
                 xtype : 'label',
