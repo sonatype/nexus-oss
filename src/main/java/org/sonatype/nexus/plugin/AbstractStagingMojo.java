@@ -18,15 +18,15 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 public abstract class AbstractStagingMojo
     extends AbstractNexusMojo
@@ -100,7 +100,7 @@ public abstract class AbstractStagingMojo
             }
             else
             {
-                repos = getClient().getClosedStageRepositoriesForUser();
+                repos = getClient().getClosedStageRepositories();
                 builder.append( prompt ).append( ": " );
             }
         }

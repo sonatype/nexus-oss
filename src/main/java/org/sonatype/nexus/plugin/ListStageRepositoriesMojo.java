@@ -18,12 +18,12 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.util.List;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
 import org.sonatype.nexus.restlight.stage.StageRepository;
-
-import java.util.List;
 
 /**
  * Lists all open Nexus staging repositories for a user. These are staging repositories that are not yet available for
@@ -50,7 +50,7 @@ public class ListStageRepositoriesMojo
         List<StageRepository> repos;
         try
         {
-            repos = client.getOpenStageRepositoriesForUser();
+            repos = client.getOpenStageRepositories();
         }
         catch ( RESTLightClientException e )
         {
