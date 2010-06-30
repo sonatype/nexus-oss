@@ -64,7 +64,7 @@ public class ThreadedPlexusAppBooterService
 
                 try
                 {
-                    this.launcherThread.join( 2000 );
+                    this.launcherThread.join( 20000 );
                 }
                 catch ( InterruptedException e )
                 {
