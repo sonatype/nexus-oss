@@ -77,8 +77,23 @@ public class KeywordSearcher
         {
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
+        
+        boolean uniqueRGA = false;
+        
+        if ( filters != null )
+        {
+            for ( ArtifactInfoFilter filter : filters )
+            {
+                if ( filter instanceof UniqueArtifactFilterPostprocessor )
+                {
+                    uniqueRGA = true;
+                    
+                    break;
+                }
+            }
+        }
 
-        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit, true,
+        return m_lucene.searchArtifactIterator( terms.get( TERM_KEYWORD ), repositoryId, from, count, hitLimit, uniqueRGA,
             searchType, filters );
     }
 

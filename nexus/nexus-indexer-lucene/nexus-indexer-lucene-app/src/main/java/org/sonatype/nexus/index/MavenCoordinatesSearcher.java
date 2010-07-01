@@ -104,8 +104,6 @@ public class MavenCoordinatesSearcher
             return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
 
-        boolean collapseRepos = true;
-
         // if the user is querying against these fields, we want to return them properly
         if ( filters != null )
         {
@@ -115,30 +113,21 @@ public class MavenCoordinatesSearcher
                 {
                     UniqueArtifactFilterPostprocessor uFilter = (UniqueArtifactFilterPostprocessor) filter;
 
-                    int found = 0;
                     if ( terms.containsKey( MavenCoordinatesSearcher.TERM_VERSION ) )
                     {
                         uFilter.addField( MAVEN.VERSION );
-                        found++;
                     }
                     if ( terms.containsKey( MavenCoordinatesSearcher.TERM_PACKAGING ) )
                     {
                         uFilter.addField( MAVEN.PACKAGING );
-                        found++;
                     }
                     if ( terms.containsKey( MavenCoordinatesSearcher.TERM_CLASSIFIER ) )
                     {
                         uFilter.addField( MAVEN.CLASSIFIER );
-                        found++;
                     }
 
-                    // if we have matched against at least 2 of these, that means we are doing
-                    // full search, and NOT aggregation
-                    if ( found >= 2 )
-                    {
-                        uFilter.addField( MAVEN.REPOSITORY_ID );
-                        collapseRepos = false;
-                    }
+                    // in GAV search, we _always_ expand repository
+                    uFilter.addField( MAVEN.REPOSITORY_ID );
 
                     break;
                 }
@@ -147,7 +136,7 @@ public class MavenCoordinatesSearcher
 
         return m_lucene.searchArtifactIterator( terms.get( TERM_GROUP ), terms.get( TERM_ARTIFACT ),
             terms.get( TERM_VERSION ), terms.get( TERM_PACKAGING ), terms.get( TERM_CLASSIFIER ), repositoryId, from,
-            count, hitLimit, collapseRepos, searchType, filters );
+            count, hitLimit, false, searchType, filters );
     }
 
 }

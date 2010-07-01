@@ -184,9 +184,12 @@ public abstract class AbstractIndexPlexusResource
                     result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
 
                     // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results, and
-                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD, then repeat without collapse
+                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                    // and full result set is smaller than HIT_LIMIT
+                    // then repeat without collapse
                     if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
-                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD )
+                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                        && searchResult.getTotalHits() < HIT_LIMIT )
                     {
                         collapseResults = false;
 
