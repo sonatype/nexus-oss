@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
@@ -41,6 +42,7 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.restlet.util.Series;
+import org.sonatype.nexus.index.ArtifactContextProducer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -60,6 +62,7 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.rest.artifact.ArtifactContentPlexusResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
@@ -91,6 +94,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
     public static final String OVERRIDE_FILENAME_KEY = "override-filename";
+    
+    @Requirement( role = ArtifactViewProvider.class )
+    public Map<String, ArtifactViewProvider> viewProviders; 
 
     public AbstractResourceStoreContentPlexusResource()
     {
@@ -514,6 +520,23 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
+        
+        
+        Parameter describeParameter = req.getResourceRef().getQueryAsForm().getFirst( IS_DESCRIBE_PARAMETER );
+        
+        if( StringUtils.isNotEmpty( describeParameter.getValue() ) )
+        {
+            String key = describeParameter.getValue();
+            // check
+            if( !viewProviders.containsKey( key ))
+            {
+                throw new IllegalRequestException( request, "No view for key: "+ key );
+            }
+            
+            return viewProviders.get( key ).retrieveView( request );
+            
+        }
+        
         ContentListDescribeResourceResponse result = new ContentListDescribeResourceResponse();
 
         ContentListDescribeResource resource = new ContentListDescribeResource();
