@@ -47,6 +47,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.nexus.rest.model.LogsListResource;
 import org.sonatype.nexus.rest.model.LogsListResourceResponse;
+import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
@@ -282,6 +283,7 @@ public class NexusApplication
         xstream.processAnnotations( PlexusComponentListResourceResponse.class );
         xstream.processAnnotations( NexusRepositoryTypeListResourceResponse.class );
         xstream.processAnnotations( PrivilegeResourceRequest.class );
+        xstream.processAnnotations( Maven2ArtifactInfoResourceRespose.class );
 
         xstream.alias( "nexus-error", ErrorResponse.class );
         xstream.alias( "error", ErrorMessage.class );

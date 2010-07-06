@@ -4139,6 +4139,82 @@
     </class>
     <!-- Purposefully no PrivilegeApplicationResource as that type of resource cannot be created -->
     
+    <class>
+      <name>Maven2ArtifactInfoResourceRespose</name>
+      <version>1.0.0+</version>
+      <version>1.0.0+</version>
+      <description>REST Response object for maven 2 artifact info view.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "maven2-info" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "maven2-info" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>   
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>Maven2ArtifactInfoResource</type>
+          </association>
+          <required>true</required>
+          <description>Maven 2 info.</description>
+        </field>
+      </fields>
+    </class>
+    
+    <class>
+      <name>Maven2ArtifactInfoResource</name>
+      <version>1.0.0+</version>
+      <description>Maven 2 Artifact Information.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "maven2-info" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven Group Id.</description>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven artifact Id.</description>
+        </field>
+        <field>
+          <name>version</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven version.</description>
+        </field>
+        <field>
+          <name>classifier</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven classifier.</description>
+        </field>
+        <field>
+          <name>extention</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven extention.</description>
+        </field>
+        <field>
+          <name>dependencyXmlChunk</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven dependency XML to be included in a pom file.</description>
+        </field>
+      </fields>
+    </class>
 	
   </classes>
 </model>
