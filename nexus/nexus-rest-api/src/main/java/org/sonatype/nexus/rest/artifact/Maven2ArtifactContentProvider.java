@@ -60,7 +60,7 @@ public class Maven2ArtifactContentProvider
         StringBuffer buffer = new StringBuffer();
         buffer.append( "<dependency>\n" );
         buffer.append( "  <groupId>" ).append( gav.getGroupId() ).append( "</groupId>\n" );
-        buffer.append( "  <groupId>" ).append( gav.getArtifactId() ).append( "</groupId>\n" );
+        buffer.append( "  <artifactId>" ).append( gav.getArtifactId() ).append( "</artifactId>\n" );
         buffer.append( "  <version>" ).append( gav.getVersion() ).append( "</version>\n" );
 
         if( StringUtils.isNotEmpty( gav.getClassifier() ) )
