@@ -32,6 +32,8 @@ import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
+import org.sonatype.nexus.rest.model.ArtifactInfoResource;
+import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
@@ -202,14 +204,15 @@ public class SearchMessageUtil
     {
         return searchForGav( groupId, artifactId, version, null );
     }
-    
+
     public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String repositoryId )
         throws IOException
     {
         return searchForGav( groupId, artifactId, version, null, repositoryId );
     }
 
-    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String packaging, String repositoryId )
+    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String packaging,
+                                             String repositoryId )
         throws IOException
     {
         Map<String, String> args = new HashMap<String, String>();
@@ -346,20 +349,20 @@ public class SearchMessageUtil
         Assert.assertEquals( Status.SUCCESS_OK.getCode(), status.getCode() );
 
     }
-    
+
     public void reindexRepository( String taskName, String repoId, boolean force )
         throws Exception
     {
         doReindex( taskName, repoId, force, false );
     }
-    
+
     public void reindexGroup( String taskName, String groupId, boolean force )
         throws Exception
     {
         doReindex( taskName, groupId, force, true );
     }
-    
-    private void doReindex( String taskName, String repoId, boolean force, boolean group ) 
+
+    private void doReindex( String taskName, String repoId, boolean force, boolean group )
         throws Exception
     {
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();
@@ -368,7 +371,7 @@ public class SearchMessageUtil
         scheduledTask.setName( taskName );
         scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
         scheduledTask.setSchedule( "manual" );
-        
+
         if ( repoId != null )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
@@ -383,22 +386,42 @@ public class SearchMessageUtil
             }
             scheduledTask.addProperty( prop );
         }
-        
+
         if ( force )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setId( ForceFullReindexPropertyDescriptor.ID );
             prop.setValue( "true" );
-            
+
             scheduledTask.addProperty( prop );
         }
-        
-        
+
         Status status = TaskScheduleUtil.create( scheduledTask );
         Assert.assertTrue( status.isSuccess() );
-        
+
         status = TaskScheduleUtil.run( TaskScheduleUtil.getTask( taskName ).getId() );
         Assert.assertTrue( status.isSuccess() );
+    }
+
+    public ArtifactInfoResource getInfo( String repositoryId, String itemPath )
+        throws IOException
+    {
+        Response res =
+            RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
+                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
+
+        String responseText = res.getEntity().getText();
+        if ( !res.getStatus().isSuccess() )
+        {
+            Assert.fail( res.getStatus() + "\n" + responseText );
+        }
+
+        XStreamRepresentation rep =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+        ArtifactInfoResourceResponse info =
+            (ArtifactInfoResourceResponse) rep.getPayload( new ArtifactInfoResourceResponse() );
+
+        return info.getData();
     }
 
 }
