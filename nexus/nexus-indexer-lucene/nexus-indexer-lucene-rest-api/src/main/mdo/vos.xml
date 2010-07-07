@@ -266,9 +266,6 @@
 					<type>long</type>
 					<required>false</required>
 					<description>When the artifact was uploaded.</description>
-					<annotations>
-						<annotation>@com.thoughtworks.xstream.annotations.XStreamConverter( value = com.thoughtworks.xstream.converters.basic.LongConverter.class )</annotation>
-					</annotations>
 				</field>
 				<field>
 					<name>lastChanged</name>
@@ -276,9 +273,6 @@
 					<type>long</type>
 					<required>false</required>
 					<description>When the artifact was changed for the last time.</description>
-					<annotations>
-						<annotation>@com.thoughtworks.xstream.annotations.XStreamConverter( value = com.thoughtworks.xstream.converters.basic.LongConverter.class )</annotation>
-					</annotations>
 				</field>
 				<field>
 					<name>size</name>
@@ -286,9 +280,6 @@
 					<type>long</type>
 					<required>true</required>
 					<description>Artifact size on disk.</description>
-					<annotations>
-						<annotation>@com.thoughtworks.xstream.annotations.XStreamConverter( value = com.thoughtworks.xstream.converters.basic.LongConverter.class )</annotation>
-					</annotations>
 				</field>
 				<field>
 					<name>sha1Hash</name>
