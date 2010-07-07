@@ -42,7 +42,6 @@ import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.restlet.util.Series;
-import org.sonatype.nexus.index.ArtifactContextProducer;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -62,7 +61,6 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
-import org.sonatype.nexus.rest.artifact.ArtifactContentPlexusResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResourceResponse;
@@ -107,6 +105,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
         setModifiable( true );
     }
 
+    @Override
     public boolean acceptsUpload()
     {
         return true;
@@ -533,7 +532,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 throw new IllegalRequestException( request, "No view for key: "+ key );
             }
             
-            return viewProviders.get( key ).retrieveView( request );
+            return viewProviders.get( key ).retrieveView( request, item );
             
         }
         

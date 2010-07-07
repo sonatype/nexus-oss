@@ -7,6 +7,7 @@ import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
@@ -25,7 +26,7 @@ public class Maven2ArtifactContentProvider
     @Requirement
     private M2GavCalculator m2GavCalculator;
 
-    public Object retrieveView( ResourceStoreRequest storeRequest )
+    public Object retrieveView( ResourceStoreRequest storeRequest, StorageItem item )
         throws StorageException
     {
         Gav gav;
