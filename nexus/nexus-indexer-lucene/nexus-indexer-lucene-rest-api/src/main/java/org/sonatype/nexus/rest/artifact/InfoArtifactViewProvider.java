@@ -21,8 +21,8 @@ import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 
-@Component( role = ArtifactViewProvider.class, hint = "artifactInfo" )
-public class ArtifactInfoContentProvider
+@Component( role = ArtifactViewProvider.class, hint = "info" )
+public class InfoArtifactViewProvider
     extends AbstractLogEnabled
     implements ArtifactViewProvider
 {

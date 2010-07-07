@@ -19,7 +19,7 @@ import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
  * @author Brian Demers
  */
 @Component( role = ArtifactViewProvider.class, hint = "maven2" )
-public class Maven2ArtifactContentProvider
+public class Maven2ArtifactViewProvider
     implements ArtifactViewProvider
 {
     @Requirement
