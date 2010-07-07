@@ -4142,7 +4142,6 @@
     <class>
       <name>Maven2ArtifactInfoResourceRespose</name>
       <version>1.0.0+</version>
-      <version>1.0.0+</version>
       <description>REST Response object for maven 2 artifact info view.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "maven2-info" )</annotation>
@@ -4200,7 +4199,7 @@
           <description>Maven classifier.</description>
         </field>
         <field>
-          <name>extention</name>
+          <name>extension</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
@@ -4251,11 +4250,32 @@
       </annotations>
       <fields>
         <field>
-          <name>diskPath</name>
+          <name>repositoryId</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The path on disk where the artifact is stored.</description>
+          <description>The repository where the artifact is stored.</description>
+        </field>
+        <field>
+          <name>repositoryName</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository name where the artifact is stored.</description>
+        </field>
+        <field>
+          <name>repositoryPath</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The path in repository where the artifact is stored.</description>
+        </field>
+        <field>
+          <name>mimeType</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The MIME type of the artifact.</description>
         </field>
         <field>
           <name>uploader</name>
@@ -4286,18 +4306,11 @@
           <description>Artifact size on disk.</description>
         </field>
         <field>
-          <name>digesterSha1</name>
+          <name>sha1Hash</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>false</required>
-          <description>Sha1 checksum.</description>
-        </field>
-        <field>
-          <name>digesterMd5</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>false</required>
-          <description>Md5 checksum.</description>
+          <description>Sha1 Hash.</description>
         </field>
         <field>
           <name>repositories</name>

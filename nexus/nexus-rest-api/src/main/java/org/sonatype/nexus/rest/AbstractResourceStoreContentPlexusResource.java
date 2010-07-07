@@ -92,9 +92,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
     public static final String OVERRIDE_FILENAME_KEY = "override-filename";
-    
+
     @Requirement( role = ArtifactViewProvider.class )
-    public Map<String, ArtifactViewProvider> viewProviders; 
+    public Map<String, ArtifactViewProvider> viewProviders;
 
     public AbstractResourceStoreContentPlexusResource()
     {
@@ -519,23 +519,21 @@ public abstract class AbstractResourceStoreContentPlexusResource
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
-        
-        
         Parameter describeParameter = req.getResourceRef().getQueryAsForm().getFirst( IS_DESCRIBE_PARAMETER );
-        
-        if( StringUtils.isNotEmpty( describeParameter.getValue() ) )
+
+        if ( StringUtils.isNotEmpty( describeParameter.getValue() ) )
         {
             String key = describeParameter.getValue();
+
             // check
-            if( !viewProviders.containsKey( key ))
+            if ( !viewProviders.containsKey( key ) )
             {
-                throw new IllegalRequestException( request, "No view for key: "+ key );
+                throw new IllegalRequestException( request, "No view for key: " + key );
             }
-            
-            return viewProviders.get( key ).retrieveView( request, item );
-            
+
+            return viewProviders.get( key ).retrieveView( item );
         }
-        
+
         ContentListDescribeResourceResponse result = new ContentListDescribeResourceResponse();
 
         ContentListDescribeResource resource = new ContentListDescribeResource();

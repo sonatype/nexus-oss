@@ -141,6 +141,7 @@ public class ArtifactInfo
 
     public String version;
 
+    @Deprecated
     private transient ArtifactVersion artifactVersion;
 
     public String classifier;
@@ -207,6 +208,7 @@ public class ArtifactInfo
         this.classifier = classifier;
     }
 
+    @Deprecated
     public ArtifactVersion getArtifactVersion()
     {
         if ( artifactVersion == null )
