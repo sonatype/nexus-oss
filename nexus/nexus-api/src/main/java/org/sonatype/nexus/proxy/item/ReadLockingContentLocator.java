@@ -31,7 +31,25 @@ public class ReadLockingContentLocator
     {
         wrappedUid.lock( Action.read );
 
-        return new ReadLockingInputStream( wrappedUid, wrappedLocator.getContent() );
+        try
+        {
+            return new ReadLockingInputStream( wrappedUid, wrappedLocator.getContent() );
+        }
+        catch ( IOException e )
+        {
+            wrappedUid.unlock();
+
+            throw e;
+        }
+        catch ( Exception e )
+        {
+            wrappedUid.unlock();
+
+            // wrap it 
+            IOException w = new IOException( e.getMessage() );
+            w.initCause( e );
+            throw w;
+        }
     }
 
     public String getMimeType()
