@@ -471,6 +471,20 @@
           <description>The repository name.</description>
         </field>
         <field>
+          <name>repositoryContentClass</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository content class.</description>
+        </field>
+        <field>
+          <name>repositoryKind</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository kind (hosted, proxy, group).</description>
+        </field>
+        <field>
           <name>repositoryURL</name>
           <version>1.0.0+</version>
           <type>String</type>

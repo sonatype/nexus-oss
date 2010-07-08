@@ -50,7 +50,12 @@ import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
+import org.sonatype.nexus.proxy.repository.HostedRepository;
+import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.repository.RepositoryKind;
+import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
@@ -367,7 +372,7 @@ public class SearchNGIndexPlexusResource
             for ( ArtifactInfo ai : iterator )
             {
                 final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
-                
+
                 artifact = hits.get( key );
 
                 if ( artifact == null )
@@ -408,6 +413,10 @@ public class SearchNGIndexPlexusResource
                     hit.setRepositoryName( repository.getName() );
 
                     hit.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
+
+                    hit.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
+
+                    hit.setRepositoryKind( extractRepositoryKind( repository ) );
 
                     // only if unique
                     artifact.addHit( hit );
@@ -455,6 +464,33 @@ public class SearchNGIndexPlexusResource
             }
 
             response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );
+        }
+    }
+
+    protected String extractRepositoryKind( Repository repository )
+    {
+        RepositoryKind kind = repository.getRepositoryKind();
+
+        if ( kind.isFacetAvailable( HostedRepository.class ) )
+        {
+            return "hosted";
+        }
+        else if ( kind.isFacetAvailable( ProxyRepository.class ) )
+        {
+            return "proxy";
+        }
+        else if ( kind.isFacetAvailable( GroupRepository.class ) )
+        {
+            return "group";
+        }
+        else if ( kind.isFacetAvailable( ShadowRepository.class ) )
+        {
+            return "virtual";
+        }
+        else
+        {
+            // huh?
+            return repository.getRepositoryKind().getMainFacet().getName();
         }
     }
 
