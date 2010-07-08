@@ -262,6 +262,8 @@ public abstract class AbstractIndexPlexusResource
 
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
 
+                boolean uniqueRGA = false;
+
                 if ( collapseResults )
                 {
                     // filters should affect only Keyword and GAVSearch!
@@ -289,11 +291,14 @@ public abstract class AbstractIndexPlexusResource
                         }
 
                         filters.add( filter );
+
+                        uniqueRGA = true;
                     }
                 }
 
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, searchType, filters );
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, uniqueRGA, searchType,
+                        filters );
 
                 if ( searchResponse != null )
                 {

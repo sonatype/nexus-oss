@@ -78,6 +78,40 @@ public abstract class AbstractIndexerNexusPlexusResource
         return result;
     }
 
+    protected String getMatchHighlightHtmlSnippet( ArtifactInfo ai )
+    {
+        if ( ai.getMatchHighlights().size() > 0 )
+        {
+            // <blockquote>Artifact classes
+            // <ul>
+            // <li>aaaa</li>
+            // <li>bbbbb</li>
+            // </ul>
+            // </blockquote>
+
+            StringBuilder sb = new StringBuilder();
+
+            for ( MatchHighlight mh : ai.getMatchHighlights() )
+            {
+                sb.append( "<blockquote>" ).append( mh.getField().getDescription() ).append( "<UL>" );
+
+                // TODO: fix this!
+                for ( String high : mh.getHighlightedMatch() )
+                {
+                    sb.append( "<LI>" ).append( high ).append( "</LI>" );
+                }
+
+                sb.append( "</UL></blockquote>" );
+            }
+
+            return sb.toString();
+        }
+        else
+        {
+            return null;
+        }
+    }
+
     /**
      * Convert from ArtifactInfo to a NexusArtifact
      * 
@@ -109,32 +143,7 @@ public abstract class AbstractIndexerNexusPlexusResource
 
         a.setContextId( ai.context );
 
-        if ( ai.getMatchHighlights().size() > 0 )
-        {
-            // <blockquote>Artifact classes
-            // <ul>
-            // <li>aaaa</li>
-            // <li>bbbbb</li>
-            // </ul>
-            // </blockquote>
-
-            StringBuilder sb = new StringBuilder();
-
-            for ( MatchHighlight mh : ai.getMatchHighlights() )
-            {
-                sb.append( "<blockquote>" ).append( mh.getField().getDescription() ).append( "<UL>" );
-
-                // TODO: fix this!
-                for ( String high : mh.getHighlightedMatch() )
-                {
-                    sb.append( "<LI>" ).append( high ).append( "</LI>" );
-                }
-
-                sb.append( "</UL></blockquote>" );
-            }
-
-            a.setHighlightedFragment( sb.toString() );
-        }
+        a.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
 
         if ( ai.repository != null )
         {

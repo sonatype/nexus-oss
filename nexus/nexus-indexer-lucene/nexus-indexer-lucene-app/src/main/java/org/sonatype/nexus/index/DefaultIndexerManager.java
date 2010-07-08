@@ -2391,20 +2391,7 @@ public class DefaultIndexerManager
 
             if ( pTerm != null )
             {
-                if ( Field.NOT_PRESENT.equalsIgnoreCase( pTerm ) )
-                {
-                    filters.add( new ArtifactInfoFilter()
-                    {
-                        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-                        {
-                            return StringUtils.isBlank( ai.packaging );
-                        }
-                    } );
-                }
-                else
-                {
-                    bq.add( createQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
-                }
+                bq.add( createQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
@@ -2416,7 +2403,7 @@ public class DefaultIndexerManager
                     // bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD ),
                     // BooleanClause.Occur.MUST_NOT );
                     // This above should work too! -- TODO: fixit!
-                    filters.add( new ArtifactInfoFilter()
+                    filters.add( 0, new ArtifactInfoFilter()
                     {
                         public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
                         {

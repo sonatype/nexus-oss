@@ -68,7 +68,7 @@ public class ClassnameSearcher
     }
 
     public IteratorSearchResponse flatIteratorSearch( Map<String, String> terms, String repositoryId, Integer from,
-                                                      Integer count, Integer hitLimit, SearchType searchType,
+                                                      Integer count, Integer hitLimit, boolean uniqueRGA, SearchType searchType,
                                                       List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException
     {

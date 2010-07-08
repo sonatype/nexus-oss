@@ -402,6 +402,20 @@
           <description>The version of the artifact.</description>
         </field>
         <field>
+          <name>latestVersion</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The latest version of the artifact ("newest", whether release or snapshot).</description>
+        </field>
+        <field>
+          <name>releasedVersion</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The latest release version of the artifact.</description>
+        </field>
+        <field>
           <name>highlightedFragment</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -435,13 +449,6 @@
         </annotation>
       </annotations>
       <fields>
-        <field>
-          <name>contextId</name>
-          <version>1.0.0+</version>
-          <type>String</type>
-          <required>true</required>
-          <description>The indexing context where the artifact is indexed.</description>
-        </field>
         <field>
           <name>repositoryId</name>
           <version>1.0.0+</version>
