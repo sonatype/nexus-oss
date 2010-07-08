@@ -1,6 +1,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.FileNotFoundException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
@@ -30,17 +32,32 @@ public class GavUtil
     public static String getRelitiveArtifactPath( Gav gav )
         throws FileNotFoundException
     {
+        long timestamp = gav.getSnapshotTimeStamp() != null ? gav.getSnapshotTimeStamp() : 0;
+        int buildNumber = gav.getSnapshotBuildNumber() != null ? gav.getSnapshotBuildNumber() : 0;
+        
         return getRelitiveArtifactPath( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                        gav.getClassifier() );
+                                        gav.getClassifier(), gav.isSnapshot(), timestamp, buildNumber );
     }
 
     public static String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
                                                   String classifier )
         throws FileNotFoundException
     {
-        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-" + classifier;
-        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + version
-            + classifierPart + "." + extension;
+        return getRelitiveArtifactPath( groupId, artifactId, version, extension, classifier, false, 0, 0 );
     }
 
+    private static String getRelitiveArtifactPath( String groupId, String artifactId, String version, String extension,
+                                                  String classifier, boolean snapshot, long timestamp, int buildNumber )
+        throws FileNotFoundException
+    {
+        String classifierPart = StringUtils.isEmpty( classifier ) ? "" : "-" + classifier;
+        String fileVersion = version;
+        if( snapshot && timestamp > 0 )
+        {
+            fileVersion = version.replaceFirst( "SNAPSHOT", new SimpleDateFormat("yyyyMMdd.HHmmss").format( new Date( timestamp ) ) + "-" + buildNumber);
+        }
+        return groupId.replace( '.', '/' ) + "/" + artifactId + "/" + version + "/" + artifactId + "-" + fileVersion
+            + classifierPart + "." + extension;
+    }
+    
 }

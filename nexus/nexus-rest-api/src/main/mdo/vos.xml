@@ -4192,6 +4192,13 @@
           <description>Maven version.</description>
         </field>
         <field>
+          <name>baseVersion</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>Maven base version, i.e. the -SNAPSHOT version for snapshots.</description>
+        </field>
+        <field>
           <name>classifier</name>
           <version>1.0.0+</version>
           <type>String</type>

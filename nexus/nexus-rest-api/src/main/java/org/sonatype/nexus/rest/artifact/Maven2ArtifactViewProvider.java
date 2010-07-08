@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
@@ -23,6 +24,9 @@ public class Maven2ArtifactViewProvider
     implements ArtifactViewProvider
 {
     @Requirement
+    private Logger logger;
+    
+    @Requirement
     private M2GavCalculator m2GavCalculator;
 
     public Object retrieveView( StorageItem item )
@@ -39,6 +43,7 @@ public class Maven2ArtifactViewProvider
 
             data.setGroupId( gav.getGroupId() );
             data.setArtifactId( gav.getArtifactId() );
+            data.setBaseVersion( gav.getBaseVersion() );
             data.setVersion( gav.getVersion() );
             data.setExtension( gav.getExtension() );
             data.setClassifier( gav.getClassifier() );
@@ -50,21 +55,20 @@ public class Maven2ArtifactViewProvider
         }
         catch ( IllegalArtifactCoordinateException e )
         {
-            // why throwing this? why not returning _nothing_ since you asked for maven info on an
-            // item that is NOT maven2 artifact (path is not a GAV)?
-            // throw new StorageException( "Failed to resolve maven2 gav from path: " + item.getPath() );
+            this.logger.debug( "Failed to calculate maven 2 path." );
+
+            // not maven, return null
             return null;
         }
     }
 
     private String generateDependencyXml( Gav gav )
     {
-
         StringBuilder buffer = new StringBuilder();
         buffer.append( "<dependency>\n" );
         buffer.append( "  <groupId>" ).append( gav.getGroupId() ).append( "</groupId>\n" );
         buffer.append( "  <artifactId>" ).append( gav.getArtifactId() ).append( "</artifactId>\n" );
-        buffer.append( "  <version>" ).append( gav.getVersion() ).append( "</version>\n" );
+        buffer.append( "  <version>" ).append( gav.getBaseVersion() ).append( "</version>\n" );
 
         if ( StringUtils.isNotEmpty( gav.getClassifier() ) )
         {

@@ -77,10 +77,13 @@ public class DeployUtils
         PostMethod filePost = new PostMethod( restServiceURL );
         filePost.getParams().setBooleanParameter( HttpMethodParams.USE_EXPECT_CONTINUE, true );
 
+        String extention = gav.getExtension() != null ? gav.getExtension() : "";
+        String classifier = gav.getClassifier() != null ? gav.getClassifier() : "";
+        
         Part[] parts =
             { new StringPart( "r", repositoryId ), new StringPart( "g", gav.getGroupId() ),
                 new StringPart( "a", gav.getArtifactId() ), new StringPart( "v", gav.getVersion() ),
-                new StringPart( "p", gav.getExtension() ), new StringPart( "c", "" ),
+                new StringPart( "p", extention ), new StringPart( "c", classifier ),
                 new FilePart( fileToDeploy.getName(), fileToDeploy ), };
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
