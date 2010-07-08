@@ -383,15 +383,33 @@ public class SearchNGIndexPlexusResource
                     hits.put( key, artifact );
                 }
 
-                NexusNGArtifactHit hit = new NexusNGArtifactHit();
-
                 Repository repository = getRepositoryRegistry().getRepository( ai.repository );
 
-                hit.setRepositoryId( repository.getId() );
+                NexusNGArtifactHit hit = null;
 
-                hit.setRepositoryName( repository.getName() );
+                for ( NexusNGArtifactHit artifactHit : artifact.getHits() )
+                {
+                    if ( repository.getId().equals( artifactHit.getRepositoryId() ) )
+                    {
+                        hit = artifactHit;
 
-                hit.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
+                        break;
+                    }
+                }
+
+                if ( hit == null )
+                {
+                    hit = new NexusNGArtifactHit();
+
+                    hit.setRepositoryId( repository.getId() );
+
+                    hit.setRepositoryName( repository.getName() );
+
+                    hit.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
+
+                    // only if unique
+                    artifact.addHit( hit );
+                }
 
                 NexusNGArtifactLink link = new NexusNGArtifactLink();
 
@@ -412,9 +430,6 @@ public class SearchNGIndexPlexusResource
 
                 // only if unique
                 hit.addArtifactLink( link );
-
-                // only if unique
-                artifact.addHit( hit );
             }
 
             // 2nd pass, set versions
