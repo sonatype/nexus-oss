@@ -305,6 +305,7 @@ public class SearchNGIndexPlexusResource
                         filter.addField( MAVEN.ARTIFACT_ID );
                         filter.addField( MAVEN.PACKAGING );
                         filter.addField( MAVEN.CLASSIFIER );
+                        filter.addField( MAVEN.REPOSITORY_ID );
 
                         if ( Boolean.TRUE.equals( expandVersion ) )
                         {
