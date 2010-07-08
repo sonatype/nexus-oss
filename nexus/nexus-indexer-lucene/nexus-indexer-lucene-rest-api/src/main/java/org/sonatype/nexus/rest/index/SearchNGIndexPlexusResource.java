@@ -15,6 +15,7 @@ package org.sonatype.nexus.rest.index;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -359,13 +360,15 @@ public class SearchNGIndexPlexusResource
         if ( !response.isTooManyResults() )
         {
             // 1st pass, collect results
-            HashMap<String, NexusNGArtifact> hits = new HashMap<String, NexusNGArtifact>();
+            LinkedHashMap<String, NexusNGArtifact> hits = new LinkedHashMap<String, NexusNGArtifact>();
 
             NexusNGArtifact artifact;
 
             for ( ArtifactInfo ai : iterator )
             {
                 final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
+                
+                System.out.println(key);
 
                 artifact = hits.get( key );
 
