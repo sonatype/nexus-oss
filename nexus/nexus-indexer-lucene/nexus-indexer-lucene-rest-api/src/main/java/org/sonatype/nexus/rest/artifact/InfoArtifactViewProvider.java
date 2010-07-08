@@ -66,6 +66,7 @@ public class InfoArtifactViewProvider
         resource.setRepositoryId( item.getRepositoryItemUid().getRepository().getId() );
         resource.setRepositoryName( item.getRepositoryItemUid().getRepository().getName() );
         resource.setRepositoryPath( item.getRepositoryItemUid().getPath() );
+        resource.setMd5Hash( fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
         resource.setSha1Hash( fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
         resource.setLastChanged( fileItem.getModified() );
         resource.setRepositories( new ArrayList<String>( repositories ) );

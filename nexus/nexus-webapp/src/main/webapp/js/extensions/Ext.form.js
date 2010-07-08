@@ -231,18 +231,18 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
 
         result.errors = remainingErrors;
       }
-      
-      if ( result.errors.length == 1 
-      && result.errors[0].id == '*' ) {
+
+      if (result.errors.length == 1 && result.errors[0].id == '*')
+      {
         Sonatype.MessageBox.show({
-                title : 'Configuration Error',
-                msg : result.errors[0].msg,
-                buttons : Sonatype.MessageBox.OK,
-                icon : Sonatype.MessageBox.ERROR
-              });
+              title : 'Configuration Error',
+              msg : result.errors[0].msg,
+              buttons : Sonatype.MessageBox.OK,
+              icon : Sonatype.MessageBox.ERROR
+            });
         return;
       }
-       
+
       this.form.markInvalid(result.errors);
       this.failureType = Ext.form.Action.SERVER_INVALID;
     }
@@ -298,7 +298,7 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
     { // non-root case
       nextPrepend = sPrepend + sVal + '.';
       value = srcObj[sVal]; // @todo: "value" name here is whack because, it's
-                            // not the field value
+      // not the field value
     }
     else
     { // root case
@@ -787,10 +787,10 @@ Ext.extend(Sonatype.ext.FormPanel, Ext.FormPanel, {
       getActionURL : function() {
         return this.isNew ? this.uri : // if new, return the uri
             (this.payload.data.resourceURI ? // if resouceURI is supplied,
-                                              // return it
+                // return it
                 this.payload.data.resourceURI
                 : this.uri + '/' + this.payload.id); // otherwise construct a
-                                                      // uri
+        // uri
       },
 
       getSaveMethod : function() {
@@ -823,3 +823,142 @@ Ext.extend(Sonatype.ext.FormPanel, Ext.FormPanel, {
             }, this);
       }
     });
+
+/*
+ * ! Ext JS Library 3.2.1 Copyright(c) 2006-2010 Ext JS, Inc.
+ * licensing@extjs.com http://www.extjs.com/license
+ */
+/**
+ * @class Ext.form.DisplayField
+ * @extends Ext.form.Field A display-only text field which is not validated and
+ *          not submitted.
+ * @constructor Creates a new DisplayField.
+ * @param {Object}
+ *          config Configuration options
+ * @xtype displayfield
+ */
+Ext.form.DisplayField = Ext.extend(Ext.form.Field, {
+  validationEvent : false,
+  validateOnBlur : false,
+  defaultAutoCreate : {
+    tag : "div"
+  },
+  /**
+   * @cfg {String} fieldClass The default CSS class for the field (defaults to
+   *      <tt>"x-form-display-field"</tt>)
+   */
+  fieldClass : "x-form-display-field",
+  /**
+   * @cfg {Boolean} htmlEncode <tt>false</tt> to skip HTML-encoding the text
+   *      when rendering it (defaults to <tt>false</tt>). This might be
+   *      useful if you want to include tags in the field's innerHTML rather
+   *      than rendering them as string literals per the default logic.
+   */
+  htmlEncode : false,
+
+  // private
+  initEvents : Ext.emptyFn,
+
+  isValid : function() {
+    return true;
+  },
+
+  validate : function() {
+    return true;
+  },
+
+  getRawValue : function() {
+    var v = this.rendered ? this.el.dom.innerHTML : Ext.value(this.value, '');
+    if (v === this.emptyText)
+    {
+      v = '';
+    }
+    if (this.htmlEncode)
+    {
+      v = Ext.util.Format.htmlDecode(v);
+    }
+    return v;
+  },
+
+  getValue : function() {
+    return this.getRawValue();
+  },
+
+  getName : function() {
+    return this.name;
+  },
+
+  setRawValue : function(v) {
+    if (this.htmlEncode)
+    {
+      v = Ext.util.Format.htmlEncode(v);
+    }
+    return this.rendered ? (this.el.dom.innerHTML = (Ext.isEmpty(v) ? '' : v)) : (this.value = v);
+  },
+
+  setValue : function(v) {
+    this.setRawValue(v);
+    return this;
+  }
+    /**
+     * @cfg {String} inputType
+     * @hide
+     */
+    /**
+     * @cfg {Boolean} disabled
+     * @hide
+     */
+    /**
+     * @cfg {Boolean} readOnly
+     * @hide
+     */
+    /**
+     * @cfg {Boolean} validateOnBlur
+     * @hide
+     */
+    /**
+     * @cfg {Number} validationDelay
+     * @hide
+     */
+    /**
+     * @cfg {String/Boolean} validationEvent
+     * @hide
+     */
+  });
+
+Ext.reg('displayfield', Ext.form.DisplayField);
+
+Ext.form.TimestampDisplayField = Ext.extend(Ext.form.DisplayField, {
+      setValue : function(v) {
+        v = new Date.parseDate(v, 'u').format('m.d.Y  h:m:s');
+        this.setRawValue(v);
+        return this;
+      }
+    });
+
+Ext.reg('timestampDisplayField', Ext.form.TimestampDisplayField);
+
+Ext.form.ByteDisplayField = Ext.extend(Ext.form.DisplayField, {
+      setValue : function(v) {
+        if (v < 1024)
+        {
+          v = v + ' Bytes';
+        }
+        else if (v < 1048576)
+        {
+          v = (v / 1024).toFixed(2) + ' KB';
+        }
+        else if (v < 1073741824)
+        {
+          v = (v / 1048576).toFixed(2) + ' MB';
+        }
+        else
+        {
+          v = (v / 1073741824).toFixed(2) + ' GB';
+        }
+        this.setRawValue(v);
+        return this;
+      }
+    });
+
+Ext.reg('byteDisplayField', Ext.form.ByteDisplayField);

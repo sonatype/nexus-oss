@@ -294,6 +294,13 @@
           <description>Sha1 Hash.</description>
         </field>
         <field>
+          <name>md5Hash</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>Md5 Hash.</description>
+        </field>
+        <field>
           <name>repositories</name>
           <version>1.0.0+</version>
           <association>
