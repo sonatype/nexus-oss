@@ -21,9 +21,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 
   this.sp = Sonatype.lib.Permissions;
 
-  this.linkDivId = Ext.id();
-  this.linkLabelId = Ext.id();
-
   var items = [{
         xtype : 'panel',
         layout : 'column',
@@ -31,7 +28,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
         items : [{
               xtype : 'panel',
               layout : 'form',
-              columnWidth : .4,
               labelWidth : 90,
               items : [{
                     xtype : 'displayfield',
@@ -151,7 +147,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 
   Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
         title : 'Artifact Information',
-        layout : 'fit',
         collapsible : false,
         collapsed : false,
         split : true,

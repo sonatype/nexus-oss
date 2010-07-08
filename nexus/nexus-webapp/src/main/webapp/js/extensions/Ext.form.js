@@ -930,7 +930,7 @@ Ext.reg('displayfield', Ext.form.DisplayField);
 
 Ext.form.TimestampDisplayField = Ext.extend(Ext.form.DisplayField, {
       setValue : function(v) {
-        v = new Date.parseDate(v, 'u').format('m.d.Y  h:m:s');
+        v = new Date.parseDate(v, 'u').toString();
         this.setRawValue(v);
         return this;
       }
