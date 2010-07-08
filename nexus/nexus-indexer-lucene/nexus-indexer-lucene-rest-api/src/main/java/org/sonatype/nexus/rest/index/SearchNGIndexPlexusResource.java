@@ -368,8 +368,6 @@ public class SearchNGIndexPlexusResource
             {
                 final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
                 
-                System.out.println(key);
-
                 artifact = hits.get( key );
 
                 if ( artifact == null )
