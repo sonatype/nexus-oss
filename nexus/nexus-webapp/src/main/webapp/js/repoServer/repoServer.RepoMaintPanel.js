@@ -525,10 +525,21 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
         if (this.payload)
         {
           this.setRootNode(new Ext.tree.AsyncTreeNode({
-                text : this.payload.get(this.titleColumn),
+                text : this.payload.data[this.titleColumn],
                 id : this.getBrowsePath(this.payload.data.resourceURI),
                 singleClickExpand : true,
-                expanded : true
+                expanded : true,
+                listeners : {
+                  expand : {
+                    fn : function() {
+                      if (this.payload.data.expandPath)
+                      {
+                        this.selectPath(this.payload.data.expandPath, 'text')
+                      }
+                    },
+                    scope : this
+                  }
+                }
               }));
         }
         else

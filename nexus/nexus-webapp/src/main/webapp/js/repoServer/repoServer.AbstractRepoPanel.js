@@ -455,7 +455,7 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         var isProxy = repoRecord.data.repoType == 'proxy';
         var isHosted = repoRecord.data.repoType == 'hosted';
         var isGroup = repoRecord.data.repoType == 'group';
-        var isMaven = repoRecord.get('format') == 'maven2' || repoRecord.get('format') == 'maven1';
+        var isMaven = repoRecord.data['format'] == 'maven2' || repoRecord.data['format'] == 'maven1';
 
         if (repoRecord.data.userManaged)
         {

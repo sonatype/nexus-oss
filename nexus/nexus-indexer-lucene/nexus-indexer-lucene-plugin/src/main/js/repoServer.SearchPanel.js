@@ -59,13 +59,23 @@ Sonatype.repoServer.SearchPanel = function(config) {
         items : [this.searchTypeButton, this.convertToFieldObject(this.searchTypes[defaultSearchTypeIndex].panelItems[0])]
       });
 
-  this.artifactContainer = new Sonatype.repoServer.ArtifactContainer({});
+  this.repoBrowserContainer = new Sonatype.repoServer.RepositoryBrowserContainer({
+        region : 'south',
+        split : true,
+        collapsible : true,
+        collapsed : true,
+        // TODO: WHY ISNT MINI MODE WORKING !!!!
+        collapseMode : 'mini',
+        height : 300,
+        artifactContainerInitEvent : 'artifactContainerInit',
+        artifactContainerUpdateEvent : 'artifactContainerUpdate'
+      });
 
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
         layout : 'border',
         hideMode : 'offsets',
         tbar : this.searchToolbar,
-        items : [this.grid, this.artifactContainer]
+        items : [this.grid, this.repoBrowserContainer]
       });
 
   this.grid.getSelectionModel().on('rowselect', this.displayArtifactInformation, this);
@@ -74,14 +84,25 @@ Sonatype.repoServer.SearchPanel = function(config) {
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       clearArtifactInformation : function(button, e) {
-        this.artifactContainer.collapsePanel();
+        this.repoBrowserContainer.collapse();
+        this.repoBrowserContainer.updatePayload(null);
       },
 
       displayArtifactInformation : function(selectionModel, index, rec) {
         var searchType = this.getSearchType(this.searchTypeButton.value);
         if (typeof searchType.showArtifactContainer != 'function' || searchType.showArtifactContainer(rec))
         {
-          this.artifactContainer.updateArtifact(rec.data);
+          var payload = {
+            data : {
+              showCtx : true,
+              name : rec.data.hits[0].repositoryName,
+              resourceURI : rec.data.hits[0].repositoryURL,
+              format : 'maven2',
+              expandPath : '/' + rec.data.hits[0].repositoryName + rec.data.hits[0].artifactLinks[0].artifactLink.substring(rec.data.hits[0].repositoryURL.length + '/content'.length)
+            }
+          }
+          this.repoBrowserContainer.expand();
+          this.repoBrowserContainer.updatePayload(payload);
         }
       },
       // search type switched on the drop down button
@@ -188,7 +209,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       },
       // get the records from the server using grid
       fetchRecords : function(panel, reverse) {
-        panel.artifactContainer.collapsePanel();
+        panel.repoBrowserContainer.updatePayload(null);
         panel.grid.totalRecords = 0;
         panel.grid.store.removeAll();
         panel.grid.store.load();
@@ -309,38 +330,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
               }
               return true;
             },
-            // use new column model to hide the source column
-            columnModel : new Ext.grid.ColumnModel({
-                  columns : [{
-                        id : 'group',
-                        header : "Group",
-                        dataIndex : 'groupId',
-                        sortable : true
-                      }, {
-                        id : 'artifact',
-                        header : "Artifact",
-                        dataIndex : 'artifactId',
-                        sortable : true
-                      }, {
-                        id : 'version',
-                        header : "Version",
-                        dataIndex : 'version',
-                        sortable : true,
-                        renderer : panel.grid.formatVersionLink
-                      }, {
-                        id : 'packaging',
-                        header : "Packaging",
-                        dataIndex : 'packaging',
-                        sortable : true,
-                        renderer : panel.grid.formatPackagingLink
-                      }, {
-                        id : 'classifier',
-                        header : "Classifier",
-                        dataIndex : 'classifier',
-                        sortable : true,
-                        renderer : panel.grid.formatClassifierLink
-                      }]
-                }),
             quickSearchCheckHandler : function(panel, value) {
               return true;
             },

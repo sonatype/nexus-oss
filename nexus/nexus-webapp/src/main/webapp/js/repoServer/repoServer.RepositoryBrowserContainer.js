@@ -2,7 +2,10 @@
 // information panel
 Sonatype.repoServer.RepositoryBrowserContainer = function(config) {
   var config = config || {};
-  var defaultConfig = {};
+  var defaultConfig = {
+    artifactContainerInitEvent : 'fileContainerInit',
+    artifactContainerUpdateEvent : 'fileContainerUpdate'
+  };
   Ext.apply(this, config, defaultConfig);
 
   var items = [];
@@ -25,8 +28,8 @@ Sonatype.repoServer.RepositoryBrowserContainer = function(config) {
         split : true,
         width : 500,
         halfSize : true,
-        initEventName : 'fileContainerInit',
-        updateEventName : 'fileContainerUpdate'
+        initEventName : this.artifactContainerInitEvent,
+        updateEventName : this.artifactContainerUpdateEvent
       });
 
   items.push(this.repositoryBrowser);
@@ -42,8 +45,23 @@ Sonatype.repoServer.RepositoryBrowserContainer = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.RepositoryBrowserContainer, Ext.Panel, {
+      updatePayload : function(payload) {
 
-});
+        if (payload == null)
+        {
+          this.collapse();
+          this.repositoryBrowser.updatePayload(null);
+          this.artifactContainer.collapsePanel();
+        }
+        else
+        {
+          this.expand();
+          this.repositoryBrowser.updatePayload(payload);
+          this.artifactContainer.updateArtifact(payload);
+        }
+
+      }
+    });
 
 // Add the browse storage and browse index panels to the repo
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
