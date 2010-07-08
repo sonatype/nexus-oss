@@ -97,7 +97,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               showCtx : true,
               name : rec.data.hits[0].repositoryName,
               resourceURI : rec.data.hits[0].repositoryURL,
-              format : 'maven2',
+              format : rec.data.hits[0].repositoryContentClass,
+              repoType : rec.data.hits[0].repositoryKind,
               expandPath : '/' + rec.data.hits[0].repositoryName + rec.data.hits[0].artifactLinks[0].artifactLink.substring(rec.data.hits[0].repositoryURL.length + '/content'.length)
             }
           }

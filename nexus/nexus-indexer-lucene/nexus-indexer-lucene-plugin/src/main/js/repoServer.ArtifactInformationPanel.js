@@ -14,9 +14,7 @@
  */
 Sonatype.repoServer.ArtifactInformationPanel = function(config) {
   var config = config || {};
-  var defaultConfig = {
-    halfSize : false
-  };
+  var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
   this.sp = Sonatype.lib.Permissions;
@@ -58,7 +56,10 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                     allowBlank : true,
                     readOnly : true,
                     formatter : function(value) {
-                      return new Date.parseDate(value, 'u').format('m.d.Y  h:m:s');
+                      if (value)
+                      {
+                        return new Date.parseDate(value, 'u').format('m.d.Y  h:m:s');
+                      }
                     }
                   }, {
                     xtype : 'timestampDisplayField',
@@ -143,8 +144,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
         items : items
       });
 
-  this.path = '';
-
   Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
         title : 'Artifact Information',
         collapsible : false,
@@ -160,30 +159,36 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
 
       artifactDownload : function() {
-        Sonatype.utils.openWindow(Sonatype.config.contentPath + '/repositories' + this.path);
+        if (this.data)
+        {
+          Sonatype.utils.openWindow(this.data.resourceURI);
+        }
       },
 
       artifactDelete : function() {
-        var url = Sonatype.config.contentPath + '/repositories' + this.path;
+        if (this.data)
+        {
+          var url = this.data.resourceURI;
 
-        Sonatype.MessageBox.show({
-              title : 'Delete Repository Item?',
-              msg : 'Delete the selected artifact ?',
-              buttons : Sonatype.MessageBox.YESNO,
-              scope : this,
-              icon : Sonatype.MessageBox.QUESTION,
-              fn : function(btnName) {
-                if (btnName == 'yes' || btnName == 'ok')
-                {
-                  Ext.Ajax.request({
-                        url : url,
-                        callback : this.deleteRepoItemCallback,
-                        scope : this,
-                        method : 'DELETE'
-                      });
+          Sonatype.MessageBox.show({
+                title : 'Delete Repository Item?',
+                msg : 'Delete the selected artifact ?',
+                buttons : Sonatype.MessageBox.YESNO,
+                scope : this,
+                icon : Sonatype.MessageBox.QUESTION,
+                fn : function(btnName) {
+                  if (btnName == 'yes' || btnName == 'ok')
+                  {
+                    Ext.Ajax.request({
+                          url : url,
+                          callback : this.deleteRepoItemCallback,
+                          scope : this,
+                          method : 'DELETE'
+                        });
+                  }
                 }
-              }
-            });
+              });
+        }
       },
 
       deleteRepoItemCallback : function(options, isSuccess, response) {
@@ -193,47 +198,58 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
         }
       },
 
-      showArtifact : function(path) {
-        this.path = path;
+      showArtifact : function(data) {
+        this.data = data;
+        if (data == null)
+        {
 
-        var url = Sonatype.config.contentPath + '/repositories' + path + '?describe=info';
-
-        Ext.Ajax.request({
-              url : url,
-              callback : function(options, isSuccess, response) {
-                if (isSuccess)
-                {
-                  var infoResp = Ext.decode(response.responseText);
-                  this.formPanel.form.setValues(infoResp.data);
-                }
-                else
-                {
-                  Sonatype.utils.connectionError(response, 'Unable to retrieve artifact information.');
-                }
-              },
-              scope : this,
-              method : 'GET'
-            });
+          this.find('name', 'repositoryPath')[0].setRawValue(null);
+          this.find('name', 'uploader')[0].setRawValue(null);
+          this.find('name', 'size')[0].setRawValue(null);
+          this.find('name', 'uploaded')[0].setRawValue(null);
+          this.find('name', 'lastChanged')[0].setRawValue(null);
+          this.find('name', 'sha1Hash')[0].setRawValue(null);
+          this.find('name', 'md5Hash')[0].setRawValue(null);
+          this.find('name', 'repositories')[0].setRawValue(null);
+        }
+        else
+        {
+          Ext.Ajax.request({
+                url : this.data.resourceURI + '?describe=info',
+                callback : function(options, isSuccess, response) {
+                  if (isSuccess)
+                  {
+                    var infoResp = Ext.decode(response.responseText);
+                    this.formPanel.form.setValues(infoResp.data);
+                  }
+                  else
+                  {
+                    Sonatype.utils.connectionError(response, 'Unable to retrieve artifact information.');
+                  }
+                },
+                scope : this,
+                method : 'GET'
+              });
+        }
       }
     });
 
 Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
       artifactContainer.add(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
-            tabTitle : 'Artifact Information',
-            halfSize : artifactContainer.halfSize
+            tabTitle : 'Artifact Information'
           }));
     });
 
-Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContainer, data) {
+Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContainer, payload) {
       var panel = artifactContainer.find('name', 'artifactInformationPanel')[0];
 
-      if (data == null)
+      if (payload == null || !payload.leaf)
       {
-        panel.showArtifact('/thirdparty/org/sonatype/flexmojos/flexmojos-flex-compiler/4.0-alpha-3/flexmojos-flex-compiler-4.0-alpha-3.jar');
+        panel.showArtifact(null);
       }
       else
       {
-        panel.showArtifact('/thirdparty/org/sonatype/flexmojos/flexmojos-flex-compiler/4.0-alpha-3/flexmojos-flex-compiler-4.0-alpha-3.jar');
+        panel.showArtifact(payload);
       }
     });

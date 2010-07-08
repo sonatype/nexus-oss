@@ -399,11 +399,11 @@ Ext.extend(Sonatype.repoServer.AbstractRepoPanel, Ext.Panel, {
         if (repoRecord.id.substring(0, 4) == 'new_' || !repoRecord.data.exposed || !repoRecord.data.userManaged)
           return;
 
-        var isVirtual = repoRecord.get('repoType') == 'virtual';
-        var isHosted = repoRecord.get('repoType') == 'hosted';
-        var isProxy = repoRecord.get('repoType') == 'proxy';
-        var isGroup = repoRecord.get('repoType') == 'group';
-        var isMaven = repoRecord.get('format') == 'maven2' || repoRecord.get('format') == 'maven1';
+        var isVirtual = repoRecord.data['repoType'] == 'virtual';
+        var isHosted = repoRecord.data['repoType'] == 'hosted';
+        var isProxy = repoRecord.data['repoType'] == 'proxy';
+        var isGroup = repoRecord.data['repoType'] == 'group';
+        var isMaven = repoRecord.data['format'] == 'maven2' || repoRecord.data['format'] == 'maven1';
 
         if (this.sp.checkPermission('nexus:cache', this.sp.DELETE) && !isVirtual)
         {

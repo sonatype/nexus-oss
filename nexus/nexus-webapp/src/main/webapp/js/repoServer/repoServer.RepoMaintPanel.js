@@ -534,7 +534,15 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
                     fn : function() {
                       if (this.payload.data.expandPath)
                       {
-                        this.selectPath(this.payload.data.expandPath, 'text')
+                        this.selectPath(this.payload.data.expandPath, 'text', function(success, node) {
+                              if (success)
+                              {
+                                if (node.ownerTree.nodeClickEvent)
+                                {
+                                  Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
+                                }
+                              }
+                            });
                       }
                     },
                     scope : this

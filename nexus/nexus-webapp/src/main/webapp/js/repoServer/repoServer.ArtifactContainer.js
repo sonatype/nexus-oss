@@ -18,7 +18,6 @@ Sonatype.repoServer.ArtifactContainer = function(config) {
     collapsible : true,
     collapsed : true,
     region : 'south',
-    halfSize : false,
     initEventName : 'artifactContainerInit',
     updateEventName : 'artifactContainerUpdate'
   };
