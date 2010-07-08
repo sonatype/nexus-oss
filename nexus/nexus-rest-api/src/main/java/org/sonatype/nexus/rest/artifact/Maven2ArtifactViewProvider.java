@@ -8,8 +8,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
-import org.sonatype.nexus.artifact.M2GavCalculator;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
@@ -25,46 +26,62 @@ public class Maven2ArtifactViewProvider
 {
     @Requirement
     private Logger logger;
-    
-    @Requirement
-    private M2GavCalculator m2GavCalculator;
 
     public Object retrieveView( StorageItem item )
         throws IOException
     {
-        Gav gav;
-        try
+        // get item's repository, from where it is actually coming
+        Repository itemsRepository = item.getRepositoryItemUid().getRepository();
+
+        // is this a MavenRepository at all? If not, this view is not applicable
+        if ( !itemsRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
-            gav = m2GavCalculator.pathToGav( item.getRepositoryItemUid().getPath() );
-
-            Maven2ArtifactInfoResourceRespose response = new Maven2ArtifactInfoResourceRespose();
-            Maven2ArtifactInfoResource data = new Maven2ArtifactInfoResource();
-            response.setData( data );
-
-            data.setGroupId( gav.getGroupId() );
-            data.setArtifactId( gav.getArtifactId() );
-            data.setBaseVersion( gav.getBaseVersion() );
-            data.setVersion( gav.getVersion() );
-            data.setExtension( gav.getExtension() );
-            data.setClassifier( gav.getClassifier() );
-
-            data.setDependencyXmlChunk( generateDependencyXml( gav ) );
-
-            return response;
-
-        }
-        catch ( IllegalArtifactCoordinateException e )
-        {
-            this.logger.debug( "Failed to calculate maven 2 path." );
-
-            // not maven, return null
+            // this items comes from a non-maven repository, this view is not applicable
             return null;
+        }
+        else
+        {
+            // we need maven repository for this operation, but we actually don't care is this
+            // maven2 or mave1 repository! Let's handle this in generic way.
+            MavenRepository mavenRepository = itemsRepository.adaptToFacet( MavenRepository.class );
+
+            try
+            {
+                // use maven repository's corresponding GavCalculator instead of "wired in" one!
+                Gav gav = mavenRepository.getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+
+                // if we are here, we have GAV, so just pack it and send it back
+                Maven2ArtifactInfoResourceRespose response = new Maven2ArtifactInfoResourceRespose();
+                Maven2ArtifactInfoResource data = new Maven2ArtifactInfoResource();
+                response.setData( data );
+
+                data.setGroupId( gav.getGroupId() );
+                data.setArtifactId( gav.getArtifactId() );
+                data.setBaseVersion( gav.getBaseVersion() );
+                data.setVersion( gav.getVersion() );
+                data.setExtension( gav.getExtension() );
+                data.setClassifier( gav.getClassifier() );
+
+                data.setDependencyXmlChunk( generateDependencyXml( gav ) );
+
+                return response;
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                logger.debug( "Failed to calculate maven 2 path." );
+
+                // could not convert item path to GAV, probably a file in maven repository not on "maven1/2 layout"
+                // return just "not applicable" (example: maven-metadata.xml or any other file that is not addressable
+                // by maven1/2)
+                return null;
+            }
         }
     }
 
     private String generateDependencyXml( Gav gav )
     {
         StringBuilder buffer = new StringBuilder();
+
         buffer.append( "<dependency>\n" );
         buffer.append( "  <groupId>" ).append( gav.getGroupId() ).append( "</groupId>\n" );
         buffer.append( "  <artifactId>" ).append( gav.getArtifactId() ).append( "</artifactId>\n" );
