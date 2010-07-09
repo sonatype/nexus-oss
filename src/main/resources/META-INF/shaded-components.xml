@@ -21,7 +21,7 @@ I have manually write these and use plexus-maven-plugin to merge them.
 				</requirement>
 			</requirements>
 			<configuration>
-				<_configuration-file>~/.settings-security.xml</_configuration-file>
+				<_configuration-file>~/.m2/settings-security.xml</_configuration-file>
 			</configuration>
 		</component>
 		<component>
