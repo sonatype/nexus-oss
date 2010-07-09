@@ -3,7 +3,6 @@ package org.sonatype.plexus.rest;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
-import org.sonatype.plexus.rest.resource.PlexusResource;
 
 /**
  * NOTE: this should NOT be a PLEXUS component. If someone wants to load it by creating a config thats great. Providing
@@ -77,4 +76,12 @@ public class DefaultReferenceFactory
 
         return result.getTargetRef();
     }
+
+    public Reference createReference( Reference base, String relPart )
+    {
+        Reference ref = new Reference( base, relPart );
+
+        return updateBaseRefPath( ref ).getTargetRef();
+    }
+
 }

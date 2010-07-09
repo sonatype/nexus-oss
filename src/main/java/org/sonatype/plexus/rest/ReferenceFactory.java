@@ -10,4 +10,6 @@ public interface ReferenceFactory
     
     Reference getContextRoot( Request request );
     
+    Reference createReference( Reference base, String relPart );
+
 }
