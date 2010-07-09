@@ -140,7 +140,7 @@ Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContaine
             if (isSuccess)
             {
               artifactContainer.tabPanel.unhideTabStripItem( panel );
-              panel.show();
+              //panel.show();
               var infoResp = Ext.decode(response.responseText);
               panel.showArtifact(infoResp.data);
             }
@@ -148,8 +148,13 @@ Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContaine
             {
               if( response.stats = 404 )
               {
+              
                 artifactContainer.tabPanel.hideTabStripItem( panel );
-                panel.hide(); // this hides the panel but leaves it white
+                
+                // this works but is a hack (we don't know the position
+                artifactContainer.tabPanel.setActiveTab(1);
+                
+                //panel.hide(); // this hides the panel but leaves it white
                 
                 // FIXME: tried these...
                 //artifactContainer.tabPanel.doLayout();
