@@ -57,12 +57,6 @@ public class Maven2ArtifactViewProvider
                     return null;
                 }
 
-                if ( gav == null || gav.isHash() || gav.isSignature() )
-                {
-                    // not applicable
-                    return null;
-                }
-
                 // if we are here, we have GAV, so just pack it and send it back
                 Maven2ArtifactInfoResourceRespose response = new Maven2ArtifactInfoResourceRespose();
                 Maven2ArtifactInfoResource data = new Maven2ArtifactInfoResource();
