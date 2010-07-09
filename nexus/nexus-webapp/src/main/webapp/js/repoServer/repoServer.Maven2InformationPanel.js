@@ -139,18 +139,35 @@ Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContaine
           callback : function(options, isSuccess, response) {
             if (isSuccess)
             {
+              artifactContainer.tabPanel.unhideTabStripItem( panel );
+              panel.show();
               var infoResp = Ext.decode(response.responseText);
               panel.showArtifact(infoResp.data);
             }
             else
             {
-              Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
+              if( response.stats = 404 )
+              {
+                artifactContainer.tabPanel.hideTabStripItem( panel );
+                panel.hide(); // this hides the panel but leaves it white
+                
+                // FIXME: tried these...
+                //artifactContainer.tabPanel.doLayout();
+                //artifactContainer.doLayout();
+                
+              }
+              else
+              {
+                Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
+              }
             }
           },
           scope : this,
-          method : 'GET'
+          method : 'GET',
+          suppressStatus : 404,
         });
 
       }
       
     });
+    

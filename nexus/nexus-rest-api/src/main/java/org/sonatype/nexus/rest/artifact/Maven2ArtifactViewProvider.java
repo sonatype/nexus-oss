@@ -50,6 +50,12 @@ public class Maven2ArtifactViewProvider
             {
                 // use maven repository's corresponding GavCalculator instead of "wired in" one!
                 Gav gav = mavenRepository.getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
+                
+                if( gav == null || gav.isSignature() || gav.isHash() )
+                {
+                    // if we cannot calculate the gav, it is not a maven artifact (or hash/sig), return null;
+                    return null;
+                }
 
                 if ( gav == null || gav.isHash() || gav.isSignature() )
                 {

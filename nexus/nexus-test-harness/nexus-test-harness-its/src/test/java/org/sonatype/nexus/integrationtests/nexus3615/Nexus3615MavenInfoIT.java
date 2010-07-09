@@ -76,6 +76,19 @@ public class Nexus3615MavenInfoIT
         this.downloadAndVerify( withClassifierAndExtentionGav, REPO_TEST_HARNESS_SNAPSHOT_REPO );
     }
     
+    @Test
+    public void testNonGavArtifacts() throws Exception
+    {
+        // deploy a non maven path
+        new DeployUtils( this ).deployWithWagon( "http", this.getRepositoryUrl( this.getTestRepositoryId() ), this.getTestFile( "pom.xml" ), "foo/bar" );
+        
+        // now get the info for it
+        Response response = RequestFacade.doGetRequest( "service/local/repositories/" + this.getTestRepositoryId() + "/content/" + "foo/bar" + "?describe=maven2" );
+        String responseText = response.getEntity().getText();
+        Assert.assertEquals( "Response was: "+ responseText, 404, response.getStatus().getCode() );
+        
+    }
+    
     public void deployGav( Gav gav, String repoId ) throws Exception
     {
         new DeployUtils( this ).deployWithWagon( "http", this.getRepositoryUrl( repoId ), this.getTestFile( "simpleJar.jar" ), this.getRelitiveArtifactPath( gav ) );
