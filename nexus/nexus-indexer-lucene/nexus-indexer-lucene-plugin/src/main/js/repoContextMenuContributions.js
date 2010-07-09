@@ -51,7 +51,7 @@ Sonatype.Events.addListener( 'repositoryMenuInit',
 Sonatype.Events.addListener( 'repositoryContentMenuInit',
   function( menu, repoRecord, contentRecord ) {
     if ( Sonatype.lib.Permissions.checkPermission( 'nexus:index', Sonatype.lib.Permissions.DELETE ) 
-        && repoRecord.get( 'repoType' ) != 'virtual' ) {
+        && repoRecord.data['repoType'] != 'virtual' ) {
       menu.add({
         text: 'ReIndex',
         handler: function( rec ) {

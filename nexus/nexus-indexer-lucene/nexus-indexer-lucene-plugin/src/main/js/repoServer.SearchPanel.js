@@ -106,6 +106,15 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           this.repoBrowserContainer.updatePayload(payload);
         }
       },
+      getDefaultPath : function( artifactLinks ) {
+      	if ( artifactLinks.length == 1 ) {
+      		return artifactLinks[0];
+      	}
+      	
+      	for ( var i = 0 ; i < artifactLinks.length ; i++ ) {
+      		
+      	}
+      },
       // search type switched on the drop down button
       switchSearchType : function(button, event) {
         // if event is null, this is called directly, and we
@@ -324,13 +333,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
             defaultQuickSearch : true,
             // use the default store
             store : null,
-            showArtifactContainer : function(record) {
-              if ('COLLAPSED' == record.get('version') || 'COLLAPSED' == record.get('packaging') || 'COLLAPSED' == record.get('classifier'))
-              {
-                return false;
-              }
-              return true;
-            },
             quickSearchCheckHandler : function(panel, value) {
               return true;
             },
@@ -463,13 +465,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
             scope : panel,
             // use the default store
             store : null,
-            showArtifactContainer : function(record) {
-              if ('COLLAPSED' == record.get('version') || 'COLLAPSED' == record.get('packaging') || 'COLLAPSED' == record.get('classifier'))
-              {
-                return false;
-              }
-              return true;
-            },
             handler : panel.switchSearchType,
             quickSearchCheckHandler : function(panel, value) {
               return value.indexOf(':') > -1;

@@ -212,17 +212,17 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 
 Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       formatVersionLink : function(value, p, record, rowIndex, colIndex, store) {
-        if ('COLLAPSED' != record.get('version'))
+        if (!store.reader.jsonData.collapsed)
         {
           return record.get('version');
         }
 
-        var gid = record.get('groupId');
-        var aid = record.get('artifactId');
-
-        var extras = '~kw,versionexpand';
-
-        return '<a href="#nexus-search;gav~' + gid + '~' + aid + '~~~~kw,versionexpand' + ' " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
+        return record.get('version') 
+            + ' <a href="#nexus-search;gav~' 
+            + record.get('groupId') 
+            + '~' 
+            + record.get('artifactId')
+            + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">(Expand All Versions)</a>';
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
         value = ''
