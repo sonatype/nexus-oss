@@ -472,9 +472,11 @@ public class SearchNGIndexPlexusResource
                         {
                             Gav gav = ai.calculateGav();
 
-                            String path = m2GavCalculator.gavToPath( gav );
+                            Gav pomGav =
+                                new Gav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), null, "pom", null,
+                                    null, null /* name */, gav.isSnapshot(), false, null, false, null );
 
-                            path = path.replace( "." + gav.getExtension(), ".pom" );
+                            String path = m2GavCalculator.gavToPath( pomGav );
 
                             link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
                         }
