@@ -24,14 +24,14 @@ public class DefaultReferenceFactory
     {
         Reference result = null;
 
-//        if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
-//        {
-//            result = new Reference( getNexus().getBaseUrl() );
-//        }
-//        else
-//        {
-            result = request.getRootRef();
-//        }
+        // if ( getNexus().isForceBaseUrl() && getNexus().getBaseUrl() != null )
+        // {
+        // result = new Reference( getNexus().getBaseUrl() );
+        // }
+        // else
+        // {
+        result = request.getRootRef();
+        // }
 
         // fix for when restlet is at webapp root
         if ( StringUtils.isEmpty( result.getPath() ) )
@@ -41,7 +41,7 @@ public class DefaultReferenceFactory
 
         return result;
     }
-    
+
     private Reference updateBaseRefPath( Reference reference )
     {
         if ( reference.getBaseRef().getPath() == null )
@@ -52,22 +52,24 @@ public class DefaultReferenceFactory
         {
             reference.getBaseRef().setPath( reference.getBaseRef().getPath() + "/" );
         }
-        
+
         return reference;
     }
-    
+
     public Reference createChildReference( Request request, String childPath )
     {
-        String uriPart = request.getResourceRef().getTargetRef().toString().substring(
-            request.getRootRef().getTargetRef().toString().length() );
-        
+        String uriPart =
+            request.getResourceRef().getTargetRef().toString().substring(
+                request.getRootRef().getTargetRef().toString().length() );
+
         // trim leading slash
         if ( uriPart.startsWith( "/" ) )
         {
             uriPart = uriPart.substring( 1 );
         }
-        
-        Reference result = updateBaseRefPath( new Reference( getContextRoot( request ),  uriPart ) ).addSegment( childPath );
+
+        Reference result =
+            updateBaseRefPath( new Reference( getContextRoot( request ), uriPart ) ).addSegment( childPath );
 
         if ( result.hasQuery() )
         {
@@ -82,6 +84,11 @@ public class DefaultReferenceFactory
         Reference ref = new Reference( base, relPart );
 
         return updateBaseRefPath( ref ).getTargetRef();
+    }
+
+    public Reference createReference( Request base, String relPart )
+    {
+        return createReference( getContextRoot( base ), relPart );
     }
 
 }

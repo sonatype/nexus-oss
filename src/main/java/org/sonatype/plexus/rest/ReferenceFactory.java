@@ -12,4 +12,6 @@ public interface ReferenceFactory
     
     Reference createReference( Reference base, String relPart );
 
+    Reference createReference( Request base, String relPart );
+
 }
