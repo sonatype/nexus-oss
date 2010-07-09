@@ -361,6 +361,13 @@
           <description>Flag that states if too many results were found.</description>
         </field>
         <field>
+          <name>collapsed</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Flag that states if result set is collapsed, and shows latest versions only.</description>
+        </field>
+        <field>
           <name>data</name>
           <version>1.0.0+</version>
           <association>

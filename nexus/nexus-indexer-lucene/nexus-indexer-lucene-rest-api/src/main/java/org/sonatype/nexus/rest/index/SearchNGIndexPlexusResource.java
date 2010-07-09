@@ -208,21 +208,32 @@ public class SearchNGIndexPlexusResource
 
                 searchResult = searchByTerms( terms, null, from, count, exact, expandVersion, collapseResults, filters );
 
-                repackIteratorSearchResponse( request, result, from, count, searchResult, collector );
-
-                if ( !result.isTooManyResults() )
+                if ( searchResult == null )
                 {
-                    // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results, and
-                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                    // and full result set is smaller than HIT_LIMIT
-                    // then repeat without collapse
-                    if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
-                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                        && searchResult.getTotalHits() < HIT_LIMIT )
-                    {
-                        collapseResults = false;
+                    collapseResults = false;
 
-                        continue;
+                    continue;
+                }
+                else
+                {
+                    repackIteratorSearchResponse( request, result, collapseResults, from, count, searchResult,
+                        collector );
+
+                    if ( !result.isTooManyResults() )
+                    {
+                        // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
+                        // and
+                        // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                        // and full result set is smaller than HIT_LIMIT
+                        // then repeat without collapse
+                        if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
+                            && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                            && searchResult.getTotalHits() < HIT_LIMIT )
+                        {
+                            collapseResults = false;
+
+                            continue;
+                        }
                     }
                 }
 
@@ -236,6 +247,8 @@ public class SearchNGIndexPlexusResource
             }
             catch ( AlreadyClosedException e )
             {
+                runCount++;
+
                 getLogger().info(
                     "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
 
@@ -247,15 +260,13 @@ public class SearchNGIndexPlexusResource
 
                 result.setData( null );
             }
-
-            runCount++;
         }
 
         if ( result.getData() == null )
         {
             try
             {
-                repackIteratorSearchResponse( request, result, from, count,
+                repackIteratorSearchResponse( request, result, collapseResults, from, count,
                     IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE, null );
             }
             catch ( NoSuchRepositoryException e )
@@ -335,9 +346,17 @@ public class SearchNGIndexPlexusResource
                     }
                     else if ( collapseResults && searchResponse.getTotalHits() < COLLAPSE_OVERRIDE_TRESHOLD )
                     {
+                        // FIXME: fix this, this is ugly
+                        // We are returning null, to hint that we need UNCOLLAPSED search!
+                        // Needed, to be able to "signal" the fact that we are overriding collapsed switch
+                        // since we have to send it back in DTOs to REST client
+                        return null;
+
+                        // old code was a recursive call:
                         // this was a "collapsed" search (probably initiated by UI), and we have less then treshold hits
                         // override collapse
-                        return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, false, filters );
+                        // return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, false, filters
+                        // );
                     }
                     else
                     {
@@ -350,12 +369,14 @@ public class SearchNGIndexPlexusResource
         throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Requested search query is not supported" );
     }
 
-    protected void repackIteratorSearchResponse( Request request, SearchNGResponse response, Integer from,
-                                                 Integer count, IteratorSearchResponse iterator,
+    protected void repackIteratorSearchResponse( Request request, SearchNGResponse response, boolean collapsed,
+                                                 Integer from, Integer count, IteratorSearchResponse iterator,
                                                  LatestVersionCollector collector )
         throws NoSuchRepositoryException
     {
         response.setTooManyResults( iterator.isHitLimitExceeded() );
+
+        response.setCollapsed( collapsed );
 
         response.setTotalCount( iterator.getTotalHits() );
 
@@ -489,6 +510,23 @@ public class SearchNGIndexPlexusResource
                     if ( holder.getRelease() != null )
                     {
                         artifactNg.setReleasedVersion( holder.getRelease().toString() );
+                    }
+
+                    if ( collapsed )
+                    {
+                        String versionToSet = holder.getRelease().toString();
+
+                        String token = artifactNg.getVersion();
+
+                        artifactNg.setVersion( versionToSet );
+
+                        for ( NexusNGArtifactHit hit : artifactNg.getHits() )
+                        {
+                            for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
+                            {
+                                link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
+                            }
+                        }
                     }
                 }
             }
