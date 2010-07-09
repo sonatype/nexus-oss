@@ -145,7 +145,7 @@ public class SearchNGIndexPlexusResource
         Integer from = null;
         Integer count = null;
         Boolean exact = null;
-        Boolean expandVersion = null;
+        Boolean expandVersion = Boolean.FALSE;
         Boolean collapseResults = Boolean.FALSE;
 
         if ( form.getFirstValue( "from" ) != null )
@@ -184,6 +184,24 @@ public class SearchNGIndexPlexusResource
         if ( form.getFirstValue( "collapseresults" ) != null )
         {
             collapseResults = Boolean.valueOf( form.getFirstValue( "collapseresults" ) );
+        }
+
+        // A little explanation about collapseResults, that might seems little bit awkward, since currently we have only
+        // one column "collapsable" (the version), but before and maybe in the future that's not the case. So, here is
+        // it:
+        // the "collapseResults" is just a flag "do we allow collapse at all". It is just a shorthand to turn on or off
+        // collapse generally
+        // Let's assume we have columns colA, colB and colC collapsable. So, instead saying
+        // expandColA=true,expandColB=true,expandColC=true,
+        // it is just easy to say collapseresults=false
+        // BUT, if collapseresults=true is sent by client, even then an "override" will happen if there is actually NO
+        // ROW to collapse!
+        // So: collapseresults=false EQUALS-TO expandColA=true & expandColB=true & expandColC=true
+        if ( collapseResults )
+        {
+            // here we would like to have ANDed all the collapsable column flags and negated the result
+            // currently we
+            collapseResults = !( true && expandVersion ); // && expandColA && expandColB;
         }
 
         IteratorSearchResponse searchResult = null;
