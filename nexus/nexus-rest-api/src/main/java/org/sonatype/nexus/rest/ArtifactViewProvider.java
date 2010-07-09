@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest;
 
 import java.io.IOException;
 
+import org.restlet.data.Request;
 import org.sonatype.nexus.proxy.item.StorageItem;
 
 /**
@@ -16,9 +17,10 @@ public interface ArtifactViewProvider
      * 
      * @param storeRequest The request to retrieve the view for.
      * @param item
+     * @param req
      * @return An object representing the view.
      * @throws IOException
      */
-    public Object retrieveView( StorageItem item )
+    public Object retrieveView( StorageItem item, Request req )
         throws IOException;
 }

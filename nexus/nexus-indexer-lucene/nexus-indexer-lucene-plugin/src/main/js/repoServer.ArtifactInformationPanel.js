@@ -12,6 +12,28 @@
  * available from Sonatype, Inc. "Sonatype" and "Sonatype Nexus" are trademarks
  * of Sonatype, Inc.
  */
+
+Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
+      setValue : function(repositories) {
+        var links = '';
+
+        for (var i = 0; i < repositories.length; i++)
+        {
+          if (i != 0)
+          {
+            links += ', ';
+          }
+
+          links += '<a href="' + repositories[i].artifactUrl + '">' + repositories[i].repositoryName + '</a>';
+        }
+
+        this.setRawValue(links);
+        return this;
+      }
+    });
+
+Ext.reg('repositoryUrlDisplayField', Ext.form.RepositoryUrlDisplayField);
+
 Sonatype.repoServer.ArtifactInformationPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
@@ -71,9 +93,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                     dateFormat : Ext.util.Format.dateRenderer('m/d/Y')
                   }, {
                     xtype : 'panel',
-                    height : 5
-                  }, {
-                    xtype : 'panel',
                     layout : 'column',
                     items : [{
                           columnWidth : '.5',
@@ -92,9 +111,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                             text : 'Delete'
                           }
                         }]
-                  }, {
-                    xtype : 'panel',
-                    height : 5
                   }, {
                     xtype : 'fieldset',
                     checkboxToggle : false,
@@ -131,11 +147,14 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                       labelSeparator : ''
                     },
                     items : [{
-                          xtype : 'displayfield',
-                          name : 'repositories',
-                          anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                          allowBlank : true,
-                          readOnly : true
+                          xtype : 'panel',
+                          items : [{
+                                xtype : 'repositoryUrlDisplayField',
+                                name : 'repositories',
+                                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+                                allowBlank : true,
+                                readOnly : true
+                              }]
                         }]
                   }]
             }]
@@ -208,7 +227,6 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
         this.data = data;
         if (data == null)
         {
-
           this.find('name', 'repositoryPath')[0].setRawValue(null);
           this.find('name', 'uploader')[0].setRawValue(null);
           this.find('name', 'size')[0].setRawValue(null);

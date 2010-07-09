@@ -537,7 +537,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 throw new IllegalRequestException( request, "No view for key: " + key );
             }
 
-            Object result = viewProviders.get( key ).retrieveView( item );
+            Object result = viewProviders.get( key ).retrieveView( item, req );
             
             // make sure we have valid content
             if( result == null )

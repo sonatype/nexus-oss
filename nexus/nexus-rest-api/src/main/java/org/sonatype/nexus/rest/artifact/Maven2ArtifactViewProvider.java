@@ -6,6 +6,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
+import org.restlet.data.Request;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -27,7 +28,7 @@ public class Maven2ArtifactViewProvider
     @Requirement
     private Logger logger;
 
-    public Object retrieveView( StorageItem item )
+    public Object retrieveView( StorageItem item, Request req )
         throws IOException
     {
         // get item's repository, from where it is actually coming
