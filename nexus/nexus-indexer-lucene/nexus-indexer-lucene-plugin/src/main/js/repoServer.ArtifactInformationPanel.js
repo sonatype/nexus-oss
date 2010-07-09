@@ -160,28 +160,18 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
             }]
       }];
 
-  this.formPanel = new Ext.form.FormPanel({
+  Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
+        title : 'Artifact Information',
         autoScroll : true,
-        border : false,
+        border : true,
         frame : true,
         collapsible : false,
         collapsed : false,
         items : items
       });
-
-  Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
-        title : 'Artifact Information',
-        collapsible : false,
-        collapsed : false,
-        split : true,
-        frame : false,
-        autoScroll : true,
-
-        items : [this.formPanel]
-      });
 };
 
-Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
 
       artifactDownload : function() {
         if (this.data)
@@ -244,7 +234,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.Panel, {
                   if (isSuccess)
                   {
                     var infoResp = Ext.decode(response.responseText);
-                    this.formPanel.form.setValues(infoResp.data);
+                    this.form.setValues(infoResp.data);
                   }
                   else
                   {

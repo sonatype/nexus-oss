@@ -59,16 +59,14 @@ Sonatype.repoServer.SearchPanel = function(config) {
         items : [this.searchTypeButton, this.convertToFieldObject(this.searchTypes[defaultSearchTypeIndex].panelItems[0])]
       });
 
-  this.repoBrowserContainer = new Sonatype.repoServer.RepositoryBrowserContainer({
+  this.repoBrowserContainer = new Sonatype.repoServer.RepositoryIndexBrowserContainer({
         region : 'south',
         split : true,
         collapsible : true,
         collapsed : true,
         // TODO: WHY ISNT MINI MODE WORKING !!!!
         collapseMode : 'mini',
-        height : 300,
-        artifactContainerInitEvent : 'artifactContainerInit',
-        artifactContainerUpdateEvent : 'artifactContainerUpdate'
+        height : 300
       });
 
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
@@ -99,21 +97,31 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               resourceURI : rec.data.hits[0].repositoryURL,
               format : rec.data.hits[0].repositoryContentClass,
               repoType : rec.data.hits[0].repositoryKind,
-              expandPath : '/' + rec.data.hits[0].repositoryName + rec.data.hits[0].artifactLinks[0].artifactLink.substring(rec.data.hits[0].repositoryURL.length + '/content'.length)
+              expandPath : this.getDefaultPath(rec)
             }
           }
           this.repoBrowserContainer.expand();
           this.repoBrowserContainer.updatePayload(payload);
         }
       },
-      getDefaultPath : function( artifactLinks ) {
-      	if ( artifactLinks.length == 1 ) {
-      		return artifactLinks[0];
-      	}
-      	
-      	for ( var i = 0 ; i < artifactLinks.length ; i++ ) {
-      		
-      	}
+      getDefaultPath : function(rec) {
+        var basePath = '/' + rec.data.hits[0].repositoryName + '/' + rec.data.groupId.replace('.', '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+
+        for (var i = 0; i < rec.data.hits[0].artifactLinks.length; i++)
+        {
+          var link = rec.data.hits[0].artifactLinks[i];
+
+          if (Ext.isEmpty(link.classifier))
+          {
+            if ( link.extension != 'pom' )
+            {
+                return basePath + '.' + link.extension;    	
+            }
+          }
+        }
+
+        var link = rec.data.hits[0].artifactLinks[0];
+        return basePath + (link.classifier ? ('-' + link.classifier) : '') + '.' + link.extension;
       },
       // search type switched on the drop down button
       switchSearchType : function(button, event) {
