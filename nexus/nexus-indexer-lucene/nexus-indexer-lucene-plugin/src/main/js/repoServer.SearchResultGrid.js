@@ -217,13 +217,12 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
           return record.get('version');
         }
 
-        var ver = record.get('version');
         var gid = record.get('groupId');
         var aid = record.get('artifactId');
 
         var extras = '~kw,versionexpand';
 
-        return '<a href="#nexus-search;gav~' + gid + '~' + aid + '~' + ver + '~~~kw,versionexpand' + ' " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
+        return '<a href="#nexus-search;gav~' + gid + '~' + aid + '~~~~kw,versionexpand' + ' " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">Drill Down</a>';
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
         value = ''

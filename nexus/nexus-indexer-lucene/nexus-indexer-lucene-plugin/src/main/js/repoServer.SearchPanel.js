@@ -484,7 +484,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
               gavPopulator(panel, data);
             },
             searchHandler : function(panel) {
-              var reverseSortResults = false;
               this.grid.store.baseParams = {};
 
               // groupId
@@ -527,22 +526,9 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
 
                 for (var i = 0; i < extras.length; i++)
                 {
-                  // from keyword search
-                  if (extras[i] == 'kw')
-                  {
-                    reverseSortResults = true;
-                  }
-                  else if (extras[i] == 'versionexpand')
+                  if (extras[i] == 'versionexpand')
                   {
                     panel.grid.store.baseParams['versionexpand'] = true;
-                  }
-                  else if (extras[i] == 'packagingexpand')
-                  {
-                    panel.grid.store.baseParams['packagingexpand'] = true;
-                  }
-                  else if (extras[i] == 'classifierexpand')
-                  {
-                    panel.grid.store.baseParams['classifierexpand'] = true;
                   }
                 }
               }
@@ -555,7 +541,7 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
 
               panel.clearWarningLabel();
 
-              panel.fetchRecords(panel, reverseSortResults);
+              panel.fetchRecords(panel, true);
             },
             applyBookmarkHandler : function(panel, data) {
               gavPopulator(panel, data);

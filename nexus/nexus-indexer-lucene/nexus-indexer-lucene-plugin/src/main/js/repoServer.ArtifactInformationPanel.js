@@ -76,15 +76,21 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                     xtype : 'panel',
                     layout : 'column',
                     items : [{
-                          xtype : 'button',
-                          handler : this.artifactDownload,
-                          scope : this,
-                          text : 'Download'
+                          columnWidth : '.5',
+                          items : {
+                            xtype : 'button',
+                            handler : this.artifactDownload,
+                            scope : this,
+                            text : 'Download'
+                          }
                         }, {
-                          xtype : 'button',
-                          handler : this.artifactDelete,
-                          scope : this,
-                          text : 'Delete'
+                          columnWidth : '.5',
+                          items : {
+                            xtype : 'button',
+                            handler : this.artifactDelete,
+                            scope : this,
+                            text : 'Delete'
+                          }
                         }]
                   }, {
                     xtype : 'panel',
