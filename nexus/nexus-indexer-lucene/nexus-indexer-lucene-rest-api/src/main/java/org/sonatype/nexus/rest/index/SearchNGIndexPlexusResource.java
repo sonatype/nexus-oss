@@ -36,6 +36,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
@@ -418,7 +419,36 @@ public class SearchNGIndexPlexusResource
 
                     hit.setRepositoryKind( extractRepositoryKind( repository ) );
 
-                    // only if unique
+                    // we are adding the POM link "blindly", unless packaging is POM,
+                    // since the it will be added below the "usual" way
+                    if ( !"pom".equals( ai.packaging ) )
+                    {
+                        NexusNGArtifactLink link = new NexusNGArtifactLink();
+
+                        link.setClassifier( null );
+
+                        link.setExtension( "pom" );
+
+                        try
+                        {
+                            Gav gav = ai.calculateGav();
+
+                            String path = m2GavCalculator.gavToPath( gav );
+
+                            path = path.replace( "." + gav.getExtension(), ".pom" );
+
+                            link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
+                        }
+                        catch ( IllegalArtifactCoordinateException e )
+                        {
+                            // hum hum, nothig here then
+                        }
+
+                        // add the POM link
+                        hit.addArtifactLink( link );
+                    }
+
+                    // we just created it, add it
                     artifact.addHit( hit );
                 }
 
