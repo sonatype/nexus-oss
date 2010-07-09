@@ -51,6 +51,12 @@ public class Maven2ArtifactViewProvider
                 // use maven repository's corresponding GavCalculator instead of "wired in" one!
                 Gav gav = mavenRepository.getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
 
+                if ( gav == null || gav.isHash() || gav.isSignature() )
+                {
+                    // not applicable
+                    return null;
+                }
+
                 // if we are here, we have GAV, so just pack it and send it back
                 Maven2ArtifactInfoResourceRespose response = new Maven2ArtifactInfoResourceRespose();
                 Maven2ArtifactInfoResource data = new Maven2ArtifactInfoResource();
