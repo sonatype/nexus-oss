@@ -9,7 +9,7 @@
   </parent>
   <groupId>org.sonatype.plugins</groupId>
   <artifactId>nexus-maven-plugin</artifactId>
-  <version>1.3.4-SNAPSHOT</version>
+  <version>1.4-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <name>Nexus Plugin for Maven</name>
   <licenses>
