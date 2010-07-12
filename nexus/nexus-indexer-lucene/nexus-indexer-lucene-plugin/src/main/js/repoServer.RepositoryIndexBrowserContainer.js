@@ -95,7 +95,7 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
                   {
                     var json = Ext.decode(response.responseText);
 
-                    var resourceURI = Sonatype.config.servicePath + '/repositories/' + options.cbPassThru.node.attributes.repositoryId + '/archive' + json.data.repositoryPath;
+                    var resourceURI = Sonatype.config.servicePath + '/repositories/' + options.cbPassThru.node.attributes.repositoryId + '/content' + json.data.repositoryPath;
 
                     options.cbPassThru.container.artifactContainer.updateArtifact({
                           leaf : true,
