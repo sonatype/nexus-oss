@@ -1,0 +1,113 @@
+package org.sonatype.nexus.integrationtests.nexus3626;
+
+import java.io.File;
+import java.io.IOException;
+
+import junit.framework.Assert;
+
+import org.apache.commons.httpclient.HttpMethod;
+import org.codehaus.plexus.util.FileUtils;
+import org.junit.Test;
+import org.restlet.data.Status;
+import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
+import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
+import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.rest.model.SearchNGResponse;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.sonatype.nexus.test.utils.GavUtil;
+import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+
+public class Nexus3626SimpleSearchIT
+    extends AbstractNexusIntegrationTest
+{
+    @Test
+    public void wagonDeploy()
+        throws Exception
+    {
+        final File pom = getTestFile( "wagon.pom" );
+        final File sha1 = new File( pom.getParentFile(), "wagon.pom.sha1" );
+        FileUtils.fileWrite( sha1.getAbsolutePath(), FileTestingUtils.createSHA1FromFile( pom ) );
+
+        final String repo = getRepositoryUrl( REPO_TEST_HARNESS_REPO );
+        final Gav gav = GavUtil.newGav( "nexus3626", "wagon", "1.0.0", "pom" );
+        final String path = getRelitiveArtifactPath( gav );
+        getDeployUtils().deployWithWagon( "http", repo, pom, path );
+        getDeployUtils().deployWithWagon( "http", repo, sha1, path + ".sha1" );
+        searchFor( pom );
+    }
+
+    @Test
+    public void mavenDeploy()
+        throws Exception
+    {
+        final File pom = getTestFile( "maven.pom" );
+        MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3626", "maven", "1.0.0", "pom" ),
+                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null, "-DgeneratePom=false" ).verifyErrorFreeLog();
+        searchFor( pom );
+    }
+
+    @Test
+    public void restDeploy()
+        throws Exception
+    {
+        final File pom = getTestFile( "rest.pom" );
+        HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
+        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText(),
+                           Status.isSuccess( r.getStatusCode() ) );
+        searchFor( pom );
+    }
+
+    @Test
+    public void manualStorage()
+        throws Exception
+    {
+        final File pom = getTestFile( "manual.pom" );
+        File dest = new File( nexusWorkDir, "storage/nexus-test-harness-repo/nexus3626/manual/1.0.0/manual-1.0.0.pom" );
+        dest.getParentFile().mkdirs();
+        FileUtils.copyFile( pom, dest );
+
+        String sha1 = FileTestingUtils.createSHA1FromFile( pom );
+        Assert.assertNotNull( sha1 );
+
+        ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
+
+        repo.setId( "repositoryOrGroupId" );
+
+        repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
+
+        ScheduledServiceListResource task =
+            TaskScheduleUtil.runTask( "RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTaskDescriptor.ID, repo );
+        Assert.assertNotNull( task );
+        TaskScheduleUtil.waitForAllTasksToStop( RebuildMavenMetadataTask.class );
+
+        RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        doSearch( sha1, "after reindexing!" );
+    }
+
+    private void searchFor( final File pom )
+        throws IOException, Exception
+    {
+        String sha1 = FileTestingUtils.createSHA1FromFile( pom );
+        Assert.assertNotNull( sha1 );
+        doSearch( sha1, "" );
+
+        RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        doSearch( sha1, "after reindexing!" );
+    }
+
+    private void doSearch( String sha1, String msg )
+        throws Exception
+    {
+        SearchNGResponse result = getSearchMessageUtil().searchSha1NGFor( sha1 );
+        Assert.assertEquals( "Pom with " + sha1 + " not found " + msg, 1, result.getTotalCount() );
+        Assert.assertEquals( "Pom with " + sha1 + " not found " + msg, 1, result.getData().size() );
+    }
+}

@@ -39,6 +39,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
+import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
@@ -422,6 +423,102 @@ public class SearchMessageUtil
             (ArtifactInfoResourceResponse) rep.getPayload( new ArtifactInfoResourceResponse() );
 
         return info.getData();
+    }
+
+    // Search NG
+
+    /**
+     * Main entry point used by other exposed methods. Do NOT expose this method, never ever.
+     * 
+     * @param queryArgs
+     * @param repositoryId
+     * @param asKeywords
+     * @return
+     * @throws Exception
+     */
+    private Response doNGSearchForR( Map<String, String> queryArgs, SearchType searchType )
+        throws IOException
+    {
+        StringBuffer serviceURI = new StringBuffer( "service/local/lucene/search?" );
+
+        for ( Entry<String, String> entry : queryArgs.entrySet() )
+        {
+            serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
+        }
+
+        if ( searchType != null )
+        {
+            // we have an override in place
+            // currently, REST API lacks search type (it is able to only ovveride isKeyword search happening, or not, of
+            // if
+            // not specified, rely on server side defaults)
+            if ( SearchType.EXACT.equals( searchType ) )
+            {
+                serviceURI.append( "exact=true&" );
+            }
+            else if ( SearchType.SCORED.equals( searchType ) )
+            {
+                serviceURI.append( "exact=false&" );
+            }
+        }
+
+        log.info( "Search serviceURI " + serviceURI );
+
+        return RequestFacade.doGetRequest( serviceURI.toString() );
+    }
+
+    /**
+     * Uses XStream to unmarshall the DTOs.
+     * 
+     * @param queryArgs
+     * @param repositoryId
+     * @param asKeywords
+     * @return
+     * @throws IOException
+     */
+    private SearchNGResponse doNGSearchFor( Map<String, String> queryArgs, SearchType searchType )
+        throws IOException
+    {
+        Response response = doNGSearchForR( queryArgs, searchType );
+
+        String responseText = response.getEntity().getText();
+
+        Assert.assertTrue( "Search failure:\n" + responseText, response.getStatus().isSuccess() );
+
+        XStreamRepresentation representation =
+            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+
+        SearchNGResponse searchResponse = (SearchNGResponse) representation.getPayload( new SearchNGResponse() );
+
+        return searchResponse;
+    }
+
+    // NG Keyword search
+
+    public SearchNGResponse searchNGFor( String query )
+        throws IOException
+    {
+        return searchNGFor( query, null );
+    }
+
+    public SearchNGResponse searchNGFor( String query, SearchType type )
+        throws IOException
+    {
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+
+        queryArgs.put( "q", query );
+
+        return doNGSearchFor( queryArgs, type );
+    }
+
+    public SearchNGResponse searchSha1NGFor( String sha1 )
+        throws IOException
+    {
+        HashMap<String, String> queryArgs = new HashMap<String, String>();
+
+        queryArgs.put( "sha1", sha1 );
+
+        return doNGSearchFor( queryArgs, null );
     }
 
 }
