@@ -26,153 +26,139 @@ Sonatype.repoServer.Maven2InformationPanel = function(config) {
 
   var items = [];
 
-    items.push({
-          xtype : 'panel',
-          layout : 'form',
-          anchor : Sonatype.view.FIELD_OFFSET + ' -10',
-          labelWidth : 70,
-          items : [{
-                xtype : 'displayfield',
-                fieldLabel : 'Group',
-                name : 'groupId',
-                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                allowBlank : true,
-                readOnly : true
-              }, {
-                xtype : 'displayfield',
-                fieldLabel : 'Artifact',
-                name : 'artifactId',
-                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                allowBlank : true,
-                readOnly : true
-              }, {
-                xtype : 'displayfield',
-                fieldLabel : 'Version',
-                name : 'baseVersion',
-                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                allowBlank : true,
-                readOnly : true
-              }, {
-                xtype : 'displayfield',
-                fieldLabel : 'Classifier',
-                name : 'classifier',
-                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                allowBlank : true,
-                readOnly : true
-              }, {
-                xtype : 'displayfield',
-                fieldLabel : 'Extention',
-                name : 'extension',
-                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                allowBlank : true,
-                  readOnly : true
-              }, {
-                xtype : 'textarea',
-                fieldLabel : 'XML',
-                anchor : Sonatype.view.FIELD_OFFSET,
-                height : 120,
-                name : 'dependencyXmlChunk',
-                allowBlank : true,
-                readOnly : true
-              }]
-        });
+  items.push({
+        xtype : 'panel',
+        layout : 'form',
+        anchor : Sonatype.view.FIELD_OFFSET + ' -10',
+        labelWidth : 70,
+        items : [{
+              xtype : 'displayfield',
+              fieldLabel : 'Group',
+              name : 'groupId',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'displayfield',
+              fieldLabel : 'Artifact',
+              name : 'artifactId',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'displayfield',
+              fieldLabel : 'Version',
+              name : 'baseVersion',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'displayfield',
+              fieldLabel : 'Classifier',
+              name : 'classifier',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'displayfield',
+              fieldLabel : 'Extension',
+              name : 'extension',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'textarea',
+              fieldLabel : 'XML',
+              anchor : Sonatype.view.FIELD_OFFSET,
+              height : 120,
+              name : 'dependencyXmlChunk',
+              allowBlank : true,
+              readOnly : true
+            }]
+      });
 
-  this.formPanel = new Ext.form.FormPanel({
+  Sonatype.repoServer.Maven2InformationPanel.superclass.constructor.call(this, {
+        title : 'Maven Information',
         autoScroll : true,
-        border : false,
+        border : true,
         frame : true,
         collapsible : false,
         collapsed : false,
         items : items
       });
-
-  Sonatype.repoServer.Maven2InformationPanel.superclass.constructor.call(this, {
-        title : 'Maven Information',
-        layout : 'fit',
-        collapsible : false,
-        collapsed : false,
-        split : true,
-        frame : false,
-        autoScroll : true,
-
-        items : [this.formPanel]
-      });
 };
 
-Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.Panel, {
+Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
 
-      showArtifact : function(data) {
-        this.formPanel.form.setValues(data);
-        
-        // hide classifier if empty
-        if( data != null && data.classifier == null )
+      showArtifact : function(data, artifactContainer) {
+        this.data = data;
+        if (data == null)
         {
-          this.find('name', 'classifier')[0].hide();
+          this.find('name', 'groupId')[0].setRawValue(null);
+          this.find('name', 'artifactId')[0].setRawValue(null);
+          this.find('name', 'baseVersion')[0].setRawValue(null);
+          this.find('name', 'classifier')[0].setRawValue(null);
+          this.find('name', 'extension')[0].setRawValue(null);
+          this.find('name', 'dependencyXmlChunk')[0].setRawValue(null);
         }
         else
         {
-          this.find('name', 'classifier')[0].show();
+          Ext.Ajax.request({
+                url : this.data.resourceURI + '?describe=maven2',
+                callback : function(options, isSuccess, response) {
+                  if (isSuccess)
+                  {
+                    var infoResp = Ext.decode(response.responseText);
+
+                    // hide classifier if empty
+                    if (this.data.classifier)
+                    {
+                      this.find('name', 'classifier')[0].show();
+                    }
+                    else
+                    {
+                      this.find('name', 'classifier')[0].hide();
+                    }
+                    this.form.setValues(infoResp.data);
+                    artifactContainer.tabPanel.unhideTabStripItem(this);
+                  }
+                  else
+                  {
+                    if (response.status = 404)
+                    {
+                      artifactContainer.tabPanel.hideTabStripItem(this);
+                      artifactContainer.tabPanel.setActiveTab(0);
+                    }
+                    else
+                    {
+                      Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
+                    }
+                  }
+                },
+                scope : this,
+                method : 'GET'
+              });
         }
       }
-});
+    });
 
 Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
       artifactContainer.add(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
-            tabTitle : 'Maven Information',
-            halfSize : artifactContainer.halfSize
+            tabTitle : 'Maven Information'
           }));
     });
 
 Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContainer, payload) {
       var panel = artifactContainer.find('name', 'maven2InformationPanel')[0];
-      
+
       if (payload == null || !payload.leaf)
       {
-         panel.showArtifact(null);
+        panel.showArtifact(null, artifactContainer);
       }
       else
       {
-      
-        Ext.Ajax.request({
-          url : payload.resourceURI + '?describe=maven2',
-          callback : function(options, isSuccess, response) {
-            if (isSuccess)
-            {
-              artifactContainer.tabPanel.unhideTabStripItem( panel );
-              //panel.show();
-              var infoResp = Ext.decode(response.responseText);
-              panel.showArtifact(infoResp.data);
-            }
-            else
-            {
-              if( response.stats = 404 )
-              {
-              
-                artifactContainer.tabPanel.hideTabStripItem( panel );
-                
-                // this works but is a hack (we don't know the position
-                artifactContainer.tabPanel.setActiveTab(1);
-                
-                //panel.hide(); // this hides the panel but leaves it white
-                
-                // FIXME: tried these...
-                //artifactContainer.tabPanel.doLayout();
-                //artifactContainer.doLayout();
-                
-              }
-              else
-              {
-                Sonatype.utils.connectionError(response, 'Unable to retrieve Maven information.');
-              }
-            }
-          },
-          scope : this,
-          method : 'GET',
-          suppressStatus : 404,
-        });
-
+        panel.showArtifact(payload, artifactContainer);
       }
-      
+
     });
-    
