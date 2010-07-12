@@ -81,7 +81,7 @@ public class SearchNGIndexPlexusResource
      */
     private static final int COLLAPSE_OVERRIDE_TRESHOLD = 35;
 
-    public static final String RESOURCE_URI = "/data_index1";
+    public static final String RESOURCE_URI = "/lucene/search";
 
     @Requirement( role = Searcher.class )
     private List<Searcher> searchers;
