@@ -28,6 +28,7 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -493,25 +494,41 @@ public class SearchNGIndexPlexusResource
                     artifact.addHit( hit );
                 }
 
-                NexusNGArtifactLink link = new NexusNGArtifactLink();
+                boolean needsToBeAdded = true;
 
-                link.setClassifier( ai.classifier );
-
-                link.setExtension( ai.fextension );
-
-                try
+                for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
                 {
-                    String path = m2GavCalculator.gavToPath( ai.calculateGav() );
+                    if ( StringUtils.equals( link.getClassifier(), ai.classifier )
+                        && StringUtils.equals( link.getExtension(), ai.fextension ) )
+                    {
+                        needsToBeAdded = false;
 
-                    link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
-                }
-                catch ( IllegalArtifactCoordinateException e )
-                {
-                    // hum hum, nothig here then
+                        break;
+                    }
                 }
 
-                // only if unique
-                hit.addArtifactLink( link );
+                if ( needsToBeAdded )
+                {
+                    NexusNGArtifactLink link = new NexusNGArtifactLink();
+
+                    link.setClassifier( ai.classifier );
+
+                    link.setExtension( ai.fextension );
+
+                    try
+                    {
+                        String path = m2GavCalculator.gavToPath( ai.calculateGav() );
+
+                        link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
+                    }
+                    catch ( IllegalArtifactCoordinateException e )
+                    {
+                        // hum hum, nothig here then
+                    }
+
+                    // only if unique
+                    hit.addArtifactLink( link );
+                }
             }
 
             // 2nd pass, set versions
