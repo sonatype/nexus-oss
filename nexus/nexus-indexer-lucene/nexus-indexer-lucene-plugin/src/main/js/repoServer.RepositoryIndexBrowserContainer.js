@@ -11,6 +11,8 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         payload : this.payload,
         tabTitle : this.tabTitle,
         region : 'center',
+        url : this.initialUrl,
+        root : this.initialRoot,
         nodeClickEvent : 'indexNodeClickedEvent',
         nodeClickPassthru : {
           container : this
@@ -59,9 +61,17 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
       if (rec.data.resourceURI && rec.data.repoType != 'virtual' && rec.data.format == 'maven2')
       {
         var panel = new Sonatype.repoServer.RepositoryIndexBrowserContainer({
-              payload : rec,
               name : 'browseindex',
-              tabTitle : 'Browse Index'
+              tabTitle : 'Browse Index',
+              autoExpand : false,
+              payload : rec,
+              initialUrl : rec.data.resourceURI + '/index_content',
+              initialRoot : new Ext.tree.AsyncTreeNode({
+                    text : rec.data['name'],
+                    path : '/',
+                    singleClickExpand : true,
+                    expanded : false
+                  })
             });
 
         if (cardPanel.items.getCount() > 0)

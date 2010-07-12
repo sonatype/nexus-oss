@@ -1,18 +1,19 @@
 Sonatype.repoServer.IndexBrowserPanel = function(config) {
   var config = config || {};
-  var defaultConfig = {};
-  Ext.apply(this, config, defaultConfig);
-
-  Sonatype.repoServer.IndexBrowserPanel.superclass.constructor.call(this, {
-        nodeIconClass : 'x-tree-node-nexus-icon',
-        useNodeIconClassParam : 'locallyAvailable',
-        url : '',
-        root : new Ext.tree.TreeNode({
+  var defaultConfig = {
+  	url : '',
+  	root : new Ext.tree.TreeNode({
               text : '(Not Available)',
               id : '/',
               singleClickExpand : true,
               expanded : true
             })
+  };
+  Ext.apply(this, config, defaultConfig);
+
+  Sonatype.repoServer.IndexBrowserPanel.superclass.constructor.call(this, {
+        nodeIconClass : 'x-tree-node-nexus-icon',
+        useNodeIconClassParam : 'locallyAvailable' 
       });
 };
 
