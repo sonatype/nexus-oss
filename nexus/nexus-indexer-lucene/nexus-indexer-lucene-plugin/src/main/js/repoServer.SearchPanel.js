@@ -105,7 +105,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         }
       },
       getDefaultPath : function(rec) {
-        var basePath = '/' + rec.data.hits[0].repositoryName + '/' + rec.data.groupId.replace('.', '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+        var basePath = '/' + rec.data.hits[0].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
 
         for (var i = 0; i < rec.data.hits[0].artifactLinks.length; i++)
         {
