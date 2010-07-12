@@ -24,13 +24,13 @@ Sonatype.repoServer.Maven2InformationPanel = function(config) {
   this.linkDivId = Ext.id();
   this.linkLabelId = Ext.id();
 
-  var items = [];
-
-  items.push({
-        xtype : 'panel',
-        layout : 'form',
-        anchor : Sonatype.view.FIELD_OFFSET + ' -10',
-        labelWidth : 70,
+  Sonatype.repoServer.Maven2InformationPanel.superclass.constructor.call(this, {
+        title : 'Maven Information',
+        autoScroll : true,
+        border : true,
+        frame : true,
+        collapsible : false,
+        collapsed : false,
         items : [{
               xtype : 'displayfield',
               fieldLabel : 'Group',
@@ -75,16 +75,6 @@ Sonatype.repoServer.Maven2InformationPanel = function(config) {
               allowBlank : true,
               readOnly : true
             }]
-      });
-
-  Sonatype.repoServer.Maven2InformationPanel.superclass.constructor.call(this, {
-        title : 'Maven Information',
-        autoScroll : true,
-        border : true,
-        frame : true,
-        collapsible : false,
-        collapsed : false,
-        items : items
       });
 };
 

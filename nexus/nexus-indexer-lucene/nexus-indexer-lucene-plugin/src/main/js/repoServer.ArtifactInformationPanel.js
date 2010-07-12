@@ -41,125 +41,6 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 
   this.sp = Sonatype.lib.Permissions;
 
-  var items = [{
-        xtype : 'panel',
-        layout : 'column',
-        anchor : Sonatype.view.FIELD_OFFSET + ' -10',
-        items : [{
-              xtype : 'panel',
-              layout : 'form',
-              labelWidth : 90,
-              items : [{
-                    xtype : 'displayfield',
-                    fieldLabel : 'Repository Path',
-                    name : 'repositoryPath',
-                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                    allowBlank : true,
-                    readOnly : true
-                  }, {
-                    xtype : 'displayfield',
-                    fieldLabel : 'Uploaded by',
-                    name : 'uploader',
-                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                    allowBlank : true,
-                    readOnly : true
-                  }, {
-                    xtype : 'byteDisplayField',
-                    fieldLabel : 'Size',
-                    name : 'size',
-                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                    allowBlank : true,
-                    readOnly : true
-                  }, {
-                    xtype : 'timestampDisplayField',
-                    fieldLabel : 'Uploaded Date',
-                    name : 'uploaded',
-                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                    allowBlank : true,
-                    readOnly : true,
-                    formatter : function(value) {
-                      if (value)
-                      {
-                        return new Date.parseDate(value, 'u').format('m.d.Y  h:m:s');
-                      }
-                    }
-                  }, {
-                    xtype : 'timestampDisplayField',
-                    fieldLabel : 'Last Modified',
-                    name : 'lastChanged',
-                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                    allowBlank : true,
-                    readOnly : true,
-                    dateFormat : Ext.util.Format.dateRenderer('m/d/Y')
-                  }, {
-                    xtype : 'panel',
-                    layout : 'column',
-                    items : [{
-                          columnWidth : '.20',
-                          items : {
-                            xtype : 'button',
-                            handler : this.artifactDownload,
-                            scope : this,
-                            text : 'Download'
-                          }
-                        }, {
-                          columnWidth : '.80',
-                          items : {
-                            xtype : 'button',
-                            handler : this.artifactDelete,
-                            scope : this,
-                            text : 'Delete'
-                          }
-                        }]
-                  }, {
-                    xtype : 'fieldset',
-                    checkboxToggle : false,
-                    title : 'Checksums',
-                    anchor : Sonatype.view.FIELDSET_OFFSET,
-                    collapsible : false,
-                    autoHeight : true,
-                    layoutConfig : {
-                      labelSeparator : ''
-                    },
-                    items : [{
-                          xtype : 'displayfield',
-                          fieldLabel : 'SHA1',
-                          name : 'sha1Hash',
-                          anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                          allowBlank : true,
-                          readOnly : true
-                        }, {
-                          xtype : 'displayfield',
-                          fieldLabel : 'MD5',
-                          name : 'md5Hash',
-                          anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                          allowBlank : true,
-                          readOnly : true
-                        }]
-                  }, {
-                    xtype : 'fieldset',
-                    checkboxToggle : false,
-                    title : 'Contained In Repositories',
-                    anchor : Sonatype.view.FIELDSET_OFFSET,
-                    collapsible : false,
-                    autoHeight : true,
-                    layoutConfig : {
-                      labelSeparator : ''
-                    },
-                    items : [{
-                          xtype : 'panel',
-                          items : [{
-                                xtype : 'repositoryUrlDisplayField',
-                                name : 'repositories',
-                                anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
-                                allowBlank : true,
-                                readOnly : true
-                              }]
-                        }]
-                  }]
-            }]
-      }];
-
   Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
         title : 'Artifact Information',
         autoScroll : true,
@@ -167,7 +48,114 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
         frame : true,
         collapsible : false,
         collapsed : false,
-        items : items
+        items : [{
+              xtype : 'displayfield',
+              fieldLabel : 'Repository Path',
+              name : 'repositoryPath',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'displayfield',
+              fieldLabel : 'Uploaded by',
+              name : 'uploader',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'byteDisplayField',
+              fieldLabel : 'Size',
+              name : 'size',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true
+            }, {
+              xtype : 'timestampDisplayField',
+              fieldLabel : 'Uploaded Date',
+              name : 'uploaded',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true,
+              formatter : function(value) {
+                if (value)
+                {
+                  return new Date.parseDate(value, 'u').format('m.d.Y  h:m:s');
+                }
+              }
+            }, {
+              xtype : 'timestampDisplayField',
+              fieldLabel : 'Last Modified',
+              name : 'lastChanged',
+              anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+              allowBlank : true,
+              readOnly : true,
+              dateFormat : Ext.util.Format.dateRenderer('m/d/Y')
+            }, {
+              xtype : 'panel',
+              layout : 'column',
+              items : [{
+                    columnWidth : '.20',
+                    items : {
+                      xtype : 'button',
+                      handler : this.artifactDownload,
+                      scope : this,
+                      text : 'Download'
+                    }
+                  }, {
+                    columnWidth : '.80',
+                    items : {
+                      xtype : 'button',
+                      handler : this.artifactDelete,
+                      scope : this,
+                      text : 'Delete'
+                    }
+                  }]
+            }, {
+              xtype : 'fieldset',
+              checkboxToggle : false,
+              title : 'Checksums',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              collapsible : false,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              items : [{
+                    xtype : 'displayfield',
+                    fieldLabel : 'SHA1',
+                    name : 'sha1Hash',
+                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+                    allowBlank : true,
+                    readOnly : true
+                  }, {
+                    xtype : 'displayfield',
+                    fieldLabel : 'MD5',
+                    name : 'md5Hash',
+                    anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+                    allowBlank : true,
+                    readOnly : true
+                  }]
+            }, {
+              xtype : 'fieldset',
+              checkboxToggle : false,
+              title : 'Contained In Repositories',
+              anchor : Sonatype.view.FIELDSET_OFFSET,
+              collapsible : false,
+              autoHeight : true,
+              layoutConfig : {
+                labelSeparator : ''
+              },
+              items : [{
+                    xtype : 'panel',
+                    items : [{
+                          xtype : 'repositoryUrlDisplayField',
+                          name : 'repositories',
+                          anchor : Sonatype.view.FIELD_OFFSET_WITH_SCROLL,
+                          allowBlank : true,
+                          readOnly : true
+                        }]
+                  }]
+            }]
       });
 };
 
