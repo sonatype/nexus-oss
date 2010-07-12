@@ -18,35 +18,39 @@
  */
 package org.sonatype.nexus.plugin;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Properties;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.IOUtil;
+import org.codehaus.plexus.util.InterpolationFilterReader;
 import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.m2settings.M2SettingsClient;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * <p>
  * Download a settings.xml template into the local maven instance. Settings can be saved to several locations:
  * </p>
- * 
  * <ul>
  * <li><b>destination == global</b>: Save to $maven.home/conf</li>
  * <li><b>destination == user</b>: Save to ~/.m2</li>
  * <li><b>target == /path/to/settings.xml</b>: Save to <code>/path/to/settings.xml</code></li>
  * </ul>
- * 
  * <p>
  * Additionally, by default any existing settings.xml file in the way will be backed up using a datestamp to ensure
  * previous backup files are not overwritten.
@@ -134,10 +138,15 @@ public class DownloadSettingsTemplateMojo
      */
     private File mavenUserConf;
 
+    /**
+     * @parameter expression="${settings.defaults}" default-value="${user.home}/.m2/settings-defaults.properties"
+     */
+    private File settingsDefaults;
+
     private M2SettingsClient client;
 
     public void execute()
-    throws MojoExecutionException
+        throws MojoExecutionException
     {
         fillMissing();
 
@@ -159,7 +168,7 @@ public class DownloadSettingsTemplateMojo
     }
 
     private void save( final Document settingsDoc )
-    throws MojoExecutionException
+        throws MojoExecutionException
     {
         File f = target;
         if ( f == null )
@@ -168,8 +177,9 @@ public class DownloadSettingsTemplateMojo
             if ( dest == null )
             {
                 getLog().warn(
-                              "Destination parameter is invalid; using: " + SettingsDestination.user
-                              + ". Please specify either '" + SettingsDestination.global.toString() + "' or '" + SettingsDestination.user.toString() + "'." );
+                    "Destination parameter is invalid; using: " + SettingsDestination.user
+                        + ". Please specify either '" + SettingsDestination.global.toString() + "' or '"
+                        + SettingsDestination.user.toString() + "'." );
 
                 dest = SettingsDestination.user;
             }
@@ -201,11 +211,39 @@ public class DownloadSettingsTemplateMojo
             if ( !f.renameTo( b ) )
             {
                 throw new MojoExecutionException( "Cannot rename existing settings to backup file.\nExisting file: "
-                                                  + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
+                    + f.getAbsolutePath() + "\nBackup file: " + b.getAbsolutePath() );
             }
 
             getLog().info( "Existing settings backed up to: " + b.getAbsolutePath() );
         }
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try
+        {
+            new XMLOutputter( Format.getPrettyFormat() ).output( settingsDoc, new OutputStreamWriter( bos ) );
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Failed to interpolate settings. Reason: " + e.getMessage(), e );
+        }
+
+        final Properties p = new Properties();
+        try
+        {
+            if ( settingsDefaults != null && settingsDefaults.exists() )
+            {
+                p.load( new FileInputStream( settingsDefaults ) );
+            }
+        }
+        catch ( IOException e )
+        {
+            throw new MojoExecutionException( "Failed to load settings.defaults: " + settingsDefaults + ". Reason: "
+                + e.getMessage(), e );
+        }
+
+        InterpolationFilterReader r =
+            new InterpolationFilterReader( new InputStreamReader( new ByteArrayInputStream( bos.toByteArray() ) ),
+                new SettingsMap( p ), "$[", "]" );
 
         Writer w = null;
         try
@@ -219,7 +257,7 @@ public class DownloadSettingsTemplateMojo
                 w = new FileWriter( f );
             }
 
-            new XMLOutputter( Format.getPrettyFormat() ).output( settingsDoc, w );
+            IOUtil.copy( r, w );
         }
         catch ( IOException e )
         {
@@ -271,7 +309,7 @@ public class DownloadSettingsTemplateMojo
         {
             try
             {
-                getLog().info("Retrieving Settings from:"+getUrl());
+                getLog().info( "Retrieving Settings from:" + getUrl() );
                 return client.getSettingsTemplateAbsolute( getUrl() );
             }
             catch ( RESTLightClientException e )
@@ -284,7 +322,9 @@ public class DownloadSettingsTemplateMojo
         {
             try
             {
-                getLog().info("Retrieving Settings from Template \""+templateId+"\" on server: \""+this.getNexusUrl()+"\"");
+                getLog().info(
+                    "Retrieving Settings from Template \"" + templateId + "\" on server: \"" + this.getNexusUrl()
+                        + "\"" );
                 return client.getSettingsTemplate( templateId );
             }
             catch ( RESTLightClientException e )

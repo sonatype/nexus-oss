@@ -118,30 +118,30 @@
       <artifactId>maven-core</artifactId>
       <version>${mavenVersion}</version>
       <exclusions>
-      	<exclusion>
-      		<groupId>org.apache.maven.wagon</groupId>
-      		<artifactId>wagon-http</artifactId>
-      	</exclusion>
-      	<exclusion>
-      		<groupId>org.apache.maven.wagon</groupId>
-      		<artifactId>wagon-http-lightweight</artifactId>
-      	</exclusion>      	
-      	<exclusion>
-      		<groupId>org.apache.maven.wagon</groupId>
-      		<artifactId>wagon-webdav-jackrabbit</artifactId>
-      	</exclusion>      	
+        <exclusion>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-http</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-http-lightweight</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-webdav-jackrabbit</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>${mavenVersion}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
       <version>${mavenVersion}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-settings</artifactId>
@@ -161,7 +161,7 @@
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
       <version>${restlight.version}</version>
-    </dependency>    
+    </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
@@ -215,8 +215,8 @@
           <groupId>org.codehaus.plexus</groupId>
         </exclusion>
         <exclusion>
-    	<groupId>org.sonatype.plexus</groupId>
-    	<artifactId>plexus-sec-dispatcher</artifactId>        
+          <groupId>org.sonatype.plexus</groupId>
+          <artifactId>plexus-sec-dispatcher</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -246,31 +246,37 @@
       <version>4.5</version>
       <scope>test</scope>
     </dependency>
-    
-	<dependency>
-    	<groupId>org.sonatype.plexus</groupId>
-    	<artifactId>plexus-cipher</artifactId>
-    	<version>1.4</version>
+
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-cipher</artifactId>
+      <version>1.4</version>
     </dependency>
 
-	<dependency>
-    	<groupId>org.sonatype.plexus</groupId>
-    	<artifactId>plexus-sec-dispatcher</artifactId>
-    	<version>1.4</version>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-sec-dispatcher</artifactId>
+      <version>1.4</version>
     </dependency>
 
-        
+
     <dependency>
-    	<groupId>com.ibm.icu</groupId>
-    	<artifactId>icu4j</artifactId>
-    	<version>2.6.1</version>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+      <version>2.6.1</version>
     </dependency>
     <dependency>
-    	<groupId>org.jdom</groupId>
-    	<artifactId>jdom</artifactId>
-    	<version>1.1</version>
-    </dependency>    
-    
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+      <version>1.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-interpolation</artifactId>
+      <version>1.13</version>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>
@@ -293,10 +299,10 @@
             <configuration>
               <descriptors>
                 <descriptor>${project.build.directory}/components.xml</descriptor>
-                <descriptor>${basedir}/src/main/resources/META-INF/shaded-components.xml</descriptor>              
+                <descriptor>${basedir}/src/main/resources/META-INF/shaded-components.xml</descriptor>
               </descriptors>
             </configuration>
-          </execution>          
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -310,24 +316,24 @@
               <goal>shade</goal>
             </goals>
             <configuration>
-	            <artifactSet>
-    	            <includes>
-    	              <include>org.sonatype.plexus:plexus-sec-dispatcher</include>
-    	              <include>org.sonatype.plexus:plexus-cipher</include>
-    	            </includes>
-              	</artifactSet>
+              <artifactSet>
+                <includes>
+                  <include>org.sonatype.plexus:plexus-sec-dispatcher</include>
+                  <include>org.sonatype.plexus:plexus-cipher</include>
+                </includes>
+              </artifactSet>
               <relocations>
                 <relocation>
                   <pattern>org.sonatype.plexus.components.sec.dispatcher</pattern>
                   <shadedPattern>org.sonatype.plexus.components.sec.dispatcher.shaded</shadedPattern>
                   <excludes>
                     <exclude>org.sonatype.plexus.components.sec.dispatcher.SecDispatcher</exclude>
-                  </excludes>                  
+                  </excludes>
                 </relocation>
                 <relocation>
                   <pattern>org.sonatype.plexus.components.cipher</pattern>
-                  <shadedPattern>org.sonatype.plexus.components.cipher.shaded</shadedPattern>                  
-                </relocation>                
+                  <shadedPattern>org.sonatype.plexus.components.cipher.shaded</shadedPattern>
+                </relocation>
               </relocations>
             </configuration>
           </execution>
@@ -451,7 +457,7 @@
         <reportSets>
           <reportSet>
             <reports>
-<!-- Broken, don't know why. -->
+              <!-- Broken, don't know why. -->
               <report>dependencies</report>
               <report>project-team</report>
               <report>mailing-list</report>
