@@ -18,7 +18,7 @@
 Sonatype.SearchStore = function(config) {
   var config = config || {};
   var defaultConfig = {
-    searchUrl : Sonatype.config.servicePath + '/data_index1'
+    searchUrl : Sonatype.config.servicePath + '/lucene/search'
   };
   Ext.apply(this, config, defaultConfig);
 

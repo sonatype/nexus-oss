@@ -80,20 +80,44 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
       {
         if (node && node.isLeaf())
         {
-          var resourceURI = node.ownerTree.loader.url.substring(0, node.ownerTree.loader.url.length - 'index_content'.length) + 'content' + node.attributes.path;
-          passthru.container.artifactContainer.updateArtifact({
-                leaf : true,
-                resourceURI : resourceURI,
-                groupId : node.attributes.groupId,
-                artifactId : node.attributes.artifactId,
-                version : node.attributes.version,
-                repoId : node.attributes.repositoryId,
-                classifier : node.attributes.classifier,
-                extension : node.attributes.extension,
-                artifactLink : node.attributes.artifactUri,
-                pomLink : node.attributes.pomUri,
-                nodeName : node.attributes.nodeName
+          Ext.Ajax.request({
+                scope : this,
+                method : 'GET',
+                options : {
+                  dontForceLogout : true
+                },
+                cbPassThru : {
+                  node : node,
+                  container : passthru.container
+                },
+                callback : function(options, isSuccess, response) {
+                  if (isSuccess)
+                  {
+                    var json = Ext.decode(response.responseText);
+
+                    var resourceURI = Sonatype.config.servicePath + '/repositories/' + options.cbPassThru.node.attributes.repositoryId + '/archive' + json.data.repositoryPath;
+
+                    options.cbPassThru.container.artifactContainer.updateArtifact({
+                          leaf : true,
+                          resourceURI : resourceURI,
+                          groupId : options.cbPassThru.node.attributes.groupId,
+                          artifactId : options.cbPassThru.node.attributes.artifactId,
+                          version : options.cbPassThru.node.attributes.version,
+                          repoId : options.cbPassThru.node.attributes.repositoryId,
+                          classifier : options.cbPassThru.node.attributes.classifier,
+                          extension : options.cbPassThru.node.attributes.extension,
+                          artifactLink : options.cbPassThru.node.attributes.artifactUri,
+                          pomLink : options.cbPassThru.node.attributes.pomUri,
+                          nodeName : options.cbPassThru.node.attributes.nodeName
+                        });
+                  }
+                },
+                url : Sonatype.config.servicePath + '/artifact/maven/resolve?r=' + node.attributes.repositoryId + '&g=' + node.attributes.groupId + '&a=' + node.attributes.artifactId + '&v=' + node.attributes.version
+                    + (Ext.isEmpty(node.attributes.classifier) ? '' : ('&c=' + node.attributes.classifier)) + '&e=' + node.attributes.extension
               });
+          // var resourceURI = node.ownerTree.loader.url.substring(0,
+          // node.ownerTree.loader.url.length - 'index_content'.length) +
+          // 'content' + node.attributes.path;
         }
         else
         {
