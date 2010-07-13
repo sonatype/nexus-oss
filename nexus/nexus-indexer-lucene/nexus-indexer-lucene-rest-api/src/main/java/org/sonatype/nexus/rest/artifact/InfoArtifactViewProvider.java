@@ -21,6 +21,7 @@ import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
@@ -47,12 +48,37 @@ public class InfoArtifactViewProvider
     public Object retrieveView( StorageItem item, Request req )
         throws IOException
     {
-        if ( !( item instanceof StorageFileItem ) )
+        StorageFileItem fileItem;
+        if ( item instanceof StorageFileItem )
+        {
+            fileItem = (StorageFileItem) item;
+        }
+        else if ( item instanceof StorageLinkItem )
+        {
+            RepositoryItemUid itemUid = ( (StorageLinkItem) item ).getTarget();
+            try
+            {
+                final StorageItem retrieveItem =
+                    itemUid.getRepository().retrieveItem( new ResourceStoreRequest( itemUid, true ) );
+                if ( retrieveItem instanceof StorageFileItem )
+                {
+                    fileItem = (StorageFileItem) retrieveItem;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch ( Exception e )
+            {
+                getLogger().error( "Failed to resolve the storagelink" + itemUid, e );
+                return null;
+            }
+        }
+        else
         {
             return null;
         }
-
-        StorageFileItem fileItem = (StorageFileItem) item;
 
         Set<String> repositories = new LinkedHashSet<String>();
         try
