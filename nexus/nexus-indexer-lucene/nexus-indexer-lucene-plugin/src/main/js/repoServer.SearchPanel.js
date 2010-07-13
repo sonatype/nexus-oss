@@ -13,22 +13,6 @@
  * of Sonatype, Inc.
  */
 
-Array.prototype.compare = function(testArr) {
-  if (this.length != testArr.length)
-    return false;
-  for (var i = 0; i < testArr.length; i++)
-  {
-    if (this[i].compare)
-    {
-      if (!this[i].compare(testArr[i]))
-        return false;
-    }
-    if (this[i] !== testArr[i])
-      return false;
-  }
-  return true;
-}
-
 Sonatype.repoServer.SearchPanel = function(config) {
   var config = config || {};
   var defaultConfig = {};
@@ -95,6 +79,8 @@ Sonatype.repoServer.SearchPanel = function(config) {
 
   this.grid.getSelectionModel().on('rowselect', this.displayArtifactInformation, this);
   this.grid.clearButton.on('click', this.clearArtifactInformation, this);
+
+  this.lastbookmark = '';
 };
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
@@ -300,6 +286,13 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       applyBookmark : function(bookmark) {
         if (bookmark)
         {
+          if (this.lastbookmark == bookmark)
+          {
+            return;
+          }
+
+          this.lastbookmark = bookmark;
+
           var parts = decodeURIComponent(bookmark).split('~');
 
           // if type not specified, simply do a quick search and guess
@@ -309,20 +302,6 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           }
           else if (parts.length > 1)
           {
-
-            if (this.searchTypeButton.value == parts[0])
-            {
-              var searchType = this.getSearchType(parts[0]);
-
-              var currentParts = searchType.getCurrentValue.call(this, this);
-              currentParts[0] = this.searchTypeButton.value;
-
-              if (currentParts.compare(parts))
-              {
-                return;
-              }
-            }
-
             this.switchSearchType({
                   value : parts[0]
                 }, null);
@@ -394,9 +373,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
               panel.getTopToolbar().items.itemAt(1).setRawValue(data[1]);
               panel.startSearch(panel, false);
             },
-            getCurrentValue : function(panel) {
-              return ['', panel.getTopToolbar().items.itemAt(1).getRawValue()];
-            },
             getBookmarkHandler : function(panel) {
               var result = panel.searchTypeButton.value;
               result += '~';
@@ -440,9 +416,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
             applyBookmarkHandler : function(panel, data) {
               panel.getTopToolbar().items.itemAt(1).setRawValue(data[1]);
               panel.startSearch(panel, false);
-            },
-            getCurrentValue : function(panel) {
-              return ['', panel.getTopToolbar().items.itemAt(1).getRawValue()];
             },
             getBookmarkHandler : function(panel) {
               var result = panel.searchTypeButton.value;
@@ -587,10 +560,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
               gavPopulator(panel, data);
               panel.startSearch(this, false);
             },
-            getCurrentValue : function(panel) {
-              return ['', panel.getTopToolbar().items.itemAt(2).getRawValue(), panel.getTopToolbar().items.itemAt(5).getRawValue(), panel.getTopToolbar().items.itemAt(8).getRawValue(), panel.getTopToolbar().items.itemAt(11).getRawValue(),
-                  panel.getTopToolbar().items.itemAt(14).getRawValue()];
-            },
             getBookmarkHandler : function(panel) {
               var result = panel.searchTypeButton.value;
               // groupId
@@ -732,9 +701,6 @@ Sonatype.Events.addListener('searchTypeInit', function(searchTypes, panel) {
               applyBookmarkHandler : function(panel, data) {
                 panel.getTopToolbar().items.itemAt(1).setRawValue(data[1]);
                 panel.startSearch(panel, false);
-              },
-              getCurrentValue : function(panel) {
-                return ['', panel.getTopToolbar().items.itemAt(1).getRawValue()];
               },
               getBookmarkHandler : function(panel) {
                 var result = panel.searchTypeButton.value;
