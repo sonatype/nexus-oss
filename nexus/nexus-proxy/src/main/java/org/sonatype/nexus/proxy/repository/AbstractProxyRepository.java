@@ -94,8 +94,8 @@ public abstract class AbstractProxyRepository
     private volatile long remoteStatusUpdated = 0;
 
     /** How much should be the last known remote status be retained. */
-    private volatile NumberSequence remoteStatusRetainTimeSequence =
-        new ConstantNumberSequence( REMOTE_STATUS_RETAIN_TIME );
+    private volatile NumberSequence remoteStatusRetainTimeSequence = new ConstantNumberSequence(
+        REMOTE_STATUS_RETAIN_TIME );
 
     private Thread repositoryStatusCheckerThread;
 
@@ -335,7 +335,7 @@ public abstract class AbstractProxyRepository
 
                     // make it a fibonacci one
                     this.remoteStatusRetainTimeSequence = new FibonacciNumberSequence( initialStep );
-                    
+
                     // make it step one
                     this.remoteStatusRetainTimeSequence.next();
 
@@ -560,8 +560,8 @@ public abstract class AbstractProxyRepository
         }
         else
         {
-            throw new RemoteStorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\"" + getId()
-                + "\"), cannot set remoteUrl!" );
+            throw new RemoteStorageException( "No remote storage set on repository \"" + getName() + "\" (ID=\""
+                + getId() + "\"), cannot set remoteUrl!" );
         }
     }
 
@@ -780,6 +780,10 @@ public abstract class AbstractProxyRepository
         }
         catch ( ItemNotFoundException ex )
         {
+            getLogger().warn(
+                "Nexus BUG, ItemNotFoundException during cache! Please report this issue along with the stack trace below!",
+                ex );
+
             // this is a nonsense, we just stored it!
             result = item;
         }
