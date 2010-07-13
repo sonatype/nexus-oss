@@ -51,7 +51,6 @@ Ext.extend(Sonatype.repoServer.RepositoryIndexBrowserContainer, Ext.Panel, {
         {
           this.expand();
           this.repositoryBrowser.updatePayload(payload);
-          this.artifactContainer.updateArtifact(payload);
         }
       }
     });
