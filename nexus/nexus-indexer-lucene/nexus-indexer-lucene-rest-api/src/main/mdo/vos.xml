@@ -451,14 +451,14 @@
           <description>The version of the artifact.</description>
         </field>
         <field>
-          <name>latestVersion</name>
+          <name>latestSnapshot</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
-          <description>The latest version of the artifact ("newest", whether release or snapshot).</description>
+          <description>The latest snapshot version of the artifact.</description>
         </field>
         <field>
-          <name>releasedVersion</name>
+          <name>latestRelease</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>

@@ -561,31 +561,42 @@ public class SearchNGIndexPlexusResource
 
                 if ( holder != null )
                 {
-                    if ( holder.getLatest() != null )
+                    if ( holder.getLatestSnapshot() != null )
                     {
-                        artifactNg.setLatestVersion( holder.getLatest().toString() );
+                        artifactNg.setLatestSnapshot( holder.getLatestSnapshot().toString() );
                     }
 
-                    if ( holder.getRelease() != null )
+                    if ( holder.getLatestRelease() != null )
                     {
-                        artifactNg.setReleasedVersion( holder.getRelease().toString() );
+                        artifactNg.setLatestRelease( holder.getLatestRelease().toString() );
                     }
 
                     if ( collapsed )
                     {
-                        String versionToSet = holder.getRelease().toString();
+                        String versionToSet = null;
 
-                        String token = artifactNg.getVersion();
+                        // do we have a "latest release" version?
+                        if ( holder.getLatestRelease() != null )
+                        {
+                            versionToSet = holder.getLatestRelease().toString();
+                        }
+                        else
+                        {
+                            versionToSet = holder.getLatestSnapshot().toString();
+                        }
+
+                        // String token = artifactNg.getVersion();
 
                         artifactNg.setVersion( versionToSet );
 
-                        for ( NexusNGArtifactHit hit : artifactNg.getHits() )
-                        {
-                            for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
-                            {
-                                link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
-                            }
-                        }
+                        // creating _direct_ links to storage
+                        // for ( NexusNGArtifactHit hit : artifactNg.getHits() )
+                        // {
+                        // for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
+                        // {
+                        // link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
+                        // }
+                        // }
                     }
                 }
             }
@@ -629,9 +640,9 @@ public class SearchNGIndexPlexusResource
 
         private final String artifactId;
 
-        private ArtifactVersion latest;
+        private ArtifactVersion latestSnapshot;
 
-        private ArtifactVersion release;
+        private ArtifactVersion latestRelease;
 
         public LatestVersionHolder( final ArtifactInfo ai )
         {
@@ -645,24 +656,28 @@ public class SearchNGIndexPlexusResource
         @SuppressWarnings( "unchecked" )
         public void maintainLatestVersions( final ArtifactInfo ai )
         {
-            if ( this.latest == null )
-            {
-                this.latest = ai.getArtifactVersion();
-            }
-            else if ( this.latest.compareTo( ai.getArtifactVersion() ) < 0 )
-            {
-                this.latest = ai.getArtifactVersion();
-            }
+            ArtifactVersion version = ai.getArtifactVersion();
 
-            if ( !VersionUtils.isSnapshot( ai.version ) )
+            if ( VersionUtils.isSnapshot( ai.version ) )
             {
-                if ( this.release == null )
+                if ( this.latestSnapshot == null )
                 {
-                    this.release = ai.getArtifactVersion();
+                    this.latestSnapshot = version;
                 }
-                else if ( this.release.compareTo( ai.getArtifactVersion() ) < 0 )
+                else if ( this.latestSnapshot.compareTo( version ) < 0 )
                 {
-                    this.release = ai.getArtifactVersion();
+                    this.latestSnapshot = version;
+                }
+            }
+            else
+            {
+                if ( this.latestRelease == null )
+                {
+                    this.latestRelease = version;
+                }
+                else if ( this.latestRelease.compareTo( version ) < 0 )
+                {
+                    this.latestRelease = version;
                 }
             }
         }
@@ -679,14 +694,14 @@ public class SearchNGIndexPlexusResource
             return artifactId;
         }
 
-        public ArtifactVersion getLatest()
+        public ArtifactVersion getLatestSnapshot()
         {
-            return latest;
+            return latestSnapshot;
         }
 
-        public ArtifactVersion getRelease()
+        public ArtifactVersion getLatestRelease()
         {
-            return release;
+            return latestRelease;
         }
 
         @Override
