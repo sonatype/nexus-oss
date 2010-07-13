@@ -21,7 +21,7 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
       refreshHandler : function(button, e) {
         // if we are dealing w/ refresh call (but not from refresh button) with
         // same repo, simply relocate to new path
-        if (button == undefined && this.oldPayload && this.payload && this.oldPayload.data.repoId == this.payload.data.repoId)
+        if (button == undefined && this.oldPayload && this.payload && this.oldPayload.data.resourceURI == this.payload.data.resourceURI)
         {
           if (this.payload.data.expandPath)
           {
