@@ -34,7 +34,6 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -148,7 +147,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public void validateStorageUrl( String url )
-        throws StorageException
+        throws LocalStorageException
     {
         boolean result = org.sonatype.nexus.util.FileUtils.validFileUrl( url );
 
@@ -164,7 +163,7 @@ public class DefaultFSLocalRepositoryStorage
      * @return the base dir
      */
     public File getBaseDir( Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
 
@@ -210,7 +209,7 @@ public class DefaultFSLocalRepositoryStorage
      * @return the file from base
      */
     public File getFileFromBase( Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         File repoBase = getBaseDir( repository, request );
 
@@ -259,10 +258,10 @@ public class DefaultFSLocalRepositoryStorage
      * @param target the target
      * @return the abstract storage item
      * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     protected AbstractStorageItem retrieveItemFromFile( Repository repository, ResourceStoreRequest request, File target )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         String path = request.getRequestPath();
 
@@ -343,7 +342,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public boolean isReachable( Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         File target = getBaseDir( repository, request );
 
@@ -351,19 +350,19 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public boolean containsItem( Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         return getFileFromBase( repository, request ).exists();
     }
 
     public AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         return retrieveItemFromFile( repository, request, getFileFromBase( repository, request ) );
     }
 
     private synchronized void mkParentDirs( Repository repository, File target )
-        throws StorageException
+        throws LocalStorageException
     {
         if ( !target.getParentFile().exists() && !target.getParentFile().mkdirs() )
         {
@@ -378,7 +377,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public void storeItem( Repository repository, StorageItem item )
-        throws UnsupportedStorageOperationException, StorageException
+        throws UnsupportedStorageOperationException, LocalStorageException
     {
         // set some sanity stuff
         item.setStoredLocally( System.currentTimeMillis() );
@@ -563,7 +562,7 @@ public class DefaultFSLocalRepositoryStorage
                     + getRenameRetryCount() 
                     + " retries in "
                     + getRenameRetryDelay() 
-                    + " ms intervals"
+                    + " ms intervals "
                     + hiddenTarget.getAbsolutePath()
                     + " --> " 
                     + target.getAbsolutePath() );
@@ -575,7 +574,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public void shredItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -613,7 +612,7 @@ public class DefaultFSLocalRepositoryStorage
     }
 
     public Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         File target = getFileFromBase( repository, request );
 

@@ -19,8 +19,8 @@ import java.util.Collection;
 import javax.inject.Singleton;
 
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -48,20 +48,20 @@ public interface LocalRepositoryStorage
      * Validate that the URL that defines storage location is valid.
      * 
      * @param url
-     * @throws StorageException
+     * @throws LocalStorageException
      */
     void validateStorageUrl( String url )
-        throws StorageException;
+        throws LocalStorageException;
 
     /**
      * Check local storage for reachability.
      * 
      * @param uid the uid
      * @return true, if available (reachable)
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     boolean isReachable( Repository repository, ResourceStoreRequest request )
-        throws StorageException;
+        throws LocalStorageException;
 
     /**
      * Gets the absolute url from base.
@@ -70,7 +70,7 @@ public interface LocalRepositoryStorage
      * @return the absolute url from base
      */
     URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
-        throws StorageException;
+        throws LocalStorageException;
 
     /**
      * Gets the attributes handler.
@@ -90,53 +90,53 @@ public interface LocalRepositoryStorage
      * Touch item and sets on it the current time.
      * 
      * @param uid the uid
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Touch item and sets on it the given timestamp.
      * 
      * @param uid the uid
      * @param timestamp the ts to set on file, 0 to "expire" it
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Touch item last requested and sets on it the current time.
      * 
      * @param uid the uid
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Touch item last requested and sets on it the given timestamp.
      * 
      * @param uid the uid
      * @param timestamp the ts to set on file, 0 to "expire" it
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Contains item.
      * 
      * @param uid the uid
      * @return true, if successful
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     boolean containsItem( Repository repository, ResourceStoreRequest request )
-        throws StorageException;
+        throws LocalStorageException;
 
     /**
      * Retrieve item.
@@ -144,32 +144,32 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @return the abstract storage item
      * @throws ItemNotFoundException the item not found exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Store item.
      * 
      * @param item the item
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void storeItem( Repository repository, StorageItem item )
         throws UnsupportedStorageOperationException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Update item attributes, does not modify the content of it.
      * 
      * @param item the item
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
     /**
      * Delete item, using wastebasket.
@@ -177,12 +177,12 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @throws ItemNotFoundException the item not found exception
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void deleteItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
-            StorageException;
+            LocalStorageException;
 
     /**
      * Shred item, avoid wastebasket.
@@ -190,12 +190,12 @@ public interface LocalRepositoryStorage
      * @param uid the uid
      * @throws ItemNotFoundException the item not found exception
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     void shredItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
             UnsupportedStorageOperationException,
-            StorageException;
+            LocalStorageException;
 
     /**
      * List items.
@@ -204,10 +204,10 @@ public interface LocalRepositoryStorage
      * @return the collection< storage item>
      * @throws ItemNotFoundException the item not found exception
      * @throws UnsupportedStorageOperationException the unsupported storage operation exception
-     * @throws StorageException the storage exception
+     * @throws LocalStorageException the storage exception
      */
     Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException,
-            StorageException;
+        LocalStorageException;
 
 }

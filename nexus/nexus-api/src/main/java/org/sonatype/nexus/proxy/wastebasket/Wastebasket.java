@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.IOException;
 
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
@@ -69,7 +69,7 @@ public interface Wastebasket
      * @throws IOException
      */
     void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
-        throws StorageException;
+        throws LocalStorageException;
 
     /**
      * Trash or 'rm -fr' the storage folder,'rm -fr' proxy attributes folder and index folder

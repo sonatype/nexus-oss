@@ -23,7 +23,6 @@ import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
@@ -74,7 +73,7 @@ public abstract class AbstractLocalRepositoryStorage
      * @return the absolute url from base
      */
     public URL getAbsoluteUrlFromBase( Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         StringBuffer urlStr = new StringBuffer( repository.getLocalUrl() );
 
@@ -94,7 +93,7 @@ public abstract class AbstractLocalRepositoryStorage
         {
             try
             {
-                return new File( urlStr.toString() ).toURL();
+                return new File( urlStr.toString() ).toURI().toURL();
             }
             catch ( MalformedURLException e1 )
             {
@@ -114,13 +113,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
     }
 
     public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -141,13 +140,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         touchItemLastRequested( System.currentTimeMillis(), repository, request );
     }
 
     public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
@@ -165,7 +164,7 @@ public abstract class AbstractLocalRepositoryStorage
 
     protected void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
         StorageItem storageItem )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         // TODO: touch it only if this is user-originated request
         // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
@@ -179,13 +178,13 @@ public abstract class AbstractLocalRepositoryStorage
     }
 
     public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
-        throws ItemNotFoundException, StorageException
+        throws ItemNotFoundException, LocalStorageException
     {
         getAttributesHandler().getAttributeStorage().putAttribute( item );
     }
 
     public final void deleteItem( Repository repository, ResourceStoreRequest request )
-        throws ItemNotFoundException, UnsupportedStorageOperationException, StorageException
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         wastebasket.delete( this, repository, request );
     }

@@ -29,7 +29,6 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -44,7 +43,7 @@ import org.sonatype.plexus.appevents.EventListener;
 
 /**
  * A default FS based implementation.
- *
+ * 
  * @author cstamas
  */
 @Component( role = Wastebasket.class )
@@ -67,7 +66,7 @@ public class DefaultFSWastebasket
         applicationEventMulticaster.addEventListener( this );
     }
 
-    public void onEvent( Event evt )
+    public void onEvent( Event<?> evt )
     {
         if ( evt instanceof ConfigurationChangeEvent )
         {
@@ -142,7 +141,7 @@ public class DefaultFSWastebasket
     }
 
     public void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
-        throws StorageException
+        throws LocalStorageException
     {
         try
         {
@@ -214,7 +213,7 @@ public class DefaultFSWastebasket
         catch ( IOException e )
         {
             // yell
-            throw new LocalStorageException( "Got IOException during wastebasket handling!", e );
+            throw new LocalStorageException( "Got IOException during wastebasket handling: " + e.getMessage(), e );
         }
         catch ( UnsupportedStorageOperationException e )
         {
@@ -265,7 +264,7 @@ public class DefaultFSWastebasket
     {
         File proxyAttributesFolder =
             new File( new File( new File( applicationConfiguration.getWorkingDirectory(), "proxy" ), "attributes" ),
-                      repository.getId() );
+                repository.getId() );
 
         delete( proxyAttributesFolder, true );
     }
@@ -287,7 +286,7 @@ public class DefaultFSWastebasket
 
     /**
      * Move the file to trash, or simply delete it forever
-     *
+     * 
      * @param file file to be deleted
      * @param deleteForever if it's true, delete the file forever, if it's false, move the file to trash
      * @throws IOException
