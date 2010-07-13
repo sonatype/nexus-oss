@@ -930,7 +930,9 @@ Ext.reg('displayfield', Ext.form.DisplayField);
 
 Ext.form.TimestampDisplayField = Ext.extend(Ext.form.DisplayField, {
       setValue : function(v) {
-        v = new Date.parseDate(v, 'u').toString();
+        // java give the timestamp in miliseconds, extjs consumes it in seconds
+        var toSecs = Math.round(v / 1000);
+        v = new Date.parseDate(toSecs, 'U').toString();
         this.setRawValue(v);
         return this;
       }
