@@ -199,6 +199,13 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         {
           Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
         }
+        else
+        {
+          var panel = Sonatype.view.mainTabPanel.addOrShowTab('nexus-search', Sonatype.repoServer.SearchPanel, {
+                title : 'Search'
+              });
+          panel.startSearch(panel, false);
+        }
       },
 
       showArtifact : function(data) {
