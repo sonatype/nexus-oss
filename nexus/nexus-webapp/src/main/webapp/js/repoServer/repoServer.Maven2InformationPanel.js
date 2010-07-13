@@ -126,9 +126,30 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
                   }
                 },
                 scope : this,
-                method : 'GET'
+                method : 'GET',
+                suppressStatus : '404'
               });
         }
+      }
+    });
+
+Sonatype.Events.addListener('fileContainerInit', function(artifactContainer) {
+      artifactContainer.add(new Sonatype.repoServer.Maven2InformationPanel({
+            name : 'maven2InformationPanel',
+            tabTitle : 'Maven Information'
+          }));
+    });
+
+Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, data) {
+      var panel = artifactContainer.find('name', 'maven2InformationPanel')[0];
+      
+      if (data == null || !data.leaf)
+      {
+        panel.showArtifact(null, artifactContainer);
+      }
+      else
+      {
+        panel.showArtifact(data, artifactContainer);
       }
     });
 

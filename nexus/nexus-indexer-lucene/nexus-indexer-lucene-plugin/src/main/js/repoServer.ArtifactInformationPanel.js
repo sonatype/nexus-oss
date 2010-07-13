@@ -243,6 +243,26 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
       }
     });
 
+Sonatype.Events.addListener('fileContainerInit', function(artifactContainer) {
+      artifactContainer.add(new Sonatype.repoServer.ArtifactInformationPanel({
+            name : 'artifactInformationPanel',
+            tabTitle : 'Artifact Information'
+          }));
+    });
+
+Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, data) {
+      var panel = artifactContainer.find('name', 'artifactInformationPanel')[0];
+
+      if (data == null || !data.leaf)
+      {
+        panel.showArtifact(null);
+      }
+      else
+      {
+        panel.showArtifact(data);
+      }
+    });
+
 Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
       artifactContainer.add(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
