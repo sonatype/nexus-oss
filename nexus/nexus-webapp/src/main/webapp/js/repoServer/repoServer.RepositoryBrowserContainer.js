@@ -26,7 +26,7 @@ Sonatype.repoServer.RepositoryBrowserContainer = function(config) {
         collapsed : true,
         region : 'east',
         split : true,
-        width : 500,
+        width : '50%',
         initEventName : this.artifactContainerInitEvent,
         updateEventName : this.artifactContainerUpdateEvent
       });

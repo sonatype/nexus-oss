@@ -24,7 +24,7 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         collapsed : true,
         region : 'east',
         split : true,
-        width : 500
+        width : '50%'
       });
 
   items.push(this.repositoryBrowser);
