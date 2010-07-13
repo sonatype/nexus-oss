@@ -59,7 +59,7 @@ public class InfoArtifactViewProvider
             try
             {
                 final StorageItem retrieveItem =
-                    itemUid.getRepository().retrieveItem( new ResourceStoreRequest( itemUid, true ) );
+                    itemUid.getRepository().retrieveItem( new ResourceStoreRequest( itemUid.getPath(), true, false ) );
                 if ( retrieveItem instanceof StorageFileItem )
                 {
                     fileItem = (StorageFileItem) retrieveItem;
@@ -105,7 +105,7 @@ public class InfoArtifactViewProvider
         // hosted / cache check usefull if the index is out to date or disable
         for ( Repository repo : repositoryRegistry.getRepositories() )
         {
-            if ( repo.getLocalStorage().containsItem( repo, new ResourceStoreRequest( itemUid.getPath() ) ) )
+            if ( repo.getLocalStorage().containsItem( repo, new ResourceStoreRequest( itemUid.getPath(), true, false ) ) )
             {
                 repositories.add( repo.getId() );
             }
