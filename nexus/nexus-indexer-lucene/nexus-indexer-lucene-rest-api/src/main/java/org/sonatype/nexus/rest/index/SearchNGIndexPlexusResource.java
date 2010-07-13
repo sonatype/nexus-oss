@@ -37,9 +37,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
@@ -87,8 +84,8 @@ public class SearchNGIndexPlexusResource
     @Requirement( role = Searcher.class )
     private List<Searcher> searchers;
 
-    @Requirement( hint = "maven2" )
-    private GavCalculator m2GavCalculator;
+    // @Requirement( hint = "maven2" )
+    // private GavCalculator m2GavCalculator;
 
     @Override
     public String getResourceUri()
@@ -469,22 +466,32 @@ public class SearchNGIndexPlexusResource
 
                         link.setExtension( "pom" );
 
-                        try
-                        {
-                            Gav gav = ai.calculateGav();
+                        // creating _redirect_ links to storage
+                        String suffix =
+                            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version
+                                + "&e=pom";
 
-                            Gav pomGav =
-                                new Gav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), null, "pom", null,
-                                    null, null /* name */, gav.isSnapshot(), false, null, false, null );
+                        link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
 
-                            String path = m2GavCalculator.gavToPath( pomGav );
-
-                            link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
-                        }
-                        catch ( IllegalArtifactCoordinateException e )
-                        {
-                            // hum hum, nothig here then
-                        }
+                        // creating _direct_ links to storage
+                        // does not work with timestamped snapshots!
+                        // try
+                        // {
+                        // Gav gav = ai.calculateGav();
+                        //
+                        // Gav pomGav =
+                        // new Gav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), null, "pom", null,
+                        // null, null /* name */, gav.isSnapshot(), false, null, false, null );
+                        //
+                        // String path = m2GavCalculator.gavToPath( pomGav );
+                        //
+                        // link.setArtifactLink( createRepositoryReference( request, repository.getId(), path
+                        // ).getTargetRef().toString() );
+                        // }
+                        // catch ( IllegalArtifactCoordinateException e )
+                        // {
+                        // // hum hum, nothig here then
+                        // }
 
                         // add the POM link
                         hit.addArtifactLink( link );
@@ -515,16 +522,31 @@ public class SearchNGIndexPlexusResource
 
                     link.setExtension( ai.fextension );
 
-                    try
-                    {
-                        String path = m2GavCalculator.gavToPath( ai.calculateGav() );
+                    // creating _direct_ links to storage
+                    // does not work with timestamped snapshots
+                    // try
+                    // {
+                    // String path = m2GavCalculator.gavToPath( ai.calculateGav() );
+                    //
+                    // link.setArtifactLink( createRepositoryReference( request, repository.getId(), path
+                    // ).getTargetRef().toString() );
+                    // }
+                    // catch ( IllegalArtifactCoordinateException e )
+                    // {
+                    // // hum hum, nothig here then
+                    // }
 
-                        link.setArtifactLink( createRepositoryReference( request, repository.getId(), path ).getTargetRef().toString() );
-                    }
-                    catch ( IllegalArtifactCoordinateException e )
+                    // creating _redirect_ links to storage
+                    String suffix =
+                        "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
+                            + ai.fextension;
+
+                    if ( StringUtils.isNotBlank( ai.classifier ) )
                     {
-                        // hum hum, nothig here then
+                        suffix = suffix + "&c=" + ai.classifier;
                     }
+
+                    link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
 
                     // only if unique
                     hit.addArtifactLink( link );
