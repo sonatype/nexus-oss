@@ -235,17 +235,20 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         panel.grid.store.removeAll();
         panel.grid.store.load();
 
-        if (reverse)
-        {
-          panel.grid.store.on('load', this.sortResults, this);
-        }
-        else
-        {
-          panel.grid.store.un('load', this.sortResults, this);
-        }
+        panel.grid.doSort = reverse;
+        panel.grid.store.on('load', this.sortResults, panel);
       },
       sortResults : function(store, records, options) {
-        store.sort('version', 'desc');
+        if (this.grid.doSort)
+        {
+          this.grid.doSort = null;
+          store.sort('version', 'desc');
+        }
+
+        if (records.length > 0)
+        {
+          this.grid.getSelectionModel().selectFirstRow();
+        }
       },
       // start the quick search, we will look at all search types
       // and try to guess which type of search to use
