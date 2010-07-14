@@ -570,7 +570,7 @@ public class SearchNGIndexPlexusResource
                     {
                         artifactNg.setLatestSnapshot( systemWideHolder.getLatestSnapshot().toString() );
 
-                        artifactNg.setLatestReleaseRepositoryId( systemWideHolder.getLatestSnapshotRepositoryId() );
+                        artifactNg.setLatestSnapshotRepositoryId( systemWideHolder.getLatestSnapshotRepositoryId() );
                     }
 
                     if ( systemWideHolder.getLatestRelease() != null )
@@ -583,6 +583,20 @@ public class SearchNGIndexPlexusResource
 
                 if ( collapsed )
                 {
+                    // store the top level version, to know what to replace
+                    final String token = artifactNg.getVersion();
+
+                    // set the top level version to one of the latest ones
+                    if ( artifactNg.getLatestRelease() != null )
+                    {
+                        artifactNg.setVersion( artifactNg.getLatestRelease() );
+                    }
+                    else
+                    {
+                        artifactNg.setVersion( artifactNg.getLatestSnapshot() );
+                    }
+
+                    // "fix" the links too
                     for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
                     {
                         LatestVersionHolder repositoryWideHolder =
@@ -603,10 +617,6 @@ public class SearchNGIndexPlexusResource
                             {
                                 versionToSet = repositoryWideHolder.getLatestSnapshot().toString();
                             }
-
-                            String token = artifactNg.getVersion();
-
-                            artifactNg.setVersion( versionToSet );
 
                             for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
                             {
