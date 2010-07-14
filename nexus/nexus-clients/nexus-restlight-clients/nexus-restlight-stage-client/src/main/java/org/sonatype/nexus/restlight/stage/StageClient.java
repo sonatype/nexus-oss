@@ -27,6 +27,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -52,6 +53,8 @@ public class StageClient
 
     public static final String STAGE_REPO_PROMOTE_ACTION = "/promote";
 
+    public static final String STAGE_REPO_BULK_PROMOTE = SVC_BASE + "/staging/bulk/promote";
+
     private static final String STAGE_REPO_ID_PARAM = "stagedRepositoryId";
 
     private static final String PROFILE_ID_ELEMENT = "id";
@@ -75,6 +78,8 @@ public class StageClient
     private static final String STAGE_REPO_XPATH = "//stagingProfile";
 
     private static final String STAGE_REPO_DETAIL_XPATH = "//stagingProfileRepository";
+
+    private static final String BUILD_PROMOTION_PROFILES_XPATH = "//stagingProfile[mode=\"GROUP\"]";
 
     public StageClient( final String baseUrl, final String user, final String password )
         throws RESTLightClientException
@@ -197,7 +202,7 @@ public class StageClient
     {
         String descElementName =
             getVocabulary().getProperty( VocabularyKeys.PROMOTE_STAGE_REPO_DESCRIPTION_ELEMENT,
-                VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
+                                         VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
 
         List<Element> extras;
         if ( !VocabularyKeys.SUPPRESS_ELEMENT_VALUE.equals( descElementName ) )
@@ -234,6 +239,93 @@ public class StageClient
         Element target = new Element( "targetRepositoryId" ).setText( targetRepositoryId );
 
         performStagingAction( repo, STAGE_REPO_PROMOTE_ACTION, Collections.singletonList( target ) );
+    }
+
+    /**
+     * Promotes a set of repositories to a group profile.
+     * 
+     * @param groupProfileId The group profile to promote to.
+     * @param repositoryIds A list of repositoryIds to be promoted.
+     * @throws RESTLightClientException
+     */
+    public void promoteRepositories( String stagingProfileGroup, String description, List<String> stagedRepositoryIds )
+        throws RESTLightClientException
+    {
+        if ( stagedRepositoryIds == null || stagedRepositoryIds.isEmpty() )
+        {
+            throw new RESTLightClientException(
+                                                "No staging repositories specified. Please provide a valid staged repository ids." );
+        }
+
+        if ( StringUtils.isEmpty( stagingProfileGroup ) )
+        {
+            throw new RESTLightClientException(
+                                                "No build promotion profile specified. Please provide a build promotion profile." );
+        }
+
+        String rootElement = this.getVocabulary().getProperty( VocabularyKeys.BULK_ACTION_REQUEST_ROOT_ELEMENT );
+        Document body = new Document().setRootElement( new Element( rootElement ) );
+
+        Element data = new Element( "data" );
+        body.getRootElement().addContent( data );
+
+        if ( StringUtils.isNotEmpty( description ) )
+        {
+            data.addContent( new Element( "description" ).setText( description ) );
+        }
+
+        data.addContent( new Element( "stagingProfileGroup" ).setText( stagingProfileGroup ) );
+
+        Element staedRepoIds = new Element( "stagedRepositoryIds" );
+        data.addContent( staedRepoIds );
+
+        for ( String repoId : stagedRepositoryIds )
+        {
+            staedRepoIds.addContent( new Element( "string" ).setText( repoId ) );
+        }
+
+        post( STAGE_REPO_BULK_PROMOTE, null, body );
+    }
+
+    /**
+     * Returns a list of all the build promotion profile Ids.
+     * 
+     * @return
+     * @throws RESTLightClientException
+     */
+    @SuppressWarnings( "unchecked" )
+    public List<StageProfile> getBuildPromotionProfiles()
+        throws RESTLightClientException
+    {
+        Document doc = get( PROFILES_PATH );
+
+        // heavy lifting is done with xpath
+        XPath profileXp = newXPath( BUILD_PROMOTION_PROFILES_XPATH );
+
+        List<Element> profiles;
+        try
+        {
+            profiles = profileXp.selectNodes( doc.getRootElement() );
+        }
+        catch ( JDOMException e )
+        {
+            throw new RESTLightClientException( "XPath selection failed: '" + BUILD_PROMOTION_PROFILES_XPATH
+                + "' (Root node: " + doc.getRootElement().getName() + ").", e );
+        }
+
+        List<StageProfile> result = new ArrayList<StageProfile>();
+        if ( profiles != null )
+        {
+            for ( Element profile : profiles )
+            {
+                // just pull out the id and name.
+                String profileId = profile.getChild( PROFILE_ID_ELEMENT ).getText();
+                String name = profile.getChild( PROFILE_NAME_ELEMENT ).getText();
+                
+                result.add( new StageProfile( profileId, name ) );
+            }
+        }
+        return result;
     }
 
     @SuppressWarnings( "unchecked" )
@@ -281,8 +373,9 @@ public class StageClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
-                                    txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put(
+                                                       profileId + "/" + txt.getText(),
+                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
@@ -302,8 +395,9 @@ public class StageClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
-                                    txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put(
+                                                       profileId + "/" + txt.getText(),
+                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
@@ -411,7 +505,7 @@ public class StageClient
         if ( repo == null )
         {
             throw new RESTLightClientException(
-                "No staging-repository details specified. Please provide a valid StageRepository instance." );
+                                                "No staging-repository details specified. Please provide a valid StageRepository instance." );
         }
 
         Map<String, String> params = new HashMap<String, String>();
@@ -451,5 +545,4 @@ public class StageClient
 
         return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, false, false );
     }
-
 }

@@ -26,7 +26,10 @@ import static org.junit.Assert.fail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+
+import junit.framework.Assert;
 
 import org.jdom.JDOMException;
 import org.junit.Test;
@@ -36,7 +39,6 @@ import org.sonatype.nexus.restlight.testharness.ConversationalFixture;
 import org.sonatype.nexus.restlight.testharness.GETFixture;
 import org.sonatype.nexus.restlight.testharness.POSTFixture;
 import org.sonatype.nexus.restlight.testharness.RESTTestFixture;
-
 
 public class StageClientTest
     extends AbstractRESTTest
@@ -131,11 +133,11 @@ public class StageClientTest
         throws JDOMException, IOException, RESTLightClientException
     {
         setupOpenReposConversation();
-        
+
         POSTFixture finishPost = new POSTFixture( getExpectedUser(), getExpectedPassword() );
-        
+
         finishPost.setExactURI( StageClient.PROFILES_PATH + "/112cc490b91265a1" + StageClient.STAGE_REPO_FINISH_ACTION );
-        
+
         if ( "1.3.1".equals( getTestNexusAPIVersion() ) )
         {
             finishPost.setRequestDocument( readTestDocumentResource( "finish-repo-old.xml" ) );
@@ -144,20 +146,20 @@ public class StageClientTest
         {
             finishPost.setRequestDocument( readTestDocumentResource( "finish-repo-new.xml" ) );
         }
-        
+
         finishPost.setResponseStatus( 201 );
-        
+
         fixture.getConversation().add( finishPost );
 
         StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
 
         StageRepository repo = client.getOpenStageRepositoryForUser( "group", "artifact", "version" );
-        
+
         assertNotNull( repo );
 
         assertEquals( "tp1-002", repo.getRepositoryId() );
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-002", repo.getUrl() );
-        
+
         client.finishRepository( repo, "this is a description" );
 
         List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
@@ -166,6 +168,69 @@ public class StageClientTest
             System.out.println( unused );
             fail( "Conversation was not finished. Didn't traverse:\n" + unused );
         }
+    }
+
+    @Test
+    public void promoteMultipleItemsToGroup()
+        throws JDOMException, IOException, RESTLightClientException
+    {
+
+        try
+        {
+            System.setProperty( TEST_NX_API_VERSION_SYSPROP, "1.7.2" );
+
+            initConversation();
+
+            POSTFixture finishPost = new POSTFixture( getExpectedUser(), getExpectedPassword() );
+
+            finishPost.setExactURI( StageClient.STAGE_REPO_BULK_PROMOTE );
+            finishPost.setRequestDocument( readTestDocumentResource( "promote-to-group-request.xml" ) );
+            finishPost.setResponseStatus( 201 );
+
+            fixture.getConversation().add( finishPost );
+
+            StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+
+            List<String> repoIds = new ArrayList<String>();
+            repoIds.add( "repoId1" );
+            repoIds.add( "repoId2" );
+            client.promoteRepositories( "groupProfile", "The description", repoIds );
+
+            List<RESTTestFixture> unused = fixture.verifyConversationWasFinished();
+            if ( unused != null && !unused.isEmpty() )
+            {
+                System.out.println( unused );
+                fail( "Conversation was not finished. Didn't traverse:\n" + unused );
+            }
+        }
+        finally
+        {
+            // reset
+            System.setProperty( TEST_NX_API_VERSION_SYSPROP, "1.3.2" );
+        }
+    }
+
+    @Test
+    public void queryBuildPromotionProfiles()
+        throws JDOMException, IOException, RESTLightClientException
+    {
+        initConversation();
+
+        GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
+        repoListGet.setExactURI( StageClient.PROFILES_PATH );
+        repoListGet.setResponseDocument( readTestDocumentResource( "profile-list-bp.xml" ) );
+        fixture.getConversation().add( repoListGet );
+
+        StageClient client = new StageClient( getBaseUrl(), getExpectedUser(), getExpectedPassword() );
+        List<StageProfile> profiles = client.getBuildPromotionProfiles();
+
+        Assert.assertEquals( 2, profiles.size() );
+        Assert.assertEquals( "profile3", profiles.get( 0 ).getProfileId() );
+        Assert.assertEquals( "test-profile3", profiles.get( 0 ).getName() );
+
+        Assert.assertEquals( "profile4", profiles.get( 1 ).getProfileId() );
+        Assert.assertEquals( "test-profile4", profiles.get( 1 ).getName() );
+
     }
 
     @Test
@@ -252,26 +317,32 @@ public class StageClientTest
         assertEquals( "http://localhost:8082/nexus/content/repositories/tp1-003", repos.get( 1 ).getUrl() );
     }
 
-    private void setupOpenReposConversation()
+    private void initConversation()
         throws JDOMException, IOException
     {
         List<RESTTestFixture> conversation = new ArrayList<RESTTestFixture>();
 
         conversation.add( getVersionCheckFixture() );
 
+        fixture.setConversation( conversation );
+    }
+
+    private void setupOpenReposConversation()
+        throws JDOMException, IOException
+    {
+        initConversation();
+
         GETFixture repoListGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         repoListGet.setExactURI( StageClient.PROFILES_PATH );
         repoListGet.setResponseDocument( readTestDocumentResource( "profile-list.xml" ) );
 
-        conversation.add( repoListGet );
+        fixture.getConversation().add( repoListGet );
 
         GETFixture reposGet = new GETFixture( getExpectedUser(), getExpectedPassword() );
         reposGet.setExactURI( StageClient.PROFILE_REPOS_PATH_PREFIX + "112cc490b91265a1" );
         reposGet.setResponseDocument( readTestDocumentResource( "profile-repo-list.xml" ) );
 
-        conversation.add( reposGet );
-
-        fixture.setConversation( conversation );
+        fixture.getConversation().add( reposGet );
     }
 
     private void setupClosedReposConversation()

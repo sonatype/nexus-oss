@@ -34,6 +34,13 @@ public final class VocabularyKeys
     public static final String PROMOTE_STAGE_REPO_ROOT_ELEMENT = "promoteRepository.rootElement";
     
     /**
+     * This is the root element of the bulk staging actions. In Nexus Professional 1.7.1, it was
+     * <code>com.sonatype.nexus.staging.api.dto.StagingActionRequestDTO</code>, but starting in Nexus Professional
+     * 1.7.2, the element has been simplified to <code>stagingActionRequest</code>.
+     */
+    public static final String BULK_ACTION_REQUEST_ROOT_ELEMENT = "bulkActionRequest.rootElement";
+    
+    /**
      * This is the description element name to use when finishing a staged repository. In Nexus Professional 1.3.1, it
      * wasn't used at all, so the value is {@link VocabularyKeys#SUPPRESS_ELEMENT_VALUE}. In Nexus Professional 1.3.2+,
      * the element is <code>description</code>.
