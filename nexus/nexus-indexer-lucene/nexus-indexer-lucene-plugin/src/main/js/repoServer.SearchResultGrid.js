@@ -186,7 +186,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               singleSelect : true
             }),
 
-        bbar : [this.fetchMoreBar, '->', this.subtitleBar],
+        bbar : [this.fetchMoreBar/*, '->', this.subtitleBar*/],
 
         viewConfig : {
           forceFit : true,
@@ -283,27 +283,23 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
           var ext = record.data.artifactHits[hitIndex].artifactLinks[i].extension;
           var link = record.data.artifactHits[hitIndex].artifactLinks[i].artifactLink;
 
-          var icon;
-          if (ext == 'pom' && !cls)
-          {
-            icon = "images/pom_obj.gif";
-          }
-          else if ((ext == '' || ext == 'jar') && !cls)
-          {
-            icon = "images/jar_obj.gif";
-          }
-          else if ((ext == '' || ext == 'jar') && cls == 'sources')
-          {
-            icon = "images/jar_sources_obj.gif";
-          }
-          else if ((ext == '' || ext == 'jar') && cls == 'javadoc')
-          {
-            icon = "images/jar_javadoc_obj.gif";
-          }
-          else
-          {
-            icon = null;
-          }
+          var icon = null;
+          // if (ext == 'pom' && !cls)
+          // {
+          // icon = "images/pom_obj.gif";
+          // }
+          // else if ((ext == '' || ext == 'jar') && !cls)
+          // {
+          // icon = "images/jar_obj.gif";
+          // }
+          // else if ((ext == '' || ext == 'jar') && cls == 'sources')
+          // {
+          // icon = "images/jar_sources_obj.gif";
+          // }
+          // else if ((ext == '' || ext == 'jar') && cls == 'javadoc')
+          // {
+          // icon = "images/jar_javadoc_obj.gif";
+          // }
 
           var desc = (cls ? (cls + '.' + ext) : ext);
 
