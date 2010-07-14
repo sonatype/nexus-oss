@@ -218,9 +218,12 @@ public class SearchNGIndexPlexusResource
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
 
                 // we need to save this reference to later
-                LatestVersionCollector collector = new LatestVersionCollector();
+                SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
+                RepositoryWideLatestVersionCollector repositoryWideCollector =
+                    new RepositoryWideLatestVersionCollector();
 
-                filters.add( collector );
+                filters.add( systemWideCollector );
+                filters.add( repositoryWideCollector );
 
                 searchResult = searchByTerms( terms, null, from, count, exact, expandVersion, collapseResults, filters );
 
@@ -233,7 +236,7 @@ public class SearchNGIndexPlexusResource
                 else
                 {
                     repackIteratorSearchResponse( request, result, collapseResults, from, count, searchResult,
-                        collector );
+                        systemWideCollector, repositoryWideCollector );
 
                     if ( !result.isTooManyResults() )
                     {
@@ -283,7 +286,7 @@ public class SearchNGIndexPlexusResource
             try
             {
                 repackIteratorSearchResponse( request, result, collapseResults, from, count,
-                    IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE, null );
+                    IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE, null, null );
             }
             catch ( NoSuchRepositoryException e )
             {
@@ -387,7 +390,8 @@ public class SearchNGIndexPlexusResource
 
     protected void repackIteratorSearchResponse( Request request, SearchNGResponse response, boolean collapsed,
                                                  Integer from, Integer count, IteratorSearchResponse iterator,
-                                                 LatestVersionCollector collector )
+                                                 SystemWideLatestVersionCollector systemWideCollector,
+                                                 RepositoryWideLatestVersionCollector repositoryWideCollector )
         throws NoSuchRepositoryException
     {
         response.setTooManyResults( iterator.isHitLimitExceeded() );
@@ -556,41 +560,54 @@ public class SearchNGIndexPlexusResource
             // 2nd pass, set versions
             for ( NexusNGArtifact artifactNg : hits.values() )
             {
-                LatestVersionHolder holder =
-                    collector.getLvhs().get( collector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() ) );
+                LatestVersionHolder systemWideHolder =
+                    systemWideCollector.getLvhs().get(
+                        systemWideCollector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() ) );
 
-                if ( holder != null )
+                if ( systemWideHolder != null )
                 {
-                    if ( holder.getLatestSnapshot() != null )
+                    if ( systemWideHolder.getLatestSnapshot() != null )
                     {
-                        artifactNg.setLatestSnapshot( holder.getLatestSnapshot().toString() );
+                        artifactNg.setLatestSnapshot( systemWideHolder.getLatestSnapshot().toString() );
+
+                        artifactNg.setLatestReleaseRepositoryId( systemWideHolder.getLatestSnapshotRepositoryId() );
                     }
 
-                    if ( holder.getLatestRelease() != null )
+                    if ( systemWideHolder.getLatestRelease() != null )
                     {
-                        artifactNg.setLatestRelease( holder.getLatestRelease().toString() );
+                        artifactNg.setLatestRelease( systemWideHolder.getLatestRelease().toString() );
+
+                        artifactNg.setLatestReleaseRepositoryId( systemWideHolder.getLatestReleaseRepositoryId() );
                     }
+                }
 
-                    if ( collapsed )
+                if ( collapsed )
+                {
+                    for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
                     {
-                        String versionToSet = null;
+                        LatestVersionHolder repositoryWideHolder =
+                            repositoryWideCollector.getLvhs().get(
+                                repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
+                                    artifactNg.getArtifactId() ) );
 
-                        // do we have a "latest release" version?
-                        if ( holder.getLatestRelease() != null )
+                        if ( repositoryWideHolder != null )
                         {
-                            versionToSet = holder.getLatestRelease().toString();
-                        }
-                        else
-                        {
-                            versionToSet = holder.getLatestSnapshot().toString();
-                        }
+                            String versionToSet = null;
 
-                        String token = artifactNg.getVersion();
+                            // do we have a "latest release" version?
+                            if ( repositoryWideHolder.getLatestRelease() != null )
+                            {
+                                versionToSet = repositoryWideHolder.getLatestRelease().toString();
+                            }
+                            else
+                            {
+                                versionToSet = repositoryWideHolder.getLatestSnapshot().toString();
+                            }
 
-                        artifactNg.setVersion( versionToSet );
+                            String token = artifactNg.getVersion();
 
-                        for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
-                        {
+                            artifactNg.setVersion( versionToSet );
+
                             for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
                             {
                                 link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
@@ -641,7 +658,11 @@ public class SearchNGIndexPlexusResource
 
         private ArtifactVersion latestSnapshot;
 
+        private String latestSnapshotRepositoryId;
+
         private ArtifactVersion latestRelease;
+
+        private String latestReleaseRepositoryId;
 
         public LatestVersionHolder( final ArtifactInfo ai )
         {
@@ -662,10 +683,14 @@ public class SearchNGIndexPlexusResource
                 if ( this.latestSnapshot == null )
                 {
                     this.latestSnapshot = version;
+
+                    this.latestSnapshotRepositoryId = ai.repository;
                 }
                 else if ( this.latestSnapshot.compareTo( version ) < 0 )
                 {
                     this.latestSnapshot = version;
+
+                    this.latestSnapshotRepositoryId = ai.repository;
                 }
             }
             else
@@ -673,10 +698,14 @@ public class SearchNGIndexPlexusResource
                 if ( this.latestRelease == null )
                 {
                     this.latestRelease = version;
+
+                    this.latestReleaseRepositoryId = ai.repository;
                 }
                 else if ( this.latestRelease.compareTo( version ) < 0 )
                 {
                     this.latestRelease = version;
+
+                    this.latestReleaseRepositoryId = ai.repository;
                 }
             }
         }
@@ -698,46 +727,19 @@ public class SearchNGIndexPlexusResource
             return latestSnapshot;
         }
 
+        public String getLatestSnapshotRepositoryId()
+        {
+            return latestSnapshotRepositoryId;
+        }
+
         public ArtifactVersion getLatestRelease()
         {
             return latestRelease;
         }
 
-        @Override
-        public int hashCode()
+        public String getLatestReleaseRepositoryId()
         {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ( ( artifactId == null ) ? 0 : artifactId.hashCode() );
-            result = prime * result + ( ( groupId == null ) ? 0 : groupId.hashCode() );
-            return result;
-        }
-
-        @Override
-        public boolean equals( Object obj )
-        {
-            if ( this == obj )
-                return true;
-            if ( obj == null )
-                return false;
-            if ( getClass() != obj.getClass() )
-                return false;
-            LatestVersionHolder other = (LatestVersionHolder) obj;
-            if ( artifactId == null )
-            {
-                if ( other.artifactId != null )
-                    return false;
-            }
-            else if ( !artifactId.equals( other.artifactId ) )
-                return false;
-            if ( groupId == null )
-            {
-                if ( other.groupId != null )
-                    return false;
-            }
-            else if ( !groupId.equals( other.groupId ) )
-                return false;
-            return true;
+            return latestReleaseRepositoryId;
         }
     }
 
@@ -748,7 +750,7 @@ public class SearchNGIndexPlexusResource
      * 
      * @author cstamas
      */
-    protected static class LatestVersionCollector
+    protected static class SystemWideLatestVersionCollector
         implements ArtifactInfoFilter
     {
         private HashMap<String, LatestVersionHolder> lvhs = new HashMap<String, LatestVersionHolder>();
@@ -774,6 +776,47 @@ public class SearchNGIndexPlexusResource
         public String getKey( String groupId, String artifactId )
         {
             return groupId + ":" + artifactId;
+        }
+
+        public HashMap<String, LatestVersionHolder> getLvhs()
+        {
+            return lvhs;
+        }
+    }
+
+    /**
+     * A special filter that actually does not filter, but collects the latest and release version for every RGA. After
+     * iteratorSearchResponse has been processed, this collector will hold all the needed versions of the processed
+     * artifact infos.
+     * 
+     * @author cstamas
+     */
+    protected static class RepositoryWideLatestVersionCollector
+        implements ArtifactInfoFilter
+    {
+        private HashMap<String, LatestVersionHolder> lvhs = new HashMap<String, LatestVersionHolder>();
+
+        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+        {
+            final String key = getKey( ai.repository, ai.groupId, ai.artifactId );
+
+            LatestVersionHolder lvh = lvhs.get( key );
+
+            if ( lvh == null )
+            {
+                lvh = new LatestVersionHolder( ai );
+
+                lvhs.put( key, lvh );
+            }
+
+            lvh.maintainLatestVersions( ai );
+
+            return true;
+        }
+
+        public String getKey( String repositoryId, String groupId, String artifactId )
+        {
+            return repositoryId + ":" + groupId + ":" + artifactId;
         }
 
         public HashMap<String, LatestVersionHolder> getLvhs()

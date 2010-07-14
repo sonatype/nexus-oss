@@ -458,11 +458,25 @@
           <description>The latest snapshot version of the artifact.</description>
         </field>
         <field>
+          <name>latestSnapshotRepositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository of latest snapshot version of the artifact.</description>
+        </field>
+        <field>
           <name>latestRelease</name>
           <version>1.0.0+</version>
           <type>String</type>
           <required>true</required>
           <description>The latest release version of the artifact.</description>
+        </field>
+        <field>
+          <name>latestReleaseRepositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository of latest release version of the artifact.</description>
         </field>
         <field>
           <name>highlightedFragment</name>
