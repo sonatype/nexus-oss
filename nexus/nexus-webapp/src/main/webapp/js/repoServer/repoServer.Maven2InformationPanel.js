@@ -117,7 +117,10 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
                     if (response.status = 404)
                     {
                       artifactContainer.tabPanel.hideTabStripItem(this);
-                      artifactContainer.tabPanel.setActiveTab(0);
+                      
+                      //artifactInformationPanel will be present on all repos
+                      var info = artifactContainer.find('name', 'artifactInformationPanel')[0];
+                      artifactContainer.tabPanel.setActiveTab(info);
                     }
                     else
                     {
