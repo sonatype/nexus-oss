@@ -1,0 +1,10 @@
+<stagingActionRequest>
+  <data>
+    <description>The description</description>
+    <stagingProfileGroup>profile3</stagingProfileGroup>
+    <stagedRepositoryIds>
+      <string>repoId1</string>
+      <string>repoId2</string>
+    </stagedRepositoryIds>
+  </data>
+</stagingActionRequest>

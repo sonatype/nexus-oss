@@ -22,6 +22,7 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.logging.LogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.plugin.util.PromptUtil;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 
@@ -134,7 +135,7 @@ public class DefaultNexusDiscovery
         else
         {
             NexusConnectionInfo info = new NexusConnectionInfo( nexusUrl );
-            if ( !booleanPrompt( "Are you sure you want to use the Nexus URL: " + nexusUrl + "? [Y/n] ", Boolean.TRUE ) )
+            if ( !PromptUtil.booleanPrompt( prompter, "Are you sure you want to use the Nexus URL: " + nexusUrl + "? [Y/n] ", Boolean.TRUE ) )
             {
                 info = new NexusConnectionInfo( urlPrompt() );
             }
@@ -277,7 +278,7 @@ public class DefaultNexusDiscovery
         }
 
         sb.append( "\n\nUse this connection? [Y/n] " );
-        return booleanPrompt( sb, Boolean.TRUE );
+        return PromptUtil.booleanPrompt( prompter, sb, Boolean.TRUE );
     }
 
     private boolean promptForUserAcceptance( final String url, final String name, final String user )
@@ -291,7 +292,7 @@ public class DefaultNexusDiscovery
         }
 
         sb.append( "\nwith username: " ).append( user ).append( "? [Y/n] " );
-        return booleanPrompt( sb, Boolean.TRUE );
+        return PromptUtil.booleanPrompt( prompter,  sb, Boolean.TRUE );
     }
 
     private Server promptForUserAndPassword( final String defaultUser )
@@ -335,42 +336,7 @@ public class DefaultNexusDiscovery
         return result;
     }
 
-    private boolean booleanPrompt( final CharSequence prompt, final Boolean defaultValue )
-    {
-        Boolean result = defaultValue;
-        do
-        {
-            String txt = null;
-            try
-            {
-                txt = prompter.prompt( prompt.toString() );
-                if ( txt != null && txt.trim().length() > 0 )
-                {
-                    txt = txt.trim().toLowerCase();
-                    if ( "y".equals( txt ) || "yes".equals( txt ) )
-                    {
-                        result = true;
-                    }
-                    else if ( "n".equals( txt ) || "no".equals( txt ) )
-                    {
-                        result = false;
-                    }
-                }
-            }
-            catch ( PrompterException e )
-            {
-                throw new IllegalStateException( "Prompt for input failed: " + e.getMessage(), e );
-            }
-
-            if ( result == null )
-            {
-                logger.warn( "Invalid input: " + txt );
-            }
-        }
-        while ( result == null );
-
-        return result;
-    }
+    
 
     private String stringPrompt( final CharSequence prompt )
     {

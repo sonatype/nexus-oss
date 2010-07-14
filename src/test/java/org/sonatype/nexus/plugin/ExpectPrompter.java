@@ -24,17 +24,23 @@ import org.codehaus.plexus.components.interactivity.Prompter;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 public class ExpectPrompter
     implements Prompter
 {
     
-    private final Map<String[], String> expectations = new LinkedHashMap<String[], String>();
+    private final LinkedHashMap<String[], String> expectations = new LinkedHashMap<String[], String>();
+    
+    private int expectationIndex = 0;
+    
+    private boolean useOrder = false;
 
     private final Set<String[]> used = new HashSet<String[]>();
     
@@ -60,7 +66,7 @@ public class ExpectPrompter
 
     public void addExpectation( final String promptSubstr, final String response )
     {
-        expectations.put( new String[] { promptSubstr }, response );
+        addExpectation( response, new String[] { promptSubstr } );
     }
 
     public void addExpectation( final String response, final String... fragments )
@@ -136,25 +142,37 @@ public class ExpectPrompter
         String result = defaultValue == null ? "-NOT SUPPLIED-" : defaultValue;
         String original = result;
 
-        promptMatching: for ( Map.Entry<String[], String> entry : expectations.entrySet() )
+        if( useOrder )
         {
-            int idx = 0;
-            for ( String fragment : entry.getKey() )
-            {
-                int nxtIdx = prompt.toLowerCase().indexOf( fragment.toLowerCase(), idx );
-                if ( nxtIdx < 0 )
-                {
-                    continue promptMatching;
-                }
-                
-                idx = nxtIdx + fragment.length();
-            }
-
+            // NOTE: A LinkedMap from Commons Collections might be great here, but they are not generic
+            List<Entry<String[], String>> orderedEntries = new ArrayList<Entry<String[], String>>( expectations.entrySet() );
+            Entry<String[], String> entry = orderedEntries.get( expectationIndex++ );
+            // just return the value (in order)
             result = entry.getValue();
+            // mark it used
             used.add( entry.getKey() );
-            break;
         }
-        
+        else
+        {
+            promptMatching: for ( Map.Entry<String[], String> entry : expectations.entrySet() )
+            {
+                int idx = 0;
+                for ( String fragment : entry.getKey() )
+                {
+                    int nxtIdx = prompt.toLowerCase().indexOf( fragment.toLowerCase(), idx );
+                    if ( nxtIdx < 0 )
+                    {
+                        continue promptMatching;
+                    }
+                    
+                    idx = nxtIdx + fragment.length();
+                }
+    
+                result = entry.getValue();
+                used.add( entry.getKey() );
+                break;
+            }
+        }
         if ( output )
         {
             System.out.println( result );
@@ -200,6 +218,16 @@ public class ExpectPrompter
             System.out.println( sb.toString() );
             fail( sb.toString() );
         }
+    }
+
+    public void setUseOrder( boolean useOrder )
+    {
+        this.useOrder = useOrder;
+    }
+
+    public boolean isUseOrder()
+    {
+        return useOrder;
     }
 
 }
