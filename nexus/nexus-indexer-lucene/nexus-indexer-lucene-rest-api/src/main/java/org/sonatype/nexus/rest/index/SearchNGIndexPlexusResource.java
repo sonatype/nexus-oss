@@ -432,7 +432,7 @@ public class SearchNGIndexPlexusResource
 
                 NexusNGArtifactHit hit = null;
 
-                for ( NexusNGArtifactHit artifactHit : artifact.getHits() )
+                for ( NexusNGArtifactHit artifactHit : artifact.getArtifactHits() )
                 {
                     if ( repository.getId().equals( artifactHit.getRepositoryId() ) )
                     {
@@ -498,7 +498,7 @@ public class SearchNGIndexPlexusResource
                     }
 
                     // we just created it, add it
-                    artifact.addHit( hit );
+                    artifact.addArtifactHit( hit );
                 }
 
                 boolean needsToBeAdded = true;
@@ -585,18 +585,17 @@ public class SearchNGIndexPlexusResource
                             versionToSet = holder.getLatestSnapshot().toString();
                         }
 
-                        // String token = artifactNg.getVersion();
+                        String token = artifactNg.getVersion();
 
                         artifactNg.setVersion( versionToSet );
 
-                        // creating _direct_ links to storage
-                        // for ( NexusNGArtifactHit hit : artifactNg.getHits() )
-                        // {
-                        // for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
-                        // {
-                        // link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
-                        // }
-                        // }
+                        for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
+                        {
+                            for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
+                            {
+                                link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
+                            }
+                        }
                     }
                 }
             }

@@ -96,10 +96,10 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           var payload = {
             data : {
               showCtx : true,
-              name : rec.data.hits[0].repositoryName,
-              resourceURI : rec.data.hits[0].repositoryURL,
-              format : rec.data.hits[0].repositoryContentClass,
-              repoType : rec.data.hits[0].repositoryKind,
+              name : rec.data.artifactHits[0].repositoryName,
+              resourceURI : rec.data.artifactHits[0].repositoryURL,
+              format : rec.data.artifactHits[0].repositoryContentClass,
+              repoType : rec.data.artifactHits[0].repositoryKind,
               expandPath : this.getDefaultPath(rec)
             }
           }
@@ -108,11 +108,11 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         }
       },
       getDefaultPath : function(rec) {
-        var basePath = '/' + rec.data.hits[0].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+        var basePath = '/' + rec.data.artifactHits[0].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
 
-        for (var i = 0; i < rec.data.hits[0].artifactLinks.length; i++)
+        for (var i = 0; i < rec.data.artifactHits[0].artifactLinks.length; i++)
         {
-          var link = rec.data.hits[0].artifactLinks[i];
+          var link = rec.data.artifactHits[0].artifactLinks[i];
 
           if (Ext.isEmpty(link.classifier))
           {
@@ -123,7 +123,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           }
         }
 
-        var link = rec.data.hits[0].artifactLinks[0];
+        var link = rec.data.artifactHits[0].artifactLinks[0];
         return basePath + (link.classifier ? ('-' + link.classifier) : '') + '.' + link.extension;
       },
       // search type switched on the drop down button

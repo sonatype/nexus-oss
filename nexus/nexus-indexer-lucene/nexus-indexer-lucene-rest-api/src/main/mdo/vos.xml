@@ -361,8 +361,8 @@
       <description>REST Response object for a list of search results, contains the typical 'data' parameter, which is a
         list of search results.</description>
       <annotations>
-        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "search-results" )</annotation>
-        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "search-results" )</annotation>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "searchNGResponse" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "searchNGResponse" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
         </annotation>
       </annotations>
@@ -413,7 +413,7 @@
           <description>List of found artifacts.</description>
           <annotations>
             <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
-            <annotation>@javax.xml.bind.annotation.XmlElement( name = "artifact" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "nexusNGArtifact" )</annotation>
           </annotations>
         </field>
       </fields>
@@ -424,7 +424,7 @@
       <version>1.0.0+</version>
       <description>Artifact details sent back on search requests.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "nexus-artifact" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "nexusNGArtifact" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
         </annotation>
       </annotations>
@@ -472,7 +472,7 @@
           <description>A HTML highlighted fragment of the matched hit.</description>
         </field>
         <field>
-          <name>hits</name>
+          <name>artifactHits</name>
           <version>1.0.0+</version>
           <association>
             <type>NexusNGArtifactHit</type>
@@ -481,8 +481,8 @@
           <required>true</required>
           <description>List of found artifact hits.</description>
           <annotations>
-            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "hits" )</annotation>
-            <annotation>@javax.xml.bind.annotation.XmlElement( name = "hit" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "artifactHits" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "artifactHit" )</annotation>
           </annotations>
         </field>
       </fields>
@@ -493,7 +493,7 @@
       <version>1.0.0+</version>
       <description>Artifact hit details sent back on search requests.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "hit" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "artifactHit" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
         </annotation>
       </annotations>

@@ -39,7 +39,7 @@ Sonatype.SearchStore = function(config) {
                 }, {
                   name : 'highlightedFragment'
                 }, {
-                  name : 'hits'
+                  name : 'artifactHits'
                 }])),
         listeners : {
           'beforeload' : {
@@ -222,16 +222,16 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
         value = ''
-        for (var i = 0; i < record.data.hits[0].artifactLinks.length; i++)
+        for (var i = 0; i < record.data.artifactHits[0].artifactLinks.length; i++)
         {
           if (i > 0)
           {
             value += ', ';
           }
 
-          var cls = record.data.hits[0].artifactLinks[i].classifier;
-          var ext = record.data.hits[0].artifactLinks[i].extension;
-          var link = record.data.hits[0].artifactLinks[i].artifactLink;
+          var cls = record.data.artifactHits[0].artifactLinks[i].classifier;
+          var ext = record.data.artifactHits[0].artifactLinks[i].extension;
+          var link = record.data.artifactHits[0].artifactLinks[i].artifactLink;
 
           value += '<a href="' + link + '" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;" target="_blank">' + (cls ? (cls + '.' + ext) : ext) + '</a>';
         }

@@ -28,8 +28,8 @@ public class XStreamInitializer
 
         xstream.registerLocalConverter( SearchNGResponse.class, "data", new AliasingListConverter(
             NexusNGArtifact.class, "artifact" ) );
-        xstream.registerLocalConverter( NexusNGArtifact.class, "hits", new AliasingListConverter(
-            NexusNGArtifactHit.class, "hit" ) );
+        xstream.registerLocalConverter( NexusNGArtifact.class, "artifactHits", new AliasingListConverter(
+            NexusNGArtifactHit.class, "artifactHit" ) );
         xstream.registerLocalConverter( NexusNGArtifactHit.class, "artifactLinks", new AliasingListConverter(
             NexusNGArtifactLink.class, "artifactLink" ) );
     }

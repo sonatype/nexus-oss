@@ -24,6 +24,7 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
@@ -42,6 +43,8 @@ public class InfoArtifactViewProvider
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
+    private RepositoryRouter repositoryRouter;
+
     @Requirement
     private ReferenceFactory referenceFactory;
 
@@ -55,11 +58,13 @@ public class InfoArtifactViewProvider
         }
         else if ( item instanceof StorageLinkItem )
         {
-            RepositoryItemUid itemUid = ( (StorageLinkItem) item ).getTarget();
             try
             {
-                final StorageItem retrieveItem =
-                    itemUid.getRepository().retrieveItem( new ResourceStoreRequest( itemUid.getPath(), true, false ) );
+                StorageItem retrieveItem =
+                    repositoryRouter.dereferenceLink( (StorageLinkItem) item,
+                        item.getResourceStoreRequest().isRequestLocalOnly(),
+                        item.getResourceStoreRequest().isRequestRemoteOnly() );
+
                 if ( retrieveItem instanceof StorageFileItem )
                 {
                     fileItem = (StorageFileItem) retrieveItem;
@@ -71,7 +76,8 @@ public class InfoArtifactViewProvider
             }
             catch ( Exception e )
             {
-                getLogger().error( "Failed to resolve the storagelink" + itemUid, e );
+                getLogger().warn( "Failed to resolve the storagelink " + item.getRepositoryItemUid(), e );
+
                 return null;
             }
         }
