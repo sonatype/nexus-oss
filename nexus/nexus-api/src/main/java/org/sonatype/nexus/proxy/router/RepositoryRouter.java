@@ -59,6 +59,24 @@ public interface RepositoryRouter
             StorageException;
 
     /**
+     * Dereferences the link.
+     * 
+     * @param item
+     * @param localOnly
+     * @param remoteOnly
+     * @return
+     * @throws AccessDeniedException
+     * @throws ItemNotFoundException
+     * @throws RepositoryNotAvailableException
+     * @throws StorageException
+     */
+    StorageItem dereferenceLink( StorageLinkItem link, boolean localOnly, boolean remoteOnly )
+        throws AccessDeniedException,
+            ItemNotFoundException,
+            IllegalOperationException,
+            StorageException;
+
+    /**
      * Calculates the RequestRoute for the given request.
      * 
      * @param request

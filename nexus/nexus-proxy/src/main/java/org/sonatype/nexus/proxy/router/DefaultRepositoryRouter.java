@@ -148,12 +148,18 @@ public class DefaultRepositoryRouter
     public StorageItem dereferenceLink( StorageLinkItem link )
         throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
     {
+        return dereferenceLink( link, false, false );
+    }
+
+    public StorageItem dereferenceLink( StorageLinkItem link, boolean localOnly, boolean remoteOnly )
+        throws AccessDeniedException, ItemNotFoundException, IllegalOperationException, StorageException
+    {
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug( "Dereferencing link " + link.getTarget() );
         }
 
-        ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath() );
+        ResourceStoreRequest req = new ResourceStoreRequest( link.getTarget().getPath(), localOnly, remoteOnly );
 
         req.getRequestContext().setParentContext( link.getItemContext() );
 
@@ -399,8 +405,8 @@ public class DefaultRepositoryRouter
     {
         if ( isList )
         {
-            ( (AbstractStorageItem) item ).setPath( ItemPathUtils.concatPaths( route.getOriginalRequestPath(), item
-                .getName() ) );
+            ( (AbstractStorageItem) item ).setPath( ItemPathUtils.concatPaths( route.getOriginalRequestPath(),
+                item.getName() ) );
         }
         else
         {
@@ -430,8 +436,9 @@ public class DefaultRepositoryRouter
         result.setResourceStoreRequest( request );
 
         String correctedPath =
-            request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) ? request.getRequestPath()
-                .substring( 1, request.getRequestPath().length() ) : request.getRequestPath();
+            request.getRequestPath().startsWith( RepositoryItemUid.PATH_SEPARATOR ) ? request.getRequestPath().substring(
+                1, request.getRequestPath().length() )
+                : request.getRequestPath();
 
         String[] explodedPath = null;
 
@@ -590,8 +597,8 @@ public class DefaultRepositoryRouter
                     if ( !repositoryRegistry.getRepositoriesWithFacet( Class.forName( rtd.getRole() ) ).isEmpty() )
                     {
                         ResourceStoreRequest req =
-                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), rtd
-                                .getPrefix() ) );
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(),
+                                rtd.getPrefix() ) );
 
                         DefaultStorageCollectionItem repositories =
                             new DefaultStorageCollectionItem( this, req, true, false );
@@ -664,14 +671,14 @@ public class DefaultRepositoryRouter
                     if ( Repository.class.equals( kind ) )
                     {
                         req =
-                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
-                                .getId() ) );
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(),
+                                repository.getId() ) );
                     }
                     else
                     {
                         req =
-                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(), repository
-                                .getPathPrefix() ) );
+                            new ResourceStoreRequest( ItemPathUtils.concatPaths( request.getRequestPath(),
+                                repository.getPathPrefix() ) );
                     }
 
                     repoItem = new DefaultStorageCollectionItem( this, req, true, false );
