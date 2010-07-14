@@ -1,24 +1,29 @@
 Sonatype.repoServer.IndexBrowserPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
-  	url : '',
-  	root : new Ext.tree.TreeNode({
-              text : '(Not Available)',
-              id : '/',
-              singleClickExpand : true,
-              expanded : true
-            })
+    url : '',
+    root : new Ext.tree.TreeNode({
+          text : '(Not Available)',
+          id : '/',
+          singleClickExpand : true,
+          expanded : true
+        })
   };
   Ext.apply(this, config, defaultConfig);
 
   Sonatype.repoServer.IndexBrowserPanel.superclass.constructor.call(this, {
         nodeIconClass : 'x-tree-node-nexus-icon',
-        useNodeIconClassParam : 'locallyAvailable' 
+        useNodeIconClassParam : 'locallyAvailable'
       });
 };
 
 Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
       refreshHandler : function(button, e) {
+        var loadMask = null;
+        if (this.parentContainer && this.parentContainer.parentContainer && this.parentContainer.parentContainer.loadMask)
+        {
+          loadMask = this.parentContainer.parentContainer.loadMask;
+        }
         // if we are dealing w/ refresh call (but not from refresh button) with
         // same repo, simply relocate to new path
         if (button == undefined && this.oldPayload && this.payload && this.oldPayload.data.resourceURI == this.payload.data.resourceURI)
@@ -32,6 +37,10 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
                     {
                       Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
                     }
+                  }
+                  else if (loadMask != null)
+                  {
+                    loadMask.hide();
                   }
                 });
           }
@@ -63,6 +72,10 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
                                   {
                                     Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
                                   }
+                                }
+                                else if (loadMask != null)
+                                {
+                                  loadMask.hide();
                                 }
                               });
                         }

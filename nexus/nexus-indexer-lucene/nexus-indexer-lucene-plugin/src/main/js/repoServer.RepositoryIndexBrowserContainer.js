@@ -13,6 +13,7 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         region : 'center',
         url : this.initialUrl,
         root : this.initialRoot,
+        parentContainer : this,
         nodeClickEvent : 'indexNodeClickedEvent',
         nodeClickPassthru : {
           container : this
@@ -70,7 +71,8 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
                     path : '/',
                     singleClickExpand : true,
                     expanded : false
-                  })
+                  }),
+              parentContainer : cardPanel
             });
 
         if (cardPanel.items.getCount() > 0)
@@ -92,6 +94,9 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
           Ext.Ajax.request({
                 scope : this,
                 method : 'GET',
+                //10 minute timeout, extreme overkill, but we have to make sure artifacts are allowed to download during this request
+                //feel free to remove this extreme timeout once this resource no longer downloads artifacts
+                timeout : 600000,
                 options : {
                   dontForceLogout : true
                 },
@@ -100,6 +105,10 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
                   container : passthru.container
                 },
                 callback : function(options, isSuccess, response) {
+                  if (passthru.container.parentContainer.loadMask)
+                  {
+                    passthru.container.parentContainer.loadMask.hide();
+                  }
                   if (isSuccess)
                   {
                     var json = Ext.decode(response.responseText);

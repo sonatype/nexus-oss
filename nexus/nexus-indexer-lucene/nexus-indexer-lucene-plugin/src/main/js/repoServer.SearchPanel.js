@@ -67,7 +67,8 @@ Sonatype.repoServer.SearchPanel = function(config) {
         collapsed : true,
         // TODO: WHY ISNT MINI MODE WORKING !!!!
         collapseMode : 'mini',
-        height : 300
+        height : 300,
+        parentContainer : this
       });
 
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
@@ -93,26 +94,49 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         var searchType = this.getSearchType(this.searchTypeButton.value);
         if (typeof searchType.showArtifactContainer != 'function' || searchType.showArtifactContainer(rec))
         {
+          var hitIndex = 0;
+          if (rec.store.reader.jsonData.collapsed)
+          {
+            var repoToUse = rec.get('latestReleaseRepositoryId');
+
+            for (var i = 0; i < rec.data.artifactHits.length; i++)
+            {
+              if (rec.data.artifactHits[i].repositoryId == repoToUse)
+              {
+                hitIndex = i;
+                break;
+              }
+            }
+          }
           var payload = {
             data : {
               showCtx : true,
-              name : rec.data.artifactHits[0].repositoryName,
-              resourceURI : rec.data.artifactHits[0].repositoryURL,
-              format : rec.data.artifactHits[0].repositoryContentClass,
-              repoType : rec.data.artifactHits[0].repositoryKind,
-              expandPath : this.getDefaultPath(rec)
+              name : rec.data.artifactHits[hitIndex].repositoryName,
+              resourceURI : rec.data.artifactHits[hitIndex].repositoryURL,
+              format : rec.data.artifactHits[hitIndex].repositoryContentClass,
+              repoType : rec.data.artifactHits[hitIndex].repositoryKind,
+              expandPath : this.getDefaultPath(rec, hitIndex)
             }
           }
           this.repoBrowserContainer.expand();
+
+          if (!this.loadMask)
+          {
+            this.loadMask = new Ext.LoadMask(this.getEl(), {
+                  msg : 'Loading search result...'
+                });
+          }
+          this.loadMask.show();
+
           this.repoBrowserContainer.updatePayload(payload);
         }
       },
-      getDefaultPath : function(rec) {
-        var basePath = '/' + rec.data.artifactHits[0].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+      getDefaultPath : function(rec, hitIndex) {
+        var basePath = '/' + rec.data.artifactHits[hitIndex].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
 
-        for (var i = 0; i < rec.data.artifactHits[0].artifactLinks.length; i++)
+        for (var i = 0; i < rec.data.artifactHits[hitIndex].artifactLinks.length; i++)
         {
-          var link = rec.data.artifactHits[0].artifactLinks[i];
+          var link = rec.data.artifactHits[hitIndex].artifactLinks[i];
 
           if (Ext.isEmpty(link.classifier))
           {
@@ -123,7 +147,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           }
         }
 
-        var link = rec.data.artifactHits[0].artifactLinks[0];
+        var link = rec.data.artifactHits[hitIndex].artifactLinks[0];
         return basePath + (link.classifier ? ('-' + link.classifier) : '') + '.' + link.extension;
       },
       // search type switched on the drop down button

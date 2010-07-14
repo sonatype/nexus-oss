@@ -40,6 +40,10 @@ Sonatype.SearchStore = function(config) {
                   name : 'highlightedFragment'
                 }, {
                   name : 'artifactHits'
+                }, {
+                  name : 'latestRelease'
+                }, {
+                  name : 'latestReleaseRepositoryId'
                 }])),
         listeners : {
           'beforeload' : {
@@ -217,21 +221,35 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
           return record.get('version');
         }
 
-        return 'Latest: ' + record.get('version') + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
+        return 'Latest: ' + record.get('latestRelease') + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
             + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">(Show All Versions)</a>';
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
-        value = ''
-        for (var i = 0; i < record.data.artifactHits[0].artifactLinks.length; i++)
+        var hitIndex = 0;
+        if (store.reader.jsonData.collapsed)
+        {
+          var repoToUse = record.get('latestReleaseRepositoryId');
+
+          for (var i = 0; i < record.data.artifactHits.length; i++)
+          {
+            if (record.data.artifactHits[i].repositoryId == repoToUse)
+            {
+              hitIndex = i;
+              break;
+            }
+          }
+        }
+        value = '';
+        for (var i = 0; i < record.data.artifactHits[hitIndex].artifactLinks.length; i++)
         {
           if (i > 0)
           {
             value += ', ';
           }
 
-          var cls = record.data.artifactHits[0].artifactLinks[i].classifier;
-          var ext = record.data.artifactHits[0].artifactLinks[i].extension;
-          var link = record.data.artifactHits[0].artifactLinks[i].artifactLink;
+          var cls = record.data.artifactHits[hitIndex].artifactLinks[i].classifier;
+          var ext = record.data.artifactHits[hitIndex].artifactLinks[i].extension;
+          var link = record.data.artifactHits[hitIndex].artifactLinks[i].artifactLink;
 
           value += '<a href="' + link + '" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;" target="_blank">' + (cls ? (cls + '.' + ext) : ext) + '</a>';
         }
