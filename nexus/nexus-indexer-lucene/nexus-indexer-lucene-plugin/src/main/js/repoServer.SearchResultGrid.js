@@ -140,6 +140,40 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               xtype : 'tbspacer'
             }, this.clearButton]
       });
+  this.subtitleBar = new Ext.Toolbar({
+        ctCls : 'search-all-tbar',
+        items : [{
+              xtype : 'panel',
+              html : '<img src="images/pom_obj.gif" />'
+            }, {
+              xtype : 'label',
+              text : 'Pom file'
+            }, {
+              xtype : 'tbspacer'
+            }, {
+              xtype : 'panel',
+              html : '<img src="images/jar_obj.gif" />'
+            }, {
+              xtype : 'label',
+              text : 'Jar artifact'
+            }, {
+              xtype : 'tbspacer'
+            }, {
+              xtype : 'panel',
+              html : '<img src="images/jar_sources_obj.gif" />'
+            }, {
+              xtype : 'label',
+              text : 'Sources artifact'
+            }, {
+              xtype : 'tbspacer'
+            }, {
+              xtype : 'panel',
+              html : '<img src="images/jar_javadoc_obj.gif" />'
+            }, {
+              xtype : 'label',
+              text : 'Javadoc artifact'
+            }]
+      });
 
   Sonatype.repoServer.SearchResultGrid.superclass.constructor.call(this, {
         region : 'center',
@@ -152,7 +186,7 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               singleSelect : true
             }),
 
-        bbar : this.fetchMoreBar,
+        bbar : [this.fetchMoreBar, '->', this.subtitleBar],
 
         viewConfig : {
           forceFit : true,
@@ -239,20 +273,87 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
             }
           }
         }
-        value = '';
+
+        var icons = [];
+        var links = [];
+
         for (var i = 0; i < record.data.artifactHits[hitIndex].artifactLinks.length; i++)
+        {
+          var cls = record.data.artifactHits[hitIndex].artifactLinks[i].classifier;
+          var ext = record.data.artifactHits[hitIndex].artifactLinks[i].extension;
+          var link = record.data.artifactHits[hitIndex].artifactLinks[i].artifactLink;
+
+          var icon;
+          if (ext == 'pom' && !cls)
+          {
+            icon = "images/pom_obj.gif";
+          }
+          else if ((ext == '' || ext == 'jar') && !cls)
+          {
+            icon = "images/jar_obj.gif";
+          }
+          else if ((ext == '' || ext == 'jar') && cls == 'sources')
+          {
+            icon = "images/jar_sources_obj.gif";
+          }
+          else if ((ext == '' || ext == 'jar') && cls == 'javadoc')
+          {
+            icon = "images/jar_javadoc_obj.gif";
+          }
+          else
+          {
+            icon = null;
+          }
+
+          var desc = (cls ? (cls + '.' + ext) : ext);
+
+          if (icon)
+          {
+            desc = '<img src="' + icon + '" title=' + desc + ' />';
+          }
+
+          desc = '<a href="' + link + '" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;" target="_blank">'
+              //
+              + desc +
+              //
+              '</a>'
+
+          if (icon)
+          {
+            icons.push(desc);
+          }
+          else
+          {
+            links.push(desc);
+          }
+
+        }
+
+        var value = '';
+
+        for (var i = 0; i < icons.length; i++)
         {
           if (i > 0)
           {
             value += ', ';
           }
-
-          var cls = record.data.artifactHits[hitIndex].artifactLinks[i].classifier;
-          var ext = record.data.artifactHits[hitIndex].artifactLinks[i].extension;
-          var link = record.data.artifactHits[hitIndex].artifactLinks[i].artifactLink;
-
-          value += '<a href="' + link + '" onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;" target="_blank">' + (cls ? (cls + '.' + ext) : ext) + '</a>';
+          value += icons[i];
         }
+
+        if (icons.length > 0)
+        {
+          value += '<BR>';
+        }
+
+        for (var i = 0; i < links.length; i++)
+        {
+          if (i > 0)
+          {
+            value += ', ';
+          }
+          value += links[i];
+        }
+
         return value;
       },
 
