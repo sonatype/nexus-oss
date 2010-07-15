@@ -91,6 +91,14 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
       {
         if (node && node.isLeaf())
         {
+          if (!passthru.container.parentContainer.loadMask)
+          {
+            passthru.container.parentContainer.loadMask = new Ext.LoadMask(passthru.container.parentContainer.getEl(), {
+                  msg : 'Loading search result...'
+                });
+          }
+          passthru.container.parentContainer.loadMask.show();
+
           Ext.Ajax.request({
                 scope : this,
                 method : 'GET',
