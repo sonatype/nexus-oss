@@ -61,12 +61,6 @@
       </exclusions>
     </dependency>
     
-    <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
-      <artifactId>guice-plexus-tck</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
   </dependencies>
   
   <build>

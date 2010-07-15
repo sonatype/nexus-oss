@@ -5,28 +5,28 @@ package org.sonatype.security.authorization;
  * 
  * @author Brian Demers
  */
-public class NoSuchAuthorizationManager
+public class NoSuchAuthorizationManagerException
     extends Exception
 {
 
     private static final long serialVersionUID = -9130834235862218360L;
 
-    public NoSuchAuthorizationManager()
+    public NoSuchAuthorizationManagerException()
     {
         super();
     }
 
-    public NoSuchAuthorizationManager( String message, Throwable cause )
+    public NoSuchAuthorizationManagerException( String message, Throwable cause )
     {
         super( message, cause );
     }
 
-    public NoSuchAuthorizationManager( String message )
+    public NoSuchAuthorizationManagerException( String message )
     {
         super( message );
     }
 
-    public NoSuchAuthorizationManager( Throwable cause )
+    public NoSuchAuthorizationManagerException( Throwable cause )
     {
         super( cause );
     }

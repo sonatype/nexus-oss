@@ -25,6 +25,10 @@
       <artifactId>guice-plexus-shim</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-bean-containers</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
     </dependency>
@@ -91,11 +95,5 @@
       <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
     
-    <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
-      <artifactId>guice-plexus-tck</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 </project>

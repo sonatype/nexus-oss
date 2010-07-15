@@ -8,22 +8,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.permission.RolePermissionResolverAware;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.ehcache.EhCacheManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SessionsSecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.session.mgt.DefaultSessionManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
@@ -40,7 +41,7 @@ import org.sonatype.plexus.components.ehcache.PlexusEhCacheWrapper;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.configuration.SecurityConfigurationManager;
@@ -62,38 +63,50 @@ import org.sonatype.security.usermanagement.UserStatus;
 /**
  * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
-@Component( role = SecuritySystem.class )
+// @Component( role = SecuritySystem.class )
+@Singleton
+@Typed( value = SecuritySystem.class )
+@Named( value = "default" )
 public class DefaultSecuritySystem
     implements SecuritySystem, Initializable, EventListener
 {
     @Requirement
+    @Inject
     private SecurityConfigurationManager securityConfiguration;
 
     @Requirement
+    @Inject
     private RealmSecurityManager applicationSecurityManager;
 
     @Requirement
+    @Inject
     private PlexusEhCacheWrapper cacheWrapper;
 
     @Requirement( role = UserManager.class )
+    @Inject
     private Map<String, UserManager> userManagerMap;
 
     @Requirement
+    @Inject
     private PlexusContainer container;
 
     @Requirement( role = AuthorizationManager.class )
+    @Inject
     private Map<String, AuthorizationManager> authorizationManagers;
 
     @Requirement
+    @Inject
     private PasswordGenerator passwordGenerator;
 
     @Requirement
+    @Inject
     private ApplicationEventMulticaster eventMulticaster;
 
-    private SecurityEmailer securityEmailer;
-
     @Requirement
+    @Inject
     private Logger logger;
+
+    private SecurityEmailer securityEmailer;
 
     private static final String ALL_ROLES_KEY = "all";
 
@@ -105,8 +118,8 @@ public class DefaultSecuritySystem
             Subject subject = new Subject.Builder( this.applicationSecurityManager ).buildSubject();
             // TODO: consider doing something else here, read the javadoc for the login method
             subject.login( token );
-//            Subject subject = this.getApplicationSecurityManager().login( null, token );
-//            ThreadContext.bind( subject );
+            // Subject subject = this.getApplicationSecurityManager().login( null, token );
+            // ThreadContext.bind( subject );
             return subject;
         }
         catch ( org.apache.shiro.authc.AuthenticationException e )
@@ -128,18 +141,19 @@ public class DefaultSecuritySystem
         }
     }
 
-//    public Subject runAs( PrincipalCollection principal )
-//    {
-//        // TODO: we might need to bind this to the ThreadContext for this thread
-//        // however if we do this we would need to unbind it so it doesn't leak
-//        DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null, this.getApplicationSecurityManager() );
-//
-//        // fake the login
-//        ThreadContext.bind( fakeLoggedInSubject );
-//        // this is un-bind when the user logs out.
-//
-//        return fakeLoggedInSubject;
-//    }
+    // public Subject runAs( PrincipalCollection principal )
+    // {
+    // // TODO: we might need to bind this to the ThreadContext for this thread
+    // // however if we do this we would need to unbind it so it doesn't leak
+    // DelegatingSubject fakeLoggedInSubject = new DelegatingSubject( principal, true, null, null,
+    // this.getApplicationSecurityManager() );
+    //
+    // // fake the login
+    // ThreadContext.bind( fakeLoggedInSubject );
+    // // this is un-bind when the user logs out.
+    //
+    // return fakeLoggedInSubject;
+    // }
 
     public Subject getSubject()
     {
@@ -160,7 +174,7 @@ public class DefaultSecuritySystem
     public boolean[] isPermitted( PrincipalCollection principal, List<String> permissions )
     {
         return this.getApplicationSecurityManager().isPermitted( principal,
-            permissions.toArray( new String[permissions.size()] ) );
+                                                                 permissions.toArray( new String[permissions.size()] ) );
     }
 
     public void checkPermission( PrincipalCollection principal, String permission )
@@ -183,7 +197,7 @@ public class DefaultSecuritySystem
         try
         {
             this.getApplicationSecurityManager().checkPermissions( principal,
-                permissions.toArray( new String[permissions.size()] ) );
+                                                                   permissions.toArray( new String[permissions.size()] ) );
         }
         catch ( org.apache.shiro.authz.AuthorizationException e )
         {
@@ -243,7 +257,7 @@ public class DefaultSecuritySystem
     }
 
     public Set<Role> listRoles( String sourceId )
-        throws NoSuchAuthorizationManager
+        throws NoSuchAuthorizationManagerException
     {
         if ( ALL_ROLES_KEY.equalsIgnoreCase( sourceId ) )
         {
@@ -324,8 +338,9 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier
-                        .getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(),
+                                                          RoleIdentifier.getRoleIdentifiersForSource( user.getSource(),
+                                                                                                      user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -370,8 +385,9 @@ public class DefaultSecuritySystem
                 try
                 {
                     RoleMappingUserManager roleMappingUserManager = (RoleMappingUserManager) tmpUserManager;
-                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(), RoleIdentifier
-                        .getRoleIdentifiersForSource( user.getSource(), user.getRoles() ) );
+                    roleMappingUserManager.setUsersRoles( user.getUserId(), user.getSource(),
+                                                          RoleIdentifier.getRoleIdentifiersForSource( user.getSource(),
+                                                                                                      user.getRoles() ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -432,8 +448,12 @@ public class DefaultSecuritySystem
                 try
                 {
                     foundUser = true;
-                    roleMappingUserManager.setUsersRoles( userId, source, RoleIdentifier.getRoleIdentifiersForSource(
-                        tmpUserManager.getSource(), roleIdentifiers ) );
+                    roleMappingUserManager.setUsersRoles(
+                                                          userId,
+                                                          source,
+                                                          RoleIdentifier.getRoleIdentifiersForSource(
+                                                                                                      tmpUserManager.getSource(),
+                                                                                                      roleIdentifiers ) );
                 }
                 catch ( UserNotFoundException e )
                 {
@@ -516,9 +536,9 @@ public class DefaultSecuritySystem
         Set<User> users = new HashSet<User>();
 
         // if the source is not set search all realms.
-        if( StringUtils.isEmpty( criteria.getSource() ) )
+        if ( StringUtils.isEmpty( criteria.getSource() ) )
         {
-         // search all user managers
+            // search all user managers
             for ( UserManager tmpUserManager : this.userManagerMap.values() )
             {
                 users.addAll( tmpUserManager.searchUsers( criteria ) );
@@ -532,7 +552,7 @@ public class DefaultSecuritySystem
             }
             catch ( NoSuchUserManagerException e )
             {
-                this.logger.warn( "UserManager: "+ criteria.getSource() +" was not found.", e );
+                this.logger.warn( "UserManager: " + criteria.getSource() + " was not found.", e );
             }
         }
 
@@ -622,11 +642,11 @@ public class DefaultSecuritySystem
     }
 
     public AuthorizationManager getAuthorizationManager( String source )
-        throws NoSuchAuthorizationManager
+        throws NoSuchAuthorizationManagerException
     {
         if ( !this.authorizationManagers.containsKey( source ) )
         {
-            throw new NoSuchAuthorizationManager( "AuthorizationManager with source: '" + source
+            throw new NoSuchAuthorizationManagerException( "AuthorizationManager with source: '" + source
                 + "' could not be found." );
         }
 
@@ -836,16 +856,16 @@ public class DefaultSecuritySystem
     {
         // reload the config
         this.securityConfiguration.clearCache();
-        
+
         // setup the CacheManager ( this could be injected if we where less coupled with ehcache)
         // The plexus wrapper can interpolate the config
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
         this.getApplicationSecurityManager().setCacheManager( ehCacheManager );
-        
-        if( org.apache.shiro.util.Initializable.class.isInstance( this.getApplicationSecurityManager()) )
+
+        if ( org.apache.shiro.util.Initializable.class.isInstance( this.getApplicationSecurityManager() ) )
         {
-            ((org.apache.shiro.util.Initializable) this.getApplicationSecurityManager()).init();
+            ( (org.apache.shiro.util.Initializable) this.getApplicationSecurityManager() ).init();
         }
         this.setSecurityManagerRealms();
     }
@@ -861,7 +881,7 @@ public class DefaultSecuritySystem
     {
         this.applicationSecurityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
     }
-    
+
     private void clearRealmCaches()
     {
         // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.

@@ -1,6 +1,9 @@
 package org.sonatype.security;
 
-import java.util.Map;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
@@ -16,21 +19,28 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 
+import com.google.inject.internal.Nullable;
+
 /**
  * Componentize the Shiro DefaultSecurityManager, and sets up caching.
  * 
  * @author Brian Demers
  */
-@Component( role = RealmSecurityManager.class )
+//@Component( role = RealmSecurityManager.class )
+@Singleton
+@Typed( value = RealmSecurityManager.class )
+@Named( value = "default" )
 public class DefaultRealmSecurityManager
     extends DefaultSecurityManager
     implements Initializable, org.apache.shiro.util.Initializable
 {
 
-    @Requirement( role = RolePermissionResolver.class )
-    private Map<String, RolePermissionResolver> rolePermissionResolverMap;
+    @Inject
+    @Nullable
+    private RolePermissionResolver rolePermissionResolver;
 
     @Requirement
+    @Inject
     private Logger logger;
 
     public DefaultRealmSecurityManager()
@@ -52,16 +62,9 @@ public class DefaultRealmSecurityManager
             new ExceptionCatchingModularRealmAuthorizer( this.getRealms() );
 
         // if we have a Role Permission Resolver, set it, if not, don't worry about it
-        if ( !rolePermissionResolverMap.isEmpty() )
+        if ( rolePermissionResolver != null )
         {
-            if ( rolePermissionResolverMap.containsKey( "default" ) )
-            {
-                authorizer.setRolePermissionResolver( rolePermissionResolverMap.get( "default" ) );
-            }
-            else
-            {
-                authorizer.setRolePermissionResolver( rolePermissionResolverMap.values().iterator().next() );
-            }
+            authorizer.setRolePermissionResolver( rolePermissionResolver );
             logger.debug( "RolePermissionResolver was set to " + authorizer.getRolePermissionResolver() );
         }
         else

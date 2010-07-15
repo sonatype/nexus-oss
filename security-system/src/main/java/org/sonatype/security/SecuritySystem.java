@@ -13,7 +13,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.authorization.AuthorizationException;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.usermanagement.InvalidCredentialsException;
@@ -164,10 +164,10 @@ public interface SecuritySystem
      * 
      * @param sourceId The identifier of an {@link AuthorizationManager}.
      * @return All the roles defined by an {@link AuthorizationManager}.
-     * @throws NoSuchAuthorizationManager
+     * @throws NoSuchAuthorizationManagerException
      */
     public Set<Role> listRoles( String sourceId )
-        throws NoSuchAuthorizationManager;
+        throws NoSuchAuthorizationManagerException;
 
     // *********************
     // * user management
@@ -366,7 +366,7 @@ public interface SecuritySystem
     public Set<Privilege> listPrivileges();
 
     public AuthorizationManager getAuthorizationManager( String source )
-        throws NoSuchAuthorizationManager;
+        throws NoSuchAuthorizationManagerException;
 
     // //
     // Application configuration, TODO: I don't think all of these need to be exposed, but they currently are
