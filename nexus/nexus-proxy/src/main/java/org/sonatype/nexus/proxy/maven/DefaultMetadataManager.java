@@ -74,10 +74,10 @@ public class DefaultMetadataManager
         {
             // TODO: a workaround, adding dummy versions, only to make Gav happy
             gav =
-                new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), RepositoryPolicy.SNAPSHOT
-                    .equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1", gavRequest.getClassifier(),
-                         gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-                             .getRepositoryPolicy() ), false, null, false, null );
+                new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(),
+                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
+                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
+                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
             version = resolveLatest( gavRequest, gav );
         }
@@ -85,10 +85,10 @@ public class DefaultMetadataManager
         {
             // TODO: a workaround, adding dummy versions, only to make Gav happy
             gav =
-                new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), RepositoryPolicy.SNAPSHOT
-                    .equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1", gavRequest.getClassifier(),
-                         gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-                             .getRepositoryPolicy() ), false, null, false, null );
+                new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(),
+                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) ? "1-SNAPSHOT" : "1",
+                    gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
+                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
             version = resolveRelease( gavRequest, gav );
         }
@@ -102,8 +102,8 @@ public class DefaultMetadataManager
         {
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), version, gavRequest.getClassifier(),
-                         gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-                             .getRepositoryPolicy() ), false, null, false, null );
+                    gavRequest.getExtension(), null, null, null,
+                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
             // if it is not "timestamped" version, try to get it
             if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
@@ -125,7 +125,7 @@ public class DefaultMetadataManager
         {
             Metadata gaMd =
                 metadataLocator.retrieveGAMetadata( new ArtifactStoreRequest( gavRequest.getMavenRepository(), gav,
-                                                                              gavRequest.isRequestLocalOnly() ) );
+                    gavRequest.isRequestLocalOnly(), gavRequest.isRequestRemoteOnly() ) );
 
             if ( gaMd.getVersioning() == null )
             {
@@ -176,9 +176,8 @@ public class DefaultMetadataManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Not a RELEASE repository for resolving GAV: " + gav.getGroupId() + " : "
-                                       + gav.getArtifactId() + " : " + gav.getVersion() + " in repository "
-                                       + repository.getId() );
+                    "Not a RELEASE repository for resolving GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
+                        + " : " + gav.getVersion() + " in repository " + repository.getId() );
             }
 
             return gavRequest.getVersion();
@@ -187,14 +186,13 @@ public class DefaultMetadataManager
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Resolving snapshot version for GAV: " + gavRequest.getGroupId() + " : "
-                                   + gavRequest.getArtifactId() + " : " + gavRequest.getVersion() + " in repository "
-                                   + repository.getId() );
+                "Resolving snapshot version for GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
+                    + " : " + gavRequest.getVersion() + " in repository " + repository.getId() );
         }
 
         Metadata gaMd =
             metadataLocator.retrieveGAMetadata( new ArtifactStoreRequest( gavRequest.getMavenRepository(), gav,
-                                                                          gavRequest.isRequestLocalOnly() ) );
+                gavRequest.isRequestLocalOnly(), gavRequest.isRequestRemoteOnly() ) );
 
         if ( gaMd.getVersioning() == null )
         {
@@ -244,9 +242,8 @@ public class DefaultMetadataManager
             if ( getLogger().isDebugEnabled() )
             {
                 getLogger().debug(
-                                   "Not a SNAPSHOT repository for resolving GAV: " + gav.getGroupId() + " : "
-                                       + gav.getArtifactId() + " : " + gav.getVersion() + " in repository "
-                                       + repository.getId() );
+                    "Not a SNAPSHOT repository for resolving GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
+                        + " : " + gav.getVersion() + " in repository " + repository.getId() );
             }
 
             return gav;
@@ -261,13 +258,13 @@ public class DefaultMetadataManager
         if ( getLogger().isDebugEnabled() )
         {
             getLogger().debug(
-                               "Resolving snapshot version for GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
-                                   + " : " + gav.getVersion() + " in repository " + repository.getId() );
+                "Resolving snapshot version for GAV: " + gav.getGroupId() + " : " + gav.getArtifactId() + " : "
+                    + gav.getVersion() + " in repository " + repository.getId() );
         }
 
         Metadata gavMd =
             metadataLocator.retrieveGAVMetadata( new ArtifactStoreRequest( gavRequest.getMavenRepository(), gav,
-                                                                           gavRequest.isRequestLocalOnly() ) );
+                gavRequest.isRequestLocalOnly(), gavRequest.isRequestRemoteOnly() ) );
 
         if ( gavMd.getVersioning() == null )
         {
@@ -282,8 +279,7 @@ public class DefaultMetadataManager
         {
             latest = gav.getBaseVersion();
 
-            latest =
-                latest.replace( SNAPSHOT_VERSION, current.getTimestamp() + "-" + current.getBuildNumber() );
+            latest = latest.replace( SNAPSHOT_VERSION, current.getTimestamp() + "-" + current.getBuildNumber() );
         }
 
         if ( !StringUtils.isEmpty( latest ) && VersionUtils.isSnapshot( latest ) )
@@ -294,9 +290,9 @@ public class DefaultMetadataManager
             }
 
             Gav result =
-                new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav.getExtension(), gav
-                    .getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(), gav.isSnapshot(), gav
-                    .isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
+                new Gav( gav.getGroupId(), gav.getArtifactId(), latest, gav.getClassifier(), gav.getExtension(),
+                    gav.getSnapshotBuildNumber(), gav.getSnapshotTimeStamp(), gav.getName(), gav.isSnapshot(),
+                    gav.isHash(), gav.getHashType(), gav.isSignature(), gav.getSignatureType() );
 
             return result;
         }

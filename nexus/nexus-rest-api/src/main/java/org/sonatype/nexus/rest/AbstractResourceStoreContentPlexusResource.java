@@ -83,10 +83,6 @@ import com.noelios.restlet.http.HttpRequest;
 public abstract class AbstractResourceStoreContentPlexusResource
     extends AbstractNexusPlexusResource
 {
-    public static final String IS_LOCAL_PARAMETER = "isLocal";
-
-    public static final String IS_REMOTE_PARAMETER = "isRemote";
-
     public static final String IS_DESCRIBE_PARAMETER = "describe";
 
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
@@ -114,25 +110,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
     protected String getResourceStorePath( Request request )
     {
         return parsePathFromUri( request.getResourceRef().getRemainingPart() );
-    }
-
-    protected boolean isLocal( Request request, String resourceStorePath )
-    {
-        // check do we need local only access
-        boolean isLocal = request.getResourceRef().getQueryAsForm().getFirst( IS_LOCAL_PARAMETER ) != null;
-
-        // overriding isLocal is we know it will be a collection
-        isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
-
-        return isLocal;
-    }
-
-    protected boolean isRemote( Request request, String resourceStorePath )
-    {
-        // check do we need remote only access
-        boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst( IS_REMOTE_PARAMETER ) != null;
-
-        return isRemote;
     }
 
     protected boolean isDescribe( Request request )

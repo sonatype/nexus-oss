@@ -39,9 +39,9 @@ public class ArtifactStoreRequest
         }
     }
 
-    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly )
+    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly, boolean remoteOnly )
     {
-        super( repository.getGavCalculator().gavToPath( gav ), localOnly );
+        super( repository.getGavCalculator().gavToPath( gav ), localOnly, remoteOnly );
 
         this.mavenRepository = repository;
 

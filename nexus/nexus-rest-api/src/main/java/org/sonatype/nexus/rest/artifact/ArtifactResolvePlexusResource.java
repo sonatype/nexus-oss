@@ -109,7 +109,7 @@ public class ArtifactResolvePlexusResource
         if ( groupId == null || artifactId == null || version == null || repositoryId == null )
         {
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                         "At least following request parameters have to be given: gavr!" );
+                "At least following request parameters have to be given: gavr!" );
         }
 
         // default the packaging
@@ -118,9 +118,14 @@ public class ArtifactResolvePlexusResource
             packaging = "jar";
         }
 
+        // a flag that will prevent actual download as happens as sideeffect if this is proxy repository
+        // and artifact being resolved is not present. This will not affect metadata download, since those are
+        // needed for resolution!
+        boolean isLocalOnly = isLocal( request, null );
+
         ArtifactStoreRequest gavRequest =
-            getResourceStoreRequest( request, false, repositoryId, groupId, artifactId, version, packaging, classifier,
-                                     extension );
+            getResourceStoreRequest( request, false, false, repositoryId, groupId, artifactId, version, packaging,
+                classifier, extension );
 
         try
         {
@@ -128,45 +133,57 @@ public class ArtifactResolvePlexusResource
 
             ArtifactStoreHelper helper = mavenRepository.getArtifactStoreHelper();
 
-            StorageFileItem file = helper.retrieveArtifact( gavRequest );
+            Gav resolvedGav = helper.resolveArtifact( gavRequest );
 
-            Gav gav = mavenRepository.getGavCalculator().pathToGav( file.getPath() );
-
-            if ( gav == null )
+            if ( resolvedGav == null )
             {
                 throw new ItemNotFoundException( "GAV: " + gavRequest.getGroupId() + " : " + gavRequest.getArtifactId()
                     + " : " + gavRequest.getVersion(), gavRequest, mavenRepository );
             }
 
+            String repositoryPath = mavenRepository.getGavCalculator().gavToPath( resolvedGav );
+
+            StorageFileItem resolvedFile = null;
+
+            if ( !isLocalOnly )
+            {
+                resolvedFile = helper.retrieveArtifact( gavRequest );
+            }
+
             ArtifactResolveResource resource = new ArtifactResolveResource();
+            
+            resource.setPresentLocally( resolvedFile != null );
 
-            resource.setSha1( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+            if ( resolvedFile != null )
+            {
+                resource.setSha1( resolvedFile.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+            }
 
-            resource.setGroupId( gav.getGroupId() );
+            resource.setGroupId( resolvedGav.getGroupId() );
 
-            resource.setArtifactId( gav.getArtifactId() );
+            resource.setArtifactId( resolvedGav.getArtifactId() );
 
-            resource.setVersion( gav.getVersion() );
+            resource.setVersion( resolvedGav.getVersion() );
 
-            resource.setClassifier( gav.getClassifier() );
+            resource.setClassifier( resolvedGav.getClassifier() );
 
-            resource.setExtension( gav.getExtension() );
+            resource.setExtension( resolvedGav.getExtension() );
 
-            resource.setFileName( gav.getName() );
+            resource.setFileName( resolvedGav.getName() );
 
-            resource.setRepositoryPath( file.getPath() );
+            resource.setRepositoryPath( repositoryPath );
 
-            resource.setSnapshot( gav.isSnapshot() );
+            resource.setSnapshot( resolvedGav.isSnapshot() );
 
             if ( resource.isSnapshot() )
             {
-                resource.setBaseVersion( gav.getBaseVersion() );
+                resource.setBaseVersion( resolvedGav.getBaseVersion() );
 
-                if ( gav.getSnapshotBuildNumber() != null )
+                if ( resolvedGav.getSnapshotBuildNumber() != null )
                 {
-                    resource.setSnapshotBuildNumber( gav.getSnapshotBuildNumber() );
+                    resource.setSnapshotBuildNumber( resolvedGav.getSnapshotBuildNumber() );
 
-                    resource.setSnapshotTimeStamp( gav.getSnapshotTimeStamp() );
+                    resource.setSnapshotTimeStamp( resolvedGav.getSnapshotTimeStamp() );
                 }
             }
 

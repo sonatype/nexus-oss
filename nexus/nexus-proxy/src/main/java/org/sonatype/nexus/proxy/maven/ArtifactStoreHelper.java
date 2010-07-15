@@ -308,12 +308,13 @@ public class ArtifactStoreHelper
                 gavRequest.getGav().getSignatureType() );
 
         ArtifactStoreRequest pomRequest =
-            new ArtifactStoreRequest( gavRequest.getMavenRepository(), pomGav, gavRequest.isRequestLocalOnly() );
+            new ArtifactStoreRequest( gavRequest.getMavenRepository(), pomGav, gavRequest.isRequestLocalOnly(),
+                gavRequest.isRequestRemoteOnly() );
 
         return retrieveArtifact( pomRequest );
     }
 
-    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
+    public Gav resolveArtifact( ArtifactStoreRequest gavRequest )
         throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException,
         IllegalArtifactCoordinateException
     {
@@ -329,12 +330,23 @@ public class ArtifactStoreHelper
                     + " : " + gavRequest.getVersion(), gavRequest, repository );
             }
 
-            gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
+            return gav;
         }
         catch ( IOException e )
         {
             throw new LocalStorageException( "Could not maintain metadata!", e );
         }
+    }
+
+    public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
+        throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException,
+        IllegalArtifactCoordinateException
+    {
+        checkRequest( gavRequest );
+
+        Gav gav = resolveArtifact( gavRequest );
+
+        gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
         StorageItem item = repository.retrieveItem( gavRequest );
 

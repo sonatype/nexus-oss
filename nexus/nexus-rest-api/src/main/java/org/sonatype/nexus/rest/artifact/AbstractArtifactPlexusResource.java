@@ -66,8 +66,9 @@ public abstract class AbstractArtifactPlexusResource
      * @param isLocal
      * @return
      */
-    protected ArtifactStoreRequest getResourceStoreRequest( Request request, boolean localOnly, String repositoryId,
-        String g, String a, String v, String p, String c, String e )
+    protected ArtifactStoreRequest getResourceStoreRequest( Request request, boolean localOnly, boolean remoteOnly,
+                                                            String repositoryId, String g, String a, String v,
+                                                            String p, String c, String e )
         throws ResourceException
     {
         if ( StringUtils.isBlank( p ) && StringUtils.isBlank( e ) )
@@ -102,7 +103,7 @@ public abstract class AbstractArtifactPlexusResource
             throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Illegal artifact coordinate.", ex );
         }
 
-        ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly );
+        ArtifactStoreRequest result = new ArtifactStoreRequest( mavenRepository, gav, localOnly, remoteOnly );
 
         if ( getLogger().isDebugEnabled() )
         {
@@ -159,7 +160,8 @@ public abstract class AbstractArtifactPlexusResource
         }
 
         ArtifactStoreRequest gavRequest =
-            getResourceStoreRequest( request, false, repositoryId, groupId, artifactId, version, null, null, "pom" );
+            getResourceStoreRequest( request, false, false, repositoryId, groupId, artifactId, version, null, null,
+                "pom" );
 
         try
         {
@@ -234,8 +236,10 @@ public abstract class AbstractArtifactPlexusResource
         }
 
         ArtifactStoreRequest gavRequest =
-            getResourceStoreRequest( request, false, repositoryId, groupId, artifactId, version, packaging, classifier,
-                extension );
+            getResourceStoreRequest( request, false, false, repositoryId, groupId, artifactId, version, packaging,
+                classifier, extension );
+
+        boolean isLocalOnly = isLocal( request, gavRequest.getRequestPath() );
 
         try
         {
@@ -248,8 +252,8 @@ public abstract class AbstractArtifactPlexusResource
             if ( redirectTo )
             {
                 Reference fileReference =
-                    createRepositoryReference( request, file.getRepositoryItemUid().getRepository().getId(), file
-                        .getRepositoryItemUid().getPath() );
+                    createRepositoryReference( request, file.getRepositoryItemUid().getRepository().getId(),
+                        file.getRepositoryItemUid().getPath() );
 
                 response.setLocationRef( fileReference );
 
@@ -393,14 +397,15 @@ public abstract class AbstractArtifactPlexusResource
                         if ( isPom )
                         {
                             gavRequest =
-                                getResourceStoreRequest( request, true, repositoryId, coords.getGroupId(), coords
-                                    .getArtifactId(), coords.getVersion(), coords.getPackaging(), null, null );
+                                getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
+                                    coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), null, null );
                         }
                         else
                         {
                             gavRequest =
-                                getResourceStoreRequest( request, true, repositoryId, coords.getGroupId(), coords
-                                    .getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier, extension );
+                                getResourceStoreRequest( request, true, false, repositoryId, coords.getGroupId(),
+                                    coords.getArtifactId(), coords.getVersion(), coords.getPackaging(), classifier,
+                                    extension );
                         }
                     }
                     else
@@ -408,7 +413,7 @@ public abstract class AbstractArtifactPlexusResource
                         is = fi.getInputStream();
 
                         gavRequest =
-                            getResourceStoreRequest( request, true, repositoryId, groupId, artifactId, version,
+                            getResourceStoreRequest( request, true, false, repositoryId, groupId, artifactId, version,
                                 packaging, classifier, extension );
                     }
 

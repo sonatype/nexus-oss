@@ -48,6 +48,10 @@ public abstract class AbstractNexusPlexusResource
 
     public static final String PASSWORD_PLACE_HOLDER = "|$|N|E|X|U|S|$|";
 
+    public static final String IS_LOCAL_PARAMETER = "isLocal";
+
+    public static final String IS_REMOTE_PARAMETER = "isRemote";
+
     @Requirement
     private Nexus nexus;
 
@@ -109,6 +113,28 @@ public abstract class AbstractNexusPlexusResource
         return this.referenceFactory.getContextRoot( request );
     }
 
+    protected boolean isLocal( Request request, String resourceStorePath )
+    {
+        // check do we need local only access
+        boolean isLocal = request.getResourceRef().getQueryAsForm().getFirst( IS_LOCAL_PARAMETER ) != null;
+
+        if ( resourceStorePath != null )
+        {
+            // overriding isLocal is we know it will be a collection
+            isLocal = isLocal || resourceStorePath.endsWith( RepositoryItemUid.PATH_SEPARATOR );
+        }
+
+        return isLocal;
+    }
+
+    protected boolean isRemote( Request request, String resourceStorePath )
+    {
+        // check do we need remote only access
+        boolean isRemote = request.getResourceRef().getQueryAsForm().getFirst( IS_REMOTE_PARAMETER ) != null;
+
+        return isRemote;
+    }
+
     private Reference updateBaseRefPath( Reference reference )
     {
         if ( reference.getBaseRef().getPath() == null )
@@ -157,8 +183,7 @@ public abstract class AbstractNexusPlexusResource
             {
                 if ( NexusCompat.getRepositoryProviderRole( repo ).equals( desc.getRole() ) )
                 {
-                    return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId )
-                        .getTargetRef();
+                    return createReference( getContextRoot( request ), "content/" + desc.getPrefix() + "/" + repoId ).getTargetRef();
                 }
             }
 

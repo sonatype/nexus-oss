@@ -3900,6 +3900,13 @@
       </annotations>
       <fields>
         <field>
+          <name>presentLocally</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>True if item is present in local storage.</description>
+        </field>
+        <field>
           <name>groupId</name>
           <version>1.0.0+</version>
           <type>String</type>
