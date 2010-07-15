@@ -15,6 +15,7 @@ import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
@@ -44,12 +45,12 @@ public class InfoArtifactViewProvider
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement
+    private ReferenceFactory referenceFactory;
+    
+    @Requirement
     private RepositoryRouter repositoryRouter;
 
-    @Requirement
-    private ReferenceFactory referenceFactory;
-
-    public Object retrieveView( ResourceStoreRequest request, StorageItem item, Request req )
+    public Object retrieveView( ResourceStore store, ResourceStoreRequest request, StorageItem item, Request req )
         throws IOException
     {
         RepositoryItemUid itemUid = null;
@@ -58,27 +59,40 @@ public class InfoArtifactViewProvider
 
         if ( item == null )
         {
-            // item is either not present or is not here yet (remote index)
-            // the we can "simulate" what route would be used to get it, and just get info from the route
-            RequestRoute route;
-            
-            try
+            if ( store instanceof RepositoryRouter )
             {
-                route = repositoryRouter.getRequestRouteForRequest( request );
+                RepositoryRouter repositoryRouter = (RepositoryRouter) store;
+                // item is either not present or is not here yet (remote index)
+                // the we can "simulate" what route would be used to get it, and just get info from the route
+                RequestRoute route;
+
+                try
+                {
+                    route = repositoryRouter.getRequestRouteForRequest( request );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // this is thrown while getting routes for any path "outside" of legal ones is given
+                    // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc
+                    // (depends on
+                    // type of registered reposes)
+                    return null;
+                }
+
+                // request would be processed by targeted repository
+                Repository itemRepository = route.getTargetedRepository();
+
+                // create an UID against that repository
+                itemUid = itemRepository.createUid( route.getRepositoryPath() );
             }
-            catch ( ItemNotFoundException e )
+            else if ( store instanceof Repository )
             {
-                // this is thrown while getting routes for any path "outside" of legal ones is given
-                // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc (depends on
-                // type of registered reposes)
+                itemUid = ( (Repository) store ).createUid( request.getRequestPath() );
+            }
+            else
+            {
                 return null;
             }
-
-            // request would be processed by targeted repository
-            Repository itemRepository = route.getTargetedRepository();
-
-            // create an UID against that repository
-            itemUid = itemRepository.createUid( route.getRepositoryPath() );
         }
         else
         {

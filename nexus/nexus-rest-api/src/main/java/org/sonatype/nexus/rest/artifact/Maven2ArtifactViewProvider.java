@@ -10,6 +10,7 @@ import org.restlet.data.Request;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
@@ -33,10 +34,7 @@ public class Maven2ArtifactViewProvider
     @Requirement
     private Logger logger;
 
-    @Requirement
-    private RepositoryRouter repositoryRouter;
-
-    public Object retrieveView( ResourceStoreRequest request, StorageItem item, Request req )
+    public Object retrieveView( ResourceStore store, ResourceStoreRequest request, StorageItem item, Request req )
         throws IOException
     {
         Repository itemRepository = null;
@@ -49,27 +47,42 @@ public class Maven2ArtifactViewProvider
         // easily calculate what it would be.
         if ( item == null )
         {
-            // item is either not present or is not here yet (remote index)
-            // the we can "simulate" what route would be used to get it, and just get info from the route
-            RequestRoute route;
-            
-            try
+            if ( store instanceof RepositoryRouter )
             {
-                route = repositoryRouter.getRequestRouteForRequest( request );
+                RepositoryRouter repositoryRouter = (RepositoryRouter) store;
+                // item is either not present or is not here yet (remote index)
+                // the we can "simulate" what route would be used to get it, and just get info from the route
+                RequestRoute route;
+
+                try
+                {
+                    route = repositoryRouter.getRequestRouteForRequest( request );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // this is thrown while getting routes for any path "outside" of legal ones is given
+                    // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc
+                    // (depends on
+                    // type of registered reposes)
+                    return null;
+                }
+
+                // request would be processed by targeted repository
+                itemRepository = route.getTargetedRepository();
+
+                // request would be processed against this repository path
+                itemPath = route.getRepositoryPath();
             }
-            catch ( ItemNotFoundException e )
+            else if ( store instanceof Repository )
             {
-                // this is thrown while getting routes for any path "outside" of legal ones is given
-                // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc (depends on
-                // type of registered reposes)
+                itemRepository = (Repository) store;
+
+                itemPath = request.getRequestPath();
+            }
+            else
+            {
                 return null;
             }
-
-            // request would be processed by targeted repository
-            itemRepository = route.getTargetedRepository();
-
-            // request would be processed against this repository path
-            itemPath = route.getRepositoryPath();
         }
         else
         {

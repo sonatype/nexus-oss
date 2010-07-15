@@ -54,7 +54,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -132,13 +131,13 @@ public abstract class AbstractResourceStoreContentPlexusResource
             {
                 StorageItem item = store.retrieveItem( req );
 
-                return renderItem( context, request, response, variant, item );
+                return renderItem( context, request, response, variant, store, item );
             }
             catch ( ItemNotFoundException e )
             {
                 if ( isDescribe( request ) )
                 {
-                    return renderDescribeItem( context, request, response, variant, req, null );
+                    return renderDescribeItem( context, request, response, variant, store, req, null );
                 }
                 else
                 {
@@ -309,13 +308,14 @@ public abstract class AbstractResourceStoreContentPlexusResource
         return result;
     }
 
-    protected Object renderItem( Context context, Request req, Response res, Variant variant, StorageItem item )
+    protected Object renderItem( Context context, Request req, Response res, Variant variant, ResourceStore store,
+                                 StorageItem item )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
         if ( isDescribe( req ) )
         {
-            return renderDescribeItem( context, req, res, variant, item.getResourceStoreRequest(), item );
+            return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
         }
 
         Representation result = null;
@@ -368,7 +368,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
             // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
             try
             {
-                return renderItem( context, req, res, variant, getNexus().dereferenceLinkItem( (StorageLinkItem) item ) );
+                return renderItem( context, req, res, variant, store,
+                    getNexus().dereferenceLinkItem( (StorageLinkItem) item ) );
             }
             catch ( Exception e )
             {
@@ -492,7 +493,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
     }
 
     protected Object renderDescribeItem( Context context, Request req, Response res, Variant variant,
-                                         ResourceStoreRequest request, StorageItem item )
+                                         ResourceStore store, ResourceStoreRequest request, StorageItem item )
         throws IOException, AccessDeniedException, NoSuchResourceStoreException, IllegalOperationException,
         ItemNotFoundException, StorageException, ResourceException
     {
@@ -509,7 +510,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 throw new IllegalRequestException( request, "No view for key: " + key );
             }
 
-            Object result = viewProviders.get( key ).retrieveView( request, item, req );
+            Object result = viewProviders.get( key ).retrieveView( store, request, item, req );
 
             // make sure we have valid content
             if ( result == null )
