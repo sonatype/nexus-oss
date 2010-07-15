@@ -94,7 +94,7 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
         else
         {
           Ext.Ajax.request({
-                url : this.data.resourceURI + '?describe=maven2&localOnly=true',
+                url : this.data.resourceURI + '?describe=maven2&isLocal=true',
                 callback : function(options, isSuccess, response) {
                   if (isSuccess)
                   {

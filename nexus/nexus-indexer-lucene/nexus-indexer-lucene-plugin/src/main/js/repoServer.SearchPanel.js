@@ -15,7 +15,9 @@
 
 Sonatype.repoServer.SearchPanel = function(config) {
   var config = config || {};
-  var defaultConfig = {};
+  var defaultConfig = {
+    layout : 'border'
+  };
   Ext.apply(this, config, defaultConfig);
 
   this.grid = new Sonatype.repoServer.SearchResultGrid({

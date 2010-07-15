@@ -94,8 +94,10 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
           Ext.Ajax.request({
                 scope : this,
                 method : 'GET',
-                //10 minute timeout, extreme overkill, but we have to make sure artifacts are allowed to download during this request
-                //feel free to remove this extreme timeout once this resource no longer downloads artifacts
+                // 10 minute timeout, extreme overkill, but we have to make sure
+                // artifacts are allowed to download during this request
+                // feel free to remove this extreme timeout once this resource
+                // no longer downloads artifacts
                 timeout : 600000,
                 options : {
                   dontForceLogout : true
@@ -131,7 +133,7 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
                   }
                 },
                 url : Sonatype.config.servicePath + '/artifact/maven/resolve?r=' + node.attributes.repositoryId + '&g=' + node.attributes.groupId + '&a=' + node.attributes.artifactId + '&v=' + node.attributes.version
-                    + (Ext.isEmpty(node.attributes.classifier) ? '' : ('&c=' + node.attributes.classifier)) + '&e=' + node.attributes.extension
+                    + (Ext.isEmpty(node.attributes.classifier) ? '' : ('&c=' + node.attributes.classifier)) + '&e=' + node.attributes.extension + '&isLocal=true'
               });
           // var resourceURI = node.ownerTree.loader.url.substring(0,
           // node.ownerTree.loader.url.length - 'index_content'.length) +

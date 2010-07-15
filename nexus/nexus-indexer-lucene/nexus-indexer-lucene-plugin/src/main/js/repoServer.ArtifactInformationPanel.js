@@ -220,7 +220,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         else
         {
           Ext.Ajax.request({
-                url : this.data.resourceURI + '?describe=info&localOnly=true',
+                url : this.data.resourceURI + '?describe=info&isLocal=true',
                 callback : function(options, isSuccess, response) {
                   if (isSuccess)
                   {
