@@ -524,11 +524,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         if ( StringUtils.isNotEmpty( describeParameter.getValue() ) )
         {
             // if item is null throw not found
-            if( item == null )
-            {
-                throw new ItemNotFoundException( request );
-            }
-            
             String key = describeParameter.getValue();
 
             // check
@@ -537,14 +532,17 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 throw new IllegalRequestException( request, "No view for key: " + key );
             }
 
-            Object result = viewProviders.get( key ).retrieveView( item, req );
-            
+            Object result = viewProviders.get( key ).retrieveView( request, item, req );
+
             // make sure we have valid content
-            if( result == null )
+            if ( result == null )
             {
                 throw new ItemNotFoundException( request );
             }
-            return result;
+            else
+            {
+                return result;
+            }
         }
 
         ContentListDescribeResourceResponse result = new ContentListDescribeResourceResponse();

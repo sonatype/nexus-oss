@@ -231,6 +231,13 @@
       </annotations>
       <fields>
         <field>
+          <name>present</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>The flag that marks item as locally present (hosted/cached).</description>
+        </field>
+        <field>
           <name>repositoryId</name>
           <version>1.0.0+</version>
           <type>String</type>

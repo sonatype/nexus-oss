@@ -9,9 +9,13 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.router.RequestRoute;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
@@ -20,6 +24,7 @@ import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
  * Returns Maven2 artifact information.
  * 
  * @author Brian Demers
+ * @author cstamas
  */
 @Component( role = ArtifactViewProvider.class, hint = "maven2" )
 public class Maven2ArtifactViewProvider
@@ -28,14 +33,56 @@ public class Maven2ArtifactViewProvider
     @Requirement
     private Logger logger;
 
-    public Object retrieveView( StorageItem item, Request req )
+    @Requirement
+    private RepositoryRouter repositoryRouter;
+
+    public Object retrieveView( ResourceStoreRequest request, StorageItem item, Request req )
         throws IOException
     {
-        // get item's repository, from where it is actually coming
-        Repository itemsRepository = item.getRepositoryItemUid().getRepository();
+        Repository itemRepository = null;
+
+        String itemPath = null;
+
+        // We can always say the M2 info only based on path
+        // but how to get stuff needed for that is kinda two-fold: either the item is present/cached and is passed in
+        // or it is not present. In 1st case, we use the item itself to get the "needed" stuff, otherwise we can
+        // easily calculate what it would be.
+        if ( item == null )
+        {
+            // item is either not present or is not here yet (remote index)
+            // the we can "simulate" what route would be used to get it, and just get info from the route
+            RequestRoute route;
+            
+            try
+            {
+                route = repositoryRouter.getRequestRouteForRequest( request );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // this is thrown while getting routes for any path "outside" of legal ones is given
+                // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc (depends on
+                // type of registered reposes)
+                return null;
+            }
+
+            // request would be processed by targeted repository
+            itemRepository = route.getTargetedRepository();
+
+            // request would be processed against this repository path
+            itemPath = route.getRepositoryPath();
+        }
+        else
+        {
+            // item is here, use it to get information
+            // get item's repository, from where it is actually coming
+            itemRepository = item.getRepositoryItemUid().getRepository();
+
+            // get item's in-repository path (not same as item.getPath()!)
+            itemPath = item.getRepositoryItemUid().getPath();
+        }
 
         // is this a MavenRepository at all? If not, this view is not applicable
-        if ( !itemsRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
+        if ( !itemRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
             // this items comes from a non-maven repository, this view is not applicable
             return null;
@@ -44,14 +91,14 @@ public class Maven2ArtifactViewProvider
         {
             // we need maven repository for this operation, but we actually don't care is this
             // maven2 or mave1 repository! Let's handle this in generic way.
-            MavenRepository mavenRepository = itemsRepository.adaptToFacet( MavenRepository.class );
+            MavenRepository mavenRepository = itemRepository.adaptToFacet( MavenRepository.class );
 
             try
             {
                 // use maven repository's corresponding GavCalculator instead of "wired in" one!
-                Gav gav = mavenRepository.getGavCalculator().pathToGav( item.getRepositoryItemUid().getPath() );
-                
-                if( gav == null || gav.isSignature() || gav.isHash() )
+                Gav gav = mavenRepository.getGavCalculator().pathToGav( itemPath );
+
+                if ( gav == null || gav.isSignature() || gav.isHash() )
                 {
                     // if we cannot calculate the gav, it is not a maven artifact (or hash/sig), return null;
                     return null;
