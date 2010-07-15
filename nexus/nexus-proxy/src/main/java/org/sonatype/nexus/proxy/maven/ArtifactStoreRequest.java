@@ -39,6 +39,11 @@ public class ArtifactStoreRequest
         }
     }
 
+    public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly )
+    {
+        this( repository, gav, localOnly, false );
+    }
+
     public ArtifactStoreRequest( MavenRepository repository, Gav gav, boolean localOnly, boolean remoteOnly )
     {
         super( repository.getGavCalculator().gavToPath( gav ), localOnly, remoteOnly );
@@ -83,6 +88,7 @@ public class ArtifactStoreRequest
         return gav.getExtension();
     }
 
+    @Override
     public String toString()
     {
         StringBuffer sb = new StringBuffer( getGroupId() );

@@ -59,6 +59,14 @@ import org.sonatype.nexus.rest.model.ArtifactCoordinate;
 public abstract class AbstractArtifactPlexusResource
     extends AbstractNexusPlexusResource
 {
+
+    protected ArtifactStoreRequest getResourceStoreRequest( Request request, boolean localOnly, String repositoryId,
+                                                            String g, String a, String v, String p, String c, String e )
+        throws ResourceException
+    {
+        return getResourceStoreRequest( request, localOnly, false, repositoryId, g, a, v, p, c, e );
+    }
+
     /**
      * Centralized way to create ResourceStoreRequests, since we have to fill in various things in Request context, like
      * authenticated username, etc.
