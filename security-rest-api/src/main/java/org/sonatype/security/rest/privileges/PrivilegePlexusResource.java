@@ -30,7 +30,7 @@ import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
@@ -104,7 +104,7 @@ public class PrivilegePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Privilege could not be found." );
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
             this.getLogger().warn( "Could not found AuthorizationManager: " + PRIVILEGE_SOURCE, e );
             // we should not ever get here
@@ -151,7 +151,7 @@ public class PrivilegePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
             this.getLogger().warn( "Could not found AuthorizationManager: "+ PRIVILEGE_SOURCE, e );
             // we should not ever get here

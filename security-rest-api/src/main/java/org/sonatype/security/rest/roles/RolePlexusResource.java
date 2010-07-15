@@ -35,7 +35,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
@@ -119,7 +119,7 @@ public class RolePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
             this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
             // we should not ever get here
@@ -174,7 +174,7 @@ public class RolePlexusResource
                 // build and throw exception
                 handleInvalidConfigurationException( e );
             }
-            catch ( NoSuchAuthorizationManager e )
+            catch ( NoSuchAuthorizationManagerException e )
             {
                 this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
                 // we should not ever get here
@@ -204,7 +204,7 @@ public class RolePlexusResource
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage() );
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
             this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
             // we should not ever get here

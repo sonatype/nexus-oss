@@ -13,13 +13,8 @@
  */
 package org.sonatype.security.rest.users;
 
-import java.io.File;
-
 import junit.framework.Assert;
 
-import org.codehaus.plexus.PlexusTestCase;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
@@ -27,7 +22,6 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
-import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.NoSuchRoleMappingException;

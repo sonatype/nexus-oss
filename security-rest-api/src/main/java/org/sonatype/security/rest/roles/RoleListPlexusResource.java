@@ -30,7 +30,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
@@ -98,7 +98,7 @@ public class RoleListPlexusResource
                 }
             }
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
            this.getLogger().error( "Unable to find AuthorizationManager 'default'", e );
            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "Unable to find AuthorizationManager 'default'" );
@@ -147,7 +147,7 @@ public class RoleListPlexusResource
                  // build and throw exception
                  handleInvalidConfigurationException( e );
              }
-            catch ( NoSuchAuthorizationManager e )
+            catch ( NoSuchAuthorizationManagerException e )
             {
                 this.getLogger().warn( "Could not found AuthorizationManager: " + ROLE_SOURCE, e );
                 // we should not ever get here

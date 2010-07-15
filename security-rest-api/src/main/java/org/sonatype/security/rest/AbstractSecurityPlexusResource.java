@@ -34,7 +34,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.AuthorizationManager;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.PlexusRoleResource;
@@ -210,7 +210,7 @@ public abstract class AbstractSecurityPlexusResource
             AuthorizationManager authzManager = securitySystem.getAuthorizationManager( DEFAULT_SOURCE );           
             roleName = authzManager.getRole( role.getRoleId() ).getName();
         }
-        catch( NoSuchAuthorizationManager e)
+        catch( NoSuchAuthorizationManagerException e)
         {
           this.getLogger().warn(
           "Failed to lookup the users Role: " + role.getRoleId() + " source: "

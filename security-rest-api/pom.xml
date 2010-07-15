@@ -18,6 +18,12 @@
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-restlet-bridge</artifactId>
       <version>${plexus-restlet-bridge.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -76,6 +82,35 @@
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0-alpha-4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <!--
+              we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the
+              way of m2eclipse.
+            -->
+            <phase>package</phase>
+            <id>enforce</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
+                  </excludes>
+                  <message>The Plexus Container is banned, use org.sonatype.spice.inject:guice-plexus-shim. 
+                  </message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>

@@ -34,7 +34,7 @@ import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Role;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.ExternalRoleMappingResourceResponse;
@@ -152,7 +152,7 @@ public class ExternalRoleMappingPlexusResource
             return result;
 
         }
-        catch ( NoSuchAuthorizationManager e )
+        catch ( NoSuchAuthorizationManagerException e )
         {
             throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Role Source '" + source
                 + "' could not be found." );
