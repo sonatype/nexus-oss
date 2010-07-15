@@ -99,6 +99,7 @@ public class ChecksumContentValidator
         try
         {
             inspector = DigestCalculatingInspector.DIGEST_SHA1_KEY;
+            
             request.pushRequestPath( uid.getPath() + ".sha1" );
 
             hashItem = doRetriveRemoteChecksumItem( proxy, request );

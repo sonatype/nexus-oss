@@ -65,10 +65,7 @@ public class ArtifactStoreHelper
     }
 
     public void storeItemWithChecksums( ResourceStoreRequest request, InputStream is, Map<String, String> userAttributes )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
         String originalPath = request.getRequestPath();
 
@@ -120,11 +117,8 @@ public class ArtifactStoreHelper
     }
 
     public void deleteItemWithChecksums( ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException
     {
         try
         {
@@ -177,9 +171,7 @@ public class ArtifactStoreHelper
     }
 
     public void storeItemWithChecksums( boolean fromTask, AbstractStorageItem item )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException
     {
         try
         {
@@ -192,9 +184,8 @@ public class ArtifactStoreHelper
                 throw new LocalStorageException( "Could not get the content from the ContentLocator!", e );
             }
 
-            StorageFileItem storedFile = (StorageFileItem) getMavenRepository().retrieveItem(
-                false,
-                new ResourceStoreRequest( item ) );
+            StorageFileItem storedFile =
+                (StorageFileItem) getMavenRepository().retrieveItem( false, new ResourceStoreRequest( item ) );
 
             ResourceStoreRequest req = new ResourceStoreRequest( storedFile );
 
@@ -229,10 +220,7 @@ public class ArtifactStoreHelper
     }
 
     public void deleteItemWithChecksums( boolean fromTask, ResourceStoreRequest request )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException, StorageException
     {
         try
         {
@@ -250,75 +238,84 @@ public class ArtifactStoreHelper
             }
         }
 
-        request.pushRequestPath( request.getRequestPath() + ".sha1" );
+        try
+        {
+            request.pushRequestPath( request.getRequestPath() + ".sha1" );
+
+            try
+            {
+                getMavenRepository().deleteItem( fromTask, request );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore not found
+            }
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
 
         try
         {
-            getMavenRepository().deleteItem( fromTask, request );
+            request.pushRequestPath( request.getRequestPath() + ".md5" );
+
+            try
+            {
+                getMavenRepository().deleteItem( fromTask, request );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore not found
+            }
         }
-        catch ( ItemNotFoundException e )
+        finally
         {
-            // ignore not found
+            request.popRequestPath();
         }
-
-        request.popRequestPath();
-
-        request.pushRequestPath( request.getRequestPath() + ".md5" );
-
-        try
-        {
-            getMavenRepository().deleteItem( fromTask, request );
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // ignore not found
-        }
-
-        request.popRequestPath();
 
         // Now remove the .asc files, and the checksums stored with them as well
         // Note this is a recursive call, hence the check for .asc
         if ( !request.getRequestPath().endsWith( ".asc" ) )
         {
-            request.pushRequestPath( request.getRequestPath() + ".asc" );
+            try
+            {
+                request.pushRequestPath( request.getRequestPath() + ".asc" );
 
-            deleteItemWithChecksums( fromTask, request );
-
-            request.popRequestPath();
+                deleteItemWithChecksums( fromTask, request );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
         }
     }
 
     public StorageFileItem retrieveArtifactPom( ArtifactStoreRequest gavRequest )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+        throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException,
+        IllegalArtifactCoordinateException
     {
-        Gav pomGav = new Gav( gavRequest.getGav().getGroupId(), gavRequest.getGav().getArtifactId(), gavRequest
-            .getGav().getVersion(), null, // gavRequest.getGav().getClassifier(),
-            "pom", // gavRequest.getGav().getExtension(),
-            gavRequest.getGav().getSnapshotBuildNumber(),
-            gavRequest.getGav().getSnapshotTimeStamp(),
-            gavRequest.getGav().getName(),
-            gavRequest.getGav().isSnapshot(),
-            gavRequest.getGav().isHash(),
-            gavRequest.getGav().getHashType(),
-            gavRequest.getGav().isSignature(),
-            gavRequest.getGav().getSignatureType() );
+        Gav pomGav =
+            new Gav(
+                gavRequest.getGav().getGroupId(),
+                gavRequest.getGav().getArtifactId(),
+                gavRequest.getGav().getVersion(),
+                null, // gavRequest.getGav().getClassifier(),
+                "pom", // gavRequest.getGav().getExtension(),
+                gavRequest.getGav().getSnapshotBuildNumber(), gavRequest.getGav().getSnapshotTimeStamp(),
+                gavRequest.getGav().getName(), gavRequest.getGav().isSnapshot(), gavRequest.getGav().isHash(),
+                gavRequest.getGav().getHashType(), gavRequest.getGav().isSignature(),
+                gavRequest.getGav().getSignatureType() );
 
-        ArtifactStoreRequest pomRequest = new ArtifactStoreRequest( gavRequest.getMavenRepository(), pomGav, gavRequest
-            .isRequestLocalOnly() );
+        ArtifactStoreRequest pomRequest =
+            new ArtifactStoreRequest( gavRequest.getMavenRepository(), pomGav, gavRequest.isRequestLocalOnly() );
 
         return retrieveArtifact( pomRequest );
     }
 
     public StorageFileItem retrieveArtifact( ArtifactStoreRequest gavRequest )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+        throws IllegalOperationException, ItemNotFoundException, StorageException, AccessDeniedException,
+        IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
@@ -347,23 +344,21 @@ public class ArtifactStoreHelper
         }
         else
         {
-            throw new LocalStorageException( "The Artifact retrieval returned non-file, path:" + item.getRepositoryItemUid().toString() );
+            throw new LocalStorageException( "The Artifact retrieval returned non-file, path:"
+                + item.getRepositoryItemUid().toString() );
         }
     }
 
     public void storeArtifactPom( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException, IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav gav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
+                gavRequest.getClassifier(), "pom", null, null, null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -380,18 +375,15 @@ public class ArtifactStoreHelper
     }
 
     public void storeArtifact( ArtifactStoreRequest gavRequest, InputStream is, Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException, IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav gav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
+                gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -399,31 +391,17 @@ public class ArtifactStoreHelper
     }
 
     public void storeArtifactWithGeneratedPom( ArtifactStoreRequest gavRequest, String packaging, InputStream is,
-        Map<String, String> attributes )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+                                               Map<String, String> attributes )
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException, IllegalArtifactCoordinateException
     {
         checkRequest( gavRequest );
 
         // Force classifier to null, as the pom shouldn't have a classifier
-        Gav pomGav = new Gav(
-            gavRequest.getGroupId(),
-            gavRequest.getArtifactId(),
-            gavRequest.getVersion(),
-            null,
-            "pom",
-            null,
-            null,
-            null,
-            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-            false,
-            null,
-            false,
-            null );
+        Gav pomGav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), null, "pom", null,
+                null, null, RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false,
+                null );
 
         try
         {
@@ -465,9 +443,7 @@ public class ArtifactStoreHelper
 
             gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( pomGav ) );
 
-            repository.storeItemWithChecksums(
-                gavRequest,
-                new ByteArrayInputStream( sw.toString().getBytes() ),
+            repository.storeItemWithChecksums( gavRequest, new ByteArrayInputStream( sw.toString().getBytes() ),
                 attributes );
 
             try
@@ -481,20 +457,10 @@ public class ArtifactStoreHelper
 
         }
 
-        Gav artifactGav = new Gav(
-            gavRequest.getGroupId(),
-            gavRequest.getArtifactId(),
-            gavRequest.getVersion(),
-            gavRequest.getClassifier(),
-            gavRequest.getExtension(),
-            null,
-            null,
-            null,
-            RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ),
-            false,
-            null,
-            false,
-            null );
+        Gav artifactGav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
+                gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( artifactGav ) );
 
@@ -502,18 +468,15 @@ public class ArtifactStoreHelper
     }
 
     public void deleteArtifactPom( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+                                   boolean deleteWholeGav )
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException, IllegalArtifactCoordinateException
     {
         // This is just so we can get teh gavToPath functionallity, to give us a path to work with
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), "pom", null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav gav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
+                gavRequest.getClassifier(), "pom", null, null, null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
         /*
@@ -534,18 +497,15 @@ public class ArtifactStoreHelper
     }
 
     public void deleteArtifact( ArtifactStoreRequest gavRequest, boolean withChecksums, boolean withAllSubordinates,
-        boolean deleteWholeGav )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            ItemNotFoundException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+                                boolean deleteWholeGav )
+        throws UnsupportedStorageOperationException, IllegalOperationException, ItemNotFoundException,
+        StorageException, AccessDeniedException, IllegalArtifactCoordinateException
     {
         // delete the artifact
-        Gav gav = new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(), gavRequest
-            .getClassifier(), gavRequest.getExtension(), null, null, null, RepositoryPolicy.SNAPSHOT.equals( repository
-            .getRepositoryPolicy() ), false, null, false, null );
+        Gav gav =
+            new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), gavRequest.getVersion(),
+                gavRequest.getClassifier(), gavRequest.getExtension(), null, null, null,
+                RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
 
         gavRequest.setRequestPath( repository.getGavCalculator().gavToPath( gav ) );
 
@@ -553,13 +513,9 @@ public class ArtifactStoreHelper
     }
 
     private void handleDelete( ArtifactStoreRequest gavRequest, boolean deleteWholeGav, boolean withChecksums,
-        boolean withAllSubordinates )
-        throws StorageException,
-            UnsupportedStorageOperationException,
-            IllegalOperationException,
-            AccessDeniedException,
-            ItemNotFoundException,
-            IllegalArtifactCoordinateException
+                               boolean withAllSubordinates )
+        throws StorageException, UnsupportedStorageOperationException, IllegalOperationException,
+        AccessDeniedException, ItemNotFoundException, IllegalArtifactCoordinateException
     {
         try
         {
@@ -601,18 +557,15 @@ public class ArtifactStoreHelper
     // =======================================================================================
 
     protected void deleteAllSubordinates( ArtifactStoreRequest gavRequest )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException,
-            IllegalArtifactCoordinateException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException,
+        AccessDeniedException, IllegalArtifactCoordinateException
     {
         // delete all "below", meaning: classifiers of the GAV
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = repository.createUid( gavRequest.getRequestPath().substring(
-            0,
-            gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
+        RepositoryItemUid parentCollUid =
+            repository.createUid( gavRequest.getRequestPath().substring( 0,
+                gavRequest.getRequestPath().indexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
         try
         {
@@ -671,17 +624,14 @@ public class ArtifactStoreHelper
     }
 
     protected void deleteWholeGav( ArtifactStoreRequest gavRequest )
-        throws UnsupportedStorageOperationException,
-            IllegalOperationException,
-            StorageException,
-            AccessDeniedException
+        throws UnsupportedStorageOperationException, IllegalOperationException, StorageException, AccessDeniedException
     {
         // delete all in this directory
         // watch for subdirs
         // delete dir if empty
-        RepositoryItemUid parentCollUid = repository.createUid( gavRequest.getRequestPath().substring(
-            0,
-            gavRequest.getRequestPath().lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
+        RepositoryItemUid parentCollUid =
+            repository.createUid( gavRequest.getRequestPath().substring( 0,
+                gavRequest.getRequestPath().lastIndexOf( RepositoryItemUid.PATH_SEPARATOR ) ) );
 
         try
         {

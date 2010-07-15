@@ -175,11 +175,18 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            request.pushRequestPath( route.getRepositoryPath() );
+            StorageItem item;
 
-            StorageItem item = route.getTargetedRepository().retrieveItem( request );
+            try
+            {
+                request.pushRequestPath( route.getRepositoryPath() );
 
-            request.popRequestPath();
+                item = route.getTargetedRepository().retrieveItem( request );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
 
             return mangle( false, request, route, item );
         }
@@ -200,11 +207,16 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            request.pushRequestPath( route.getRepositoryPath() );
+            try
+            {
+                request.pushRequestPath( route.getRepositoryPath() );
 
-            route.getTargetedRepository().storeItem( request, is, userAttributes );
-
-            request.popRequestPath();
+                route.getTargetedRepository().storeItem( request, is, userAttributes );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
         }
         else
         {
@@ -226,44 +238,49 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            from.pushRequestPath( fromRoute.getRepositoryPath() );
-            to.pushRequestPath( toRoute.getRepositoryPath() );
-
-            if ( fromRoute.getTargetedRepository() == toRoute.getTargetedRepository() )
+            try
             {
-                fromRoute.getTargetedRepository().copyItem( from, to );
-            }
-            else
-            {
-                StorageItem item = fromRoute.getTargetedRepository().retrieveItem( from );
+                from.pushRequestPath( fromRoute.getRepositoryPath() );
+                to.pushRequestPath( toRoute.getRepositoryPath() );
 
-                if ( item instanceof StorageFileItem )
+                if ( fromRoute.getTargetedRepository() == toRoute.getTargetedRepository() )
                 {
-                    try
-                    {
-                        toRoute.getTargetedRepository().storeItem( to, ( (StorageFileItem) item ).getInputStream(),
-                            item.getAttributes() );
-                    }
-                    catch ( IOException e )
-                    {
-                        // XXX: this is nonsense, to box IOException into subclass of IOException!
-                        throw new LocalStorageException( e );
-                    }
-                }
-                else if ( item instanceof StorageCollectionItem )
-                {
-                    toRoute.getTargetedRepository().createCollection( to, item.getAttributes() );
+                    fromRoute.getTargetedRepository().copyItem( from, to );
                 }
                 else
                 {
-                    throw new IllegalRequestException( from, "Cannot copy item of class='" + item.getClass().getName()
-                        + "' over multiple repositories." );
+                    StorageItem item = fromRoute.getTargetedRepository().retrieveItem( from );
+
+                    if ( item instanceof StorageFileItem )
+                    {
+                        try
+                        {
+                            toRoute.getTargetedRepository().storeItem( to, ( (StorageFileItem) item ).getInputStream(),
+                                item.getAttributes() );
+                        }
+                        catch ( IOException e )
+                        {
+                            // XXX: this is nonsense, to box IOException into subclass of IOException!
+                            throw new LocalStorageException( e );
+                        }
+                    }
+                    else if ( item instanceof StorageCollectionItem )
+                    {
+                        toRoute.getTargetedRepository().createCollection( to, item.getAttributes() );
+                    }
+                    else
+                    {
+                        throw new IllegalRequestException( from, "Cannot copy item of class='"
+                            + item.getClass().getName() + "' over multiple repositories." );
+                    }
+
                 }
-
             }
-
-            from.popRequestPath();
-            to.popRequestPath();
+            finally
+            {
+                from.popRequestPath();
+                to.popRequestPath();
+            }
         }
         else
         {
@@ -299,11 +316,18 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            request.pushRequestPath( route.getRepositoryPath() );
+            Collection<StorageItem> items;
 
-            Collection<StorageItem> items = route.getTargetedRepository().list( request );
+            try
+            {
+                request.pushRequestPath( route.getRepositoryPath() );
 
-            request.popRequestPath();
+                items = route.getTargetedRepository().list( request );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
 
             ArrayList<StorageItem> result = new ArrayList<StorageItem>( items.size() );
 
@@ -331,11 +355,16 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            request.pushRequestPath( route.getRepositoryPath() );
+            try
+            {
+                request.pushRequestPath( route.getRepositoryPath() );
 
-            route.getTargetedRepository().createCollection( request, userAttributes );
-
-            request.popRequestPath();
+                route.getTargetedRepository().createCollection( request, userAttributes );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
         }
         else
         {
@@ -355,11 +384,16 @@ public class DefaultRepositoryRouter
         {
             // it hits a repository, mangle path and call it
 
-            request.pushRequestPath( route.getRepositoryPath() );
+            try
+            {
+                request.pushRequestPath( route.getRepositoryPath() );
 
-            route.getTargetedRepository().deleteItem( request );
-
-            request.popRequestPath();
+                route.getTargetedRepository().deleteItem( request );
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
         }
         else
         {
@@ -381,11 +415,16 @@ public class DefaultRepositoryRouter
             {
                 // it hits a repository, mangle path and call it
 
-                request.pushRequestPath( route.getRepositoryPath() );
+                try
+                {
+                    request.pushRequestPath( route.getRepositoryPath() );
 
-                result.addTargetSet( route.getTargetedRepository().getTargetsForRequest( request ) );
-
-                request.popRequestPath();
+                    result.addTargetSet( route.getTargetedRepository().getTargetsForRequest( request ) );
+                }
+                finally
+                {
+                    request.popRequestPath();
+                }
             }
         }
         catch ( ItemNotFoundException e )
@@ -729,11 +768,17 @@ public class DefaultRepositoryRouter
             if ( route.getTargetedRepository() != null )
             {
                 // if this repository is contained in any group, we need to get those targets, and tweak the TargetMatch
-                request.pushRequestPath( route.getOriginalRequestPath() );
+                try
+                {
+                    request.pushRequestPath( route.getOriginalRequestPath() );
 
-                matched.addTargetSet( this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(), request ) );
-
-                request.popRequestPath();
+                    matched.addTargetSet( this.itemAuthorizer.getGroupsTargetSet( route.getTargetedRepository(),
+                        request ) );
+                }
+                finally
+                {
+                    request.popRequestPath();
+                }
             }
         }
         catch ( ItemNotFoundException e )

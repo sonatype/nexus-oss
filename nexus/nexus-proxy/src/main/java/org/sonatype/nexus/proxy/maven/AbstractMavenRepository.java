@@ -293,17 +293,17 @@ public abstract class AbstractMavenRepository
     {
         getExternalConfiguration( true ).setMetadataMaxAge( metadataMaxAge );
     }
-    
+
     public boolean isMavenArtifact( StorageItem item )
     {
         return isMavenArtifactPath( item.getPath() );
     }
-    
+
     public boolean isMavenMetadata( StorageItem item )
     {
         return isMavenMetadataPath( item.getPath() );
     }
-    
+
     public boolean isMavenArtifactPath( String path )
     {
         try
@@ -314,7 +314,7 @@ public abstract class AbstractMavenRepository
         {
             // ignore it
         }
-        
+
         return false;
     }
 
@@ -450,37 +450,46 @@ public abstract class AbstractMavenRepository
     {
         try
         {
-            request.pushRequestPath( request.getRequestPath() + ".sha1" );
+            try
+            {
+                request.pushRequestPath( request.getRequestPath() + ".sha1" );
+
+                try
+                {
+                    getLocalStorage().deleteItem( this, request );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // this is exactly what we're trying to achieve
+                }
+            }
+            finally
+            {
+                request.popRequestPath();
+            }
 
             try
             {
-                getLocalStorage().deleteItem( this, request );
+                request.pushRequestPath( request.getRequestPath() + ".md5" );
+
+                try
+                {
+                    getLocalStorage().deleteItem( this, request );
+                }
+                catch ( ItemNotFoundException e )
+                {
+                    // this is exactly what we're trying to achieve
+                }
             }
-            catch ( ItemNotFoundException e )
+            finally
             {
-                // this is exactly what we're trying to achieve
+                request.popRequestPath();
             }
-
-            request.popRequestPath();
-
-            request.pushRequestPath( request.getRequestPath() + ".md5" );
-
-            try
-            {
-                getLocalStorage().deleteItem( this, request );
-            }
-            catch ( ItemNotFoundException e )
-            {
-                // this is exactly what we're trying to achieve
-            }
-
-            request.popRequestPath();
         }
         catch ( UnsupportedStorageOperationException e )
         {
             // huh?
         }
-
     }
 
     @Override
@@ -489,22 +498,32 @@ public abstract class AbstractMavenRepository
     {
         super.markItemRemotelyChecked( request );
 
-        request.pushRequestPath( request.getRequestPath() + ".sha1" );
-
-        if ( getLocalStorage().containsItem( this, request ) )
+        try
         {
-            super.markItemRemotelyChecked( request );
+            request.pushRequestPath( request.getRequestPath() + ".sha1" );
+
+            if ( getLocalStorage().containsItem( this, request ) )
+            {
+                super.markItemRemotelyChecked( request );
+            }
+        }
+        finally
+        {
+            request.popRequestPath();
         }
 
-        request.popRequestPath();
-
-        request.pushRequestPath( request.getRequestPath() + ".md5" );
-
-        if ( getLocalStorage().containsItem( this, request ) )
+        try
         {
-            super.markItemRemotelyChecked( request );
-        }
+            request.pushRequestPath( request.getRequestPath() + ".md5" );
 
-        request.popRequestPath();
+            if ( getLocalStorage().containsItem( this, request ) )
+            {
+                super.markItemRemotelyChecked( request );
+            }
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
     }
 }

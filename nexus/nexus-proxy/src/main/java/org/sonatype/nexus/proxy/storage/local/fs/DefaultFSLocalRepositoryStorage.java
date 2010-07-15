@@ -71,11 +71,11 @@ public class DefaultFSLocalRepositoryStorage
 
     @Configuration( value = "${upload.stream.bufferSize}" )
     private String copyStreamBufferSizeString;
-    
+
     private int renameRetryCount = -1;
 
     private int renameRetryDelay = -1;
-    
+
     private int copyStreamBufferSize = -1;
 
     /**
@@ -103,21 +103,22 @@ public class DefaultFSLocalRepositoryStorage
 
         return renameRetryDelay;
     }
-    
+
     protected int getCopyStreamBufferSize()
     {
-        if( this.copyStreamBufferSize == -1 )
+        if ( this.copyStreamBufferSize == -1 )
         {
             try
             {
-                // keeping this separate from initializeRenameRetryParams, parsing because hopefully that change will get backed out.
+                // keeping this separate from initializeRenameRetryParams, parsing because hopefully that change will
+                // get backed out.
                 this.copyStreamBufferSize = Integer.parseInt( copyStreamBufferSizeString );
             }
             catch ( NumberFormatException e )
             {
                 this.getLogger().debug( "Property upload.stream.bufferSize is not a valid integer, defaulting to 4096" );
                 this.copyStreamBufferSize = 4096;
-            }   
+            }
         }
         return this.copyStreamBufferSize;
     }
@@ -165,11 +166,18 @@ public class DefaultFSLocalRepositoryStorage
     public File getBaseDir( Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
     {
-        request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
+        URL url;
+        
+        try
+        {
+            request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
 
-        URL url = getAbsoluteUrlFromBase( repository, request );
-
-        request.popRequestPath();
+            url = getAbsoluteUrlFromBase( repository, request );
+        }
+        finally
+        {
+            request.popRequestPath();
+        }
 
         File file;
 
@@ -302,7 +310,7 @@ public class DefaultFSLocalRepositoryStorage
                 {
                     DefaultStorageLinkItem link =
                         new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
-                                                    getLinkTarget( target ) );
+                            getLinkTarget( target ) );
                     getAttributesHandler().fetchAttributes( link );
                     link.setModified( target.lastModified() );
                     link.setCreated( target.lastModified() );
@@ -323,7 +331,7 @@ public class DefaultFSLocalRepositoryStorage
             {
                 DefaultStorageFileItem file =
                     new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                                                new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
+                        new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
                 getAttributesHandler().fetchAttributes( file );
                 file.setModified( target.lastModified() );
                 file.setCreated( target.lastModified() );
@@ -408,12 +416,12 @@ public class DefaultFSLocalRepositoryStorage
                     is = ( (StorageFileItem) item ).getInputStream();
 
                     os = new FileOutputStream( hiddenTarget );
-                    
+
                     int bufferSize = this.getCopyStreamBufferSize();
                     // log what the buffer size is so we can make sure we set it correctly.
-                    if( this.getLogger().isDebugEnabled())
+                    if ( this.getLogger().isDebugEnabled() )
                     {
-                        this.getLogger().debug( "Copying stream with buffer size of: "+ bufferSize );
+                        this.getLogger().debug( "Copying stream with buffer size of: " + bufferSize );
                     }
                     IOUtil.copy( is, os, bufferSize );
 
@@ -480,9 +488,7 @@ public class DefaultFSLocalRepositoryStorage
                 FileOutputStream os = new FileOutputStream( target );
 
                 IOUtil.copy(
-                             new ByteArrayInputStream(
-                                                       ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() ).getBytes() ),
-                             os );
+                    new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() ).getBytes() ), os );
 
                 os.flush();
                 os.close();
@@ -510,18 +516,17 @@ public class DefaultFSLocalRepositoryStorage
         {
             target.delete();
         }
-    
+
         // first try
         boolean success = hiddenTarget.renameTo( target );
-    
+
         // if retries enabled go ahead and start the retry process
         for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
         {
             getLogger().debug(
-                               "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath()
-                                   + " --> " + target.getAbsolutePath() + " will wait " + getRenameRetryDelay()
-                                   + " milliseconds and try again" );
-    
+                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
+                    + target.getAbsolutePath() + " will wait " + getRenameRetryDelay() + " milliseconds and try again" );
+
             try
             {
                 Thread.sleep( getRenameRetryDelay() );
@@ -529,27 +534,24 @@ public class DefaultFSLocalRepositoryStorage
             catch ( InterruptedException e )
             {
             }
-            
+
             // try to delete again...
             if ( target.exists() )
             {
                 target.delete();
             }
-    
+
             // and rename again...
             success = hiddenTarget.renameTo( target );
-            
+
             if ( success )
             {
-                getLogger().info( "Rename operation succeeded after " 
-                    + i 
-                    + " retries on " 
-                    + hiddenTarget.getAbsolutePath()
-                    + " --> " 
-                    + target.getAbsolutePath() );
+                getLogger().info(
+                    "Rename operation succeeded after " + i + " retries on " + hiddenTarget.getAbsolutePath() + " --> "
+                        + target.getAbsolutePath() );
             }
         }
-    
+
         if ( !success )
         {
             try
@@ -558,15 +560,10 @@ public class DefaultFSLocalRepositoryStorage
             }
             catch ( IOException e )
             {
-                getLogger().error( "Rename operation failed after " 
-                    + getRenameRetryCount() 
-                    + " retries in "
-                    + getRenameRetryDelay() 
-                    + " ms intervals "
-                    + hiddenTarget.getAbsolutePath()
-                    + " --> " 
-                    + target.getAbsolutePath() );
-                
+                getLogger().error(
+                    "Rename operation failed after " + getRenameRetryCount() + " retries in " + getRenameRetryDelay()
+                        + " ms intervals " + hiddenTarget.getAbsolutePath() + " --> " + target.getAbsolutePath() );
+
                 throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
                     + target.getAbsolutePath() + "\"! " + e.getMessage() );
             }
