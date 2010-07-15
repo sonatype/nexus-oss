@@ -124,7 +124,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
 
           if (!this.loadMask)
           {
-            this.loadMask = new Ext.LoadMask(this.getEl(), {
+            this.loadMask = new Ext.LoadMask(this.repoBrowserContainer.getEl(), {
                   msg : 'Loading search result...'
                 });
           }
