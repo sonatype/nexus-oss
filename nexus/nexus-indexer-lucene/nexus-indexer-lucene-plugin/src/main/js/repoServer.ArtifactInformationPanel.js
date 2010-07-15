@@ -97,11 +97,13 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
               items : [{}],
               buttons : [{
                     xtype : 'button',
+                    id : 'artifactinfo-download-button',
                     text : 'Download',
                     handler : this.artifactDownload,
                     scope : this
                   }, {
                     xtype : 'button',
+                    id : 'artifactinfo-delete-button',
                     text : 'Delete',
                     handler : this.artifactDelete,
                     scope : this
@@ -204,6 +206,43 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         }
       },
 
+      setupNonLocalView : function(repositoryPath) {
+        this.find('name', 'repositoryPath')[0].setRawValue(repositoryPath + ' (Not Locally Cached)');
+        this.find('name', 'uploader')[0].setRawValue(null);
+        this.find('name', 'size')[0].setRawValue(null);
+        this.find('name', 'uploaded')[0].setRawValue(null);
+        this.find('name', 'lastChanged')[0].setRawValue(null);
+        this.find('name', 'sha1Hash')[0].setRawValue(null);
+        this.find('name', 'md5Hash')[0].setRawValue(null);
+        this.find('name', 'repositories')[0].setRawValue(null);
+
+        this.find('name', 'uploader')[0].hide();
+        this.find('name', 'size')[0].hide();
+        this.find('name', 'uploaded')[0].hide();
+        this.find('name', 'lastChanged')[0].hide();
+        Ext.getCmp('artifactinfo-delete-button').hide();
+        var fieldsets = this.findByType('fieldset');
+
+        for (var i = 0; i < fieldsets.length; i++)
+        {
+          fieldsets[i].hide();
+        }
+      },
+
+      clearNonLocalView : function() {
+        this.find('name', 'uploader')[0].show();
+        this.find('name', 'size')[0].show();
+        this.find('name', 'uploaded')[0].show();
+        this.find('name', 'lastChanged')[0].show();
+        Ext.getCmp('artifactinfo-delete-button').show();
+        var fieldsets = this.findByType('fieldset');
+
+        for (var i = 0; i < fieldsets.length; i++)
+        {
+          fieldsets[i].show();
+        }
+      },
+
       showArtifact : function(data) {
         this.data = data;
         if (data == null)
@@ -225,15 +264,32 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
                   if (isSuccess)
                   {
                     var infoResp = Ext.decode(response.responseText);
-                    this.form.setValues(infoResp.data);
+
+                    if (!infoResp.data.presentLocally)
+                    {
+                      this.setupNonLocalView(infoResp.data.repositoryPath);
+                    }
+                    else
+                    {
+                      this.clearNonLocalView();
+                      this.form.setValues(infoResp.data);
+                    }
                   }
                   else
                   {
-                    Sonatype.utils.connectionError(response, 'Unable to retrieve artifact information.');
+                    if (response.status = 404)
+                    {
+                      artifactContainer.hideTab(this);
+                    }
+                    else
+                    {
+                      Sonatype.utils.connectionError(response, 'Unable to retrieve artifact information.');
+                    }
                   }
                 },
                 scope : this,
-                method : 'GET'
+                method : 'GET',
+                suppressStatus : '404'
               });
         }
       }

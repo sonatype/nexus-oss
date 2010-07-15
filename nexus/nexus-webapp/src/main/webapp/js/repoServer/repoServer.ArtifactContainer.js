@@ -41,5 +41,25 @@ Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, 
         {
           this.expand();
         }
+      },
+      hideTab : function(panel) {
+        this.tabPanel.hideTabStripItem(panel);
+        for (var i = 0; i < this.tabPanel.items.getCount(); i++)
+        {
+          var nextPanel = this.tabPanel.items.get(i);
+          if (nextPanel.id != panel.id)
+          {
+            this.tabPanel.setActiveTab(nextPanel);
+            return;
+          }
+        }
+
+        // we haven't found anything, so collapse
+        this.tabPanel.doLayout();
+        this.collapse();
+      },
+      showTab : function(panel) {
+        this.tabPanel.unhideTabStripItem(panel);
       }
+
     });

@@ -110,17 +110,13 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
                       this.find('name', 'classifier')[0].hide();
                     }
                     this.form.setValues(infoResp.data);
-                    artifactContainer.tabPanel.unhideTabStripItem(this);
+                    artifactContainer.showTab(this);
                   }
                   else
                   {
                     if (response.status = 404)
                     {
-                      artifactContainer.tabPanel.hideTabStripItem(this);
-                      
-                      //artifactInformationPanel will be present on all repos
-                      var info = artifactContainer.find('name', 'artifactInformationPanel')[0];
-                      artifactContainer.tabPanel.setActiveTab(info);
+                      artifactContainer.hideTab(this);
                     }
                     else
                     {
