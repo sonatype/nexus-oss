@@ -160,7 +160,7 @@ public class InfoArtifactViewProvider
         resource.setRepositoryName( itemUid.getRepository().getName() );
         resource.setRepositoryPath( itemUid.getPath() );
         resource.setRepositories( createRepositoriesUrl( repositories, req, itemUid.getPath() ) );
-        resource.setPresent( fileItem != null );
+        resource.setPresentLocally( fileItem != null );
 
         if ( fileItem != null )
         {

@@ -231,7 +231,7 @@
       </annotations>
       <fields>
         <field>
-          <name>present</name>
+          <name>presentLocally</name>
           <version>1.0.0+</version>
           <type>boolean</type>
           <required>true</required>
