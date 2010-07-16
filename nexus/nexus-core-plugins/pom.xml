@@ -30,6 +30,7 @@
     <module>nexus-ldap-plugin-parent</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-core-documentation-plugin</module>
+    <module>nexus-groovy-console-plugin</module>
   </modules>
 
 </project>
