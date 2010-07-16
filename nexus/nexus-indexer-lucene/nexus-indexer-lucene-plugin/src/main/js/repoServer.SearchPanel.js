@@ -15,9 +15,7 @@
 
 Sonatype.repoServer.SearchPanel = function(config) {
   var config = config || {};
-  var defaultConfig = {
-    layout : 'border'
-  };
+  var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
   this.grid = new Sonatype.repoServer.SearchResultGrid({
@@ -65,10 +63,6 @@ Sonatype.repoServer.SearchPanel = function(config) {
   this.repoBrowserContainer = new Sonatype.repoServer.RepositoryIndexBrowserContainer({
         region : 'south',
         split : true,
-        collapsible : true,
-        collapsed : true,
-        // TODO: WHY ISNT MINI MODE WORKING !!!!
-        collapseMode : 'mini',
         height : 300,
         parentContainer : this
       });
@@ -88,7 +82,6 @@ Sonatype.repoServer.SearchPanel = function(config) {
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       clearArtifactInformation : function(button, e) {
-        this.repoBrowserContainer.collapse();
         this.repoBrowserContainer.updatePayload(null);
       },
 
@@ -120,7 +113,6 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               expandPath : this.getDefaultPath(rec, hitIndex)
             }
           }
-          this.repoBrowserContainer.expand();
 
           if (!this.loadMask)
           {

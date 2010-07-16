@@ -100,23 +100,19 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 
   this.defaultColumnModel = new Ext.grid.ColumnModel({
         columns : [{
-              id : 'group',
               header : "Group",
               dataIndex : 'groupId',
               sortable : true
             }, {
-              id : 'artifact',
               header : "Artifact",
               dataIndex : 'artifactId',
               sortable : true
             }, {
-              id : 'version',
               header : "Version",
               dataIndex : 'version',
               sortable : true,
               renderer : this.formatVersionLink
             }, {
-              id : 'download',
               header : "Download",
               sortable : true,
               renderer : this.formatDownloadLinks

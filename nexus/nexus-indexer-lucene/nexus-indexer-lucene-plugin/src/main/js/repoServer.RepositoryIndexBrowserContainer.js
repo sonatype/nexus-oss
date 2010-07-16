@@ -44,13 +44,11 @@ Ext.extend(Sonatype.repoServer.RepositoryIndexBrowserContainer, Ext.Panel, {
       updatePayload : function(payload) {
         if (payload == null)
         {
-          this.collapse();
           this.repositoryBrowser.updatePayload(null);
           this.artifactContainer.collapsePanel();
         }
         else
         {
-          this.expand();
           this.repositoryBrowser.updatePayload(payload);
         }
       }
