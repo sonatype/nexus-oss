@@ -100,20 +100,21 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
 
   this.defaultColumnModel = new Ext.grid.ColumnModel({
         columns : [{
-              header : "Group",
+              header : 'Group',
               dataIndex : 'groupId',
               sortable : true
             }, {
-              header : "Artifact",
+              header : 'Artifact',
               dataIndex : 'artifactId',
               sortable : true
             }, {
-              header : "Version",
+              header : 'Version',
               dataIndex : 'version',
               sortable : true,
               renderer : this.formatVersionLink
             }, {
-              header : "Download",
+              id : 'search-result-download',
+              header : 'Download',
               sortable : true,
               renderer : this.formatDownloadLinks
             }]
@@ -182,31 +183,15 @@ Sonatype.repoServer.SearchResultGrid = function(config) {
               singleSelect : true
             }),
 
-        bbar : [this.fetchMoreBar/*, '->', this.subtitleBar*/],
-
         viewConfig : {
-          forceFit : true,
-          enableRowBody : true,
-          getRowClass : this.applyRowClass
+          forceFit : true
         },
+
+        bbar : [this.fetchMoreBar/* , '->', this.subtitleBar */],
 
         listeners : {
           render : {
             fn : function(grid) {
-              grid.body.on({
-                    'mousedown' : function(e, t) {
-                      var i = t.getAttribute('index');
-                      this.toggleExtraInfo(parseInt(i, 10));
-                      e.stopEvent();
-                      return false;
-                    },
-                    'click' : function(e, t) {
-                      e.stopEvent();
-                      return false;
-                    },
-                    delegate : 'a.pom-link',
-                    scope : grid
-                  });
 
               var store = grid.getStore();
               var view = grid.getView();
@@ -372,16 +357,6 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         var input = rowEl.child('.copy-pom-dep', true);
         input.select(); // @todo: why won't this field highlight?!!!!
         rowEl.toggleClass('x-grid3-row-expanded');
-      },
-
-      // within this function "this" is actually the GridView
-      applyRowClass : function(record, rowIndex, p, ds) {
-        var xf = Ext.util.Format;
-        var xmlDep = Sonatype.repoServer.RepoServer.pomDepTmpl.apply(record.data);
-        // note: wrapper div with overflow:auto and autocomplete="off" are
-        // attempts to avoid a FF bug
-        p.body = '<span>POM Dependency: </span><input class="copy-pom-dep" type="text" autocomplete="off" value="' + xmlDep + '"/>';
-        return 'x-grid3-row-collapsed';
       },
 
       updateRowTotals : function(p) {

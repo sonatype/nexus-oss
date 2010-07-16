@@ -31,6 +31,7 @@ public class IndexerImagesNexusResourceBundle
         result.add( newStaticResource( "/images/jar_sources_obj.gif" ) );
         result.add( newStaticResource( "/images/jar_javadoc_obj.gif" ) );
         result.add( newStaticResource( "/images/resource_obj.gif" ) );
+        result.add( newStaticResource( "/css/indexer-lucene-plugin.css") );
 
         return result;
     }

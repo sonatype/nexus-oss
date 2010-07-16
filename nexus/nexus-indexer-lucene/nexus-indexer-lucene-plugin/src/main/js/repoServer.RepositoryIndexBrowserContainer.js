@@ -5,8 +5,6 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
-  var items = [];
-
   this.repositoryBrowser = new Sonatype.repoServer.IndexBrowserPanel({
         payload : this.payload,
         tabTitle : this.tabTitle,
@@ -28,15 +26,12 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         width : '50%'
       });
 
-  items.push(this.repositoryBrowser);
-  items.push(this.artifactContainer);
-
   Sonatype.repoServer.RepositoryIndexBrowserContainer.superclass.constructor.call(this, {
         layout : 'border',
         // this hideMode causes the tab to properly render when coming back from
         // hidden
         hideMode : 'offsets',
-        items : items
+        items : [this.repositoryBrowser, this.artifactContainer]
       });
 };
 
