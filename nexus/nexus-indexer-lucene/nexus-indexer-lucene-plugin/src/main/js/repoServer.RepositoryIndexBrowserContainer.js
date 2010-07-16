@@ -2,7 +2,9 @@
 // information panel
 Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
   var config = config || {};
-  var defaultConfig = {};
+  var defaultConfig = {
+    showRepositoryDropDown : false
+  };
   Ext.apply(this, config, defaultConfig);
 
   this.repositoryBrowser = new Sonatype.repoServer.IndexBrowserPanel({
@@ -15,7 +17,8 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         nodeClickEvent : 'indexNodeClickedEvent',
         nodeClickPassthru : {
           container : this
-        }
+        },
+        showRepositoryDropDown : this.showRepositoryDropDown
       });
 
   this.artifactContainer = new Sonatype.repoServer.ArtifactContainer({

@@ -64,7 +64,8 @@ Sonatype.repoServer.SearchPanel = function(config) {
         region : 'south',
         split : true,
         height : 300,
-        parentContainer : this
+        parentContainer : this,
+        showRepositoryDropDown : true
       });
 
   Sonatype.repoServer.SearchPanel.superclass.constructor.call(this, {
@@ -106,11 +107,15 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           var payload = {
             data : {
               showCtx : true,
+              id : rec.data.artifactHits[hitIndex].repositoryId,
               name : rec.data.artifactHits[hitIndex].repositoryName,
               resourceURI : rec.data.artifactHits[hitIndex].repositoryURL,
               format : rec.data.artifactHits[hitIndex].repositoryContentClass,
               repoType : rec.data.artifactHits[hitIndex].repositoryKind,
-              expandPath : this.getDefaultPath(rec, hitIndex)
+              expandPath : this.getDefaultPath(rec, hitIndex),
+              hits : rec.data.artifactHits,
+              rec : rec,
+              getDefaultPath : this.getDefaultPath
             }
           }
 
