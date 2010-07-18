@@ -1111,6 +1111,19 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                       minListWidth : this.COMBO_WIDTH
                     };
                   }
+                  else if (curRec.type == 'htmleditor')
+                  {
+                    items[j] = {
+                      xtype : 'htmleditor',
+                      fieldLabel : curRec.name,
+                      itemCls : curRec.required ? 'required-field' : '',
+                      helpText : curRec.helpText,
+                      name : 'serviceProperties_' + curRec.id,
+                      allowBlank : curRec.required ? false : true,
+                      disabled : true,
+                      width : this.COMBO_WIDTH
+                    };
+                  }
 
                   allItems[allItems.length] = {
                     xtype : 'fieldset',

@@ -10,7 +10,8 @@
   <artifactId>nexus-groovy-console-plugin</artifactId>
 
   <packaging>nexus-plugin</packaging>
-
+  <name>Nexus Groovy Console Plugin</name>
+  <description>Adds running groovy scripts in tasks and on events.</description>
   <build>
     <plugins>
       <plugin>
@@ -26,7 +27,25 @@
           </dependency>
         </dependencies>
       </plugin>
-
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+        <version>${plexus.version}</version>
+        <executions>
+          <execution>
+            <id>process-classes</id>
+            <goals>
+              <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -89,9 +108,14 @@
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>1.7.0</version>
+      <version>1.7.3</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.8.1</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
       <artifactId>commons-vfs</artifactId>

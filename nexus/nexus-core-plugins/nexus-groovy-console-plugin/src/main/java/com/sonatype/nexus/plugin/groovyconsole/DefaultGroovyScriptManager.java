@@ -2,12 +2,13 @@ package com.sonatype.nexus.plugin.groovyconsole;
 
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
+import groovy.util.AntBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
@@ -61,6 +62,7 @@ public class DefaultGroovyScriptManager
         }
 
         Binding binding = new Binding();
+        binding.setVariable( "ant", new AntBuilder() );
         binding.setVariable( "event", evt );
         binding.setVariable( "plexus", plexus );
         binding.setVariable( "logger", getLogger() );
@@ -89,7 +91,7 @@ public class DefaultGroovyScriptManager
     public void save( GroovyScriptDTO script )
         throws IOException
     {
-        storage.store(script.getName(), script.getScript());
+        storage.store( script.getName(), script.getScript() );
     }
 
 }
