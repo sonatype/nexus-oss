@@ -2044,7 +2044,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 value : value
               };
               i++;
-            }, servicePropertiesPanel.getLayout().activeItem);
+            }, this);
 
         return outputArr;
       },
