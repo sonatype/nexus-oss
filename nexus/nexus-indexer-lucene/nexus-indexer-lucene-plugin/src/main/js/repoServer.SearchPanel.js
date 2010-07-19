@@ -104,6 +104,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               }
             }
           }
+
           var payload = {
             data : {
               showCtx : true,
@@ -112,42 +113,16 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               resourceURI : rec.data.artifactHits[hitIndex].repositoryURL,
               format : rec.data.artifactHits[hitIndex].repositoryContentClass,
               repoType : rec.data.artifactHits[hitIndex].repositoryKind,
-              expandPath : this.getDefaultPath(rec, hitIndex),
+              hitIndex : hitIndex,
+              handcraftedPath : true,
+              expandPath : true,
               hits : rec.data.artifactHits,
-              rec : rec,
-              getDefaultPath : this.getDefaultPath
+              rec : rec
             }
-          }
-
-          if (!this.loadMask)
-          {
-            this.loadMask = new Ext.LoadMask(this.repoBrowserContainer.getEl(), {
-                  msg : 'Loading search result...'
-                });
-          }
-          this.loadMask.show();
+          };
 
           this.repoBrowserContainer.updatePayload(payload);
         }
-      },
-      getDefaultPath : function(rec, hitIndex) {
-        var basePath = '/' + rec.data.artifactHits[hitIndex].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
-
-        for (var i = 0; i < rec.data.artifactHits[hitIndex].artifactLinks.length; i++)
-        {
-          var link = rec.data.artifactHits[hitIndex].artifactLinks[i];
-
-          if (Ext.isEmpty(link.classifier))
-          {
-            if (link.extension != 'pom')
-            {
-              return basePath + '.' + link.extension;
-            }
-          }
-        }
-
-        var link = rec.data.artifactHits[hitIndex].artifactLinks[0];
-        return basePath + (link.classifier ? ('-' + link.classifier) : '') + '.' + link.extension;
       },
       // search type switched on the drop down button
       switchSearchType : function(button, event) {

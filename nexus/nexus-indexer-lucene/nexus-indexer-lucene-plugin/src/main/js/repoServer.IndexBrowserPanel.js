@@ -51,11 +51,13 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
                                 resourceURI : treepanel.payload.data.hits[i].repositoryURL,
                                 format : treepanel.payload.data.hits[i].repositoryContentClass,
                                 repoType : treepanel.payload.data.hits[i].repositoryKind,
-                                expandPath : treepanel.payload.data.getDefaultPath(treepanel.payload.data.rec, i),
-                                showCtx : true,
+                                expandPath : treepanel.payload.data.expandPath,
+                                handcraftedPath : treepanel.payload.data.handcraftedPath,
+                                showCtx : treepanel.payload.data.showCtx,
                                 hits : treepanel.payload.data.hits,
                                 rec : treepanel.payload.data.rec,
-                                getDefaultPath : treepanel.payload.data.getDefaultPath
+                                getDefaultPath : treepanel.payload.data.getDefaultPath,
+                                hitIndex : treepanel.payload.data.hitIndex
                               }
                             }, true);
                       }
@@ -71,33 +73,96 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
     });
 
 Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
-      refreshHandler : function(button, e) {
+      nodeExpandHandler : function() {
         var loadMask = null;
-        if (this.parentContainer && this.parentContainer.parentContainer && this.parentContainer.parentContainer.loadMask)
+        if (this.parentContainer && this.parentContainer.loadMask)
         {
-          loadMask = this.parentContainer.parentContainer.loadMask;
+          loadMask = this.parentContainer.loadMask;
         }
+
+        if (this.payload.data.expandPath)
+        {
+          this.selectPath(this.getDefaultPathFromPayload(), 'text', function(success, node) {
+                if (success)
+                {
+                  if (node.ownerTree.nodeClickEvent)
+                  {
+                    Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
+                  }
+                }
+                else if (loadMask != null)
+                {
+                  loadMask.hide();
+                }
+              });
+        }
+      },
+      handcraftTreeFromPayload : function() {
+        var rec = this.payload.data.rec;
+        var hitIndex = this.payload.data.hitIndex;
+
+        var root = new Ext.tree.TreeNode({
+              text : rec.data.artifactHits[hitIndex].repositoryName,
+              path : '/',
+              singleClickExpand : true,
+              expanded : true
+            });
+
+        var groupIdDirs = rec.data.groupId.replace(/\./g, '/').split('/');
+        var path = '/';
+        var currentNode = root;
+
+        for (var i = 0; i < groupIdDirs.length; i++)
+        {
+          path += groupIdDirs[i] + '/';
+          var nodetype = Ext.tree.TreeNode;
+          if ((i + 1) == groupIdDirs.length)
+          {
+            nodetype = Ext.tree.AsyncTreeNode;
+          }
+          var child = new nodetype({
+                text : groupIdDirs[i],
+                path : path,
+                singleClickExpand : true,
+                expanded : true
+              });
+          currentNode.appendChild(child);
+          currentNode = child;
+        }
+
+        currentNode.on('expand', this.nodeExpandHandler, this);
+
+        return root;
+      },
+      getDefaultPathFromPayload : function() {
+        var rec = this.payload.data.rec;
+        var hitIndex = this.payload.data.hitIndex;
+
+        var basePath = '/' + rec.data.artifactHits[hitIndex].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+
+        for (var i = 0; i < rec.data.artifactHits[hitIndex].artifactLinks.length; i++)
+        {
+          var link = rec.data.artifactHits[hitIndex].artifactLinks[i];
+
+          if (Ext.isEmpty(link.classifier))
+          {
+            if (link.extension != 'pom')
+            {
+              return basePath + '.' + link.extension;
+            }
+          }
+        }
+
+        var link = rec.data.artifactHits[hitIndex].artifactLinks[0];
+        return basePath + (link.classifier ? ('-' + link.classifier) : '') + '.' + link.extension;
+      },
+      refreshHandler : function(button, e) {
         Sonatype.Events.fireEvent(this.nodeClickEvent, null, this.nodeClickPassthru);
         // if we are dealing w/ refresh call (but not from refresh button) with
         // same repo, simply relocate to new path
         if (button == undefined && this.oldPayload && this.payload && this.oldPayload.data.resourceURI == this.payload.data.resourceURI)
         {
-          if (this.payload.data.expandPath)
-          {
-            this.selectPath(this.payload.data.expandPath, 'text', function(success, node) {
-                  if (success)
-                  {
-                    if (node.ownerTree.nodeClickEvent)
-                    {
-                      Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
-                    }
-                  }
-                  else if (loadMask != null)
-                  {
-                    loadMask.hide();
-                  }
-                });
-          }
+          this.nodeExpandHandler();
         }
         else
         {
@@ -109,35 +174,25 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
           {
             this.loader.url = this.payload.data.resourceURI + '/index_content';
 
-            this.setRootNode(new Ext.tree.AsyncTreeNode({
-                  text : this.payload.data[this.titleColumn],
-                  path : '/',
-                  singleClickExpand : true,
-                  expanded : true,
-                  listeners : {
-                    expand : {
-                      fn : function() {
-                        if (this.payload.data.expandPath)
-                        {
-                          this.selectPath(this.payload.data.expandPath, 'text', function(success, node) {
-                                if (success)
-                                {
-                                  if (node.ownerTree.nodeClickEvent)
-                                  {
-                                    Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
-                                  }
-                                }
-                                else if (loadMask != null)
-                                {
-                                  loadMask.hide();
-                                }
-                              });
-                        }
-                      },
-                      scope : this
+            if (this.payload.data.handcraftedPath)
+            {
+              this.setRootNode(this.handcraftTreeFromPayload());
+            }
+            else
+            {
+              this.setRootNode(new Ext.tree.AsyncTreeNode({
+                    text : this.payload.data[this.titleColumn],
+                    path : '/',
+                    singleClickExpand : true,
+                    expanded : true,
+                    listeners : {
+                      expand : {
+                        fn : this.nodeExpandHandler,
+                        scope : this
+                      }
                     }
-                  }
-                }));
+                  }));
+            }
           }
           else
           {

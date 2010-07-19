@@ -47,6 +47,16 @@ Ext.extend(Sonatype.repoServer.RepositoryIndexBrowserContainer, Ext.Panel, {
         }
         else
         {
+          if (payload.data.expandPath)
+          {
+            if (!this.loadMask)
+            {
+              this.loadMask = new Ext.LoadMask(this.getEl(), {
+                    msg : 'Loading search result...'
+                  });
+            }
+            this.loadMask.show();
+          }
           this.repositoryBrowser.updatePayload(payload);
         }
       }
@@ -87,13 +97,13 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
       {
         if (node && node.isLeaf())
         {
-          if (!passthru.container.parentContainer.loadMask)
+          if (!passthru.container.loadMask)
           {
-            passthru.container.parentContainer.loadMask = new Ext.LoadMask(passthru.container.parentContainer.getEl(), {
+            passthru.container.loadMask = new Ext.LoadMask(passthru.container.parentContainer.getEl(), {
                   msg : 'Loading search result...'
                 });
           }
-          passthru.container.parentContainer.loadMask.show();
+          passthru.container.loadMask.show();
 
           Ext.Ajax.request({
                 scope : this,
@@ -111,9 +121,9 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
                   container : passthru.container
                 },
                 callback : function(options, isSuccess, response) {
-                  if (passthru.container.parentContainer.loadMask)
+                  if (passthru.container.loadMask)
                   {
-                    passthru.container.parentContainer.loadMask.hide();
+                    passthru.container.loadMask.hide();
                   }
                   if (isSuccess)
                   {
