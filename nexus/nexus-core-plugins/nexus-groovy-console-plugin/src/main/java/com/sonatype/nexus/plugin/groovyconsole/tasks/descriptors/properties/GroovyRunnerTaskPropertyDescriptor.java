@@ -29,7 +29,7 @@ public class GroovyRunnerTaskPropertyDescriptor
     @Override
     public String getType()
     {
-        return "htmleditor";
+        return "textarea";
     }
 
 }

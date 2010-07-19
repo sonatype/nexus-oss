@@ -35,6 +35,8 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
         data : [['Sunday', 'sunday'], ['Monday', 'monday'], ['Tuesday', 'tuesday'], ['Wednesday', 'wednesday'], ['Thursday', 'thursday'], ['Friday', 'friday'], ['Saturday', 'saturday']]
       });
 
+  this.customTypes = {};
+
   this.actions = {
     refresh : new Ext.Action({
           text : 'Refresh',
@@ -949,9 +951,15 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       });
 
   this.formCards = this.findById('schedule-config-forms');
+
+  this.on('render', this.initializeCustomTypes, this);
 };
 
 Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
+      initializeCustomTypes : function() {
+        Sonatype.Events.fireEvent('initializeCustomTypes', this.customTypes);
+      },
+
       // Populate the dynamic content, based upon the currently defined service
       // types from the server
       populateServiceTypePanelItems : function(id) {
@@ -1111,18 +1119,12 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                       minListWidth : this.COMBO_WIDTH
                     };
                   }
-                  else if (curRec.type == 'htmleditor')
+                  else
                   {
-                    items[j] = {
-                      xtype : 'htmleditor',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH
-                    };
+                    if (this.customTypes[curRec.type])
+                    {
+                      items[j] = this.customTypes[curRec.type].createItem.call(this, curRec);
+                    }
                   }
 
                   allItems[allItems.length] = {
@@ -1230,7 +1232,8 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
             fpanel : formInfoObj.formPanel,
             dataModifiers : this.submitDataModFuncs[serviceSchedule],
             serviceDataObj : Sonatype.repoServer.referenceData.schedule[serviceSchedule],
-            isNew : isNew
+            isNew : isNew,
+            scope : this
               // extra option to send to callback, instead of conditioning on
               // method
             });
@@ -2029,6 +2032,13 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               {
                 value = item.getValue();
               }
+              else
+              {
+                if (this.customTypes[item.xtype])
+                {
+                  value = this.customTypes[item.xtype].retrieveValue.call(this, item);
+                }
+              }
               outputArr[i] = {
                 id : item.getName().substring('serviceProperties_'.length),
                 value : value
@@ -2155,6 +2165,13 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 else if (servicePropertyItem.xtype == 'combo')
                 {
                   servicePropertyItem.setValue(srcObj.properties[i].value);
+                }
+                else
+                {
+                  if (this.customTypes[servicePropertyItem.xtype])
+                  {
+                    this.customTypes[servicePropertyItem.xtype].setValue.call(this, servicePropertyItem, srcObj.properties[i].value);
+                  }
                 }
                 break;
               }
