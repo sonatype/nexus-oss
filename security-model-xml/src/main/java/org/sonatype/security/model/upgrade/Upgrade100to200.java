@@ -17,7 +17,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
@@ -29,7 +32,9 @@ import org.sonatype.security.legacy.model.v1_0_0.CUser;
 import org.sonatype.security.legacy.model.v1_0_0.Configuration;
 import org.sonatype.security.legacy.model.v1_0_0.io.xpp3.SecurityLegacyConfigurationXpp3Reader;
 
-@Component( role = SecurityUpgrader.class, hint = "1.0.0" )
+@Singleton
+@Typed( value = SecurityUpgrader.class )
+@Named( value = "1.0.0" )
 public class Upgrade100to200
     implements SecurityUpgrader
 {

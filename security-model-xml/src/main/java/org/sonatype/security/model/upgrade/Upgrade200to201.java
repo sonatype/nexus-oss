@@ -20,7 +20,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
@@ -31,7 +34,9 @@ import org.sonatype.security.model.v2_0_0.CUser;
 import org.sonatype.security.model.v2_0_0.Configuration;
 import org.sonatype.security.model.v2_0_0.io.xpp3.SecurityConfigurationXpp3Reader;
 
-@Component( role = SecurityUpgrader.class, hint = "2.0.0" )
+@Singleton
+@Typed( value = SecurityUpgrader.class )
+@Named( value = "2.0.0" )
 public class Upgrade200to201
     implements SecurityUpgrader
 {

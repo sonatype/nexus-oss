@@ -15,8 +15,11 @@ package org.sonatype.security.model.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.model.Configuration;
@@ -27,14 +30,16 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author cstamas
  */
-@Component( role = SecurityModelConfigurationSource.class, hint = "static" )
+@Singleton
+@Typed( value = SecurityModelConfigurationSource.class )
+@Named( value = "static" )
 public class StaticModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
     
     private static final String STATIC_SECURITY_RESOURCE = "/META-INF/security/security.xml";
     
-    @Requirement
+    @Inject
     private Logger logger;
     
     /**

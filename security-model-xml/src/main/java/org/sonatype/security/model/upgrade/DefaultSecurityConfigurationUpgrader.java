@@ -18,8 +18,11 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.Map;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
@@ -35,15 +38,17 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author cstamas
  */
-@Component( role = SecurityConfigurationUpgrader.class )
+@Singleton
+@Typed( value = SecurityConfigurationUpgrader.class )
+@Named( value = "default" )
 public class DefaultSecurityConfigurationUpgrader
     extends AbstractLogEnabled
     implements SecurityConfigurationUpgrader
 {
-    @Requirement( role = SecurityUpgrader.class )
+    @Inject
     private Map<String, SecurityUpgrader> upgraders;
     
-    @Requirement( role = SecurityDataUpgrader.class )
+    @Inject
     private Map<String, SecurityDataUpgrader> dataUpgraders;
 
     /**

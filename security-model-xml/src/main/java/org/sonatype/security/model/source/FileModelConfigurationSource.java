@@ -18,8 +18,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.configuration.ConfigurationException;
@@ -32,7 +35,9 @@ import org.sonatype.security.model.upgrade.SecurityConfigurationUpgrader;
  * 
  * @author cstamas
  */
-@Component( role = SecurityModelConfigurationSource.class, hint = "file" )
+@Singleton
+@Typed( value = SecurityModelConfigurationSource.class )
+@Named( value = "file" )
 public class FileModelConfigurationSource
     extends AbstractSecurityModelConfigurationSource
 {
@@ -40,19 +45,21 @@ public class FileModelConfigurationSource
     /**
      * The configuration file.
      */
-    @org.codehaus.plexus.component.annotations.Configuration( value = "${security-xml-file}" )
+    @Inject
+    @Named( value = "${security-xml-file}" )
     private File configurationFile;
 
     /**
      * The configuration upgrader.
      */
-    @Requirement
+    @Inject
     private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**
      * The defaults configuration source.
      */
-    @Requirement( hint = "static" )
+    @Inject
+    @Named( value = "static" )
     private SecurityModelConfigurationSource securityDefaults;
 
     /** Flag to mark defaulted config */

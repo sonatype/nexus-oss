@@ -15,27 +15,29 @@ package org.sonatype.security.model.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
 import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.CUserRoleMapping;
-import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.v2_0_3.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.v2_0_4.upgrade.BasicVersionUpgrade;
 
-@Component( role = SecurityUpgrader.class, hint = "2.0.3" )
+@Singleton
+@Typed( value = SecurityUpgrader.class )
+@Named( value = "2.0.3" )
 public class Upgrade203to204
     implements SecurityUpgrader
 {
     private static String DEFAULT_SOURCE = "default";
 
-    @Requirement
+    @Inject
     private Logger logger;
     
     public Object loadConfiguration( File file )
