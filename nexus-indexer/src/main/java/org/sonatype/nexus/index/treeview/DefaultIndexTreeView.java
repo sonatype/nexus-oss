@@ -45,18 +45,24 @@ public class DefaultIndexTreeView
     public TreeNode listNodes( TreeNodeFactory factory, String path )
         throws IOException
     {
+        return listNodes( new TreeViewRequest( factory, path ) );
+    }
+
+    public TreeNode listNodes( TreeViewRequest request )
+        throws IOException
+    {
         // get the last path elem
         String name = null;
-        if ( !"/".equals( path ) )
+        if ( !"/".equals( request.getPath() ) )
         {
 
-            if ( path.endsWith( "/" ) )
+            if ( request.getPath().endsWith( "/" ) )
             {
-                name = path.substring( 0, path.length() - 1 );
+                name = request.getPath().substring( 0, request.getPath().length() - 1 );
             }
             else
             {
-                name = path;
+                name = request.getPath();
             }
 
             name = name.substring( name.lastIndexOf( '/' ) + 1, name.length() );
@@ -73,26 +79,27 @@ public class DefaultIndexTreeView
             name = "/";
         }
 
-        TreeNode result = factory.createGNode( this, path, name );
+        TreeNode result = request.getFactory().createGNode( this, request.getPath(), name );
 
-        if ( "/".equals( path ) )
+        if ( "/".equals( request.getPath() ) )
         {
             // get root groups and finish
-            Set<String> rootGroups = factory.getIndexingContext().getRootGroups();
+            Set<String> rootGroups = request.getFactory().getIndexingContext().getRootGroups();
 
             for ( String group : rootGroups )
             {
                 if ( group.length() > 0 )
                 {
-                    result.getChildren().add( factory.createGNode( this, path + group + "/", group ) );
+                    result.getChildren().add(
+                        request.getFactory().createGNode( this, request.getPath() + group + "/", group ) );
                 }
             }
         }
         else
         {
-            Set<String> allGroups = factory.getIndexingContext().getAllGroups();
+            Set<String> allGroups = request.getFactory().getIndexingContext().getAllGroups();
 
-            listChildren( result, factory, allGroups );
+            listChildren( result, request.getFactory(), allGroups );
         }
 
         return result;
@@ -189,10 +196,10 @@ public class DefaultIndexTreeView
     protected String getPathForAi( String path, ArtifactInfo ai )
     {
         StringBuffer sb = new StringBuffer( path ) //
-            .append( ai.artifactId ) //
-            .append( "/" ).append( ai.version ) //
-            .append( "/" ).append( ai.artifactId ) //
-            .append( "-" ).append( ai.version );
+        .append( ai.artifactId ) //
+        .append( "/" ).append( ai.version ) //
+        .append( "/" ).append( ai.artifactId ) //
+        .append( "-" ).append( ai.version );
 
         if ( ai.classifier != null )
         {
