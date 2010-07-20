@@ -1,6 +1,9 @@
 package org.sonatype.security.sample.web;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -13,7 +16,9 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 /**
  * A Resource that simple returns "Hello".
  */
-@Component( role = PlexusResource.class, hint = "sample-resource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "sample-resource" )
 public class SimplePlexusResource
     extends AbstractPlexusResource
 {

@@ -20,8 +20,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
@@ -44,22 +47,25 @@ import org.sonatype.security.usermanagement.StringDigester;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
 
-@Component( role = ConfigurationManager.class, hint = "default" )
+@Singleton
+@Typed( value = ConfigurationManager.class )
+@Named( value = "default" )
 public class DefaultConfigurationManager
     extends AbstractLogEnabled
     implements ConfigurationManager
 {
 
-    @Requirement(hint="file")
+    @Inject
+    @Named( value = "file" )
     private SecurityModelConfigurationSource configurationSource;
     
-    @Requirement
+    @Inject
     private SecurityConfigurationValidator validator;
     
-    @Requirement( role = PrivilegeDescriptor.class )
+    @Inject
     private List<PrivilegeDescriptor> privilegeDescriptors;
     
-    @Requirement( role = SecurityConfigurationCleaner.class )
+    @Inject
     private SecurityConfigurationCleaner configCleaner;
 
     /**

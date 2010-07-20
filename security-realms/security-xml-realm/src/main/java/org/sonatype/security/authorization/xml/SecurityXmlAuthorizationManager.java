@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.security.authorization.AuthorizationManager;
@@ -36,20 +39,23 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 /**
  * AuthorizationManager that wraps roles from security-xml-realm.
  */
-@Component( role = AuthorizationManager.class )
+@Singleton
+@Typed( value = AuthorizationManager.class )
+@Named( value = "default" )
 public class SecurityXmlAuthorizationManager
     implements AuthorizationManager
 {
 
     public static final String SOURCE = "default";
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
     
-    @Requirement
+    @Inject
     private PrivilegeInheritanceManager privInheritance;
     
-    @Requirement
+    @Inject
     private ApplicationEventMulticaster eventMulticaster;
 
     public String getSource()

@@ -12,6 +12,11 @@
  */
 package org.sonatype.security.realms;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AccountException;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -38,14 +43,18 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * 
  * @author Brian Demers
  */
-@Component( role = Realm.class, hint = XmlAuthenticatingRealm.ROLE, description = "Xml Authenticating Realm" )
+@Singleton
+@Typed( value = Realm.class )
+@Named( value = XmlAuthenticatingRealm.ROLE )
+//@Description( value = "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Initializable, Realm
 {
     public static final String ROLE = "XmlAuthenticatingRealm";
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
     @Override

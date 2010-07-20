@@ -16,9 +16,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -46,22 +49,26 @@ import org.sonatype.security.usermanagement.UserStatus;
  * 
  * @author Brian Demers
  */
-@Component( role = UserManager.class, description = "Default" )
+@Singleton
+@Typed( value = UserManager.class )
+@Named( value = "default" )
+//@Description( value = "Default" )
 public class SecurityXmlUserManager
     extends AbstractUserManager
     implements RoleMappingUserManager
 {
     public static final String SOURCE = "default";
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
     private SecuritySystem securitySystem;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     protected CUser toUser( User user )

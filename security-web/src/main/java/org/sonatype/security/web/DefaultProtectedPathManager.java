@@ -1,7 +1,10 @@
 package org.sonatype.security.web;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.web.filter.mgt.FilterChainManager;
-import org.codehaus.plexus.component.annotations.Component;
 
 /**
  * The default implementation requires a FilterChainManager, so the configuration can be passed to it.
@@ -9,7 +12,9 @@ import org.codehaus.plexus.component.annotations.Component;
  * @author Brian Demers
  *
  */
-@Component( role = ProtectedPathManager.class )
+@Singleton
+@Typed( value = ProtectedPathManager.class )
+@Named( value = "default" )
 public class DefaultProtectedPathManager
     implements ProtectedPathManager, FilterChainManagerAware
 {

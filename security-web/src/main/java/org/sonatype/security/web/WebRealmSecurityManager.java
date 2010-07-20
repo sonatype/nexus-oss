@@ -2,6 +2,10 @@ package org.sonatype.security.web;
 
 import java.util.Map;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.pam.FirstSuccessfulStrategy;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
@@ -22,7 +26,9 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
  * configuration into the SecuritySystem. The downside to that is we would need to expose an accessor for it. ( This
  * component is loaded from a servelet ), but that might be cleaner then what we are doing now.
  */
-@Component( role = RealmSecurityManager.class, hint = "web" )
+@Singleton
+@Typed( value = RealmSecurityManager.class )
+@Named( value = "web" )
 public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
     implements Initializable

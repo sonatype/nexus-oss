@@ -15,7 +15,9 @@ package org.sonatype.security.authorization.xml;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Default implementation of PrivilegeInheritanceManager which adds read to each action. The way we see it, if you can
@@ -23,7 +25,9 @@ import org.codehaus.plexus.component.annotations.Component;
  * 
  * @author Brian Demers
  */
-@Component( role = PrivilegeInheritanceManager.class )
+@Singleton
+@Typed( value = PrivilegeInheritanceManager.class )
+@Named( value = "default" )
 public class DefaultPrivilegeInheritanceManager
     implements PrivilegeInheritanceManager
 {

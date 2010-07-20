@@ -15,17 +15,19 @@ package org.sonatype.security.realms.url;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.authorization.Role;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
-import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
-import org.sonatype.security.usermanagement.UserNotFoundException;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
-@Component( role = UserManager.class, hint = "test" )
+@Singleton
+@Typed( value = UserManager.class )
+@Named( value = "test" )
 public class MockUserLocator
     extends AbstractReadOnlyUserManager
 {

@@ -15,6 +15,11 @@ package org.sonatype.security.realms;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -25,8 +30,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -37,14 +40,17 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * 
  * @author Brian Demers
  */
-@Component( role = Realm.class, hint = XmlAuthorizingRealm.ROLE, description = "Xml Authorizing Realm" )
+@Singleton
+@Typed( value = Realm.class )
+@Named( value = XmlAuthorizingRealm.ROLE )
+//@Description( value = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm
 {
     public static final String ROLE = "XmlAuthorizingRealm";
 
-    @Requirement
+    @Inject
     private UserManager userManager;
 
     public XmlAuthorizingRealm()

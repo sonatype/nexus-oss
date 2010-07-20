@@ -1,6 +1,9 @@
 package org.sonatype.security.sample.web;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Router;
@@ -9,7 +12,9 @@ import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.security.web.ProtectedPathManager;
 
-@Component( role = Application.class, hint = "secureApplication" )
+@Singleton
+@Typed( value = Application.class )
+@Named( value = "secureApplication" )
 public class PlexusSecureApplication
     extends PlexusRestletApplicationBridge
 {

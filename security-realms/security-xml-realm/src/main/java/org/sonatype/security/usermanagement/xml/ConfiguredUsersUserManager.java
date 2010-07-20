@@ -17,13 +17,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -41,17 +45,21 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  * 
  * @author Brian Demers
  */
-@Component( role = UserManager.class, hint = "allConfigured", description = "All Configured Users" )
+@Singleton
+@Typed( value = UserManager.class )
+@Named( value = "allConfigured" )
+//@Description( value = "All Configured Users" )
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {
 
-    @Requirement
+    @Inject
     private Logger logger;
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
+    // TODO: guice lazy loading?
     // @Requirement
     private SecuritySystem securitySystem;
 

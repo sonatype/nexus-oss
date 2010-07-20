@@ -16,7 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
@@ -37,22 +41,28 @@ import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
  * 
  * @author Brian Demers
  */
-@Component( role = UserManager.class, hint = "url", description = "URL Realm Users" )
+@Singleton
+@Typed( value = UserManager.class )
+@Named( value = "url" )
+// @Description( value = "URL Realm Users" )
 public class URLUserManager
     extends AbstractReadOnlyUserManager
 {
     public static final String SOURCE = "url";
 
-    @Configuration( value = "${url-authentication-email-domain}" )
+    @Inject
+    @Named( value = "${url-authentication-email-domain}" )
     private String emailDomain = "apache.org";
 
-    @Configuration( value = "${url-authentication-default-role}" )
+    @Inject
+    @Named( value = "${url-authentication-default-role}" )
     private String defaultRole = "default-url-role";
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement( role = UserManager.class )
+    @Inject
     private List<UserManager> userLocators;
 
     public String getSource()

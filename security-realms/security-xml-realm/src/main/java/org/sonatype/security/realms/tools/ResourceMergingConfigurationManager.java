@@ -19,8 +19,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -40,16 +43,19 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author Brian Demers
  *
  */
-@Component( role = ConfigurationManager.class, hint = "resourceMerging" )
+@Singleton
+@Typed( value = ConfigurationManager.class )
+@Named( value = "resourceMerging" )
 public class ResourceMergingConfigurationManager
     extends AbstractLogEnabled
     implements ConfigurationManager
 {
     // This will handle all normal security.xml file loading/storing
-    @Requirement( role = ConfigurationManager.class, hint = "default" )
+    @Inject
+    @Named( value = "default" )
     private ConfigurationManager manager;
 
-    @Requirement( role = StaticSecurityResource.class )
+    @Inject
     private List<StaticSecurityResource> staticResources;
 
     /**

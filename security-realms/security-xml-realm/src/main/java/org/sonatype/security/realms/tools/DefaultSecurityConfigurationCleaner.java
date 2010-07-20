@@ -14,7 +14,10 @@ package org.sonatype.security.realms.tools;
 
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.security.model.CRole;
 import org.sonatype.security.model.CUserRoleMapping;
@@ -27,7 +30,9 @@ import org.sonatype.security.model.Configuration;
  * 
  * @author Brian Demers
  */
-@Component( role = SecurityConfigurationCleaner.class )
+@Singleton
+@Typed( value = SecurityConfigurationCleaner.class )
+@Named( value = "default" )
 public class DefaultSecurityConfigurationCleaner
     extends AbstractLogEnabled
     implements SecurityConfigurationCleaner

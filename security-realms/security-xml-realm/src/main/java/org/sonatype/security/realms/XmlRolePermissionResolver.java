@@ -7,11 +7,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.authz.permission.WildcardPermission;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CPrivilege;
@@ -27,15 +30,18 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
  * 
  * @author Brian Demers
  */
-@Component( role = RolePermissionResolver.class )
+@Singleton
+@Typed( value = RolePermissionResolver.class )
+@Named( value = "default" )
 public class XmlRolePermissionResolver
     implements RolePermissionResolver
 {
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
-    @Requirement( role = PrivilegeDescriptor.class )
+    @Inject
     private List<PrivilegeDescriptor> privilegeDescriptors;
 
     public Collection<Permission> resolvePermissionsInRole( String roleString )
