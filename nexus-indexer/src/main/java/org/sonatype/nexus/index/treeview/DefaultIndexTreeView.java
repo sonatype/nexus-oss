@@ -24,6 +24,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.FlatSearchRequest;
 import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
@@ -42,6 +43,7 @@ public class DefaultIndexTreeView
         return nexusIndexer;
     }
 
+    @Deprecated
     public TreeNode listNodes( TreeNodeFactory factory, String path )
         throws IOException
     {
@@ -53,6 +55,7 @@ public class DefaultIndexTreeView
     {
         // get the last path elem
         String name = null;
+
         if ( !"/".equals( request.getPath() ) )
         {
 
@@ -79,27 +82,65 @@ public class DefaultIndexTreeView
             name = "/";
         }
 
-        TreeNode result = request.getFactory().createGNode( this, request.getPath(), name );
+        // the root node depends on request we have, so let's see
+        TreeNode result;
 
-        if ( "/".equals( request.getPath() ) )
+        if ( request.hasFieldHints() )
         {
-            // get root groups and finish
-            Set<String> rootGroups = request.getFactory().getIndexingContext().getRootGroups();
-
-            for ( String group : rootGroups )
+            // we know that hints are there: G hint, GA hint or GAV hint
+            if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID, MAVEN.VERSION ) )
             {
-                if ( group.length() > 0 )
-                {
-                    result.getChildren().add(
-                        request.getFactory().createGNode( this, request.getPath() + group + "/", group ) );
-                }
+                // we need to build V node and children (artifact)
+                ArtifactInfo ai =
+                    new ArtifactInfo( request.getFactory().getIndexingContext().getRepositoryId(),
+                        request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
+                        request.getFieldHint( MAVEN.VERSION ), null );
+
+                result = request.getFactory().createVNode( this, ai, request.getPath() );
             }
+            else if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID ) )
+            {
+                // we need to build A node and children (V, artifact)
+                ArtifactInfo ai =
+                    new ArtifactInfo( request.getFactory().getIndexingContext().getRepositoryId(),
+                        request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
+                        "not-there-yet", null );
+
+                result = request.getFactory().createANode( this, ai, request.getPath() );
+            }
+            else
+            {
+                // we need to build G node and children (A, V, artifact)
+                result = request.getFactory().createGNode( this, request.getPath(), name );
+            }
+
+            listChildren( result, request, null );
         }
         else
         {
-            Set<String> allGroups = request.getFactory().getIndexingContext().getAllGroups();
+            // non hinted way, the "old" way
+            result = request.getFactory().createGNode( this, request.getPath(), name );
 
-            listChildren( result, request.getFactory(), allGroups );
+            if ( "/".equals( request.getPath() ) )
+            {
+                // get root groups and finish
+                Set<String> rootGroups = request.getFactory().getIndexingContext().getRootGroups();
+
+                for ( String group : rootGroups )
+                {
+                    if ( group.length() > 0 )
+                    {
+                        result.getChildren().add(
+                            request.getFactory().createGNode( this, request.getPath() + group + "/", group ) );
+                    }
+                }
+            }
+            else
+            {
+                Set<String> allGroups = request.getFactory().getIndexingContext().getAllGroups();
+
+                listChildren( result, request, allGroups );
+            }
         }
 
         return result;
@@ -111,14 +152,14 @@ public class DefaultIndexTreeView
      * @param allGroups
      * @throws IOException
      */
-    protected void listChildren( TreeNode root, TreeNodeFactory factory, Set<String> allGroups )
+    protected void listChildren( TreeNode root, TreeViewRequest request, Set<String> allGroups )
         throws IOException
     {
         String path = root.getPath();
 
         Map<String, TreeNode> folders = new HashMap<String, TreeNode>();
 
-        Set<ArtifactInfo> artifacts = getArtifacts( path, factory.getIndexingContext() );
+        Set<ArtifactInfo> artifacts = getArtifacts( root, request );
 
         for ( ArtifactInfo ai : artifacts )
         {
@@ -134,14 +175,15 @@ public class DefaultIndexTreeView
 
                 if ( artifactResource == null )
                 {
-                    artifactResource = factory.createANode( this, ai, path + ai.artifactId + "/" );
+                    artifactResource = request.getFactory().createANode( this, ai, path + ai.artifactId + "/" );
 
                     root.getChildren().add( artifactResource );
 
                     folders.put( artifactKey, artifactResource );
                 }
 
-                versionResource = factory.createVNode( this, ai, path + ai.artifactId + "/" + ai.version + "/" );
+                versionResource =
+                    request.getFactory().createVNode( this, ai, path + ai.artifactId + "/" + ai.version + "/" );
 
                 artifactResource.getChildren().add( versionResource );
 
@@ -150,7 +192,7 @@ public class DefaultIndexTreeView
 
             String nodePath = getPathForAi( path, ai );
 
-            versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
+            versionResource.getChildren().add( request.getFactory().createArtifactNode( this, ai, nodePath ) );
 
             // TODO: do we need to represent these are another artifacts?
             // The correct answer is YES, but...
@@ -172,23 +214,26 @@ public class DefaultIndexTreeView
             // }
         }
 
-        Set<String> groups = getGroups( path, allGroups );
-
-        for ( String group : groups )
+        if ( !request.hasFieldHints() )
         {
-            TreeNode groupResource = root.findChildByPath( path + group + "/", Type.G );
+            Set<String> groups = getGroups( path, allGroups );
 
-            if ( groupResource == null )
+            for ( String group : groups )
             {
-                groupResource = factory.createGNode( this, path + group + "/", group );
+                TreeNode groupResource = root.findChildByPath( path + group + "/", Type.G );
 
-                root.getChildren().add( groupResource );
-            }
-            else
-            {
-                // if the folder has been created as an artifact name,
-                // we need to check for possible nested groups as well
-                listChildren( groupResource, factory, allGroups );
+                if ( groupResource == null )
+                {
+                    groupResource = request.getFactory().createGNode( this, path + group + "/", group );
+
+                    root.getChildren().add( groupResource );
+                }
+                else
+                {
+                    // if the folder has been created as an artifact name,
+                    // we need to check for possible nested groups as well
+                    listChildren( groupResource, request, allGroups );
+                }
             }
         }
     }
@@ -242,9 +287,16 @@ public class DefaultIndexTreeView
         return result;
     }
 
-    protected Set<ArtifactInfo> getArtifacts( String path, IndexingContext indexingContext )
+    protected Set<ArtifactInfo> getArtifacts( TreeNode root, TreeViewRequest request )
         throws IOException
     {
+        if ( request.hasFieldHints() )
+        {
+            return getHintedArtifacts( root, request );
+        }
+
+        String path = root.getPath();
+
         Set<ArtifactInfo> result = null;
 
         String g = null;
@@ -269,7 +321,7 @@ public class DefaultIndexTreeView
 
         g = wp.substring( 1 ).replace( '/', '.' );
 
-        result = getArtifactsByG( g, indexingContext );
+        result = getArtifactsByG( g, request.getFactory().getIndexingContext() );
 
         if ( !result.isEmpty() )
         {
@@ -287,7 +339,7 @@ public class DefaultIndexTreeView
 
             g = wp.substring( 1, wp.lastIndexOf( "/" ) ).replace( '/', '.' );
 
-            result = getArtifactsByGA( g, a, indexingContext );
+            result = getArtifactsByGA( g, a, request.getFactory().getIndexingContext() );
 
             if ( !result.isEmpty() )
             {
@@ -309,7 +361,7 @@ public class DefaultIndexTreeView
 
                 g = wp.substring( 1, wp.lastIndexOf( "/" ) ).replace( '/', '.' );
 
-                result = getArtifactsByGAV( g, a, v, indexingContext );
+                result = getArtifactsByGAV( g, a, v, request.getFactory().getIndexingContext() );
 
                 if ( !result.isEmpty() )
                 {
@@ -324,6 +376,33 @@ public class DefaultIndexTreeView
 
         // if we are here, no hits found
         return Collections.emptySet();
+    }
+
+    protected Set<ArtifactInfo> getHintedArtifacts( TreeNode root, TreeViewRequest request )
+        throws IOException
+    {
+        // we know that hints are there: G hint, GA hint or GAV hint
+        if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID, MAVEN.VERSION ) )
+        {
+            return getArtifactsByGAV( request.getFieldHint( MAVEN.GROUP_ID ),
+                request.getFieldHint( MAVEN.ARTIFACT_ID ), request.getFieldHint( MAVEN.VERSION ),
+                request.getFactory().getIndexingContext() );
+        }
+        else if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID ) )
+        {
+            return getArtifactsByGA( request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
+                request.getFactory().getIndexingContext() );
+        }
+        else if ( request.hasFieldHint( MAVEN.GROUP_ID ) )
+        {
+            return getArtifactsByG( request.getFieldHint( MAVEN.GROUP_ID ), request.getFactory().getIndexingContext() );
+        }
+        else
+        {
+
+            // if we are here, no hits found or something horribly went wrong?
+            return Collections.emptySet();
+        }
     }
 
     protected Set<ArtifactInfo> getArtifactsByG( String g, IndexingContext indexingContext )
