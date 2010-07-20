@@ -10,10 +10,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * Base set of functionality for the TreeNode that all implementations will need.
- *
+ * 
  * @version $Revision$ $Date$
  */
 public abstract class AbstractTreeNode
@@ -242,9 +241,9 @@ public abstract class AbstractTreeNode
     }
 
     /**
-     * Get the children of this node.  If this is a leaf node, null will be returned.
-     * This will NOT perform any actions on the index to retrieve the children, will
-     * only return children that have already been loaded via the listChildren method.
+     * Get the children of this node. If this is a leaf node, null will be returned. This will NOT perform any actions
+     * on the index to retrieve the children, will only return children that have already been loaded via the
+     * listChildren method.
      * 
      * @return List<TreeNode>
      */
@@ -259,8 +258,8 @@ public abstract class AbstractTreeNode
     }
 
     /**
-     * Get the children of this node.  If this is a leaf node, null will be returned.
-     * This will use the index to retrieve the list of child nodes.
+     * Get the children of this node. If this is a leaf node, null will be returned. This will use the index to retrieve
+     * the list of child nodes.
      * 
      * @return List<TreeNode>
      */
@@ -269,7 +268,7 @@ public abstract class AbstractTreeNode
     {
         if ( !isLeaf() && getChildren().isEmpty() && !isLeaf() )
         {
-            children = treeView.listNodes( factory, getPath() ).getChildren();
+            children = treeView.listNodes( new TreeViewRequest( factory, getPath() ) ).getChildren();
         }
 
         return children;
