@@ -432,7 +432,7 @@ public class SearchNGIndexPlexusResource
                     hits.put( key, artifact );
                 }
 
-                Repository repository = getRepositoryRegistry().getRepository( ai.repository );
+                Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
 
                 NexusNGArtifactHit hit = null;
 
