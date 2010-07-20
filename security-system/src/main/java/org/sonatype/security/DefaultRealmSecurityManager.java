@@ -11,8 +11,6 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
@@ -26,7 +24,6 @@ import com.google.inject.internal.Nullable;
  * 
  * @author Brian Demers
  */
-//@Component( role = RealmSecurityManager.class )
 @Singleton
 @Typed( value = RealmSecurityManager.class )
 @Named( value = "default" )
@@ -39,7 +36,6 @@ public class DefaultRealmSecurityManager
     @Nullable
     private RolePermissionResolver rolePermissionResolver;
 
-    @Requirement
     @Inject
     private Logger logger;
 

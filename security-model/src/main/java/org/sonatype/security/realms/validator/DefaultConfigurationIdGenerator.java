@@ -14,9 +14,13 @@ package org.sonatype.security.realms.validator;
 
 import java.util.Random;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-@Component( role = ConfigurationIdGenerator.class )
+@Singleton
+@Typed( value = ConfigurationIdGenerator.class )
+@Named( value = "default" )
 public class DefaultConfigurationIdGenerator
     implements ConfigurationIdGenerator
 {

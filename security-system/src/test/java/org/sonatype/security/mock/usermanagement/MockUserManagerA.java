@@ -1,11 +1,16 @@
 package org.sonatype.security.mock.usermanagement;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.UserManager;
 
-@Component( role = UserManager.class, hint = "MockUserManagerA" )
+@Singleton
+@Typed( value = UserManager.class )
+@Named( value = "MockUserManagerA" )
 public class MockUserManagerA
     extends AbstractMockUserManager
 

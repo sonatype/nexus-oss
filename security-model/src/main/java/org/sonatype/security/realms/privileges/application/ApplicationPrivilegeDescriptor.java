@@ -15,8 +15,11 @@ package org.sonatype.security.realms.privileges.application;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -27,17 +30,21 @@ import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 import org.sonatype.security.realms.validator.SecurityValidationContext;
 
-@Component( role = PrivilegeDescriptor.class, hint = "ApplicationPrivilegeDescriptor" )
+@Singleton
+@Typed( value = PrivilegeDescriptor.class )
+@Named( value = "ApplicationPrivilegeDescriptor" )
 public class ApplicationPrivilegeDescriptor
     extends AbstractPrivilegeDescriptor
     implements PrivilegeDescriptor
 {
     public static final String TYPE = "method";
     
-    @Requirement( role = PrivilegePropertyDescriptor.class, hint = "ApplicationPrivilegeMethodPropertyDescriptor" )
+    @Inject
+    @Named( value = "ApplicationPrivilegeMethodPropertyDescriptor" )
     private PrivilegePropertyDescriptor methodProperty;
     
-    @Requirement( role = PrivilegePropertyDescriptor.class, hint = "ApplicationPrivilegePermissionPropertyDescriptor" )
+    @Inject
+    @Named( value = "ApplicationPrivilegePermissionPropertyDescriptor" )
     private PrivilegePropertyDescriptor permissionProperty;
     
     public String getName()

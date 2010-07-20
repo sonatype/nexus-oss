@@ -14,12 +14,16 @@ package org.sonatype.security.usermanagement;
 
 import java.util.Random;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 /**
  * Default implementation of PasswordGenerator.
  */
-@Component( role = PasswordGenerator.class )
+@Singleton
+@Typed( value = PasswordGenerator.class )
+@Named( value = "default" )
 public class DefaultPasswordGenerator
     implements PasswordGenerator
 {

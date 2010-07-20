@@ -19,8 +19,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.validation.ValidationMessage;
@@ -33,15 +36,17 @@ import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.realms.privileges.PrivilegeDescriptor;
 
-@Component( role = SecurityConfigurationValidator.class )
+@Singleton
+@Typed( value = SecurityConfigurationValidator.class )
+@Named( value = "default" )
 public class DefaultConfigurationValidator
     extends AbstractLogEnabled
     implements SecurityConfigurationValidator
 {
-    @Requirement
+    @Inject
     private ConfigurationIdGenerator idGenerator;
 
-    @Requirement( role = PrivilegeDescriptor.class )
+    @Inject
     private List<PrivilegeDescriptor> privilegeDescriptors;
 
     private static String DEFAULT_SOURCE = "default";

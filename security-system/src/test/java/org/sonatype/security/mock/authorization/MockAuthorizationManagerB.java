@@ -3,7 +3,10 @@ package org.sonatype.security.mock.authorization;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.authorization.AbstractReadOnlyAuthorizationManager;
 import org.sonatype.security.authorization.AuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
@@ -11,7 +14,9 @@ import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.Role;
 
-@Component( role = AuthorizationManager.class, hint = "sourceB" )
+@Singleton
+@Typed( value = AuthorizationManager.class )
+@Named( value = "sourceB" )
 public class MockAuthorizationManagerB
     extends AbstractReadOnlyAuthorizationManager
 {

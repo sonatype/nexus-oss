@@ -12,10 +12,15 @@
  */
 package org.sonatype.security.realms.privileges.application;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.privileges.PrivilegePropertyDescriptor;
 
-@Component( role = PrivilegePropertyDescriptor.class, hint = "ApplicationPrivilegeMethodPropertyDescriptor" )
+@Singleton
+@Typed( value = PrivilegePropertyDescriptor.class )
+@Named( value = "ApplicationPrivilegeMethodPropertyDescriptor" )
 public class ApplicationPrivilegeMethodPropertyDescriptor
     implements PrivilegePropertyDescriptor
 {

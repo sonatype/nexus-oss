@@ -25,7 +25,6 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
@@ -63,46 +62,36 @@ import org.sonatype.security.usermanagement.UserStatus;
 /**
  * This implementation wraps a Shiro SecurityManager, and adds user management.
  */
-// @Component( role = SecuritySystem.class )
 @Singleton
 @Typed( value = SecuritySystem.class )
 @Named( value = "default" )
 public class DefaultSecuritySystem
     implements SecuritySystem, Initializable, EventListener
 {
-    @Requirement
     @Inject
     private SecurityConfigurationManager securityConfiguration;
 
-    @Requirement
     @Inject
     private RealmSecurityManager applicationSecurityManager;
 
-    @Requirement
     @Inject
     private PlexusEhCacheWrapper cacheWrapper;
 
-    @Requirement( role = UserManager.class )
     @Inject
     private Map<String, UserManager> userManagerMap;
 
-    @Requirement
     @Inject
     private PlexusContainer container;
 
-    @Requirement( role = AuthorizationManager.class )
     @Inject
     private Map<String, AuthorizationManager> authorizationManagers;
 
-    @Requirement
     @Inject
     private PasswordGenerator passwordGenerator;
 
-    @Requirement
     @Inject
     private ApplicationEventMulticaster eventMulticaster;
 
-    @Requirement
     @Inject
     private Logger logger;
 

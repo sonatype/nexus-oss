@@ -14,6 +14,10 @@ package org.sonatype.security.realms;
 
 import java.util.Collections;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -26,9 +30,10 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = Realm.class, hint = "FakeRealm2" )
+@Singleton
+@Typed( value = Realm.class )
+@Named( value = "FakeRealm2" )
 public class FakeRealm2
     extends AuthorizingRealm
 {

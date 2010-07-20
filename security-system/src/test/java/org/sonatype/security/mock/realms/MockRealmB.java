@@ -1,5 +1,9 @@
 package org.sonatype.security.mock.realms;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -10,9 +14,10 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
 
-@Component( role = Realm.class, hint = "MockRealmB" )
+@Singleton
+@Typed( value = Realm.class )
+@Named( value = "MockRealmB" )
 public class MockRealmB
     extends AuthorizingRealm
 {

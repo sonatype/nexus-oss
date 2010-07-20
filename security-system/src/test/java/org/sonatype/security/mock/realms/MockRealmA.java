@@ -3,6 +3,11 @@ package org.sonatype.security.mock.realms;
 import java.util.Collection;
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -13,19 +18,20 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
-@Component( role = Realm.class, hint = "MockRealmA" )
+@Singleton
+@Typed( value = Realm.class )
+@Named( value = "MockRealmA" )
 public class MockRealmA
     extends AuthenticatingRealm
 {
 
-    @Requirement( hint = "MockUserManagerA" )
+    @Inject
+    @Named(value = "MockUserManagerA" )
     private UserManager userManager;
     
     public MockRealmA()
