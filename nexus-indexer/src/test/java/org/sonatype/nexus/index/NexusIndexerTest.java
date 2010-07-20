@@ -51,6 +51,12 @@ public class NexusIndexerTest
 
         Query q = null;
 
+        // exact search against field stored in both ways (tokenized/untokenized)
+        q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-loggin*", SearchType.EXACT );
+
+        // g:commons-loggin*
+        assertEquals( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey() + ":commons-loggin*", q.toString() );
+
         // scored search against field stored in both ways (tokenized/untokenized)
         q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-loggin*", SearchType.SCORED );
 
@@ -78,11 +84,12 @@ public class NexusIndexerTest
         // scored search against field having tokenized IndexerField only (should be impossible).
         q = indexer.constructQuery( MAVEN.NAME, "Some artifact name from Pom", SearchType.SCORED );
 
-        assertEquals( MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":some "
-            + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":artifact "
-            + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":name "
-            + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":from "
-            + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":pom*", q.toString() );
+        assertEquals(
+            MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":some "
+                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":artifact "
+                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":name "
+                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":from "
+                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":pom*", q.toString() );
 
         // keyword search against field having tokenized IndexerField only (should be impossible).
         q = indexer.constructQuery( MAVEN.NAME, "some artifact name from Pom", SearchType.EXACT );
@@ -528,7 +535,7 @@ public class NexusIndexerTest
         // {
         // Document doc = indexReader.document( i );
         // System.err.println( i + " : " + doc.get( ArtifactInfo.UINFO));
-        //          
+        //
         // }
         return indexer;
     }

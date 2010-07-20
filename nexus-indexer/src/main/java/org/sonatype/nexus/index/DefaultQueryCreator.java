@@ -172,8 +172,16 @@ public class DefaultQueryCreator
         {
             if ( indexerField.isKeyword() )
             {
-                // exactly what callee wants
-                return new TermQuery( new Term( indexerField.getKey(), query ) );
+                // no tokenization should happen against the field!
+                if ( query.contains( "*" ) || query.contains( "?" ) )
+                {
+                    return new WildcardQuery( new Term( indexerField.getKey(), query ) );
+                }
+                else
+                {
+                    // exactly what callee wants
+                    return new TermQuery( new Term( indexerField.getKey(), query ) );
+                }
             }
             else if ( !indexerField.isKeyword() && indexerField.isStored() )
             {
