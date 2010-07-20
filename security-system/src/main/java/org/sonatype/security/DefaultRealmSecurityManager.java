@@ -11,9 +11,9 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.session.mgt.DefaultSessionManager;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.slf4j.Logger;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 

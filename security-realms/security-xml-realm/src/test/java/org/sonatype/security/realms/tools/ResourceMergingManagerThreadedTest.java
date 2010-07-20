@@ -9,7 +9,7 @@ import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.ComponentRequirement;
 import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 
 import edu.umd.cs.mtc.MultithreadedTestCase;
 import edu.umd.cs.mtc.TestFramework;

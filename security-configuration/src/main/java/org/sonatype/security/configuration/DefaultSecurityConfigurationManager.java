@@ -10,7 +10,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationResponse;

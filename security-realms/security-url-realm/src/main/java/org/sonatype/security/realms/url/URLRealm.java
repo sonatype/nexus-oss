@@ -37,7 +37,6 @@ import org.apache.shiro.crypto.hash.Sha1Hash;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.logging.Logger;
 import org.restlet.Client;
 import org.restlet.Context;
 import org.restlet.data.ChallengeResponse;
@@ -46,6 +45,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
+import org.slf4j.Logger;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 

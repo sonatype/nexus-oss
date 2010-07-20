@@ -18,7 +18,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;

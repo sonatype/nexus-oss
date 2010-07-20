@@ -12,11 +12,10 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.slf4j.Logger;
 import org.sonatype.security.authentication.FirstSuccessfulModularRealmAuthenticator;
 import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthorizer;
 

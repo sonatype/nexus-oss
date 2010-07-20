@@ -23,7 +23,7 @@ import javax.inject.Singleton;
 
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
+import org.slf4j.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
