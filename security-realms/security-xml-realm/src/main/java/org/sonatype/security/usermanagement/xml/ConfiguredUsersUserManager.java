@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -54,11 +53,11 @@ public class ConfiguredUsersUserManager
     @Inject
     private Logger logger;
 
-    // TODO: guice lazy loading?
     @Inject
     private SecuritySystem securitySystem;
 
-    @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
+    @Inject
+    @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
     public static final String SOURCE = "allConfigured";

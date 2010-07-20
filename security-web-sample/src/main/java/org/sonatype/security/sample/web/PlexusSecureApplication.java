@@ -1,10 +1,10 @@
 package org.sonatype.security.sample.web;
 
 import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Application;
 import org.restlet.Router;
 import org.sonatype.plexus.rest.PlexusRestletApplicationBridge;
@@ -19,7 +19,7 @@ public class PlexusSecureApplication
     extends PlexusRestletApplicationBridge
 {
 
-    @Requirement
+    @Inject
     private ProtectedPathManager protectedPathManager;
 
     @Override

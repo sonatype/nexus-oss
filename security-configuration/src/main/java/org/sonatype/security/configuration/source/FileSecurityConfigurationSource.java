@@ -53,7 +53,7 @@ public class FileSecurityConfigurationSource
     // /**
     // * The configuration upgrader.
     // */
-    // @Requirement
+    // @@Inject
     // private SecurityConfigurationUpgrader configurationUpgrader;
 
     /**

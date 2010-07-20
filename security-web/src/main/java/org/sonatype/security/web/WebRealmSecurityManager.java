@@ -3,6 +3,7 @@ package org.sonatype.security.web;
 import java.util.Map;
 
 import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -12,7 +13,6 @@ import org.apache.shiro.authz.permission.RolePermissionResolver;
 import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.slf4j.Logger;
@@ -33,10 +33,10 @@ public class WebRealmSecurityManager
     implements Initializable
 {
 
-    @Requirement( role = RolePermissionResolver.class )
+    @Inject
     private Map<String, RolePermissionResolver> rolePermissionResolverMap;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     public WebRealmSecurityManager()
