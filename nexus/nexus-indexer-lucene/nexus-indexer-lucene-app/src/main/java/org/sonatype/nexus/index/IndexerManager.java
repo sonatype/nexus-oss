@@ -20,6 +20,7 @@ import org.apache.lucene.search.Query;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -207,7 +208,12 @@ public interface IndexerManager
     // Tree nodes
     // ----------------------------------------------------------------------------
 
+    /**
+     * @deprecated Use {@link #listNodes(TreeViewRequest) instead.
+     */
     TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path );
+
+    TreeNode listNodes( TreeViewRequest request );
 
     void optimizeRepositoryIndex( String repositoryId )
         throws IOException;;

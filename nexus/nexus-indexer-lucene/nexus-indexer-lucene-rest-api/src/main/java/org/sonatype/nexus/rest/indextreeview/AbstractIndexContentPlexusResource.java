@@ -16,14 +16,17 @@ package org.sonatype.nexus.rest.indextreeview;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -35,12 +38,18 @@ import com.thoughtworks.xstream.XStream;
 
 /**
  * Abstract index content resource.
- *
+ * 
  * @author dip
  */
 public abstract class AbstractIndexContentPlexusResource
     extends AbstractIndexerNexusPlexusResource
 {
+    private static final String HINT_GROUP_ID = "groupIdHint";
+
+    private static final String HINT_ARTIFACT_ID = "artifactIdHint";
+
+    private static final String HINT_VERSION = "versionHint";
+
     @Requirement
     protected IndexerManager indexerManager;
 
@@ -49,12 +58,12 @@ public abstract class AbstractIndexContentPlexusResource
     {
         return null;
     }
-    
+
     @Override
     public void configureXStream( XStream xstream )
     {
         super.configureXStream( xstream );
-        
+
         xstream.processAnnotations( IndexBrowserTreeNode.class );
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
     }
@@ -69,32 +78,70 @@ public abstract class AbstractIndexContentPlexusResource
             response.redirectPermanent( path + "/" );
             return null;
         }
-        
+
+        String groupIdHint = null;
+        String artifactIdHint = null;
+        String versionHint = null;
+
+        Form form = request.getResourceRef().getQueryAsForm();
+
+        if ( form.getFirstValue( HINT_GROUP_ID ) != null )
+        {
+            groupIdHint = form.getFirstValue( HINT_GROUP_ID );
+        }
+        if ( form.getFirstValue( HINT_ARTIFACT_ID ) != null )
+        {
+            artifactIdHint = form.getFirstValue( HINT_ARTIFACT_ID );
+        }
+        if ( form.getFirstValue( HINT_VERSION ) != null )
+        {
+            versionHint = form.getFirstValue( HINT_VERSION );
+        }
+
         String repositoryId = getRepositoryId( request );
-        
+
         try
         {
             Repository repository = getRepositoryRegistry().getRepository( repositoryId );
-            
-            if( GroupRepository.class.isInstance( repository ) || repository.isSearchable() )
+
+            if ( GroupRepository.class.isInstance( repository ) || repository.isSearchable() )
             {
-                TreeNodeFactory factory = new IndexBrowserTreeNodeFactory( 
-                    indexerManager.getRepositoryBestIndexContext( repository.getId() ), 
-                    repository, 
-                    createRedirectBaseRef( request ).toString() );
-                
-                TreeNode node = indexerManager.listNodes( factory, repository, path );
-                
+                TreeNodeFactory factory =
+                    new IndexBrowserTreeNodeFactory(
+                        indexerManager.getRepositoryBestIndexContext( repository.getId() ), repository,
+                        createRedirectBaseRef( request ).toString() );
+
+                TreeViewRequest tvReq = new TreeViewRequest( factory, path );
+
+                if ( StringUtils.isNotBlank( groupIdHint ) )
+                {
+                    tvReq.addFieldHint( MAVEN.GROUP_ID, groupIdHint );
+                }
+
+                if ( StringUtils.isNotBlank( artifactIdHint ) )
+                {
+                    tvReq.addFieldHint( MAVEN.ARTIFACT_ID, artifactIdHint );
+                }
+
+                if ( StringUtils.isNotBlank( versionHint ) )
+                {
+                    tvReq.addFieldHint( MAVEN.VERSION, versionHint );
+                }
+
+                TreeNode node = indexerManager.listNodes( tvReq );
+
                 if ( node == null )
                 {
-                    throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Unable to retrieve index tree nodes" );
+                    throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND,
+                        "Unable to retrieve index tree nodes" );
                 }
-                
-                return new IndexBrowserTreeViewResponseDTO( ( IndexBrowserTreeNode ) node );
+
+                return new IndexBrowserTreeViewResponseDTO( (IndexBrowserTreeNode) node );
             }
             else
             {
-                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "The index is disabled for this repository." ); 
+                throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND,
+                    "The index is disabled for this repository." );
             }
         }
         catch ( NoSuchRepositoryAccessException e )
@@ -108,7 +155,7 @@ public abstract class AbstractIndexContentPlexusResource
             throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found", e );
         }
     }
-    
+
     protected abstract String getRepositoryId( Request request );
 
     protected String parsePathFromUri( String parsedPath )
@@ -129,9 +176,9 @@ public abstract class AbstractIndexContentPlexusResource
         {
             parsedPath = "/";
         }
-        
+
         int index = parsedPath.indexOf( "index_content" );
-        
+
         if ( index > -1 )
         {
             parsedPath = parsedPath.substring( index + "index_content".length() );

@@ -66,6 +66,7 @@ import org.sonatype.nexus.index.packer.IndexPackingRequest.IndexFormat;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.index.updater.AbstractResourceFetcher;
 import org.sonatype.nexus.index.updater.IndexUpdateRequest;
 import org.sonatype.nexus.index.updater.IndexUpdateResult;
@@ -2546,6 +2547,7 @@ public class DefaultIndexerManager
     // Tree nodes
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path )
     {
         try
@@ -2555,7 +2557,22 @@ public class DefaultIndexerManager
         catch ( IOException e )
         {
             // TODO Auto-generated catch block
-            getLogger().error( "Error retrieving index nodes", e );
+            getLogger().warn( "Error retrieving index nodes", e );
+        }
+
+        return null;
+    }
+
+    public TreeNode listNodes( TreeViewRequest request )
+    {
+        try
+        {
+            return indexTreeView.listNodes( request );
+        }
+        catch ( IOException e )
+        {
+            // TODO Auto-generated catch block
+            getLogger().warn( "Error retrieving index nodes", e );
         }
 
         return null;
