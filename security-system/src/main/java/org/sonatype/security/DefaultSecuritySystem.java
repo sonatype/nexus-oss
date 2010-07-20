@@ -24,8 +24,6 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
@@ -82,7 +80,7 @@ public class DefaultSecuritySystem
     private Map<String, UserManager> userManagerMap;
 
     @Inject
-    private PlexusContainer container;
+    private Map<String, Realm> realmMap;
 
     @Inject
     private Map<String, AuthorizationManager> authorizationManagers;
@@ -210,20 +208,19 @@ public class DefaultSecuritySystem
 
         for ( String realmId : realmIds )
         {
-            try
+            if( this.realmMap.containsKey( realmId ))
             {
-                // First will load from plexus container
-                realms.add( (Realm) container.lookup( Realm.class, realmId ) );
+                realms.add( this.realmMap.get( realmId ) );
             }
-            catch ( ComponentLookupException e )
+            else
             {
-                this.logger.debug( "Failed to look up realm as plexus component, trying a Class.forName()", e );
+                this.logger.debug( "Failed to look up realm as a component, trying a Class.forName()" );
                 // If that fails, will simply use reflection to load
                 try
                 {
                     realms.add( (Realm) Class.forName( realmId ).newInstance() );
                 }
-                catch ( Exception e1 )
+                catch ( Exception e )
                 {
                     this.logger.error( "Unable to lookup security realms", e );
                 }

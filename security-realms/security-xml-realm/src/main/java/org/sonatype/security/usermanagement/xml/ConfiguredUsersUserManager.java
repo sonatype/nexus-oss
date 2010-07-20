@@ -22,9 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
@@ -55,9 +53,6 @@ public class ConfiguredUsersUserManager
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private PlexusContainer container;
 
     // TODO: guice lazy loading?
     @Inject
