@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -55,6 +56,8 @@ public class AbstractEnvironmentMojo
     implements Contextualizable
 {
 
+    final static List DEFAULT_PORT_NAMES = Arrays.asList(new String[]{"proxy-repo-port","proxy-repo-control-port","nexus-application-port","nexus-proxy-port","nexus-control-port","email-server-port","webproxy-server-port"});
+    
     /** @component */
     protected org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
@@ -201,6 +204,14 @@ public class AbstractEnvironmentMojo
      */
     private String mavenBaseDir;
 
+    /**
+     * Known ports can be manually set as part of the configuration
+     * @parameter
+     */
+    private Map<String,Integer> staticPorts;
+
+
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -259,10 +270,10 @@ public class AbstractEnvironmentMojo
         copyEmma( libFolder );
         File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
 
-        Collection<MavenArtifact> nexusPluginsArtifacts = getNexusPluginsArtifacts();
-        if ( nexusPluginsArtifacts != null )
+        Collection<MavenArtifact> npas = getNexusPluginsArtifacts();
+        if ( npas != null )
         {
-            setupPlugins( nexusBaseDir, nexusPluginsArtifacts, libFolder, pluginFolder );
+            setupPlugins( nexusBaseDir, npas, libFolder, pluginFolder );
         }
 
         if ( promoteOptionalPlugin )
@@ -464,23 +475,36 @@ public class AbstractEnvironmentMojo
         }
     }
 
+
     private void allocatePorts()
         throws MojoExecutionException, MojoFailureException
     {
-        List<Port> portsList = new ArrayList<Port>();
-        portsList.add( new Port( "proxy-repo-port" ) );
-        portsList.add( new Port( "proxy-repo-control-port" ) );
-        portsList.add( new Port( "nexus-application-port" ) );
-        portsList.add( new Port( "nexus-proxy-port" ) );
-        portsList.add( new Port( "nexus-control-port" ) );
-        portsList.add( new Port( "email-server-port" ) );
-        portsList.add( new Port( "webproxy-server-port" ) );
 
-        PortAllocatorMojo portAllocator = new PortAllocatorMojo();
-        portAllocator.setProject( project );
-        portAllocator.setLog( getLog() );
-        portAllocator.setPorts( portsList.toArray( new Port[0] ) );
-        portAllocator.execute();
+        List<String> dynamicPortNames = new ArrayList(DEFAULT_PORT_NAMES);
+        if(this.staticPorts != null){
+            dynamicPortNames.removeAll(staticPorts.keySet());
+        }
+
+        // calc dynamic ports
+        List<Port> portsList = new ArrayList<Port>();
+        for (String portName : dynamicPortNames){
+            portsList.add( new Port( portName ) );
+        }
+        if (!portsList.isEmpty()){
+            PortAllocatorMojo portAllocator = new PortAllocatorMojo();
+            portAllocator.setProject( project );
+            portAllocator.setLog( getLog() );
+            portAllocator.setPorts( portsList.toArray( new Port[0] ) );
+            portAllocator.execute();
+        }
+
+        // now set static ports
+        if(this.staticPorts != null){
+            for(Map.Entry<String,Integer> entry : this.staticPorts.entrySet()){
+                getLog().debug( "Assigning port '" + entry.getValue() + "' to property '" + entry.getKey() + "'" );
+                project.getProperties().put( entry.getKey(), String.valueOf( entry.getValue() ) );
+            }
+        }
     }
 
     private void copyExtraResources()
