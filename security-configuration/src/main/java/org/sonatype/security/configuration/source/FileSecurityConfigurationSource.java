@@ -18,9 +18,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -34,7 +36,9 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * 
  * @author tstevens
  */
-@Component( role = SecurityConfigurationSource.class, hint = "file" )
+@Singleton
+@Typed( value = SecurityConfigurationSource.class )
+@Named( value = "file" )
 public class FileSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
@@ -42,7 +46,8 @@ public class FileSecurityConfigurationSource
     /**
      * The configuration file.
      */
-    @Configuration( value = "${application-conf}/security-configuration.xml" )
+    @Inject
+    @Named( value = "${application-conf}/security-configuration.xml" )
     private File configurationFile;
 
     // /**
@@ -54,10 +59,11 @@ public class FileSecurityConfigurationSource
     /**
      * The defaults configuration source.
      */
-    @Requirement( hint = "static" )
+    @Inject
+    @Named( value = "static" )
     private SecurityConfigurationSource securityDefaults;
 
-    @Requirement
+    @Inject
     private PasswordHelper passwordHelper;
 
     /** Flag to mark defaulted config */

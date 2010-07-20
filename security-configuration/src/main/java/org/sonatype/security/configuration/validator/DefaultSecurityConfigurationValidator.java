@@ -2,12 +2,17 @@ package org.sonatype.security.configuration.validator;
 
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
-@Component( role = SecurityConfigurationValidator.class )
+@Singleton
+@Typed( value = SecurityConfigurationValidator.class )
+@Named( value = "default" )
 public class DefaultSecurityConfigurationValidator
     implements SecurityConfigurationValidator
 {

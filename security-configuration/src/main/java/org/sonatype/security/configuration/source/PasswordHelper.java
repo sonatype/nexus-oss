@@ -6,8 +6,11 @@
  */
 package org.sonatype.security.configuration.source;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.plexus.components.cipher.PlexusCipher;
 import org.sonatype.plexus.components.cipher.PlexusCipherException;
 
@@ -15,13 +18,15 @@ import org.sonatype.plexus.components.cipher.PlexusCipherException;
  * FIXME This needs to be abstracted, as this is just a copy of the class in nexus. The problem is if we move this to
  * base-configuration (or something) it becomes less secure, as we are using the same key for everything)
  */
-@Component( role = PasswordHelper.class )
+@Singleton
+@Typed( value = PasswordHelper.class )
+@Named( value = "default" )
 public class PasswordHelper
 {
 
     private static final String ENC = "CMMDwoV";
 
-    @Requirement
+    @Inject
     private PlexusCipher plexusCipher;
 
     public String encrypt( String password )

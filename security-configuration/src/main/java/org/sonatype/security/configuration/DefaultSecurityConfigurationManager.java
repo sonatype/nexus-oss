@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.codehaus.plexus.logging.Logger;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -16,18 +19,21 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 import org.sonatype.security.configuration.validator.SecurityConfigurationValidator;
 import org.sonatype.security.configuration.validator.SecurityValidationContext;
 
-@Component( role = SecurityConfigurationManager.class )
+@Singleton
+@Typed( value = SecurityConfigurationManager.class )
+@Named( value = "default" )
 public class DefaultSecurityConfigurationManager
     implements SecurityConfigurationManager
 {
 
-    @Requirement( hint = "file" )
+    @Inject
+    @Named( value = "file" )
     private SecurityConfigurationSource configurationSource;
 
-    @Requirement
+    @Inject
     private SecurityConfigurationValidator validator;
 
-    @Requirement
+    @Inject
     private Logger logger;
 
     /**

@@ -15,7 +15,10 @@ package org.sonatype.security.configuration.source;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.security.configuration.model.SecurityConfiguration;
 
@@ -25,7 +28,9 @@ import org.sonatype.security.configuration.model.SecurityConfiguration;
  * 
  * @author cstamas
  */
-@Component( role = SecurityConfigurationSource.class, hint = "static" )
+@Singleton
+@Typed( value = SecurityConfigurationSource.class )
+@Named( value = "static" )
 public class StaticSecurityConfigurationSource
     extends AbstractSecurityConfigurationSource
 {
