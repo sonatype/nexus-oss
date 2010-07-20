@@ -64,8 +64,6 @@ public class SecurityXmlUserManager
     private ConfigurationManager configuration;
 
     @Inject
-    private PlexusContainer container;
-
     private SecuritySystem securitySystem;
 
     @Inject
@@ -307,19 +305,6 @@ public class SecurityXmlUserManager
 
     private SecuritySystem getSecuritySystem()
     {
-        // FIXME: hack, we need to lazy load the security system, due to a circular dependency
-        if ( this.securitySystem == null )
-        {
-            try
-            {
-                this.securitySystem = this.container.lookup( SecuritySystem.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                this.logger.error( "Unable to load SecuritySystem", e );
-            }
-        }
-
         return this.securitySystem;
     }
 

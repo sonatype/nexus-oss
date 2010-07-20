@@ -33,6 +33,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.inject.Nullable;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -95,6 +96,8 @@ public class DefaultSecuritySystem
     @Inject
     private Logger logger;
 
+    @Inject
+    @Nullable
     private SecurityEmailer securityEmailer;
 
     private static final String ALL_ROLES_KEY = "all";
@@ -781,15 +784,8 @@ public class DefaultSecuritySystem
     {
         if ( this.securityEmailer == null )
         {
-            try
-            {
-                this.securityEmailer = this.container.lookup( SecurityEmailer.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                this.logger.error( "Failed to find a SecurityEmailer" );
-                this.securityEmailer = new NullSecurityEmailer();
-            }
+            this.logger.error( "Failed to find a SecurityEmailer" );
+            this.securityEmailer = new NullSecurityEmailer();
         }
         return this.securityEmailer;
     }

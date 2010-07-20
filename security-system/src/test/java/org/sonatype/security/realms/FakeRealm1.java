@@ -30,8 +30,6 @@ import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.security.usermanagement.UserManager;
 
 @Singleton
 @Typed( value = Realm.class )

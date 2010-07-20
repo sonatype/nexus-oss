@@ -60,7 +60,7 @@ public class ConfiguredUsersUserManager
     private PlexusContainer container;
 
     // TODO: guice lazy loading?
-    // @Requirement
+    @Inject
     private SecuritySystem securitySystem;
 
     @Requirement( role = ConfigurationManager.class, hint = "resourceMerging" )
@@ -150,19 +150,6 @@ public class ConfiguredUsersUserManager
 
     private SecuritySystem getSecuritySystem()
     {
-        // FIXME: hack, we need to lazy load the security system, due to a circular dependency
-        if ( this.securitySystem == null )
-        {
-            try
-            {
-                this.securitySystem = this.container.lookup( SecuritySystem.class );
-            }
-            catch ( ComponentLookupException e )
-            {
-                this.logger.error( "Unable to load SecuritySystem", e );
-            }
-        }
-
         return this.securitySystem;
     }
 
