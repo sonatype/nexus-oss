@@ -11,6 +11,7 @@ Sonatype.repoServer.RepositoryBrowserContainer = function(config) {
   var items = [];
 
   this.repositoryBrowser = new Sonatype.repoServer.RepositoryBrowsePanel({
+        name : 'repositoryBrowser',
         payload : this.payload,
         tabTitle : this.tabTitle,
         browseIndex : false,

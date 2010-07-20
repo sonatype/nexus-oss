@@ -227,6 +227,19 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   this.dataStore.addListener('load', this.onRepoStoreLoad, this);
   this.dataStore.addListener('loadexception', this.onRepoStoreLoadException, this);
   this.dataStore.load();
+
+  this.cardPanel.on('afterlayout', function() {
+        var tpanel = this.cardPanel.getLayout().activeItem.tabPanel;
+        if (tpanel)
+        {
+          tpanel.on('tabchange', function() {
+                Sonatype.utils.updateHistory(this);
+              }, this);
+        }
+      }, this);
+  Sonatype.Events.addListener('repoBrowserStartSearch', function() {
+        Sonatype.utils.updateHistory(this);
+      }, this);
 };
 
 Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
@@ -241,7 +254,56 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               });
         }
         else
+        {
           this.selectBookmarkedItem(bookmark);
+        }
+      },
+
+      selectBookmarkedItem : function(bookmark) {
+        var parts = decodeURIComponent(bookmark).split('~');
+
+        if (parts && parts.length > 0)
+        {
+          Sonatype.repoServer.RepositoryPanel.superclass.selectBookmarkedItem.call(this, parts[0]);
+        }
+
+        if (parts && parts.length > 1)
+        {
+          var tab = this.cardPanel.find('name', parts[1])[0];
+          var panel = this.cardPanel.getLayout().activeItem;
+          panel.tabPanel.setActiveTab(tab);
+        }
+
+        if (parts && parts.length > 2 && parts[1] == 'browsestorage')
+        {
+          var repoBrowser = this.cardPanel.find('name', 'repositoryBrowser')[0];
+          repoBrowser.searchField.setValue(parts[2]);
+          repoBrowser.searchTask.delay(200);
+        }
+      },
+
+      getBookmark : function() {
+        var bookmark = Sonatype.repoServer.RepositoryPanel.superclass.getBookmark.call(this);
+        if (bookmark == null)
+        {
+          return bookmark;
+        }
+
+        var tab = this.cardPanel.getLayout().activeItem.tabPanel.activeTab;
+        if (tab)
+        {
+          bookmark += ('~' + tab.name);
+        }
+        if (tab.name == 'browsestorage')
+        {
+          var repoBrowser = this.cardPanel.find('name', 'repositoryBrowser')[0];
+          var path = repoBrowser.searchField.getValue();
+          if (path)
+          {
+            bookmark += ('~' + path);
+          }
+        }
+        return bookmark;
       },
 
       deleteTrashHandler : function(button, e) {
@@ -397,6 +459,31 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
   this.searchTask = new Ext.util.DelayedTask(this.startSearch, this, [this]);
   this.nodeContextMenuEvent = 'repositoryContentMenuInit';
 
+  this.searchField = new Ext.app.SearchField({
+        xtype : 'nexussearchfield',
+        searchPanel : this,
+        width : 400,
+        enableKeyEvents : true,
+        listeners : {
+          'keyup' : {
+            fn : function(field, event) {
+              var key = event.getKey();
+              if (!event.isNavKeyPress())
+              {
+                this.searchTask.delay(200);
+              }
+            },
+            scope : this
+          },
+          'render' : function(c) {
+            Ext.QuickTips.register({
+                  target : c.getEl(),
+                  text : 'Enter a complete path to lookup, for example org/sonatype/nexus'
+                });
+          }
+        }
+      });
+
   Sonatype.repoServer.RepositoryBrowsePanel.superclass.constructor.call(this, {
         anchor : '0 -2',
         bodyStyle : 'background-color:#FFFFFF',
@@ -412,30 +499,7 @@ Sonatype.repoServer.RepositoryBrowsePanel = function(config) {
               cls : 'x-btn-text-icon',
               scope : this,
               handler : this.refreshHandler
-            }, ' ', 'Path Lookup:', {
-              xtype : 'nexussearchfield',
-              searchPanel : this,
-              width : 400,
-              enableKeyEvents : true,
-              listeners : {
-                'keyup' : {
-                  fn : function(field, event) {
-                    var key = event.getKey();
-                    if (!event.isNavKeyPress())
-                    {
-                      this.searchTask.delay(200);
-                    }
-                  },
-                  scope : this
-                },
-                'render' : function(c) {
-                  Ext.QuickTips.register({
-                        target : c.getEl(),
-                        text : 'Enter a complete path to lookup, for example org/sonatype/nexus'
-                      });
-                }
-              }
-            }],
+            }, ' ', 'Path Lookup:', this.searchField],
         loader : new Ext.tree.SonatypeTreeLoader({
               url : '',
               listeners : {
@@ -575,6 +639,8 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       startSearch : function(p) {
         var field = p.searchField;
         var searchText = field.getRawValue();
+
+        Sonatype.Events.fireEvent('repoBrowserStartSearch', searchText);
 
         var treePanel = p;
         if (searchText)
