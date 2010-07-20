@@ -642,6 +642,11 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
 
         Sonatype.Events.fireEvent('repoBrowserStartSearch', searchText);
 
+        if (searchText.charAt(0) == '/')
+        {
+          searchText = searchText.slice(1, searchText.length);
+        }
+
         var treePanel = p;
         if (searchText)
         {
@@ -680,11 +685,22 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
                   }
                   if (remainder)
                   {
-                    var s = findMatchingNodes(node, remainder);
-                    if (autoComplete || (s && s != remainder))
+                    if (node.expanded)
                     {
-                      return textToMatch + '/' + (s ? s : remainder);
+                      var s = findMatchingNodes(node, remainder);
+                      if (autoComplete || (s && s != remainder))
+                      {
+                        return textToMatch + '/' + (s ? s : remainder);
+                      }
                     }
+                    else
+                    {
+                      node.on('expand', function(node) {
+                            findMatchingNodes(node, remainder)
+                          }, this);
+
+                    }
+
                   }
                 }
               }

@@ -350,6 +350,13 @@
           <description>The repository where the artifact is stored.</description>
         </field>
         <field>
+          <name>path</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The artifact path.</description>
+        </field>
+        <field>
           <name>artifactUrl</name>
           <version>1.0.0+</version>
           <type>String</type>

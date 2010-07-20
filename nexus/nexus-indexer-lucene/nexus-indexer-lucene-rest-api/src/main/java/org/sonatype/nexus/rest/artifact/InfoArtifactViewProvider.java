@@ -47,6 +47,7 @@ public class InfoArtifactViewProvider
     @Requirement
     private ReferenceFactory referenceFactory;
 
+    @Override
     protected Object retrieveView( ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,
                                    Request req )
         throws IOException
@@ -117,12 +118,11 @@ public class InfoArtifactViewProvider
      * 
      * @return
      */
+    @Override
     protected boolean dereferenceLinks()
     {
         return true;
     }
-
-    // ==
 
     private List<RepositoryUrlResource> createRepositoriesUrl( Set<String> repositories, Request req, String path )
     {
@@ -147,6 +147,8 @@ public class InfoArtifactViewProvider
             }
             repoUrl.setArtifactUrl( referenceFactory.createReference( req,
                 "content/repositories/" + repositoryId + path ).toString() );
+            repoUrl.setPath( path );
+
             urls.add( repoUrl );
         }
         return urls;

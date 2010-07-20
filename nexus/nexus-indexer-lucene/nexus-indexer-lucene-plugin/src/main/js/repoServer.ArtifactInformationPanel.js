@@ -24,7 +24,8 @@ Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
             links += ', ';
           }
 
-          links += '<a href="' + repositories[i].artifactUrl + '">' + repositories[i].repositoryName + '</a>';
+          var path = 'index.html#view-repositories;thirdparty~browsestorage~' + repositories[i].path;
+          links += '<a href="' + path + '">' + repositories[i].repositoryName + '</a>';
         }
 
         this.setRawValue(links);
