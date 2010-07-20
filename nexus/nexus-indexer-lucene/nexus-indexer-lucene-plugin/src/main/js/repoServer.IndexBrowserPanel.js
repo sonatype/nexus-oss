@@ -74,11 +74,7 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
 
 Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
       nodeExpandHandler : function() {
-        var loadMask = null;
-        if (this.parentContainer && this.parentContainer.loadMask)
-        {
-          loadMask = this.parentContainer.loadMask;
-        }
+        var parentContainer = this.parentContainer;
 
         if (this.payload.data.expandPath)
         {
@@ -90,9 +86,9 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
                     Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
                   }
                 }
-                else if (loadMask != null)
+                else if (parentContainer != null)
                 {
-                  loadMask.hide();
+                  parentContainer.loadComplete();
                 }
               });
         }

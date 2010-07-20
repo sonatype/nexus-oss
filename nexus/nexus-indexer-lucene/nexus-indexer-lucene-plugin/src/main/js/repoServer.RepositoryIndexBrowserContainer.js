@@ -59,6 +59,12 @@ Ext.extend(Sonatype.repoServer.RepositoryIndexBrowserContainer, Ext.Panel, {
           }
           this.repositoryBrowser.updatePayload(payload);
         }
+      },
+      loadComplete : function() {
+        if (this.loadMask)
+        {
+          this.loadMask.hide();
+        }
       }
     });
 
