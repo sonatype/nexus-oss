@@ -12,10 +12,12 @@ var SEARCH_FIELD_CONFIG = {
   },
   onTriggerClick: function(a,b,c){
     var v = this.getRawValue();
-    if ( v.length > 0 ) {
-      var panel = Sonatype.view.mainTabPanel.addOrShowTab(
-          'nexus-search', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
-      panel.startQuickSearch( v );
+    if (v.length > 0)
+    {
+      // var panel = Sonatype.view.mainTabPanel.addOrShowTab(
+      // 'nexus-search', Sonatype.repoServer.SearchPanel, { title: 'Search' } );
+      // panel.startQuickSearch( v );
+      window.location = 'index.html#nexus-search;quick~' + v;
     }
   }
 };
