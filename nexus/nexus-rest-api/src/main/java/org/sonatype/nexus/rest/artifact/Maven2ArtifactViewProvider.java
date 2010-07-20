@@ -3,20 +3,16 @@ package org.sonatype.nexus.rest.artifact;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.Request;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RequestRoute;
+import org.sonatype.nexus.rest.AbstractArtifactViewProvider;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
@@ -29,70 +25,14 @@ import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
  */
 @Component( role = ArtifactViewProvider.class, hint = "maven2" )
 public class Maven2ArtifactViewProvider
-    implements ArtifactViewProvider
+    extends AbstractArtifactViewProvider
 {
-    @Requirement
-    private Logger logger;
-
-    public Object retrieveView( ResourceStore store, ResourceStoreRequest request, StorageItem item, Request req )
+    public Object retrieveView( ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item, Request req )
         throws IOException
     {
-        Repository itemRepository = null;
+        final Repository itemRepository = itemUid.getRepository();
 
-        String itemPath = null;
-
-        // We can always say the M2 info only based on path
-        // but how to get stuff needed for that is kinda two-fold: either the item is present/cached and is passed in
-        // or it is not present. In 1st case, we use the item itself to get the "needed" stuff, otherwise we can
-        // easily calculate what it would be.
-        if ( item == null )
-        {
-            if ( store instanceof RepositoryRouter )
-            {
-                RepositoryRouter repositoryRouter = (RepositoryRouter) store;
-                // item is either not present or is not here yet (remote index)
-                // the we can "simulate" what route would be used to get it, and just get info from the route
-                RequestRoute route;
-
-                try
-                {
-                    route = repositoryRouter.getRequestRouteForRequest( request );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // this is thrown while getting routes for any path "outside" of legal ones is given
-                    // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc
-                    // (depends on
-                    // type of registered reposes)
-                    return null;
-                }
-
-                // request would be processed by targeted repository
-                itemRepository = route.getTargetedRepository();
-
-                // request would be processed against this repository path
-                itemPath = route.getRepositoryPath();
-            }
-            else if ( store instanceof Repository )
-            {
-                itemRepository = (Repository) store;
-
-                itemPath = request.getRequestPath();
-            }
-            else
-            {
-                return null;
-            }
-        }
-        else
-        {
-            // item is here, use it to get information
-            // get item's repository, from where it is actually coming
-            itemRepository = item.getRepositoryItemUid().getRepository();
-
-            // get item's in-repository path (not same as item.getPath()!)
-            itemPath = item.getRepositoryItemUid().getPath();
-        }
+        final String itemPath = itemUid.getPath();
 
         // is this a MavenRepository at all? If not, this view is not applicable
         if ( !itemRepository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
@@ -135,7 +75,7 @@ public class Maven2ArtifactViewProvider
             }
             catch ( IllegalArtifactCoordinateException e )
             {
-                logger.debug( "Failed to calculate maven 2 path." );
+                getLogger().debug( "Failed to calculate maven 2 path.", e );
 
                 // could not convert item path to GAV, probably a file in maven repository not on "maven1/2 layout"
                 // return just "not applicable" (example: maven-metadata.xml or any other file that is not addressable

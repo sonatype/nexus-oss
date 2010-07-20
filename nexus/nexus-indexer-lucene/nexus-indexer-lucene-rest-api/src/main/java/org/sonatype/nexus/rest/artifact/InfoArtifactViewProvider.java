@@ -8,35 +8,35 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.restlet.data.Request;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
-import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
-import org.sonatype.nexus.proxy.ResourceStore;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.router.RepositoryRouter;
-import org.sonatype.nexus.proxy.router.RequestRoute;
+import org.sonatype.nexus.rest.AbstractArtifactViewProvider;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryUrlResource;
 import org.sonatype.plexus.rest.ReferenceFactory;
 
+/**
+ * Artifact info view provider.
+ * 
+ * @author Velo
+ * @author cstamas
+ */
 @Component( role = ArtifactViewProvider.class, hint = "info" )
 public class InfoArtifactViewProvider
-    extends AbstractLogEnabled
-    implements ArtifactViewProvider
+    extends AbstractArtifactViewProvider
 {
     @Requirement
     private IndexerManager indexerManager;
@@ -46,92 +46,12 @@ public class InfoArtifactViewProvider
 
     @Requirement
     private ReferenceFactory referenceFactory;
-    
-    @Requirement
-    private RepositoryRouter repositoryRouter;
 
-    public Object retrieveView( ResourceStore store, ResourceStoreRequest request, StorageItem item, Request req )
+    protected Object retrieveView( ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,
+                                   Request req )
         throws IOException
     {
-        RepositoryItemUid itemUid = null;
-
-        StorageFileItem fileItem = null;
-
-        if ( item == null )
-        {
-            if ( store instanceof RepositoryRouter )
-            {
-                RepositoryRouter repositoryRouter = (RepositoryRouter) store;
-                // item is either not present or is not here yet (remote index)
-                // the we can "simulate" what route would be used to get it, and just get info from the route
-                RequestRoute route;
-
-                try
-                {
-                    route = repositoryRouter.getRequestRouteForRequest( request );
-                }
-                catch ( ItemNotFoundException e )
-                {
-                    // this is thrown while getting routes for any path "outside" of legal ones is given
-                    // like /content/foo/bar, since 2nd pathelem may be "repositories", "groups", "shadows", etc
-                    // (depends on
-                    // type of registered reposes)
-                    return null;
-                }
-
-                // request would be processed by targeted repository
-                Repository itemRepository = route.getTargetedRepository();
-
-                // create an UID against that repository
-                itemUid = itemRepository.createUid( route.getRepositoryPath() );
-            }
-            else if ( store instanceof Repository )
-            {
-                itemUid = ( (Repository) store ).createUid( request.getRequestPath() );
-            }
-            else
-            {
-                return null;
-            }
-        }
-        else
-        {
-            itemUid = item.getRepositoryItemUid();
-
-            if ( item instanceof StorageFileItem )
-            {
-                fileItem = (StorageFileItem) item;
-            }
-            else if ( item instanceof StorageLinkItem )
-            {
-                // TODO: we may have "deeper" links too! Implement this properly!
-                try
-                {
-                    StorageItem retrieveItem =
-                        repositoryRouter.dereferenceLink( (StorageLinkItem) item, request.isRequestLocalOnly(),
-                            request.isRequestRemoteOnly() );
-
-                    if ( retrieveItem instanceof StorageFileItem )
-                    {
-                        fileItem = (StorageFileItem) retrieveItem;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-                catch ( Exception e )
-                {
-                    getLogger().warn( "Failed to resolve the storagelink " + item.getRepositoryItemUid(), e );
-
-                    return null;
-                }
-            }
-            else
-            {
-                return null;
-            }
-        }
+        StorageFileItem fileItem = (StorageFileItem) item;
 
         Set<String> repositories = new LinkedHashSet<String>();
 
@@ -191,6 +111,18 @@ public class InfoArtifactViewProvider
 
         return result;
     }
+
+    /**
+     * Here, we do want _real_ data: hashes, size, dates of link targets too, if any.
+     * 
+     * @return
+     */
+    protected boolean dereferenceLinks()
+    {
+        return true;
+    }
+
+    // ==
 
     private List<RepositoryUrlResource> createRepositoriesUrl( Set<String> repositories, Request req, String path )
     {
