@@ -2,15 +2,20 @@ Sonatype.repoServer.IndexBrowserPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
     url : '',
-    root : new Ext.tree.TreeNode({
+    showRepositoryDropDown : false
+  };
+
+  Ext.apply(this, config, defaultConfig);
+
+  if (!this.root)
+  {
+    this.root = new Ext.tree.TreeNode({
           text : '(Not Available)',
           id : '/',
           singleClickExpand : true,
           expanded : true
-        }),
-    showRepositoryDropDown : false
-  };
-  Ext.apply(this, config, defaultConfig);
+        });
+  }
 
   if (this.showRepositoryDropDown)
   {
