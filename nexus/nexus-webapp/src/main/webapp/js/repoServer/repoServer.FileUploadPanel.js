@@ -451,7 +451,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
                 cls : 'x-form-invalid-msg'
               });
           tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
-                                                      // on form fields
+          // on form fields
         }
         tree.invalid = true;
         var oldErrorText = tree.invalidText;
@@ -1005,6 +1005,7 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
                             xtype : 'panel',
                             layout : 'fit',
                             tabTitle : 'Artifact Upload',
+                            name : 'uploadPanel',
                             items : [uploadPanel]
                           });
 

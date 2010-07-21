@@ -228,18 +228,31 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   this.dataStore.addListener('loadexception', this.onRepoStoreLoadException, this);
   this.dataStore.load();
 
+  this.currentBookmark = [];
   this.cardPanel.on('afterlayout', function() {
         var tpanel = this.cardPanel.getLayout().activeItem.tabPanel;
         if (tpanel)
         {
-          tpanel.on('tabchange', function() {
+          tpanel.on('tabchange', function(panel, tab) {
+                this.currentBookmark[1] = tab.name;
+                if (tab.name != 'browsestorage')
+                {
+                  this.currentBookmark[2] = null;
+                }
                 Sonatype.utils.updateHistory(this);
               }, this);
         }
       }, this);
-  Sonatype.Events.addListener('repoBrowserStartSearch', function() {
+  Sonatype.Events.addListener('repoBrowserStartSearch', function(text) {
+        this.currentBookmark[2] = text;
         Sonatype.utils.updateHistory(this);
       }, this);
+
+  Sonatype.Events.addListener('repoBrowserStopSearch', function() {
+        this.currentBookmark[2] = null;
+        Sonatype.utils.updateHistory(this);
+      }, this);
+
 };
 
 Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
@@ -261,25 +274,36 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
 
       selectBookmarkedItem : function(bookmark) {
         var parts = decodeURIComponent(bookmark).split('~');
+        this.currentBookmark = parts;
 
         if (parts && parts.length > 0)
         {
           Sonatype.repoServer.RepositoryPanel.superclass.selectBookmarkedItem.call(this, parts[0]);
+
+          if (parts && parts.length > 1)
+          {
+            var panel = this.cardPanel.getLayout().activeItem.tabPanel;
+            var tab = panel.find('name', parts[1])[0];
+            if (tab)
+            {
+              panel.setActiveTab(tab);
+            }
+            else
+            {
+              this.currentBookmark[1] = null;
+              this.currentBookmark[2] = null;
+              Sonatype.utils.updateHistory(this);
+            }
+
+            if (parts && parts.length > 2 && parts[1] == 'browsestorage')
+            {
+              var repoBrowser = panel.find('name', 'repositoryBrowser')[0];
+              repoBrowser.searchField.setValue(parts[2]);
+              repoBrowser.searchTask.delay(200);
+            }
+          }
         }
 
-        if (parts && parts.length > 1)
-        {
-          var tab = this.cardPanel.find('name', parts[1])[0];
-          var panel = this.cardPanel.getLayout().activeItem;
-          panel.tabPanel.setActiveTab(tab);
-        }
-
-        if (parts && parts.length > 2 && parts[1] == 'browsestorage')
-        {
-          var repoBrowser = this.cardPanel.find('name', 'repositoryBrowser')[0];
-          repoBrowser.searchField.setValue(parts[2]);
-          repoBrowser.searchTask.delay(200);
-        }
       },
 
       getBookmark : function() {
@@ -289,20 +313,25 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           return bookmark;
         }
 
-        var tab = this.cardPanel.getLayout().activeItem.tabPanel.activeTab;
-        if (tab)
+        this.currentBookmark[0] = bookmark;
+
+        bookmark = '';
+
+        for (var i = 0; i < this.currentBookmark.length; i++)
         {
-          bookmark += ('~' + tab.name);
-        }
-        if (tab.name == 'browsestorage')
-        {
-          var repoBrowser = this.cardPanel.find('name', 'repositoryBrowser')[0];
-          var path = repoBrowser.searchField.getValue();
-          if (path)
+          if (!this.currentBookmark[i])
           {
-            bookmark += ('~' + path);
+            break;
           }
+
+          if (i > 0)
+          {
+            bookmark += '~';
+          }
+
+          bookmark += this.currentBookmark[i];
         }
+
         return bookmark;
       },
 
@@ -747,6 +776,8 @@ Ext.extend(Sonatype.repoServer.RepositoryBrowsePanel, Ext.tree.TreePanel, {
       stopSearch : function(p) {
         p.searchField.triggers[0].hide();
         p.oldSearchText = '';
+
+        Sonatype.Events.fireEvent('repoBrowserStopSearch');
 
         var treePanel = p;
 
