@@ -152,10 +152,7 @@ public class DefaultIndexTreeView
 
                     TreeNode groupResource = root;
 
-                    // here comes the twist: we have to search for parent G node, but _backwards_ to obey the
-                    // initial
-                    // request's path!
-
+                    // here comes the twist: we have to search for parent G node
                     String partialGroupId = null;
 
                     String[] groupIdElems = ai.groupId.split( "\\." );
