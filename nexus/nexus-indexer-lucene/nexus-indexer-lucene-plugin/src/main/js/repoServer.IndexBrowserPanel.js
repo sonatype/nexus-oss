@@ -52,8 +52,8 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
                                 format : treepanel.payload.data.hits[i].repositoryContentClass,
                                 repoType : treepanel.payload.data.hits[i].repositoryKind,
                                 expandPath : treepanel.payload.data.expandPath,
-                                handcraftedPath : treepanel.payload.data.handcraftedPath,
                                 showCtx : treepanel.payload.data.showCtx,
+                                useHints : treepanel.payload.data.useHints,
                                 hits : treepanel.payload.data.hits,
                                 rec : treepanel.payload.data.rec,
                                 getDefaultPath : treepanel.payload.data.getDefaultPath,
@@ -93,43 +93,6 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
               });
         }
       },
-      handcraftTreeFromPayload : function() {
-        var rec = this.payload.data.rec;
-        var hitIndex = this.payload.data.hitIndex;
-
-        var root = new Ext.tree.TreeNode({
-              text : rec.data.artifactHits[hitIndex].repositoryName,
-              path : '/',
-              singleClickExpand : true,
-              expanded : true
-            });
-
-        var groupIdDirs = rec.data.groupId.replace(/\./g, '/').split('/');
-        var path = '/';
-        var currentNode = root;
-
-        for (var i = 0; i < groupIdDirs.length; i++)
-        {
-          path += groupIdDirs[i] + '/';
-          var nodetype = Ext.tree.TreeNode;
-          if ((i + 1) == groupIdDirs.length)
-          {
-            nodetype = Ext.tree.AsyncTreeNode;
-          }
-          var child = new nodetype({
-                text : groupIdDirs[i],
-                path : path,
-                singleClickExpand : true,
-                expanded : true
-              });
-          currentNode.appendChild(child);
-          currentNode = child;
-        }
-
-        currentNode.on('expand', this.nodeExpandHandler, this);
-
-        return root;
-      },
       getDefaultPathFromPayload : function() {
         var rec = this.payload.data.rec;
         var hitIndex = this.payload.data.hitIndex;
@@ -154,57 +117,52 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
       },
       refreshHandler : function(button, e) {
         Sonatype.Events.fireEvent(this.nodeClickEvent, null, this.nodeClickPassthru);
-        // if we are dealing w/ refresh call (but not from refresh button) with
-        // same repo, simply relocate to new path
-        if (button == undefined && this.oldPayload && this.payload && this.oldPayload.data.resourceURI == this.payload.data.resourceURI)
+        if (this.root)
         {
-          this.nodeExpandHandler();
+          this.root.destroy();
         }
-        else
+        if (this.payload)
         {
-          if (this.root)
+          this.loader.url = this.payload.data.resourceURI + '/index_content';
+          if (this.payload.data.useHints)
           {
-            this.root.destroy();
-          }
-          if (this.payload)
-          {
-            this.loader.url = this.payload.data.resourceURI + '/index_content';
-
-            if (this.payload.data.handcraftedPath)
-            {
-              this.setRootNode(this.handcraftTreeFromPayload());
-            }
-            else
-            {
-              this.setRootNode(new Ext.tree.AsyncTreeNode({
-                    text : this.payload.data[this.titleColumn],
-                    path : '/',
-                    singleClickExpand : true,
-                    expanded : true,
-                    listeners : {
-                      expand : {
-                        fn : this.nodeExpandHandler,
-                        scope : this
-                      }
-                    }
-                  }));
+            this.loader.baseParams = {
+              groupIdHint : this.payload.data.rec.data.groupId,
+              artifactIdHint : this.payload.data.rec.data.artifactId
             }
           }
           else
           {
-            this.setRootNode(new Ext.tree.TreeNode({
-                  text : '(Not Available)',
-                  id : '/',
-                  singleClickExpand : true,
-                  expanded : true
-                }));
+            this.loader.baseParams = null;
           }
 
-          if (this.innerCt)
-          {
-            this.innerCt.update('');
-            this.afterRender();
-          }
+          this.setRootNode(new Ext.tree.AsyncTreeNode({
+                text : this.payload.data[this.titleColumn],
+                path : '/',
+                singleClickExpand : true,
+                expanded : true,
+                listeners : {
+                  expand : {
+                    fn : this.nodeExpandHandler,
+                    scope : this
+                  }
+                }
+              }));
+        }
+        else
+        {
+          this.setRootNode(new Ext.tree.TreeNode({
+                text : '(Not Available)',
+                id : '/',
+                singleClickExpand : true,
+                expanded : true
+              }));
+        }
+
+        if (this.innerCt)
+        {
+          this.innerCt.update('');
+          this.afterRender();
         }
       },
 

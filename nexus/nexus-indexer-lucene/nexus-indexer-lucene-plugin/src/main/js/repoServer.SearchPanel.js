@@ -114,7 +114,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               format : rec.data.artifactHits[hitIndex].repositoryContentClass,
               repoType : rec.data.artifactHits[hitIndex].repositoryKind,
               hitIndex : hitIndex,
-              handcraftedPath : true,
+              useHints : true,
               expandPath : true,
               hits : rec.data.artifactHits,
               rec : rec

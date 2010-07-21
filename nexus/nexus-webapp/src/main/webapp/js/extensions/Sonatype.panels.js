@@ -809,6 +809,7 @@ Sonatype.panels.TreePanel = function(config) {
                         // Sonatype: nodes contain a relative request path
                         url : this.url + ((this.appendPathToRoot || node.attributes.path != '/') ? (this.nodePathPrepend + node.attributes.path) : ''),
                         success : this.handleResponse,
+                        params : this.baseParams,
                         failure : this.handleFailure,
                         scope : this,
                         argument : {
