@@ -288,11 +288,19 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             {
               panel.setActiveTab(tab);
             }
-            else
+            else if (Sonatype.user.curr.isLoggedIn)
             {
               this.currentBookmark[1] = null;
               this.currentBookmark[2] = null;
               Sonatype.utils.updateHistory(this);
+            }
+            else
+            {
+              var token = Ext.History.getToken();
+              Sonatype.view.historyDisabled = false;
+              Sonatype.view.afterLoginToken = token;
+              Sonatype.repoServer.RepoServer.loginHandler();
+              return;
             }
 
             if (parts && parts.length > 2 && parts[1] == 'browsestorage')
