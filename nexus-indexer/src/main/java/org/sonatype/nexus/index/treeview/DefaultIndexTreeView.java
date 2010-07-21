@@ -81,44 +81,15 @@ public class DefaultIndexTreeView
         }
 
         // the root node depends on request we have, so let's see
-        TreeNode result;
+        TreeNode result = request.getFactory().createGNode( this, request.getPath(), name );
 
         if ( request.hasFieldHints() )
         {
-            // we know that hints are there: G hint, GA hint or GAV hint
-            if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID, MAVEN.VERSION ) )
-            {
-                // we need to build V node and children (artifact)
-                ArtifactInfo ai =
-                    new ArtifactInfo( request.getFactory().getIndexingContext().getRepositoryId(),
-                        request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
-                        request.getFieldHint( MAVEN.VERSION ), null );
-
-                result = request.getFactory().createVNode( this, ai, request.getPath() );
-            }
-            else if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID ) )
-            {
-                // we need to build A node and children (V, artifact)
-                ArtifactInfo ai =
-                    new ArtifactInfo( request.getFactory().getIndexingContext().getRepositoryId(),
-                        request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
-                        "not-there-yet", null );
-
-                result = request.getFactory().createANode( this, ai, request.getPath() );
-            }
-            else
-            {
-                // we need to build G node and children (A, V, artifact)
-                result = request.getFactory().createGNode( this, request.getPath(), name );
-            }
-
             listChildren( result, request, null );
         }
         else
         {
             // non hinted way, the "old" way
-            result = request.getFactory().createGNode( this, request.getPath(), name );
-
             if ( "/".equals( request.getPath() ) )
             {
                 // get root groups and finish
@@ -157,26 +128,9 @@ public class DefaultIndexTreeView
 
         Map<String, TreeNode> folders = new HashMap<String, TreeNode>();
 
-        // we have to "pre-fill" the folders map, depending on the root we have
-        // root node may be G, A or V only. No Type.artifact possible.
-        if ( Type.G.equals( root.getType() ) )
-        {
-            // this is "okay", no prefill, as usual
-        }
-        else if ( Type.A.equals( root.getType() ) )
-        {
-            // A
-            String artifactKey = Type.A + ":" + root.getArtifactId();
+        String rootPartialGroupId = StringUtils.strip( root.getPath().replaceAll( "/", "." ), "." );
 
-            folders.put( artifactKey, root );
-        }
-        else if ( Type.V.equals( root.getType() ) )
-        {
-            // V
-            String artifactKey = Type.V + ":" + root.getArtifactId() + ":" + root.getVersion();
-
-            folders.put( artifactKey, root );
-        }
+        folders.put( Type.G + ":" + rootPartialGroupId, root );
 
         IteratorSearchResponse artifacts = getArtifacts( root, request );
 
@@ -194,15 +148,72 @@ public class DefaultIndexTreeView
 
                 if ( artifactResource == null )
                 {
-                    artifactResource =
-                        request.getFactory().createANode( this, ai, getPathForAi( ai, MAVEN.ARTIFACT_ID ) + "/" );
+                    TreeNode groupParentResource = root;
 
-                    root.getChildren().add( artifactResource );
+                    TreeNode groupResource = root;
+
+                    // here comes the twist: we have to search for parent G node, but _backwards_ to obey the
+                    // initial
+                    // request's path!
+
+                    String partialGroupId = null;
+
+                    String[] groupIdElems = ai.groupId.split( "\\." );
+
+                    for ( String groupIdElem : groupIdElems )
+                    {
+                        if ( partialGroupId == null )
+                        {
+                            partialGroupId = groupIdElem;
+                        }
+                        else
+                        {
+                            partialGroupId = partialGroupId + "." + groupIdElem;
+                        }
+
+                        String groupKey = Type.G + ":" + partialGroupId;
+
+                        groupResource = folders.get( groupKey );
+
+                        // it needs to be created only if not found (is null) and is _below_ groupParentResource
+                        if ( groupResource == null
+                            && groupParentResource.getPath().length() < getPathForAi( ai, MAVEN.GROUP_ID ).length() )
+                        {
+                            String gNodeName =
+                                partialGroupId.lastIndexOf( '.' ) > -1 ? partialGroupId.substring(
+                                    partialGroupId.lastIndexOf( '.' ) + 1, partialGroupId.length() ) : partialGroupId;
+
+                            groupResource =
+                                request.getFactory().createGNode( this,
+                                    "/" + partialGroupId.replaceAll( "\\.", "/" ) + "/", gNodeName );
+
+                            groupParentResource.getChildren().add( groupResource );
+
+                            folders.put( groupKey, groupResource );
+
+                            groupParentResource = groupResource;
+                        }
+                        else if (groupResource != null)
+                        {
+                            // we found it as already existing, break if this is the node we want
+                            if ( groupResource.getPath().equals( getPathForAi( ai, MAVEN.GROUP_ID ) ) )
+                            {
+                                break;
+                            }
+
+                            groupParentResource = groupResource;
+                        }
+                    }
+
+                    artifactResource =
+                        request.getFactory().createANode( this, ai, getPathForAi( ai, MAVEN.ARTIFACT_ID ) );
+
+                    groupParentResource.getChildren().add( artifactResource );
 
                     folders.put( artifactKey, artifactResource );
                 }
 
-                versionResource = request.getFactory().createVNode( this, ai, getPathForAi( ai, MAVEN.VERSION ) + "/" );
+                versionResource = request.getFactory().createVNode( this, ai, getPathForAi( ai, MAVEN.VERSION ) );
 
                 artifactResource.getChildren().add( versionResource );
 
@@ -256,7 +267,7 @@ public class DefaultIndexTreeView
         if ( MAVEN.GROUP_ID.equals( field ) )
         {
             // stop here
-            return sb.toString();
+            return sb.append( "/" ).toString();
         }
 
         sb.append( "/" ).append( ai.artifactId );
@@ -264,7 +275,7 @@ public class DefaultIndexTreeView
         if ( MAVEN.ARTIFACT_ID.equals( field ) )
         {
             // stop here
-            return sb.toString();
+            return sb.append( "/" ).toString();
         }
 
         sb.append( "/" ).append( ai.version );
@@ -272,7 +283,7 @@ public class DefaultIndexTreeView
         if ( MAVEN.VERSION.equals( field ) )
         {
             // stop here
-            return sb.toString();
+            return sb.append( "/" ).toString();
         }
 
         sb.append( "/" ).append( ai.artifactId ).append( "-" ).append( ai.version );
