@@ -1,5 +1,8 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.MapConstraints;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -51,13 +55,20 @@ import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
+
+
 public class AbstractEnvironmentMojo
     extends AbstractMojo
     implements Contextualizable
 {
 
-    final static List DEFAULT_PORT_NAMES = Arrays.asList(new String[]{"proxy-repo-port","proxy-repo-control-port","nexus-application-port","nexus-proxy-port","nexus-control-port","email-server-port","webproxy-server-port"});
-    
+    public final static List<String> DEFAULT_PORT_NAMES = Collections.unmodifiableList(Arrays.asList(new String[]{"proxy-repo-port","proxy-repo-control-port","nexus-application-port","nexus-proxy-port","nexus-control-port","email-server-port","webproxy-server-port"}));
+
+    /**
+     * Max times to try and allocate unique port values
+     */
+    public static final int MAX_PORT_ALLOCATION_RETRY = 3;
+
     /** @component */
     protected org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
@@ -208,7 +219,7 @@ public class AbstractEnvironmentMojo
      * Known ports can be manually set as part of the configuration
      * @parameter
      */
-    private Map<String,Integer> staticPorts;
+    private Map staticPorts;
 
 
 
@@ -222,6 +233,7 @@ public class AbstractEnvironmentMojo
 
         init();
 
+        validateStaticPorts();
         allocatePorts();
 
         project.getProperties().put( "jetty-application-host", "0.0.0.0" );
@@ -475,36 +487,86 @@ public class AbstractEnvironmentMojo
         }
     }
 
+    // todo add this as a constraint
+    static final Pattern PORT_PATTERN = Pattern.compile("^(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)$");
 
-    private void allocatePorts()
-        throws MojoExecutionException, MojoFailureException
-    {
-
-        List<String> dynamicPortNames = new ArrayList(DEFAULT_PORT_NAMES);
+    private void validateStaticPorts() throws MojoExecutionException, MojoFailureException{
         if(this.staticPorts != null){
-            dynamicPortNames.removeAll(staticPorts.keySet());
-        }
-
-        // calc dynamic ports
-        List<Port> portsList = new ArrayList<Port>();
-        for (String portName : dynamicPortNames){
-            portsList.add( new Port( portName ) );
-        }
-        if (!portsList.isEmpty()){
-            PortAllocatorMojo portAllocator = new PortAllocatorMojo();
-            portAllocator.setProject( project );
-            portAllocator.setLog( getLog() );
-            portAllocator.setPorts( portsList.toArray( new Port[0] ) );
-            portAllocator.execute();
-        }
-
-        // now set static ports
-        if(this.staticPorts != null){
-            for(Map.Entry<String,Integer> entry : this.staticPorts.entrySet()){
-                getLog().debug( "Assigning port '" + entry.getValue() + "' to property '" + entry.getKey() + "'" );
-                project.getProperties().put( entry.getKey(), String.valueOf( entry.getValue() ) );
+            try{
+                BiMap staticPortMap = HashBiMap.create(this.staticPorts.size());
+                staticPortMap = MapConstraints.constrainedBiMap(staticPortMap, MapConstraints.notNull());
+                staticPortMap.putAll(this.staticPorts);
+                this.staticPorts = staticPortMap;
+            } catch ( NullPointerException npe){
+                throw new MojoExecutionException("Port names and values must not be null.", npe);
+            } catch( IllegalArgumentException iae){
+                throw new MojoExecutionException("Port names and values must not be duplicated.", iae);
             }
         }
+    }
+
+
+    /**
+     * Call this to allocate the port values and store as project properties
+     * so that they can be filtered into the Nexus config files
+     */
+    private void allocatePorts() throws MojoExecutionException, MojoFailureException{
+        allocatePorts(0);
+    }
+
+    /**
+     * @throws MojoExecutionException
+     * @throws MojoFailureException if methodEntryCount exceeds {@link #MAX_PORT_ALLOCATION_RETRY}
+     * @param entryNum a value less than {@link #MAX_PORT_ALLOCATION_RETRY}
+     */
+    private void allocatePorts(int methodEntryCount)
+        throws MojoExecutionException, MojoFailureException
+    {
+        if(methodEntryCount >= MAX_PORT_ALLOCATION_RETRY){
+            throw new MojoFailureException("Exceeded the maximum number of port allocation retries (" + MAX_PORT_ALLOCATION_RETRY + ")");
+        }
+        methodEntryCount++;
+
+        // calc dynamic and static ports
+        List<Port> portsList = new ArrayList<Port>();
+        for (String portName : DEFAULT_PORT_NAMES){
+            Port port = new Port(portName);
+            if(this.staticPorts != null && this.staticPorts.containsKey(portName)){
+                // this prevents assigning random port and instead
+                // tests the static port for availability
+                String portNum = String.valueOf(this.staticPorts.get(portName));
+                getLog().debug("Statically defining port '"
+                            + portName + "' with value '" + portNum + "'.");
+                port.setPortNumber(Integer.valueOf(portNum));
+                port.setFailIfOccupied(true);
+            }
+            portsList.add( port );
+        }
+
+        // allocate dynamic ports and verify requested ports
+        PortAllocatorMojo portAllocator = new PortAllocatorMojo();
+        portAllocator.setProject( project );
+        portAllocator.setLog( getLog() );
+        portAllocator.setPorts( portsList.toArray( new Port[0] ) );
+        portAllocator.execute();
+        
+
+        // detect port collisions from dynamic port assignment
+        List<String> portNums = new ArrayList<String>();
+        for (String portName : DEFAULT_PORT_NAMES){
+            String portNum = String.valueOf(project.getProperties().get( portName ));
+            assert !"null".equals(portNum);
+            if(portNums.contains(portNum)){
+                // duplicate ports generated by port allocator, try again
+                getLog().debug("Duplicate port value of " + portNum +
+                        " is defined. Trying to re-allocate non-duplicate port values.");
+                allocatePorts(methodEntryCount);
+            }
+            portNums.add(portNum);
+        }
+
+        
+
     }
 
     private void copyExtraResources()
@@ -514,20 +576,20 @@ public class AbstractEnvironmentMojo
         {
             Artifact artifact = getMavenArtifact( extraResource );
 
-            File destination;
+            File dest;
             if ( extraResource.getOutputDirectory() != null )
             {
-                destination = extraResource.getOutputDirectory();
+                dest = extraResource.getOutputDirectory();
             }
             else if ( extraResource.getOutputProperty() != null )
             {
-                destination = new File( project.getProperties().getProperty( extraResource.getOutputProperty() ) );
+                dest = new File( project.getProperties().getProperty( extraResource.getOutputProperty() ) );
             }
             else
             {
-                destination = resourcesDestinationLocation;
+                dest = resourcesDestinationLocation;
             }
-            unpack( artifact.getFile(), destination, artifact.getType() );
+            unpack( artifact.getFile(), dest, artifact.getType() );
         }
     }
 
@@ -641,17 +703,17 @@ public class AbstractEnvironmentMojo
 
                 File source = new File( sourceDir, file );
 
-                File destination = new File( destinationDir, file );
-                destination.getParentFile().mkdirs();
+                File dest = new File( destinationDir, file );
+                dest.getParentFile().mkdirs();
 
                 if ( Arrays.asList( "zip", "jar", "tar.gz" ).contains( extension ) )
                 {
                     // just copy know binaries
-                    FileUtils.copyFile( source, destination );
+                    FileUtils.copyFile( source, dest );
                 }
                 else
                 {
-                    mavenFileFilter.copyFile( source, destination, true, project, null, false, "UTF-8", session );
+                    mavenFileFilter.copyFile( source, dest, true, project, null, false, "UTF-8", session );
                 }
             }
         }
@@ -718,22 +780,22 @@ public class AbstractEnvironmentMojo
         {
             Artifact pluginArtifact = getMavenArtifact( plugin );
 
-            File destination;
+            File dest;
             if ( plugin.getOutputDirectory() != null )
             {
-                destination = plugin.getOutputDirectory();
+                dest = plugin.getOutputDirectory();
             }
             else if ( plugin.getOutputProperty() != null )
             {
-                destination = new File( project.getProperties().getProperty( plugin.getOutputProperty() ) );
+                dest = new File( project.getProperties().getProperty( plugin.getOutputProperty() ) );
             }
             else if ( "bundle".equals( pluginArtifact.getClassifier() ) && "zip".equals( pluginArtifact.getType() ) )
             {
-                destination = pluginsFolder;
+                dest = pluginsFolder;
             }
             else
             {
-                destination = libsFolder;
+                dest = libsFolder;
             }
 
             String type = pluginArtifact.getType();
@@ -741,8 +803,8 @@ public class AbstractEnvironmentMojo
             if ( "jar".equals( type ) )
             {
                 // System.out.println( "copying jar: "+ pluginArtifact.getFile().getAbsolutePath() + " to: "+
-                // destination.getAbsolutePath() );
-                copy( pluginArtifact.getFile(), destination );
+                // dest.getAbsolutePath() );
+                copy( pluginArtifact.getFile(), dest );
             }
             else if ( "zip".equals( type ) || "tar.gz".equals( type ) )
             {
@@ -752,7 +814,7 @@ public class AbstractEnvironmentMojo
                     throw new MojoFailureException( "Could not properly resolve artifact " + pluginArtifact + ", got "
                         + file );
                 }
-                unpack( file, destination, type );
+                unpack( file, dest, type );
             }
             else
             {
@@ -843,7 +905,7 @@ public class AbstractEnvironmentMojo
                 getFilteredArtifacts( mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(),
                                       mavenArtifact.getType(), mavenArtifact.getClassifier() );
 
-            if ( projectArtifacts.size() == 0 )
+            if ( projectArtifacts.isEmpty() )
             {
                 throw new MojoFailureException( "Maven artifact: '" + mavenArtifact.toString()
                     + "' not found on dependencies list" );
