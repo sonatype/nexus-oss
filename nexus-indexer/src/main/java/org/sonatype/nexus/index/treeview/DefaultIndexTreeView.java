@@ -7,27 +7,25 @@
 package org.sonatype.nexus.index.treeview;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchRequest;
-import org.sonatype.nexus.index.FlatSearchResponse;
+import org.sonatype.nexus.index.Field;
+import org.sonatype.nexus.index.IteratorSearchRequest;
+import org.sonatype.nexus.index.IteratorSearchResponse;
 import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.creator.MinimalArtifactInfoIndexCreator;
+import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
 @Component( role = IndexTreeView.class )
@@ -159,7 +157,28 @@ public class DefaultIndexTreeView
 
         Map<String, TreeNode> folders = new HashMap<String, TreeNode>();
 
-        Set<ArtifactInfo> artifacts = getArtifacts( root, request );
+        // we have to "pre-fill" the folders map, depending on the root we have
+        // root node may be G, A or V only. No Type.artifact possible.
+        if ( Type.G.equals( root.getType() ) )
+        {
+            // this is "okay", no prefill, as usual
+        }
+        else if ( Type.A.equals( root.getType() ) )
+        {
+            // A
+            String artifactKey = Type.A + ":" + root.getArtifactId();
+
+            folders.put( artifactKey, root );
+        }
+        else if ( Type.V.equals( root.getType() ) )
+        {
+            // V
+            String artifactKey = Type.V + ":" + root.getArtifactId() + ":" + root.getVersion();
+
+            folders.put( artifactKey, root );
+        }
+
+        IteratorSearchResponse artifacts = getArtifacts( root, request );
 
         for ( ArtifactInfo ai : artifacts )
         {
@@ -175,43 +194,24 @@ public class DefaultIndexTreeView
 
                 if ( artifactResource == null )
                 {
-                    artifactResource = request.getFactory().createANode( this, ai, path + ai.artifactId + "/" );
+                    artifactResource =
+                        request.getFactory().createANode( this, ai, getPathForAi( ai, MAVEN.ARTIFACT_ID ) + "/" );
 
                     root.getChildren().add( artifactResource );
 
                     folders.put( artifactKey, artifactResource );
                 }
 
-                versionResource =
-                    request.getFactory().createVNode( this, ai, path + ai.artifactId + "/" + ai.version + "/" );
+                versionResource = request.getFactory().createVNode( this, ai, getPathForAi( ai, MAVEN.VERSION ) + "/" );
 
                 artifactResource.getChildren().add( versionResource );
 
                 folders.put( versionKey, versionResource );
             }
 
-            String nodePath = getPathForAi( path, ai );
+            String nodePath = getPathForAi( ai, null );
 
             versionResource.getChildren().add( request.getFactory().createArtifactNode( this, ai, nodePath ) );
-
-            // TODO: do we need to represent these are another artifacts?
-            // The correct answer is YES, but...
-            // if ( ArtifactAvailablility.PRESENT.equals( ai.javadocExists ) )
-            // {
-            // ai.classifier = "javadoc";
-            //
-            // nodePath = getPathForAi( path, ai );
-            //
-            // versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
-            // }
-            // if ( ArtifactAvailablility.PRESENT.equals( ai.sourcesExists ) )
-            // {
-            // ai.classifier = "sources";
-            //
-            // nodePath = getPathForAi( path, ai );
-            //
-            // versionResource.getChildren().add( factory.createArtifactNode( this, ai, nodePath ) );
-            // }
         }
 
         if ( !request.hasFieldHints() )
@@ -238,13 +238,44 @@ public class DefaultIndexTreeView
         }
     }
 
-    protected String getPathForAi( String path, ArtifactInfo ai )
+    /**
+     * Builds a path out from ArtifactInfo. The field paramter controls "how deep" the path goes. Possible values are
+     * MAVEN.GROUP_ID (builds a path from groupId only), MAVEN.ARTIFACT_ID (builds a path from groupId + artifactId),
+     * MAVEN.VERSION (builds a path up to version) or anything else (including null) will build "full" artifact path.
+     * 
+     * @param ai
+     * @param field
+     * @return path
+     */
+    protected String getPathForAi( ArtifactInfo ai, Field field )
     {
-        StringBuffer sb = new StringBuffer( path ) //
-        .append( ai.artifactId ) //
-        .append( "/" ).append( ai.version ) //
-        .append( "/" ).append( ai.artifactId ) //
-        .append( "-" ).append( ai.version );
+        StringBuilder sb = new StringBuilder( "/" );
+
+        sb.append( ai.groupId.replaceAll( "\\.", "/" ) );
+
+        if ( MAVEN.GROUP_ID.equals( field ) )
+        {
+            // stop here
+            return sb.toString();
+        }
+
+        sb.append( "/" ).append( ai.artifactId );
+
+        if ( MAVEN.ARTIFACT_ID.equals( field ) )
+        {
+            // stop here
+            return sb.toString();
+        }
+
+        sb.append( "/" ).append( ai.version );
+
+        if ( MAVEN.VERSION.equals( field ) )
+        {
+            // stop here
+            return sb.toString();
+        }
+
+        sb.append( "/" ).append( ai.artifactId ).append( "-" ).append( ai.version );
 
         if ( ai.classifier != null )
         {
@@ -287,7 +318,7 @@ public class DefaultIndexTreeView
         return result;
     }
 
-    protected Set<ArtifactInfo> getArtifacts( TreeNode root, TreeViewRequest request )
+    protected IteratorSearchResponse getArtifacts( TreeNode root, TreeViewRequest request )
         throws IOException
     {
         if ( request.hasFieldHints() )
@@ -297,7 +328,7 @@ public class DefaultIndexTreeView
 
         String path = root.getPath();
 
-        Set<ArtifactInfo> result = null;
+        IteratorSearchResponse result = null;
 
         String g = null;
 
@@ -321,9 +352,9 @@ public class DefaultIndexTreeView
 
         g = wp.substring( 1 ).replace( '/', '.' );
 
-        result = getArtifactsByG( g, request.getFactory().getIndexingContext() );
+        result = getArtifactsByG( g, request );
 
-        if ( !result.isEmpty() )
+        if ( result.getTotalHits() > 0 )
         {
             return result;
         }
@@ -339,9 +370,9 @@ public class DefaultIndexTreeView
 
             g = wp.substring( 1, wp.lastIndexOf( "/" ) ).replace( '/', '.' );
 
-            result = getArtifactsByGA( g, a, request.getFactory().getIndexingContext() );
+            result = getArtifactsByGA( g, a, request );
 
-            if ( !result.isEmpty() )
+            if ( result.getTotalHits() > 0 )
             {
                 return result;
             }
@@ -361,9 +392,9 @@ public class DefaultIndexTreeView
 
                 g = wp.substring( 1, wp.lastIndexOf( "/" ) ).replace( '/', '.' );
 
-                result = getArtifactsByGAV( g, a, v, request.getFactory().getIndexingContext() );
+                result = getArtifactsByGAV( g, a, v, request );
 
-                if ( !result.isEmpty() )
+                if ( result.getTotalHits() > 0 )
                 {
                     return result;
                 }
@@ -375,87 +406,92 @@ public class DefaultIndexTreeView
         }
 
         // if we are here, no hits found
-        return Collections.emptySet();
+        return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
     }
 
-    protected Set<ArtifactInfo> getHintedArtifacts( TreeNode root, TreeViewRequest request )
+    protected IteratorSearchResponse getHintedArtifacts( TreeNode root, TreeViewRequest request )
         throws IOException
     {
         // we know that hints are there: G hint, GA hint or GAV hint
         if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID, MAVEN.VERSION ) )
         {
             return getArtifactsByGAV( request.getFieldHint( MAVEN.GROUP_ID ),
-                request.getFieldHint( MAVEN.ARTIFACT_ID ), request.getFieldHint( MAVEN.VERSION ),
-                request.getFactory().getIndexingContext() );
+                request.getFieldHint( MAVEN.ARTIFACT_ID ), request.getFieldHint( MAVEN.VERSION ), request );
         }
         else if ( request.hasFieldHint( MAVEN.GROUP_ID, MAVEN.ARTIFACT_ID ) )
         {
             return getArtifactsByGA( request.getFieldHint( MAVEN.GROUP_ID ), request.getFieldHint( MAVEN.ARTIFACT_ID ),
-                request.getFactory().getIndexingContext() );
+                request );
         }
         else if ( request.hasFieldHint( MAVEN.GROUP_ID ) )
         {
-            return getArtifactsByG( request.getFieldHint( MAVEN.GROUP_ID ), request.getFactory().getIndexingContext() );
+            return getArtifactsByG( request.getFieldHint( MAVEN.GROUP_ID ), request );
         }
         else
         {
-
             // if we are here, no hits found or something horribly went wrong?
-            return Collections.emptySet();
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
     }
 
-    protected Set<ArtifactInfo> getArtifactsByG( String g, IndexingContext indexingContext )
+    protected IteratorSearchResponse getArtifactsByG( String g, TreeViewRequest request )
         throws IOException
     {
-        Query q = new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey(), g ) );
-
-        FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
-
-        FlatSearchResponse searchResponse = getNexusIndexer().searchFlat( searchRequest );
-
-        return searchResponse.getResults();
+        return getArtifactsByGAVField( g, null, null, request );
     }
 
-    protected Set<ArtifactInfo> getArtifactsByGA( String g, String a, IndexingContext indexingContext )
+    protected IteratorSearchResponse getArtifactsByGA( String g, String a, TreeViewRequest request )
         throws IOException
     {
-        BooleanQuery q = new BooleanQuery();
-
-        q.add( new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey(), g ) ),
-            BooleanClause.Occur.MUST );
-
-        // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_ARTIFACT_ID_KW.getKey(), a ) ),
-            BooleanClause.Occur.MUST );
-
-        FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
-
-        FlatSearchResponse searchResponse = getNexusIndexer().searchFlat( searchRequest );
-
-        return searchResponse.getResults();
+        return getArtifactsByGAVField( g, a, null, request );
     }
 
-    protected Set<ArtifactInfo> getArtifactsByGAV( String g, String a, String v, IndexingContext indexingContext )
+    protected IteratorSearchResponse getArtifactsByGAV( String g, String a, String v, TreeViewRequest request )
         throws IOException
     {
+        return getArtifactsByGAVField( g, a, v, request );
+    }
+
+    protected IteratorSearchResponse getArtifactsByGAVField( String g, String a, String v, TreeViewRequest request )
+        throws IOException
+    {
+        assert g != null;
+
+        Query groupIdQ = null;
+        Query artifactIdQ = null;
+        Query versionQ = null;
+
+        // minimum must have
+        groupIdQ = getNexusIndexer().constructQuery( MAVEN.GROUP_ID, g, SearchType.EXACT );
+
+        if ( StringUtils.isNotBlank( a ) )
+        {
+            artifactIdQ = getNexusIndexer().constructQuery( MAVEN.ARTIFACT_ID, a, SearchType.EXACT );
+        }
+
+        if ( StringUtils.isNotBlank( v ) )
+        {
+            versionQ = getNexusIndexer().constructQuery( MAVEN.VERSION, v, SearchType.EXACT );
+        }
+
         BooleanQuery q = new BooleanQuery();
 
-        q.add( new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey(), g ) ),
-            BooleanClause.Occur.MUST );
+        q.add( new BooleanClause( groupIdQ, BooleanClause.Occur.MUST ) );
 
-        // q.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, "\"" + a + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_ARTIFACT_ID_KW.getKey(), a ) ),
-            BooleanClause.Occur.MUST );
+        if ( artifactIdQ != null )
+        {
+            q.add( new BooleanClause( artifactIdQ, BooleanClause.Occur.MUST ) );
+        }
 
-        // q.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, "\"" + v + "\"" ), BooleanClause.Occur.MUST );
-        q.add( new TermQuery( new Term( MinimalArtifactInfoIndexCreator.FLD_VERSION_KW.getKey(), v ) ),
-            BooleanClause.Occur.MUST );
+        if ( versionQ != null )
+        {
+            q.add( new BooleanClause( versionQ, BooleanClause.Occur.MUST ) );
+        }
 
-        FlatSearchRequest searchRequest = new FlatSearchRequest( q, indexingContext );
+        IteratorSearchRequest searchRequest = new IteratorSearchRequest( q, request.getArtifactInfoFilter() );
 
-        FlatSearchResponse searchResponse = getNexusIndexer().searchFlat( searchRequest );
+        IteratorSearchResponse result = getNexusIndexer().searchIterator( searchRequest );
 
-        return searchResponse.getResults();
+        return result;
     }
 }
