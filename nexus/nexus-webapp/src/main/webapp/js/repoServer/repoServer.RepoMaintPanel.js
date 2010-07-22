@@ -290,9 +290,8 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             }
             else if (Sonatype.user.curr.isLoggedIn)
             {
-              this.currentBookmark[1] = null;
-              this.currentBookmark[2] = null;
-              Sonatype.utils.updateHistory(this);
+              this.currentBookmark[1] = panel.getActiveTab().name;
+              Sonatype.utils.replaceHistory(this);
             }
             else
             {
@@ -300,6 +299,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               Sonatype.view.historyDisabled = false;
               Sonatype.view.afterLoginToken = token;
               Sonatype.repoServer.RepoServer.loginHandler();
+              this.currentBookmark[1] = panel.getActiveTab().name;
               return;
             }
 

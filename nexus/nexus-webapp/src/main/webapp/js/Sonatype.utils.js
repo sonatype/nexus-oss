@@ -798,10 +798,12 @@
                 Sonatype.user.curr.username = null;
                 Sonatype.user.curr.loggedInUserSource = null;
               }
-              
+
               var availSvrs = Sonatype.config.installedServers;
-              for (var srv in availSvrs) {
-                if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined') {
+              for (var srv in availSvrs)
+              {
+                if (availSvrs[srv] && typeof(Sonatype[srv]) != 'undefined')
+                {
                   Sonatype[srv][Sonatype.utils.capitalize(srv)].statusComplete(respObj);
                 }
               }
@@ -891,6 +893,20 @@
     },
 
     updateHistory : function(tab) {
+      var bookmark = Sonatype.utils.getBookmark(tab);
+      var oldBookmark = Ext.History.getToken();
+      if (bookmark != oldBookmark)
+      {
+        Ext.History.add(bookmark);
+      }
+    },
+
+    replaceHistory : function(tab) {
+      var bookmark = Sonatype.utils.getBookmark(tab);
+      location.replace(window.location.href.replace(/\#.*$/, '') + '#' + bookmark); 
+    },
+
+    getBookmark : function(tab) {
       if (Sonatype.view.historyDisabled)
         return;
 
@@ -927,11 +943,8 @@
           bookmark += Sonatype.view.HISTORY_DELIMITER + b2;
         }
       }
-      var oldBookmark = Ext.History.getToken();
-      if (bookmark != oldBookmark)
-      {
-        Ext.History.add(bookmark);
-      }
+
+      return bookmark;
     },
 
     openWindow : function(url) {
