@@ -228,29 +228,42 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   this.dataStore.addListener('loadexception', this.onRepoStoreLoadException, this);
   this.dataStore.load();
 
+  this.updatingBookmark = false;
+  this.updating = new Ext.util.DelayedTask(function() {
+        this.updatingBookmark = false;
+      }, this, [this]);
   this.currentBookmark = [];
   this.cardPanel.on('afterlayout', function() {
         var tpanel = this.cardPanel.getLayout().activeItem.tabPanel;
         if (tpanel)
         {
           tpanel.on('tabchange', function(panel, tab) {
-                this.currentBookmark[1] = tab.name;
-                if (tab.name != 'browsestorage')
+                if (!this.updatingBookmark)
                 {
-                  this.currentBookmark[2] = null;
+                  this.currentBookmark[1] = tab.name;
+                  if (tab.name != 'browsestorage')
+                  {
+                    this.currentBookmark[2] = null;
+                  }
+                  Sonatype.utils.updateHistory(this);
                 }
-                Sonatype.utils.updateHistory(this);
               }, this);
         }
       }, this);
   Sonatype.Events.addListener('repoBrowserStartSearch', function(text) {
-        this.currentBookmark[2] = text;
-        Sonatype.utils.updateHistory(this);
+        if (!this.updatingBookmark)
+        {
+          this.currentBookmark[2] = text;
+          Sonatype.utils.updateHistory(this);
+        }
       }, this);
 
   Sonatype.Events.addListener('repoBrowserStopSearch', function() {
-        this.currentBookmark[2] = null;
-        Sonatype.utils.updateHistory(this);
+        if (!this.updatingBookmark)
+        {
+          this.currentBookmark[2] = null;
+          Sonatype.utils.updateHistory(this);
+        }
       }, this);
 
 };
@@ -258,6 +271,7 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
 Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
 
       applyBookmark : function(bookmark) {
+        this.updatingBookmark = true;
         if (this.groupStore.lastOptions == null)
         {
           this.groupStore.on('load', function(store, recs, options) {
@@ -292,14 +306,19 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             }
           }
 
-          if (parts && parts.length > 1)
+          if (parts.length == 1)
+          {
+            parts[1] = 'browsestorage';
+            Sonatype.utils.updateHistory(this);
+          }
+
+          if (parts.length > 1)
           {
             var panel = this.cardPanel.getLayout().activeItem.tabPanel;
             var tab = panel.find('name', parts[1])[0];
             if (tab)
             {
               panel.setActiveTab(tab);
-              this.currentBookmark[1] = tab.name;
             }
             else if (Sonatype.user.curr.isLoggedIn)
             {
@@ -324,7 +343,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
             }
           }
         }
-
+        this.updating.delay(200);
       },
 
       getBookmark : function() {
