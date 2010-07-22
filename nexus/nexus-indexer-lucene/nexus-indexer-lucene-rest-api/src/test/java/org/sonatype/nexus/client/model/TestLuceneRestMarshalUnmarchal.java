@@ -16,10 +16,6 @@ package org.sonatype.nexus.client.model;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
-import org.sonatype.plexus.rest.xstream.json.JsonOrgHierarchicalStreamDriver;
-import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
-
-import com.thoughtworks.xstream.XStream;
 
 public class TestLuceneRestMarshalUnmarchal
     extends TestMarshalUnmarchal
