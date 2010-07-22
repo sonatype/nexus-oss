@@ -61,7 +61,6 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
                                 useHints : treepanel.payload.data.useHints,
                                 hits : treepanel.payload.data.hits,
                                 rec : treepanel.payload.data.rec,
-                                getDefaultPath : treepanel.payload.data.getDefaultPath,
                                 hitIndex : treepanel.payload.data.hitIndex
                               }
                             }, true);
@@ -102,7 +101,7 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
         var rec = this.payload.data.rec;
         var hitIndex = this.payload.data.hitIndex;
 
-        var basePath = '/' + rec.data.artifactHits[hitIndex].repositoryName + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
+        var basePath = '/' + this.payload.data.name + '/' + rec.data.groupId.replace(/\./g, '/') + '/' + rec.data.artifactId + '/' + rec.data.version + '/' + rec.data.artifactId + '-' + rec.data.version;
 
         for (var i = 0; i < rec.data.artifactHits[hitIndex].artifactLinks.length; i++)
         {
