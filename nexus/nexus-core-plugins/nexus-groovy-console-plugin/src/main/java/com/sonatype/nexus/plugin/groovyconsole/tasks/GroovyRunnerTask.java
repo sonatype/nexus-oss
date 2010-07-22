@@ -4,8 +4,6 @@ import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.util.AntBuilder;
 
-import java.io.File;
-
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
@@ -46,24 +44,15 @@ public class GroovyRunnerTask
         CompilerConfiguration config = new CompilerConfiguration( CompilerConfiguration.DEFAULT );
         GroovyShell shell = new GroovyShell( binding, config );
         String groovyScript = getGroovyScript();
-        Object result = null;
-
-        if ( new File( groovyScript ).exists() )
-        {
-            shell.evaluate( new File( groovyScript ) );
-        }
-        else
-        {
-            shell.evaluate( groovyScript );
-        }
+        Object result = shell.evaluate( groovyScript );
         getLogger().info( "Script return: " + result );
-        return null;
+        return result;
     }
 
     @Override
     protected String getAction()
     {
-        return "Groovy Runner Task getAction()";
+        return "Groovy Runner Task";
     }
 
     @Override

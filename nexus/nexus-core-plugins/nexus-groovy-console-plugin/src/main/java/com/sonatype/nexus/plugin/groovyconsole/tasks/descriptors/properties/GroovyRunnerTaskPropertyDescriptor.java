@@ -12,7 +12,7 @@ public class GroovyRunnerTaskPropertyDescriptor
 
     public GroovyRunnerTaskPropertyDescriptor()
     {
-        setHelpText( "Groovy Script" );
+        setHelpText( "The following properties are exposed: ant, an AntBuilder object; task, the current executing task; plexus, a PlexusContainer object; logger, a logger object." );
         setRequired( true );
     }
 
