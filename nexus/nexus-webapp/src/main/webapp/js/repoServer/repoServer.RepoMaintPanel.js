@@ -229,6 +229,20 @@ Sonatype.repoServer.RepositoryPanel = function(config) {
   this.dataStore.load();
 
   this.currentBookmark = [];
+  this.cardPanel.on('afterlayout', function() {
+        var tpanel = this.cardPanel.getLayout().activeItem.tabPanel;
+        if (tpanel)
+        {
+          tpanel.on('tabchange', function(panel, tab) {
+                this.currentBookmark[1] = tab.name;
+                if (tab.name != 'browsestorage')
+                {
+                  this.currentBookmark[2] = null;
+                }
+                Sonatype.utils.updateHistory(this);
+              }, this);
+        }
+      }, this);
   Sonatype.Events.addListener('repoBrowserStartSearch', function(text) {
         this.currentBookmark[2] = text;
         Sonatype.utils.updateHistory(this);
@@ -281,13 +295,6 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           if (parts && parts.length > 1)
           {
             var panel = this.cardPanel.getLayout().activeItem.tabPanel;
-            panel.on('deactivate', function() {
-                  panel.removeListener('tabchange', cacheTabHandler, this);
-                }, this);
-            panel.on('activate', function() {
-                  panel.on('tabchange', cacheTabHandler, this);
-                }, this);
-
             var tab = panel.find('name', parts[1])[0];
             if (tab)
             {
@@ -318,15 +325,6 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           }
         }
 
-      },
-
-      cacheTabHandler : function(panel, tab) {
-        this.currentBookmark[1] = tab.name;
-        if (tab.name != 'browsestorage')
-        {
-          this.currentBookmark[2] = null;
-        }
-        Sonatype.utils.updateHistory(this);
       },
 
       getBookmark : function() {
