@@ -152,12 +152,8 @@ public class DefaultMergedTreeNodeFactory
         
         try
         {
-            getRepository().retrieveItem( request );
+            getRepository().getLocalStorage().containsItem( getRepository(), request );
             return true;
-        }
-        catch ( ItemNotFoundException e )
-        {
-            // item really not cached locally
         }
         catch ( Exception e )
         {
