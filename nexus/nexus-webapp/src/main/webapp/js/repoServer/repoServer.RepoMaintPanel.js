@@ -309,7 +309,7 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
           if (parts.length == 1)
           {
             parts[1] = 'browsestorage';
-            Sonatype.utils.updateHistory(this);
+            Sonatype.utils.replaceHistory(this);
           }
 
           if (parts.length > 1)
