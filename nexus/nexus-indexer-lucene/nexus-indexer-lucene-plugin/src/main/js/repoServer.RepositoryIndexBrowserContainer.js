@@ -114,11 +114,6 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
           Ext.Ajax.request({
                 scope : this,
                 method : 'GET',
-                // 10 minute timeout, extreme overkill, but we have to make sure
-                // artifacts are allowed to download during this request
-                // feel free to remove this extreme timeout once this resource
-                // no longer downloads artifacts
-                timeout : 600000,
                 options : {
                   dontForceLogout : true
                 },
@@ -161,7 +156,6 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
         }
         else
         {
-          passthru.container.artifactContainer.collapse();
           passthru.container.artifactContainer.updateArtifact(null);
         }
       }

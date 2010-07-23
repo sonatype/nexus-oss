@@ -29,15 +29,12 @@ Sonatype.repoServer.ArtifactContainer = function(config) {
 
 Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, {
       collapsePanel : function() {
-        if (!this.collapsed)
-        {
-          this.collapse();
-        }
+        this.collapse();
         Sonatype.Events.fireEvent(this.updateEventName, this, null);
       },
       updateArtifact : function(data) {
         Sonatype.Events.fireEvent(this.updateEventName, this, data);
-        if (data != null && this.collapsed)
+        if (data != null)
         {
           this.expand();
         }
