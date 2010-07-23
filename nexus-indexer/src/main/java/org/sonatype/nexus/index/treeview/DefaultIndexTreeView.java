@@ -190,7 +190,7 @@ public class DefaultIndexTreeView
 
                             groupParentResource = groupResource;
                         }
-                        else if (groupResource != null)
+                        else if ( groupResource != null )
                         {
                             // we found it as already existing, break if this is the node we want
                             if ( groupResource.getPath().equals( getPathForAi( ai, MAVEN.GROUP_ID ) ) )
@@ -497,6 +497,8 @@ public class DefaultIndexTreeView
         }
 
         IteratorSearchRequest searchRequest = new IteratorSearchRequest( q, request.getArtifactInfoFilter() );
+
+        searchRequest.getContexts().add( request.getFactory().getIndexingContext() );
 
         IteratorSearchResponse result = getNexusIndexer().searchIterator( searchRequest );
 
