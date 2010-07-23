@@ -19,11 +19,13 @@
 package org.sonatype.nexus.plugin;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.beanutils.BeanComparator;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.codehaus.plexus.util.StringUtils;
@@ -48,7 +50,7 @@ public class PromoteToStageProfileMojo
     /**
      * @parameter expression="${repositoryIds}"
      */
-    private Set<String> repositoryIds = new HashSet<String>();
+    private Set<String> repositoryIds = new LinkedHashSet<String>();
 
     /**
      * @parameter expression="${description}"
@@ -60,6 +62,7 @@ public class PromoteToStageProfileMojo
      */
     private String stagingBuildPromotionProfileId;
 
+    @SuppressWarnings( "unchecked" )
     public void execute()
         throws MojoExecutionException
     {
@@ -83,6 +86,7 @@ public class PromoteToStageProfileMojo
         try
         {
             repos = client.getClosedStageRepositories();
+            Collections.sort( repos, new BeanComparator( "repositoryId" ) );
         }
         catch ( RESTLightClientException e )
         {
@@ -203,7 +207,7 @@ public class PromoteToStageProfileMojo
     {
         boolean finished = false;
         // init the list
-        setRepositoryIds( new HashSet<String>() );
+        setRepositoryIds( new LinkedHashSet<String>() );
 
         StringBuffer buffer = new StringBuffer();
         buffer.append( "Closed Staging Repositories:\n" );

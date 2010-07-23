@@ -92,7 +92,7 @@ public class PromoteToStageProfileMojoTest
         prompter.setUseOrder( true );
         prompter.addExpectation( "Repository: ", "1" );
         prompter.addExpectation( "Add another Repository?", "y" );
-        prompter.addExpectation( "Repository:", "3" );
+        prompter.addExpectation( "Repository:", "2" );
         prompter.addExpectation( "Add another Repository?", "n" );
         
 //        prompter.addExpectation( "Repository", "0" );
