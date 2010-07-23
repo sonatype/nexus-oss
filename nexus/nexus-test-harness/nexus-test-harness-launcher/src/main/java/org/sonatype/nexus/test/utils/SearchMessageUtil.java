@@ -436,10 +436,19 @@ public class SearchMessageUtil
      * @return
      * @throws Exception
      */
-    private Response doNGSearchForR( Map<String, String> queryArgs, SearchType searchType )
+    private Response doNGSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        StringBuffer serviceURI = new StringBuffer( "service/local/lucene/search?" );
+        StringBuffer serviceURI;
+        
+        if ( repositoryId == null )
+        {
+            serviceURI = new StringBuffer( "service/local/lucene/search?" );
+        }
+        else
+        {
+            serviceURI = new StringBuffer( "service/local/lucene/search/repositories/" + repositoryId + "?" );
+        }
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
         {
@@ -476,10 +485,10 @@ public class SearchMessageUtil
      * @return
      * @throws IOException
      */
-    private SearchNGResponse doNGSearchFor( Map<String, String> queryArgs, SearchType searchType )
+    private SearchNGResponse doNGSearchFor( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        Response response = doNGSearchForR( queryArgs, searchType );
+        Response response = doNGSearchForR( queryArgs, repositoryId, searchType );
 
         String responseText = response.getEntity().getText();
 
@@ -498,27 +507,82 @@ public class SearchMessageUtil
     public SearchNGResponse searchNGFor( String query )
         throws IOException
     {
-        return searchNGFor( query, null );
+        return searchNGFor( query, null, null );
     }
 
-    public SearchNGResponse searchNGFor( String query, SearchType type )
+    public SearchNGResponse searchNGFor( String query, String repositoryId, SearchType type )
         throws IOException
     {
         HashMap<String, String> queryArgs = new HashMap<String, String>();
 
         queryArgs.put( "q", query );
 
-        return doNGSearchFor( queryArgs, type );
+        return doNGSearchFor( queryArgs, repositoryId, type );
+    }
+
+    public SearchNGResponse searchNGForGav( String groupId, String artifactId, String version, String classifier,
+                                            String packaging )
+        throws IOException
+    {
+        return searchNGForGav( groupId, artifactId, version, classifier, packaging, null, null );
+    }
+
+    public SearchNGResponse searchNGForGav( String groupId, String artifactId, String version, String classifier,
+                                            String packaging, String repositoryId, SearchType type )
+        throws IOException
+    {
+        Map<String, String> args = new HashMap<String, String>();
+
+        if ( StringUtils.isNotBlank( groupId ) )
+        {
+            args.put( "g", groupId );
+        }
+        if ( StringUtils.isNotBlank( artifactId ) )
+        {
+            args.put( "a", artifactId );
+        }
+        if ( StringUtils.isNotBlank( version ) )
+        {
+            args.put( "v", version );
+        }
+        if ( StringUtils.isNotBlank( classifier ) )
+        {
+            args.put( "c", classifier );
+        }
+        if ( StringUtils.isNotBlank( packaging ) )
+        {
+            args.put( "p", packaging );
+        }
+
+        return doNGSearchFor( args, repositoryId, type );
+    }
+
+    public SearchNGResponse searchNGForGav( Gav gav )
+        throws IOException
+    {
+        return searchNGForGav( gav, null, null );
+    }
+
+    public SearchNGResponse searchNGForGav( Gav gav, String repositoryId, SearchType type )
+        throws IOException
+    {
+        return searchNGForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getClassifier(),
+            gav.getExtension(), repositoryId, type );
     }
 
     public SearchNGResponse searchSha1NGFor( String sha1 )
+        throws IOException
+    {
+        return searchSha1NGFor( sha1, null, null );
+    }
+
+    public SearchNGResponse searchSha1NGFor( String sha1, String repositoryId, SearchType type )
         throws IOException
     {
         HashMap<String, String> queryArgs = new HashMap<String, String>();
 
         queryArgs.put( "sha1", sha1 );
 
-        return doNGSearchFor( queryArgs, null );
+        return doNGSearchFor( queryArgs, repositoryId, type );
     }
-
 }
