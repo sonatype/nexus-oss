@@ -140,18 +140,32 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
             this.loader.baseParams = null;
           }
 
-          this.setRootNode(new Ext.tree.AsyncTreeNode({
-                text : this.payload.data[this.titleColumn],
-                path : '/',
-                singleClickExpand : true,
-                expanded : true,
-                listeners : {
-                  expand : {
-                    fn : this.nodeExpandHandler,
-                    scope : this
+          if (this.payload.children && this.payload.children.length > 0)
+          {
+            this.setRootNode(new Ext.tree.AsyncTreeNode({
+                  text : this.payload.data[this.titleColumn],
+                  leaf : false,
+                  path : '/',
+                  singleClickExpand : true,
+                  expanded : true,
+                  listeners : {
+                    expand : {
+                      fn : this.nodeExpandHandler,
+                      scope : this
+                    }
                   }
-                }
-              }));
+                }));
+          }
+          else
+          {
+            this.setRootNode(new Ext.tree.TreeNode({
+                  text : this.payload ? this.payload.get(this.titleColumn) : '/',
+                  path : '/',
+                  singleClickExpand : true,
+                  expanded : false,
+                  allowChildren : true
+                }));
+          }
         }
         else
         {
