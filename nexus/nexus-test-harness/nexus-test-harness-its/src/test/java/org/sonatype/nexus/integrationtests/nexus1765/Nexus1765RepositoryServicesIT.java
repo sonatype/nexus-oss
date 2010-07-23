@@ -114,7 +114,8 @@ public class Nexus1765RepositoryServicesIT
         String repoId = this.getTestRepositoryId();
         Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/index_content/" );
 
-        Assert.assertEquals( "Status: " + response.getStatus(), 403, response.getStatus().getCode() );
+        // NOTE this will succeed, as you don't need view priv to retrieve index content from repo
+        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
     }
     
 }
