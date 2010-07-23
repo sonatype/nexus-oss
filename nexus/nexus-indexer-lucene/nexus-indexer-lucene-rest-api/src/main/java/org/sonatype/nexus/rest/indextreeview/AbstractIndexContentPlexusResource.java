@@ -102,7 +102,7 @@ public abstract class AbstractIndexContentPlexusResource
 
         try
         {
-            Repository repository = getRepositoryRegistry().getRepository( repositoryId );
+            Repository repository = getUnprotectedRepositoryRegistry().getRepository( repositoryId );
 
             if ( GroupRepository.class.isInstance( repository ) || repository.isSearchable() )
             {
