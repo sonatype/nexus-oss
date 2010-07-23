@@ -167,5 +167,48 @@ public class DefaultNexusDiscovery_FillAuthTest
         assertEquals( user, info.getUser() );
         assertEquals( password, info.getPassword() );
     }
+    
+    
+    @Test
+    public void enctypedPasswordWithServerAuthId()
+        throws NexusDiscoveryException
+    {
+        String nexusUrl = "http://www.somewhere.com/";
+        String user = "user";
+        String serverId = "test-server";
+
+        testClientManager.testUrl = nexusUrl;
+        testClientManager.testUser = user;
+        testClientManager.testPassword = clearTextPassword;
+
+        Settings settings = new Settings();
+
+        Server server = new Server();
+        server.setId( serverId );
+        server.setUsername( user );
+        server.setPassword( encryptedPassword );
+
+        settings.addServer( server );
+
+        Mirror mirror = new Mirror();
+        mirror.setId( serverId );
+        mirror.setUrl( nexusUrl );
+
+        settings.addMirror( mirror );
+
+        Model model = new Model();
+        model.setModelVersion( "4.0.0" );
+        model.setGroupId( "group.id" );
+        model.setArtifactId( "artifact-id" );
+        model.setVersion( "1" );
+
+        MavenProject project = new MavenProject( model );
+
+        NexusConnectionInfo info = discovery.fillAuth( nexusUrl, settings, project, "blah", true );
+        assertNotNull( info );
+        assertEquals( user, info.getUser() );
+        assertEquals( clearTextPassword, info.getPassword() );
+    }
+    
 
 }

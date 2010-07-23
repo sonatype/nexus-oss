@@ -118,9 +118,10 @@ public class DefaultNexusDiscovery
             {
                 if ( info.isConnectable() )
                 {
+                    Server server = serversById.get( info.getConnectionId() );
                     if ( ( fullyAutomatic || promptForUserAcceptance( info.getNexusUrl(), info.getConnectionName(),
                                                                       info.getUser() ) )
-                        && setAndValidateConnectionAuth( info, null ) )
+                        && setAndValidateConnectionAuth( info, server ) )
                     {
                         return info;
                     }
@@ -231,7 +232,7 @@ public class DefaultNexusDiscovery
         }
         else
         {
-            logger.info( "Login failed for: " + info.getNexusUrl() + " (user: " + server.getUsername() + ")" );
+            logger.info( "Login failed for: " + info.getNexusUrl() + " (user: " + info.getUser() + ")" );
 
             return false;
         }

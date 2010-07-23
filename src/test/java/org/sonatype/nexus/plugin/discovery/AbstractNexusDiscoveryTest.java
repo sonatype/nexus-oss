@@ -46,6 +46,8 @@ public class AbstractNexusDiscoveryTest
     protected static File secFile;
 
     protected static String encryptedPassword;
+    
+    protected static String clearTextPassword = "password";
 
     protected static String oldSecLocation;
 
@@ -55,7 +57,7 @@ public class AbstractNexusDiscoveryTest
     {
         DefaultPlexusCipher cipher = new DefaultPlexusCipher();
 
-        String master = cipher.encryptAndDecorate( "password", DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
+        String master = cipher.encryptAndDecorate( clearTextPassword, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION );
 
         SettingsSecurity sec = new SettingsSecurity();
         sec.setMaster( master );

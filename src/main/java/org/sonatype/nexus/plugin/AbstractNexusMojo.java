@@ -241,12 +241,19 @@ public abstract class AbstractNexusMojo
             {
                 Server server = getSettings() == null ? null : getSettings().getServer( getServerAuthId() );
                 if ( server != null )
-                {
+                {   
                     getLog().info( "Using authentication information for server: '" + getServerAuthId() + "'." );
-
-                    setUsername( server.getUsername() );
-                    setPassword( server.getPassword() );
-                    authFound = true;
+                    
+                    try
+                    {
+                        setUsername( server.getUsername() );
+                        setPassword( discoverer.getSecDispatcher().decrypt( server.getPassword() ) );
+                        authFound = true;
+                    }
+                    catch ( SecDispatcherException e )
+                    {
+                        throw new MojoExecutionException( "Failed to decrypt Nexus password: " + e.getMessage(), e );
+                    }
                 }
                 else
                 {
