@@ -894,16 +894,20 @@
 
     updateHistory : function(tab) {
       var bookmark = Sonatype.utils.getBookmark(tab);
-      var oldBookmark = Ext.History.getToken();
-      if (bookmark != oldBookmark)
+
+      if (bookmark)
       {
-        Ext.History.add(bookmark);
+        var oldBookmark = Ext.History.getToken();
+        if (bookmark != oldBookmark)
+        {
+          Ext.History.add(bookmark);
+        }
       }
     },
 
     replaceHistory : function(tab) {
       var bookmark = Sonatype.utils.getBookmark(tab);
-      location.replace(window.location.href.replace(/\#.*$/, '') + '#' + bookmark); 
+      location.replace(window.location.href.replace(/\#.*$/, '') + '#' + bookmark);
     },
 
     getBookmark : function(tab) {
