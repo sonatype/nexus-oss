@@ -60,7 +60,7 @@ public class CreateRepoScriptIT
         // trigger event expected by groovy script
         this.messageUtil.createRepository( resource );
 
-        String logs = FileUtils.fileRead( nexusLog );
+        String logs = FileUtils.fileRead( new File( nexusLogDir, getTestId() + "/nexus.log" ) );
         Assert.assertTrue( logs.contains( "Groovy console did kicked in!" ) );
     }
 
