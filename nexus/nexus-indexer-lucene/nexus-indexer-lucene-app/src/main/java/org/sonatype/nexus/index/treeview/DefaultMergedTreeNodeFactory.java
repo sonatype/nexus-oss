@@ -152,8 +152,7 @@ public class DefaultMergedTreeNodeFactory
         
         try
         {
-            getRepository().getLocalStorage().containsItem( getRepository(), request );
-            return true;
+            return getRepository().getLocalStorage().containsItem( getRepository(), request );
         }
         catch ( Exception e )
         {
