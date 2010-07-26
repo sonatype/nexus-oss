@@ -13,6 +13,7 @@
             <privileges>
                 <privilege>17</privilege>
                 <privilege>19</privilege>
+                <privilege>54</privilege>
             </privileges>
         </role>   
         <role>
