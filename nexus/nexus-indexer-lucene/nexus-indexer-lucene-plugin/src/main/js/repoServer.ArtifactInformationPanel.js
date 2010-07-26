@@ -42,6 +42,14 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 
   this.sp = Sonatype.lib.Permissions;
 
+  this.deleteButton = new Ext.Button({
+        xtype : 'button',
+        id : 'artifactinfo-delete-button',
+        text : 'Delete',
+        handler : this.artifactDelete,
+        scope : this
+      });
+
   Sonatype.repoServer.ArtifactInformationPanel.superclass.constructor.call(this, {
         title : 'Artifact Information',
         autoScroll : true,
@@ -102,13 +110,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
                     text : 'Download',
                     handler : this.artifactDownload,
                     scope : this
-                  }, {
-                    xtype : 'button',
-                    id : 'artifactinfo-delete-button',
-                    text : 'Delete',
-                    handler : this.artifactDelete,
-                    scope : this
-                  }]
+                  }, this.deleteButton]
             }, {
               xtype : 'fieldset',
               checkboxToggle : false,
@@ -194,16 +196,16 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
       },
 
       deleteRepoItemCallback : function(options, isSuccess, response) {
-        if (!isSuccess)
-        {
-          Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
-        }
-        else
+        if (isSuccess)
         {
           var panel = Sonatype.view.mainTabPanel.addOrShowTab('nexus-search', Sonatype.repoServer.SearchPanel, {
                 title : 'Search'
               });
           panel.startSearch(panel, false);
+        }
+        else
+        {
+          Sonatype.MessageBox.alert('Error', response.status == 401 ? 'You don\'t have permission to delete artifacts in this repository' : 'The server did not delete the file/folder from the repository');
         }
       },
 
@@ -274,6 +276,8 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
                     {
                       this.clearNonLocalView();
                       this.form.setValues(infoResp.data);
+
+                      this.deleteButton.setVisible(infoResp.data.canDelete);
                     }
                   }
                   else

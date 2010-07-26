@@ -1,32 +1,14 @@
 package org.sonatype.nexus.integrationtests.nexus3615;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.internal.matchers.IsCollectionContaining;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
-import org.sonatype.nexus.rest.model.RepositoryUrlResource;
 
 public class Nexus3615ArtifactInfoProviderIT
-    extends AbstractNexusIntegrationTest
+    extends AbstractArtifactInfoIT
 {
-
-    @Override
-    protected void deployArtifacts()
-        throws Exception
-    {
-        super.deployArtifacts();
-
-        File pom = getTestFile( "artifact.pom" );
-        File jar = getTestFile( "artifact.jar" );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO, jar, pom, null, null );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_REPO2, jar, pom, null, null );
-        getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, jar, pom, null, null );
-    }
 
     @Test
     public void getInfo()
@@ -43,16 +25,5 @@ public class Nexus3615ArtifactInfoProviderIT
             REPO_TEST_HARNESS_REPO, REPO_TEST_HARNESS_REPO2, REPO_TEST_HARNESS_RELEASE_REPO ) );
         Assert.assertEquals( "application/java-archive", info.getMimeType() );
         Assert.assertEquals( 1364, info.getSize() );
-    }
-
-    private Iterable<String> getRepositoryId( List<RepositoryUrlResource> repositories )
-    {
-        List<String> repoIds = new ArrayList<String>();
-        for ( RepositoryUrlResource repositoryUrlResource : repositories )
-        {
-            repoIds.add( repositoryUrlResource.getRepositoryId() );
-        }
-
-        return repoIds;
     }
 }

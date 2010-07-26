@@ -2,6 +2,7 @@ package org.sonatype.nexus.rest.artifact;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,9 +13,11 @@ import org.restlet.data.Request;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.IteratorSearchResponse;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -23,6 +26,7 @@ import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.rest.AbstractArtifactViewProvider;
 import org.sonatype.nexus.rest.ArtifactViewProvider;
+import org.sonatype.nexus.rest.NoSuchRepositoryAccessException;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryUrlResource;
@@ -41,11 +45,14 @@ public class InfoArtifactViewProvider
     @Requirement
     private IndexerManager indexerManager;
 
-    @Requirement
+    @Requirement( hint = "protected" )
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement
     private ReferenceFactory referenceFactory;
+
+    @Requirement
+    private AccessManager accessManager;
 
     @Override
     protected Object retrieveView( ResourceStoreRequest request, RepositoryItemUid itemUid, StorageItem item,
@@ -56,14 +63,17 @@ public class InfoArtifactViewProvider
 
         Set<String> repositories = new LinkedHashSet<String>();
 
-        if ( fileItem != null )
+        // the artifact does exists on the repository it was found =D
+        repositories.add( itemUid.getRepository().getId() );
+
+        final String checksum =
+            fileItem == null ? null : fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+        if ( checksum != null )
         {
             try
             {
                 IteratorSearchResponse searchResponse =
-                    indexerManager.searchArtifactSha1ChecksumIterator(
-                        fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ), null, null, null,
-                        null, null );
+                    indexerManager.searchArtifactSha1ChecksumIterator( checksum, null, null, null, null, null );
 
                 for ( ArtifactInfo info : searchResponse )
                 {
@@ -77,14 +87,59 @@ public class InfoArtifactViewProvider
             }
         }
 
-        // hosted / cache check usefull if the index is out to date or disable
+        // hosted / cache check useful if the index is out to date or disable
         for ( Repository repo : repositoryRegistry.getRepositories() )
         {
-            if ( repo.getLocalStorage().containsItem(
-                repo,
-                new ResourceStoreRequest( itemUid.getPath(), request.isRequestLocalOnly(), request.isRequestLocalOnly() ) ) )
+            // already found the artifact on this repo
+            if ( repositories.contains( repo.getId() ) )
             {
-                repositories.add( repo.getId() );
+                continue;
+            }
+
+            final ResourceStoreRequest repoRequest =
+                new ResourceStoreRequest( itemUid.getPath(), request.isRequestLocalOnly(),
+                    request.isRequestRemoteOnly() );
+            if ( repo.getLocalStorage().containsItem( repo, repoRequest ) )
+            {
+                try
+                {
+                    StorageItem repoItem = repo.retrieveItem( repoRequest );
+                    if ( checksum == null
+                        || checksum.equals( repoItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) ) )
+                    {
+                        repositories.add( repo.getId() );
+                    }
+                }
+                catch ( AccessDeniedException e )
+                {
+                    // that is fine, user doesn't have access
+                    continue;
+                }
+                catch ( Exception e )
+                {
+                    getLogger().error( e.getMessage(), e );
+                }
+            }
+        }
+
+        // must exclude all repos that user doesn't have view access
+        for ( Iterator<String> iterator = repositories.iterator(); iterator.hasNext(); )
+        {
+            String repoId = iterator.next();
+            try
+            {
+                repositoryRegistry.getRepository( repoId );
+            }
+            catch ( NoSuchRepositoryAccessException e )
+            {
+                // don't have view access, so won't see it!
+                iterator.remove();
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // completely unexpect, probably another thread removed this repo
+                getLogger().error( e.getMessage(), e );
+                iterator.remove();
             }
         }
 
@@ -100,12 +155,22 @@ public class InfoArtifactViewProvider
         if ( fileItem != null )
         {
             resource.setMd5Hash( fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_MD5_KEY ) );
-            resource.setSha1Hash( fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ) );
+            resource.setSha1Hash( checksum );
             resource.setLastChanged( fileItem.getModified() );
             resource.setSize( fileItem.getLength() );
             resource.setUploaded( fileItem.getCreated() );
             resource.setUploader( fileItem.getAttributes().get( AccessManager.REQUEST_USER ) );
             resource.setMimeType( fileItem.getMimeType() );
+
+            try
+            {
+                accessManager.decide( itemUid.getRepository(), request, Action.delete );
+                resource.setCanDelete( true );
+            }
+            catch ( AccessDeniedException e )
+            {
+                resource.setCanDelete( false );
+            }
         }
 
         result.setData( resource );

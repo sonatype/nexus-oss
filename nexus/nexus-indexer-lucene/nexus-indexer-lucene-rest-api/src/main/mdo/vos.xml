@@ -321,6 +321,13 @@
             <annotation>@javax.xml.bind.annotation.XmlElement( name = "repositories" )</annotation>
           </annotations>
         </field>
+        <field>
+          <name>canDelete</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+          <description>Informs if current user has what is needed to delete this artifact.</description>
+        </field>
       </fields>
     </class>
 

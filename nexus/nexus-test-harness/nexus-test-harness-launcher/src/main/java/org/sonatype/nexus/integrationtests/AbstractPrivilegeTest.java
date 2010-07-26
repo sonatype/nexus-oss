@@ -45,9 +45,9 @@ public abstract class AbstractPrivilegeTest
 {
     protected static Logger LOG = Logger.getLogger( AbstractPrivilegeTest.class );
 
-    protected static final String TEST_USER_NAME = "test-user";
+    public static final String TEST_USER_NAME = "test-user";
 
-    protected static final String TEST_USER_PASSWORD = "admin123";
+    public static final String TEST_USER_PASSWORD = "admin123";
 
     protected UserMessageUtil userUtil;
 
