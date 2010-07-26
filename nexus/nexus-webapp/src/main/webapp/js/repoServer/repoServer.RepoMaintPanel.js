@@ -296,12 +296,15 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
                 return rec.data[this.dataBookmark] == parts[0];
               }, this);
 
+          var selected = null;
+
           if (recIndex >= 0)
           {
             var rec = this.gridPanel.getSelectionModel().getSelected();
             var toSelect = this.dataStore.getAt(recIndex);
             if (rec == null || rec.id != toSelect.id)
             {
+              selected = toSelect;
               this.gridPanel.getSelectionModel().selectRecords([toSelect]);
             }
           }
@@ -335,11 +338,18 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               return;
             }
 
-            if (parts && parts.length > 2 && parts[1] == 'browsestorage')
+            if (parts && parts.length > 2 && parts[1] == 'browsestorage' && selected != null)
             {
               var repoBrowser = panel.find('name', 'repositoryBrowser')[0];
-              repoBrowser.searchField.setValue(parts[2]);
-              repoBrowser.searchTask.delay(200);
+              repoBrowser.selectPath('/' + selected.data.name + parts[2], 'text', function(success, node) {
+                    if (success)
+                    {
+                      if (node.ownerTree.nodeClickEvent)
+                      {
+                        Sonatype.Events.fireEvent(node.ownerTree.nodeClickEvent, node, node.ownerTree.nodeClickPassthru);
+                      }
+                    }
+                  });
             }
           }
         }
