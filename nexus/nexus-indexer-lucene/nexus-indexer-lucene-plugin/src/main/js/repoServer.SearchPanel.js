@@ -94,6 +94,11 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           if (rec.store.reader.jsonData.collapsed)
           {
             var repoToUse = rec.get('latestReleaseRepositoryId');
+            
+            if ( !repoToUse )
+            {
+            	repoToUse = rec.get('latestSnapshotRepositoryId');
+            }
 
             for (var i = 0; i < rec.data.artifactHits.length; i++)
             {

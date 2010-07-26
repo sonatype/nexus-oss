@@ -44,6 +44,10 @@ Sonatype.SearchStore = function(config) {
                   name : 'latestRelease'
                 }, {
                   name : 'latestReleaseRepositoryId'
+                }, {
+                  name : 'latestSnapshot'
+                }, {
+                  name : 'latestSnapshotRepositoryId'
                 }])),
         listeners : {
           'beforeload' : {
@@ -235,8 +239,15 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         {
           return record.get('version');
         }
+        
+        var latest = record.get('latestRelease');
+        
+        if ( !latest )
+        {
+        	latest = record.get('latestSnapshot');
+        }
 
-        return 'Latest: ' + record.get('latestRelease') + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
+        return 'Latest: ' + latest + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
             + '~~~~kw,versionexpand " onmousedown="cancel_bubble(event)" onclick="cancel_bubble(event); return true;">(Show All Versions)</a>';
       },
       formatDownloadLinks : function(value, p, record, rowIndex, colIndex, store) {
@@ -244,6 +255,11 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         if (store.reader.jsonData.collapsed)
         {
           var repoToUse = record.get('latestReleaseRepositoryId');
+          
+          if ( !repoToUse )
+          {
+          	repoToUse = record.get('latestSnapshotRepositoryId');
+          }
 
           for (var i = 0; i < record.data.artifactHits.length; i++)
           {
