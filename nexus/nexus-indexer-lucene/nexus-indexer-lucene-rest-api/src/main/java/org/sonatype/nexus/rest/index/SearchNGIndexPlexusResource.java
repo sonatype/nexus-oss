@@ -122,12 +122,14 @@ public class SearchNGIndexPlexusResource
      * @param c classifier to perform a maven search against (can be combined with g, a, v & p params as well).
      * @param from result index to start retrieving results from.
      * @param count number of results to have returned to you.
+     * @param repositoryId The repositoryId to which repository search should be narrowed. Omit if search should be
+     *            global.
      */
     @Override
     @GET
     @ResourceMethodSignature( queryParams = { @QueryParam( "q" ), @QueryParam( "g" ), @QueryParam( "a" ),
         @QueryParam( "v" ), @QueryParam( "p" ), @QueryParam( "c" ), @QueryParam( "cn" ), @QueryParam( "sha1" ),
-        @QueryParam( "from" ), @QueryParam( "count" ) }, output = SearchResponse.class )
+        @QueryParam( "from" ), @QueryParam( "count" ), @QueryParam( "repositoryId" ) }, output = SearchResponse.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -143,6 +145,7 @@ public class SearchNGIndexPlexusResource
         Integer from = null;
         Integer count = null;
         Boolean exact = null;
+        String repositoryId = null;
         Boolean expandVersion = Boolean.FALSE;
         Boolean collapseResults = Boolean.FALSE;
 
@@ -168,6 +171,11 @@ public class SearchNGIndexPlexusResource
             {
                 count = null;
             }
+        }
+
+        if ( form.getFirstValue( "repositoryId" ) != null )
+        {
+            repositoryId = form.getFirstValue( "repositoryId" );
         }
 
         if ( form.getFirstValue( "exact" ) != null )
@@ -225,7 +233,7 @@ public class SearchNGIndexPlexusResource
                 filters.add( systemWideCollector );
                 filters.add( repositoryWideCollector );
 
-                searchResult = searchByTerms( terms, null, from, count, exact, expandVersion, collapseResults, filters );
+                searchResult = searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters );
 
                 if ( searchResult == null )
                 {
