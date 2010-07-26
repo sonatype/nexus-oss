@@ -471,6 +471,13 @@ public class RepositoryMessageUtil
 
     }
 
+    /**
+     * 
+     * @param repoId
+     * @return
+     * @throws IOException
+     * @deprecated This is half baked stuff
+     */
     public static ContentListResourceResponse downloadRepoIndexContent( String repoId )
         throws IOException
     {
