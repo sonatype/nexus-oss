@@ -32,6 +32,7 @@ import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.ArtifactInfoResourceResponse;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -425,6 +426,7 @@ public class SearchMessageUtil
         return info.getData();
     }
 
+    // ================================
     // Search NG
 
     /**
@@ -581,4 +583,58 @@ public class SearchMessageUtil
 
         return doNGSearchFor( queryArgs, repositoryId, type );
     }
+
+    // =================
+    // TreeView
+
+    public IndexBrowserTreeViewResponseDTO indexBrowserTreeView( String repoId, String path )
+        throws IOException
+    {
+        return indexBrowserTreeView( repoId, path, null, null, null );
+    }
+
+    public IndexBrowserTreeViewResponseDTO indexBrowserTreeView( String repoId, String path, String groupIdHint,
+                                                                 String artifactIdHint, String versionIdHint )
+        throws IOException
+    {
+        assert repoId != null : "Repository ID must not be null!";
+
+        // trim off leading "/" if any
+        if ( path != null && path.startsWith( "/" ) )
+        {
+            path = path.substring( 1 );
+        }
+
+        String serviceURI = "service/local/repositories/" + repoId + "/index_content/" + path + "?";
+
+        if ( StringUtils.isNotBlank( groupIdHint ) )
+        {
+            serviceURI = serviceURI + "groupIdHint=" + groupIdHint + "&";
+        }
+        if ( StringUtils.isNotBlank( artifactIdHint ) )
+        {
+            serviceURI = serviceURI + "artifactIdHint=" + artifactIdHint + "&";
+        }
+        if ( StringUtils.isNotBlank( versionIdHint ) )
+        {
+            serviceURI = serviceURI + "versionHint=" + versionIdHint + "&";
+        }
+
+        Response response = RequestFacade.doGetRequest( serviceURI );
+
+        String responseText = response.getEntity().getText();
+
+        Status status = response.getStatus();
+
+        Assert.assertTrue( responseText + status, status.isSuccess() );
+
+        XStreamRepresentation re =
+            new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
+
+        IndexBrowserTreeViewResponseDTO resourceResponse =
+            (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
+
+        return resourceResponse;
+    }
+
 }
