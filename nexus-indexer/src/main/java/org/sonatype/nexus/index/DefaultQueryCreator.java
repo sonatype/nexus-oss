@@ -125,7 +125,7 @@ public class DefaultQueryCreator
             }
             catch ( ParseException e )
             {
-                getLogger().info(
+                getLogger().debug(
                     "Query parsing with \"legacy\" method, we got ParseException from QueryParser: " + e.getMessage() );
 
                 result = legacyConstructQuery( field, query );
@@ -287,7 +287,7 @@ public class DefaultQueryCreator
                 }
                 catch ( ParseException e )
                 {
-                    getLogger().info(
+                    getLogger().debug(
                         "Query parsing with \"legacy\" method, we got ParseException from QueryParser: "
                             + e.getMessage() );
 
