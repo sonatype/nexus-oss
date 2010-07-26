@@ -606,13 +606,25 @@ public class SearchMessageUtil
     {
         assert repoId != null : "Repository ID must not be null!";
 
-        // trim off leading "/" if any
-        if ( path != null && path.startsWith( "/" ) )
+        String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
+
+        if ( path != null )
         {
-            path = path.substring( 1 );
+            // trim off leading "/" if any
+            while ( path.length() > 0 && path.startsWith( "/" ) )
+            {
+                path = path.substring( 1 );
+            }
+
+            serviceURI = serviceURI + path;
+
+            if ( !serviceURI.endsWith( "/" ) )
+            {
+                serviceURI = serviceURI + "/";
+            }
         }
 
-        String serviceURI = "service/local/repositories/" + repoId + "/index_content/" + path + "?";
+        serviceURI = serviceURI + "?";
 
         if ( StringUtils.isNotBlank( groupIdHint ) )
         {
