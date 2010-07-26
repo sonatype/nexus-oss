@@ -439,15 +439,11 @@ public class SearchMessageUtil
     private Response doNGSearchForR( Map<String, String> queryArgs, String repositoryId, SearchType searchType )
         throws IOException
     {
-        StringBuffer serviceURI;
-        
-        if ( repositoryId == null )
+        StringBuffer serviceURI = new StringBuffer( "service/local/lucene/search?" );
+
+        if ( StringUtils.isNotBlank( repositoryId ) )
         {
-            serviceURI = new StringBuffer( "service/local/lucene/search?" );
-        }
-        else
-        {
-            serviceURI = new StringBuffer( "service/local/lucene/search/repositories/" + repositoryId + "?" );
+            serviceURI.append( "repositoryId=" ).append( repositoryId ).append( "&" );
         }
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
