@@ -49,6 +49,7 @@ import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -467,6 +468,13 @@ public class SearchNGIndexPlexusResource
                     hit.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
 
                     hit.setRepositoryKind( extractRepositoryKind( repository ) );
+                    
+                    MavenRepository mavenRepo = repository.adaptToFacet( MavenRepository.class );
+                    
+                    if ( mavenRepo != null )
+                    {
+                        hit.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
+                    }
 
                     // we are adding the POM link "blindly", unless packaging is POM,
                     // since the it will be added below the "usual" way

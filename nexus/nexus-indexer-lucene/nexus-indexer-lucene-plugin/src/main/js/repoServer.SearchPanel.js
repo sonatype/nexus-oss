@@ -94,10 +94,10 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
           if (rec.store.reader.jsonData.collapsed)
           {
             var repoToUse = rec.get('latestReleaseRepositoryId');
-            
-            if ( !repoToUse )
+
+            if (!repoToUse)
             {
-            	repoToUse = rec.get('latestSnapshotRepositoryId');
+              repoToUse = rec.get('latestSnapshotRepositoryId');
             }
 
             for (var i = 0; i < rec.data.artifactHits.length; i++)
@@ -122,7 +122,8 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
               useHints : true,
               expandPath : true,
               hits : rec.data.artifactHits,
-              rec : rec
+              rec : rec,
+              isSnapshot : rec.data.artifactHits[hitIndex].repositoryPolicy == 'SNAPSHOT'
             }
           };
 

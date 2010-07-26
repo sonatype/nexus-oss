@@ -562,6 +562,13 @@
           <description>The repository kind (hosted, proxy, group).</description>
         </field>
         <field>
+          <name>repositoryPolicy</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository policy (RELEASE or SNAPSHOT).</description>
+        </field>
+        <field>
           <name>repositoryURL</name>
           <version>1.0.0+</version>
           <type>String</type>

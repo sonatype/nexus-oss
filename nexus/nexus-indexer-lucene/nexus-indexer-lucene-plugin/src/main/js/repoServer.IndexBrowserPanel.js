@@ -183,16 +183,19 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
           {
             for (var i = 0; i < this.payload.data.hits.length; i++)
             {
-              var record = new Ext.data.Record.create({
-                    name : 'id'
-                  }, {
-                    name : 'name'
-                  });
+              if ((this.payload.data.isSnapshot && this.payload.data.hits[i].repositoryPolicy == 'SNAPSHOT') || (!this.payload.data.isSnapshot && this.payload.data.hits[i].repositoryPolicy == 'RELEASE'))
+              {
+                var record = new Ext.data.Record.create({
+                      name : 'id'
+                    }, {
+                      name : 'name'
+                    });
 
-              store.add(new record({
-                    id : this.payload.data.hits[i].repositoryId,
-                    name : this.payload.data.hits[i].repositoryName
-                  }));
+                store.add(new record({
+                      id : this.payload.data.hits[i].repositoryId,
+                      name : this.payload.data.hits[i].repositoryName
+                    }));
+              }
             }
 
             this.repocombo.setValue(this.payload.data.id);
