@@ -593,6 +593,13 @@ public class SearchMessageUtil
         return indexBrowserTreeView( repoId, path, null, null, null );
     }
 
+    public IndexBrowserTreeViewResponseDTO indexBrowserTreeView( String repoId, String groupIdHint,
+                                                                 String artifactIdHint )
+        throws IOException
+    {
+        return indexBrowserTreeView( repoId, null, groupIdHint, artifactIdHint, null );
+    }
+
     public IndexBrowserTreeViewResponseDTO indexBrowserTreeView( String repoId, String path, String groupIdHint,
                                                                  String artifactIdHint, String versionIdHint )
         throws IOException
