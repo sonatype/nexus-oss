@@ -85,9 +85,6 @@ public class SearchNGIndexPlexusResource
     @Requirement( role = Searcher.class )
     private List<Searcher> searchers;
 
-    // @Requirement( hint = "maven2" )
-    // private GavCalculator m2GavCalculator;
-
     @Override
     public String getResourceUri()
     {
@@ -234,7 +231,8 @@ public class SearchNGIndexPlexusResource
                 filters.add( systemWideCollector );
                 filters.add( repositoryWideCollector );
 
-                searchResult = searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters );
+                searchResult =
+                    searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters );
 
                 if ( searchResult == null )
                 {
@@ -363,7 +361,7 @@ public class SearchNGIndexPlexusResource
                 }
 
                 final IteratorSearchResponse searchResponse =
-                    searcher.flatIteratorSearch( terms, repositoryId, from, count, HIT_LIMIT, false, searchType,
+                    searcher.flatIteratorSearch( terms, repositoryId, from, count, null, false, searchType,
                         actualFilters );
 
                 if ( searchResponse != null )
@@ -428,17 +426,25 @@ public class SearchNGIndexPlexusResource
 
                 if ( artifact == null )
                 {
-                    artifact = new NexusNGArtifact();
+                    if ( ( hits.size() + 1 ) > HIT_LIMIT )
+                    {
+                        // check for HIT_LIMIT: if we are stepping it over, stop here
+                        break;
+                    }
+                    else
+                    {
+                        artifact = new NexusNGArtifact();
 
-                    artifact.setGroupId( ai.groupId );
+                        artifact.setGroupId( ai.groupId );
 
-                    artifact.setArtifactId( ai.artifactId );
+                        artifact.setArtifactId( ai.artifactId );
 
-                    artifact.setVersion( ai.version );
+                        artifact.setVersion( ai.version );
 
-                    artifact.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
+                        artifact.setHighlightedFragment( getMatchHighlightHtmlSnippet( ai ) );
 
-                    hits.put( key, artifact );
+                        hits.put( key, artifact );
+                    }
                 }
 
                 Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
@@ -468,9 +474,9 @@ public class SearchNGIndexPlexusResource
                     hit.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
 
                     hit.setRepositoryKind( extractRepositoryKind( repository ) );
-                    
+
                     MavenRepository mavenRepo = repository.adaptToFacet( MavenRepository.class );
-                    
+
                     if ( mavenRepo != null )
                     {
                         hit.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
