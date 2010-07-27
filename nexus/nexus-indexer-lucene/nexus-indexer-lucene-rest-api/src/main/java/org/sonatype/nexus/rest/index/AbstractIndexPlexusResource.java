@@ -161,8 +161,8 @@ public abstract class AbstractIndexPlexusResource
             try
             {
                 searchResult =
-                    searchByTerms( terms, getRepositoryId( request ), from, count, exact, expandVersion,
-                        expandPackaging, expandClassifier, collapseResults );
+                    searchByTerms( terms, getRepositoryId( request ), from, count == null ? 500 : count, exact,
+                        expandVersion, expandPackaging, expandClassifier, collapseResults );
 
                 // non-identify search happened
                 boolean tooManyResults = searchResult.isHitLimitExceeded();
