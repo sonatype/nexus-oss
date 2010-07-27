@@ -80,12 +80,18 @@ Sonatype.repoServer.SearchPanel = function(config) {
   this.grid.on('rowclick', this.rowClickHandler, this);
   this.grid.on('keypress', this.keypressHandler, this);
   this.grid.clearButton.on('click', this.clearArtifactInformation, this);
+  this.repoBrowserContainer.repositoryBrowser.getSelectionModel().on('selectionchange', this.focusGrid, this);
 
   this.lastbookmark = '';
   this.searchTask = new Ext.util.DelayedTask(this.delayedDisplayArtifactInformation, this, []);
 };
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
+      focusGrid : function() {
+        // this.grid.doLayout();
+        // this.grid.focus(false, 10);
+      },
+
       clearArtifactInformation : function(button, e) {
         this.repoBrowserContainer.updatePayload(null);
       },
