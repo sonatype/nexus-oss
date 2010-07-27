@@ -1,5 +1,7 @@
 package org.sonatype.nexus.rest;
 
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
+import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
@@ -19,8 +21,14 @@ public class XStreamInitializer
         xstream.registerLocalConverter( SearchResponse.class, "data", new AliasingListConverter( NexusArtifact.class,
             "artifact" ) );
 
+        // Tree
+        xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
+        xstream.processAnnotations( IndexBrowserTreeNode.class );
+        xstream.registerLocalConverter( IndexBrowserTreeNode.class, "children", new AliasingListConverter(
+            IndexBrowserTreeNode.class, "child" ) );
+
         // NG
-        
+
         xstream.processAnnotations( SearchNGResponse.class );
         xstream.processAnnotations( NexusNGArtifact.class );
         xstream.processAnnotations( NexusNGArtifactHit.class );
