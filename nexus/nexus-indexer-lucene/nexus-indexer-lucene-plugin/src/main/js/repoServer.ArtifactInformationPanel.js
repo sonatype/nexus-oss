@@ -44,9 +44,15 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
 
   this.deleteButton = new Ext.Button({
         xtype : 'button',
-        id : 'artifactinfo-delete-button',
         text : 'Delete',
         handler : this.artifactDelete,
+        scope : this
+      });
+
+  this.downloadButton = new Ext.Button({
+        xtype : 'button',
+        text : 'Download',
+        handler : this.artifactDownload,
         scope : this
       });
 
@@ -104,13 +110,7 @@ Sonatype.repoServer.ArtifactInformationPanel = function(config) {
               layout : 'column',
               buttonAlign : 'left',
               items : [{}],
-              buttons : [{
-                    xtype : 'button',
-                    id : 'artifactinfo-download-button',
-                    text : 'Download',
-                    handler : this.artifactDownload,
-                    scope : this
-                  }, this.deleteButton]
+              buttons : [this.downloadButton, this.deleteButton]
             }, {
               xtype : 'fieldset',
               checkboxToggle : false,
@@ -223,7 +223,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         this.find('name', 'size')[0].hide();
         this.find('name', 'uploaded')[0].hide();
         this.find('name', 'lastChanged')[0].hide();
-        Ext.getCmp('artifactinfo-delete-button').hide();
+        this.deleteButton.hide();
         var fieldsets = this.findByType('fieldset');
 
         for (var i = 0; i < fieldsets.length; i++)
@@ -232,12 +232,15 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         }
       },
 
-      clearNonLocalView : function() {
+      clearNonLocalView : function(showDeleteButton) {
         this.find('name', 'uploader')[0].show();
         this.find('name', 'size')[0].show();
         this.find('name', 'uploaded')[0].show();
         this.find('name', 'lastChanged')[0].show();
-        Ext.getCmp('artifactinfo-delete-button').show();
+        if (showDeleteButton)
+        {
+          this.deleteButton.show();
+        }
         var fieldsets = this.findByType('fieldset');
 
         for (var i = 0; i < fieldsets.length; i++)
@@ -274,10 +277,8 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
                     }
                     else
                     {
-                      this.clearNonLocalView();
+                      this.clearNonLocalView(infoResp.data.canDelete);
                       this.form.setValues(infoResp.data);
-
-                      this.deleteButton.setVisible(infoResp.data.canDelete);
                     }
                   }
                   else
@@ -300,10 +301,11 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
       }
     });
 
-Sonatype.Events.addListener('fileContainerInit', function(artifactContainer) {
-      artifactContainer.add(new Sonatype.repoServer.ArtifactInformationPanel({
+Sonatype.Events.addListener('fileContainerInit', function(items) {
+      items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
-            tabTitle : 'Artifact Information'
+            tabTitle : 'Artifact Information',
+            preferredIndex : 1
           }));
     });
 
@@ -320,10 +322,11 @@ Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, d
       }
     });
 
-Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
-      artifactContainer.add(new Sonatype.repoServer.ArtifactInformationPanel({
+Sonatype.Events.addListener('artifactContainerInit', function(items) {
+      items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
-            tabTitle : 'Artifact Information'
+            tabTitle : 'Artifact Information',
+            preferredIndex : 1
           }));
     });
 

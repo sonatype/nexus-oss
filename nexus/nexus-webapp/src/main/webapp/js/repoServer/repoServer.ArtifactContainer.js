@@ -24,7 +24,42 @@ Sonatype.repoServer.ArtifactContainer = function(config) {
         layoutOnTabChange : true
       });
 
-  Sonatype.Events.fireEvent(this.initEventName, this, null);
+  var items = [];
+
+  Sonatype.Events.fireEvent(this.initEventName, items, null);
+
+  items.sort(function(a, b) {
+        if (a.preferredIndex == undefined && b.preferredIndex == undefined)
+        {
+          return 0;
+        }
+
+        if (a.preferredIndex == undefined)
+        {
+          return 1;
+        }
+        else if (b.preferredIndex == undefined)
+        {
+          return -1;
+        }
+        else if (a.preferredIndex < b.preferredIndex)
+        {
+          return -1;
+        }
+        else if (a.preferredIndex > b.preferredIndex)
+        {
+          return 1;
+        }
+        else
+        {
+          return 0;
+        }
+      });
+
+  for (var i = 0; i < items.length; i++)
+  {
+    this.add(items[i]);
+  }
 };
 
 Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, {

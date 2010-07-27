@@ -132,16 +132,17 @@ Ext.extend(Sonatype.repoServer.Maven2InformationPanel, Ext.form.FormPanel, {
       }
     });
 
-Sonatype.Events.addListener('fileContainerInit', function(artifactContainer) {
-      artifactContainer.add(new Sonatype.repoServer.Maven2InformationPanel({
+Sonatype.Events.addListener('fileContainerInit', function(items) {
+      items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
-            tabTitle : 'Maven Information'
+            tabTitle : 'Maven Information',
+            preferredIndex : 0
           }));
     });
 
 Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, data) {
       var panel = artifactContainer.find('name', 'maven2InformationPanel')[0];
-      
+
       if (data == null || !data.leaf)
       {
         panel.showArtifact(null, artifactContainer);
@@ -152,10 +153,11 @@ Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, d
       }
     });
 
-Sonatype.Events.addListener('artifactContainerInit', function(artifactContainer) {
-      artifactContainer.add(new Sonatype.repoServer.Maven2InformationPanel({
+Sonatype.Events.addListener('artifactContainerInit', function(items) {
+      items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
-            tabTitle : 'Maven Information'
+            tabTitle : 'Maven Information',
+            preferredIndex : 0
           }));
     });
 
