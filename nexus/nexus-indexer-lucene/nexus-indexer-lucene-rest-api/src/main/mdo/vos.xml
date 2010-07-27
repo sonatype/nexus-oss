@@ -370,6 +370,13 @@
           <required>true</required>
           <description>The artifact url.</description>
         </field>
+        <field>
+          <name>canView</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Tells if the users has view access to a given artifact.</description>
+        </field>
       </fields>
     </class>
 

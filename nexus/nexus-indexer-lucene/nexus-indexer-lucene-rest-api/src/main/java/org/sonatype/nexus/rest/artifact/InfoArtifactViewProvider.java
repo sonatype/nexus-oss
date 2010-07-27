@@ -2,7 +2,6 @@ package org.sonatype.nexus.rest.artifact;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,6 +45,9 @@ public class InfoArtifactViewProvider
     private IndexerManager indexerManager;
 
     @Requirement( hint = "protected" )
+    private RepositoryRegistry protectedRepositoryRegistry;
+
+    @Requirement
     private RepositoryRegistry repositoryRegistry;
 
     @Requirement
@@ -88,7 +90,7 @@ public class InfoArtifactViewProvider
         }
 
         // hosted / cache check useful if the index is out to date or disable
-        for ( Repository repo : repositoryRegistry.getRepositories() )
+        for ( Repository repo : protectedRepositoryRegistry.getRepositories() )
         {
             // already found the artifact on this repo
             if ( repositories.contains( repo.getId() ) )
@@ -119,27 +121,6 @@ public class InfoArtifactViewProvider
                 {
                     getLogger().error( e.getMessage(), e );
                 }
-            }
-        }
-
-        // must exclude all repos that user doesn't have view access
-        for ( Iterator<String> iterator = repositories.iterator(); iterator.hasNext(); )
-        {
-            String repoId = iterator.next();
-            try
-            {
-                repositoryRegistry.getRepository( repoId );
-            }
-            catch ( NoSuchRepositoryAccessException e )
-            {
-                // don't have view access, so won't see it!
-                iterator.remove();
-            }
-            catch ( NoSuchRepositoryException e )
-            {
-                // completely unexpect, probably another thread removed this repo
-                getLogger().error( e.getMessage(), e );
-                iterator.remove();
             }
         }
 
@@ -200,6 +181,24 @@ public class InfoArtifactViewProvider
         for ( String repositoryId : repositories )
         {
             RepositoryUrlResource repoUrl = new RepositoryUrlResource();
+
+            try
+            {
+                protectedRepositoryRegistry.getRepository( repositoryId );
+                repoUrl.setCanView( true );
+            }
+            catch ( NoSuchRepositoryAccessException e )
+            {
+                // don't have view access, so won't see it!
+                repoUrl.setCanView( false );
+            }
+            catch ( NoSuchRepositoryException e )
+            {
+                // completely unexpect, probably another thread removed this repo
+                getLogger().error( e.getMessage(), e );
+                continue;
+            }
+
             repoUrl.setRepositoryId( repositoryId );
             try
             {
