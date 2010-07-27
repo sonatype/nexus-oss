@@ -75,15 +75,39 @@ Sonatype.repoServer.SearchPanel = function(config) {
         items : [this.grid, this.repoBrowserContainer]
       });
 
-  this.grid.getSelectionModel().on('rowselect', this.displayArtifactInformation, this);
+  // this.grid.getSelectionModel().on('rowselect',
+  // this.displayArtifactInformation, this);
+  this.grid.on('rowclick', this.rowClickHandler, this);
+  this.grid.on('keypress', this.keypressHandler, this);
   this.grid.clearButton.on('click', this.clearArtifactInformation, this);
 
   this.lastbookmark = '';
+  this.searchTask = new Ext.util.DelayedTask(this.delayedDisplayArtifactInformation, this, []);
 };
 
 Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
       clearArtifactInformation : function(button, e) {
         this.repoBrowserContainer.updatePayload(null);
+      },
+
+      rowClickHandler : function(grid, rowindex, evt) {
+        this.displayArtifactInformation(grid.getSelectionModel(), rowindex, grid.getSelectionModel().getSelected());
+      },
+
+      keypressHandler : function(evt) {
+        this.searchTask.cancel();
+        if (evt.keyCode == 13)
+        {
+          this.delayedDisplayArtifactInformation();
+        }
+        else
+        {
+          this.searchTask.delay(2000);
+        }
+      },
+
+      delayedDisplayArtifactInformation : function() {
+        this.displayArtifactInformation(this.grid.getSelectionModel(), -1, this.grid.getSelectionModel().getSelected());
       },
 
       displayArtifactInformation : function(selectionModel, index, rec) {
