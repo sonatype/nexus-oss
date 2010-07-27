@@ -2162,11 +2162,6 @@ public class DefaultIndexerManager
         {
             req.setCount( count );
         }
-        else
-        {
-            // protect UI from break-down ;)
-            req.setCount( 500 );
-        }
 
         if ( hitLimit != null )
         {
