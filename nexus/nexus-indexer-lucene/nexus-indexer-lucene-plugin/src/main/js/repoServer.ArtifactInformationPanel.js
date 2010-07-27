@@ -25,7 +25,14 @@ Ext.form.RepositoryUrlDisplayField = Ext.extend(Ext.form.DisplayField, {
           }
 
           var path = 'index.html#view-repositories;' + repositories[i].repositoryId + '~browsestorage~' + repositories[i].path;
-          links += '<a href="' + path + '">' + repositories[i].repositoryName + '</a>';
+          if (repositories[i].canView)
+          {
+            links += '<a href="' + path + '">' + repositories[i].repositoryName + '</a>';
+          }
+          else
+          {
+            links += repositories[i].repositoryName;
+          }
         }
 
         this.setRawValue(links);
