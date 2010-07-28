@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.rest.index;
+package org.sonatype.nexus.rest.indexng;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.apache.lucene.store.AlreadyClosedException;
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -37,7 +36,6 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.IteratorSearchResponse;
@@ -47,7 +45,6 @@ import org.sonatype.nexus.index.MavenCoordinatesSearcher;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -677,183 +674,6 @@ public class SearchNGIndexPlexusResource
         {
             // huh?
             return repository.getRepositoryKind().getMainFacet().getName();
-        }
-    }
-
-    // ==
-
-    protected static class LatestVersionHolder
-    {
-        private final String groupId;
-
-        private final String artifactId;
-
-        private ArtifactVersion latestSnapshot;
-
-        private String latestSnapshotRepositoryId;
-
-        private ArtifactVersion latestRelease;
-
-        private String latestReleaseRepositoryId;
-
-        public LatestVersionHolder( final ArtifactInfo ai )
-        {
-            this.groupId = ai.groupId;
-
-            this.artifactId = ai.artifactId;
-
-            maintainLatestVersions( ai );
-        }
-
-        @SuppressWarnings( "unchecked" )
-        public void maintainLatestVersions( final ArtifactInfo ai )
-        {
-            ArtifactVersion version = ai.getArtifactVersion();
-
-            if ( VersionUtils.isSnapshot( ai.version ) )
-            {
-                if ( this.latestSnapshot == null )
-                {
-                    this.latestSnapshot = version;
-
-                    this.latestSnapshotRepositoryId = ai.repository;
-                }
-                else if ( this.latestSnapshot.compareTo( version ) < 0 )
-                {
-                    this.latestSnapshot = version;
-
-                    this.latestSnapshotRepositoryId = ai.repository;
-                }
-            }
-            else
-            {
-                if ( this.latestRelease == null )
-                {
-                    this.latestRelease = version;
-
-                    this.latestReleaseRepositoryId = ai.repository;
-                }
-                else if ( this.latestRelease.compareTo( version ) < 0 )
-                {
-                    this.latestRelease = version;
-
-                    this.latestReleaseRepositoryId = ai.repository;
-                }
-            }
-        }
-
-        // ==
-
-        public String getGroupId()
-        {
-            return groupId;
-        }
-
-        public String getArtifactId()
-        {
-            return artifactId;
-        }
-
-        public ArtifactVersion getLatestSnapshot()
-        {
-            return latestSnapshot;
-        }
-
-        public String getLatestSnapshotRepositoryId()
-        {
-            return latestSnapshotRepositoryId;
-        }
-
-        public ArtifactVersion getLatestRelease()
-        {
-            return latestRelease;
-        }
-
-        public String getLatestReleaseRepositoryId()
-        {
-            return latestReleaseRepositoryId;
-        }
-    }
-
-    /**
-     * A special filter that actually does not filter, but collects the latest and release version for every GA. After
-     * iteratorSearchResponse has been processed, this collector will hold all the needed versions of the processed
-     * artifact infos.
-     * 
-     * @author cstamas
-     */
-    protected static class SystemWideLatestVersionCollector
-        implements ArtifactInfoFilter
-    {
-        private HashMap<String, LatestVersionHolder> lvhs = new HashMap<String, LatestVersionHolder>();
-
-        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-        {
-            final String key = getKey( ai.groupId, ai.artifactId );
-
-            LatestVersionHolder lvh = lvhs.get( key );
-
-            if ( lvh == null )
-            {
-                lvh = new LatestVersionHolder( ai );
-
-                lvhs.put( key, lvh );
-            }
-
-            lvh.maintainLatestVersions( ai );
-
-            return true;
-        }
-
-        public String getKey( String groupId, String artifactId )
-        {
-            return groupId + ":" + artifactId;
-        }
-
-        public HashMap<String, LatestVersionHolder> getLvhs()
-        {
-            return lvhs;
-        }
-    }
-
-    /**
-     * A special filter that actually does not filter, but collects the latest and release version for every RGA. After
-     * iteratorSearchResponse has been processed, this collector will hold all the needed versions of the processed
-     * artifact infos.
-     * 
-     * @author cstamas
-     */
-    protected static class RepositoryWideLatestVersionCollector
-        implements ArtifactInfoFilter
-    {
-        private HashMap<String, LatestVersionHolder> lvhs = new HashMap<String, LatestVersionHolder>();
-
-        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-        {
-            final String key = getKey( ai.repository, ai.groupId, ai.artifactId );
-
-            LatestVersionHolder lvh = lvhs.get( key );
-
-            if ( lvh == null )
-            {
-                lvh = new LatestVersionHolder( ai );
-
-                lvhs.put( key, lvh );
-            }
-
-            lvh.maintainLatestVersions( ai );
-
-            return true;
-        }
-
-        public String getKey( String repositoryId, String groupId, String artifactId )
-        {
-            return repositoryId + ":" + groupId + ":" + artifactId;
-        }
-
-        public HashMap<String, LatestVersionHolder> getLvhs()
-        {
-            return lvhs;
         }
     }
 }
