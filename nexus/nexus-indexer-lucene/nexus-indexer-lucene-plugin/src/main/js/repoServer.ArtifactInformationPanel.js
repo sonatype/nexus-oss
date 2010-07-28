@@ -312,7 +312,7 @@ Sonatype.Events.addListener('fileContainerInit', function(items) {
       items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
             tabTitle : 'Artifact Information',
-            preferredIndex : 1
+            preferredIndex : 20
           }));
     });
 
@@ -333,7 +333,7 @@ Sonatype.Events.addListener('artifactContainerInit', function(items) {
       items.push(new Sonatype.repoServer.ArtifactInformationPanel({
             name : 'artifactInformationPanel',
             tabTitle : 'Artifact Information',
-            preferredIndex : 1
+            preferredIndex : 20
           }));
     });
 

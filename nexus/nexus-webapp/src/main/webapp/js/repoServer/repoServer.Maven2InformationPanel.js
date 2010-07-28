@@ -136,7 +136,7 @@ Sonatype.Events.addListener('fileContainerInit', function(items) {
       items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
             tabTitle : 'Maven Information',
-            preferredIndex : 0
+            preferredIndex : 10
           }));
     });
 
@@ -157,7 +157,7 @@ Sonatype.Events.addListener('artifactContainerInit', function(items) {
       items.push(new Sonatype.repoServer.Maven2InformationPanel({
             name : 'maven2InformationPanel',
             tabTitle : 'Maven Information',
-            preferredIndex : 0
+            preferredIndex : 10
           }));
     });
 
