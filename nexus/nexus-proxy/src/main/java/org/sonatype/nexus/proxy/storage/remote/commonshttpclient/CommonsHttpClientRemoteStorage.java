@@ -634,7 +634,7 @@ public class CommonsHttpClientRemoteStorage
                                                 + repository.getName()
                                                 + "\" (ID="
                                                 + repository.getId()
-                                                + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (bqseUrl of proxy repository)!" );
+                                                + ") is backed by Amazon S3 service. This means that Nexus can't reliably detect the validity of your setup (baseUrl of proxy repository)!" );
         }
     }
 
