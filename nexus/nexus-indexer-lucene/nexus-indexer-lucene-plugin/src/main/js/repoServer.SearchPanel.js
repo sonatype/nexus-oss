@@ -282,6 +282,7 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
         if (records.length > 0)
         {
           this.grid.getSelectionModel().selectFirstRow();
+          this.displayArtifactInformation(this.grid.getSelectionModel(), 0, this.grid.getSelectionModel().getSelected());
         }
       },
       // start the quick search, we will look at all search types
