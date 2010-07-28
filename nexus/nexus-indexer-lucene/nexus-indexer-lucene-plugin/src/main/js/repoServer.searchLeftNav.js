@@ -27,7 +27,7 @@ var SEARCH_FIELD_CONFIG = {
 Sonatype.Events.addListener('nexusNavigationInit', function(nexusPanel) {
       if (Sonatype.lib.Permissions.checkPermission('nexus:index', Sonatype.lib.Permissions.READ))
       {
-        nexusPanel.add({
+        nexusPanel.insert(0,{
               title : 'Artifact Search',
               id : 'st-nexus-search',
               items : [Ext.apply({

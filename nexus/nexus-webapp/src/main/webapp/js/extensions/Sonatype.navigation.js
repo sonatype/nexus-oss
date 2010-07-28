@@ -30,6 +30,41 @@ Sonatype.navigation.NavigationPanel = function(config) {
 };
 
 Ext.extend(Sonatype.navigation.NavigationPanel, Ext.Panel, {
+      insert : function(sectionIndex, container) {
+        if (sectionIndex == null || sectionIndex == undefined)
+          sectionIndex = 0;
+        if (container == null)
+          return;
+
+        // check if this is an attempt to add a navigation item to an existing
+        // section
+        if (container.sectionId)
+        {
+          var panel = this.findById(container.sectionId);
+          if (panel)
+          {
+            return panel.insert(sectionIndex, container);
+          }
+          else
+          {
+            if (this.delayedItems[container.sectionId] == null)
+            {
+              this.delayedItems[container.sectionId] = [];
+            }
+            this.delayedItems[container.sectionId].push(container);
+            return null;
+          }
+        }
+
+        var panel = new Sonatype.navigation.Section(container);
+        panel = Sonatype.navigation.NavigationPanel.superclass.insert.call(this, sectionIndex, panel);
+        if (panel.id && this.delayedItems[panel.id])
+        {
+          panel.add(this.delayedItems[panel.id]);
+          this.delayedItems[panel.id] = null;
+        }
+        return panel;
+      },
       add : function(c) {
         var arr = null;
         var a = arguments;
