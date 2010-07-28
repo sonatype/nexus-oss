@@ -12,7 +12,6 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.MultiSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
 import org.apache.lucene.search.highlight.QueryScorer;
@@ -37,7 +36,8 @@ public class DefaultIteratorResultSet
      * count of hits. If anyone needs more than 1000 of hits, it should download the index and use Indexer API instead
      * to perform searches locally.
      */
-    private static final int HARD_HIT_COUNT_LIMIT = 1000;
+    // TODO: inspect is this limit actually needed or not.
+    private static final int HARD_HIT_COUNT_LIMIT = Integer.MAX_VALUE;
 
     private final ArtifactInfoFilter filter;
 
