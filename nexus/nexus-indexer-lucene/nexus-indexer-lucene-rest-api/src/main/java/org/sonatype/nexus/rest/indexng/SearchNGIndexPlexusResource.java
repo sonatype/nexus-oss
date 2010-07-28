@@ -415,6 +415,7 @@ public class SearchNGIndexPlexusResource
 
             NexusNGArtifact artifact;
 
+            // 1sd pass, build first two level (no links), and actually consume the iterator and collectors will be set
             for ( ArtifactInfo ai : iterator )
             {
                 final String key = ai.groupId + ":" + ai.artifactId + ":" + ai.version;
@@ -479,109 +480,59 @@ public class SearchNGIndexPlexusResource
                         hit.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
                     }
 
-                    // we are adding the POM link "blindly", unless packaging is POM,
-                    // since the it will be added below the "usual" way
-                    if ( !"pom".equals( ai.packaging ) )
+                    // if collapsed, we add links in 2nd pass, otherwise here
+                    if ( !collapsed )
                     {
-                        NexusNGArtifactLink link = new NexusNGArtifactLink();
+                        // we are adding the POM link "blindly", unless packaging is POM,
+                        // since the it will be added below the "usual" way
+                        if ( !"pom".equals( ai.packaging ) )
+                        {
+                            NexusNGArtifactLink link =
+                                createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId,
+                                    ai.version, "pom", null );
 
-                        link.setClassifier( null );
-
-                        link.setExtension( "pom" );
-
-                        // creating _redirect_ links to storage
-                        String suffix =
-                            "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version
-                                + "&e=pom";
-
-                        link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
-
-                        // creating _direct_ links to storage
-                        // does not work with timestamped snapshots!
-                        // try
-                        // {
-                        // Gav gav = ai.calculateGav();
-                        //
-                        // Gav pomGav =
-                        // new Gav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), null, "pom", null,
-                        // null, null /* name */, gav.isSnapshot(), false, null, false, null );
-                        //
-                        // String path = m2GavCalculator.gavToPath( pomGav );
-                        //
-                        // link.setArtifactLink( createRepositoryReference( request, repository.getId(), path
-                        // ).getTargetRef().toString() );
-                        // }
-                        // catch ( IllegalArtifactCoordinateException e )
-                        // {
-                        // // hum hum, nothig here then
-                        // }
-
-                        // add the POM link
-                        hit.addArtifactLink( link );
+                            // add the POM link
+                            hit.addArtifactLink( link );
+                        }
                     }
 
                     // we just created it, add it
                     artifact.addArtifactHit( hit );
                 }
 
-                boolean needsToBeAdded = true;
-
-                for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
+                if ( !collapsed )
                 {
-                    if ( StringUtils.equals( link.getClassifier(), ai.classifier )
-                        && StringUtils.equals( link.getExtension(), ai.fextension ) )
+                    boolean needsToBeAdded = true;
+
+                    for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
                     {
-                        needsToBeAdded = false;
+                        if ( StringUtils.equals( link.getClassifier(), ai.classifier )
+                            && StringUtils.equals( link.getExtension(), ai.fextension ) )
+                        {
+                            needsToBeAdded = false;
 
-                        break;
-                    }
-                }
-
-                if ( needsToBeAdded )
-                {
-                    NexusNGArtifactLink link = new NexusNGArtifactLink();
-
-                    link.setClassifier( ai.classifier );
-
-                    link.setExtension( ai.fextension );
-
-                    // creating _direct_ links to storage
-                    // does not work with timestamped snapshots
-                    // try
-                    // {
-                    // String path = m2GavCalculator.gavToPath( ai.calculateGav() );
-                    //
-                    // link.setArtifactLink( createRepositoryReference( request, repository.getId(), path
-                    // ).getTargetRef().toString() );
-                    // }
-                    // catch ( IllegalArtifactCoordinateException e )
-                    // {
-                    // // hum hum, nothig here then
-                    // }
-
-                    // creating _redirect_ links to storage
-                    String suffix =
-                        "?r=" + ai.repository + "&g=" + ai.groupId + "&a=" + ai.artifactId + "&v=" + ai.version + "&e="
-                            + ai.fextension;
-
-                    if ( StringUtils.isNotBlank( ai.classifier ) )
-                    {
-                        suffix = suffix + "&c=" + ai.classifier;
+                            break;
+                        }
                     }
 
-                    link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
+                    if ( needsToBeAdded )
+                    {
+                        NexusNGArtifactLink link =
+                            createNexusNGArtifactLink( request, ai.repository, ai.groupId, ai.artifactId, ai.version,
+                                ai.fextension, ai.classifier );
 
-                    // only if unique
-                    hit.addArtifactLink( link );
+                        hit.addArtifactLink( link );
+                    }
                 }
             }
 
             // 2nd pass, set versions
             for ( NexusNGArtifact artifactNg : hits.values() )
             {
-                LatestVersionHolder systemWideHolder =
-                    systemWideCollector.getLvhs().get(
-                        systemWideCollector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() ) );
+                final String systemWideCollectorKey =
+                    systemWideCollector.getKey( artifactNg.getGroupId(), artifactNg.getArtifactId() );
+
+                LatestVersionHolder systemWideHolder = systemWideCollector.getLVHForKey( systemWideCollectorKey );
 
                 if ( systemWideHolder != null )
                 {
@@ -600,11 +551,9 @@ public class SearchNGIndexPlexusResource
                     }
                 }
 
+                // add some "touche" on 1st level
                 if ( collapsed )
                 {
-                    // store the top level version, to know what to replace
-                    final String token = artifactNg.getVersion();
-
                     // set the top level version to one of the latest ones
                     if ( artifactNg.getLatestRelease() != null )
                     {
@@ -615,13 +564,15 @@ public class SearchNGIndexPlexusResource
                         artifactNg.setVersion( artifactNg.getLatestSnapshot() );
                     }
 
-                    // "fix" the links too
+                    // "create" the links now
                     for ( NexusNGArtifactHit hit : artifactNg.getArtifactHits() )
                     {
-                        LatestVersionHolder repositoryWideHolder =
-                            repositoryWideCollector.getLvhs().get(
-                                repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
-                                    artifactNg.getArtifactId() ) );
+                        final String repositoryWideCollectorKey =
+                            repositoryWideCollector.getKey( hit.getRepositoryId(), artifactNg.getGroupId(),
+                                artifactNg.getArtifactId() );
+
+                        LatestECVersionHolder repositoryWideHolder =
+                            repositoryWideCollector.getLVHForKey( repositoryWideCollectorKey );
 
                         if ( repositoryWideHolder != null )
                         {
@@ -637,17 +588,63 @@ public class SearchNGIndexPlexusResource
                                 versionToSet = repositoryWideHolder.getLatestSnapshot().toString();
                             }
 
-                            for ( NexusNGArtifactLink link : hit.getArtifactLinks() )
+                            // add POM link
+                            NexusNGArtifactLink pomLink =
+                                createNexusNGArtifactLink( request, hit.getRepositoryId(), artifactNg.getGroupId(),
+                                    artifactNg.getArtifactId(), versionToSet, "pom", null );
+
+                            hit.addArtifactLink( pomLink );
+
+                            // TODO: order!
+                            // add main artifact link
+                            // add everything else
+
+                            for ( ECHolder holder : repositoryWideHolder.getEcHolders() )
                             {
-                                link.setArtifactLink( link.getArtifactLink().replaceAll( token, versionToSet ) );
+                                // add non-poms only, since we added POMs above
+                                if ( !"pom".equals( holder.getExtension() ) )
+                                {
+                                    NexusNGArtifactLink link =
+                                        createNexusNGArtifactLink( request, hit.getRepositoryId(),
+                                            artifactNg.getGroupId(), artifactNg.getArtifactId(), versionToSet,
+                                            holder.getExtension(), holder.getClassifier() );
+
+                                    hit.addArtifactLink( link );
+                                }
                             }
                         }
                     }
                 }
+
             }
 
             response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );
         }
+    }
+
+    protected NexusNGArtifactLink createNexusNGArtifactLink( final Request request, final String repositoryId,
+                                                             final String groupId, final String artifactId,
+                                                             final String version, final String extension,
+                                                             final String classifier )
+    {
+        NexusNGArtifactLink link = new NexusNGArtifactLink();
+
+        link.setExtension( extension );
+
+        link.setClassifier( classifier );
+
+        // creating _redirect_ links to storage
+        String suffix =
+            "?r=" + repositoryId + "&g=" + groupId + "&a=" + artifactId + "&v=" + version + "&e=" + extension;
+
+        if ( StringUtils.isNotBlank( classifier ) )
+        {
+            suffix = suffix + "&c=" + classifier;
+        }
+
+        link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
+
+        return link;
     }
 
     protected String extractRepositoryKind( Repository repository )

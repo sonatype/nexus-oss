@@ -25,6 +25,12 @@ public class RepositoryWideLatestVersionCollector
         return getKey( ai.repository, ai.groupId, ai.artifactId );
     }
 
+    @Override
+    public LatestECVersionHolder getLVHForKey( String key )
+    {
+        return (LatestECVersionHolder) getLvhs().get( key );
+    }
+
     public String getKey( String repositoryId, String groupId, String artifactId )
     {
         return repositoryId + ":" + groupId + ":" + artifactId;

@@ -22,14 +22,12 @@ public class LatestVersionHolder
     private ArtifactVersion latestRelease;
 
     private String latestReleaseRepositoryId;
-
+    
     public LatestVersionHolder( final ArtifactInfo ai )
     {
         this.groupId = ai.groupId;
 
         this.artifactId = ai.artifactId;
-
-        maintainLatestVersions( ai );
     }
 
     @SuppressWarnings( "unchecked" )

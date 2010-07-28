@@ -29,12 +29,19 @@ public abstract class AbstractLatestVersionCollector
         return true;
     }
 
-    public HashMap<String, LatestVersionHolder> getLvhs()
+    public LatestVersionHolder getLVHForKey( String key )
     {
-        return lvhs;
+        return lvhs.get( key );
     }
 
     public abstract LatestVersionHolder createLVH( IndexingContext ctx, ArtifactInfo ai );
 
     public abstract String getKeyFromAi( IndexingContext ctx, ArtifactInfo ai );
+
+    // ==
+
+    protected HashMap<String, LatestVersionHolder> getLvhs()
+    {
+        return lvhs;
+    }
 }

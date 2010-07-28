@@ -28,10 +28,10 @@ public class LatestECVersionHolder
 
         if ( versionChanged )
         {
-            this.ecHolders.clear();
+            ecHolders.clear();
         }
 
-        this.ecHolders.add( new ECHolder( ai.fextension, ai.classifier ) );
+        ecHolders.add( new ECHolder( ai.fextension, ai.classifier ) );
 
         return versionChanged;
     }
