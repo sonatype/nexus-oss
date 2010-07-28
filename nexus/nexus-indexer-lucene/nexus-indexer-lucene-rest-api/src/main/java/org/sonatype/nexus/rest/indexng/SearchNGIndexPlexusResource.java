@@ -599,7 +599,15 @@ public class SearchNGIndexPlexusResource
                             // add main artifact link
                             // add everything else
 
-                            for ( ECHolder holder : repositoryWideHolder.getEcHolders() )
+                            // make the list by joining two collections
+                            // rationale: in case of reposes, only one of these will be populated, other will be empty
+                            // but in case of mixed policy (like group), probably both will exist
+                            // TODO: this will not work like it in groups, since then the versions will mismatch!
+                            ArrayList<ECHolder> ecHolders =
+                                new ArrayList<ECHolder>( repositoryWideHolder.getReleaseECHolders() );
+                            ecHolders.addAll( repositoryWideHolder.getSnapshotECHolders() );
+
+                            for ( ECHolder holder : ecHolders )
                             {
                                 // add non-poms only, since we added POMs above
                                 if ( !"pom".equals( holder.getExtension() ) )
@@ -615,7 +623,6 @@ public class SearchNGIndexPlexusResource
                         }
                     }
                 }
-
             }
 
             response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );

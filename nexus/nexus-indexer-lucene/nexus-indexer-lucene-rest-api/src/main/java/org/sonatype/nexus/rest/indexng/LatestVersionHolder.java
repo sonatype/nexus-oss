@@ -11,6 +11,11 @@ import org.sonatype.nexus.index.ArtifactInfo;
  */
 public class LatestVersionHolder
 {
+    public enum VersionChange
+    {
+        SMALLER, EQUALS, GREATER;
+    };
+
     private final String groupId;
 
     private final String artifactId;
@@ -22,7 +27,7 @@ public class LatestVersionHolder
     private ArtifactVersion latestRelease;
 
     private String latestReleaseRepositoryId;
-    
+
     public LatestVersionHolder( final ArtifactInfo ai )
     {
         this.groupId = ai.groupId;
@@ -30,13 +35,20 @@ public class LatestVersionHolder
         this.artifactId = ai.artifactId;
     }
 
+    /**
+     * Maintains the LatestVersionHolder and returns VersionChange how passed in ArtifactInfo relates to current state
+     * of this object.
+     * 
+     * @param ai
+     * @return relation of passed in ai paramter to current state
+     */
     @SuppressWarnings( "unchecked" )
-    public boolean maintainLatestVersions( final ArtifactInfo ai )
+    public VersionChange maintainLatestVersions( final ArtifactInfo ai )
     {
         @SuppressWarnings( "deprecation" )
         ArtifactVersion version = ai.getArtifactVersion();
 
-        boolean versionChanged = false;
+        VersionChange versionChange = VersionChange.EQUALS;
 
         if ( VersionUtils.isSnapshot( ai.version ) )
         {
@@ -46,15 +58,28 @@ public class LatestVersionHolder
 
                 this.latestSnapshotRepositoryId = ai.repository;
 
-                versionChanged = true;
+                versionChange = VersionChange.GREATER;
             }
-            else if ( this.latestSnapshot.compareTo( version ) < 0 )
+            else
             {
-                this.latestSnapshot = version;
+                int cmp = latestSnapshot.compareTo( version );
 
-                this.latestSnapshotRepositoryId = ai.repository;
+                if ( cmp < 0 )
+                {
+                    this.latestSnapshot = version;
 
-                versionChanged = true;
+                    this.latestSnapshotRepositoryId = ai.repository;
+
+                    versionChange = VersionChange.GREATER;
+                }
+                else if ( cmp == 0 )
+                {
+                    versionChange = VersionChange.EQUALS;
+                }
+                else
+                {
+                    versionChange = VersionChange.SMALLER;
+                }
             }
         }
         else
@@ -65,19 +90,32 @@ public class LatestVersionHolder
 
                 this.latestReleaseRepositoryId = ai.repository;
 
-                versionChanged = true;
+                versionChange = VersionChange.GREATER;
             }
-            else if ( this.latestRelease.compareTo( version ) < 0 )
+            else
             {
-                this.latestRelease = version;
+                int cmp = latestRelease.compareTo( version );
 
-                this.latestReleaseRepositoryId = ai.repository;
+                if ( cmp < 0 )
+                {
+                    this.latestRelease = version;
 
-                versionChanged = true;
+                    this.latestReleaseRepositoryId = ai.repository;
+
+                    versionChange = VersionChange.GREATER;
+                }
+                else if ( cmp == 0 )
+                {
+                    versionChange = VersionChange.EQUALS;
+                }
+                else
+                {
+                    versionChange = VersionChange.SMALLER;
+                }
             }
         }
 
-        return versionChanged;
+        return versionChange;
     }
 
     // ==
