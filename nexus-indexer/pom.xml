@@ -10,7 +10,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer</artifactId>
-  <version>3.0.3-SNAPSHOT</version>
+  <version>3.0.3</version>
 
   <name>Sonatype Nexus: Indexer</name>
 
@@ -22,9 +22,9 @@
   </licenses>
   
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-indexer</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-indexer</developerConnection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-indexer</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.3</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.3</developerConnection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-indexer-3.0.3</url>
   </scm>
 
   <properties>
