@@ -279,6 +279,12 @@ Ext.extend(Sonatype.repoServer.RepositoryPanel, Sonatype.panels.GridViewer, {
               }, this, {
                 single : true
               });
+
+          this.groupStore.on('loadexception', function(store, recs, options) {
+                this.selectBookmarkedItem(bookmark);
+              }, this, {
+                single : true
+              });
         }
         else
         {
