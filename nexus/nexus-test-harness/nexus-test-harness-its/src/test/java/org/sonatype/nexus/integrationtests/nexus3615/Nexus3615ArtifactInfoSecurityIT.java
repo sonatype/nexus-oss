@@ -112,7 +112,8 @@ public class Nexus3615ArtifactInfoSecurityIT
         Assert.assertEquals( REPO_TEST_HARNESS_REPO, info.getRepositoryId() );
         Assert.assertEquals( "/nexus3615/artifact/1.0/artifact-1.0.jar", info.getRepositoryPath() );
         Assert.assertEquals( "b354a0022914a48daf90b5b203f90077f6852c68", info.getSha1Hash() );
-        Assert.assertEquals( 1, info.getRepositories().size() );
+        //view priv no longer controls search results, only read priv
+        Assert.assertEquals( 3, info.getRepositories().size() );
         Assert.assertThat( getRepositoryId( info.getRepositories() ),
             IsCollectionContaining.hasItems( REPO_TEST_HARNESS_REPO ) );
         Assert.assertEquals( "application/java-archive", info.getMimeType() );
