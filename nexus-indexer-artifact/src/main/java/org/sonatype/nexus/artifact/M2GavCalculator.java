@@ -281,7 +281,7 @@ public class M2GavCalculator
 
         path.append( gav.getVersion() );
 
-        if ( gav.getClassifier() != null )
+        if ( gav.getClassifier() != null && gav.getClassifier().trim().length() > 0 )
         {
             path.append( "-" );
 
