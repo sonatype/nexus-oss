@@ -256,7 +256,7 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
         }
       },
 
-      showArtifact : function(data) {
+      showArtifact : function(data, artifactContainer) {
         this.data = data;
         if (data == null)
         {
@@ -321,11 +321,11 @@ Sonatype.Events.addListener('fileContainerUpdate', function(artifactContainer, d
 
       if (data == null || !data.leaf)
       {
-        panel.showArtifact(null);
+        panel.showArtifact(null, artifactContainer);
       }
       else
       {
-        panel.showArtifact(data);
+        panel.showArtifact(data, artifactContainer);
       }
     });
 
@@ -342,10 +342,10 @@ Sonatype.Events.addListener('artifactContainerUpdate', function(artifactContaine
 
       if (payload == null || !payload.leaf)
       {
-        panel.showArtifact(null);
+        panel.showArtifact(null, artifactContainer);
       }
       else
       {
-        panel.showArtifact(payload);
+        panel.showArtifact(payload, artifactContainer);
       }
     });
