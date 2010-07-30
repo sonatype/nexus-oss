@@ -75,11 +75,12 @@ Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, 
         }
       },
       hideTab : function(panel) {
+      	panel.tabHidden = true;
         this.tabPanel.hideTabStripItem(panel);
         for (var i = 0; i < this.tabPanel.items.getCount(); i++)
         {
           var nextPanel = this.tabPanel.items.get(i);
-          if (nextPanel.id != panel.id)
+          if (nextPanel.id != panel.id && !nextPanel.tabHidden)
           {
             this.tabPanel.setActiveTab(nextPanel);
             return;
@@ -91,6 +92,7 @@ Ext.extend(Sonatype.repoServer.ArtifactContainer, Sonatype.panels.AutoTabPanel, 
         this.collapse();
       },
       showTab : function(panel) {
+      	panel.tabHidden = false;
         this.tabPanel.unhideTabStripItem(panel);
       }
 
