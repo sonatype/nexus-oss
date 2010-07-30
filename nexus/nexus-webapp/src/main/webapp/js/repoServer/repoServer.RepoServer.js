@@ -367,6 +367,7 @@
                   Sonatype.utils.authToken = null;
                   Sonatype.view.justLoggedOut = true;
                   Sonatype.utils.loadNexusStatus();
+                  window.location = 'index.html#welcome';
                 }
               });
 
