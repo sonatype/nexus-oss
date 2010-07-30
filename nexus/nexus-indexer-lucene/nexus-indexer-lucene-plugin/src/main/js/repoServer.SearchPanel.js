@@ -64,7 +64,6 @@ Sonatype.repoServer.SearchPanel = function(config) {
         region : 'south',
         split : true,
         height : 375,
-        parentContainer : this,
         showRepositoryDropDown : true
       });
 

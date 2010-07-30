@@ -26,9 +26,9 @@ Sonatype.repoServer.RepositoryIndexBrowserContainer = function(config) {
         collapsed : true,
         region : 'east',
         split : true,
-        width : '50%'
-      });
+        width : '600'
 
+      });
   Sonatype.repoServer.RepositoryIndexBrowserContainer.superclass.constructor.call(this, {
         layout : 'border',
         // this hideMode causes the tab to properly render when coming back from
@@ -83,8 +83,7 @@ Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
                     path : '/',
                     singleClickExpand : true,
                     expanded : false
-                  }),
-              parentContainer : cardPanel
+                  })
             });
 
         if (cardPanel.items.getCount() > 0)
@@ -105,7 +104,7 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
         {
           if (!passthru.container.loadMask)
           {
-            passthru.container.loadMask = new Ext.LoadMask(passthru.container.parentContainer.getEl(), {
+            passthru.container.loadMask = new Ext.LoadMask(passthru.container.getEl(), {
                   msg : 'Loading search result...'
                 });
           }
