@@ -11,6 +11,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -133,7 +134,22 @@ public abstract class AbstractArtifactViewProvider
      */
     protected boolean processNotFoundItems( RepositoryItemUid uid )
     {
-        return uid.getRepository().getRepositoryKind().isFacetAvailable( ProxyRepository.class );
+        Repository repo = uid.getRepository();
+        if ( repo.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            return true;
+        }
+        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            for ( Repository member : repo.adaptToFacet( GroupRepository.class ).getMemberRepositories() )
+            {
+                if ( member.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
