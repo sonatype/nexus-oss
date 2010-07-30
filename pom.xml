@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.plugins</groupId>
     <artifactId>plugins-parent</artifactId>
-    <version>5</version>
+    <version>6-SNAPSHOT</version>
     <relativePath>../plugins-parent/pom.xml</relativePath>
   </parent>
   <groupId>org.sonatype.plugins</groupId>
@@ -416,23 +416,19 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.2</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>1.2</version>
         <configuration>
           <omitVisitors>UnreadFields</omitVisitors>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.1</version>
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <targetJdk>1.5</targetJdk>
         </configuration>
@@ -440,23 +436,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>2.5</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.5</version>
         <configuration>
           <tagletArtifacts>
             <tagletArtifact>
               <groupId>org.apache.maven.plugin-tools</groupId>
               <artifactId>maven-plugin-tools-javadoc</artifactId>
-              <version>2.5</version>
             </tagletArtifact>
             <tagletArtifact>
               <groupId>org.codehaus.plexus</groupId>
               <artifactId>plexus-javadoc</artifactId>
-              <version>1.0</version>
             </tagletArtifact>
           </tagletArtifacts>
         </configuration>
@@ -464,7 +456,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>2.1.1</version>
         <reportSets>
           <reportSet>
             <reports>
