@@ -103,7 +103,7 @@ public abstract class AbstractArtifactViewProvider
         // so, item may be null or non-null, if non-null, it may be link
 
         // check for item not found finally. Those may be allowed in proxy repositories only.
-        if ( item == null && !processNotFoundItems( itemUid ) )
+        if ( item == null && !processNotFoundItems( itemUid.getRepository() ) )
         {
             // return not-applicable. This is not a proxy repository, and the item is not found. Since it is not
             // proxy repo, it will be never cached from remote too, simply, it is not here.
@@ -132,9 +132,8 @@ public abstract class AbstractArtifactViewProvider
      * 
      * @return
      */
-    protected boolean processNotFoundItems( RepositoryItemUid uid )
+    protected boolean processNotFoundItems( Repository repo )
     {
-        Repository repo = uid.getRepository();
         if ( repo.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             return true;
@@ -143,7 +142,7 @@ public abstract class AbstractArtifactViewProvider
         {
             for ( Repository member : repo.adaptToFacet( GroupRepository.class ).getMemberRepositories() )
             {
-                if ( member.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                if ( processNotFoundItems( member ) )
                 {
                     return true;
                 }
