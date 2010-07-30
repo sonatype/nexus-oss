@@ -635,7 +635,7 @@ public class DefaultSnapshotRemover
 
                             String path = mrepository.getGavCalculator().gavToPath( releaseGav );
 
-                            ResourceStoreRequest req = new ResourceStoreRequest( path );
+                            ResourceStoreRequest req = new ResourceStoreRequest( path, true );
 
                             req.getRequestContext().putAll( context );
 
