@@ -87,7 +87,7 @@ public abstract class AbstractNexusTestCase
         {
             try
             {
-                FileUtils.deleteDirectory( plexusHomeDir );
+                FileUtils.deleteDirectory( dir );
             }
             catch ( IOException e )
             {
