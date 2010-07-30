@@ -83,8 +83,8 @@ public class DefaultArtifactoryMigrator
 
     private static final String MAVEN1 = "maven1";
 
-    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER =
-        new NotFileFilter( new SuffixFileFilter( ".artifactory-metadata" ) );
+    private static final NotFileFilter ARTIFACTORY_METADATA_FILE_FILTER = new NotFileFilter( new SuffixFileFilter(
+        ".artifactory-metadata" ) );
 
     @Requirement( role = org.codehaus.plexus.archiver.UnArchiver.class, hint = "zip" )
     private ZipUnArchiver zipUnArchiver;
@@ -395,7 +395,7 @@ public class DefaultArtifactoryMigrator
                         }
                         GroupRepository nexusGroup =
                             createGroup( repo.getKey(), repoType, result, nexusRepoReleases.getId(),
-                                         nexusRepoSnapshots.getId() );
+                                nexusRepoSnapshots.getId() );
 
                         if ( resolution.isCopyCachedArtifacts() )
                         {
@@ -407,7 +407,7 @@ public class DefaultArtifactoryMigrator
                         {
                             CMapping map =
                                 new CMapping( resolution.getRepositoryId(), nexusGroup.getId(),
-                                              nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
+                                    nexusRepoReleases.getId(), nexusRepoSnapshots.getId() );
                             addMapping( map );
                         }
 
@@ -427,15 +427,15 @@ public class DefaultArtifactoryMigrator
                     else
                     {
                         importRepository( result, repositoriesBackup, artifactoryProxies, resolution, repo,
-                                          repo.getHandleSnapshots(), null );
+                            repo.getHandleSnapshots(), null );
                     }
                 }
 
             }
             catch ( MigrationException e )
             {
-                result.addErrorMessage( "Failed to import repository '" + resolution.getRepositoryId() + "': "
-                    + e.getMessage(), e );
+                result.addErrorMessage(
+                    "Failed to import repository '" + resolution.getRepositoryId() + "': " + e.getMessage(), e );
             }
         }
     }
@@ -482,8 +482,7 @@ public class DefaultArtifactoryMigrator
 
         ManuallyConfiguredRepositoryTemplate template =
             repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
-                                                                                                 group, null ) );
+                repositoryTemplateProvider.getApplicationConfiguration(), group, null ) );
 
         try
         {
@@ -658,8 +657,7 @@ public class DefaultArtifactoryMigrator
 
         ManuallyConfiguredRepositoryTemplate template =
             repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
-                                                                                                 nexusRepo, null ) );
+                repositoryTemplateProvider.getApplicationConfiguration(), nexusRepo, null ) );
 
         try
         {
@@ -815,6 +813,12 @@ public class DefaultArtifactoryMigrator
     {
         CMapping map = mappingConfiguration.getMapping( repoId );
 
+        if ( map == null )
+        {
+            // no mapping
+            return;
+        }
+
         if ( map.getNexusGroupId() == null )
         {
             repositoriesIds.add( map.getNexusRepositoryId() );
@@ -851,8 +855,7 @@ public class DefaultArtifactoryMigrator
 
         ManuallyConfiguredRepositoryTemplate template =
             repositoryTemplateProvider.createManuallyTemplate( new CRepositoryCoreConfiguration(
-                                                                                                 repositoryTemplateProvider.getApplicationConfiguration(),
-                                                                                                 shadowRepo, null ) );
+                repositoryTemplateProvider.getApplicationConfiguration(), shadowRepo, null ) );
 
         try
         {
@@ -876,8 +879,7 @@ public class DefaultArtifactoryMigrator
         try
         {
             repositoryConvertor.convertRepositoryWithCopy( repositoryBackup, getStorage( nexusRepoReleases ),
-                                                           getStorage( nexusRepoSnapshots ),
-                                                           ARTIFACTORY_METADATA_FILE_FILTER );
+                getStorage( nexusRepoSnapshots ), ARTIFACTORY_METADATA_FILE_FILTER );
         }
         catch ( IOException e )
         {
@@ -932,7 +934,7 @@ public class DefaultArtifactoryMigrator
             {
                 // this should never ever happen, repo should be created before this point
                 result.addErrorMessage( "The repository '" + repoId + "' does not exists! Unable to create metadatas!",
-                                        e );
+                    e );
                 continue;
             }
 
