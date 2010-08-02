@@ -32,9 +32,9 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 /**
- * Test SnapshotRemoverTask to remove old artifacts but keep updated artifacts
+ * Tests SnapshotRemoverTask to not go remote when checking for release existence.
  * 
- * @author marvin
+ * @author cstamas
  */
 public class Nexus634CheckDoesNotGoRemoteIT
     extends AbstractSnapshotRemoverIT
@@ -59,7 +59,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
         this.repositoryMessageUtil =
             new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
     }
-    
+
     @Before
     public void deploySnapshotArtifacts()
         throws Exception
