@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
@@ -38,7 +41,9 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * 
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "UserResetPlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "UserResetPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserResetPlexusResource.RESOURCE_URI )

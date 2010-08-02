@@ -14,6 +14,9 @@ package org.sonatype.security.rest.roles;
 
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -41,7 +44,9 @@ import org.sonatype.security.rest.model.PlexusRoleListResourceResponse;
  * @author bdemers
  * @see RoleListPlexusResource
  */
-@Component(role=PlexusResource.class, hint="PlexusRoleListPlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "PlexusRoleListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PlexusRoleListPlexusResource.RESOURCE_URI )

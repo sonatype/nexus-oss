@@ -14,14 +14,16 @@ package org.sonatype.security.rest.privileges;
 
 import java.util.List;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -42,7 +44,9 @@ import org.sonatype.security.rest.model.PrivilegeTypeResourceResponse;
  * 
  * @author bdemers
  */
-@Component( role = PlexusResource.class, hint = "PrivilegeTypePlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "PrivilegeTypePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PrivilegeTypePlexusResource.RESOURCE_URI )
@@ -52,7 +56,8 @@ public class PrivilegeTypePlexusResource
 
     public static final String RESOURCE_URI = "/privilege_types";
     
-    @Requirement( hint = "resourceMerging")
+    @Inject
+    @Named( value = "resourceMerging")
     private ConfigurationManager configurationManager;
     
     @Override

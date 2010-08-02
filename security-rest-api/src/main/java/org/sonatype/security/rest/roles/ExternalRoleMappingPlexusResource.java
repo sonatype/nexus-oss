@@ -17,6 +17,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -46,7 +49,9 @@ import org.sonatype.security.usermanagement.xml.SecurityXmlUserManager;
  *  
  * @author bdemers
  */
-@Component( role = PlexusResource.class, hint = "ExternalRoleMappingPlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "ExternalRoleMappingPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( ExternalRoleMappingPlexusResource.RESOURCE_URI )

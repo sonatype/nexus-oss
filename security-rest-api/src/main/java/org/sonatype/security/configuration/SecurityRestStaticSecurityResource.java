@@ -12,7 +12,10 @@
  */
 package org.sonatype.security.configuration;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
@@ -22,7 +25,9 @@ import org.sonatype.security.realms.tools.StaticSecurityResource;
  * @author bdemers
  *
  */
-@Component( role = StaticSecurityResource.class, hint = "SecurityRestStaticSecurityResource" )
+@Singleton
+@Typed( value = StaticSecurityResource.class )
+@Named( value = "SecurityRestStaticSecurityResource" )
 public class SecurityRestStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource

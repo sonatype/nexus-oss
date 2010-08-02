@@ -17,10 +17,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
 import org.restlet.data.Status;
@@ -57,12 +57,12 @@ public abstract class AbstractSecurityPlexusResource
     extends AbstractPlexusResource
 {
 
-    @Requirement
+    @Inject
     private SecuritySystem securitySystem;
 
     protected static final String DEFAULT_SOURCE = "default";
 
-    @Requirement
+    @Inject
     protected ReferenceFactory referenceFactory;
 
     protected SecuritySystem getSecuritySystem()

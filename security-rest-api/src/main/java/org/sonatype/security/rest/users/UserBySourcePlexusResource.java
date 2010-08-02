@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -19,7 +22,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -41,7 +43,9 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
  * @author bdemers
  *
  */
-@Component( role = PlexusResource.class, hint = "UserBySourcePlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "UserBySourcePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserBySourcePlexusResource.RESOURCE_URI )

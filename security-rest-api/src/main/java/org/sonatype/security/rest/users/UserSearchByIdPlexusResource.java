@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.rest.users;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,7 +39,9 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
  * @author bdemers
  *
  */
-@Component( role = PlexusResource.class, hint = "UserSearchByIdPlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "UserSearchByIdPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserSearchByIdPlexusResource.RESOURCE_URI )

@@ -12,6 +12,9 @@
  */
 package org.sonatype.security.rest.privileges;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -41,7 +44,9 @@ import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
  * 
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "PrivilegePlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "PrivilegePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( PrivilegePlexusResource.RESOURCE_URI )

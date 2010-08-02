@@ -15,6 +15,9 @@ package org.sonatype.security.rest.roles;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -24,7 +27,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -47,7 +49,9 @@ import org.sonatype.security.rest.model.RoleResourceResponse;
  *  REST resource for managing security roles.
  * @author tstevens
  */
-@Component( role = PlexusResource.class, hint = "RolePlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "RolePlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( RolePlexusResource.RESOURCE_URI )

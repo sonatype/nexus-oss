@@ -12,11 +12,16 @@
  */
 package org.sonatype.security.rest.users;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-@Component( role = StaticSecurityResource.class, hint = "MockStaticSecurityResource" )
+@Singleton
+@Typed( value = StaticSecurityResource.class )
+@Named( value = "MockStaticSecurityResource" )
 public class MockStaticSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource

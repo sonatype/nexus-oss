@@ -14,6 +14,10 @@ package org.sonatype.security.rest.users;
 
 import java.util.Map;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,8 +25,6 @@ import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -44,7 +46,9 @@ import org.sonatype.security.usermanagement.UserManager;
  * 
  * @author bdemers
  */
-@Component( role = PlexusResource.class, hint = "UserLocatorComponentListPlexusResource" )
+@Singleton
+@Typed( value = PlexusResource.class )
+@Named( value = "UserLocatorComponentListPlexusResource" )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
 @Path( UserLocatorComponentListPlexusResource.RESOURCE_URI )
@@ -54,10 +58,10 @@ public class UserLocatorComponentListPlexusResource
 
     public static final String RESOURCE_URI = "/components/userLocators";
 
-    @Requirement
+    @Inject
     private PlexusContainer container;
 
-    @Requirement( role = UserManager.class )
+    @Inject
     private Map<String, UserManager> userManagers;
 
     @Override

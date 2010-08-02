@@ -14,10 +14,16 @@ package org.sonatype.security.mock;
 
 import java.util.List;
 
-import org.codehaus.plexus.component.annotations.Component;
+import javax.enterprise.inject.Typed;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.sonatype.security.email.SecurityEmailer;
 
-@Component( role = SecurityEmailer.class )
+@Singleton
+@Typed( value = SecurityEmailer.class )
+@Named( value = "default" )
+
 public class MockEmailer
     implements SecurityEmailer
 {
