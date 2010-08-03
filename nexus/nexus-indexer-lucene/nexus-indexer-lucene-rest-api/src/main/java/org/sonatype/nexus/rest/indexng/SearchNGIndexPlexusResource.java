@@ -70,7 +70,9 @@ public class SearchNGIndexPlexusResource
     /**
      * Hard upper limit of the count of search hits delivered over REST API.
      */
-    private static final int HIT_LIMIT = 500;
+    private static final int GA_HIT_LIMIT = 500;
+
+    private static final int DOCUMENTS_HIT_LIMIT = 1000;
 
     /**
      * The treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).
@@ -251,7 +253,7 @@ public class SearchNGIndexPlexusResource
                         // then repeat without collapse
                         if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
                             && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                            && searchResult.getTotalHits() < HIT_LIMIT )
+                            && searchResult.getTotalHits() < GA_HIT_LIMIT )
                         {
                             collapseResults = false;
 
@@ -413,6 +415,8 @@ public class SearchNGIndexPlexusResource
             // 1st pass, collect results
             LinkedHashMap<String, NexusNGArtifact> hits = new LinkedHashMap<String, NexusNGArtifact>();
 
+            int documentsHits = 0;
+
             NexusNGArtifact artifact;
 
             // 1sd pass, build first two level (no links), and actually consume the iterator and collectors will be set
@@ -424,7 +428,8 @@ public class SearchNGIndexPlexusResource
 
                 if ( artifact == null )
                 {
-                    if ( ( hits.size() + 1 ) > HIT_LIMIT )
+                    documentsHits++;
+                    if ( documentsHits > DOCUMENTS_HIT_LIMIT || ( hits.size() + 1 ) > GA_HIT_LIMIT )
                     {
                         // check for HIT_LIMIT: if we are stepping it over, stop here
                         break;
