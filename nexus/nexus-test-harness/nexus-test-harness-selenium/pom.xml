@@ -167,7 +167,7 @@
         <configuration>
           <source>${basedir}/target/nexus/nexus-oss-webapp-${project.version}/runtime/apps/nexus/webapp</source>
           <doNotInstrument>
-            <js>ext-2.2</js>
+            <js>ext-2.3</js>
             <js>firebug-lite-1.2-compressed.js</js>
           </doNotInstrument>
           <exclude>
@@ -175,8 +175,8 @@
           </exclude>
           <scripts>
             <![CDATA[
-  <script src="ext-2.2/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script> 
-  <script src="ext-2.2/ext-all.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="ext-2.3/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script> 
+  <script src="ext-2.3/ext-all.js" type="text/javascript" charset="utf-8"></script> 
   <script src="js/extensions/ext-override.js" type="text/javascript" charset="utf-8"></script> 
  
   <script src="js/filetree/js/Ext.ux.form.BrowseButton.js" type="text/javascript" charset="utf-8"></script> 

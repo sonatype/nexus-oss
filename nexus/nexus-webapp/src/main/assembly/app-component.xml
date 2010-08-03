@@ -30,11 +30,11 @@
       <outputDirectory>/${pom.build.finalName}/runtime/apps/nexus/webapp</outputDirectory>
       <includes>
         <include>*</include>
-        <include>ext-2.2/ext-all.js</include>
-        <include>ext-2.2/adapter/ext/ext-base.js</include>
-        <include>ext-2.2/resources/css/ext-all.css</include>
-        <include>ext-2.2/resources/css/xtheme-gray.css</include>
-        <include>ext-2.2/resources/images/**</include>
+        <include>ext-2.3/ext-all.js</include>
+        <include>ext-2.3/adapter/ext/ext-base.js</include>
+        <include>ext-2.3/resources/css/ext-all.css</include>
+        <include>ext-2.3/resources/css/xtheme-gray.css</include>
+        <include>ext-2.3/resources/images/**</include>
         <include>js/*</include>
         <include>js/extensions/*</include>
         <include>js/filetree/js/Ext.ux.form.BrowseButton.js</include>
@@ -46,6 +46,9 @@
         <include>images/**</include>
         <include>WEB-INF/*</include>
       </includes>
+      <excludes>
+        <exclude>ext-2.2/**</exclude>
+      </excludes>
     </fileSet>
 	<fileSet>
 	  <directory>target/ui-compressed/js</directory>

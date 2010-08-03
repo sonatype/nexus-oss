@@ -34,8 +34,8 @@
   #end
   <!-- Plugin pre HEAD contributions ends here -->
 
-  <link rel="stylesheet" href="ext-2.2/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="ext-2.2/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-2.3/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-2.3/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/sonatype-all.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
   <script src="js/sonatype-all.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

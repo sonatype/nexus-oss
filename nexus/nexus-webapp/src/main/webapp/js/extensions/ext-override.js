@@ -19,7 +19,7 @@
 /*
  * ext-base-debug
  */
-Ext.BLANK_IMAGE_URL = "ext-2.2/resources/images/default/s.gif";
+Ext.BLANK_IMAGE_URL = "ext-2.3/resources/images/default/s.gif";
 /*
  * Ext.lib.Ajax.request = function(method, uri, cb, data, options) {
  * if(options){ var hs = options.headers; if(hs){ for(var h in hs){

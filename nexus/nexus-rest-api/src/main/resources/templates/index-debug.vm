@@ -34,13 +34,13 @@
   #end
   <!-- Plugin pre HEAD contributions ends here -->
 
-  <link rel="stylesheet" href="ext-2.2/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
-  <link rel="stylesheet" href="ext-2.2/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-2.3/resources/css/ext-all.css" type="text/css" media="screen" charset="utf-8">
+  <link rel="stylesheet" href="ext-2.3/resources/css/xtheme-gray.css" type="text/css" media="screen" charset="utf-8">
   <link rel="stylesheet" href="style/Sonatype.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
   <link rel="stylesheet" href="style/Ext.ux.form.LovCombo.css?$nexusVersion" type="text/css" media="screen" title="no title" charset="utf-8">
 
-  <script src="ext-2.2/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
-  <script src="ext-2.2/ext-all.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ext-2.3/adapter/ext/ext-base.js" type="text/javascript" charset="utf-8"></script>
+  <script src="ext-2.3/ext-all.js" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/ext-override.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
 
   <script src="js/filetree/js/Ext.ux.form.BrowseButton.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

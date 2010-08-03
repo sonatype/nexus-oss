@@ -53,7 +53,7 @@
       host : host,
       servicePath : servicePath,
       resourcePath : resourcePath,
-      extPath : resourcePath + '/ext-2.2',
+      extPath : resourcePath + '/ext-2.3',
       contentPath : contentPath,
       cssPath : '/styles',
       jsPath : '/js',

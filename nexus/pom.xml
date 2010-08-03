@@ -890,7 +890,7 @@
             <include>**/*.js</include>
           </includes>
           <excludes>
-            <exclude>**/ext-2.2/**</exclude>
+            <exclude>**/ext-2.3/**</exclude>
             <exclude>**/js/filetree/**</exclude>
           </excludes>
           <!-- this is important for muti-module project -->
