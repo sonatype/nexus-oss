@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -113,6 +114,10 @@
       <exclusions>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
           <artifactId>plexus-component-api</artifactId>
         </exclusion>
       </exclusions>
@@ -182,7 +187,6 @@
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
     </dependency>
 
   </dependencies>

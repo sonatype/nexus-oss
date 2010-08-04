@@ -41,20 +41,16 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- We use oldie Plexus annos, so this is a must -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <version>1.5.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
 

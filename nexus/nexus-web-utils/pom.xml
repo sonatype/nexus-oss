@@ -46,18 +46,9 @@
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- Testing -->

@@ -19,12 +19,8 @@
 
     <!-- Plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
 
     <!-- Optional simple client -->
@@ -68,49 +64,6 @@
         <configuration>
           <forkMode>never</forkMode>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <id>jdk15</id>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>cli</shadedClassifierName>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.sonatype.nexus.index.cli.NexusIndexerCli</mainClass>
-                </transformer>
-              </transformers>
-              <artifactSet>
-                <includes>
-                  <include>aspectj:aspectjrt</include>
-                  <include>commons-cli:commons-cli</include>
-                  <include>org.apache.lucene:lucene-core</include>
-                  <include>org.apache.maven.artifact:maven-artifact</include>
-                  <include>org.apache.maven:maven-model</include>
-                  <include>org.apache.maven:maven-plugin-api</include>
-                  <include>org.apache.xbean:xbean-reflect</include>
-                  <include>org.codehaus.plexus:plexus-classworlds</include>
-                  <include>org.codehaus.plexus:plexus-cli</include>
-                  <include>org.codehaus.plexus:plexus-container-default</include>
-                  <include>org.codehaus.plexus:plexus-utils</include>
-                  <include>com.google.code.google-collections:google-collect</include>
-                </includes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>

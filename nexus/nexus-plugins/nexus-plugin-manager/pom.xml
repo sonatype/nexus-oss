@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-plugins</artifactId>
+    <version>1.7.3-SNAPSHOT</version>
+  </parent>
+
+  <packaging>pom</packaging>
+
+  <artifactId>guice-nexus</artifactId>
+
+  <name>Nexus Plugins : Manager (Guice)</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <modules>
+    <module>guice-nexus-scanners</module>
+    <module>guice-nexus-binders</module>
+    <module>guice-nexus-shim</module>
+    <module>spice-inject-nexus</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>maven-bundle-plugin</artifactId>
+          <version>2.1.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.sonatype.spice.inject</groupId>
+        <artifactId>guice-plexus</artifactId>
+        <version>1.3.2-SNAPSHOT</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>guice-nexus-scanners</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>guice-nexus-binders</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>guice-nexus-shim</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>spice-inject-nexus</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
+
+</project>

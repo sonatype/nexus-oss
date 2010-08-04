@@ -248,7 +248,7 @@ public class NexusIndexerCli
     private void setLogLevel( PlexusContainer plexus, int logLevel )
         throws ComponentLookupException
     {
-        plexus.lookup( LoggerManager.class ).setThreshold( logLevel );
+        plexus.lookup( LoggerManager.class ).setThresholds( logLevel );
     }
 
     private void index( final CommandLine cli, PlexusContainer plexus )

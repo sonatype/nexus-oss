@@ -3,7 +3,7 @@
     <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>15</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
   <groupId>org.sonatype.nexus</groupId>
@@ -13,51 +13,30 @@
   <!-- a short but descriptive name for the project -->
   <name>Nexus Indexer Artifact</name>
 
-  
-  <properties>
-    <maven.version>2.2.1</maven.version>
-    <archetype.version>2.0-alpha-4</archetype.version>
-  </properties>
-
-  <!-- override the snapshot included in Maven -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.xbean</groupId>
-        <artifactId>xbean-reflect</artifactId>
-        <version>3.4</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-  <!-- Here for "compatibility" reason only! -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
-      <version>1.0.0</version>
     </dependency>
+
     <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact-manager</artifactId>
-      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven.version}</version>
     </dependency>
-    </dependencies>
+  </dependencies>
 
   <build>
     <plugins>

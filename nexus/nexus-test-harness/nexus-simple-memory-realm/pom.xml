@@ -23,13 +23,8 @@
           <version>${plexus-security.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-            <scope>provided</scope>
+        <groupId>org.sonatype.spice</groupId>
+        <artifactId>spice-inject-plexus</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

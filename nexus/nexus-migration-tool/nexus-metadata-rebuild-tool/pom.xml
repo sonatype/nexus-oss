@@ -19,21 +19,13 @@
 	<!-- a short but descriptive name for the project -->
 	<name>Nexus Tools: Maven Metadata Rebuild Tool</name>
 	<dependencies>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-utils</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
+    </dependency>
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-cli</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-component-annotations</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.plexus</groupId>
-			<artifactId>plexus-container-default</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.sonatype.nexus</groupId>

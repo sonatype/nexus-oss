@@ -17,7 +17,7 @@
 
 
     <component>
-      <role>TEST-empty</role>
+      <role>TEST_EMPTY</role>
       <description></description>
       <role-hint></role-hint>
       <implementation>
@@ -27,7 +27,7 @@
     </component>
 
     <component>
-      <role>TEST-null</role>
+      <role>TEST_NULL</role>
       <implementation>
         java.lang.Object
 			</implementation>
@@ -35,7 +35,7 @@
     </component>
 
     <component>
-      <role>TEST-ROLE</role>
+      <role>TEST_ROLE</role>
       <description>Test Description.</description>
       <role-hint>test-hint</role-hint>
       <implementation>
@@ -45,7 +45,7 @@
     </component>
 
     <component>
-      <role>MULTI-TEST</role>
+      <role>MULTI_TEST</role>
       <description>Description-1</description>
       <role-hint>hint-1</role-hint>
       <implementation>
@@ -55,7 +55,7 @@
     </component>
 
     <component>
-      <role>MULTI-TEST</role>
+      <role>MULTI_TEST</role>
       <description>Description-2</description>
       <role-hint>hint-2</role-hint>
       <implementation>

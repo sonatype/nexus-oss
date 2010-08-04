@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>guice-nexus</artifactId>
+    <version>1.7.3-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>guice-nexus-binders</artifactId>
+
+  <name>Nexus Plugins : Guice - Nexus binders</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.spice.inject</groupId>
+      <artifactId>guice-plexus-binders</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>guice-nexus-scanners</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>

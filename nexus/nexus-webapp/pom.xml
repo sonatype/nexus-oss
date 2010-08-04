@@ -109,11 +109,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>tanukisoft</groupId>
       <artifactId>wrapper</artifactId>
       <scope>runtime</scope>
@@ -121,7 +116,6 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-legacy-adapter</artifactId>
-      <version>${plexus-security.version}</version>
     </dependency>
     <dependency>
       <groupId>javax.xml.bind</groupId>
@@ -151,12 +145,12 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>com.google.code.google-collections</groupId>
-      <artifactId>google-collect</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>guice-nexus-shim</artifactId>
+      <artifactId>spice-inject-nexus</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -191,20 +185,6 @@
       <artifactId>httpunit</artifactId>
       <version>1.6.2</version>
       <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-      <version>1.2.1.4</version>
-      <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-manager</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
     </dependency>
     
     <!-- optional libs -->
