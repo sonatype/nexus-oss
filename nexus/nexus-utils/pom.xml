@@ -1,4 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <!-- the version of maven's project object model -->
+  <modelVersion>4.0.0</modelVersion>
 
   <!-- Parent POM -->
   <parent>
@@ -6,9 +10,6 @@
     <artifactId>nexus</artifactId>
     <version>1.7.3-SNAPSHOT</version>
   </parent>
-
-  <!-- the version of maven's project object model -->
-  <modelVersion>4.0.0</modelVersion>
 
   <!-- a unique name for this project -->
   <artifactId>nexus-utils</artifactId>

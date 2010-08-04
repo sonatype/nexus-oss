@@ -166,6 +166,7 @@
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <spice-utils.version>1.0.0</spice-utils.version>
   </properties>
+
   <dependencyManagement>
     <dependencies>
       <!-- Platform -->
@@ -444,28 +445,28 @@
           </exclusion>
         </exclusions>
       </dependency>
-    <dependency>
-      <groupId>org.sonatype.security.realms</groupId>
-      <artifactId>security-url-realm</artifactId>
-      <version>${plexus-security.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.codehaus.plexus</groupId>
-          <artifactId>plexus-container-default</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-legacy-adapter</artifactId>
-      <version>${plexus-security.version}</version>
+      <dependency>
+        <groupId>org.sonatype.security.realms</groupId>
+        <artifactId>security-url-realm</artifactId>
+        <version>${plexus-security.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
         </exclusions>
-    </dependency>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.security</groupId>
+        <artifactId>security-legacy-adapter</artifactId>
+        <version>${plexus-security.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>org.jsecurity</groupId>
         <artifactId>jsecurity</artifactId>
@@ -1182,8 +1183,7 @@
   <modules>
     <module>nexus-indexer-lucene</module>
     <module>nexus-plugins</module>
-    <!-- New Guice based IoC cannot cope with it currently
-    <module>nexus-mock</module> -->
+    <!-- New Guice based IoC cannot cope with it currently <module>nexus-mock</module> -->
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>

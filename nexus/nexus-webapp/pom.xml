@@ -1,33 +1,35 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <!-- the version of maven's project object model -->
   <modelVersion>4.0.0</modelVersion>
+
   <!-- Parent POM -->
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
     <version>1.7.3-SNAPSHOT</version>
   </parent>
+
   <!-- a unique name for this project -->
   <artifactId>nexus-webapp</artifactId>
-  <!--we don't need this to be a jar except that the app assembler crashes if it's not-->
+  <!--we don't need this to be a jar except that the app assembler crashes if it's not -->
   <packaging>war</packaging>
   <!-- a short but descriptive name for the project -->
   <name>Nexus (Web Application frontend)</name>
+
   <properties>
-    <!--
-            NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target
-            directory.
-        -->
+    <!-- NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory. -->
     <jsw-input>target/jsw-template</jsw-input>
     <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
-    
+
     <plugin-repository.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/plugin-repository</plugin-repository.directory>
     <optional-plugins.directory>${project.build.finalName}/WEB-INF/runtime/apps/nexus/optional-plugins</optional-plugins.directory>
     <plugin-api.version>1.0.3</plugin-api.version>
-    
   </properties>
+
   <dependencies>
 
     <dependency>
@@ -36,40 +38,40 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
-    	<groupId>xml-apis</groupId>
-    	<artifactId>xml-apis</artifactId>
-    	<version>1.0.b2</version>
-    	<scope>provided</scope>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.0.b2</version>
+      <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
-    <!-- There are problems with the Maven reactor that would require these modules 
-         However if we include as a test scope the reactor will be happy and the dependency pom will be correct -->
+
+    <!-- There are problems with the Maven reactor that would require these modules However if we include as a test scope 
+      the reactor will be happy and the dependency pom will be correct -->
     <dependency>
-	  <groupId>org.sonatype.nexus.plugins</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-	  <version>${project.version}</version>
-	  <classifier>bundle</classifier>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-	  <groupId>org.sonatype.nexus.plugins</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-core-documentation-plugin</artifactId>
-	  <version>${project.version}</version>
-	  <classifier>bundle</classifier>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
@@ -78,7 +80,7 @@
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
@@ -87,7 +89,7 @@
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
@@ -96,7 +98,7 @@
       <type>zip</type>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- The bundle -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
@@ -141,7 +143,7 @@
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>servlet-api</artifactId>
-        </exclusion>        
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -164,7 +166,7 @@
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>servlet-api</artifactId>
-        </exclusion>        
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -173,7 +175,7 @@
       <type>tar.gz</type>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-api</artifactId>
@@ -186,7 +188,7 @@
       <version>1.6.2</version>
       <scope>test</scope>
     </dependency>
-    
+
     <!-- optional libs -->
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
@@ -204,10 +206,10 @@
         <exclusion>
           <groupId>org.mortbay.jetty</groupId>
           <artifactId>jetty</artifactId>
-        </exclusion>        
+        </exclusion>
       </exclusions>
     </dependency>
-    
+
   </dependencies>
   <build>
     <filters>
@@ -272,7 +274,7 @@
               <outputDirectory>${jsw-input}</outputDirectory>
             </configuration>
           </execution>
-          
+
           <execution>
             <id>unpack-plugins</id>
             <phase>prepare-package</phase>
@@ -281,50 +283,50 @@
             </goals>
             <configuration>
               <artifactItems>
-                  <artifactItem>
-                      <groupId>org.sonatype.nexus.plugins</groupId>
-                      <artifactId>nexus-plugin-console-plugin</artifactId>
-                      <version>${project.version}</version>
-                      <classifier>bundle</classifier>
-                      <type>zip</type>
-                      <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                  </artifactItem>
-                  <artifactItem>
-                      <groupId>org.sonatype.nexus.plugins</groupId>
-                      <artifactId>nexus-core-documentation-plugin</artifactId>
-                      <version>${project.version}</version>
-                      <classifier>bundle</classifier>
-                      <type>zip</type>
-                      <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                  </artifactItem>
-                  <artifactItem>
-                      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
-                      <artifactId>nexus-ldap-realm-plugin</artifactId>
-                      <version>${project.version}</version>
-                      <classifier>bundle</classifier>
-                      <type>zip</type>
-                      <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                  </artifactItem>
-                  <artifactItem>
-                    <groupId>org.sonatype.nexus.plugins</groupId>
-                    <artifactId>nexus-rrb-plugin</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>bundle</classifier>
-                    <type>zip</type>
-                    <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                  </artifactItem>
-                  <artifactItem>
-                    <groupId>org.sonatype.nexus</groupId>
-                    <artifactId>nexus-indexer-lucene-plugin</artifactId>
-                    <version>${project.version}</version>
-                    <classifier>bundle</classifier>
-                    <type>zip</type>
-                    <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
-                  </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-plugin-console-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-core-documentation-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+                  <artifactId>nexus-ldap-realm-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus.plugins</groupId>
+                  <artifactId>nexus-rrb-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-indexer-lucene-plugin</artifactId>
+                  <version>${project.version}</version>
+                  <classifier>bundle</classifier>
+                  <type>zip</type>
+                  <outputDirectory>target/${plugin-repository.directory}</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>
-          
+
         </executions>
       </plugin>
       <plugin>
@@ -340,7 +342,7 @@
               <aggregations>
                 <aggregation>
                   <output>${compressed-dir}/js/sonatype-all.js</output>
-                  <!-- files to include, path relative to output's directory or absolute path-->
+                  <!-- files to include, path relative to output's directory or absolute path -->
                   <includes>
                     <include>${basedir}/src/main/webapp/ext-2.3/adapter/ext/ext-base.js</include>
                     <include>${basedir}/src/main/webapp/ext-2.3/ext-all.js</include>
@@ -411,7 +413,7 @@
               <aggregations>
                 <aggregation>
                   <output>${compressed-dir}/style/sonatype-all.css</output>
-                  <!-- files to include, path relative to output's directory or absolute path-->
+                  <!-- files to include, path relative to output's directory or absolute path -->
                   <includes>
                     <include>${compressed-dir}/style/Ext.ux.form.LovCombo.css</include>
                     <include>${compressed-dir}/style/Sonatype.css</include>
@@ -451,7 +453,7 @@
             <artifactId>plexus-utils</artifactId>
             <version>1.1</version>
           </dependency>
-       </dependencies>
+        </dependencies>
       </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
@@ -500,18 +502,15 @@
               <goal>single</goal>
             </goals>
             <configuration>
-                <descriptors>
-                  <!-- <descriptor>src/main/assembly/bundle.xml</descriptor>  -->
-                  <descriptor>src/main/assembly/itar.xml</descriptor>
-            <!--base changed...no updates for this version-->
-            <!--
-                            <descriptor>src/main/assembly/base.xml</descriptor>
-                            <descriptor>src/main/assembly/app.xml</descriptor>
-                        -->
-                </descriptors>
-                <tarLongFileMode>gnu</tarLongFileMode>
+              <descriptors>
+                <!-- <descriptor>src/main/assembly/bundle.xml</descriptor> -->
+                <descriptor>src/main/assembly/itar.xml</descriptor>
+                <!--base changed...no updates for this version -->
+                <!-- <descriptor>src/main/assembly/base.xml</descriptor> <descriptor>src/main/assembly/app.xml</descriptor> -->
+              </descriptors>
+              <tarLongFileMode>gnu</tarLongFileMode>
             </configuration>
-          </execution>         
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -528,10 +527,7 @@
         <version>1.4</version>
         <configuration>
           <includeTestClasspath>true</includeTestClasspath>
-          <!--
-                        prependClasspaths>
-                        <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath>
-                        </prependClasspaths -->
+          <!-- prependClasspaths> <prependClasspath>${project.build.directory}/plexus-home/conf</prependClasspath> </prependClasspaths -->
           <systemProperties>
             <plexus.host.control.socket.enabled>true</plexus.host.control.socket.enabled>
           </systemProperties>

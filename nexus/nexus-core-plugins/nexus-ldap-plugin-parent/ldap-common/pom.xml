@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -12,15 +13,9 @@
   <artifactId>ldap-common</artifactId>
   <name>LDAP Common</name>
   <description />
-  
-  
-  <dependencies>
 
-<!--<dependency>
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>1.5.0</version>
-    </dependency> -->
+
+  <dependencies>
 
     <dependency>
       <groupId>bouncycastle</groupId>
@@ -67,12 +62,12 @@
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
       <version>${plexus-ldap-testsuite.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-        </exclusions>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.thoughtworks.xstream</groupId>
@@ -85,7 +80,7 @@
       <version>3.2.1</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
@@ -99,10 +94,10 @@
     </dependency>
 
     <dependency>
-    	<groupId>javax.servlet</groupId>
-    	<artifactId>servlet-api</artifactId>
-    	<version>2.5</version>
-    	<scope>test</scope>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -118,9 +113,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <!--
-            workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart
-          -->
+          <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
           <argLine>-Xmx256M</argLine>
           <excludes>
             <exclude>**/SonatypeLdapTest.java</exclude>

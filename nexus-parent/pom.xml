@@ -1,14 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
     <version>6</version>
     <relativePath />
   </parent>
+
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
   <version>17-SNAPSHOT</version>
+
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
 
@@ -35,8 +40,7 @@
         <artifactId>spice-inject-plexus</artifactId>
         <version>${spice-inject-plexus.version}</version>
       </dependency>
-      <!-- This below is actually tied to this above, but some modules
-      like modello only modules does need p-u only as dependency -->
+      <!-- This below is actually tied to this above, but some modules like modello only modules does need p-u only as dependency -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
@@ -75,7 +79,7 @@
         <artifactId>jetty-util</artifactId>
         <version>${jetty.version}</version>
       </dependency>
-      
+
       <!-- Maven -->
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -110,7 +114,7 @@
           </exclusion>
         </exclusions>
       </dependency>
-      
+
     </dependencies>
   </dependencyManagement>
 

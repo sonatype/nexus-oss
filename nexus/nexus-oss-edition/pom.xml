@@ -1,42 +1,44 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus</artifactId>
-        <version>1.7.3-SNAPSHOT</version>
-    </parent>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus</artifactId>
+    <version>1.7.3-SNAPSHOT</version>
+  </parent>
 
-    <artifactId>nexus-oss-edition</artifactId>
+  <artifactId>nexus-oss-edition</artifactId>
 
-    <packaging>jar</packaging>
+  <packaging>jar</packaging>
 
-    <name>Nexus (OSS Edition)</name>
+  <name>Nexus (OSS Edition)</name>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.sonatype.nexus</groupId>
-            <artifactId>nexus-api</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-api</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-inject-plexus</artifactId>
     </dependency>
-    </dependencies>
+  </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.plexus</groupId>
-                <artifactId>plexus-component-metadata</artifactId>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
