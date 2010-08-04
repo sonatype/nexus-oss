@@ -966,7 +966,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>guice-nexus-shim</artifactId>
+        <artifactId>spice-inject-nexus</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
