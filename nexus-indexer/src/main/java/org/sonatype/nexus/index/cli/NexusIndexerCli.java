@@ -185,8 +185,8 @@ public class NexusIndexerCli
         options.addOption( OptionBuilder.withLongOpt( "chunks" ) //
         .withDescription( "Create incremental chunks." ).create( CREATE_INCREMENTAL_CHUNKS ) );
 
-        options.addOption( OptionBuilder.withLongOpt( "keep" ).hasArg()
-        .withDescription( "Number of incremental chunks to keep." ).create( INCREMENTAL_CHUNK_KEEP_COUNT ) );
+        options.addOption( OptionBuilder.withLongOpt( "keep" ).hasArg().withDescription(
+            "Number of incremental chunks to keep." ).create( INCREMENTAL_CHUNK_KEEP_COUNT ) );
 
         options.addOption( OptionBuilder.withLongOpt( "checksums" ) //
         .withDescription( "Create checksums for all files (sha1, md5)." ).create( CREATE_FILE_CHECKSUMS ) );
@@ -213,6 +213,17 @@ public class NexusIndexerCli
         formatter.printHelp( "nexus-indexer [options]", "\nOptions:", options, "\n" );
     }
 
+    public void displayHelp( String message )
+    {
+        System.out.println();
+
+        System.out.println( message );
+
+        System.out.println();
+
+        displayHelp();
+    }
+
     @Override
     public void invokePlexusComponent( final CommandLine cli, PlexusContainer plexus )
         throws Exception
@@ -230,18 +241,20 @@ public class NexusIndexerCli
             setLogLevel( plexus, Logger.LEVEL_ERROR );
         }
 
-        if( cli.hasOption( UNPACK ) )
+        if ( cli.hasOption( UNPACK ) )
         {
             unpack( cli, plexus );
         }
-        else if ( cli.hasOption( INDEX ) )
+        else if ( cli.hasOption( INDEX ) && cli.hasOption( REPO ) )
         {
             index( cli, plexus );
         }
         else
         {
             status = 1;
-            displayHelp();
+
+            displayHelp( "Use either unpack (\"" + UNPACK + "\") or index (\"" + INDEX + "\" and \"" + REPO
+                + "\") options, but none has been found!" );
         }
     }
 
@@ -252,9 +265,7 @@ public class NexusIndexerCli
     }
 
     private void index( final CommandLine cli, PlexusContainer plexus )
-        throws ComponentLookupException,
-            IOException,
-            UnsupportedExistingLuceneIndexException
+        throws ComponentLookupException, IOException, UnsupportedExistingLuceneIndexException
     {
         String indexDirectoryName = cli.getOptionValue( INDEX );
 
@@ -280,7 +291,9 @@ public class NexusIndexerCli
 
         boolean quiet = cli.hasOption( QUIET );
 
-        Integer chunkCount = cli.hasOption( INCREMENTAL_CHUNK_KEEP_COUNT ) ? Integer.parseInt( cli.getOptionValue( INCREMENTAL_CHUNK_KEEP_COUNT ) ) : null;
+        Integer chunkCount =
+            cli.hasOption( INCREMENTAL_CHUNK_KEEP_COUNT ) ? Integer.parseInt( cli.getOptionValue( INCREMENTAL_CHUNK_KEEP_COUNT ) )
+                : null;
 
         if ( !quiet )
         {
@@ -316,11 +329,11 @@ public class NexusIndexerCli
 
         NexusIndexer indexer = plexus.lookup( NexusIndexer.class );
         IndexingContext context = null;
-        
+
         try
         {
             long tstart = System.currentTimeMillis();
-    
+
             context = indexer.addIndexingContext( //
                 repositoryName, // context id
                 repositoryName, // repository id
@@ -329,19 +342,19 @@ public class NexusIndexerCli
                 null, // repositoryUrl
                 null, // index update url
                 indexers );
-    
+
             IndexPacker packer = plexus.lookup( IndexPacker.class );
-    
+
             ArtifactScanningListener listener = new IndexerListener( context, debug, quiet );
-    
+
             indexer.scan( context, listener, true );
-    
+
             IndexPackingRequest request = new IndexPackingRequest( context, outputFolder );
-    
+
             request.setCreateChecksumFiles( createChecksums );
-    
+
             request.setCreateIncrementalChunks( createIncrementalChunks );
-    
+
             if ( createLegacyIndex )
             {
                 request.setFormats( Arrays.asList( IndexFormat.FORMAT_LEGACY, IndexFormat.FORMAT_V1 ) );
@@ -350,15 +363,15 @@ public class NexusIndexerCli
             {
                 request.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
             }
-    
+
             if ( chunkCount != null )
             {
                 request.setMaxIndexChunks( chunkCount.intValue() );
             }
-    
+
             packIndex( packer, request, debug, quiet );
-    
-            if( !quiet )
+
+            if ( !quiet )
             {
                 printStats( tstart );
             }
@@ -380,7 +393,7 @@ public class NexusIndexerCli
         final File outputFolder = new File( outputDirectoryName ).getCanonicalFile();
 
         final boolean quiet = cli.hasOption( QUIET );
-        if( !quiet )
+        if ( !quiet )
         {
             System.err.printf( "Index Folder:      %s\n", indexFolder.getAbsolutePath() );
             System.err.printf( "Output Folder:     %s\n", outputFolder.getAbsolutePath() );
@@ -396,33 +409,27 @@ public class NexusIndexerCli
         try
         {
             is = new BufferedInputStream( new FileInputStream( indexArchive ) );
-            DefaultIndexUpdater.unpackIndexData(
-                is,
-                directory,
-                (IndexingContext) Proxy.newProxyInstance(
-                    getClass().getClassLoader(),
-                    new Class[]{ IndexingContext.class },
-                    new PartialImplementation()
+            DefaultIndexUpdater.unpackIndexData( is, directory, (IndexingContext) Proxy.newProxyInstance(
+                getClass().getClassLoader(), new Class[] { IndexingContext.class }, new PartialImplementation()
+                {
+                    public List<IndexCreator> getIndexCreators()
                     {
-                        public List<IndexCreator> getIndexCreators()
-                        {
-                            return indexers;
-                        }
+                        return indexers;
                     }
-                )
+                } )
 
             );
         }
         finally
         {
             IOUtil.close( is );
-            if( directory != null )
+            if ( directory != null )
             {
                 directory.close();
             }
         }
 
-        if( !quiet )
+        if ( !quiet )
         {
             printStats( tstart );
         }
@@ -487,7 +494,7 @@ public class NexusIndexerCli
         long t = System.currentTimeMillis() - startTimeInMillis;
 
         long s = t / 1000L;
-        if( t > 60 * 1000 )
+        if ( t > 60 * 1000 )
         {
             long m = t / 1000L / 60L;
 
@@ -501,9 +508,7 @@ public class NexusIndexerCli
         Runtime r = Runtime.getRuntime();
 
         System.err.printf( "Final memory: %dM/%dM\n", //
-                           ( r.totalMemory() - r.freeMemory() ) / MB,
-                           r.totalMemory() / MB
-        );
+            ( r.totalMemory() - r.freeMemory() ) / MB, r.totalMemory() / MB );
     }
 
     /**
@@ -548,11 +553,7 @@ public class NexusIndexerCli
             if ( !quiet && debug && "maven-plugin".equals( ai.packaging ) )
             {
                 System.err.printf( "Plugin: %s:%s:%s - %s %s\n", //
-                    ai.groupId,
-                    ai.artifactId,
-                    ai.version,
-                    ai.prefix,
-                    "" + ai.goals );
+                    ai.groupId, ai.artifactId, ai.version, ai.prefix, "" + ai.goals );
             }
 
             if ( !quiet && ( debug || ( t - ts ) > 2000L ) )
