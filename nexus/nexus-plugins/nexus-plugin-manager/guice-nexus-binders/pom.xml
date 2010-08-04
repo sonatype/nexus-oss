@@ -12,7 +12,7 @@
 
   <artifactId>guice-nexus-binders</artifactId>
 
-  <name>Nexus Plugins : Guice - Nexus binders</name>
+  <name>Nexus : Plugins : Manager : Guice - Nexus binders</name>
 
   <dependencies>
     <dependency>

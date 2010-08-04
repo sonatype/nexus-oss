@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-restlight-m2-settings-client</artifactId>
-  <name>Nexus Lightweight REST Clients: M2 Settings</name>
+  <name>Nexus : Clients : Lightweight REST Clients : M2 Settings</name>
 
   <dependencies>
     <dependency>

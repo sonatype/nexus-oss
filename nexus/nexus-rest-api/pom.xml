@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-rest-api</artifactId>
-  <name>Nexus (Rest API)</name>
+  <name>Nexus : Core Rest API</name>
 
   <dependencies>
     <dependency>

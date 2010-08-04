@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-simple-memory-realm</artifactId>
-  <name>Nexus Test Harness Simple Memory Realm</name>
+  <name>Nexus : Test Harness : Simple Memory Realm</name>
 
   <build>
     <plugins>

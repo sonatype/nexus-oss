@@ -18,7 +18,7 @@
   <packaging>jar</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus (Web Utils)</name>
+  <name>Nexus : Web Utils</name>
 
   <dependencies>
 

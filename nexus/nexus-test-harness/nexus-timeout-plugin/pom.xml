@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-timeout-plugin</artifactId>
-  <name>Nexus Timeout Plugin (Testing)</name>
+  <name>Nexus : Test Harness : Timeout Plugin</name>
   <description>Used to generate a request timeout.</description>
 
   <developers>

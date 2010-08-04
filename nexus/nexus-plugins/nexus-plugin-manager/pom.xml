@@ -14,7 +14,7 @@
 
   <artifactId>guice-nexus</artifactId>
 
-  <name>Nexus Plugins : Manager (Guice)</name>
+  <name>Nexus : Plugins : Manager</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

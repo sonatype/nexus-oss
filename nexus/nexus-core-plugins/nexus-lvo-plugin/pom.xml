@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>nexus-lvo-plugin</artifactId>
-  <name>Nexus LVO Plugin (Extras)</name>
+  <name>Nexus : Core Plugins : LVO Plugin</name>
   <description>Nexus LVO Plugin (Extras).</description>
 
   <scm>

@@ -19,7 +19,7 @@
   <packaging>pom</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Plugins</name>
+  <name>Nexus : Plugins</name>
 
   <modules>
     <module>nexus-plugin-manager</module>

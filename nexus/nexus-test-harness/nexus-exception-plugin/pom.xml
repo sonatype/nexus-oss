@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-exception-plugin</artifactId>
-  <name>Nexus Exception Plugin (Testing)</name>
+  <name>Nexus : Test Harness : Exception Plugin</name>
   <description>Used to generate an exception in nexus.</description>
 
   <developers>

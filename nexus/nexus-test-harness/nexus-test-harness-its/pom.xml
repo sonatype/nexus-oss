@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-test-harness-its</artifactId>
-  <name>Nexus Test Harness OSS ITs</name>
+  <name>Nexus : Test Harness : Core ITs</name>
 
   <properties>
     <!-- Below is the "product", the subject of the ITs -->

@@ -12,7 +12,7 @@
   <artifactId>nexus-distribution-archives</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus (Distribution Archives)</name>
+  <name>Nexus : Distros : Distribution Archives</name>
 
   <modules>
     <module>car-nexus-oss</module>

@@ -12,7 +12,7 @@
   <artifactId>nexus-oss-webapp</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus OSS Webapp Bundle</name>
+  <name>Nexus : Distros : Nexus OSS Bundle</name>
 
   <properties>
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>

@@ -11,7 +11,7 @@
 
   <artifactId>nexus-plugin-console-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus Plugin Console Plugin</name>
+  <name>Nexus : Core Plugins : Plugin Console Plugin</name>
   <description>Nexus Core Plugin :: Plugin Console</description>
 
   <developers>

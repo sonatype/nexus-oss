@@ -13,7 +13,7 @@
   <artifactId>nexus-indexer</artifactId>
   <version>3.0.4-SNAPSHOT</version>
 
-  <name>Sonatype Nexus: Indexer</name>
+  <name>Sonatype Nexus Indexer</name>
 
   <licenses>
     <license>

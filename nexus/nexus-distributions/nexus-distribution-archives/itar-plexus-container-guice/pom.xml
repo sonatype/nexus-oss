@@ -14,7 +14,7 @@
   <artifactId>itar-plexus-container-guice</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus (ITAR :: Plexus Container :: Guice)</name>
+  <name>Nexus : Distros : Distribution Archives : Spice Inject ITAR</name>
 
   <dependencies>
     <dependency>

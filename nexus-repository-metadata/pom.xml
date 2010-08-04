@@ -14,7 +14,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Sonatype Nexus: Nexus Repository Metadata</name>
+  <name>Sonatype Nexus Repository Metadata</name>
 
   <licenses>
     <license>

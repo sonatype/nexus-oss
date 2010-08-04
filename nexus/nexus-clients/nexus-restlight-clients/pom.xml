@@ -14,7 +14,7 @@
   <artifactId>nexus-restlight-clients</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus Lightweight REST Clients</name>
+  <name>Nexus : Clients : Lightweight REST Clients</name>
   <url>http://nexus.sonatype.org</url>
 
   <modules>

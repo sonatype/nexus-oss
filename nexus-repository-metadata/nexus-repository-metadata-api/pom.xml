@@ -10,7 +10,7 @@
 
   <artifactId>nexus-repository-metadata-api</artifactId>
 
-  <name>Sonatype Nexus: Nexus Repository Metadata API</name>
+  <name>Sonatype Nexus Repository Metadata : API</name>
 
   <dependencies>
     <dependency>

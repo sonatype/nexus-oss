@@ -12,7 +12,7 @@
 
   <artifactId>nexus-rrb-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus Core Plugin :: Remote Repository Browsing</name>
+  <name>Nexus : Core Plugins : Remote Repository Browsing</name>
   <description>Adds browsing support for proxied remote repositories</description>
 
   <developers>

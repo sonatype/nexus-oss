@@ -11,7 +11,7 @@
 
   <artifactId>nexus-proxy</artifactId>
 
-  <name>Nexus (Proxy)</name>
+  <name>Nexus : Proxy</name>
 
   <dependencies>
     <dependency>

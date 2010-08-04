@@ -18,7 +18,8 @@
   <packaging>jar</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Tools: Repository Conversion Tool</name>
+  <name>Nexus : Migration Tools : Repository Conversion Tool</name>
+  
   <dependencies>
     <dependency>
       <groupId>org.sonatype.spice</groupId>

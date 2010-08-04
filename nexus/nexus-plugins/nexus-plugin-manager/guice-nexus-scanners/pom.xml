@@ -12,7 +12,7 @@
 
   <artifactId>guice-nexus-scanners</artifactId>
 
-  <name>Nexus Plugins : Guice - Nexus scanners</name>
+  <name>Nexus : Plugins : Manager : Guice - Nexus scanners</name>
 
   <dependencies>
     <dependency>

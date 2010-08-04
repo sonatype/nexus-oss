@@ -11,7 +11,7 @@
 
   <artifactId>nexus-test-harness</artifactId>
   <packaging>pom</packaging>
-  <name>Nexus Test Harness</name>
+  <name>Nexus : Test Harness</name>
 
   <profiles>
     <profile>

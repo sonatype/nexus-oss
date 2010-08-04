@@ -12,7 +12,7 @@
 
   <artifactId>guice-nexus-shim</artifactId>
 
-  <name>Nexus Plugins : Guice - Nexus shim</name>
+  <name>Nexus : Plugins : Manager : Guice - Nexus shim</name>
 
   <dependencies>
     <dependency>

@@ -13,7 +13,7 @@
 
   <packaging>jar</packaging>
 
-  <name>Nexus (OSS Edition)</name>
+  <name>Nexus : OSS Edition</name>
 
   <dependencies>
     <dependency>

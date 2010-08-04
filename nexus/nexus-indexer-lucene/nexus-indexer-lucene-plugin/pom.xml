@@ -11,8 +11,7 @@
 
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus Indexer Lucene (Nexus Plugin)</name>
-  <description>Nexus Indexer Lucene UI and security contributions</description>
+  <name>Nexus : Indexer Lucene : Plugin</name>
 
   <developers>
     <developer>

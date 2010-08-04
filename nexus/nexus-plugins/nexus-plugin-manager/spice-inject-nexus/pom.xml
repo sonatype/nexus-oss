@@ -14,7 +14,7 @@
 
   <artifactId>spice-inject-nexus</artifactId>
 
-  <name>Spice - Inject (Nexus bean support)</name>
+  <name>Nexus : Plugins : Manager : Spice - Inject (Nexus bean support)</name>
 
   <build>
     <plugins>

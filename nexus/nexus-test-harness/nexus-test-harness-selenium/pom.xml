@@ -10,6 +10,7 @@
   </parent>
 
   <artifactId>nexus-test-harness-selenium</artifactId>
+  <name>Nexus : Test Harness : Selenium</name>
 
   <properties>
     <threads>4</threads>

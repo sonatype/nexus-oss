@@ -12,7 +12,7 @@
   <version>1.0.1-SNAPSHOT</version>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Indexer Artifact</name>
+  <name>Sonatype Nexus Indexer Artifact</name>
 
   <dependencies>
     <dependency>

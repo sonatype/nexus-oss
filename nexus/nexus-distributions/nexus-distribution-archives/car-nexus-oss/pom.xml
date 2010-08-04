@@ -14,7 +14,7 @@
   <artifactId>car-nexus-oss</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus (CAR :: Nexus OSS)</name>
+  <name>Nexus : Distros : Distribution Archives : Core CAR</name>
 
   <build>
     <plugins>

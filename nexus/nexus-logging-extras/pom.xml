@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-logging-extras</artifactId>
-  <name>Nexus Logging Extras</name>
+  <name>Nexus : Logging Extras</name>
 
   <dependencies>
     <!-- We have components in here -->

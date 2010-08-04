@@ -22,7 +22,7 @@
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-core-plugins</artifactId>
   <packaging>pom</packaging>
-  <name>Nexus Core Plugins Aggregator</name>
+  <name>Nexus : Core Plugins</name>
 
   <modules>
     <module>nexus-lvo-plugin</module>

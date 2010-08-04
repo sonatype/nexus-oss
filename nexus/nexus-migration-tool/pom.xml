@@ -19,7 +19,7 @@
   <packaging>pom</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus Tools</name>
+  <name>Nexus : Migration Tools</name>
 
   <modules>
     <module>nexus-repository-conversion-tool</module>
