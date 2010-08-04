@@ -197,10 +197,6 @@
                   <include>org.apache.maven:maven-model</include>
                   <include>org.apache.maven:maven-plugin-api</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
-
-                  <!-- Needed by SpiceInject until Stuart fixes are applied -->
-                  <include>org.apache.maven.archetype:archetype-common</include>
-
                   <include>org.sonatype.spice:spice-inject-plexus</include>
                   <include>org.codehaus.plexus:plexus-component-annotations</include>
                   <include>org.codehaus.plexus:plexus-classworlds</include>
