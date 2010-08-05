@@ -13,6 +13,7 @@
 package org.sonatype.nexus;
 
 import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.appbooter.PlexusAppBooterCustomizer;
@@ -29,8 +30,7 @@ public final class NexusBooterCustomizer
 
     public void customizeContainerConfiguration( final ContainerConfiguration configuration )
     {
-        System.setProperty( "guice.disable.misplaced.annotation.check", "true" );
-        System.setProperty( "plexus.disable.component.visibility.check", "true" );
+        configuration.setClassPathScanning( true ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
     }
 
     public void customizeContext( final Context context )
