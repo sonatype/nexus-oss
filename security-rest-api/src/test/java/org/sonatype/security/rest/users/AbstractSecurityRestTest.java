@@ -1,6 +1,7 @@
 package org.sonatype.security.rest.users;
 import java.io.File;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -17,6 +18,11 @@ public abstract class AbstractSecurityRestTest extends PlexusTestCase
     protected static final String TEST_CONFIG = "target/test-classes/"+UserToRolePRTest.class.getName().replaceAll( "\\.", "\\/" ) +"-security.xml";
 
     
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
     
     @Override
     protected void setUp()
