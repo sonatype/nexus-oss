@@ -20,6 +20,7 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.Realm;
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
@@ -43,7 +44,13 @@ public class XmlAuthenticatingRealmTest
     private XmlAuthenticatingRealm realm;
     
     private DefaultConfigurationManager configurationManager;
-        
+    
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+    
     @Override
     protected void customizeContext( Context context )
     {

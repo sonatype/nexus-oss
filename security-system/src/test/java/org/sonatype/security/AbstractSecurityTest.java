@@ -2,6 +2,7 @@ package org.sonatype.security;
 
 import java.io.File;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -14,6 +15,12 @@ public abstract class AbstractSecurityTest
 
     protected File APP_CONF = new File( PLEXUS_HOME, "conf" );
 
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+    
     @Override
     protected void customizeContext( Context context )
     {

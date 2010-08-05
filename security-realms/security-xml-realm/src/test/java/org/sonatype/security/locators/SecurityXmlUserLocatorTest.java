@@ -18,6 +18,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -29,6 +30,12 @@ public class SecurityXmlUserLocatorTest
     extends PlexusTestCase
 {
 
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+    
     public UserManager getUserManager()
         throws Exception
     {

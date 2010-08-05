@@ -4,6 +4,7 @@ import java.io.File;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
@@ -78,6 +79,12 @@ public class SampleAppTest
         return restClient.handle( request );
     }
 
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+    
     @Override
     protected void customizeContext( org.codehaus.plexus.context.Context context )
     {

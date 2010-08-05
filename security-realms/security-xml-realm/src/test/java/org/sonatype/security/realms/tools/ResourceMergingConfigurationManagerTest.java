@@ -15,6 +15,7 @@ package org.sonatype.security.realms.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.security.model.CPrivilege;
@@ -24,6 +25,12 @@ public class ResourceMergingConfigurationManagerTest
     extends PlexusTestCase
 {
     private ConfigurationManager manager;
+    
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
     
     @Override
     protected void customizeContext( Context context )

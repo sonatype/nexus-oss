@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
@@ -29,6 +30,12 @@ public abstract class AbstractSecurityConfigTest
 
     protected static final File CONF_HOME = new File( PLEXUS_HOME, "conf" );
 
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+    
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
@@ -93,7 +100,7 @@ public abstract class AbstractSecurityConfigTest
     @Override
     protected void setUp()
         throws Exception
-    {
+    {   
         super.setUp();
         
         // delete the config dir
