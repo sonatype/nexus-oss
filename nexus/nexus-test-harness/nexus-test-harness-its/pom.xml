@@ -94,6 +94,10 @@
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>${project.groupId}</groupId>
+              <artifactId>nexus-test-harness-launcher</artifactId>
+            </plugin>
+            <plugin>
+              <groupId>${project.groupId}</groupId>
               <artifactId>nexus-simple-memory-realm</artifactId>
             </plugin>
             <plugin>

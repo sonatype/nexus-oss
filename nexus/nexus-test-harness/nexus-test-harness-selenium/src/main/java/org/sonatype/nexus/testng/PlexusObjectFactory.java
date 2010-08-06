@@ -7,8 +7,8 @@ import java.lang.reflect.Constructor;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.context.Context;
 import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.appcontext.AppContext;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.IObjectFactory;
 
@@ -78,7 +78,7 @@ public class PlexusObjectFactory
         final PlexusAppBooter plexusAppBooter = new PlexusAppBooter()
         {
             @Override
-            protected void customizeContext( Context context )
+            protected void customizeContext( AppContext context )
             {
                 super.customizeContext( context );
 

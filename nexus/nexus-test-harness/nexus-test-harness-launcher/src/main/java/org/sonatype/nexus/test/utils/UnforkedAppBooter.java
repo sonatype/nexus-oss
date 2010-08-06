@@ -39,6 +39,11 @@ import org.sonatype.appbooter.ForkedAppBooter;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.appbooter.ctl.ControllerClient;
 
+/**
+ * DO NOT USE THIS CLASS! THIS ONE IS COMPLETELY WRONG!
+ * 
+ * @deprecated you don't want to use this class.
+ */
 @Component( role = ForkedAppBooter.class, hint = "TestUnforkedAppBooter", instantiationStrategy = "per-lookup" )
 public class UnforkedAppBooter
     implements ForkedAppBooter
@@ -108,9 +113,7 @@ public class UnforkedAppBooter
     }
 
     private ClassLoader getForkedClassloader()
-        throws FileNotFoundException,
-            IOException,
-            MalformedURLException
+        throws FileNotFoundException, IOException, MalformedURLException
     {
         if ( forkedCL == null )
         {
@@ -125,9 +128,7 @@ public class UnforkedAppBooter
     }
 
     private ArrayList<URL> getClasspath()
-        throws FileNotFoundException,
-            IOException,
-            MalformedURLException
+        throws FileNotFoundException, IOException, MalformedURLException
     {
         String conf = System.getProperty( "classpath.conf" );
 
@@ -194,20 +195,22 @@ public class UnforkedAppBooter
         return cfg;
     }
 
-    private Map<String, String> getContext() throws InterpolationException
+    private Map<String, String> getContext()
+        throws InterpolationException
     {
         Map<String, String> context = new LinkedHashMap<String, String>();
         for ( Map.Entry<String, String> e : systemProperties.entrySet() )
         {
             String key = e.getKey();
-            if ( key.startsWith( "plexus." ) ) {
+            if ( key.startsWith( "plexus." ) )
+            {
                 key = key.substring( "plexus.".length() );
             }
             context.put( key, e.getValue() );
         }
         context.put( "basedir", basedir.getAbsolutePath() );
         context.put( "configuration", configuration.getAbsolutePath() );
-        
+
         File containerPropertiesFile = new File( configuration.getParentFile(), "plexus.properties" );
 
         if ( containerPropertiesFile.exists() )
@@ -230,22 +233,22 @@ public class UnforkedAppBooter
             {
                 System.err.println( "Failed to load plexus properties: " + containerPropertiesFile );
             }
-            
+
             RegexBasedInterpolator interpolator = new RegexBasedInterpolator();
 
             interpolator.addValueSource( new MapBasedValueSource( containerProperties ) );
             interpolator.addValueSource( new MapBasedValueSource( System.getProperties() ) );
             interpolator.addValueSource( new MapBasedValueSource( context ) );
-            
+
             for ( Object key : containerProperties.keySet() )
             {
-                if ( ! context.containsKey( key ) )
+                if ( !context.containsKey( key ) )
                 {
                     context.put( (String) key, interpolator.interpolate( (String) containerProperties.get( key ) ) );
                 }
             }
         }
-        
+
         return context;
     }
 

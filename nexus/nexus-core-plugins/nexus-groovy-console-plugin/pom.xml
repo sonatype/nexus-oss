@@ -68,6 +68,12 @@
           </nexusBundleArtifact>
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusVersion>${project.version}</nexusVersion>
+          <nexusPluginsArtifacts>
+          	<plugin>
+            	<groupId>org.sonatype.nexus</groupId>
+				<artifactId>nexus-test-harness-launcher</artifactId>
+        	</plugin>
+       	  </nexusPluginsArtifacts>
         </configuration>
       </plugin>
 
@@ -152,6 +158,11 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
+    
+	<dependency>
+	  <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+	  <artifactId>plexus-app-booter</artifactId>
+	</dependency>
 
   </dependencies>
 

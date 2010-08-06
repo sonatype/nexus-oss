@@ -67,7 +67,7 @@ public class NexusStatusUtil
         catch ( IOException e )
         {
             throw new NexusIllegalStateException( "Unable to retrieve nexus status " + new XStream().toXML( response ),
-                e );
+                                                  e );
         }
 
         StatusResourceResponse status = (StatusResourceResponse) xstream.fromXML( entityText );
@@ -75,7 +75,7 @@ public class NexusStatusUtil
         return status;
     }
 
-    public void start()
+    public void start( String testId )
         throws Exception
     {
         int totalWaitCycles = 200 * 5; // 200 sec
@@ -88,7 +88,7 @@ public class NexusStatusUtil
 
             if ( i % retryStartCycles == 0 )
             {
-                getAppBooterService().start();
+                getAppBooterService( testId ).start();
             }
 
             // log.debug( "wait for Nexus start, attempt: " + i );
@@ -117,7 +117,7 @@ public class NexusStatusUtil
 
         try
         {
-            getAppBooterService().shutdown();
+            getAppBooterService( testId ).shutdown();
         }
         catch ( Throwable t )
         {
@@ -258,7 +258,7 @@ public class NexusStatusUtil
         return false;
     }
 
-    private ThreadedPlexusAppBooterService getAppBooterService()
+    private ThreadedPlexusAppBooterService getAppBooterService( String testId )
         throws Exception
     {
         if ( APP_BOOTER_SERVICE == null )
@@ -297,7 +297,7 @@ public class NexusStatusUtil
             int controlPort = socket.getLocalPort();
             socket.close();
 
-            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort );
+            APP_BOOTER_SERVICE = new ThreadedPlexusAppBooterService( classworldsConf, controlPort, testId );
         }
 
         return APP_BOOTER_SERVICE;

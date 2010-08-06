@@ -5,7 +5,7 @@
   <parent>
     <artifactId>nexus-test-harness</artifactId>
     <groupId>org.sonatype.nexus</groupId>
-    <version>1.6.2-SNAPSHOT</version>
+    <version>1.7.3-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-selenium</artifactId>

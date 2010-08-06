@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.appbooter.ctl.Service;
+import org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer;
 
 public class ThreadedPlexusAppBooterService
     implements Service
@@ -19,13 +20,21 @@ public class ThreadedPlexusAppBooterService
 
     private int controlPort;
 
+    private String testId;
+
     private static int THREAD_COUNT = 1;
 
-    public ThreadedPlexusAppBooterService( File classworldsConf, int controlPort )
+    public ThreadedPlexusAppBooterService( File classworldsConf, int controlPort, String testId )
         throws Exception
     {
         // System.setProperty( "plexus"+ PlexusAppBooterService.ENABLE_CONTROL_SOCKET, "true" );
         this.controlPort = controlPort;
+        this.testId = testId;
+
+        // we are "tricking" this line:
+        // set plexus.appbooter.customizers default org.sonatype.nexus.NexusBooterCustomizer
+        System.setProperty( "plexus.appbooter.customizers",
+                            "org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer,org.sonatype.nexus.NexusBooterCustomizer" );
 
         this.launcher.configure( new FileInputStream( classworldsConf ) );
         this.launcher.setAppMain( "org.sonatype.appbooter.PlexusAppBooter", "plexus.core" );
@@ -82,7 +91,7 @@ public class ThreadedPlexusAppBooterService
         if ( this.launcherThread == null )
         {
             LOG.info( "Creating LauncherThread (" + launcher + ", " + controlPort + ")" );
-            this.launcherThread = new LauncherThread( launcher, controlPort );
+            this.launcherThread = new LauncherThread( launcher, controlPort, testId );
             this.launcherThread.start();
         }
         else
@@ -103,7 +112,7 @@ public class ThreadedPlexusAppBooterService
             else
             {
                 // it died off, without any exception
-                this.launcherThread = new LauncherThread( launcher, controlPort );
+                this.launcherThread = new LauncherThread( launcher, controlPort, testId );
                 this.launcherThread.start();
             }
         }
@@ -130,14 +139,17 @@ public class ThreadedPlexusAppBooterService
     {
         private Launcher launcher;
 
-        private int controlPort;
+        private int controlPortArg;
+        
+        private String testIdArg;
 
         private Exception exception;
 
-        public LauncherThread( Launcher launcher, int controlPort )
+        public LauncherThread( Launcher launcher, int controlPort, String testId )
         {
             this.launcher = launcher;
-            this.controlPort = controlPort;
+            this.controlPortArg = controlPort;
+            this.testIdArg = ITAppBooterCustomizer.TEST_ID_PREFIX + testId;
             this.setName( "LauncherThread-" + THREAD_COUNT++ );
         }
 
@@ -146,7 +158,7 @@ public class ThreadedPlexusAppBooterService
         {
             try
             {
-                this.launcher.launch( new String[] { Integer.toString( controlPort ) } );
+                this.launcher.launch( new String[] { Integer.toString( controlPortArg ), testIdArg } );
             }
             catch ( Exception e )
             {
@@ -164,7 +176,7 @@ public class ThreadedPlexusAppBooterService
     public void clean()
     {
         this.launcherThread = null;
-        
+
         // TODO: this causes severe problems
         // Maybe since not all the _isolated_ classloader threads are done yet?
         // System.gc();

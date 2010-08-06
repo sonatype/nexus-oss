@@ -3,7 +3,8 @@ package org.sonatype.nexus.testng;
 import java.util.Map.Entry;
 
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.context.Context;
+import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.appcontext.AppContext;
 import org.sonatype.nexus.mock.MockAppBooterCustomizer;
 import org.sonatype.nexus.test.utils.TestProperties;
 
@@ -12,20 +13,20 @@ public class SeleniumAppBooterCustomizer
 {
 
     @Override
-    public void customizeContext( Context ctx )
+    public void customizeContext( final PlexusAppBooter appBooter, final AppContext ctx )
     {
         for ( Entry<String, String> entry : TestProperties.getAll().entrySet() )
         {
             ctx.put( entry.getKey(), entry.getValue() );
         }
-        super.customizeContext( ctx );
+        super.customizeContext( appBooter, ctx );
     }
 
     @Override
-    public void customizeContainerConfiguration( ContainerConfiguration cc )
+    public void customizeContainerConfiguration( final PlexusAppBooter appBooter, final ContainerConfiguration config )
     {
-        cc.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
+        config.setContainerConfigurationURL( Class.class.getResource( "/plexus/plexus.xml" ) );
 
-        super.customizeContainerConfiguration( cc );
+        super.customizeContainerConfiguration( appBooter, config );
     }
 }

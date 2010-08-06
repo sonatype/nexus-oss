@@ -137,7 +137,7 @@
 
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <plexus.appbooter.version>2.1.0</plexus.appbooter.version>
+    <plexus.appbooter.version>2.1.1-SNAPSHOT</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
     <plexus-security.version>1.1.8</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
@@ -180,6 +180,12 @@
         <artifactId>plexus-jsw-app-booter</artifactId>
         <version>${plexus.appbooter.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+        <artifactId>plexus-forked-app-booter</artifactId>
+        <version>${plexus.appbooter.version}</version>
+        <scope>compile</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.appbooter.plexus-platforms</groupId>

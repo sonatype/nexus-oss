@@ -1,27 +1,24 @@
 package org.sonatype.nexus;
 
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.ComponentRepository;
-import org.codehaus.plexus.context.Context;
-import org.sonatype.appbooter.PlexusAppBooterCustomizer;
+import org.sonatype.appbooter.AbstractPlexusAppBooterCustomizer;
+import org.sonatype.appbooter.PlexusAppBooter;
+import org.sonatype.appcontext.AppContext;
 import org.sonatype.nexus.plugins.plexus.NexusPluginsComponentRepository;
 
 public class NexusBooterCustomizer
-    implements PlexusAppBooterCustomizer
+    extends AbstractPlexusAppBooterCustomizer
 {
-    public void customizeContext( Context context )
+    public void customizeContext( final PlexusAppBooter booter, final AppContext context )
     {
         context.put( ComponentRepository.class.getName(), new NexusPluginsComponentRepository() );
     }
 
-    public void customizeContainerConfiguration( ContainerConfiguration containerConfiguration )
+    public void customizeContainerConfiguration( final PlexusAppBooter booter,
+                                                 final ContainerConfiguration containerConfiguration )
     {
-        containerConfiguration.setComponentRepository( (ComponentRepository) containerConfiguration.getContext()
-            .get( ComponentRepository.class.getName() ) );
+        containerConfiguration.setComponentRepository( (ComponentRepository) containerConfiguration.getContext().get( ComponentRepository.class.getName() ) );
     }
 
-    public void customizeContainer( PlexusContainer plexusContainer )
-    {
-    }
 }

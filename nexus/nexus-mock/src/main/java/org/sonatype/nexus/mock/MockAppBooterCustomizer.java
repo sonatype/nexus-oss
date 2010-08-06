@@ -1,25 +1,15 @@
 package org.sonatype.nexus.mock;
 
 import org.codehaus.plexus.ContainerConfiguration;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.context.Context;
-import org.sonatype.appbooter.PlexusAppBooterCustomizer;
+import org.sonatype.appbooter.AbstractPlexusAppBooterCustomizer;
+import org.sonatype.appbooter.PlexusAppBooter;
 
 public class MockAppBooterCustomizer
-    implements PlexusAppBooterCustomizer
+    extends AbstractPlexusAppBooterCustomizer
 {
-    public void customizeContext( Context ctx )
-    {
-        // no need for this
-    }
-
-    public void customizeContainerConfiguration( ContainerConfiguration config )
+    @Override
+    public void customizeContainerConfiguration( final PlexusAppBooter appBooter, ContainerConfiguration config )
     {
         config.addComponentDiscoveryListener( new InhibitingComponentDiscovererListener() );
-    }
-
-    public void customizeContainer( PlexusContainer container )
-    {
-        // no need for this
     }
 }
