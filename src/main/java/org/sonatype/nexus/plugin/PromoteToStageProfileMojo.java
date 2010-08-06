@@ -50,7 +50,7 @@ public class PromoteToStageProfileMojo
     /**
      * @parameter expression="${repositoryIds}"
      */
-    private Set<String> repositoryIds = new LinkedHashSet<String>();
+    private LinkedHashSet<String> repositoryIds = new LinkedHashSet<String>();
 
     /**
      * @parameter expression="${description}"
@@ -257,7 +257,7 @@ public class PromoteToStageProfileMojo
 
     public void setRepositoryIds( Set<String> repositoryIds )
     {
-        this.repositoryIds = repositoryIds;
+        this.repositoryIds = new LinkedHashSet<String>( repositoryIds );
     }
 
     public String getDescription()
