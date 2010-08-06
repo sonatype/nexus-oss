@@ -67,7 +67,7 @@ public class ComponentPlexusResourceTest
         // added all the time.
 
         // now for a more controled test
-        result = runGetForRole( "MULTI-TEST" );
+        result = runGetForRole( "MULTI_TEST" );
         Assert.assertEquals( 2, result.getData().size() );
 
         // the order is undefined
@@ -78,11 +78,11 @@ public class ComponentPlexusResourceTest
         {
             if ( resource.getRoleHint().endsWith( "1" ) )
             {
-                resource1 = (PlexusComponentListResource) result.getData().get( 0 );
+                resource1 = resource;
             }
             else
             {
-                resource2 = (PlexusComponentListResource) result.getData().get( 1 );
+                resource2 = resource;
             }
         }
 
@@ -101,7 +101,7 @@ public class ComponentPlexusResourceTest
     public void testValidRoleSingleResult()
         throws Exception
     {
-        PlexusComponentListResourceResponse result = runGetForRole( "TEST-ROLE" );
+        PlexusComponentListResourceResponse result = runGetForRole( "TEST_ROLE" );
 
         Assert.assertTrue( result.getData().size() == 1 );
 
@@ -114,7 +114,7 @@ public class ComponentPlexusResourceTest
     public void testNullDescriptionAndHint()
         throws Exception
     {
-        PlexusComponentListResourceResponse result = runGetForRole( "TEST-null" );
+        PlexusComponentListResourceResponse result = runGetForRole( "TEST_NULL" );
 
         Assert.assertTrue( result.getData().size() == 1 );
 
@@ -127,7 +127,7 @@ public class ComponentPlexusResourceTest
     public void testEmptyDescriptionAndHint()
         throws Exception
     {
-        PlexusComponentListResourceResponse result = runGetForRole( "TEST-empty" );
+        PlexusComponentListResourceResponse result = runGetForRole( "TEST_EMPTY" );
 
         Assert.assertTrue( result.getData().size() == 1 );
 

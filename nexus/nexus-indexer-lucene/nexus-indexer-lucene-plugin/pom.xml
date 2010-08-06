@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -10,8 +11,7 @@
 
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus Indexer Lucene (Nexus Plugin)</name>
-  <description>Nexus Indexer Lucene UI and security contributions</description>
+  <name>Nexus : Indexer Lucene : Plugin</name>
 
   <developers>
     <developer>
@@ -41,20 +41,16 @@
       <scope>provided</scope>
     </dependency>
 
+    <!-- We use oldie Plexus annos, so this is a must -->
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-component-annotations</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <version>1.5.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
 

@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>16</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -12,7 +13,7 @@
   <artifactId>nexus-indexer</artifactId>
   <version>3.0.4-SNAPSHOT</version>
 
-  <name>Sonatype Nexus: Indexer</name>
+  <name>Sonatype Nexus Indexer</name>
 
   <licenses>
     <license>
@@ -20,7 +21,7 @@
       <url>http://www.eclipse.org/org/documents/epl-v10.html</url>
     </license>
   </licenses>
-  
+
   <scm>
     <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-indexer</connection>
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-indexer</developerConnection>
@@ -28,49 +29,35 @@
   </scm>
 
   <properties>
-    <maven.version>2.2.1</maven.version>
     <archetype.version>2.0-alpha-4</archetype.version>
     <wagon.version>1.0-beta-6</wagon.version>
   </properties>
-
-  <!-- override the snapshot included in Maven -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.xbean</groupId>
-        <artifactId>xbean-reflect</artifactId>
-        <version>3.4</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-indexer-artifact</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
-      <version>1.0.2</version>
     </dependency>
+
     <!-- Maven -->
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact</artifactId>
-      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-artifact-manager</artifactId>
-      <version>${maven.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
-      <version>${maven.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-provider-api</artifactId>
@@ -82,6 +69,10 @@
       <artifactId>archetype-common</artifactId>
       <version>${archetype.version}</version>
       <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
         <exclusion>
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-core</artifactId>
@@ -103,22 +94,21 @@
 
     <!-- Plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-cli</artifactId>
       <version>1.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+
     <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
@@ -178,7 +168,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>1.2</version>
+        <version>1.3.3</version>
         <executions>
           <execution>
             <id>jdk15</id>
@@ -206,12 +196,13 @@
                   <include>org.apache.maven:maven-artifact</include>
                   <include>org.apache.maven:maven-model</include>
                   <include>org.apache.maven:maven-plugin-api</include>
-                  <include>org.apache.xbean:xbean-reflect</include>
-                  <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
-                  <include>org.codehaus.plexus:plexus-container-default</include>
+                  <include>org.sonatype.spice:spice-inject-plexus</include>
+                  <include>org.codehaus.plexus:plexus-component-annotations</include>
+                  <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-utils</include>
-                  <include>com.google.code.google-collections:google-collect</include>
+                  <include>org.sonatype.spice:spice-inject-bean</include>
+                  <include>org.sonatype.spice.inject:guice-patches:jar:noaop</include>
                 </includes>
               </artifactSet>
             </configuration>
@@ -232,9 +223,7 @@
           <includes>
             <include>**/*.java</include>
           </includes>
-          <!-- this is important for muti-module project
-          <aggregate>true</aggregate>
-          -->
+          <!-- this is important for muti-module project <aggregate>true</aggregate> -->
         </configuration>
       </plugin>
 

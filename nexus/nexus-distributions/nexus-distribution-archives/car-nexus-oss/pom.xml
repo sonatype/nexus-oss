@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -13,7 +14,7 @@
   <artifactId>car-nexus-oss</artifactId>
   <packaging>pom</packaging>
 
-  <name>Nexus (CAR :: Nexus OSS)</name>
+  <name>Nexus : Distros : Distribution Archives : Core CAR</name>
 
   <build>
     <plugins>
@@ -24,6 +25,6 @@
         <artifactId>maven-resources-plugin</artifactId>
       </plugin>
     </plugins>
-  </build>   
+  </build>
 
 </project>

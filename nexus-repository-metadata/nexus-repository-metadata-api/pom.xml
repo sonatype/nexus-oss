@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -9,7 +10,7 @@
 
   <artifactId>nexus-repository-metadata-api</artifactId>
 
-  <name>Sonatype Nexus: Nexus Repository Metadata API</name>
+  <name>Sonatype Nexus Repository Metadata : API</name>
 
   <dependencies>
     <dependency>
@@ -19,12 +20,8 @@
 
     <!-- Plexus -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
 
     <!-- Optional simple client -->
@@ -71,49 +68,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <id>jdk15</id>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>cli</shadedClassifierName>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>org.sonatype.nexus.index.cli.NexusIndexerCli</mainClass>
-                </transformer>
-              </transformers>
-              <artifactSet>
-                <includes>
-                  <include>aspectj:aspectjrt</include>
-                  <include>commons-cli:commons-cli</include>
-                  <include>org.apache.lucene:lucene-core</include>
-                  <include>org.apache.maven.artifact:maven-artifact</include>
-                  <include>org.apache.maven:maven-model</include>
-                  <include>org.apache.maven:maven-plugin-api</include>
-                  <include>org.apache.xbean:xbean-reflect</include>
-                  <include>org.codehaus.plexus:plexus-classworlds</include>
-                  <include>org.codehaus.plexus:plexus-cli</include>
-                  <include>org.codehaus.plexus:plexus-container-default</include>
-                  <include>org.codehaus.plexus:plexus-utils</include>
-                  <include>com.google.code.google-collections:google-collect</include>
-                </includes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>com.google.code.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
         <version>1.4.0</version>
@@ -122,9 +76,7 @@
           <includes>
             <include>**/*.java</include>
           </includes>
-          <!-- this is important for muti-module project
-          <aggregate>true</aggregate>
-          -->
+          <!-- this is important for muti-module project <aggregate>true</aggregate> -->
         </configuration>
       </plugin>
     </plugins>

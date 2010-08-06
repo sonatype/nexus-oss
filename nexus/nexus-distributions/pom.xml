@@ -9,7 +9,7 @@
 
   <artifactId>nexus-distributions</artifactId>
   <packaging>pom</packaging>
-  <name>Nexus Repository Distributions</name>
+  <name>Nexus : Distros</name>
 
   <modules>
     <module>nexus-distribution-archives</module>

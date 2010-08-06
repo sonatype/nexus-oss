@@ -6,6 +6,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
+import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -33,11 +34,13 @@ import com.thoughtworks.xstream.XStream;
 @Path( RemoteBrowserResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 @Consumes( { "application/xml", "application/json" } )
+@Component( role = PlexusResource.class, hint = "org.sonatype.nexus.plugins.rrb.RemoteBrowserResource" )
 public class RemoteBrowserResource
     extends AbstractResourceStoreContentPlexusResource
     implements PlexusResource
 {
-    public static final String RESOURCE_URI = "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY + "}/remotebrowser"; 
+    public static final String RESOURCE_URI = "/repositories/{" + AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY
+        + "}/remotebrowser";
 
     private final Logger logger = LoggerFactory.getLogger( RemoteBrowserResource.class );
 
@@ -105,24 +108,24 @@ public class RemoteBrowserResource
         }
         MavenRepositoryReader mr = new MavenRepositoryReader();
         MavenRepositoryReaderResponse data = new MavenRepositoryReaderResponse();
-        data.setData( mr.extract( remoteUrl + prefix, createRemoteResourceReference( request, id, remoteUrl ).toString( false, false ),
-                                  proxyRepository, id ) );
+        data.setData( mr.extract( remoteUrl + prefix,
+            createRemoteResourceReference( request, id, remoteUrl ).toString( false, false ), proxyRepository, id ) );
         logger.debug( "return value is {}", data.toString() );
         return data;
     }
-    
+
     protected Reference createRemoteResourceReference( Request request, String repoId, String remoteUrl )
     {
         Reference repoRootRef = createRepositoryReference( request, repoId );
-        
+
         return createReference( repoRootRef, "remotebrowser/" + remoteUrl );
     }
 
     // TODO: if/when xxx is implemented the renderItem method might look something like:
-    //    
+    //
     // @Inject
     // private NexusItemAuthorizer authorizer;
-    //    
+    //
     // @Override
     // protected Object renderItem( Context context, Request request, Response response, Variant variant,
     // StorageItem storageItem )
@@ -134,7 +137,7 @@ public class RemoteBrowserResource
     // StorageException,
     // ResourceException
     // {
-    //    
+    //
     // // I think this is triggered automaticly when you try to get the stream from a fileStorageItem,
     // //but we are not going to call that method. so do the check programaticly
     // if ( !authorizer.authorizePath(
@@ -147,14 +150,14 @@ public class RemoteBrowserResource
     // storageItem.getResourceStoreRequest(),
     // "No access to file!" );
     // }
-    //        
+    //
     // // you should be able to get the path from storageItem.getRemoteUrl()
     // // NOTE: we should not use any of the stream methods on the FileStorageItem as that
     // // would cache the remote file( and we are after the directory listings
     // // so I am not even sure how that would work out)
-    //        
+    //
     // // now you have the remote url so you could feed that into the same thing you are using now
-    //        
+    //
     // }
 
     @Override
@@ -162,7 +165,6 @@ public class RemoteBrowserResource
         throws NoSuchResourceStoreException, ResourceException
     {
         return getUnprotectedRepositoryRegistry().getRepository(
-                                                                 request.getAttributes().get(
-                                                                                              AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
+            request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString() );
     }
 }

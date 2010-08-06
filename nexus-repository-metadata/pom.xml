@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>15</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -13,7 +14,7 @@
   <version>1.0.3-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>Sonatype Nexus: Nexus Repository Metadata</name>
+  <name>Sonatype Nexus Repository Metadata</name>
 
   <licenses>
     <license>
@@ -70,14 +71,12 @@
             <includes>
               <include>**/*.java</include>
             </includes>
-            <!-- this is important for muti-module project
-          <aggregate>true</aggregate>
-          -->
+            <!-- this is important for muti-module project <aggregate>true</aggregate> -->
           </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
-    
+
     <plugins>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>

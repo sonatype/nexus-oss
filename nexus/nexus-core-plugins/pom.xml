@@ -22,7 +22,7 @@
   <groupId>org.sonatype.nexus.plugins</groupId>
   <artifactId>nexus-core-plugins</artifactId>
   <packaging>pom</packaging>
-  <name>Nexus Core Plugins Aggregator</name>
+  <name>Nexus : Core Plugins</name>
 
   <modules>
     <module>nexus-lvo-plugin</module>
@@ -30,7 +30,8 @@
     <module>nexus-ldap-plugin-parent</module>
     <module>nexus-rrb-plugin</module>
     <module>nexus-core-documentation-plugin</module>
-    <module>nexus-groovy-console-plugin</module>
+    <!-- OOMs and other problems with this one
+    <module>nexus-groovy-console-plugin</module>-->
   </modules>
 
 </project>
