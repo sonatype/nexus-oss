@@ -24,9 +24,9 @@ public class NXCM2124CheckConsoleDocumentationIT
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
         Assert.assertThat( getPluginsNames( pluginInfos ),
-            IsCollectionContaining.hasItem( "Nexus Plugin Console Plugin" ) );
+            IsCollectionContaining.hasItem( "Nexus : Core Plugins : Plugin Console Plugin" ) );
 
-        PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus Plugin Console Plugin" );
+        PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console Plugin" );
         Assert.assertNotNull( pluginConsolePlugin.getDocumentation() );
         Assert.assertFalse( pluginConsolePlugin.getDocumentation().isEmpty() );
 
