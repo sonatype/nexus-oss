@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.rest.schedules;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -64,8 +66,8 @@ public class ScheduledServiceTypePlexusResource
     }
 
     /**
-     * Get the list of scheduled service types available in nexus.  And all of the configuration parameters available
-     * for each type.
+     * Get the list of scheduled service types available in nexus. And all of the configuration parameters available for
+     * each type.
      */
     @Override
     @GET
@@ -102,7 +104,20 @@ public class ScheduledServiceTypePlexusResource
             }
         }
 
+        sortTaskType( result.getData() );
+
         return result;
+    }
+
+    private void sortTaskType( List<ScheduledServiceTypeResource> types )
+    {
+        Collections.sort( types, new Comparator<ScheduledServiceTypeResource>()
+        {
+            public int compare( ScheduledServiceTypeResource t1, ScheduledServiceTypeResource t2 )
+            {
+                return ( t1.getName() ).compareTo( t2.getName() );
+            }
+        } );
     }
 
 }
