@@ -14,7 +14,6 @@
 package org.sonatype.nexus.integrationtests.nexus3670;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
 import junit.framework.Assert;
@@ -34,13 +33,21 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 public class Nexus3670IndexTreeViewIT
     extends AbstractNexusIntegrationTest
 {
+    @Override
+    protected void runOnce()
+        throws Exception
+    {
+        super.runOnce();
+
+        // just making sure all tasks are finished
+        TaskScheduleUtil.waitForAllTasksToStop();
+    }
+
     @Test
     public void verifyAllGood()
         throws Exception
     {
         // this is just a "preflight", that all is there what we want, not a real test
-
-        TaskScheduleUtil.waitForAllTasksToStop();
 
         // groupId
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "nexus3670" );
