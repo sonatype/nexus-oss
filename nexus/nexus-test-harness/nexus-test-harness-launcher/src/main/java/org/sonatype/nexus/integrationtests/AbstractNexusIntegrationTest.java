@@ -25,6 +25,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -548,6 +549,9 @@ public abstract class AbstractNexusIntegrationTest
             // and then deploy the artifact, sounds like fun, right!
 
             File[] projectFolders = projectsDir.listFiles( MavenProjectFileFilter.INSTANCE );
+
+            // to achieve same ordering on different OSes
+            Arrays.sort( projectFolders );
 
             for ( int ii = 0; ii < projectFolders.length; ii++ )
             {
