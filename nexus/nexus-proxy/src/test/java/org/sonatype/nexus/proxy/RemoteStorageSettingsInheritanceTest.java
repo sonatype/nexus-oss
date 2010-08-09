@@ -103,6 +103,13 @@ public class RemoteStorageSettingsInheritanceTest
         throws Exception
     {
         long rscChangeTs = aProxyRepository.getRemoteStorageContext().getLastChanged();
+        try
+        {
+            Thread.sleep( 2 );
+        }
+        catch ( InterruptedException ignore )
+        {
+        }
 
         RemoteProxySettings proxy = aProxyRepository.getRemoteProxySettings();
 
@@ -126,6 +133,13 @@ public class RemoteStorageSettingsInheritanceTest
         throws Exception
     {
         long rscChangeTs = aProxyRepository.getRemoteStorageContext().getLastChanged();
+        try
+        {
+            Thread.sleep( 2 );
+        }
+        catch ( InterruptedException ignore )
+        {
+        }
 
         // and the problem now
         // change the global proxy
