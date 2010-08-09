@@ -239,12 +239,12 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         {
           return record.get('version');
         }
-        
+
         var latest = record.get('latestRelease');
-        
-        if ( !latest )
+
+        if (!latest)
         {
-        	latest = record.get('latestSnapshot');
+          latest = record.get('latestSnapshot');
         }
 
         return 'Latest: ' + latest + ' <a href="#nexus-search;gav~' + record.get('groupId') + '~' + record.get('artifactId')
@@ -255,10 +255,10 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         if (store.reader.jsonData.collapsed)
         {
           var repoToUse = record.get('latestReleaseRepositoryId');
-          
-          if ( !repoToUse )
+
+          if (!repoToUse)
           {
-          	repoToUse = record.get('latestSnapshotRepositoryId');
+            repoToUse = record.get('latestSnapshotRepositoryId');
           }
 
           for (var i = 0; i < record.data.artifactHits.length; i++)
@@ -278,7 +278,26 @@ Ext.extend(Sonatype.repoServer.SearchResultGrid, Ext.grid.GridPanel, {
         {
           var cls = record.data.artifactHits[hitIndex].artifactLinks[i].classifier;
           var ext = record.data.artifactHits[hitIndex].artifactLinks[i].extension;
-          var link = record.data.artifactHits[hitIndex].artifactLinks[i].artifactLink;
+          var rep = record.data.artifactHits[hitIndex].repositoryId;
+          var grp = record.data.groupId;
+          var art = record.data.artifactId;
+          var ver = record.data.version;
+
+          if (store.reader.jsonData.collapsed)
+          {
+            ver = record.data.latestRelease;
+            if (Ext.isEmpty(ver))
+            {
+              ver = record.data.latestSnapshot;
+            }
+          }
+
+          var link = Sonatype.config.repos.urls.redirect + '?r=' + rep + '&g=' + grp + '&a=' + art + '&v=' + ver + '&e=' + ext;
+
+          if (!Ext.isEmpty(cls))
+          {
+            link += '&c=' + cls;
+          }
 
           var icon = null;
           // if (ext == 'pom' && !cls)
