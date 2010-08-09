@@ -51,7 +51,7 @@ public final class NexusTypeVisitor
     // Implementation fields
     // ----------------------------------------------------------------------
 
-    private final CustomNamedAnnotationVisitor customNamedVisitor = new CustomNamedAnnotationVisitor();
+    private final NamedHintAnnotationVisitor namedHintVisitor = new NamedHintAnnotationVisitor();
 
     private final NexusTypeCache nexusTypeCache = new NexusTypeCache();
 
@@ -107,11 +107,8 @@ public final class NexusTypeVisitor
     @Override
     public AnnotationVisitor visitAnnotation( final String desc, final boolean visible )
     {
-        if ( nexusType.isComponent() && NAMED_DESC.equals( desc ) )
-        {
-            return customNamedVisitor;
-        }
-        return plexusTypeVisitor.visitAnnotation( desc, visible );
+        final AnnotationVisitor annotationVisitor = plexusTypeVisitor.visitAnnotation( desc, visible );
+        return nexusType.isComponent() && NAMED_DESC.equals( desc ) ? namedHintVisitor : annotationVisitor;
     }
 
     @Override
@@ -153,14 +150,14 @@ public final class NexusTypeVisitor
 
     AnnotationVisitor getComponentVisitor()
     {
-        return visitAnnotation( COMPONENT_DESC, true );
+        return plexusTypeVisitor.visitAnnotation( COMPONENT_DESC, true );
     }
 
     // ----------------------------------------------------------------------
     // Named annotation scanner
     // ----------------------------------------------------------------------
 
-    final class CustomNamedAnnotationVisitor
+    final class NamedHintAnnotationVisitor
         extends EmptyAnnotationVisitor
     {
         @Override
