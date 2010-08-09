@@ -127,7 +127,13 @@ public class Nexus421PlainNotificationIT
         // should be about "unblocked"
         // wait for long, since we really _dont_ know when the mail gonna be sent:
         // See "fibonacci" calculation above!
-        server.waitForIncomingEmail( 440000, expectedBlockedMails + expectedUnblockedMails );
+        for ( int retryCount = 0; retryCount < 30; retryCount++ )
+        {
+            if ( server.waitForIncomingEmail( 15000, expectedBlockedMails + expectedUnblockedMails ) )
+            {
+                break;
+            }
+        }
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
