@@ -645,6 +645,7 @@ public class SearchNGIndexPlexusResource
 
         link.setClassifier( classifier );
 
+        /* REMOVED BLOATED CONTENT FROM DTO
         // creating _redirect_ links to storage
         String suffix =
             "?r=" + repositoryId + "&g=" + groupId + "&a=" + artifactId + "&v=" + version + "&e=" + extension;
@@ -655,7 +656,7 @@ public class SearchNGIndexPlexusResource
         }
 
         link.setArtifactLink( createRedirectBaseRef( request ).toString() + suffix );
-
+        */
         return link;
     }
 
