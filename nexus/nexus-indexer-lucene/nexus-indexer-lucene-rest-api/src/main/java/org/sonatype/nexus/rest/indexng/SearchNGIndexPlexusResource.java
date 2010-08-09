@@ -57,6 +57,7 @@ import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusNGArtifact;
 import org.sonatype.nexus.rest.model.NexusNGArtifactHit;
 import org.sonatype.nexus.rest.model.NexusNGArtifactLink;
+import org.sonatype.nexus.rest.model.NexusNGRepositoryDetail;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
@@ -451,6 +452,8 @@ public class SearchNGIndexPlexusResource
                 }
 
                 Repository repository = getUnprotectedRepositoryRegistry().getRepository( ai.repository );
+                
+                addRepositoryDetails( request, response, repository );
 
                 NexusNGArtifactHit hit = null;
 
@@ -469,21 +472,6 @@ public class SearchNGIndexPlexusResource
                     hit = new NexusNGArtifactHit();
 
                     hit.setRepositoryId( repository.getId() );
-
-                    hit.setRepositoryName( repository.getName() );
-
-                    hit.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
-
-                    hit.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
-
-                    hit.setRepositoryKind( extractRepositoryKind( repository ) );
-
-                    MavenRepository mavenRepo = repository.adaptToFacet( MavenRepository.class );
-
-                    if ( mavenRepo != null )
-                    {
-                        hit.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
-                    }
 
                     // if collapsed, we add links in 2nd pass, otherwise here
                     if ( !collapsed )
@@ -631,6 +619,44 @@ public class SearchNGIndexPlexusResource
             }
 
             response.setData( new ArrayList<NexusNGArtifact>( hits.values() ) );
+        }
+    }
+    
+    protected void addRepositoryDetails( Request request, SearchNGResponse response, Repository repository )
+    {
+        boolean add = true;
+        
+        for ( NexusNGRepositoryDetail repoDetail : response.getRepoDetails() )
+        {
+            if ( repoDetail.getRepositoryId().equals( repository.getId() ) )
+            {
+                add = false;
+                break;
+            }
+        }
+        
+        if ( add )
+        {
+            NexusNGRepositoryDetail repoDetail = new NexusNGRepositoryDetail();
+            
+            repoDetail.setRepositoryId( repository.getId() );
+
+            repoDetail.setRepositoryName( repository.getName() );
+
+            repoDetail.setRepositoryURL( createRepositoryReference( request, repository.getId() ).getTargetRef().toString() );
+
+            repoDetail.setRepositoryContentClass( repository.getRepositoryContentClass().getId() );
+
+            repoDetail.setRepositoryKind( extractRepositoryKind( repository ) );
+
+            MavenRepository mavenRepo = repository.adaptToFacet( MavenRepository.class );
+
+            if ( mavenRepo != null )
+            {
+                repoDetail.setRepositoryPolicy( mavenRepo.getRepositoryPolicy().name() );
+            }
+            
+            response.addRepoDetail( repoDetail );
         }
     }
 

@@ -139,20 +139,36 @@ Ext.extend(Sonatype.repoServer.SearchPanel, Ext.Panel, {
             }
           }
 
+          var getRepoDetails = function(repoId, repoList) {
+            for (var i = 0; i < repoList.length; i++)
+            {
+              if (repoList[i].repositoryId == repoId)
+              {
+                return repoList[i];
+              }
+            }
+            
+            return null;
+          };
+
+          var repoDetails = getRepoDetails( rec.data.artifactHits[hitIndex].repositoryId, rec.store.reader.jsonData.repoDetails);
+
           var payload = {
             data : {
               showCtx : true,
-              id : rec.data.artifactHits[hitIndex].repositoryId,
-              name : rec.data.artifactHits[hitIndex].repositoryName,
-              resourceURI : rec.data.artifactHits[hitIndex].repositoryURL,
-              format : rec.data.artifactHits[hitIndex].repositoryContentClass,
-              repoType : rec.data.artifactHits[hitIndex].repositoryKind,
+              id : repoDetails.repositoryId,
+              name : repoDetails.repositoryName,
+              resourceURI : repoDetails.repositoryURL,
+              format : repoDetails.repositoryContentClass,
+              repoType : repoDetails.repositoryKind,
               hitIndex : hitIndex,
               useHints : true,
               expandPath : true,
               hits : rec.data.artifactHits,
               rec : rec,
-              isSnapshot : rec.data.artifactHits[hitIndex].repositoryPolicy == 'SNAPSHOT'
+              isSnapshot : repoDetails.repositoryPolicy == 'SNAPSHOT',
+              repoList : rec.store.reader.jsonData.repoDetails,
+              getRepoDetails : getRepoDetails
             }
           };
 

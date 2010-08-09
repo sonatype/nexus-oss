@@ -431,6 +431,20 @@
           <description>Flag that states if result set is collapsed, and shows latest versions only.</description>
         </field>
         <field>
+          <name>repoDetails</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>NexusNGRepositoryDetail</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+          <description>List of repositories artifacts found in.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositoryDetails" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "repositoryDetail" )</annotation>
+          </annotations>
+        </field>
+        <field>
           <name>data</name>
           <version>1.0.0+</version>
           <association>
@@ -529,13 +543,13 @@
         </field>
       </fields>
     </class>
-
+    
     <class>
-      <name>NexusNGArtifactHit</name>
+      <name>NexusNGRepositoryDetail</name>
       <version>1.0.0+</version>
-      <description>Artifact hit details sent back on search requests.</description>
+      <description>Artifact repository details sent back on search requests.</description>
       <annotations>
-        <annotation>@javax.xml.bind.annotation.XmlType( name = "artifactHit" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "repositoryDetail" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
         </annotation>
       </annotations>
@@ -581,6 +595,26 @@
           <type>String</type>
           <required>true</required>
           <description>The repository base URL.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>NexusNGArtifactHit</name>
+      <version>1.0.0+</version>
+      <description>Artifact hit details sent back on search requests.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "artifactHit" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)
+        </annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>repositoryId</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
+          <description>The repository ID.</description>
         </field>
         <field>
           <name>artifactLinks</name>

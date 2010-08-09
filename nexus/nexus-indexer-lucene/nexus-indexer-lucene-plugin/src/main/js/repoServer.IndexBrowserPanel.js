@@ -49,19 +49,23 @@ Sonatype.Events.addListener('indexBrowserToolbarInit', function(treepanel, toolb
                     {
                       if (record.data.id == treepanel.payload.data.hits[i].repositoryId)
                       {
+                        var repoDetails = treepanel.payload.data.getRepoDetails(record.data.id, treepanel.payload.data.repoList);
                         treepanel.updatePayload({
                               data : {
-                                id : treepanel.payload.data.hits[i].repositoryId,
-                                name : treepanel.payload.data.hits[i].repositoryName,
-                                resourceURI : treepanel.payload.data.hits[i].repositoryURL,
-                                format : treepanel.payload.data.hits[i].repositoryContentClass,
-                                repoType : treepanel.payload.data.hits[i].repositoryKind,
-                                expandPath : treepanel.payload.data.expandPath,
                                 showCtx : treepanel.payload.data.showCtx,
+                                id : repoDetails.repositoryId,
+                                name : repoDetails.repositoryName,
+                                resourceURI : repoDetails.repositoryURL,
+                                format : repoDetails.repositoryContentClass,
+                                repoType : repoDetails.repositoryKind,
+                                hitIndex : treepanel.payload.data.hitIndex,
                                 useHints : treepanel.payload.data.useHints,
+                                expandPath : treepanel.payload.data.expandPath,
                                 hits : treepanel.payload.data.hits,
                                 rec : treepanel.payload.data.rec,
-                                hitIndex : treepanel.payload.data.hitIndex
+                                isSnapshot : repoDetails.repositoryPolicy == 'SNAPSHOT',
+                                repoList : treepanel.payload.data.repoList,
+                                getRepoDetails : treepanel.payload.data.getRepoDetails
                               }
                             }, true);
                       }
@@ -183,7 +187,8 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
           {
             for (var i = 0; i < this.payload.data.hits.length; i++)
             {
-              if ((this.payload.data.isSnapshot && this.payload.data.hits[i].repositoryPolicy == 'SNAPSHOT') || (!this.payload.data.isSnapshot && this.payload.data.hits[i].repositoryPolicy == 'RELEASE'))
+              var repoDetails = this.payload.data.getRepoDetails(this.payload.data.hits[i].repositoryId, this.payload.data.repoList);
+              if ((this.payload.data.isSnapshot && repoDetails.repositoryPolicy == 'SNAPSHOT') || (!this.payload.data.isSnapshot && repoDetails.repositoryPolicy == 'RELEASE'))
               {
                 var record = new Ext.data.Record.create({
                       name : 'id'
@@ -192,8 +197,8 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
                     });
 
                 store.add(new record({
-                      id : this.payload.data.hits[i].repositoryId,
-                      name : this.payload.data.hits[i].repositoryName
+                      id : repoDetails.repositoryId,
+                      name : repoDetails.repositoryName
                     }));
               }
             }
