@@ -283,7 +283,7 @@ public class SearchNGIndexPlexusResource
                 runCount++;
 
                 getLogger().info(
-                    "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
+                    "NexusIndexer issue (NEXUS-3702), we got AlreadyClosedException that happens when Reindexing or other \"indexer intensive\" task is running on instance while searching! Redoing search again." );
 
                 if ( getLogger().isDebugEnabled() )
                 {
@@ -308,8 +308,9 @@ public class SearchNGIndexPlexusResource
             }
 
             getLogger().info(
-                "Nexus BUG: Was unable to perform search " + RETRIES
-                    + " times, giving up, and lying about TooManyResults." );
+                "Nexus issue (NEXUS-3702): Was unable to perform search "
+                    + RETRIES
+                    + " times, giving up, and lying about TooManyResults. Please retry to reproduce this with DEBUG logs and report this issue!" );
         }
 
         return result;
