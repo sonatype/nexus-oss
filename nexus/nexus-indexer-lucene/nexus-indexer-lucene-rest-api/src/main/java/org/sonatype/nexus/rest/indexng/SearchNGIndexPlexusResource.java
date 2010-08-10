@@ -45,6 +45,7 @@ import org.sonatype.nexus.index.MavenCoordinatesSearcher;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.index.Searcher;
 import org.sonatype.nexus.index.UniqueArtifactFilterPostprocessor;
+import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
@@ -73,14 +74,17 @@ public class SearchNGIndexPlexusResource
      * max. Note: this does not correspond to ArtifactInfo count! This is GA count that may be backed by a zillion
      * ArtifactInfos! Before (old resource) this was 200.
      */
-    private static final int GA_HIT_LIMIT = 200;
+    private static final int GA_HIT_LIMIT = 100;
 
     /**
-     * Hard upper limit of the ArtifactInfo count to process. In short, how many ArtifactInfos (lucene Documents) should
-     * be processed max for building up the response. Note: this does not respond to GA count! We can have 100 different
-     * versions of same GA! Before (old resource) this was 200.
+     * The threshold of change size in relevance, from where we may "cut" the results.
      */
-    private static final int DOCUMENTS_HIT_LIMIT = 600;
+    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = 0.35f;
+
+    /**
+     * The treshold of change from the very 1st hit. from where we may "cut" the results.
+     */
+    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = 0.7f;
 
     /**
      * The treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).
@@ -230,13 +234,27 @@ public class SearchNGIndexPlexusResource
             {
                 List<ArtifactInfoFilter> filters = new ArrayList<ArtifactInfoFilter>();
 
+                // filters.add( new ArtifactInfoFilter()
+                // {
+                // public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
+                // {
+                // System.out.println( "    " + ai.context + " : " + ai.toString() + " -- " + ai.getLuceneScore() );
+                //
+                // return true;
+                // }
+                // } );
+
                 // we need to save this reference to later
                 SystemWideLatestVersionCollector systemWideCollector = new SystemWideLatestVersionCollector();
-                RepositoryWideLatestVersionCollector repositoryWideCollector =
-                    new RepositoryWideLatestVersionCollector();
-
                 filters.add( systemWideCollector );
-                filters.add( repositoryWideCollector );
+
+                RepositoryWideLatestVersionCollector repositoryWideCollector = null;
+
+                if ( collapseResults )
+                {
+                    repositoryWideCollector = new RepositoryWideLatestVersionCollector();
+                    filters.add( repositoryWideCollector );
+                }
 
                 searchResult =
                     searchByTerms( terms, repositoryId, from, count, exact, expandVersion, collapseResults, filters );
@@ -425,9 +443,11 @@ public class SearchNGIndexPlexusResource
             // 1st pass, collect results
             LinkedHashMap<String, NexusNGArtifact> hits = new LinkedHashMap<String, NexusNGArtifact>();
 
-            int documentsHits = 0;
-
             NexusNGArtifact artifact;
+
+            float firstDocumentScore = -1f;
+
+            float lastDocumentScore = -1f;
 
             // 1sd pass, build first two level (no links), and actually consume the iterator and collectors will be set
             for ( ArtifactInfo ai : iterator )
@@ -436,12 +456,42 @@ public class SearchNGIndexPlexusResource
 
                 artifact = hits.get( key );
 
+                // System.out.println( "* " + ai.context + " : " + ai.toString() + " -- " + ai.getLuceneScore() + " -- "
+                // + ( artifact != null ? "F" : "N" ) );
+
                 if ( artifact == null )
                 {
-                    documentsHits++;
-
-                    if ( documentsHits > DOCUMENTS_HIT_LIMIT || ( hits.size() + 1 ) > GA_HIT_LIMIT )
+                    // we stop if we delivered "most important" hits (change of relevance from 1st document we got)
+                    if ( ( firstDocumentScore - ai.getLuceneScore() ) > DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD )
                     {
+                        getLogger().info(
+                            "Stopping delivering search results since we span "
+                                + DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD + " of score change." );
+
+                        break;
+                    }
+
+                    // we stop if we detect a "big drop" in relevance in relation to previous document's score
+                    if ( lastDocumentScore > 0 && hits.size() > 0 )
+                    {
+                        if ( Math.abs( ai.getLuceneScore() - lastDocumentScore ) > DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD )
+                        {
+                            getLogger().info(
+                                "Stopping delivering search results since we hit a relevance drop bigger than "
+                                    + DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD + "." );
+
+                            // the relevance change was big, so we stepped over "trash" results that are
+                            // probably not relevant at all, just stop here then
+                            break;
+                        }
+                    }
+
+                    // we stop if we hit the GA limit
+                    if ( ( hits.size() + 1 ) > GA_HIT_LIMIT )
+                    {
+                        getLogger().info(
+                            "Stopping delivering search results since we hit a GA hit limit of " + GA_HIT_LIMIT + "." );
+
                         // check for HIT_LIMIT: if we are stepping it over, stop here
                         break;
                     }
@@ -527,6 +577,13 @@ public class SearchNGIndexPlexusResource
                         hit.addArtifactLink( link );
                     }
                 }
+
+                if ( firstDocumentScore < 0 )
+                {
+                    firstDocumentScore = ai.getLuceneScore();
+                }
+
+                lastDocumentScore = ai.getLuceneScore();
             }
 
             // 2nd pass, set versions
