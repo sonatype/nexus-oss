@@ -28,9 +28,19 @@ public class IteratorSearchResponse
         return results;
     }
 
-    public Iterator<ArtifactInfo> iterator()
+    public IteratorResultSet iterator()
     {
         return getResults();
+    }
+
+    /**
+     * A helper method delegating the call to the IteratorResultSet.
+     * 
+     * @return
+     */
+    public int getTotalProcessedArtifactInfoCount()
+    {
+        return getResults().getTotalProcessedArtifactInfoCount();
     }
 
     // ==
@@ -56,12 +66,17 @@ public class IteratorSearchResponse
         {
             return this;
         }
+
+        public int getTotalProcessedArtifactInfoCount()
+        {
+            return 0;
+        }
     };
 
-    public static final IteratorSearchResponse EMPTY_ITERATOR_SEARCH_RESPONSE =
-        new IteratorSearchResponse( null, 0, EMPTY_ITERATOR_RESULT_SET );
+    public static final IteratorSearchResponse EMPTY_ITERATOR_SEARCH_RESPONSE = new IteratorSearchResponse( null, 0,
+        EMPTY_ITERATOR_RESULT_SET );
 
-    public static final IteratorSearchResponse TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE =
-        new IteratorSearchResponse( null, LIMIT_EXCEEDED, EMPTY_ITERATOR_RESULT_SET );
+    public static final IteratorSearchResponse TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE = new IteratorSearchResponse(
+        null, LIMIT_EXCEEDED, EMPTY_ITERATOR_RESULT_SET );
 
 }

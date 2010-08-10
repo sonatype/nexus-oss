@@ -56,6 +56,8 @@ public class DefaultIteratorResultSet
     private final int maxRecPointer;
 
     private int pointer;
+    
+    private int processedArtifactInfoCount;
 
     private ArtifactInfo ai;
 
@@ -79,6 +81,8 @@ public class DefaultIteratorResultSet
                 request.getCount(), HARD_HIT_COUNT_LIMIT ) );
 
         this.pointer = from;
+        
+        this.processedArtifactInfoCount = 0;
 
         this.maxRecPointer = from + count;
 
@@ -108,6 +112,23 @@ public class DefaultIteratorResultSet
         return result;
     }
 
+    public void remove()
+    {
+        throw new UnsupportedOperationException( "Method not supported on " + getClass().getName() );
+    }
+
+    public Iterator<ArtifactInfo> iterator()
+    {
+        return this;
+    }
+
+    public int getTotalProcessedArtifactInfoCount()
+    {
+        return processedArtifactInfoCount;
+    }
+
+    // ==
+    
     protected ArtifactInfo createNextAi()
         throws IOException
     {
@@ -152,6 +173,7 @@ public class DefaultIteratorResultSet
             }
 
             pointer++;
+            processedArtifactInfoCount++;
         }
 
         return result;
@@ -286,15 +308,5 @@ public class DefaultIteratorResultSet
     protected IndexingContext getIndexingContextForPointer( int docPtr )
     {
         return ( (NexusIndexSearcher) searcher.getSearchables()[searcher.subSearcher( docPtr )] ).getIndexingContext();
-    }
-
-    public void remove()
-    {
-        throw new UnsupportedOperationException( "Method not supported on " + getClass().getName() );
-    }
-
-    public Iterator<ArtifactInfo> iterator()
-    {
-        return this;
     }
 }
