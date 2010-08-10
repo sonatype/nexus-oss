@@ -440,7 +440,7 @@
           <required>true</required>
           <description>List of repositories artifacts found in.</description>
           <annotations>
-            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositoryDetails" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repoDetails" )</annotation>
             <annotation>@javax.xml.bind.annotation.XmlElement( name = "repositoryDetail" )</annotation>
           </annotations>
         </field>
