@@ -56,7 +56,7 @@ public class DefaultIteratorResultSet
     private final int maxRecPointer;
 
     private int pointer;
-    
+
     private int processedArtifactInfoCount;
 
     private ArtifactInfo ai;
@@ -81,7 +81,7 @@ public class DefaultIteratorResultSet
                 request.getCount(), HARD_HIT_COUNT_LIMIT ) );
 
         this.pointer = from;
-        
+
         this.processedArtifactInfoCount = 0;
 
         this.maxRecPointer = from + count;
@@ -128,7 +128,7 @@ public class DefaultIteratorResultSet
     }
 
     // ==
-    
+
     protected ArtifactInfo createNextAi()
         throws IOException
     {
@@ -149,6 +149,8 @@ public class DefaultIteratorResultSet
 
             if ( result != null )
             {
+                result.setLuceneScore( hits.score( pointer ) );
+
                 result.repository = context.getRepositoryId();
 
                 result.context = context.getId();

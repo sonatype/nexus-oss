@@ -143,6 +143,8 @@ public class ArtifactInfo
 
     @Deprecated
     private transient ArtifactVersion artifactVersion;
+    
+    private transient float luceneScore;
 
     public String classifier;
 
@@ -216,6 +218,16 @@ public class ArtifactInfo
             artifactVersion = new DefaultArtifactVersion( version );
         }
         return artifactVersion;
+    }
+
+    public float getLuceneScore()
+    {
+        return luceneScore;
+    }
+
+    public void setLuceneScore( float score )
+    {
+        this.luceneScore = score;
     }
 
     public String getUinfo()
