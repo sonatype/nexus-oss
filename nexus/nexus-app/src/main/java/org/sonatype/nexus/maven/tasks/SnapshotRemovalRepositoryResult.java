@@ -22,6 +22,17 @@ public class SnapshotRemovalRepositoryResult
     private int deletedFiles;
     
     private boolean isSuccessful;
+    
+    private boolean skipped;
+    
+    private int skippedCount;
+    
+    public SnapshotRemovalRepositoryResult( String repoId, boolean skipped )
+    {
+        this.repoId = repoId;
+        this.skipped = skipped;
+        this.isSuccessful = true;
+    }
 
     public SnapshotRemovalRepositoryResult( String repoId, int deletedSnapshots, int deletedFiles, boolean isSucceful )
     {
@@ -69,6 +80,23 @@ public class SnapshotRemovalRepositoryResult
         this.isSuccessful = isSuccessful;
     }
     
+    public boolean isSkipped()
+    {
+        return skipped;
+    }
     
-
+    public void setSkipped( boolean skipped )
+    {
+        this.skipped = skipped;
+    }
+    
+    public int getSkippedCount()
+    {
+        return skippedCount;
+    }
+    
+    public void setSkippedCount( int skippedCount )
+    {
+        this.skippedCount = skippedCount;
+    }
 }

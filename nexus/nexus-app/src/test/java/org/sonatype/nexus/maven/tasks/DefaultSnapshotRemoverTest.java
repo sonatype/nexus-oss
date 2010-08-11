@@ -497,6 +497,56 @@ public class DefaultSnapshotRemoverTest
 
         validateResults( snapshots, expecting );
     }
+    
+    public void testAllReposNotDoingRepoMoreThanOnce()
+        throws Exception
+    {
+        fillInRepo();
+
+        // run on the public group, which contains the snapshot repo
+        SnapshotRemovalRequest request = new SnapshotRemovalRequest( null, null, 1, 1, false );
+        SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
+
+        assertTrue( result.isSuccessful() );
+        
+        // we should have skipped once, when processing the public group
+        assertEquals( "should have found 1 instance of skipped repo", 1, result.getProcessedRepositories().get( "snapshots" ).getSkippedCount() );
+
+        HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
+        expecting.put( "/org/sonatype/nexus/nexus/1.2.2-SNAPSHOT/nexus-1.2.2-20080123.160704-197.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.2.2-SNAPSHOT/nexus-1.2.2-SNAPSHOT.pom", Boolean.TRUE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090123.160704-197.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090123.170636-198.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090202.142204-272.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom", Boolean.FALSE );
+        expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090210.090218-375.pom", Boolean.TRUE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+                       Boolean.TRUE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+                       Boolean.FALSE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+                       Boolean.FALSE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+                       Boolean.FALSE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+                       Boolean.FALSE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+                       Boolean.FALSE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+                       Boolean.TRUE );
+        expecting.put(
+                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+                       Boolean.TRUE );
+
+        validateResults( snapshots, expecting );
+    }
 
     public void testGroup()
         throws Exception

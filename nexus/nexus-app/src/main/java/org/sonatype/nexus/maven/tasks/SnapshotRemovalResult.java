@@ -38,22 +38,30 @@ public class SnapshotRemovalResult
 
     public void addResult( SnapshotRemovalRepositoryResult res )
     {
-        if ( processedRepositories.containsKey( res.getRepositoryId() ) )
+        if ( res != null )
         {
-            SnapshotRemovalRepositoryResult ex = processedRepositories.get( res.getRepositoryId() );
+            if ( processedRepositories.containsKey( res.getRepositoryId() ) )
+            {
+                SnapshotRemovalRepositoryResult ex = processedRepositories.get( res.getRepositoryId() );
 
-            ex.setDeletedFiles( ex.getDeletedFiles() + res.getDeletedFiles() );
+                ex.setDeletedFiles( ex.getDeletedFiles() + res.getDeletedFiles() );
 
-            ex.setDeletedSnapshots( ex.getDeletedSnapshots() + res.getDeletedSnapshots() );
-        }
-        else
-        {
-            processedRepositories.put( res.getRepositoryId(), res );
-        }
+                ex.setDeletedSnapshots( ex.getDeletedSnapshots() + res.getDeletedSnapshots() );
+                
+                if ( res.isSkipped() )
+                {
+                    ex.setSkippedCount( ex.getSkippedCount() + 1 );
+                }
+            }
+            else
+            {
+                processedRepositories.put( res.getRepositoryId(), res );
+            }
 
-        if ( !res.isSuccessful() )
-        {
-            isSuccessful = false;
+            if ( !res.isSuccessful() )
+            {
+                isSuccessful = false;
+            }
         }
     }
 
