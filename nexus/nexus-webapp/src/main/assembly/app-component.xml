@@ -46,9 +46,6 @@
         <include>images/**</include>
         <include>WEB-INF/*</include>
       </includes>
-      <excludes>
-        <exclude>ext-2.2/**</exclude>
-      </excludes>
     </fileSet>
 	<fileSet>
 	  <directory>target/ui-compressed/js</directory>
