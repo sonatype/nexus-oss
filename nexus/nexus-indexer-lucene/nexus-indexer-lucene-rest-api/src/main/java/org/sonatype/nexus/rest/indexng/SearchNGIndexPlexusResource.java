@@ -75,6 +75,11 @@ public class SearchNGIndexPlexusResource
      * ArtifactInfos! Before (old resource) this was 200.
      */
     private static final int GA_HIT_LIMIT = 100;
+    
+    /**
+     * will override the above GA_HIT_LIMIT if set
+     */
+    private static Integer USER_DEFINED_GA_HIT_LIMIT = Integer.getInteger( "plexus.search.ga.hit.limit" );
 
     /**
      * The threshold of change size in relevance, from where we may "cut" the results.
@@ -279,7 +284,7 @@ public class SearchNGIndexPlexusResource
                         // then repeat without collapse
                         if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
                             && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                            && searchResult.getTotalHits() < GA_HIT_LIMIT )
+                            && searchResult.getTotalHits() < getGAHitLimit() )
                         {
                             collapseResults = false;
 
@@ -487,10 +492,10 @@ public class SearchNGIndexPlexusResource
                     }
 
                     // we stop if we hit the GA limit
-                    if ( ( hits.size() + 1 ) > GA_HIT_LIMIT )
+                    if ( ( hits.size() + 1 ) > getGAHitLimit() )
                     {
                         getLogger().info(
-                            "Stopping delivering search results since we hit a GA hit limit of " + GA_HIT_LIMIT + "." );
+                            "Stopping delivering search results since we hit a GA hit limit of " + getGAHitLimit() + "." );
 
                         // check for HIT_LIMIT: if we are stepping it over, stop here
                         break;
@@ -766,5 +771,15 @@ public class SearchNGIndexPlexusResource
             // huh?
             return repository.getRepositoryKind().getMainFacet().getName();
         }
+    }
+    
+    protected int getGAHitLimit()
+    {
+        if ( USER_DEFINED_GA_HIT_LIMIT != null && USER_DEFINED_GA_HIT_LIMIT > 0 )
+        {
+            return USER_DEFINED_GA_HIT_LIMIT.intValue();
+        }
+        
+        return GA_HIT_LIMIT;
     }
 }
