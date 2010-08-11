@@ -69,6 +69,7 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
@@ -357,6 +358,10 @@ public abstract class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
+	    //this prevents locking issues on windows!!!!
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+        TaskScheduleUtil.waitForAllTasksToStop();
+
         // turn off security, of the current IT with security on won't affect the next IT
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 
