@@ -22,7 +22,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
-import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.Context;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
@@ -107,14 +106,14 @@ public class UserResetPlexusResource
         {
             getLogger().debug( "Invalid userid: " + userId, e );
 
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "User ID not found!" );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "User ID not found!", e );
         }
         catch ( InvalidConfigurationException e )
         {
             // this should never happen
             getLogger().warn( "Failed to set password!", e );
 
-            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to set password!." );
+            throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Failed to set password!.", e );
         }
     }
 
