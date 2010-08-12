@@ -627,7 +627,7 @@ public class SearchNGIndexPlexusResource
                 "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery().toString() + "\") matched total of "
                     + iterator.getTotalHits() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
                     + " records were processed out of those, resulting in " + hits.size()
-                    + " unqiue GA records. Lucene scored documents first=" + firstDocumentScore + ", last="
+                    + " unique GA records. Lucene scored documents first=" + firstDocumentScore + ", last="
                     + lastDocumentScore + ". Main processing loop took "
                     + ( System.currentTimeMillis() - startedAtMillis ) + " ms." );
 
