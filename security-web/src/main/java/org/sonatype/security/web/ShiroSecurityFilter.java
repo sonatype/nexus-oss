@@ -71,7 +71,7 @@ public class ShiroSecurityFilter
 
         // start up security
         this.getSecuritySystem().start();
-        this.securityManager = (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class );
+        this.securityManager = (WebSecurityManager) this.getPlexusContainer().lookup( RealmSecurityManager.class, "web" );
 
         // call super
         super.configure();

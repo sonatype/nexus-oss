@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,7 +96,8 @@ public class DefaultSecuritySystem
     private Logger logger;
 
     @Inject
-    @Nullable
+    private List<SecurityEmailer> securityEmailers;
+
     private SecurityEmailer securityEmailer;
 
     private static final String ALL_ROLES_KEY = "all";
@@ -781,8 +783,16 @@ public class DefaultSecuritySystem
     {
         if ( this.securityEmailer == null )
         {
-            this.logger.error( "Failed to find a SecurityEmailer" );
-            this.securityEmailer = new NullSecurityEmailer();
+            Iterator<SecurityEmailer> i = this.securityEmailers.iterator();
+            if ( i.hasNext() )
+            {
+                this.securityEmailer = i.next();
+            }
+            else
+            {
+                this.logger.error( "Failed to find a SecurityEmailer" );
+                this.securityEmailer = new NullSecurityEmailer();
+            }
         }
         return this.securityEmailer;
     }
