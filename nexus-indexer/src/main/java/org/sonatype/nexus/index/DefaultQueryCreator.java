@@ -223,7 +223,11 @@ public class DefaultQueryCreator
                     Term t = new Term( indexerField.getKey(), query );
 
                     bq.add( new TermQuery( t ), Occur.SHOULD );
-                    bq.add( new PrefixQuery( t ), Occur.SHOULD );
+                    
+                    PrefixQuery pq = new PrefixQuery( t );
+                    pq.setBoost( 0.8f );
+                    
+                    bq.add( pq , Occur.SHOULD );
 
                     return bq;
                 }
@@ -235,8 +239,6 @@ public class DefaultQueryCreator
 
                 // tokenization should happen against the field!
                 QueryParser qp = new QueryParser( indexerField.getKey(), new NexusAnalyzer() );
-
-                Query q1 = null;
 
                 // small cheap trick
                 // if a query is not "expert" (does not contain field:val kind of expression)
@@ -259,15 +261,28 @@ public class DefaultQueryCreator
 
                 try
                 {
-                    q1 = qp.parse( qpQuery );
+                    // qpQuery = "\"" + qpQuery + "\"";
+
+                    BooleanQuery q1 = new BooleanQuery();
+
+                    q1.add( qp.parse( qpQuery ), Occur.SHOULD );
+                    
+                    if ( qpQuery.contains( " " ) )
+                    {
+                        q1.add( qp.parse( "\"" + qpQuery + "\"" ), Occur.SHOULD );
+                    }
 
                     Query q2 = null;
 
-                    IndexerField keywordField = selectIndexerField( indexerField.getOntology(), SearchType.EXACT );
-
-                    if ( keywordField.isKeyword() )
+                    // try with KW only if the processed query in qpQuery does not have spaces!
+                    if ( !query.contains( " " ) )
                     {
-                        q2 = constructQuery( indexerField.getOntology(), keywordField, query, type );
+                        IndexerField keywordField = selectIndexerField( indexerField.getOntology(), SearchType.EXACT );
+
+                        if ( keywordField.isKeyword() )
+                        {
+                            q2 = constructQuery( indexerField.getOntology(), keywordField, query, type );
+                        }
                     }
 
                     if ( q2 == null )

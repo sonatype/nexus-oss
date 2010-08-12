@@ -16,11 +16,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.MultiReader;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.ParallelMultiSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Searchable;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.codehaus.plexus.component.annotations.Component;
@@ -292,26 +292,37 @@ public class DefaultSearchEngine
             request.setCount( IteratorSearchRequest.UNDEFINED );
         }
 
-        ArrayList<IndexSearcher> contextsToSearch = new ArrayList<IndexSearcher>( indexingContexts.size() );
+        // to not change the API all away, but we need stable ordering here
+        // filter for those 1st, that take part in here
+        ArrayList<IndexingContext> contexts = new ArrayList<IndexingContext>( indexingContexts.size() );
 
         for ( IndexingContext ctx : indexingContexts )
         {
             if ( ignoreContext || ctx.isSearchable() )
             {
-                contextsToSearch.add( ctx.getReadOnlyIndexSearcher() );
+                contexts.add( ctx );
             }
         }
 
-        ParallelMultiSearcher multiSearcher =
-            new ParallelMultiSearcher( contextsToSearch.toArray( new Searchable[contextsToSearch.size()] ) );
+        ArrayList<IndexReader> contextsToSearch = new ArrayList<IndexReader>( contexts.size() );
+
+        for ( IndexingContext ctx : contexts )
+        {
+            contextsToSearch.add( ctx.getIndexReader() );
+        }
+
+        MultiReader multiReader =
+            new MultiReader( contextsToSearch.toArray( new IndexReader[contextsToSearch.size()] ) );
+
+        IndexSearcher indexSearcher = new IndexSearcher( multiReader );
 
         // NEXUS-3482 made us to NOT use reverse ordering (it is a fix I wanted to implement, but user contributed patch
         // did come in faster! -- Thanks)
         Hits hits =
-            multiSearcher.search( request.getQuery(), new Sort( new SortField[] { SortField.FIELD_SCORE,
+            indexSearcher.search( request.getQuery(), new Sort( new SortField[] { SortField.FIELD_SCORE,
                 new SortField( null, SortField.DOC, false ) } ) );
 
         return new IteratorSearchResponse( request.getQuery(), hits.length(), new DefaultIteratorResultSet( request,
-            multiSearcher, hits ) );
+            indexSearcher, contexts, hits ) );
     }
 }

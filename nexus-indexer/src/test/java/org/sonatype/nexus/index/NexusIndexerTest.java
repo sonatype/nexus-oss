@@ -61,9 +61,7 @@ public class NexusIndexerTest
         q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-loggin*", SearchType.SCORED );
 
         // g:commons-loggin* (groupId:commons groupId:loggin*)
-        assertEquals( MinimalArtifactInfoIndexCreator.FLD_GROUP_ID_KW.getKey() + ":commons-loggin* ("
-            + MinimalArtifactInfoIndexCreator.FLD_GROUP_ID.getKey() + ":commons "
-            + MinimalArtifactInfoIndexCreator.FLD_GROUP_ID.getKey() + ":loggin*)", q.toString() );
+        assertEquals( "g:commons-loggin* ((groupId:commons groupId:loggin*) groupId:\"commons loggin\")", q.toString() );
 
         // keyword search against field stored in both ways (tokenized/untokenized)
         q = indexer.constructQuery( MAVEN.GROUP_ID, "commons-logging", SearchType.EXACT );
@@ -78,18 +76,12 @@ public class NexusIndexerTest
         // scored search against field having untokenized indexerField only
         q = indexer.constructQuery( MAVEN.PACKAGING, "maven-archetype", SearchType.SCORED );
 
-        assertEquals( MinimalArtifactInfoIndexCreator.FLD_PACKAGING.getKey() + ":maven-archetype "
-            + MinimalArtifactInfoIndexCreator.FLD_PACKAGING.getKey() + ":maven-archetype*", q.toString() );
+        assertEquals( "p:maven-archetype p:maven-archetype*^0.8", q.toString() );
 
         // scored search against field having tokenized IndexerField only (should be impossible).
         q = indexer.constructQuery( MAVEN.NAME, "Some artifact name from Pom", SearchType.SCORED );
 
-        assertEquals(
-            MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":some "
-                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":artifact "
-                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":name "
-                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":from "
-                + MinimalArtifactInfoIndexCreator.FLD_NAME.getKey() + ":pom*", q.toString() );
+        assertEquals( "(n:some n:artifact n:name n:from n:pom*) n:\"some artifact name from pom\"", q.toString() );
 
         // keyword search against field having tokenized IndexerField only (should be impossible).
         q = indexer.constructQuery( MAVEN.NAME, "some artifact name from Pom", SearchType.EXACT );

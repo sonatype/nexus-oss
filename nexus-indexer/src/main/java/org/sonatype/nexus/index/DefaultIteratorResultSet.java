@@ -9,8 +9,9 @@ import java.util.List;
 import org.apache.lucene.analysis.CachingTokenFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.MultiSearcher;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.highlight.Formatter;
 import org.apache.lucene.search.highlight.Highlighter;
@@ -19,7 +20,6 @@ import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 import org.apache.lucene.search.highlight.TextFragment;
 import org.sonatype.nexus.index.context.IndexUtils;
 import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.context.NexusIndexSearcher;
 import org.sonatype.nexus.index.creator.JarFileContentsIndexCreator;
 
 /**
@@ -39,13 +39,19 @@ public class DefaultIteratorResultSet
     // TODO: inspect is this limit actually needed or not.
     private static final int HARD_HIT_COUNT_LIMIT = Integer.MAX_VALUE;
 
+    private final IteratorSearchRequest searchRequest;
+
+    private final IndexSearcher indexSearcher;
+
+    private final List<IndexingContext> contexts;
+
+    private final int[] starts;
+
     private final ArtifactInfoFilter filter;
 
     private final ArtifactInfoPostprocessor postprocessor;
 
     private final List<MatchHighlightRequest> matchHighlightRequests;
-
-    private final MultiSearcher searcher;
 
     private final Hits hits;
 
@@ -61,16 +67,32 @@ public class DefaultIteratorResultSet
 
     private ArtifactInfo ai;
 
-    protected DefaultIteratorResultSet( AbstractSearchRequest request, MultiSearcher searcher, final Hits hits )
+    protected DefaultIteratorResultSet( final IteratorSearchRequest request, final IndexSearcher indexSearcher,
+                                        final List<IndexingContext> contexts, final Hits hits )
         throws IOException
     {
+        this.searchRequest = request;
+
+        this.indexSearcher = indexSearcher;
+
+        this.contexts = contexts;
+
+        {
+            int maxDoc = 0;
+            this.starts = new int[contexts.size() + 1]; // build starts array
+            for ( int i = 0; i < contexts.size(); i++ )
+            {
+                starts[i] = maxDoc;
+                maxDoc += contexts.get( i ).getIndexReader().maxDoc(); // compute maxDocs
+            }
+            starts[contexts.size()] = maxDoc;
+        }
+
         this.filter = request.getArtifactInfoFilter();
 
         this.postprocessor = request.getArtifactInfoPostprocessor();
 
         this.matchHighlightRequests = request.getMatchHighlightRequests();
-
-        this.searcher = searcher;
 
         this.hits = hits;
 
@@ -143,12 +165,19 @@ public class DefaultIteratorResultSet
         {
             Document doc = hits.doc( pointer );
 
-            IndexingContext context = getIndexingContextForPointer( hits.id( pointer ) );
+            IndexingContext context = getIndexingContextForPointer( doc, hits.id( pointer ) );
 
             result = IndexUtils.constructArtifactInfo( doc, context );
 
             if ( result != null )
             {
+                // uncomment this to have explainations too
+                // WARNING: NOT FOR PRODUCTION SYSTEMS, THIS IS VERY COSTLY OPERATION
+                // For debugging only
+                //
+                // result.getAttributes().put( Explanation.class.getName(),
+                // indexSearcher.explain( searchRequest.getQuery(), hits.id( pointer ) ).toString() );
+
                 result.setLuceneScore( hits.score( pointer ) );
 
                 result.repository = context.getRepositoryId();
@@ -307,8 +336,33 @@ public class DefaultIteratorResultSet
         return fragTexts;
     }
 
-    protected IndexingContext getIndexingContextForPointer( int docPtr )
+    protected IndexingContext getIndexingContextForPointer( Document doc, int docPtr )
     {
-        return ( (NexusIndexSearcher) searcher.getSearchables()[searcher.subSearcher( docPtr )] ).getIndexingContext();
+        return contexts.get( readerIndex( docPtr, this.starts, this.contexts.size() ) );
+    }
+
+    private static int readerIndex( int n, int[] starts, int numSubReaders )
+    { // find reader for doc n:
+        int lo = 0; // search starts array
+        int hi = numSubReaders - 1; // for first element less
+
+        while ( hi >= lo )
+        {
+            int mid = ( lo + hi ) >>> 1;
+            int midValue = starts[mid];
+            if ( n < midValue )
+                hi = mid - 1;
+            else if ( n > midValue )
+                lo = mid + 1;
+            else
+            { // found a match
+                while ( mid + 1 < numSubReaders && starts[mid + 1] == midValue )
+                {
+                    mid++; // scan to last match
+                }
+                return mid;
+            }
+        }
+        return hi;
     }
 }

@@ -26,7 +26,7 @@ public class NexusIndexSearcher
         throws IOException
     {
         super( reader );
-
+        
         this.indexingContext = indexingContext;
     }
 

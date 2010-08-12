@@ -1,4 +1,4 @@
-### Searched for field urn:maven#groupId (with 2 registered index fields) using query "commons logg" (QC create LQL "(g:commons logg g:commons logg*) (groupId:commons groupId:logg*)")
+### Searched for field urn:maven#groupId (with 2 registered index fields) using query "commons logg" (QC create LQL "(groupId:commons groupId:logg*) groupId:"commons logg"")
 test :: commons-logging:commons-logging:1.1:null:jar
 test :: commons-logging:commons-logging:1.1:sources:jar
 test :: commons-logging:commons-logging:1.0.4:null:jar

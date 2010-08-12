@@ -421,12 +421,24 @@ public class DefaultIndexingContext
         }
     }
 
+    protected boolean isIndexWriterDirty()
+    {
+        if ( indexWriter == null )
+        {
+            return false;
+        }
+        else
+        {
+            return indexWriter.hasUncommitedChanges();
+        }
+    }
+
     public IndexReader getIndexReader()
         throws IOException
     {
         synchronized ( indexLock )
         {
-            if ( indexReader == null || !indexReader.isCurrent() )
+            if ( indexReader == null || (!indexReader.isCurrent() && !isIndexWriterDirty()) )
             {
                 if ( indexReader != null )
                 {
@@ -472,7 +484,7 @@ public class DefaultIndexingContext
         // uses to read/maintain the Lucene Indexes (once for UPDATE, once for Searches).
         // The performance gain (no lock contention) is currently too small for the price of
         // doubled file handles. We will have to resolve this later.
-        
+
         // disabled for now, see getReadOnlyIndexSearcher() method for explanation
         // synchronized ( indexLock )
         // {
@@ -504,9 +516,17 @@ public class DefaultIndexingContext
 
             w.commit();
         }
-        finally
+        catch ( CorruptIndexException e )
         {
             w.close();
+
+            throw e;
+        }
+        catch ( IOException e )
+        {
+            w.close();
+
+            throw e;
         }
     }
 
@@ -592,8 +612,6 @@ public class DefaultIndexingContext
     {
         synchronized ( indexLock )
         {
-            closeReaders();
-
             IndexWriter w = getIndexWriter();
 
             IndexSearcher s = getIndexSearcher();
@@ -648,7 +666,8 @@ public class DefaultIndexingContext
             finally
             {
                 r.close();
-                closeReaders();
+
+                w.commit();
             }
 
             rebuildGroups();

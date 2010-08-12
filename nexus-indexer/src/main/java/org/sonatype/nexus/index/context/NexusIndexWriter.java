@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.CorruptIndexException;
-import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.ExtendedIndexWriter;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.LockObtainFailedException;
 
@@ -19,14 +19,14 @@ import org.apache.lucene.store.LockObtainFailedException;
  * to allow to track if writer is closed
  */
 public class NexusIndexWriter
-    extends IndexWriter
+    extends ExtendedIndexWriter
 {
     private boolean closed;
 
     public NexusIndexWriter( final Directory directory, final Analyzer analyzer, boolean create )
         throws CorruptIndexException, LockObtainFailedException, IOException
     {
-        this( directory, analyzer, create, true /* autoCommit */);
+        this( directory, analyzer, create, false /* autoCommit */);
     }
 
     public NexusIndexWriter( final Directory directory, final Analyzer analyzer, boolean create, boolean autoCommit )

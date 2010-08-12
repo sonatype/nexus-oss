@@ -1,4 +1,4 @@
-### Searched for field urn:maven#version (with 2 registered index fields) using query "1.0" (QC create LQL "(v:1.0 v:1.0*) (version:1 version:0*)")
+### Searched for field urn:maven#version (with 2 registered index fields) using query "1.0" (QC create LQL "(v:1.0 v:1.0*^0.8) ((version:1 version:0*) version:"1 0")")
 test :: proptest:proptest-archetype:1.0:null:maven-archetype
 test :: org.apache.maven.plugins:maven-core-it-plugin:1.0:null:maven-plugin
 test :: org.apache.maven.plugins:maven-core-it-plugin:1.0:sources:jar
