@@ -46,7 +46,7 @@ public class TouchTestCapability
             repo.storeItem(
                 new ResourceStoreRequest( "/capability/test.txt" ),
                 new ByteArrayInputStream(
-                    ( "capabilities test!\n" + properties.get( RepositoryOrGroupCapabilityPropertyDescriptor.ID ) ).getBytes() ),
+                    ( "capabilities test!\n" + properties.get( TouchTestCapabilityDescriptor.FIELD_REPO_OR_GROUP_ID ) ).getBytes() ),
                 null );
         }
         catch ( Exception e )
