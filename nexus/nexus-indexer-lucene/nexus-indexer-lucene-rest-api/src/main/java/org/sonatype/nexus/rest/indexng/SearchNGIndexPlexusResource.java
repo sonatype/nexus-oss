@@ -36,6 +36,8 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.IteratorSearchResponse;
@@ -110,6 +112,16 @@ public class SearchNGIndexPlexusResource
     private static final int COLLAPSE_OVERRIDE_TRESHOLD = 35;
 
     public static final String RESOURCE_URI = "/lucene/search";
+
+    /**
+     * Separate logger for "diagnostic" messages regarding searchNG. Just add following line to log4j.properties of
+     * Nexus (in sonatype-work/nexus/conf directory) to get diagnostic loglines about search:
+     * 
+     * <pre>
+     * log4j.logger.search.ng.diagnostic = DEBUG
+     * </pre>
+     */
+    private Logger searchDiagnosticLogger = LoggerFactory.getLogger( "search.ng.diagnostic" );
 
     @Requirement( role = Searcher.class )
     private List<Searcher> searchers;
@@ -353,6 +365,11 @@ public class SearchNGIndexPlexusResource
         return result;
     }
 
+    protected Logger getSearchDiagnosticLogger()
+    {
+        return searchDiagnosticLogger;
+    }
+
     private IteratorSearchResponse searchByTerms( final Map<String, String> terms, final String repositoryId,
                                                   final Integer from, final Integer count, final Boolean exact,
                                                   final Boolean expandVersion, final Boolean collapseResults,
@@ -487,7 +504,7 @@ public class SearchNGIndexPlexusResource
                 {
                     if ( System.currentTimeMillis() - startedAtMillis > FIRST_LOOP_EXECUTION_TIME_LIMIT )
                     {
-                        getLogger().info(
+                        getSearchDiagnosticLogger().debug(
                             "Stopping delivering search results since we spent more than "
                                 + FIRST_LOOP_EXECUTION_TIME_LIMIT + " millis in 1st loop processing results." );
 
@@ -498,7 +515,7 @@ public class SearchNGIndexPlexusResource
                     if ( hits.size() > 10
                         && ( firstDocumentScore - ai.getLuceneScore() ) > DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD )
                     {
-                        getLogger().info(
+                        getSearchDiagnosticLogger().debug(
                             "Stopping delivering search results since we span "
                                 + DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD + " of score change (firstDocScore="
                                 + firstDocumentScore + ", currentDocScore=" + ai.getLuceneScore() + ")." );
@@ -511,7 +528,7 @@ public class SearchNGIndexPlexusResource
                     {
                         if ( ( lastDocumentScore - ai.getLuceneScore() ) > DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD )
                         {
-                            getLogger().info(
+                            getSearchDiagnosticLogger().debug(
                                 "Stopping delivering search results since we hit a relevance drop bigger than "
                                     + DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD + " (lastDocScore=" + lastDocumentScore
                                     + ", currentDocScore=" + ai.getLuceneScore() + ")." );
@@ -525,7 +542,7 @@ public class SearchNGIndexPlexusResource
                     // we stop if we hit the GA limit
                     if ( ( hits.size() + 1 ) > GA_HIT_LIMIT )
                     {
-                        getLogger().info(
+                        getSearchDiagnosticLogger().debug(
                             "Stopping delivering search results since we hit a GA hit limit of " + GA_HIT_LIMIT + "." );
 
                         // check for HIT_LIMIT: if we are stepping it over, stop here
@@ -623,7 +640,7 @@ public class SearchNGIndexPlexusResource
             }
 
             // summary:
-            getLogger().info(
+            getSearchDiagnosticLogger().debug(
                 "Query terms \"" + terms + "\" (LQL \"" + iterator.getQuery().toString() + "\") matched total of "
                     + iterator.getTotalHits() + " records, " + iterator.getTotalProcessedArtifactInfoCount()
                     + " records were processed out of those, resulting in " + hits.size()
