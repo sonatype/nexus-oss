@@ -29,11 +29,26 @@ public class TouchTestCapability
     @Override
     public void create( Map<String, String> properties )
     {
-        Repository repo = getRepository( properties );
+        doIt( properties );
+    }
+
+    @Override
+    public void update( Map<String, String> properties )
+    {
+        doIt( properties );
+    }
+
+    private void doIt( final Map<String, String> properties )
+    {
+        final Repository repo = getRepository( properties );
+
         try
         {
-            repo.storeItem( new ResourceStoreRequest( "/capability/test.txt" ), new ByteArrayInputStream(
-                "capabilities test!".getBytes() ), null );
+            repo.storeItem(
+                new ResourceStoreRequest( "/capability/test.txt" ),
+                new ByteArrayInputStream(
+                    ( "capabilities test!\n" + properties.get( RepositoryOrGroupCapabilityPropertyDescriptor.ID ) ).getBytes() ),
+                null );
         }
         catch ( Exception e )
         {
@@ -45,17 +60,18 @@ public class TouchTestCapability
     private Repository getRepository( final Map<String, String> properties )
     {
         String repositoryId = properties.get( RepositoryOrGroupCapabilityPropertyDescriptor.ID );
+        final Repository repo;
         try
         {
             repositoryId = repositoryId.replaceFirst( "repo_", "" );
             repositoryId = repositoryId.replaceFirst( "group_", "" );
-            final Repository found = repositoryRegistry.getRepository( repositoryId );
-            return found;
+            repo = repositoryRegistry.getRepository( repositoryId );
         }
         catch ( final NoSuchRepositoryException e )
         {
             throw new RuntimeException( String.format( "Cannot find repository %s", repositoryId ) );
         }
+        return repo;
     }
 
 }
