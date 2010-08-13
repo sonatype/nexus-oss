@@ -13,6 +13,7 @@
 package org.sonatype.security.realms;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.enterprise.inject.Typed;
@@ -30,7 +31,9 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.slf4j.Logger;
 import org.sonatype.security.usermanagement.RoleIdentifier;
+import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -43,7 +46,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = XmlAuthorizingRealm.ROLE )
-//@Description( value = "Xml Authorizing Realm" )
+// @Description( value = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm
@@ -52,6 +55,12 @@ public class XmlAuthorizingRealm
 
     @Inject
     private UserManager userManager;
+
+    @Inject
+    private Map<String, UserManager> userManagerMap;
+
+    @Inject
+    private Logger logger;
 
     public XmlAuthorizingRealm()
     {
@@ -85,25 +94,80 @@ public class XmlAuthorizingRealm
             throw new AuthorizationException( "Cannot authorize with no principals." );
         }
 
-        // TODO: We should check where this principal came from and only load the roles for it
         String username = principals.getPrimaryPrincipal().toString();
         Set<String> roles = new HashSet<String>();
-        try
+
+        Set<String> realmNames = new HashSet<String>( principals.getRealmNames() );
+        // clean up the realm names for processing (replace the Xml*Realm with default)
+        cleanUpRealmList( realmNames );
+
+        if ( RoleMappingUserManager.class.isInstance( userManager ) )
         {
-            // get just the role Id from the user
-            for ( RoleIdentifier roleIdentifier : userManager.getUser( username ).getRoles() )
+            for ( String realmName : realmNames )
             {
-                roles.add( roleIdentifier.getRoleId() );
+                try
+                {
+                    for ( RoleIdentifier roleIdentifier : ( (RoleMappingUserManager) userManager ).getUsersRoles( username,
+                                                                                                                  realmName ) )
+                    {
+                        roles.add( roleIdentifier.getRoleId() );
+                    }
+                }
+                catch ( UserNotFoundException e )
+                {
+                    if ( this.logger.isTraceEnabled() )
+                    {
+                        this.logger.trace( "Failed to find role mappings for user: " + username + " realm: "
+                            + realmName );
+                    }
+                }
             }
         }
-        catch ( UserNotFoundException e )
+        else if ( realmNames.contains( "default" ) )
+        {
+            try
+            {
+                for ( RoleIdentifier roleIdentifier : userManager.getUser( username ).getRoles() )
+                {
+                    roles.add( roleIdentifier.getRoleId() );
+                }
+            }
+            catch ( UserNotFoundException e )
+            {
+                throw new AuthorizationException( "User for principals: " + principals.getPrimaryPrincipal()
+                    + " could not be found.", e );
+            }
+
+        }
+        else
+        // user not managed by this Realm
         {
             throw new AuthorizationException( "User for principals: " + principals.getPrimaryPrincipal()
-                + " could not be found.", e );
+                + " not manged by XML realm." );
         }
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roles );
 
         return info;
+    }
+
+    private void cleanUpRealmList( Set<String> realmNames )
+    {
+
+        for ( UserManager userManager : this.userManagerMap.values() )
+        {
+            String authRealmName = userManager.getAuthenticationRealmName();
+            if ( authRealmName != null && realmNames.contains( authRealmName ) )
+            {
+                realmNames.remove( authRealmName );
+                realmNames.add( userManager.getSource() );
+            }
+        }
+        
+        if ( realmNames.contains( getName() ) )
+        {
+            realmNames.remove( getName() );
+            realmNames.add( "default" );
+        }
     }
 }
