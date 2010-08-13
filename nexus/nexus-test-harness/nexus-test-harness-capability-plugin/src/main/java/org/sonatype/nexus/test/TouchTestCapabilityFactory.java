@@ -6,7 +6,7 @@ import org.sonatype.nexus.plugins.capabilities.api.Capability;
 import org.sonatype.nexus.plugins.capabilities.api.CapabilityFactory;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 
-@Component( role = CapabilityFactory.class, hint = "TimestampCapabilityFactory" )
+@Component( role = CapabilityFactory.class, hint = TouchTestCapability.ID )
 public class TouchTestCapabilityFactory
     implements CapabilityFactory
 {

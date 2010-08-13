@@ -16,6 +16,8 @@ public class TouchTestCapability
     implements Capability
 {
 
+    public static final String ID = "TouchTest";
+
     private RepositoryRegistry repositoryRegistry;
 
     protected TouchTestCapability( String id, RepositoryRegistry repositoryRegistry )
