@@ -32,6 +32,7 @@
     <module>nexus-core-documentation-plugin</module>
     <!-- OOMs and other problems with this one
     <module>nexus-groovy-console-plugin</module>-->
+    <module>nexus-capabilities-plugin</module>
   </modules>
 
 </project>

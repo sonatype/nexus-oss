@@ -82,6 +82,17 @@
         <version>0.1.0</version>
         <type>zip</type>
       </itar>
+      <itar>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-capabilities-plugin</artifactId>
+        <version>${project.version}</version>
+        <classifier>bundle</classifier>
+        <type>zip</type>
+        <virtual>true</virtual>
+        <unpack>true</unpack>
+        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/plugin-repository
+        </outputDirectory>
+      </itar>
     </itars>    
     
   </assembly>
