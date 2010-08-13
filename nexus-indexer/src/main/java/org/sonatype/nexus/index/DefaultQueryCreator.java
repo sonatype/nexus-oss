@@ -9,6 +9,7 @@ package org.sonatype.nexus.index;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
@@ -239,6 +240,7 @@ public class DefaultQueryCreator
 
                 // tokenization should happen against the field!
                 QueryParser qp = new QueryParser( indexerField.getKey(), new NexusAnalyzer() );
+                qp.setDefaultOperator( Operator.AND );
 
                 // small cheap trick
                 // if a query is not "expert" (does not contain field:val kind of expression)

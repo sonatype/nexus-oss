@@ -60,7 +60,7 @@ public class DefaultIndexerManagerTest
 
         indexerManager.reindexAllRepositories( "/", false );
 
-        searchForKeywordNG( "org.sonatype.nexus", 15 );
+        searchForKeywordNG( "org.sonatype.nexus", 10 );
 
         assertTemporatyContexts( releases );
     }

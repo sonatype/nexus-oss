@@ -113,7 +113,7 @@ public class Nexus384DotAndDashSearchIT
     { // both
         
         List<NexusArtifact> results = getSearchMessageUtil().searchFor( "dashed.doted" );
-        Assert.assertEquals( 4, results.size() );
+        Assert.assertEquals( 2, results.size() );
     }
 
     @Test

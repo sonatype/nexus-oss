@@ -49,9 +49,22 @@ public abstract class AbstractIndexerManagerTest
     protected IteratorSearchResponse searchForKeywordNG( String term, int expected )
         throws Exception
     {
-        IteratorSearchResponse result = indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED, null );
+        IteratorSearchResponse result =
+            indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED, null );
 
-        assertEquals( "Unexpected result set size!", expected, result.getTotalHits() );
+        if ( expected != result.getTotalHits() )
+        {
+            // dump the stuff
+            StringBuilder sb = new StringBuilder( "Found artifacts:\n" );
+
+            for ( ArtifactInfo ai : result )
+            {
+                sb.append( ai.context ).append( " : " ).append( ai.toString() ).append( "\n" );
+            }
+
+            fail( sb.toString() + "\nUnexpected result set size! We expected " + expected + " but got "
+                + result.getTotalHits() );
+        }
 
         return result;
     }
