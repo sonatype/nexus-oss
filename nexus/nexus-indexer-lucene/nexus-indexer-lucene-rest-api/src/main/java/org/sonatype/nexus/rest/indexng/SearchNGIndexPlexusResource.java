@@ -83,9 +83,9 @@ public class SearchNGIndexPlexusResource
         Integer.getInteger( "plexus.search.ga.hit.limit", DEFAULT_GA_HIT_LIMIT ).intValue();
 
     /**
-     * Time to spend in 1st processing loop before bail out.
+     * Time to spend in 1st processing loop before bail out. It defaults to 30sec (UI timeout is 60secs).
      */
-    private static final long DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT = 10000;
+    private static final long DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT = 30000;
 
     /**
      * The actual time limit to spend in search, that may be overridden by users using Java System Properties, and
