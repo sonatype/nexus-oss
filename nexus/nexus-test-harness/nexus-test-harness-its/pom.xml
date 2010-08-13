@@ -111,6 +111,8 @@
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-test-harness-capability-plugin</artifactId>
+              <classifier>bundle</classifier>
+              <type>zip</type>
             </plugin>
           </nexusPluginsArtifacts>
         </configuration>
@@ -150,6 +152,8 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-capability-plugin</artifactId>
       <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
     </dependency>
 
     <!-- Needed to make it "win" -->
@@ -188,6 +192,12 @@
       <version>${project.version}</version>
     </dependency>
 
+    <!-- NEXUS-3699 -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <profiles>
