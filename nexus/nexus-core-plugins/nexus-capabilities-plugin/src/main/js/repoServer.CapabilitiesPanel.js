@@ -15,9 +15,9 @@
 /*
  * Capabilities Edit/Create panel layout and controller
  */
- 
- var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities';
- var CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes';
+
+var CAPABILITIES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilities';
+var CAPABILITY_TYPES_SERVICE_PATH = Sonatype.config.servicePath + '/capabilityTypes';
 
 Sonatype.repoServer.CapabilitiesPanel = function(config) {
   var config = config || {};
@@ -63,14 +63,14 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         sortType : Ext.data.SortTypes.asUCString
       }]);
 
-  // A record to hold details of each capability type 
+  // A record to hold details of each capability type
   this.capabilityTypeRecordConstructor = Ext.data.Record.create([{
         name : 'id',
         sortType : Ext.data.SortTypes.asUCString
       }, {
         name : 'name'
       }, {
-        name : 'properties'
+        name : 'formFields'
       }]);
 
   // A record that holds the data for each configured capability in the system
@@ -157,7 +157,8 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
         }
       });
 
-  // Reader and datastore that queries the server for the list of capabilities types
+  // Reader and datastore that queries the server for the list of capabilities
+  // types
   this.capabilityTypeReader = new Ext.data.JsonReader({
         root : 'data',
         id : 'id'
@@ -169,7 +170,7 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
           field : 'id',
           direction : 'ASC'
         },
-        autoLoad : true        
+        autoLoad : true
       });
 
   // Reader and datastore that queries the server for the list of currently
@@ -354,204 +355,6 @@ Sonatype.repoServer.CapabilitiesPanel = function(config) {
 };
 
 Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
-
-      // Populate the dynamic content, based upon the currently defined capability
-      // types from the server
-      populateCapabilityTypePanelItems : function(id) {
-        // If the items haven't loaded yet, wait until they are. This of course
-        // requires that their be at least
-        // 1 capability type available at ALL times on the server.
-        // TODO: could probably use better logic here
-        // if (this.capabilityTypeDataStore.data.items.length < 1)
-        // {
-        //  return this.populateCapabilityTypePanelItems.defer(300, this, arguments);
-        // }
-
-        var allItems = [];
-
-        allItems[0] = {
-          xtype : 'fieldset',
-          id : id + '_emptyItem',
-          checkboxToggle : false,
-          title : 'Task Settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          collapsible : false,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          }
-        };
-
-        // Now add the dynamic content
-        this.capabilityTypeDataStore.each(function(item, i, len) {
-              var items = [];
-              if (item.data.properties.length > 0)
-              {
-                for (var j = 0; j < item.data.properties.length; j++)
-                {
-                  var curRec = item.data.properties[j];
-                  // Note that each item is disabled initially, this is because
-                  // the select handler for the capabilityType
-                  // combo box handles enabling/disabling as necessary, so each
-                  // inactive card isn't also included in the form
-                  if (curRec.type == 'string')
-                  {
-                    items[j] = {
-                      xtype : 'textfield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
-                    };
-                  }
-                  else if (curRec.type == 'number')
-                  {
-                    items[j] = {
-                      xtype : 'numberfield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
-                    };
-                  }
-                  else if (curRec.type == 'boolean')
-                  {
-                    items[j] = {
-                      xtype : 'checkbox',
-                      fieldLabel : curRec.name,
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      disabled : true
-                    };
-                  }
-                  else if (curRec.type == 'date')
-                  {
-                    items[j] = {
-                      xtype : 'datefield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      value : new Date()
-                    };
-                  }
-                  else if (curRec.type == 'repo')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      store : this.repositoryDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-                  else if (curRec.type == 'group')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      store : this.repositoryGroupDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-                  else if (curRec.type == 'repo-or-group')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'capabilityProperties_' + curRec.id,
-                      store : this.repoOrGroupDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-
-                  allItems[allItems.length] = {
-                    xtype : 'fieldset',
-                    id : id + '_' + item.data.id,
-                    checkboxToggle : false,
-                    title : 'Capability Settings',
-                    anchor : Sonatype.view.FIELDSET_OFFSET,
-                    collapsible : false,
-                    autoHeight : true,
-                    labelWidth : 175,
-                    layoutConfig : {
-                      labelSeparator : ''
-                    },
-                    items : items
-                  };
-                }
-              }
-              else
-              {
-                allItems[allItems.length] = {
-                  xtype : 'fieldset',
-                  id : id + '_' + item.data.id,
-                  checkboxToggle : false,
-                  title : 'Field Settings',
-                  anchor : Sonatype.view.FIELDSET_OFFSET,
-                  collapsible : false,
-                  autoHeight : true,
-                  labelWidth : 175,
-                  layoutConfig : {
-                    labelSeparator : ''
-                  }
-                };
-              }
-            }, this);
-
-        return allItems;
-      },
-
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
         this.capabilitiesDataStore.removeAll();
@@ -579,7 +382,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 cls : 'x-form-invalid-msg'
               });
           tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
-                                                      // on form fields
+          // on form fields
         }
         tree.invalid = true;
         tree.errorEl.update(tree.invalidText);
@@ -608,17 +411,17 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             waitMsg : isNew ? 'Configuring capability...' : 'Updating capability configuration...',
             fpanel : formInfoObj.formPanel,
             dataModifiers : {
-                capability : Sonatype.utils.lowercase,
-                properties : this.exportCapabilityPropertiesHelper.createDelegate(this)
+              capability : Sonatype.utils.lowercase,
+              properties : this.exportCapabilityPropertiesHelper.createDelegate(this)
             },
             serviceDataObj : {
-                id : "",
-                name : "",
-                typeId : "",
-                properties : [{
+              id : "",
+              name : "",
+              typeId : "",
+              properties : [{
                     key : "",
                     value : ""
-                }]
+                  }]
             },
             isNew : isNew
               // extra option to send to callback, instead of conditioning on
@@ -669,7 +472,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[3].items, this.populateCapabilityTypePanelItems(id));
+        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -705,7 +508,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               name : 'New Capability',
               resourceURI : 'new'
             }, id); // use "new_capability_" id instead of resourceURI like the
-                    // reader does
+        // reader does
         this.capabilitiesDataStore.insert(0, [newRec]);
         this.capabilitiesGridPanel.getSelectionModel().selectRow(0);
       },
@@ -747,7 +550,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             // select as a param
             Sonatype.MessageBox.getDialog().on('show', function() {
                   this.focusEl = this.buttons[2]; // ack! we're offset dependent
-                                                  // here
+                  // here
                   this.focus();
                 }, Sonatype.MessageBox.getDialog(), {
                   single : true
@@ -838,17 +641,17 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
             var sentData = action.output.data;
             var dataObj = {
               id : receivedData.id,
-              name : receivedData.name,              
+              name : receivedData.name,
               resourceURI : receivedData.resourceURI,
               typeId : receivedData.typeId,
-              typeName : receivedData.typeName 
+              typeName : receivedData.typeName
             };
 
             var newRec = new this.capabilityRecordConstructor(dataObj, action.options.fpanel.id);
 
             this.capabilitiesDataStore.remove(this.capabilitiesDataStore.getById(action.options.fpanel.id)); // remove
-                                                                                                        // old
-                                                                                                        // one
+            // old
+            // one
             this.capabilitiesDataStore.addSorted(newRec);
             this.capabilitiesGridPanel.getSelectionModel().selectRecords([newRec], false);
 
@@ -927,8 +730,8 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               method : 'GET',
               fpanel : formPanel,
               dataModifiers : {
-      	          capability : Sonatype.utils.capitalize,
-                  properties : this.importCapabilityPropertiesHelper.createDelegate(this)
+                capability : Sonatype.utils.capitalize,
+                properties : this.importCapabilityPropertiesHelper.createDelegate(this)
               },
               scope : this
             });
@@ -936,7 +739,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
       rowSelect : function(selectionModel, index, rec) {
         var id = rec.id; // note: rec.id is unique for new resources and equal
-                          // to resourceURI for existing ones
+        // to resourceURI for existing ones
         var formPanel = this.formCards.findById(id);
 
         // assumption: new route forms already exist in formCards, so they won't
@@ -947,7 +750,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[3].items, this.populateCapabilityTypePanelItems(id));
+          Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1086,7 +889,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
           }
         }
       },
-      
+
       exportCapabilityPropertiesHelper : function(val, fpanel) {
         var outputArr = [];
 
@@ -1129,10 +932,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
 
         return outputArr;
       },
-      
+
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
         // Maps the incoming json properties to the generic component
-        // Uses the id of the capabilityProperty item as the key, so the id _must_
+        // Uses the id of the capabilityProperty item as the key, so the id
+        // _must_
         // be unique within a capability type
         for (var i = 0; i < srcObj.properties.length; i++)
         {

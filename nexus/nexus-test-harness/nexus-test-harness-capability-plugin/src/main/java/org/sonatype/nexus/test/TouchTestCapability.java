@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.sonatype.nexus.plugins.capabilities.api.AbstractCapability;
 import org.sonatype.nexus.plugins.capabilities.api.Capability;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.RepositoryOrGroupCapabilityPropertyDescriptor;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
@@ -59,7 +58,7 @@ public class TouchTestCapability
 
     private Repository getRepository( final Map<String, String> properties )
     {
-        String repositoryId = properties.get( RepositoryOrGroupCapabilityPropertyDescriptor.ID );
+        String repositoryId = properties.get( TouchTestCapabilityDescriptor.FIELD_REPO_OR_GROUP_ID );
         final Repository repo;
         try
         {

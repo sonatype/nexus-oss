@@ -381,6 +381,7 @@
                     <include>${compressed-dir}/js/Sonatype.headLinks.js</include>
                     <include>${compressed-dir}/js/Sonatype.view.js</include>
                     <include>${compressed-dir}/js/extensions/ZeroClipboard.js</include>
+                    <include>${compressed-dir}/js/formFieldGenerator.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.referenceData.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.resources.js</include>
                     <include>${compressed-dir}/js/repoServer/repoServer.FeedViewPanel.js</include>

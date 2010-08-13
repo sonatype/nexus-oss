@@ -70,6 +70,7 @@
   <script src="js/Sonatype.resources.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.headLinks.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.view.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/formFieldGenerator.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/ZeroClipboard.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/repoServer/repoServer.referenceData.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins.capabilities.internal.rest;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -12,13 +14,13 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptor;
 import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityDescriptorRegistry;
-import org.sonatype.nexus.plugins.capabilities.api.descriptor.CapabilityPropertyDescriptor;
-import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityTypePropertyResource;
+import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityFormFieldResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityTypeResource;
 import org.sonatype.nexus.plugins.capabilities.internal.rest.dto.CapabilityTypeResourceResponse;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.formfield.AbstractFormFieldResource;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -26,7 +28,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 @Path( CapabilityTypesPlexusResource.RESOURCE_URI )
 @Produces( { "application/xml", "application/json" } )
 public class CapabilityTypesPlexusResource
-    extends AbstractNexusPlexusResource
+    extends AbstractFormFieldResource
     implements PlexusResource
 {
 
@@ -88,21 +90,11 @@ public class CapabilityTypesPlexusResource
 
                 response.addData( capabilityTypeResource );
 
-                final CapabilityPropertyDescriptor[] propertyDescriptors = capabilityDescriptor.propertyDescriptors();
-                if ( propertyDescriptors != null )
-                {
-                    for ( final CapabilityPropertyDescriptor capabilityPropertyDescriptor : propertyDescriptors )
-                    {
-                        final CapabilityTypePropertyResource capabilityTypePropertyResource =
-                            new CapabilityTypePropertyResource();
-                        capabilityTypePropertyResource.setId( capabilityPropertyDescriptor.id() );
-                        capabilityTypePropertyResource.setName( capabilityPropertyDescriptor.name() );
-                        capabilityTypePropertyResource.setType( capabilityPropertyDescriptor.type() );
-                        capabilityTypePropertyResource.setRequired( capabilityPropertyDescriptor.isRequired() );
-                        capabilityTypePropertyResource.setRegexValidation( capabilityPropertyDescriptor.regexValidation() );
-                        capabilityTypeResource.addProperty( capabilityTypePropertyResource );
-                    }
-                }
+                final List<FormField> formFields = capabilityDescriptor.formFields();
+
+                capabilityTypeResource.setFormFields( (List<CapabilityFormFieldResource>) formFieldToDTO( formFields,
+                                                                                                          CapabilityFormFieldResource.class ) );
+
             }
         }
 
