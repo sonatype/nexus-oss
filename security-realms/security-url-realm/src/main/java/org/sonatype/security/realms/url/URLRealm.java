@@ -46,6 +46,7 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.slf4j.Logger;
+import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
 
@@ -59,18 +60,10 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = "url" )
-//@Description( value = "URL Realm" )
+// @Description( value = "URL Realm" )
 public class URLRealm
     extends AuthorizingRealm
 {
-    @Inject
-    @Named( value = "${authentication-url}" )
-    private String authenticationURL;
-
-    @Inject
-    @Named( value = "${url-authentication-default-role}" )
-    private String defaultRole = "default-url-role";
-
     @Named( value = "default-authentication-cache" )
     private String authenticationCacheName;
 
@@ -80,6 +73,9 @@ public class URLRealm
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private UrlRealmConfiguration urlRealmConfiguration;
 
     private Cache<Object, Object> authenticatingCache = null;
 
@@ -226,7 +222,7 @@ public class URLRealm
         ChallengeResponse authentication = new ChallengeResponse( scheme, username, password );
 
         Request request = new Request();
-        request.setResourceRef( this.authenticationURL );
+        request.setResourceRef( this.urlRealmConfiguration.getConfiguration().getUrl() );
         request.setMethod( Method.GET );
         request.setChallengeResponse( authentication );
 
@@ -247,7 +243,6 @@ public class URLRealm
         return new AllowAllCredentialsMatcher();
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo( PrincipalCollection principals )
     {
@@ -275,22 +270,10 @@ public class URLRealm
         // we don't have a list of users for this realm, so the default role effects ALL users
 
         Set<String> roles = new HashSet<String>();
-        roles.add( this.defaultRole );
+        roles.add( this.urlRealmConfiguration.getConfiguration().getDefaultRole() );
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo( roles );
 
         return info;
     }
-
-    // we only need test to have access to this.
-    String getAuthenticationURL()
-    {
-        return authenticationURL;
-    }
-
-    void setAuthenticationURL( String authenticationURL )
-    {
-        this.authenticationURL = authenticationURL;
-    }
-
 }

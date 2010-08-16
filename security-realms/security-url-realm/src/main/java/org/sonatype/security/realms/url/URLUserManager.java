@@ -21,11 +21,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.component.annotations.Configuration;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
+import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.AbstractReadOnlyUserManager;
 import org.sonatype.security.usermanagement.DefaultUser;
 import org.sonatype.security.usermanagement.RoleIdentifier;
@@ -51,17 +50,12 @@ public class URLUserManager
     public static final String SOURCE = "url";
 
     @Inject
-    @Named( value = "${url-authentication-email-domain}" )
-    private String emailDomain = "apache.org";
-
-    @Inject
-    @Named( value = "${url-authentication-default-role}" )
-    private String defaultRole = "default-url-role";
-
-    @Inject
     @Named( value = "resourceMerging" )
     private ConfigurationManager configuration;
 
+    @Inject
+    private UrlRealmConfiguration urlRealmConfiguration;
+    
     @Inject
     private List<UserManager> userLocators;
 
@@ -107,7 +101,7 @@ public class URLUserManager
             {
                 User user = null;
 
-                if ( userRoleMapping.getRoles().contains( this.defaultRole ) )
+                if ( userRoleMapping.getRoles().contains( this.urlRealmConfiguration.getConfiguration().getDefaultRole() ) )
                 {
                     user = this.toUser( userRoleMapping.getUserId(), false );
                 }
@@ -196,15 +190,17 @@ public class URLUserManager
 
     private User toUser( String userId, boolean addDefaultRole )
     {
+        String defaultRole = urlRealmConfiguration.getConfiguration().getDefaultRole();
+        
         DefaultUser user = new DefaultUser();
-        user.setEmailAddress( userId + "@" + emailDomain );
+        user.setEmailAddress( userId + "@" + defaultRole );
         user.setName( userId );
         user.setSource( SOURCE );
         user.setUserId( userId );
 
         if ( addDefaultRole )
         {
-            user.addRole( new RoleIdentifier( SOURCE, this.defaultRole ) );
+            user.addRole( new RoleIdentifier( SOURCE, defaultRole ) );
         }
 
         return user;

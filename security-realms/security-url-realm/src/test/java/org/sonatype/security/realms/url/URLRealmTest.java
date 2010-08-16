@@ -12,6 +12,8 @@
  */
 package org.sonatype.security.realms.url;
 
+import javax.inject.Named;
+
 import junit.framework.Assert;
 
 import org.apache.shiro.authc.AccountException;
@@ -24,8 +26,12 @@ import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.codehaus.plexus.context.Context;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.security.AbstractSecurityTestCase;
+import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.UserManager;
 
+import com.sonatype.security.realms.url.config.model.Configuration;
+
+@Named
 public class URLRealmTest
     extends AbstractSecurityTestCase
 {
@@ -44,8 +50,6 @@ public class URLRealmTest
         throws Exception
     {
         URLRealm urlRealm = (URLRealm) this.lookup( Realm.class, "url" );
-        urlRealm.setAuthenticationURL( server.getUrl( AUTH_APP_NAME ) + "/" ); // add the '/' to the end
-
         return urlRealm;
     }
 
@@ -131,15 +135,15 @@ public class URLRealmTest
         }
     }
 
-    @Override
-    protected void customizeContext( Context ctx )
-    {
-        super.customizeContext( ctx );
-        ctx.put( "url-authentication-email-domain", "sonateyp.org" );
-        ctx.put( "url-authentication-default-role", DEFAULT_ROLE );
-        ctx.put( "authentication-url", "NOT_SET" ); // we cannot figure this out until after the container starts
-
-    }
+//    @Override
+//    protected void customizeContext( Context ctx )
+//    {
+//        super.customizeContext( ctx );
+////        ctx.put( "url-authentication-email-domain", "sonateyp.org" );
+////        ctx.put( "url-authentication-default-role", DEFAULT_ROLE );
+////        ctx.put( "authentication-url", "NOT_SET" ); // we cannot figure this out until after the container starts
+//
+//    }
 
     @Override
     protected void setUp()
@@ -150,6 +154,12 @@ public class URLRealmTest
         server = this.lookup( ServletServer.class );
         // start the server
         server.start();
+        
+        UrlRealmConfiguration urlRealmConfiguration = this.lookup( UrlRealmConfiguration.class );
+        Configuration configuration = urlRealmConfiguration.getConfiguration();
+        configuration.setDefaultRole( DEFAULT_ROLE );
+        configuration.setEmailDomain( "sonateyp.org" );
+        configuration.setUrl( server.getUrl( AUTH_APP_NAME ) + "/"  ); // add the '/' to the end        
     }
 
     @Override
