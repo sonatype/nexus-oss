@@ -33,6 +33,12 @@ public class TouchTestCapability
         doIt( properties );
     }
 
+    @Override
+    public void load( Map<String, String> properties )
+    {
+        doIt( properties );
+    }
+
     private void doIt( final Map<String, String> properties )
     {
         final Repository repo = getRepository( TouchTestCapabilityDescriptor.FIELD_REPO_OR_GROUP_ID, properties );
@@ -42,7 +48,7 @@ public class TouchTestCapability
             repo.storeItem(
                 new ResourceStoreRequest( "/capability/test.txt" ),
                 new ByteArrayInputStream(
-                    ( "capabilities test!\n" + properties.get( TouchTestCapabilityDescriptor.FIELD_REPO_OR_GROUP_ID ) ).getBytes() ),
+                    ( "capabilities test!\n" + properties.get( TouchTestCapabilityDescriptor.FIELD_MSG_ID ) + "\n" + properties.get( TouchTestCapabilityDescriptor.FIELD_REPO_OR_GROUP_ID ) ).getBytes() ),
                 null );
         }
         catch ( Exception e )

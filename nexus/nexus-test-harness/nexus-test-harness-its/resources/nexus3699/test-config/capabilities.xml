@@ -8,11 +8,11 @@
       <typeId>TouchTest</typeId>
       <properties>
         <property>
-          <key>repositoryOrGroupId</key>
-          <value>all_repo</value>
+          <key>repoOrGroupId</key>
+          <value>repo_nexus-test-harness-repo</value>
         </property>
         <property>
-          <key>msg</key>
+          <key>message</key>
           <value>test-capability</value>
         </property>
       </properties>
