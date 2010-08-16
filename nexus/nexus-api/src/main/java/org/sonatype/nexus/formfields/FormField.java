@@ -2,6 +2,9 @@ package org.sonatype.nexus.formfields;
 
 public interface FormField
 {
+    public static final boolean MANDATORY = true;
+    public static final boolean OPTIONAL = false;
+    
     /**
      * Get the type of this form field
      * @return

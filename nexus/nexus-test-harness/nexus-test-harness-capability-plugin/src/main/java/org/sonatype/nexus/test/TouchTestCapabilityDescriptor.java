@@ -17,10 +17,10 @@ public class TouchTestCapabilityDescriptor
 
     public static final String FIELD_MSG_ID = "message";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( FIELD_REPO_OR_GROUP_ID, true );
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( FIELD_REPO_OR_GROUP_ID, FormField.MANDATORY );
 
     private final StringTextFormField msgField = new StringTextFormField( FIELD_MSG_ID, "Message", "Message help text",
-                                                                          true );
+                                                                          FormField.MANDATORY );
 
     public String id()
     {
