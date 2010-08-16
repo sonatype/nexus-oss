@@ -167,7 +167,7 @@ public class DefaultFSLocalRepositoryStorage
         throws LocalStorageException
     {
         URL url;
-        
+
         try
         {
             request.pushRequestPath( RepositoryItemUid.PATH_ROOT );
@@ -438,7 +438,16 @@ public class DefaultFSLocalRepositoryStorage
 
                 target.setLastModified( item.getModified() );
 
-                ( (DefaultStorageFileItem) item ).setLength( target.length() );
+                ( (StorageFileItem) item ).setLength( target.length() );
+
+                // replace content locator transparently, if we just consumed a non-reusable one
+                // Hint: in general, those items coming from user uploads or remote proxy caching requests are non
+                // reusable ones
+                if ( !( (StorageFileItem) item ).getContentLocator().isReusable() )
+                {
+                    ( (StorageFileItem) item ).setContentLocator( new FileContentLocator( target,
+                        ( (StorageFileItem) item ).getMimeType() ) );
+                }
 
                 InputStream mdis = new FileInputStream( target );
 
