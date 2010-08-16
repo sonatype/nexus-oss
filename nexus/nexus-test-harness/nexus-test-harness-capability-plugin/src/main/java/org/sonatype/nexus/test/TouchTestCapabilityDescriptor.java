@@ -17,6 +17,11 @@ public class TouchTestCapabilityDescriptor
 
     public static final String FIELD_MSG_ID = "message";
 
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( FIELD_REPO_OR_GROUP_ID, true );
+
+    private final StringTextFormField msgField = new StringTextFormField( FIELD_MSG_ID, "Message", "Message help text",
+                                                                          true );
+
     public String id()
     {
         return TouchTestCapability.ID;
@@ -30,21 +35,8 @@ public class TouchTestCapabilityDescriptor
     public List<FormField> formFields()
     {
         List<FormField> fields = new ArrayList<FormField>();
-
-        FormField repoField = new RepoOrGroupComboFormField();
-        repoField.setHelpText( "Select the repository or repository group to which this capability applies" );
-        repoField.setId( FIELD_REPO_OR_GROUP_ID );
-        repoField.setLabel( "Repository/Group" );
-        repoField.setRequired( true );
         fields.add( repoField );
-
-        FormField msgField = new StringTextFormField();
-        msgField.setHelpText( "Message help text" );
-        msgField.setId( FIELD_MSG_ID );
-        msgField.setLabel( "Message" );
-        msgField.setRequired( true );
         fields.add( msgField );
-
         return fields;
     }
 

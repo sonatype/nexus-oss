@@ -9,6 +9,25 @@ public abstract class AbstractFormField
     private boolean required;
     private String label;
     
+    public AbstractFormField( String id, String label, String helpText, boolean required, String regexValidation )
+    {
+        this( id, label, helpText, required );
+        this.regexValidation = regexValidation;
+    }
+    
+    public AbstractFormField( String id, String label, String helpText, boolean required )
+    {
+        this( id );
+        this.label = label;
+        this.helpText = helpText;
+        this.required = required;
+    }
+    
+    public AbstractFormField( String id )
+    {
+        this.id = id;
+    }
+    
     public String getLabel()
     {
         return this.label;
