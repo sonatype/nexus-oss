@@ -15,7 +15,7 @@
   <packaging>nexus-plugin</packaging>
 
   <!-- a short but descriptive name for the project -->
-  <name>Nexus (Capabilities)</name>
+  <name>Nexus : Core Plugins : Capabilities</name>
 
   <dependencies>
     <dependency>

@@ -9,6 +9,8 @@
 
   <artifactId>nexus-test-harness-capability-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
+  
+  <name>Nexus : Core Plugins : Capabilities : Plugin ITs</name>
 
   <dependencies>
     <dependency>
