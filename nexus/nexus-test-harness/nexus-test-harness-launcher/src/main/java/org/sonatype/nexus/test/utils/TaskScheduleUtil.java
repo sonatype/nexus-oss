@@ -121,7 +121,7 @@ public class TaskScheduleUtil
     public static void waitForTasks()
         throws Exception
     {
-        waitForTasks( 40 );
+        waitForTasks( 100 );
     }
 
     public static void waitForAllTasksToStop()
@@ -327,7 +327,7 @@ public class TaskScheduleUtil
                                                         ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( taskName, typeId, 40, properties );
+        return runTask( taskName, typeId, 100, properties );
     }
 
     public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
