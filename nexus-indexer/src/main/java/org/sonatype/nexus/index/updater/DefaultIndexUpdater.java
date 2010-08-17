@@ -36,17 +36,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.IndexOutput;
 import org.apache.lucene.store.LockObtainFailedException;
-import org.apache.maven.artifact.manager.WagonManager;
-import org.apache.maven.wagon.ConnectionException;
-import org.apache.maven.wagon.ResourceDoesNotExistException;
-import org.apache.maven.wagon.Wagon;
-import org.apache.maven.wagon.WagonException;
-import org.apache.maven.wagon.authentication.AuthenticationException;
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
-import org.apache.maven.wagon.authorization.AuthorizationException;
 import org.apache.maven.wagon.events.TransferListener;
 import org.apache.maven.wagon.proxy.ProxyInfo;
-import org.apache.maven.wagon.repository.Repository;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
@@ -574,134 +565,134 @@ public class DefaultIndexUpdater
     /**
      * A ResourceFetcher implementation based on Wagon
      */
-    public static class WagonFetcher
-        extends AbstractResourceFetcher
-        implements ResourceFetcher
-    {
-
-        private final WagonManager wagonManager;
-
-        private final TransferListener listener;
-
-        private final AuthenticationInfo authenticationInfo;
-
-        private final ProxyInfo proxyInfo;
-
-        private Wagon wagon = null;
-
-        public WagonFetcher( final WagonManager wagonManager, final TransferListener listener,
-                             final AuthenticationInfo authenticationInfo, final ProxyInfo proxyInfo )
-        {
-            this.wagonManager = wagonManager;
-            this.listener = listener;
-            this.authenticationInfo = authenticationInfo;
-            this.proxyInfo = proxyInfo;
-        }
-
-        public void connect( final String id, final String url )
-            throws IOException
-        {
-            Repository repository = new Repository( id, url );
-
-            try
-            {
-                wagon = wagonManager.getWagon( repository );
-
-                if( listener != null )
-                {
-                    wagon.addTransferListener( listener );
-                }
-
-                // when working in the context of Maven, the WagonManager is already
-                // populated with proxy information from the Maven environment
-
-                if( authenticationInfo != null )
-                {
-                    if( proxyInfo != null )
-                    {
-                        wagon.connect( repository, authenticationInfo, proxyInfo );
-                    }
-                    else
-                    {
-                        wagon.connect( repository, authenticationInfo );
-                    }
-                }
-                else
-                {
-                    if( proxyInfo != null )
-                    {
-                        wagon.connect( repository, proxyInfo );
-                    }
-                    else
-                    {
-                        wagon.connect( repository );
-                    }
-                }
-            }
-            catch( AuthenticationException ex )
-            {
-                String msg = "Authentication exception connecting to " + repository;
-                logError( msg, ex );
-                throw new IOException( msg );
-            }
-            catch( WagonException ex )
-            {
-                String msg = "Wagon exception connecting to " + repository;
-                logError( msg, ex );
-                throw new IOException( msg );
-            }
-        }
-
-        public void disconnect()
-        {
-            if( wagon != null )
-            {
-                try
-                {
-                    wagon.disconnect();
-                }
-                catch( ConnectionException ex )
-                {
-                    logError( "Failed to close connection", ex );
-                }
-            }
-        }
-
-        public void retrieve( final String name, final File targetFile )
-            throws IOException, FileNotFoundException
-        {
-            try
-            {
-                wagon.get( name, targetFile );
-            }
-            catch( AuthorizationException e )
-            {
-                String msg = "Authorization exception retrieving " + name;
-                logError( msg, e );
-                throw new IOException( msg );
-            }
-            catch( ResourceDoesNotExistException e )
-            {
-                String msg = "Resource " + name + " does not exist";
-                logError( msg, e );
-                throw new FileNotFoundException( msg );
-            }
-            catch( WagonException e )
-            {
-                String msg = "Transfer for " + name + " failed";
-                logError( msg, e );
-                throw new IOException( msg + "; " + e.getMessage() );
-            }
-        }
-
-        private void logError( final String msg, final Exception ex )
-        {
-            if( listener != null )
-            {
-                listener.debug( msg + "; " + ex.getMessage() );
-            }
-        }
-    }
+//    public static class WagonFetcher
+//        extends AbstractResourceFetcher
+//        implements ResourceFetcher
+//    {
+//
+//        private final WagonManager wagonManager;
+//
+//        private final TransferListener listener;
+//
+//        private final AuthenticationInfo authenticationInfo;
+//
+//        private final ProxyInfo proxyInfo;
+//
+//        private Wagon wagon = null;
+//
+//        public WagonFetcher( final WagonManager wagonManager, final TransferListener listener,
+//                             final AuthenticationInfo authenticationInfo, final ProxyInfo proxyInfo )
+//        {
+//            this.wagonManager = wagonManager;
+//            this.listener = listener;
+//            this.authenticationInfo = authenticationInfo;
+//            this.proxyInfo = proxyInfo;
+//        }
+//
+//        public void connect( final String id, final String url )
+//            throws IOException
+//        {
+//            Repository repository = new Repository( id, url );
+//
+//            try
+//            {
+//                wagon = wagonManager.getWagon( repository );
+//
+//                if( listener != null )
+//                {
+//                    wagon.addTransferListener( listener );
+//                }
+//
+//                // when working in the context of Maven, the WagonManager is already
+//                // populated with proxy information from the Maven environment
+//
+//                if( authenticationInfo != null )
+//                {
+//                    if( proxyInfo != null )
+//                    {
+//                        wagon.connect( repository, authenticationInfo, proxyInfo );
+//                    }
+//                    else
+//                    {
+//                        wagon.connect( repository, authenticationInfo );
+//                    }
+//                }
+//                else
+//                {
+//                    if( proxyInfo != null )
+//                    {
+//                        wagon.connect( repository, proxyInfo );
+//                    }
+//                    else
+//                    {
+//                        wagon.connect( repository );
+//                    }
+//                }
+//            }
+//            catch( AuthenticationException ex )
+//            {
+//                String msg = "Authentication exception connecting to " + repository;
+//                logError( msg, ex );
+//                throw new IOException( msg );
+//            }
+//            catch( WagonException ex )
+//            {
+//                String msg = "Wagon exception connecting to " + repository;
+//                logError( msg, ex );
+//                throw new IOException( msg );
+//            }
+//        }
+//
+//        public void disconnect()
+//        {
+//            if( wagon != null )
+//            {
+//                try
+//                {
+//                    wagon.disconnect();
+//                }
+//                catch( ConnectionException ex )
+//                {
+//                    logError( "Failed to close connection", ex );
+//                }
+//            }
+//        }
+//
+//        public void retrieve( final String name, final File targetFile )
+//            throws IOException, FileNotFoundException
+//        {
+//            try
+//            {
+//                wagon.get( name, targetFile );
+//            }
+//            catch( AuthorizationException e )
+//            {
+//                String msg = "Authorization exception retrieving " + name;
+//                logError( msg, e );
+//                throw new IOException( msg );
+//            }
+//            catch( ResourceDoesNotExistException e )
+//            {
+//                String msg = "Resource " + name + " does not exist";
+//                logError( msg, e );
+//                throw new FileNotFoundException( msg );
+//            }
+//            catch( WagonException e )
+//            {
+//                String msg = "Transfer for " + name + " failed";
+//                logError( msg, e );
+//                throw new IOException( msg + "; " + e.getMessage() );
+//            }
+//        }
+//
+//        private void logError( final String msg, final Exception ex )
+//        {
+//            if( listener != null )
+//            {
+//                listener.debug( msg + "; " + ex.getMessage() );
+//            }
+//        }
+//    }
 
     /**
      * Filesystem-based ResourceFetcher implementation
