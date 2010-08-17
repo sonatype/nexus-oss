@@ -423,13 +423,16 @@ public class DefaultIndexingContext
 
     protected boolean isIndexWriterDirty()
     {
-        if ( indexWriter == null )
+        synchronized ( indexLock )
         {
-            return false;
-        }
-        else
-        {
-            return indexWriter.hasUncommitedChanges();
+            if ( indexWriter == null )
+            {
+                return false;
+            }
+            else
+            {
+                return indexWriter.hasUncommitedChanges();
+            }
         }
     }
 
@@ -438,7 +441,7 @@ public class DefaultIndexingContext
     {
         synchronized ( indexLock )
         {
-            if ( indexReader == null || (!indexReader.isCurrent() && !isIndexWriterDirty()) )
+            if ( indexReader == null || ( !indexReader.isCurrent() && !isIndexWriterDirty() ) )
             {
                 if ( indexReader != null )
                 {
