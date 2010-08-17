@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -34,7 +34,6 @@ import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.swizzle.jira.Issue;
 import org.codehaus.swizzle.jira.Jira;
-import org.mortbay.jetty.EofException;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
@@ -287,8 +286,8 @@ public class DefaultErrorReportingManager
                         response.setJiraUrl( existingIssues.get( 0 ).getLink() );
                         renameBundle( unencryptedFile, existingIssues.iterator().next().getKey() );
                         getLogger().info(
-                                          "Not reporting problem as it already exists in database: "
-                                              + existingIssues.iterator().next().getLink() );
+                            "Not reporting problem as it already exists in database: "
+                                + existingIssues.iterator().next().getLink() );
                     }
                 }
                 response.setSuccess( true );
@@ -378,7 +377,7 @@ public class DefaultErrorReportingManager
 
             List<Issue> issues =
                 jira.getIssuesFromTextSearchWithProject( Arrays.asList( getJIRAProject() ), "\"" + description + "\"",
-                                                         20 );
+                    20 );
 
             if ( !issues.isEmpty() )
             {
@@ -462,8 +461,7 @@ public class DefaultErrorReportingManager
         if ( useGlobalProxy )
         {
             subRequest.setProxyConfigurator( new NexusProxyServerConfigurator(
-                                                                               nexusConfig.getGlobalRemoteStorageContext(),
-                                                                               getLogger() ) );
+                nexusConfig.getGlobalRemoteStorageContext(), getLogger() ) );
         }
 
         return subRequest;
@@ -550,7 +548,7 @@ public class DefaultErrorReportingManager
                 }
                 else
                 {
-                    addFileToZip( confFile, zStream, null );   
+                    addFileToZip( confFile, zStream, null );
                 }
             }
 
@@ -559,7 +557,8 @@ public class DefaultErrorReportingManager
                 addFileToZip( logFile, zStream, null );
             }
 
-            Set<Entry<String, ErrorReportBundleContentContributor>> bundleExtraContent = this.bundleExtraContent.entrySet();
+            Set<Entry<String, ErrorReportBundleContentContributor>> bundleExtraContent =
+                this.bundleExtraContent.entrySet();
             for ( Entry<String, ErrorReportBundleContentContributor> extraContent : bundleExtraContent )
             {
                 String basePath = extraContent.getKey() + "/";
@@ -591,18 +590,18 @@ public class DefaultErrorReportingManager
 
         return zipFile;
     }
-    
+
     private void addDirToZip( File directory, ZipOutputStream zStream, String path )
         throws IOException
     {
-        if ( directory != null 
-            && directory.isDirectory() )
+        if ( directory != null && directory.isDirectory() )
         {
             File[] files = directory.listFiles();
-            
+
             for ( File file : files )
             {
-                String pathname = path != null ? ( path + "/" + file.getName() ) : directory.getName() + "/" + file.getName();
+                String pathname =
+                    path != null ? ( path + "/" + file.getName() ) : directory.getName() + "/" + file.getName();
                 if ( file.isDirectory() )
                 {
                     addDirToZip( file, zStream, pathname );
@@ -767,13 +766,13 @@ public class DefaultErrorReportingManager
     {
         if ( throwable != null )
         {
-            if ( throwable instanceof EofException )
+            if ( "org.mortbay.jetty.EofException".equals( throwable.getClass().getName() ) )
             {
                 return true;
             }
             else if ( throwable.getMessage() != null
                 && ( throwable.getMessage().contains( "An exception occured writing the response entity" ) || throwable.getMessage().contains(
-                                                                                                                                               "Error while handling an HTTP server call" ) ) )
+                    "Error while handling an HTTP server call" ) ) )
             {
                 return true;
             }
