@@ -1,5 +1,6 @@
 package org.sonatype.nexus.plugins.capabilities.internal.config;
 
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.StringUtils;
@@ -11,6 +12,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.CCapa
 import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Configuration;
 
 @Singleton
+@Named
 public class DefaultCapabilityConfigurationValidator
     implements CapabilityConfigurationValidator
 {
