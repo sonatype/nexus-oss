@@ -1,6 +1,5 @@
 package org.sonatype.nexus.plugins.capabilities.internal.config.test;
 
-import org.codehaus.plexus.ContainerConfiguration;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.AbstractNexusTestCase;
@@ -13,14 +12,6 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.Confi
 public class DefaultCapabilityConfigurationValidatorTest
     extends AbstractNexusTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        super.customizeContainerConfiguration( configuration );
-
-        configuration.setClassPathScanning( true );
-    }
 
     private CapabilityConfigurationValidator validator;
 

@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.logging.Logger;
@@ -39,6 +40,7 @@ import org.sonatype.nexus.plugins.capabilities.internal.config.persistence.io.xp
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 @Singleton
+@Named
 public class DefaultCapabilityConfiguration
     implements CapabilityConfiguration
 {
@@ -63,10 +65,9 @@ public class DefaultCapabilityConfiguration
 
     @Inject
     public DefaultCapabilityConfiguration( final ApplicationConfiguration applicationConfiguration,
-                                         final ApplicationEventMulticaster applicationEventMulticaster,
-                                         final CapabilityConfigurationValidator validator,
-                                         final ConfigurationIdGenerator idGenerator,
-                                         final Logger logger )
+                                           final ApplicationEventMulticaster applicationEventMulticaster,
+                                           final CapabilityConfigurationValidator validator,
+                                           final ConfigurationIdGenerator idGenerator, final Logger logger )
     {
         this.applicationEventMulticaster = applicationEventMulticaster;
         this.validator = validator;
