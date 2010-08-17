@@ -23,20 +23,6 @@
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-host-api</artifactId>
     </dependency>
-
-    <!-- Maven -->
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-artifact-manager</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-model</artifactId>
-    </dependency>
   </dependencies>
 
   <build>
