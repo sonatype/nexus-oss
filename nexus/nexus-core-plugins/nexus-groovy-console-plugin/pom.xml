@@ -49,7 +49,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.5</version>
         <executions>
           <execution>
             <goals>
