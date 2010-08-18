@@ -425,7 +425,7 @@ public class DefaultIndexingContext
     {
         synchronized ( indexLock )
         {
-            if ( indexWriter == null )
+            if ( indexWriter == null || indexWriter.isClosed() )
             {
                 return false;
             }

@@ -195,8 +195,7 @@ public class IndexUtils
         setRootGroups( context, rootGroups );
         setAllGroups( context, allGroups );
 
-        context.getIndexWriter().optimize();
-        context.getIndexWriter().commit();
+        context.optimize();
     }
 
     // ----------------------------------------------------------------------------
