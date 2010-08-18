@@ -27,6 +27,7 @@ import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.security.SecuritySystem;
+import org.sonatype.security.configuration.SecurityConfigurationManager;
 
 /**
  * Extension of ShiroFilter that uses Plexus lookup to get the configuration, if any role param is given. Otherwise it
@@ -68,6 +69,8 @@ public class ShiroSecurityFilter
     protected void configure()
         throws Exception
     {
+        SecurityConfigurationManager cfg = this.getPlexusContainer().lookup( SecurityConfigurationManager.class );
+        cfg.setSecurityManager( "web" );
 
         // start up security
         this.getSecuritySystem().start();

@@ -79,6 +79,13 @@
           </association>
           <required>true</required>
         </field>
+        <field>
+          <name>securityManager</name>
+          <version>2.0.3+</version>
+          <type>String</type>
+          <description>The id of a security manager to be used by default security system.</description>
+          <required>true</required>
+        </field>        
       </fields>
       <codeSegments>
         <codeSegment>

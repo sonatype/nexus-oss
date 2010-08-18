@@ -28,9 +28,7 @@
 
     <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
-      <implementation>
-				org.sonatype.jettytestsuite.ServletServer
-      </implementation>
+      <implementation>org.sonatype.jettytestsuite.ServletServer</implementation>
       <configuration>
         <port>12345</port>
         <webappContexts>

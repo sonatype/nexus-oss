@@ -32,4 +32,11 @@ public interface SecurityConfigurationManager
      */
     void save();
 
+    /**
+     * @return the id of a security manager to be used by default security system
+     */
+    String getSecurityManager();
+
+    void setSecurityManager( String securityManager );
+
 }
