@@ -10,7 +10,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.locks.ReentrantLock;
 
+import javax.enterprise.inject.Typed;
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -21,38 +24,22 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
-import org.sonatype.security.authorization.NoSuchRoleException;
-import org.sonatype.security.realms.url.URLRealm;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import com.sonatype.security.realms.url.config.model.Configuration;
 import com.sonatype.security.realms.url.config.model.io.xpp3.urlRealmConfigurationXpp3Reader;
 import com.sonatype.security.realms.url.config.model.io.xpp3.urlRealmConfigurationXpp3Writer;
 
 @Singleton
 @Named
+@Typed( value = UrlRealmConfiguration.class )
 public class DefaultUrlRealmConfiguration
     implements UrlRealmConfiguration
 {
-
-//    @Inject
-//    @Named( value = "${application-conf}/url-realm.xml" )
-//    private File configurationFile;
-    
-//    @Inject
-//    @Named( value = "${security-xml-file}" )
-//    private String configDirectory;
     
     @Inject
-    @Named( value = "${application-conf}" )
-    private File configDirectory;
+    @Named( value = "${application-conf}/url-realm.xml" )
+    private File configurationFile;
     
-//    @Inject
-//    @Named( value = "${application-conf}/url-realm.xml" )
-//    private String configurationFileName;
-
     @Inject
     private Logger logger;
     
@@ -215,7 +202,6 @@ public class DefaultUrlRealmConfiguration
     
     private File getConfigFile()
     {
-        return new File( this.configDirectory, "url-realm.xml" );
-//        return configurationFile;
+        return configurationFile;
     }
 }

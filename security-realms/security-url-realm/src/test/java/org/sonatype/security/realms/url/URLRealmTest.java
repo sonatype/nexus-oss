@@ -12,8 +12,6 @@
  */
 package org.sonatype.security.realms.url;
 
-import javax.inject.Named;
-
 import junit.framework.Assert;
 
 import org.apache.shiro.authc.AccountException;
@@ -23,7 +21,6 @@ import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.context.Context;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
@@ -31,7 +28,6 @@ import org.sonatype.security.usermanagement.UserManager;
 
 import com.sonatype.security.realms.url.config.model.Configuration;
 
-@Named
 public class URLRealmTest
     extends AbstractSecurityTestCase
 {
