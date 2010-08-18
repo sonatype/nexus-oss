@@ -32,7 +32,6 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
-import org.sonatype.inject.Nullable;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
@@ -72,7 +71,7 @@ public class DefaultSecuritySystem
     private SecurityConfigurationManager securityConfiguration;
 
     @Inject
-    private RealmSecurityManager applicationSecurityManager;
+    private Map<String, RealmSecurityManager> securityManagers;
 
     @Inject
     private PlexusEhCacheWrapper cacheWrapper;
@@ -107,7 +106,8 @@ public class DefaultSecuritySystem
     {
         try
         {
-            Subject subject = new Subject.Builder( this.applicationSecurityManager ).buildSubject();
+            Subject subject =
+ new Subject.Builder( getSecurityManager() ).buildSubject();
             // TODO: consider doing something else here, read the javadoc for the login method
             subject.login( token );
             // Subject subject = this.getApplicationSecurityManager().login( null, token );
@@ -125,7 +125,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            return this.getApplicationSecurityManager().authenticate( token );
+            return this.getSecurityManager().authenticate( token );
         }
         catch ( org.apache.shiro.authc.AuthenticationException e )
         {
@@ -160,12 +160,12 @@ public class DefaultSecuritySystem
 
     public boolean isPermitted( PrincipalCollection principal, String permission )
     {
-        return this.getApplicationSecurityManager().isPermitted( principal, permission );
+        return this.getSecurityManager().isPermitted( principal, permission );
     }
 
     public boolean[] isPermitted( PrincipalCollection principal, List<String> permissions )
     {
-        return this.getApplicationSecurityManager().isPermitted( principal,
+        return this.getSecurityManager().isPermitted( principal,
                                                                  permissions.toArray( new String[permissions.size()] ) );
     }
 
@@ -174,7 +174,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.getApplicationSecurityManager().checkPermission( principal, permission );
+            this.getSecurityManager().checkPermission( principal, permission );
         }
         catch ( org.apache.shiro.authz.AuthorizationException e )
         {
@@ -188,7 +188,7 @@ public class DefaultSecuritySystem
     {
         try
         {
-            this.getApplicationSecurityManager().checkPermissions( principal,
+            this.getSecurityManager().checkPermissions( principal,
                                                                    permissions.toArray( new String[permissions.size()] ) );
         }
         catch ( org.apache.shiro.authz.AuthorizationException e )
@@ -199,7 +199,7 @@ public class DefaultSecuritySystem
 
     public boolean hasRole( PrincipalCollection principals, String string )
     {
-        return this.getApplicationSecurityManager().hasRole( principals, string );
+        return this.getSecurityManager().hasRole( principals, string );
     }
 
     private Collection<Realm> getRealmsFromConfigSource()
@@ -582,7 +582,7 @@ public class DefaultSecuritySystem
         }
 
         // get the sorted order of realms from the realm locator
-        Collection<Realm> realms = this.getApplicationSecurityManager().getRealms();
+        Collection<Realm> realms = this.getSecurityManager().getRealms();
 
         for ( Realm realm : realms )
         {
@@ -666,7 +666,7 @@ public class DefaultSecuritySystem
         try
         {
             UsernamePasswordToken authenticationToken = new UsernamePasswordToken( userId, oldPassword );
-            if ( this.getApplicationSecurityManager().authenticate( authenticationToken ) == null )
+            if ( this.getSecurityManager().authenticate( authenticationToken ) == null )
             {
                 throw new InvalidCredentialsException();
             }
@@ -853,11 +853,11 @@ public class DefaultSecuritySystem
         // The plexus wrapper can interpolate the config
         EhCacheManager ehCacheManager = new EhCacheManager();
         ehCacheManager.setCacheManager( this.cacheWrapper.getEhCacheManager() );
-        this.getApplicationSecurityManager().setCacheManager( ehCacheManager );
+        this.getSecurityManager().setCacheManager( ehCacheManager );
 
-        if ( org.apache.shiro.util.Initializable.class.isInstance( this.getApplicationSecurityManager() ) )
+        if ( org.apache.shiro.util.Initializable.class.isInstance( this.getSecurityManager() ) )
         {
-            ( (org.apache.shiro.util.Initializable) this.getApplicationSecurityManager() ).init();
+            ( (org.apache.shiro.util.Initializable) this.getSecurityManager() ).init();
         }
         this.setSecurityManagerRealms();
     }
@@ -866,20 +866,20 @@ public class DefaultSecuritySystem
         throws StoppingException
     {
         // we need to kill caches on stop
-        this.applicationSecurityManager.destroy();
+        getSecurityManager().destroy();
     }
 
     private void setSecurityManagerRealms()
     {
-        this.applicationSecurityManager.setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
+        getSecurityManager().setRealms( new ArrayList<Realm>( this.getRealmsFromConfigSource() ) );
     }
 
     private void clearRealmCaches()
     {
         // NOTE: we don't need to iterate all the Sec Managers, they use the same Realms, so one is fine.
-        if ( this.getApplicationSecurityManager().getRealms() != null )
+        if ( this.getSecurityManager().getRealms() != null )
         {
-            for ( Realm realm : this.getApplicationSecurityManager().getRealms() )
+            for ( Realm realm : this.getSecurityManager().getRealms() )
             {
                 // check if its a AuthorizingRealm, if so clear the cache
                 if ( AuthorizingRealm.class.isInstance( realm ) )
@@ -918,12 +918,12 @@ public class DefaultSecuritySystem
     {
         // add event handler
         this.eventMulticaster.addEventListener( this );
-        SecurityUtils.setSecurityManager( this.getApplicationSecurityManager() );
+        SecurityUtils.setSecurityManager( this.getSecurityManager() );
 
     }
 
-    private RealmSecurityManager getApplicationSecurityManager()
+    private RealmSecurityManager getSecurityManager()
     {
-        return this.applicationSecurityManager;
+        return this.securityManagers.get( this.securityConfiguration.getSecurityManager() );
     }
 }

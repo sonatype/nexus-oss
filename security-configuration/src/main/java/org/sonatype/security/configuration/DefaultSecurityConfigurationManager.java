@@ -71,8 +71,7 @@ public class DefaultSecurityConfigurationManager
     public void setAnonymousPassword( String anonymousPassword )
         throws InvalidConfigurationException
     {
-        ValidationResponse vr = validator.validateAnonymousPassword( this
-            .initializeContext(), anonymousPassword );
+        ValidationResponse vr = validator.validateAnonymousPassword( this.initializeContext(), anonymousPassword );
 
         if ( vr.isValid() )
         {
@@ -92,8 +91,7 @@ public class DefaultSecurityConfigurationManager
     public void setAnonymousUsername( String anonymousUsername )
         throws InvalidConfigurationException
     {
-        ValidationResponse vr = validator.validateAnonymousUsername( this
-            .initializeContext(), anonymousUsername );
+        ValidationResponse vr = validator.validateAnonymousUsername( this.initializeContext(), anonymousUsername );
 
         if ( vr.isValid() )
         {
@@ -188,6 +186,23 @@ public class DefaultSecurityConfigurationManager
         context.setSecurityConfiguration( this.getConfiguration() );
 
         return context;
+    }
+
+    public String getSecurityManager()
+    {
+        String sm = this.getConfiguration().getSecurityManager();
+        if ( sm == null )
+        {
+            setSecurityManager( "default" );
+            return this.getConfiguration().getSecurityManager();
+        }
+        return sm;
+    }
+
+    public void setSecurityManager( String securityManager )
+    {
+        this.getConfiguration().setSecurityManager( securityManager );
+        save();
     }
 
 }
