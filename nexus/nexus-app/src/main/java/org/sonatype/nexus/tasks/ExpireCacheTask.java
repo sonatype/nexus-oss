@@ -31,6 +31,18 @@ import org.sonatype.scheduling.SchedulerTask;
 public class ExpireCacheTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return ExpireCacheTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
+    @Override
+    protected String getRepositoryPathFieldId()
+    {
+        return ExpireCacheTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
+    }
+
     public Object doRun()
         throws Exception
     {
@@ -38,8 +50,7 @@ public class ExpireCacheTask
 
         if ( getRepositoryGroupId() != null )
         {
-            getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).expireCaches( req );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).expireCaches( req );
         }
         else if ( getRepositoryId() != null )
         {

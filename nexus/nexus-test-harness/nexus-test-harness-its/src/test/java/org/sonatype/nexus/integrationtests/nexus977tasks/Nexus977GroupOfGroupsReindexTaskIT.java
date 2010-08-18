@@ -39,7 +39,7 @@ public class Nexus977GroupOfGroupsReindexTaskIT
         FileUtils.copyFile( getTestFile( "project.jar" ), dest );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "ReindexTaskDescriptor-snapshot", ReindexTaskDescriptor.ID, repo );

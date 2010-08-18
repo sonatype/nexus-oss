@@ -74,7 +74,7 @@ public class Nexus635ExpireCacheTaskIT
                            compareFileSHA1s( secondDownload, artifact1 ) );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "tasks-snapshot-repo" );
 
         // prop = new ScheduledServicePropertyResource();

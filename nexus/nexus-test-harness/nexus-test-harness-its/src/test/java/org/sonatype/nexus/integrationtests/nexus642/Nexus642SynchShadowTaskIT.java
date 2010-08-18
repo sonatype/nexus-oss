@@ -78,11 +78,11 @@ public class Nexus642SynchShadowTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "sync-repo-props" );
+        repo.setKey( "sync-repo-props" );
         repo.setValue( shadowRepo );
 
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
-        age.setId( "shadowRepositoryId" );
+        age.setKey( "shadowRepositoryId" );
         age.setValue( shadowRepo );
 
         // clean unused

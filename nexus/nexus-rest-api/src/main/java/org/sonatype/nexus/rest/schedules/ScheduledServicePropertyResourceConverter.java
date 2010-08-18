@@ -40,9 +40,9 @@ public class ScheduledServicePropertyResourceConverter
         while ( reader.hasMoreChildren() )
         {
             reader.moveDown();
-            if ( "id".equals( reader.getNodeName() ) )
+            if ( "key".equals( reader.getNodeName() ) )
             {
-                resource.setId( (String) context.convertAnother( source, String.class ) );
+                resource.setKey( (String) context.convertAnother( source, String.class ) );
             }
             else if ( "value".equals( reader.getNodeName() ) )
             {

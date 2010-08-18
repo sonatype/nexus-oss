@@ -1,5 +1,10 @@
-FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore, repoStore, groupStore, repoOrGroupStore) {
+FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore, repoStore, groupStore, repoOrGroupStore, customTypes, width) {
   var allTypes = [];
+
+  if (!width)
+  {
+    width = 300;
+  }
 
   allTypes[0] = {
     xtype : 'fieldset',
@@ -36,7 +41,7 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 name : fieldNamePrefix + curRec.id,
                 allowBlank : curRec.required ? false : true,
                 disabled : true,
-                width : this.COMBO_WIDTH,
+                width : width,
                 regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
               };
             }
@@ -50,7 +55,7 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 name : fieldNamePrefix + curRec.id,
                 allowBlank : curRec.required ? false : true,
                 disabled : true,
-                width : this.COMBO_WIDTH,
+                width : width,
                 regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
               };
             }
@@ -96,8 +101,8 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 selectOnFocus : true,
                 allowBlank : curRec.required ? false : true,
                 disabled : true,
-                width : this.COMBO_WIDTH,
-                minListWidth : this.COMBO_WIDTH
+                width : width,
+                minListWidth : width
               };
             }
             else if (curRec.type == 'group')
@@ -119,8 +124,8 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 selectOnFocus : true,
                 allowBlank : curRec.required ? false : true,
                 disabled : true,
-                width : this.COMBO_WIDTH,
-                minListWidth : this.COMBO_WIDTH
+                width : width,
+                minListWidth : width
               };
             }
             else if (curRec.type == 'repo-or-group')
@@ -142,9 +147,13 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
                 selectOnFocus : true,
                 allowBlank : curRec.required ? false : true,
                 disabled : true,
-                width : this.COMBO_WIDTH,
-                minListWidth : this.COMBO_WIDTH
+                width : width,
+                minListWidth : width
               };
+            }
+            else if (customTypes && customTypes[curRec.type])
+            {
+              items[j] = customTypes[curRec.type].createItem.call(this, curRec, fieldNamePrefix, width);
             }
 
             allTypes[allTypes.length] = {
@@ -182,4 +191,95 @@ FormFieldGenerator = function(panelId, fieldSetName, fieldNamePrefix, typeStore,
       }, this);
 
   return allTypes;
+};
+
+FormFieldExporter = function(formPanel, panelIdSuffix, formFieldPrefix, customTypes) {
+  var outputArr = [];
+
+  var formFieldPanel = formPanel.findById(formPanel.id + panelIdSuffix);
+  var i = 0;
+  // These are dynamic fields here, so some pretty straightforward generic
+  // logic below
+  formFieldPanel.getLayout().activeItem.items.each(function(item, i, len) {
+        var value;
+
+        if (item.xtype == 'datefield')
+        {
+          // long representation is used, not actual date
+          // force to a string, as that is what the current api requires
+          value = '' + item.getValue().getTime();
+        }
+        else if (item.xtype == 'textfield')
+        {
+          value = item.getValue();
+        }
+        else if (item.xtype == 'numberfield')
+        {
+          // force to a string, as that is what the current api requires
+          value = '' + item.getValue();
+        }
+        else if (item.xtype == 'checkbox')
+        {
+          value = '' + item.getValue();
+        }
+        else if (item.xtype == 'combo')
+        {
+          value = item.getValue();
+        }
+        else if (customTypes && customTypes[item.xtype])
+        {
+          value = customTypes[item.xtype].retrieveValue.call(item, item);
+        }
+
+        outputArr[i] = {
+          key : item.getName().substring(formFieldPrefix.length),
+          value : value
+        };
+        i++;
+      }, formFieldPanel.getLayout().activeItem);
+
+  return outputArr;
+};
+FormFieldImporter = function(jsonObject, formPanel, formFieldPrefix, customTypes) {
+  // Maps the incoming json properties to the generic component
+  for (var i = 0; i < jsonObject.properties.length; i++)
+  {
+    var formFields = formPanel.find('name', formFieldPrefix + jsonObject.properties[i].key);
+    for (var j = 0; j < formFields.length; j++)
+    {
+      var formField = formFields[j];
+
+      if (formField != null)
+      {
+        if (!formField.disabled && !Ext.isEmpty(jsonObject.properties[i].value))
+        {
+          if (formField.xtype == 'datefield')
+          {
+            formField.setValue(new Date(Number(jsonObject.properties[i].value)));
+          }
+          else if (formField.xtype == 'textfield')
+          {
+            formField.setValue(jsonObject.properties[i].value);
+          }
+          else if (formField.xtype == 'numberfield')
+          {
+            formField.setValue(Number(jsonObject.properties[i].value));
+          }
+          else if (formField.xtype == 'checkbox')
+          {
+            formField.setValue(Boolean('true' == jsonObject.properties[i].value));
+          }
+          else if (formField.xtype == 'combo')
+          {
+            formField.setValue(jsonObject.properties[i].value);
+          }
+          else if (customTypes && customTypes[formField.xtype])
+          {
+            customTypes[formField.xtype].setValue.call(formField, formField, jsonObject.properties[i].value);
+          }
+          break;
+        }
+      }
+    }
+  }
 };

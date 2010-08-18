@@ -82,19 +82,19 @@ public abstract class AbstractSnapshotRemoverIT
         throws Exception
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-        repositoryProp.setId( "repositoryOrGroupId" );
+        repositoryProp.setKey( "repositoryOrGroupId" );
         repositoryProp.setValue( repositoryOrGroupId );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
-        keepSnapshotsProp.setId( "minSnapshotsToKeep" );
+        keepSnapshotsProp.setKey( "minSnapshotsToKeep" );
         keepSnapshotsProp.setValue( String.valueOf( minSnapshotsToKeep ) );
 
         ScheduledServicePropertyResource ageProp = new ScheduledServicePropertyResource();
-        ageProp.setId( "removeOlderThanDays" );
+        ageProp.setKey( "removeOlderThanDays" );
         ageProp.setValue( String.valueOf( removeOlderThanDays ) );
 
         ScheduledServicePropertyResource removeReleasedProp = new ScheduledServicePropertyResource();
-        removeReleasedProp.setId( "removeIfReleaseExists" );
+        removeReleasedProp.setKey( "removeIfReleaseExists" );
         removeReleasedProp.setValue( String.valueOf( removeIfReleaseExists ) );
 
         ScheduledServiceListResource task =

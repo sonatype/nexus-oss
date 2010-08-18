@@ -179,7 +179,7 @@ Sonatype.repoServer.SchedulesEditPanel = function(config) {
       }, {
         name : 'name'
       }, {
-        name : 'properties'
+        name : 'formFields'
       }]);
 
   // A record that holds the data for each service in the system
@@ -960,210 +960,6 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         Sonatype.Events.fireEvent('initializeCustomTypes', this.customTypes);
       },
 
-      // Populate the dynamic content, based upon the currently defined service
-      // types from the server
-      populateServiceTypePanelItems : function(id) {
-        // If the items haven't loaded yet, wait until they are. This of course
-        // requires that their be at least
-        // 1 service type available at ALL times on the server.
-        // TODO: could probably use better logic here
-        if (this.serviceTypeDataStore.data.items.length < 1)
-        {
-          return this.populateServiceTypePanelItems.defer(300, this, arguments);
-        }
-
-        var allItems = [];
-
-        allItems[0] = {
-          xtype : 'fieldset',
-          id : id + '_emptyItem',
-          checkboxToggle : false,
-          title : 'Task Settings',
-          anchor : Sonatype.view.FIELDSET_OFFSET,
-          collapsible : false,
-          autoHeight : true,
-          layoutConfig : {
-            labelSeparator : ''
-          }
-        };
-
-        // Now add the dynamic content
-        this.serviceTypeDataStore.each(function(item, i, len) {
-              var items = [];
-              if (item.data.properties.length > 0)
-              {
-                for (var j = 0; j < item.data.properties.length; j++)
-                {
-                  var curRec = item.data.properties[j];
-                  // Note that each item is disabled initially, this is because
-                  // the select handler for the serviceType
-                  // combo box handles enabling/disabling as necessary, so each
-                  // inactive card isn't also included in the form
-                  if (curRec.type == 'string')
-                  {
-                    items[j] = {
-                      xtype : 'textfield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
-                    };
-                  }
-                  else if (curRec.type == 'number')
-                  {
-                    items[j] = {
-                      xtype : 'numberfield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      regex : curRec.regexValidation ? new RegExp(curRec.regexValidation) : null
-                    };
-                  }
-                  else if (curRec.type == 'boolean')
-                  {
-                    items[j] = {
-                      xtype : 'checkbox',
-                      fieldLabel : curRec.name,
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      disabled : true
-                    };
-                  }
-                  else if (curRec.type == 'date')
-                  {
-                    items[j] = {
-                      xtype : 'datefield',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      value : new Date()
-                    };
-                  }
-                  else if (curRec.type == 'repo')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      store : this.repositoryDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-                  else if (curRec.type == 'group')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      store : this.repositoryGroupDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-                  else if (curRec.type == 'repo-or-group')
-                  {
-                    items[j] = {
-                      xtype : 'combo',
-                      fieldLabel : curRec.name,
-                      itemCls : curRec.required ? 'required-field' : '',
-                      helpText : curRec.helpText,
-                      name : 'serviceProperties_' + curRec.id,
-                      store : this.repoOrGroupDataStore,
-                      displayField : 'name',
-                      valueField : 'id',
-                      editable : false,
-                      forceSelection : true,
-                      mode : 'local',
-                      triggerAction : 'all',
-                      emptyText : 'Select...',
-                      selectOnFocus : true,
-                      allowBlank : curRec.required ? false : true,
-                      disabled : true,
-                      width : this.COMBO_WIDTH,
-                      minListWidth : this.COMBO_WIDTH
-                    };
-                  }
-                  else
-                  {
-                    if (this.customTypes[curRec.type])
-                    {
-                      items[j] = this.customTypes[curRec.type].createItem.call(this, curRec);
-                    }
-                  }
-
-                  allItems[allItems.length] = {
-                    xtype : 'fieldset',
-                    id : id + '_' + item.data.id,
-                    checkboxToggle : false,
-                    title : 'Task Settings',
-                    anchor : Sonatype.view.FIELDSET_OFFSET,
-                    collapsible : false,
-                    autoHeight : true,
-                    labelWidth : 175,
-                    layoutConfig : {
-                      labelSeparator : ''
-                    },
-                    items : items
-                  };
-                }
-              }
-              else
-              {
-                allItems[allItems.length] = {
-                  xtype : 'fieldset',
-                  id : id + '_' + item.data.id,
-                  checkboxToggle : false,
-                  title : 'Task Settings',
-                  anchor : Sonatype.view.FIELDSET_OFFSET,
-                  collapsible : false,
-                  autoHeight : true,
-                  labelWidth : 175,
-                  layoutConfig : {
-                    labelSeparator : ''
-                  }
-                };
-              }
-            }, this);
-
-        return allItems;
-      },
-
       // Dump the currently stored data and requery for everything
       reloadAll : function() {
         this.schedulesDataStore.removeAll();
@@ -1284,7 +1080,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[4].items, this.populateServiceTypePanelItems(id));
+        Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -1662,7 +1458,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
                 id : id
               });
           config = this.configUniqueIdHelper(id, config);
-          Ext.apply(config.items[4].items, this.populateServiceTypePanelItems(id));
+          Ext.apply(config.items[4].items, FormFieldGenerator(id, 'Task Settings', 'serviceProperties_', this.serviceTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, this.customTypes, this.COMBO_WIDTH));
           formPanel = new Ext.FormPanel(config);
 
           formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -2000,53 +1796,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         return outputArr;
       },
       exportServicePropertiesHelper : function(val, fpanel) {
-        var outputArr = [];
-
-        var servicePropertiesPanel = fpanel.findById(fpanel.id + '_service-type-config-card-panel');
-        var i = 0;
-        // These are dynamic fields here, so some pretty straightforward generic
-        // logic below
-        servicePropertiesPanel.getLayout().activeItem.items.each(function(item, i, len) {
-              var value;
-
-              if (item.xtype == 'datefield')
-              {
-                // long representation is used, not actual date
-                // force to a string, as that is what the current api requires
-                value = '' + item.getValue().getTime();
-              }
-              else if (item.xtype == 'textfield')
-              {
-                value = item.getValue();
-              }
-              else if (item.xtype == 'numberfield')
-              {
-                // force to a string, as that is what the current api requires
-                value = '' + item.getValue();
-              }
-              else if (item.xtype == 'checkbox')
-              {
-                value = '' + item.getValue();
-              }
-              else if (item.xtype == 'combo')
-              {
-                value = item.getValue();
-              }
-              else
-              {
-                if (this.customTypes[item.xtype])
-                {
-                  value = this.customTypes[item.xtype].retrieveValue.call(this, item);
-                }
-              }
-              outputArr[i] = {
-                id : item.getName().substring('serviceProperties_'.length),
-                value : value
-              };
-              i++;
-            }, this);
-
-        return outputArr;
+      	return FormFieldExporter(fpanel, '_service-type-config-card-panel', 'serviceProperties_', this.customTypes);
       },
       importStartDateHelper : function(val, srcObj, fpanel) {
         var selectedStartDate = "";
@@ -2132,52 +1882,7 @@ Ext.extend(Sonatype.repoServer.SchedulesEditPanel, Ext.Panel, {
         return arr;
       },
       importServicePropertiesHelper : function(val, srcObj, fpanel) {
-        // Maps the incoming json properties to the generic component
-        // Uses the id of the serviceProperty item as the key, so the id _must_
-        // be unique within a service type
-        for (var i = 0; i < srcObj.properties.length; i++)
-        {
-          var servicePropertyItems = fpanel.find('name', 'serviceProperties_' + srcObj.properties[i].id);
-          for (var j = 0; j < servicePropertyItems.length; j++)
-          {
-            var servicePropertyItem = servicePropertyItems[j];
-
-            if (servicePropertyItem != null)
-            {
-              if (!servicePropertyItem.disabled && !Ext.isEmpty(srcObj.properties[i].value))
-              {
-                if (servicePropertyItem.xtype == 'datefield')
-                {
-                  servicePropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
-                }
-                else if (servicePropertyItem.xtype == 'textfield')
-                {
-                  servicePropertyItem.setValue(srcObj.properties[i].value);
-                }
-                else if (servicePropertyItem.xtype == 'numberfield')
-                {
-                  servicePropertyItem.setValue(Number(srcObj.properties[i].value));
-                }
-                else if (servicePropertyItem.xtype == 'checkbox')
-                {
-                  servicePropertyItem.setValue(Boolean('true' == srcObj.properties[i].value));
-                }
-                else if (servicePropertyItem.xtype == 'combo')
-                {
-                  servicePropertyItem.setValue(srcObj.properties[i].value);
-                }
-                else
-                {
-                  if (this.customTypes[servicePropertyItem.xtype])
-                  {
-                    this.customTypes[servicePropertyItem.xtype].setValue.call(this, servicePropertyItem, srcObj.properties[i].value);
-                  }
-                }
-                break;
-              }
-            }
-          }
-        }
-        return val;
+      	FormFieldImporter(srcObj, fpanel, 'serviceProperties_', this.customTypes);
+      	return val;
       }
     });

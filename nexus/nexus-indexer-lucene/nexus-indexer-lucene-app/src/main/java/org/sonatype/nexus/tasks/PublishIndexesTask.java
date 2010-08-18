@@ -36,6 +36,12 @@ public class PublishIndexesTask
     private IndexerManager indexerManager;
 
     @Override
+    protected String getRepositoryFieldId()
+    {
+        return PublishIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
+    @Override
     protected Object doRun()
         throws Exception
     {

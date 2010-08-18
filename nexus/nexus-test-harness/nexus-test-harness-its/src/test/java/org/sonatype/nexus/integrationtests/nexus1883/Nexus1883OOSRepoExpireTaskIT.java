@@ -27,7 +27,7 @@ public class Nexus1883OOSRepoExpireTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( REPO_TEST_HARNESS_SHADOW );
 
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );

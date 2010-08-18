@@ -26,14 +26,14 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         RepositoryMessageUtil.updateIndexes( "r1", "r2", "r3" );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repository_r4" );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( "r4", DownloadIndexesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repository_r5" );
         task = TaskScheduleUtil.runTask( "r5", DownloadIndexesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
@@ -50,7 +50,7 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         Assert.assertFalse( new File( nexusWorkDir, "storage/g4/.index" ).exists() );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, 200,

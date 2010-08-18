@@ -8,27 +8,32 @@ import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 import com.sonatype.nexus.plugin.groovyconsole.tasks.descriptors.GroovyRunnerTaskDescriptor;
-import com.sonatype.nexus.plugin.groovyconsole.tasks.descriptors.properties.GroovyRunnerTaskPropertyDescriptor;
 
 @Component( role = SchedulerTask.class, hint = GroovyRunnerTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class GroovyRunnerTask
-    extends AbstractNexusRepositoriesPathAwareTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
     @Requirement
     private PlexusContainer plexus;
 
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return GroovyRunnerTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
     public String getGroovyScript()
     {
-        return getParameters().get( GroovyRunnerTaskPropertyDescriptor.ID );
+        return getParameters().get( GroovyRunnerTaskDescriptor.SCRIPT_FIELD_ID );
     }
 
     public void setGroovyScript( String groovyScript )
     {
-        getParameters().put( GroovyRunnerTaskPropertyDescriptor.ID, groovyScript );
+        getParameters().put( GroovyRunnerTaskDescriptor.SCRIPT_FIELD_ID, groovyScript );
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.inject.Singleton;
 
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.plugin.ExtensionPoint;
 
 @ExtensionPoint
@@ -27,8 +27,8 @@ public interface ScheduledTaskDescriptor
     String getId();
 
     String getName();
-
-    List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors();
+    
+    List<FormField> formFields();
 
     boolean isExposed();
 }

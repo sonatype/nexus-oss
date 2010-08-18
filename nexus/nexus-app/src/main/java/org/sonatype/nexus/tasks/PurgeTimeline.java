@@ -23,7 +23,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.PurgeOlderThanDaysPropertyDescriptor;
 import org.sonatype.nexus.timeline.NexusTimeline;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -45,12 +44,12 @@ public class PurgeTimeline
 
     public int getPurgeOlderThan()
     {
-        return Integer.parseInt( getParameters().get( PurgeOlderThanDaysPropertyDescriptor.ID ) );
+        return Integer.parseInt( getParameters().get( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID ) );
     }
 
     public void setPurgeOlderThan( int purgeOlderThan )
     {
-        getParameters().put( PurgeOlderThanDaysPropertyDescriptor.ID, Integer.toString( purgeOlderThan ) );
+        getParameters().put( PurgeTimelineTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString( purgeOlderThan ) );
     }
 
     public Set<String> getTypes()
@@ -106,12 +105,12 @@ public class PurgeTimeline
         else if ( getSubTypes().size() == 0 )
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(), null,
-                null );
+                                     null );
         }
         else
         {
             timeline.purgeOlderThan( System.currentTimeMillis() - ( getPurgeOlderThan() * A_DAY ), getTypes(),
-                getSubTypes(), null );
+                                     getSubTypes(), null );
         }
 
         return null;

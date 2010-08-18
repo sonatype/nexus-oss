@@ -28,20 +28,20 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
         super.runOnce();
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_release" );
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "RebuildMavenMetadata-release", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_release2" );
         task = TaskScheduleUtil.runTask( "RebuildMavenMetadata-release2", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
 
         repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_snapshot" );
         task = TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
         Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );

@@ -27,7 +27,7 @@ public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );

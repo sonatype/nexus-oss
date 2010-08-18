@@ -48,7 +48,7 @@ public class Nexus639PurgeTaskIT
 
         // run the purge task for everything
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "purgeOlderThan" );
+        repo.setKey( "purgeOlderThan" );
         repo.setValue( "0" );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
 

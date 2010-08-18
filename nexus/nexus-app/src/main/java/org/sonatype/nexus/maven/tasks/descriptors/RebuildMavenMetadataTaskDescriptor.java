@@ -17,20 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "RebuildMavenMetadata", description = "Rebuild Maven Metadata Files" )
 public class RebuildMavenMetadataTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    
     public static final String ID = "RebuildMavenMetadataTask";
-
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+    
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+    
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID, FormField.MANDATORY );
 
     public String getId()
     {
@@ -41,14 +41,13 @@ public class RebuildMavenMetadataTaskDescriptor
     {
         return "Rebuild Maven Metadata Files";
     }
-
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
-
-        properties.add( repositoryOrGroupId );
-
-        return properties;
+        List<FormField> fields = new ArrayList<FormField>();
+        
+        fields.add( repoField );
+        
+        return fields;
     }
-
 }

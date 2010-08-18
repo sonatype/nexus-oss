@@ -26,7 +26,6 @@ import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.scheduling.DefaultScheduledTask;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.SchedulerTask;
@@ -57,29 +56,31 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return repositoryRegistry;
     }
 
+    protected abstract String getRepositoryFieldId();
+
     public String getRepositoryId()
     {
-        return getIdFromPrefixedString( REPO_PREFIX, getParameters().get( RepositoryOrGroupPropertyDescriptor.ID ) );
+        return getIdFromPrefixedString( REPO_PREFIX, getParameters().get( getRepositoryFieldId() ) );
     }
 
     public void setRepositoryId( String repositoryId )
     {
         if ( !StringUtils.isEmpty( repositoryId ) )
         {
-            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, REPO_PREFIX + repositoryId );
+            getParameters().put( getRepositoryFieldId(), REPO_PREFIX + repositoryId );
         }
     }
 
     public String getRepositoryGroupId()
     {
-        return getIdFromPrefixedString( GROUP_PREFIX, getParameters().get( RepositoryOrGroupPropertyDescriptor.ID ) );
+        return getIdFromPrefixedString( GROUP_PREFIX, getParameters().get( getRepositoryFieldId() ) );
     }
 
     public void setRepositoryGroupId( String repositoryGroupId )
     {
         if ( !StringUtils.isEmpty( repositoryGroupId ) )
         {
-            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, GROUP_PREFIX + repositoryGroupId );
+            getParameters().put( getRepositoryFieldId(), GROUP_PREFIX + repositoryGroupId );
         }
     }
 
@@ -129,7 +130,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
         {
             ComponentDescriptor<?> cd =
                 getPlexusContainer().getComponentDescriptor( SchedulerTask.class, SchedulerTask.class.getName(),
-                    taskType );
+                                                             taskType );
 
             if ( cd != null )
             {
@@ -144,14 +145,13 @@ public abstract class AbstractNexusRepositoriesTask<T>
                         // check against RUNNING intersection
                         if ( TaskState.RUNNING.equals( task.getTaskState() )
                             && DefaultScheduledTask.class.isAssignableFrom( task.getClass() )
-                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get(
-                                RepositoryOrGroupPropertyDescriptor.ID ) ) )
+                            && repositorySetIntersectionIsNotEmpty( task.getTaskParams().get( getRepositoryFieldId() ) ) )
                         {
                             if ( getLogger().isDebugEnabled() )
                             {
-                                getLogger().debug(
-                                    "Task " + task.getName() + " is already running and is conflicting with task "
-                                        + this.getClass().getName() );
+                                getLogger().debug( "Task " + task.getName()
+                                                       + " is already running and is conflicting with task "
+                                                       + this.getClass().getName() );
                             }
 
                             return true;
@@ -206,7 +206,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             else
             {
                 thisReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(),
-                    GroupRepository.class ).getMemberRepositories() );
+                                                                                    GroupRepository.class ).getMemberRepositories() );
             }
 
             List<Repository> otherReposes = new ArrayList<Repository>();
@@ -218,7 +218,7 @@ public abstract class AbstractNexusRepositoriesTask<T>
             else
             {
                 otherReposes.addAll( getRepositoryRegistry().getRepositoryWithFacet( otherRepositoryGroupId,
-                    GroupRepository.class ).getMemberRepositories() );
+                                                                                     GroupRepository.class ).getMemberRepositories() );
             }
 
             HashSet<Repository> testSet = new HashSet<Repository>();

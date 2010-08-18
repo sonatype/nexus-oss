@@ -36,6 +36,12 @@ public class DownloadIndexesTask
     private IndexerManager indexerManager;
 
     @Override
+    protected String getRepositoryFieldId()
+    {
+        return DownloadIndexesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
+    @Override
     protected Object doRun()
         throws Exception
     {

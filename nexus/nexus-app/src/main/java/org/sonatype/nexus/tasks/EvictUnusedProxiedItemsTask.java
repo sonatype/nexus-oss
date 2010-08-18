@@ -22,7 +22,6 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.EvictOlderThanDaysPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -34,14 +33,21 @@ import org.sonatype.scheduling.SchedulerTask;
 public class EvictUnusedProxiedItemsTask
     extends AbstractNexusRepositoriesTask<Collection<String>>
 {
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return EvictUnusedItemsTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
     public int getEvictOlderCacheItemsThen()
     {
-        return Integer.parseInt( getParameters().get( EvictOlderThanDaysPropertyDescriptor.ID ) );
+        return Integer.parseInt( getParameters().get( EvictUnusedItemsTaskDescriptor.OLDER_THAN_FIELD_ID ) );
     }
 
     public void setEvictOlderCacheItemsThen( int evictOlderCacheItemsThen )
     {
-        getParameters().put( EvictOlderThanDaysPropertyDescriptor.ID, Integer.toString( evictOlderCacheItemsThen ) );
+        getParameters().put( EvictUnusedItemsTaskDescriptor.OLDER_THAN_FIELD_ID,
+                             Integer.toString( evictOlderCacheItemsThen ) );
     }
 
     @Override
@@ -53,16 +59,14 @@ public class EvictUnusedProxiedItemsTask
         long olderThan = System.currentTimeMillis() - ( getEvictOlderCacheItemsThen() * A_DAY );
 
         if ( getRepositoryGroupId() != null )
-        {   
-            return getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).evictUnusedItems(
-                    req,
-                    olderThan );
+        {
+            return getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).evictUnusedItems( req,
+                                                                                                                                     olderThan );
         }
         else if ( getRepositoryId() != null )
         {
-            return getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryId(), Repository.class ).evictUnusedItems( req, olderThan );
+            return getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).evictUnusedItems( req,
+                                                                                                                           olderThan );
         }
         else
         {

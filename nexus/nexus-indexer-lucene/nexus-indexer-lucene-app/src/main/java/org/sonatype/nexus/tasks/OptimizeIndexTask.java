@@ -35,6 +35,18 @@ public class OptimizeIndexTask
     private IndexerManager indexManager;
 
     @Override
+    protected String getRepositoryFieldId()
+    {
+        return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+    
+    @Override
+    protected String getRepositoryPathFieldId()
+    {
+        return null;
+    }
+
+    @Override
     public Object doRun()
         throws Exception
     {

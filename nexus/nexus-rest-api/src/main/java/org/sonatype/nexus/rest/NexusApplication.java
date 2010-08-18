@@ -40,6 +40,7 @@ import org.sonatype.nexus.rest.model.ErrorReportRequest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
+import org.sonatype.nexus.rest.model.FormFieldResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -93,7 +94,6 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
@@ -349,8 +349,8 @@ public class NexusApplication
             new AliasingListConverter( String.class, "day" ) );
         xstream.registerLocalConverter( ScheduledServiceTypeResourceResponse.class, "data", new AliasingListConverter(
             ScheduledServiceTypeResource.class, "schedule-type" ) );
-        xstream.registerLocalConverter( ScheduledServiceTypeResource.class, "properties", new AliasingListConverter(
-            ScheduledServiceTypePropertyResource.class, "scheduled-task-property" ) );
+        xstream.registerLocalConverter( ScheduledServiceTypeResource.class, "formFields", new AliasingListConverter(
+            FormFieldResource.class, "form-field" ) );
         xstream.registerLocalConverter( ScheduledServiceListResourceResponse.class, "data", new AliasingListConverter(
             ScheduledServiceListResource.class, "schedules-list-item" ) );
 

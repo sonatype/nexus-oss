@@ -18,7 +18,6 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.SynchronizeShadowTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ShadowPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -30,23 +29,28 @@ import org.sonatype.scheduling.SchedulerTask;
 public class SynchronizeShadowsTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return SynchronizeShadowTaskDescriptor.REPO_FIELD_ID;
+    }
+
     public String getShadowRepositoryId()
     {
-        return getParameter( ShadowPropertyDescriptor.ID );
+        return getParameter( SynchronizeShadowTaskDescriptor.REPO_FIELD_ID );
     }
 
     public void setShadowRepositoryId( String shadowRepositoryId )
     {
-        getParameters().put( ShadowPropertyDescriptor.ID, shadowRepositoryId );
+        getParameters().put( SynchronizeShadowTaskDescriptor.REPO_FIELD_ID, shadowRepositoryId );
     }
 
     @Override
     protected Object doRun()
         throws Exception
     {
-        ShadowRepository shadow = getRepositoryRegistry().getRepositoryWithFacet(
-            getShadowRepositoryId(),
-            ShadowRepository.class );
+        ShadowRepository shadow =
+            getRepositoryRegistry().getRepositoryWithFacet( getShadowRepositoryId(), ShadowRepository.class );
 
         shadow.synchronizeWithMaster();
 

@@ -59,15 +59,15 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
                       "target/downloads/nexus977tasks/project-1.0-20100520.154534-88.jar" );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
-        keepSnapshotsProp.setId( "minSnapshotsToKeep" );
+        keepSnapshotsProp.setKey( "minSnapshotsToKeep" );
         keepSnapshotsProp.setValue( String.valueOf( 0 ) );
 
         ScheduledServicePropertyResource ageProp = new ScheduledServicePropertyResource();
-        ageProp.setId( "removeOlderThanDays" );
+        ageProp.setKey( "removeOlderThanDays" );
         ageProp.setValue( String.valueOf( 0 ) );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,

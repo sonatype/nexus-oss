@@ -20,7 +20,6 @@ import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.EmptyOlderThanDaysPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -69,7 +68,7 @@ public class EmptyTrashTask
 
     public int getEmptyOlderCacheItemsThan()
     {
-        String days = getParameters().get( EmptyOlderThanDaysPropertyDescriptor.ID );
+        String days = getParameters().get( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID );
 
         if ( StringUtils.isEmpty( days ) )
         {
@@ -81,6 +80,6 @@ public class EmptyTrashTask
 
     public void setEmptyOlderCacheItemsThan( int emptyOlderCacheItemsThan )
     {
-        getParameters().put( EmptyOlderThanDaysPropertyDescriptor.ID, Integer.toString( emptyOlderCacheItemsThan ) );
+        getParameters().put( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID, Integer.toString( emptyOlderCacheItemsThan ) );
     }
 }

@@ -41,11 +41,11 @@ public abstract class AbstractLegacyRulesIT
         super.runOnce();
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
         TaskScheduleUtil.runTask( "nexus1560-repo", RebuildMavenMetadataTaskDescriptor.ID, repo );
         ScheduledServicePropertyResource repo2 = new ScheduledServicePropertyResource();
-        repo2.setId( "repositoryOrGroupId" );
+        repo2.setKey( "repositoryOrGroupId" );
         repo2.setValue( "repo_" + REPO_TEST_HARNESS_REPO2 );
         TaskScheduleUtil.runTask( "nexus1560-repo2", RebuildMavenMetadataTaskDescriptor.ID, repo2 );
     }

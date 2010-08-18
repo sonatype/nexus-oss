@@ -71,7 +71,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
         // rebuild attributes
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "repo_" + this.getTestRepositoryId() );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
         Assert.assertNotNull( task );
@@ -148,10 +148,10 @@ public class Nexus636EvictUnusedProxiedTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( repository );
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
-        age.setId( "evictOlderCacheItemsThen" );
+        age.setKey( "evictOlderCacheItemsThen" );
         age.setValue( String.valueOf( cacheAge ) );
 
         // clean unused

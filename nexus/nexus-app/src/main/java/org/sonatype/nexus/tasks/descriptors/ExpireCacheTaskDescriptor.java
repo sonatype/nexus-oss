@@ -17,30 +17,33 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "ExpireCache", description = "Expire Repository Caches" )
 public class ExpireCacheTaskDescriptor
     extends AbstractScheduledTaskDescriptor
-    implements Initializable
 {
     public static final String ID = "ExpireCacheTask";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "ResourceStorePath" )
-    private ScheduledTaskPropertyDescriptor resourceStorePath;
+    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
-    public void initialize()
-        throws InitializationException
-    {
-        repositoryOrGroupId
-            .setHelpText( "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\")" );
-    }
+    private final RepoOrGroupComboFormField repoField =
+        new RepoOrGroupComboFormField(
+                                       REPO_OR_GROUP_FIELD_ID,
+                                       RepoOrGroupComboFormField.DEFAULT_LABEL,
+                                       "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\")",
+                                       FormField.MANDATORY );
+
+    private final NumberTextFormField resourceStorePathField =
+        new NumberTextFormField(
+                                 RESOURCE_STORE_PATH_FIELD_ID,
+                                 "Repository path",
+                                 "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
+                                 FormField.OPTIONAL );
 
     public String getId()
     {
@@ -52,13 +55,13 @@ public class ExpireCacheTaskDescriptor
         return "Expire Repository Caches";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( repositoryOrGroupId );
-        properties.add( resourceStorePath );
+        fields.add( repoField );
+        fields.add( resourceStorePathField );
 
-        return properties;
+        return fields;
     }
 }

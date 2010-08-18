@@ -34,6 +34,18 @@ import org.sonatype.scheduling.SchedulerTask;
 public class RebuildAttributesTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return RebuildAttributesTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
+    @Override
+    protected String getRepositoryPathFieldId()
+    {
+        return null;
+    }
+
     public Object doRun()
         throws Exception
     {
@@ -43,16 +55,13 @@ public class RebuildAttributesTask
 
         if ( getRepositoryGroupId() != null )
         {
-            getRepositoryRegistry()
-                .getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes(
-                    req,
-                    initialData );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes( req,
+                                                                                                                                initialData );
         }
         else if ( getRepositoryId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes(
-                req,
-                initialData );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes( req,
+                                                                                                                      initialData );
         }
         else
         {

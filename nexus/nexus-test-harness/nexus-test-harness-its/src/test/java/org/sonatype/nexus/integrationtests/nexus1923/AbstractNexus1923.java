@@ -186,7 +186,7 @@ public abstract class AbstractNexus1923
         throws Exception
     {
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
 
         if ( repositoryId.equals( GROUP_ID ) )
         {

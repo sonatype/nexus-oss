@@ -43,8 +43,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import com.thoughtworks.xstream.XStream;
@@ -329,7 +327,7 @@ public class SearchMessageUtil
         if ( response.getStatus().isError() )
         {
             Assert.assertFalse( "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus(),
-                response.getStatus().isError() );
+                                response.getStatus().isError() );
         }
         String responseText = response.getEntity().getText();
 
@@ -377,7 +375,7 @@ public class SearchMessageUtil
         if ( repoId != null )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setId( RepositoryOrGroupPropertyDescriptor.ID );
+            prop.setKey( ReindexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
             if ( group )
             {
                 prop.setValue( "group_" + repoId );
@@ -392,7 +390,7 @@ public class SearchMessageUtil
         if ( force )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setId( ForceFullReindexPropertyDescriptor.ID );
+            prop.setKey( ReindexTaskDescriptor.FULL_REINDEX_FIELD_ID );
             prop.setValue( "true" );
 
             scheduledTask.addProperty( prop );
@@ -410,7 +408,7 @@ public class SearchMessageUtil
     {
         Response res =
             RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
-                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
+                                       Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
 
         String responseText = res.getEntity().getText();
         if ( !res.getStatus().isSuccess() )
@@ -565,7 +563,7 @@ public class SearchMessageUtil
         throws IOException
     {
         return searchNGForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getClassifier(),
-            gav.getExtension(), repositoryId, type );
+                               gav.getExtension(), repositoryId, type );
     }
 
     public SearchNGResponse searchSha1NGFor( String sha1 )

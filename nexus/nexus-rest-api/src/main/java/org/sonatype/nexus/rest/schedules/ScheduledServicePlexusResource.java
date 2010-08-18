@@ -164,7 +164,7 @@ public class ScheduledServicePlexusResource
                 {
                     ScheduledServicePropertyResource prop = iter.next();
 
-                    task.getTaskParams().put( prop.getId(), prop.getValue() );
+                    task.getTaskParams().put( prop.getKey(), prop.getValue() );
                 }
 
                 TaskUtils.setAlertEmail( task, resource.getAlertEmail() );

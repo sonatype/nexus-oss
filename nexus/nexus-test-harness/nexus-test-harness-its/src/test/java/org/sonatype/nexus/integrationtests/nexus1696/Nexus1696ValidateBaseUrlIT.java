@@ -199,7 +199,7 @@ public class Nexus1696ValidateBaseUrlIT
         scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "all_repo" );
         scheduledTask.addProperty( prop );
 

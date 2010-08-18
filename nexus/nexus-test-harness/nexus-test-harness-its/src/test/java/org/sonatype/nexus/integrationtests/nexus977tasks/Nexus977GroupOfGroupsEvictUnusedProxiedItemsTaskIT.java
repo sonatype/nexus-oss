@@ -28,11 +28,11 @@ public class Nexus977GroupOfGroupsEvictUnusedProxiedItemsTaskIT
         Assert.assertTrue( new File( nexusWorkDir, "storage/r5/nexus977tasks/project/2.1/project-2.1.jar" ).exists() );
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
 
         ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
-        age.setId( "evictOlderCacheItemsThen" );
+        age.setKey( "evictOlderCacheItemsThen" );
         age.setValue( String.valueOf( 0 ) );
 
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, repo, age );

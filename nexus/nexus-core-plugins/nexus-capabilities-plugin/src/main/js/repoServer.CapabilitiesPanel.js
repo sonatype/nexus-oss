@@ -472,7 +472,7 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
               id : id
             });
         config = this.configUniqueIdHelper(id, config);
-        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore));
+        Ext.apply(config.items[3].items, FormFieldGenerator(id, 'Capability Settings', 'capabilityProperties_', this.capabilityTypeDataStore, this.repositoryDataStore, this.repositoryGroupDataStore, this.repoOrGroupDataStore, null, this.COMBO_WIDTH));
         var formPanel = new Ext.FormPanel(config);
 
         formPanel.form.on('actioncomplete', this.actionCompleteHandler, this);
@@ -891,89 +891,11 @@ Ext.extend(Sonatype.repoServer.CapabilitiesPanel, Ext.Panel, {
       },
 
       exportCapabilityPropertiesHelper : function(val, fpanel) {
-        var outputArr = [];
-
-        var capabilityPropertiesPanel = fpanel.findById(fpanel.id + '_capability-type-config-card-panel');
-        var i = 0;
-        // These are dynamic fields here, so some pretty straightforward generic
-        // logic below
-        capabilityPropertiesPanel.getLayout().activeItem.items.each(function(item, i, len) {
-              var value;
-
-              if (item.xtype == 'datefield')
-              {
-                // long representation is used, not actual date
-                // force to a string, as that is what the current api requires
-                value = '' + item.getValue().getTime();
-              }
-              else if (item.xtype == 'textfield')
-              {
-                value = item.getValue();
-              }
-              else if (item.xtype == 'numberfield')
-              {
-                // force to a string, as that is what the current api requires
-                value = '' + item.getValue();
-              }
-              else if (item.xtype == 'checkbox')
-              {
-                value = '' + item.getValue();
-              }
-              else if (item.xtype == 'combo')
-              {
-                value = item.getValue();
-              }
-              outputArr[i] = {
-                key : item.getName().substring('capabilityProperties_'.length),
-                value : value
-              };
-              i++;
-            }, capabilityPropertiesPanel.getLayout().activeItem);
-
-        return outputArr;
+        return FormFieldExporter(fpanel, '_capability-type-config-card-panel', 'capabilityProperties_');
       },
 
       importCapabilityPropertiesHelper : function(val, srcObj, fpanel) {
-        // Maps the incoming json properties to the generic component
-        // Uses the id of the capabilityProperty item as the key, so the id
-        // _must_
-        // be unique within a capability type
-        for (var i = 0; i < srcObj.properties.length; i++)
-        {
-          var capabilityPropertyItems = fpanel.find('name', 'capabilityProperties_' + srcObj.properties[i].key);
-          for (var j = 0; j < capabilityPropertyItems.length; j++)
-          {
-            var capabilityPropertyItem = capabilityPropertyItems[j];
-
-            if (capabilityPropertyItem != null)
-            {
-              if (!capabilityPropertyItem.disabled && !Ext.isEmpty(srcObj.properties[i].value))
-              {
-                if (capabilityPropertyItem.xtype == 'datefield')
-                {
-                  capabilityPropertyItem.setValue(new Date(Number(srcObj.properties[i].value)));
-                }
-                else if (capabilityPropertyItem.xtype == 'textfield')
-                {
-                  capabilityPropertyItem.setValue(srcObj.properties[i].value);
-                }
-                else if (capabilityPropertyItem.xtype == 'numberfield')
-                {
-                  capabilityPropertyItem.setValue(Number(srcObj.properties[i].value));
-                }
-                else if (capabilityPropertyItem.xtype == 'checkbox')
-                {
-                  capabilityPropertyItem.setValue(Boolean('true' == srcObj.properties[i].value));
-                }
-                else if (capabilityPropertyItem.xtype == 'combo')
-                {
-                  capabilityPropertyItem.setValue(srcObj.properties[i].value);
-                }
-                break;
-              }
-            }
-          }
-        }
+        FormFieldImporter(srcObj, fpanel, 'capabilityProperties_');
         return val;
       }
     });

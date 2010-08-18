@@ -49,7 +49,7 @@ public class Nexus533TaskWeeklyIT
             scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setId( "repositoryOrGroupId" );
+            prop.setKey( "repositoryOrGroupId" );
             prop.setValue( "all_repo" );
             scheduledTask.addProperty( prop );
         }

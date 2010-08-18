@@ -17,6 +17,12 @@ public class DummyWaitingNexusRepositoriesTask
     extends AbstractNexusRepositoriesTask<Object>
 {
     private long sleepTime = 10000;
+    
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return null;
+    }
 
     public long getSleepTime()
     {

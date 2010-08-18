@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "PurgeTimeline", description = "Purge Nexus Timeline" )
 public class PurgeTimelineTaskDescriptor
@@ -26,8 +26,14 @@ public class PurgeTimelineTaskDescriptor
 {
     public static final String ID = "PurgeTimeline";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "PurgeOlderThanDays" )
-    private ScheduledTaskPropertyDescriptor olderThan;
+    public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
+
+    private final NumberTextFormField olderThanField =
+        new NumberTextFormField(
+                                 OLDER_THAN_FIELD_ID,
+                                 "Purge items older than (days)",
+                                 "Set the number of days, to purge all items that were trashed before the given number of days.",
+                                 FormField.OPTIONAL );
 
     public String getId()
     {
@@ -39,12 +45,12 @@ public class PurgeTimelineTaskDescriptor
         return "Purge Nexus Timeline";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( olderThan );
+        fields.add( olderThanField );
 
-        return properties;
+        return fields;
     }
 }

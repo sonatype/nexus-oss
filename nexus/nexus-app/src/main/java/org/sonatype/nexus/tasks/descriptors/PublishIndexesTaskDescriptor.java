@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "PublishIndexes", description = "Publish Indexes" )
 public class PublishIndexesTaskDescriptor
@@ -26,8 +26,10 @@ public class PublishIndexesTaskDescriptor
 {
     public static final String ID = "PublishIndexesTask";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
+
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
+                                                                                       FormField.MANDATORY );
 
     public String getId()
     {
@@ -39,12 +41,12 @@ public class PublishIndexesTaskDescriptor
         return "Publish Indexes";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( repositoryOrGroupId );
+        fields.add( repoField );
 
-        return properties;
+        return fields;
     }
 }

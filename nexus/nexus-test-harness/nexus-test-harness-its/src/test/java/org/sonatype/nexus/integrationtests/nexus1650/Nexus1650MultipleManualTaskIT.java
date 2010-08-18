@@ -61,19 +61,19 @@ public class Nexus1650MultipleManualTaskIT
         throws Exception
     {
         ScheduledServicePropertyResource repositoryProp = new ScheduledServicePropertyResource();
-        repositoryProp.setId( "repositoryOrGroupId" );
+        repositoryProp.setKey( "repositoryOrGroupId" );
         repositoryProp.setValue( "nexus-test-harness-snapshot-repo" );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
-        keepSnapshotsProp.setId( "minSnapshotsToKeep" );
+        keepSnapshotsProp.setKey( "minSnapshotsToKeep" );
         keepSnapshotsProp.setValue( String.valueOf( 0 ) );
 
         ScheduledServicePropertyResource ageProp = new ScheduledServicePropertyResource();
-        ageProp.setId( "removeOlderThanDays" );
+        ageProp.setKey( "removeOlderThanDays" );
         ageProp.setValue( String.valueOf( 0 ) );
 
         ScheduledServicePropertyResource removeReleasedProp = new ScheduledServicePropertyResource();
-        removeReleasedProp.setId( "removeIfReleaseExists" );
+        removeReleasedProp.setKey( "removeIfReleaseExists" );
         removeReleasedProp.setValue( String.valueOf( true ) );
 
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();

@@ -13,18 +13,30 @@
  */
 package org.sonatype.nexus.scheduling;
 
-import org.sonatype.nexus.tasks.descriptors.properties.ResourceStorePathPropertyDescriptor;
-
 public abstract class AbstractNexusRepositoriesPathAwareTask<T>
     extends AbstractNexusRepositoriesTask<T>
 {
+    protected abstract String getRepositoryPathFieldId();
+
     public String getResourceStorePath()
     {
-        return getParameters().get( ResourceStorePathPropertyDescriptor.ID );
+        String id = getRepositoryPathFieldId();
+
+        if ( id == null )
+        {
+            return null;
+        }
+
+        return getParameters().get( id );
     }
 
     public void setResourceStorePath( String resourceStorePath )
     {
-        getParameters().put( ResourceStorePathPropertyDescriptor.ID, resourceStorePath );
+        String id = getRepositoryPathFieldId();
+
+        if ( id != null )
+        {
+            getParameters().put( id, resourceStorePath );
+        }
     }
 }

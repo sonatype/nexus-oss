@@ -32,7 +32,7 @@ import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationMessage;
 import org.sonatype.configuration.validation.ValidationResponse;
 import org.sonatype.nexus.configuration.validator.ApplicationValidationResponse;
-import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
+import org.sonatype.nexus.rest.formfield.AbstractFormFieldResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceDailyResource;
@@ -57,7 +57,7 @@ import org.sonatype.scheduling.schedules.Schedule;
 import org.sonatype.scheduling.schedules.WeeklySchedule;
 
 public abstract class AbstractScheduledServicePlexusResource
-    extends AbstractNexusPlexusResource
+    extends AbstractFormFieldResource
 {
 
     /**
@@ -171,7 +171,7 @@ public abstract class AbstractScheduledServicePlexusResource
             if( !TaskUtils.isPrivateProperty( key ) )
             {
                 ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-                prop.setId( key );
+                prop.setKey( key );
                 prop.setValue( map.get( key ) );
                 list.add( prop );
             }
@@ -343,7 +343,7 @@ public abstract class AbstractScheduledServicePlexusResource
         for( Iterator iter = model.getProperties().iterator(); iter.hasNext(); )
         {
             ScheduledServicePropertyResource prop = (ScheduledServicePropertyResource) iter.next();
-            task.addParameter( prop.getId(), prop.getValue() );
+            task.addParameter( prop.getKey(), prop.getValue() );
         }
 
         TaskUtils.setAlertEmail( task, model.getAlertEmail() );

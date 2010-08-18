@@ -18,7 +18,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.scheduling.AbstractNexusTask;
-import org.sonatype.nexus.tasks.descriptors.properties.RepositoryOrGroupPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -28,6 +27,7 @@ import org.sonatype.scheduling.SchedulerTask;
 public class ResetGroupIndexTask
     extends AbstractNexusTask<Object>
 {
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
 
     @Requirement
     private IndexerManager indexerManager;
@@ -64,14 +64,14 @@ public class ResetGroupIndexTask
 
     public String getRepositoryGroupId()
     {
-        return getParameters().get( RepositoryOrGroupPropertyDescriptor.ID );
+        return getParameters().get( REPO_OR_GROUP_FIELD_ID );
     }
 
     public void setRepositoryGroupId( String repositoryGroupId )
     {
         if ( !StringUtils.isEmpty( repositoryGroupId ) )
         {
-            getParameters().put( RepositoryOrGroupPropertyDescriptor.ID, repositoryGroupId );
+            getParameters().put( REPO_OR_GROUP_FIELD_ID, repositoryGroupId );
         }
     }
 

@@ -44,7 +44,7 @@ public class Nexus533TaskManualIT
             scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setId( "repositoryOrGroupId" );
+            prop.setKey( "repositoryOrGroupId" );
             prop.setValue( "all_repo" );
             scheduledTask.addProperty( prop );
         }
@@ -57,7 +57,7 @@ public class Nexus533TaskManualIT
         scheduledTask.getProperties().clear();
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "repo_nexus-test-harness-repo" );
         scheduledTask.addProperty( prop );
     }

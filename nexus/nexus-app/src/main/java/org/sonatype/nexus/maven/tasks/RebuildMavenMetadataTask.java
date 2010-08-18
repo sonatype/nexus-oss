@@ -29,8 +29,19 @@ import org.sonatype.scheduling.SchedulerTask;
 public class RebuildMavenMetadataTask
     extends AbstractNexusRepositoriesPathAwareTask<Object>
 {
-
     public static final String REBUILD_MAVEN_METADATA_ACTION = "REBUILD_MAVEN_METADATA";
+    
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return RebuildMavenMetadataTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+    
+    @Override
+    protected String getRepositoryPathFieldId()
+    {
+        return null;
+    }
 
     public Object doRun()
         throws Exception
@@ -39,28 +50,27 @@ public class RebuildMavenMetadataTask
 
         // group wins if both given, repoId if group not given. Or null, if none given.
         String repoId = StringUtils.isNotBlank( getRepositoryGroupId() ) ? getRepositoryGroupId() : getRepositoryId();
-        
+
         // no repo id, then do all repos
         if ( StringUtils.isEmpty( repoId ) )
         {
-            getNexus().rebuildMavenMetadataAllRepositories( req );   
+            getNexus().rebuildMavenMetadataAllRepositories( req );
         }
         else
         {
             Repository repository = getRepositoryRegistry().getRepository( repoId );
-    
+
             // is this a Maven repository at all?
             if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
             {
                 MavenRepository mavenRepository = repository.adaptToFacet( MavenRepository.class );
-    
+
                 mavenRepository.recreateMavenMetadata( req );
             }
             else
             {
-                getLogger().debug(
-                    "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
-                        + ") is not a Maven repository. Will not rebuild maven metadata." );
+                getLogger().debug( "Repository \"" + repository.getName() + "\" (id=" + repository.getId()
+                                       + ") is not a Maven repository. Will not rebuild maven metadata." );
             }
         }
 

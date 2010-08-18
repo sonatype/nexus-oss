@@ -358,10 +358,6 @@ public abstract class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
-	    //this prevents locking issues on windows!!!!
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
-        TaskScheduleUtil.waitForAllTasksToStop();
-
         // turn off security, of the current IT with security on won't affect the next IT
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 

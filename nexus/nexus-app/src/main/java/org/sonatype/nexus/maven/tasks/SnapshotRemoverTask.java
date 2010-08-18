@@ -16,9 +16,6 @@ package org.sonatype.nexus.maven.tasks;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
-import org.sonatype.nexus.maven.tasks.descriptors.properties.MinimumSnapshotCountPropertyDescriptor;
-import org.sonatype.nexus.maven.tasks.descriptors.properties.RemoveIfReleasedPropertyDescriptor;
-import org.sonatype.nexus.maven.tasks.descriptors.properties.SnapshotRetentionDaysPropertyDescriptor;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -37,9 +34,15 @@ public class SnapshotRemoverTask
 
     public static final int DEFAULT_OLDER_THAN_DAYS = -1;
 
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return SnapshotRemovalTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
     public int getMinSnapshotsToKeep()
     {
-        String param = getParameters().get( MinimumSnapshotCountPropertyDescriptor.ID );
+        String param = getParameters().get( SnapshotRemovalTaskDescriptor.MIN_TO_KEEP_FIELD_ID );
 
         if ( StringUtils.isEmpty( param ) )
         {
@@ -51,12 +54,12 @@ public class SnapshotRemoverTask
 
     public void setMinSnapshotsToKeep( int minSnapshotsToKeep )
     {
-        getParameters().put( MinimumSnapshotCountPropertyDescriptor.ID, Integer.toString( minSnapshotsToKeep ) );
+        getParameters().put( SnapshotRemovalTaskDescriptor.MIN_TO_KEEP_FIELD_ID, Integer.toString( minSnapshotsToKeep ) );
     }
 
     public int getRemoveOlderThanDays()
     {
-        String param = getParameters().get( SnapshotRetentionDaysPropertyDescriptor.ID );
+        String param = getParameters().get( SnapshotRemovalTaskDescriptor.KEEP_DAYS_FIELD_ID );
 
         if ( StringUtils.isEmpty( param ) )
         {
@@ -68,17 +71,18 @@ public class SnapshotRemoverTask
 
     public void setRemoveOlderThanDays( int removeOlderThanDays )
     {
-        getParameters().put( SnapshotRetentionDaysPropertyDescriptor.ID, Integer.toString( removeOlderThanDays ) );
+        getParameters().put( SnapshotRemovalTaskDescriptor.KEEP_DAYS_FIELD_ID, Integer.toString( removeOlderThanDays ) );
     }
 
     public boolean isRemoveIfReleaseExists()
     {
-        return Boolean.parseBoolean( getParameters().get( RemoveIfReleasedPropertyDescriptor.ID ) );
+        return Boolean.parseBoolean( getParameters().get( SnapshotRemovalTaskDescriptor.REMOVE_WHEN_RELEASED_FIELD_ID ) );
     }
 
     public void setRemoveIfReleaseExists( boolean removeIfReleaseExists )
     {
-        getParameters().put( RemoveIfReleasedPropertyDescriptor.ID, Boolean.toString( removeIfReleaseExists ) );
+        getParameters().put( SnapshotRemovalTaskDescriptor.REMOVE_WHEN_RELEASED_FIELD_ID,
+                             Boolean.toString( removeIfReleaseExists ) );
     }
 
     public SnapshotRemovalResult doRun()

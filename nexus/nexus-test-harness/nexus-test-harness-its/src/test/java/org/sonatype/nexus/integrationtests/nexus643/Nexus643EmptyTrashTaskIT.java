@@ -25,7 +25,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.EmptyOlderThanDaysPropertyDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -45,16 +44,12 @@ public class Nexus643EmptyTrashTaskIT
         Assert.assertTrue( "Something should be at trash!", trashContent.exists() );
 
         // Empty trash content older than 1 days
-        File oldTrashFile = new File(
-            nexusWorkDir,
-            "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.pom" );
-        File newTrashFile = new File(
-            nexusWorkDir,
-            "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.jar" );
+        File oldTrashFile = new File( nexusWorkDir, "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.pom" );
+        File newTrashFile = new File( nexusWorkDir, "trash/nexus-test-harness-repo/nexus643/artifact-1-1.0.0.jar" );
         oldTrashFile.setLastModified( System.currentTimeMillis() - 24L * 60L * 60L * 1000L * 2 );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( EmptyOlderThanDaysPropertyDescriptor.ID );
+        prop.setKey( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID );
         prop.setValue( "1" );
 
         TaskScheduleUtil.runTask( "Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, prop );

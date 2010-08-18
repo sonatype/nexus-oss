@@ -28,11 +28,10 @@ import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
+import org.sonatype.nexus.rest.model.FormFieldResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 
@@ -87,18 +86,8 @@ public class ScheduledServiceTypePlexusResource
                 type.setId( taskDescriptor.getId() );
                 type.setName( taskDescriptor.getName() );
 
-                for ( ScheduledTaskPropertyDescriptor propertyDescriptor : taskDescriptor.getPropertyDescriptors() )
-                {
-                    ScheduledServiceTypePropertyResource property = new ScheduledServiceTypePropertyResource();
-                    property.setHelpText( propertyDescriptor.getHelpText() );
-                    property.setId( propertyDescriptor.getId() );
-                    property.setName( propertyDescriptor.getName() );
-                    property.setRequired( propertyDescriptor.isRequired() );
-                    property.setType( propertyDescriptor.getType() );
-                    property.setRegexValidation( propertyDescriptor.getRegexValidation() );
-
-                    type.addProperty( property );
-                }
+                type.setFormFields( (List<FormFieldResource>) formFieldToDTO( taskDescriptor.formFields(),
+                                                                              FormFieldResource.class ) );
 
                 result.addData( type );
             }

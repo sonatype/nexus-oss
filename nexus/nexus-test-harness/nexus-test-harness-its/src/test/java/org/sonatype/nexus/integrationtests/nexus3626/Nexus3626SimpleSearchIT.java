@@ -77,7 +77,7 @@ public class Nexus3626SimpleSearchIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
 
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
 

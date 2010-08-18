@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.CheckboxFormField;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
 public class ReindexTaskDescriptor
@@ -27,11 +27,19 @@ public class ReindexTaskDescriptor
 {
     public static final String ID = "ReindexTask";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = ForceFullReindexPropertyDescriptor.ID )
-    private ScheduledTaskPropertyDescriptor fullReindex;
+    public static final String FULL_REINDEX_FIELD_ID = "forceFullReindex";
+
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
+                                                                                       FormField.MANDATORY );
+
+    private final CheckboxFormField fullReindexField =
+        new CheckboxFormField(
+                               FULL_REINDEX_FIELD_ID,
+                               "Do full reindex",
+                               "If selected will generate a new full index, otherwise just generate the incremental index.",
+                               FormField.OPTIONAL );
 
     public String getId()
     {
@@ -43,13 +51,13 @@ public class ReindexTaskDescriptor
         return "Reindex Repositories";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( repositoryOrGroupId );
-        properties.add( fullReindex );
+        fields.add( repoField );
+        fields.add( fullReindexField );
 
-        return properties;
+        return fields;
     }
 }

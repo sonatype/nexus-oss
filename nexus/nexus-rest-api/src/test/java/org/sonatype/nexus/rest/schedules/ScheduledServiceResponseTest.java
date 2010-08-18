@@ -148,7 +148,7 @@ public class ScheduledServiceResponseTest
     public void testAdvancedScheduledServiceWithProperties()
         throws Exception
     {
-        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\",\"properties\":[{\"id\":\"1\",\"value\":\"true\",\"@class\":\"org.sonatype.nexus.rest.model.ScheduledServicePropertyResource\"}]}}}";
+        String jsonString = "{\"data\":{\"id\":null,\"name\":\"test\",\"typeId\":\"Synchronize Repositories\",\"schedule\":\"advanced\",\"cronCommand\":\"somecroncommand\",\"properties\":[{\"key\":\"1\",\"value\":\"true\",\"@class\":\"org.sonatype.nexus.rest.model.ScheduledServicePropertyResource\"}]}}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
             jsonString,
@@ -162,7 +162,7 @@ public class ScheduledServiceResponseTest
         assert response.getData().getTypeId().equals( "Synchronize Repositories" );
         assert response.getData().getSchedule().equals( "advanced" );
         assert response.getData().getProperties().size() == 1;
-        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getId().equals( "1" );
+        assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getKey().equals( "1" );
         assert ( (ScheduledServicePropertyResource) response.getData().getProperties().get( 0 ) ).getValue().equals(
             "true" );
         assert ( (ScheduledServiceAdvancedResource) response.getData() ).getCronCommand().equals( "somecroncommand" );

@@ -17,10 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.formfields.CheckboxFormField;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "SnapshotRemoval", description = "Remove Snapshots From Repository" )
 public class SnapshotRemovalTaskDescriptor
@@ -28,17 +30,34 @@ public class SnapshotRemovalTaskDescriptor
 {
     public static final String ID = "SnapshotRemoverTask";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RepositoryOrGroup" )
-    private ScheduledTaskPropertyDescriptor repositoryOrGroupId;
+    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "MinimumSnapshotCount" )
-    private ScheduledTaskPropertyDescriptor minSnapshots;
+    public static final String MIN_TO_KEEP_FIELD_ID = "minSnapshotsToKeep";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "SnapshotRetentionDays" )
-    private ScheduledTaskPropertyDescriptor retentionDays;
+    public static final String KEEP_DAYS_FIELD_ID = "removeOlderThanDays";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "RemoveIfReleased" )
-    private ScheduledTaskPropertyDescriptor removeWhenReleased;
+    public static final String REMOVE_WHEN_RELEASED_FIELD_ID = "removeIfReleaseExists";
+
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
+                                                                                       FormField.MANDATORY );
+
+    private final NumberTextFormField minToKeepField =
+        new NumberTextFormField( MIN_TO_KEEP_FIELD_ID, "Minimum snapshot count",
+                                 "Minimum number of snapshots to keep for one GAV.", FormField.OPTIONAL );
+
+    private final NumberTextFormField keepDaysField =
+        new NumberTextFormField(
+                                 KEEP_DAYS_FIELD_ID,
+                                 "Snapshot retention (days)",
+                                 "The job will purge all snapshots older than the entered number of days, but will obey to Min. count of snapshots to keep.",
+                                 FormField.OPTIONAL );
+
+    private final CheckboxFormField removeWhenReleasedField =
+        new CheckboxFormField(
+                               REMOVE_WHEN_RELEASED_FIELD_ID,
+                               "Remove if released",
+                               "The job will purge all snapshots that have a corresponding released artifact (same version not including the -SNAPSHOT).",
+                               FormField.OPTIONAL );
 
     public String getId()
     {
@@ -50,15 +69,15 @@ public class SnapshotRemovalTaskDescriptor
         return "Remove Snapshots From Repository";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( repositoryOrGroupId );
-        properties.add( minSnapshots );
-        properties.add( retentionDays );
-        properties.add( removeWhenReleased );
+        fields.add( repoField );
+        fields.add( minToKeepField );
+        fields.add( keepDaysField );
+        fields.add( removeWhenReleasedField );
 
-        return properties;
+        return fields;
     }
 }

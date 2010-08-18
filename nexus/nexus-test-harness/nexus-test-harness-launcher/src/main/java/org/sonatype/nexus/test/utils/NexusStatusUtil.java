@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 
@@ -140,6 +141,7 @@ public class NexusStatusUtil
         try
         {
             // NOTE: We can't kill active tasks, we need to wait for them to stop
+            TestContainer.getInstance().getTestContext().useAdminForRequests();
             TaskScheduleUtil.waitForAllTasksToStop();
 
             try

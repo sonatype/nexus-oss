@@ -58,7 +58,7 @@ public class Nexus980ReindexVirtualReposIT
             return;
         }
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( REPO_TEST_HARNESS_SHADOW );
 
         ScheduledServiceBaseResource scheduledTask = new ScheduledServiceBaseResource();

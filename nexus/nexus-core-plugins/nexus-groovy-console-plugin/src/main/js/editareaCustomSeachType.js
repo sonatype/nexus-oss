@@ -1,15 +1,15 @@
 Sonatype.Events.addListener('initializeCustomTypes', function(customTypes) {
       customTypes['textarea'] = {
-        createItem : function(curRec) {
+        createItem : function(curRec, prefix, width) {
           return {
             xtype : 'textarea',
-            fieldLabel : curRec.name,
+            fieldLabel : curRec.label,
             itemCls : curRec.required ? 'required-field' : '',
             helpText : curRec.helpText,
-            name : 'serviceProperties_' + curRec.id,
+            name : prefix + curRec.id,
             allowBlank : curRec.required ? false : true,
             disabled : true,
-            width : this.COMBO_WIDTH
+            width : width
           }
         },
         retrieveValue : function(item) {

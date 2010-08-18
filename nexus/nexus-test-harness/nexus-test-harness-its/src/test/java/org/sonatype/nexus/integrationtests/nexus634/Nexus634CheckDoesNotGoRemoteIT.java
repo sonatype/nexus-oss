@@ -109,7 +109,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
 
         // expire caches
         ScheduledServicePropertyResource repoOrGroupProp = new ScheduledServicePropertyResource();
-        repoOrGroupProp.setId( "repositoryOrGroupId" );
+        repoOrGroupProp.setKey( "repositoryOrGroupId" );
         repoOrGroupProp.setValue( REPO_RELEASE_PROXY_REPO1 );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, repoOrGroupProp );
         Assert.assertNotNull( task );

@@ -52,6 +52,7 @@ import org.sonatype.nexus.rest.model.ErrorReportResponseDTO;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.FeedListResource;
 import org.sonatype.nexus.rest.model.FeedListResourceResponse;
+import org.sonatype.nexus.rest.model.FormFieldResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationListResourceResponse;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -120,7 +121,6 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatus;
 import org.sonatype.nexus.rest.model.ScheduledServiceResourceStatusResponse;
-import org.sonatype.nexus.rest.model.ScheduledServiceTypePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceTypeResourceResponse;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
@@ -195,12 +195,12 @@ public class TestMarshalUnmarchal
 
         xstreamJSON = napp.doConfigureXstream( new XStream( new JsonOrgHierarchicalStreamDriver() ) );
     }
-    
+
     protected XStream getXmlXStream()
     {
         return xstreamXML;
     }
-    
+
     protected XStream getJsonXStream()
     {
         return xstreamJSON;
@@ -222,48 +222,48 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( errorResponse );
 
     }
-    
+
     public void testContentListDescribeResourceResponse()
         throws ParseException
     {
         ContentListDescribeResource resource = new ContentListDescribeResource();
         resource.setProcessingTimeMillis( 1000 );
         resource.setRequestUrl( "requesturl" );
-        
+
         ContentListDescribeRequestResource requestRes = new ContentListDescribeRequestResource();
-        //TODO: Figure out why this is causing test to fail.
-        //requestRes.setRequestContext( Arrays.asList( "item1", "item2" ) );
+        // TODO: Figure out why this is causing test to fail.
+        // requestRes.setRequestContext( Arrays.asList( "item1", "item2" ) );
         requestRes.setRequestPath( "requestpath" );
         requestRes.setRequestUrl( "requestUrl" );
-        
+
         resource.setRequest( requestRes );
-        
+
         ContentListDescribeResponseResource responseRes = new ContentListDescribeResponseResource();
-        //TODO: Figure out why this is causing test to fail.
-        //responseRes.setAppliedMappings( Arrays.asList( "map1", "map2" ) );
-        //TODO: Figure out why this is causing test to fail.
-        //responseRes.setAttributes( Arrays.asList( "attr1", "attr2" ) );
+        // TODO: Figure out why this is causing test to fail.
+        // responseRes.setAppliedMappings( Arrays.asList( "map1", "map2" ) );
+        // TODO: Figure out why this is causing test to fail.
+        // responseRes.setAttributes( Arrays.asList( "attr1", "attr2" ) );
         responseRes.setOriginatingRepositoryId( "originatingRepoId" );
         responseRes.setOriginatingRepositoryMainFacet( "mainfacet" );
         responseRes.setOriginatingRepositoryName( "name" );
-        //TODO: Figure out why this is causing test to fail.
-        //responseRes.setProcessedRepositoriesList( Arrays.asList( "proc1", "proc2" ) );
-        //TODO: Figure out why this is causing test to fail.
-        //responseRes.setProperties( Arrays.asList( "prop1", "prop2" ) );
+        // TODO: Figure out why this is causing test to fail.
+        // responseRes.setProcessedRepositoriesList( Arrays.asList( "proc1", "proc2" ) );
+        // TODO: Figure out why this is causing test to fail.
+        // responseRes.setProperties( Arrays.asList( "prop1", "prop2" ) );
         responseRes.setResponseActualClass( "actualclass" );
         responseRes.setResponsePath( "responsepath" );
         responseRes.setResponseType( "responseType" );
         responseRes.setResponseUid( "responseuid" );
-        //TODO: Figure out why this is causing test to fail.
-        //responseRes.setSources( Arrays.asList( "source1", "source2" ) );
-        
+        // TODO: Figure out why this is causing test to fail.
+        // responseRes.setSources( Arrays.asList( "source1", "source2" ) );
+
         resource.setResponse( responseRes );
-        
+
         ContentListDescribeResourceResponse response = new ContentListDescribeResourceResponse();
         response.setData( resource );
-        
-        //TODO: UNCOMMENT ME WHEN JSON DRIVER IS FIXED, SO LONGS CAN BE HANDLED!!
-        //this.marshalUnmarchalThenCompare( response );
+
+        // TODO: UNCOMMENT ME WHEN JSON DRIVER IS FIXED, SO LONGS CAN BE HANDLED!!
+        // this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
 
@@ -326,33 +326,33 @@ public class TestMarshalUnmarchal
         repo.setOverrideLocalStorageUrl( "overridelocalstorage" );
         repo.setProvider( "provider" );
         repo.setProviderRole( "providerRole" );
-        
+
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "remoteStorageUrl" );
-        
+
         AuthenticationSettings auth = new AuthenticationSettings();
         auth.setNtlmDomain( "ntlmdomain" );
         auth.setNtlmHost( "ntmlhost" );
         auth.setPassword( "password" );
         auth.setUsername( "username" );
-        
+
         remoteStorage.setAuthentication( auth );
-        
+
         RemoteConnectionSettings connection = new RemoteConnectionSettings();
         connection.setConnectionTimeout( 50 );
         connection.setQueryString( "querystring" );
         connection.setRetrievalRetryCount( 5 );
         connection.setUserAgentString( "useragent" );
-        
+
         remoteStorage.setConnectionSettings( connection );
-        
+
         RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
         proxy.setAuthentication( auth );
         proxy.setProxyHostname( "proxyhost" );
         proxy.setProxyPort( 55 );
-        
+
         remoteStorage.setHttpProxySettings( proxy );
-        
+
         repo.setRemoteStorage( remoteStorage );
 
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
@@ -401,40 +401,40 @@ public class TestMarshalUnmarchal
         repo.setDownloadRemoteIndexes( true );
         repo.setChecksumPolicy( "IGNORE" );
         repo.setMetadataMaxAge( 42 );
-        repo.setArtifactMaxAge( 41 );        
+        repo.setArtifactMaxAge( 41 );
         repo.setContentResourceURI( "contentResourceURI" );
         repo.setDefaultLocalStorageUrl( "defaultlocalstorage" );
         repo.setExposed( true );
         repo.setOverrideLocalStorageUrl( "overridelocalstorage" );
         repo.setProvider( "provider" );
         repo.setProviderRole( "providerRole" );
-        
+
         RepositoryResourceRemoteStorage remoteStorage = new RepositoryResourceRemoteStorage();
         remoteStorage.setRemoteStorageUrl( "remoteStorageUrl" );
-        
+
         AuthenticationSettings auth = new AuthenticationSettings();
         auth.setNtlmDomain( "ntlmdomain" );
         auth.setNtlmHost( "ntmlhost" );
         auth.setPassword( "password" );
         auth.setUsername( "username" );
-        
+
         remoteStorage.setAuthentication( auth );
-        
+
         RemoteConnectionSettings connection = new RemoteConnectionSettings();
         connection.setConnectionTimeout( 50 );
         connection.setQueryString( "querystring" );
         connection.setRetrievalRetryCount( 5 );
         connection.setUserAgentString( "useragent" );
-        
+
         remoteStorage.setConnectionSettings( connection );
-        
+
         RemoteHttpProxySettings proxy = new RemoteHttpProxySettings();
         proxy.setAuthentication( auth );
         proxy.setProxyHostname( "proxyhost" );
         proxy.setProxyPort( 55 );
-        
+
         remoteStorage.setHttpProxySettings( proxy );
-        
+
         repo.setRemoteStorage( remoteStorage );
 
         RepositoryResourceResponse resourceResponse = new RepositoryResourceResponse();
@@ -495,13 +495,13 @@ public class TestMarshalUnmarchal
         resource.setProxyMode( "proxyMode" );
         resource.setRepoType( "repoType" );
         resource.setRemoteStatus( "remoteStatus" );
-        
+
         RepositoryDependentStatusResource dep = new RepositoryDependentStatusResource();
         dep.setFormat( "maven4" );
         dep.setId( "someid" );
         dep.setLocalStatus( "somestatus" );
         dep.setRepoType( "type" );
-        
+
         resource.addDependentRepo( dep );
 
         resourceResponse.setData( resource );
@@ -736,14 +736,14 @@ public class TestMarshalUnmarchal
         resource.setSecurityAnonymousPassword( "anonPass" );
         resource.setSecurityAnonymousUsername( "anonUser" );
         resource.setSecurityEnabled( true );
-        //TODO: Figure out why this is causing test to fail...
-        //resource.setSecurityRealms( Arrays.asList( "realm1", "realm2" ) );
+        // TODO: Figure out why this is causing test to fail...
+        // resource.setSecurityRealms( Arrays.asList( "realm1", "realm2" ) );
 
         RestApiSettings restSet = new RestApiSettings();
         restSet.setBaseUrl( "baseUrl" );
-        restSet.setForceBaseUrl( false);
+        restSet.setForceBaseUrl( false );
         resource.setGlobalRestApiSettings( restSet );
-        
+
         RemoteConnectionSettings connSet = new RemoteConnectionSettings();
         connSet.setConnectionTimeout( 2 );
         connSet.setQueryString( "queryString" );
@@ -771,12 +771,12 @@ public class TestMarshalUnmarchal
         smtpSet.setTlsEnabled( true );
         smtpSet.setUsername( "username" );
         resource.setSmtpSettings( smtpSet );
-        
+
         ErrorReportingSettings errorSet = new ErrorReportingSettings();
         errorSet.setJiraPassword( "jiraPass" );
         errorSet.setJiraUsername( "jiraUser" );
         errorSet.setUseGlobalProxy( true );
-        
+
         resource.setErrorReportingSettings( errorSet );
 
         resourceResponse.setData( resource );
@@ -971,7 +971,7 @@ public class TestMarshalUnmarchal
         this.marshalUnmarchalThenCompare( resourceResponse );
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
-    
+
     public void testScheduledServiceResourceStatusResponse()
     {
         ScheduledServiceResourceStatus status = new ScheduledServiceResourceStatus();
@@ -981,7 +981,7 @@ public class TestMarshalUnmarchal
         status.setNextRunTime( "nextruntime" );
         status.setResourceURI( "resourceuri" );
         status.setStatus( "status" );
-        
+
         ScheduledServiceBaseResource base = new ScheduledServiceBaseResource();
         base.setId( "Id" );
         base.setSchedule( "manual" );
@@ -991,20 +991,20 @@ public class TestMarshalUnmarchal
         base.setEnabled( true );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         base.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         base.addProperty( prop2 );
-        
+
         status.setResource( base );
-        
+
         ScheduledServiceResourceStatusResponse resource = new ScheduledServiceResourceStatusResponse();
         resource.setData( status );
-        
+
         this.marshalUnmarchalThenCompare( resource );
         this.validateXmlHasNoPackageNames( resource );
     }
@@ -1020,12 +1020,12 @@ public class TestMarshalUnmarchal
         resource.setEnabled( true );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1050,12 +1050,12 @@ public class TestMarshalUnmarchal
         resource.setEnabled( true );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1079,12 +1079,12 @@ public class TestMarshalUnmarchal
         resource.setRecurringTime( "recurringTime" );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1107,12 +1107,12 @@ public class TestMarshalUnmarchal
         resource.setCronCommand( "cronCommand" );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1137,12 +1137,12 @@ public class TestMarshalUnmarchal
         resource.addRecurringDay( "recurringDay2" );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1167,12 +1167,12 @@ public class TestMarshalUnmarchal
         resource.addRecurringDay( "recurringDay2" );
 
         ScheduledServicePropertyResource prop1 = new ScheduledServicePropertyResource();
-        prop1.setId( "id1" );
+        prop1.setKey( "id1" );
         prop1.setValue( "value1" );
         resource.addProperty( prop1 );
 
         ScheduledServicePropertyResource prop2 = new ScheduledServicePropertyResource();
-        prop2.setId( "id2" );
+        prop2.setKey( "id2" );
         prop2.setValue( "value2" );
         resource.addProperty( prop2 );
 
@@ -1191,45 +1191,45 @@ public class TestMarshalUnmarchal
         item1.setId( "id1" );
         item1.setName( "name1" );
 
-        ScheduledServiceTypePropertyResource prop1 = new ScheduledServiceTypePropertyResource();
+        FormFieldResource prop1 = new FormFieldResource();
         prop1.setHelpText( "helpText1" );
         prop1.setId( "id1" );
-        prop1.setName( "name1" );
+        prop1.setLabel( "name1" );
         prop1.setRequired( true );
         prop1.setType( "type1" );
         prop1.setRegexValidation( "regex" );
-        item1.addProperty( prop1 );
+        item1.addFormField( prop1 );
 
-        ScheduledServiceTypePropertyResource prop2 = new ScheduledServiceTypePropertyResource();
+        FormFieldResource prop2 = new FormFieldResource();
         prop2.setHelpText( "helpText2" );
         prop2.setId( "id2" );
-        prop2.setName( "name2" );
+        prop2.setLabel( "name2" );
         prop2.setRequired( true );
         prop2.setType( "type2" );
         prop2.setRegexValidation( "regex2" );
-        item1.addProperty( prop2 );
+        item1.addFormField( prop2 );
 
         ScheduledServiceTypeResource item2 = new ScheduledServiceTypeResource();
         item2.setId( "id1" );
         item2.setName( "name1" );
 
-        ScheduledServiceTypePropertyResource prop3 = new ScheduledServiceTypePropertyResource();
+        FormFieldResource prop3 = new FormFieldResource();
         prop3.setHelpText( "helpText3" );
         prop3.setId( "id3" );
-        prop3.setName( "name3" );
+        prop3.setLabel( "name3" );
         prop3.setRequired( true );
         prop3.setType( "type3" );
         prop3.setRegexValidation( "regex3" );
-        item2.addProperty( prop3 );
+        item2.addFormField( prop3 );
 
-        ScheduledServiceTypePropertyResource prop4 = new ScheduledServiceTypePropertyResource();
+        FormFieldResource prop4 = new FormFieldResource();
         prop4.setHelpText( "helpText4" );
         prop4.setId( "id4" );
-        prop4.setName( "name4" );
+        prop4.setLabel( "name4" );
         prop4.setRequired( true );
         prop4.setType( "type4" );
         prop4.setRegexValidation( "regex4" );
-        item2.addProperty( prop4 );
+        item2.addFormField( prop4 );
 
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );
@@ -1641,7 +1641,7 @@ public class TestMarshalUnmarchal
         nfcRepoResource1.setRepositoryId( "repoId1" );
         nfcRepoResource1.addNfcPath( "path1" );
         nfcRepoResource1.addNfcPath( "path2" );
-        
+
         NFCStats stats = new NFCStats();
         stats.setHits( 1000 );
         stats.setMisses( 5000 );
@@ -1652,7 +1652,7 @@ public class TestMarshalUnmarchal
         nfcRepoResource2.setRepositoryId( "repoId2" );
         nfcRepoResource2.addNfcPath( "path3" );
         nfcRepoResource2.addNfcPath( "path4" );
-        
+
         NFCStats stats2 = new NFCStats();
         stats2.setHits( 1000 );
         stats2.setMisses( 5000 );
@@ -1665,9 +1665,9 @@ public class TestMarshalUnmarchal
 
         resourceResponse.setData( resource );
 
-        //Excluded because our damn json reader doesn't support parsing long values...very very bad
-        //this.marshalUnmarchalThenCompare( resourceResponse );
-        //TODO: UNCOMMENT this when the json driver is fixed.
+        // Excluded because our damn json reader doesn't support parsing long values...very very bad
+        // this.marshalUnmarchalThenCompare( resourceResponse );
+        // TODO: UNCOMMENT this when the json driver is fixed.
         this.validateXmlHasNoPackageNames( resourceResponse );
     }
 
@@ -1759,7 +1759,7 @@ public class TestMarshalUnmarchal
         scheduledTask.setAlertEmail( "foo@bar.org" );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        prop.setId( "repositoryOrGroupId" );
+        prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "all_repo" );
         scheduledTask.addProperty( prop );
 
@@ -1836,7 +1836,6 @@ public class TestMarshalUnmarchal
         role1.setRoleId( "roleId2" );
         resource1.addRole( role2 );
 
-
         PlexusUserResource resource2 = new PlexusUserResource();
         resourceResponse.addData( resource2 );
 
@@ -1859,89 +1858,89 @@ public class TestMarshalUnmarchal
         this.validateXmlHasNoPackageNames( resourceResponse );
 
     }
-    
+
     public void testLogConfigResourceResponse()
     {
         LogConfigResourceResponse response = new LogConfigResourceResponse();
-        
+
         LogConfigResource data = new LogConfigResource();
         data.setFileAppenderLocation( "fileappender" );
         data.setFileAppenderPattern( "pattern" );
         data.setRootLoggerAppenders( "rootlogger" );
         data.setRootLoggerLevel( "level" );
-        
+
         response.setData( data );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
-    
+
     public void testMirrorResourceListResponse()
     {
         MirrorResourceListResponse response = new MirrorResourceListResponse();
-        
+
         MirrorResource data = new MirrorResource();
         data.setId( "id" );
         data.setUrl( "url" );
-        
+
         response.addData( data );
-        
+
         MirrorResource data2 = new MirrorResource();
         data2.setId( "id2" );
         data2.setUrl( "url2" );
-        
+
         response.addData( data2 );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
-    
+
     public void testMirrorResourceListRequest()
     {
         MirrorResourceListRequest response = new MirrorResourceListRequest();
-        
+
         MirrorResource data = new MirrorResource();
         data.setId( "id" );
         data.setUrl( "url" );
-        
+
         response.addData( data );
-        
+
         MirrorResource data2 = new MirrorResource();
         data2.setId( "id2" );
         data2.setUrl( "url2" );
-        
+
         response.addData( data2 );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
-    
+
     public void testMirrorStatusResourceListResponse()
     {
         MirrorStatusResourceListResponse response = new MirrorStatusResourceListResponse();
-        
+
         MirrorStatusResource data = new MirrorStatusResource();
         data.setId( "id" );
         data.setUrl( "url" );
         data.setStatus( "status" );
-        
+
         response.addData( data );
-        
+
         MirrorStatusResource data2 = new MirrorStatusResource();
         data2.setId( "id2" );
         data2.setUrl( "url2" );
         data2.setStatus( "status2" );
-        
+
         response.addData( data2 );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
-    
+
     public void testSmtpSettingsResourceRequest()
     {
         SmtpSettingsResourceRequest request = new SmtpSettingsResourceRequest();
-        
+
         SmtpSettingsResource resource = new SmtpSettingsResource();
         resource.setHost( "host" );
         resource.setPassword( "password" );
@@ -1951,44 +1950,44 @@ public class TestMarshalUnmarchal
         resource.setTestEmail( "testemail" );
         resource.setTlsEnabled( true );
         resource.setUsername( "username" );
-        
+
         request.setData( resource );
-        
+
         this.marshalUnmarchalThenCompare( request );
         this.validateXmlHasNoPackageNames( request );
     }
-    
+
     public void testErrorReportRequest()
     {
         ErrorReportRequest request = new ErrorReportRequest();
-        
+
         ErrorReportRequestDTO resource = new ErrorReportRequestDTO();
         resource.setDescription( "description" );
         resource.setTitle( "title" );
-        
+
         request.setData( resource );
-        
+
         this.marshalUnmarchalThenCompare( request );
         this.validateXmlHasNoPackageNames( request );
     }
-    
+
     public void testErrorReportResponse()
     {
         ErrorReportResponse request = new ErrorReportResponse();
-        
+
         ErrorReportResponseDTO resource = new ErrorReportResponseDTO();
         resource.setJiraUrl( "jiraurl" );
-        
+
         request.setData( resource );
-        
+
         this.marshalUnmarchalThenCompare( request );
         this.validateXmlHasNoPackageNames( request );
     }
-    
+
     public void testArtifactResolveResourceResponse()
     {
         ArtifactResolveResourceResponse response = new ArtifactResolveResourceResponse();
-        
+
         ArtifactResolveResource data = new ArtifactResolveResource();
         data.setArtifactId( "artifactId" );
         data.setBaseVersion( "baseversion" );
@@ -1998,39 +1997,39 @@ public class TestMarshalUnmarchal
         data.setGroupId( "groupid" );
         data.setRepositoryPath( "repopath" );
         data.setSha1( "sha1" );
-        data.setSnapshot( true ); 
+        data.setSnapshot( true );
         data.setSnapshotBuildNumber( 100 );
         data.setSnapshotTimeStamp( 12345 );
         data.setVersion( "version" );
-        
+
         response.setData( data );
-        
-        //Exclude because json reader doesn't properly handle long values...
-        //this.marshalUnmarchalThenCompare( response );
-        //TODO: UNCOMMENT ME WHEN JSON DRIVER IS FIXED
+
+        // Exclude because json reader doesn't properly handle long values...
+        // this.marshalUnmarchalThenCompare( response );
+        // TODO: UNCOMMENT ME WHEN JSON DRIVER IS FIXED
         this.validateXmlHasNoPackageNames( response );
     }
-    
+
     public void testNexusRepositoryTypeListResourceResponse()
     {
         NexusRepositoryTypeListResourceResponse response = new NexusRepositoryTypeListResourceResponse();
-        
+
         NexusRepositoryTypeListResource resource = new NexusRepositoryTypeListResource();
         resource.setDescription( "description" );
         resource.setFormat( "format" );
         resource.setProvider( "provider" );
         resource.setProviderRole( "providerRole" );
-        
+
         response.addData( resource );
-        
+
         NexusRepositoryTypeListResource resource2 = new NexusRepositoryTypeListResource();
         resource2.setDescription( "description2" );
         resource2.setFormat( "format2" );
         resource2.setProvider( "provider2" );
         resource2.setProviderRole( "providerRole2" );
-        
+
         response.addData( resource2 );
-        
+
         this.marshalUnmarchalThenCompare( response );
         this.validateXmlHasNoPackageNames( response );
     }
@@ -2131,13 +2130,13 @@ public class TestMarshalUnmarchal
         // do xml
         String xml = this.xstreamXML.toXML( obj );
 
-        System.out.println( "xml: \n"+  xml);
+        System.out.println( "xml: \n" + xml );
         this.compareObjects( obj, xstreamXML.fromXML( xml ) );
 
         // do json
-        String json = new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append(
-            this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
-        System.out.println( "json:\n "+ json );
+        String json =
+            new StringBuffer( "{ \"" ).append( obj.getClass().getName() ).append( "\" : " ).append( this.xstreamJSON.toXML( obj ) ).append( " }" ).toString();
+        System.out.println( "json:\n " + json );
         try
         {
             this.compareObjects( obj, xstreamJSON.fromXML( json, obj.getClass().newInstance() ) );

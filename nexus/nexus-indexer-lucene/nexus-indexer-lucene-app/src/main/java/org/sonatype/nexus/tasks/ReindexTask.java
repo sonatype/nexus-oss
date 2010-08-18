@@ -14,17 +14,18 @@
 package org.sonatype.nexus.tasks;
 
 import java.util.List;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ForceFullReindexPropertyDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Reindex task.
- *
+ * 
  * @author cstamas
  */
 @Component( role = SchedulerTask.class, hint = ReindexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
@@ -35,28 +36,40 @@ public class ReindexTask
     @Requirement( role = ReindexTaskHandler.class )
     private List<ReindexTaskHandler> handlers;
 
+    @Override
+    protected String getRepositoryFieldId()
+    {
+        return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+    }
+
+    @Override
+    protected String getRepositoryPathFieldId()
+    {
+        return null;
+    }
+
     public boolean getFullReindex()
     {
-        boolean fullReindex = new Boolean( getParameter( ForceFullReindexPropertyDescriptor.ID ) );
+        boolean fullReindex = new Boolean( getParameter( ReindexTaskDescriptor.FULL_REINDEX_FIELD_ID ) );
         return fullReindex;
     }
 
     public void setFullReindex( boolean fullReindex )
     {
-        getParameters().put( ForceFullReindexPropertyDescriptor.ID, String.valueOf( fullReindex ) );
+        getParameters().put( ReindexTaskDescriptor.FULL_REINDEX_FIELD_ID, String.valueOf( fullReindex ) );
     }
 
     @Override
     public Object doRun()
         throws Exception
     {
-        for( ReindexTaskHandler handler : handlers )
+        for ( ReindexTaskHandler handler : handlers )
         {
-            if( getRepositoryId() != null )
+            if ( getRepositoryId() != null )
             {
                 handler.reindexRepository( getRepositoryId(), getResourceStorePath(), getFullReindex() );
             }
-            else if( getRepositoryGroupId() != null )
+            else if ( getRepositoryGroupId() != null )
             {
                 handler.reindexRepositoryGroup( getRepositoryGroupId(), getResourceStorePath(), getFullReindex() );
             }
@@ -78,15 +91,15 @@ public class ReindexTask
     @Override
     protected String getMessage()
     {
-        if( getRepositoryGroupId() != null )
+        if ( getRepositoryGroupId() != null )
         {
             return "Reindexing repository group " + getRepositoryGroupName() + " from path " + getResourceStorePath()
-                   + " and below.";
+                + " and below.";
         }
-        else if( getRepositoryId() != null )
+        else if ( getRepositoryId() != null )
         {
             return "Reindexing repository " + getRepositoryName() + " from path " + getResourceStorePath()
-                   + " and below.";
+                + " and below.";
         }
         else
         {

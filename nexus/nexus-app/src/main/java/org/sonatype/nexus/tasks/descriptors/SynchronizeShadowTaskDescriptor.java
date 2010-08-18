@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
+import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "SynchronizeShadow", description = "Synchronize Shadow Repository" )
 public class SynchronizeShadowTaskDescriptor
@@ -26,8 +26,11 @@ public class SynchronizeShadowTaskDescriptor
 {
     public static final String ID = "SynchronizeShadowsTask";
 
-    @Requirement( role = ScheduledTaskPropertyDescriptor.class, hint = "Shadow" )
-    private ScheduledTaskPropertyDescriptor shadowId;
+    public static final String REPO_FIELD_ID = "shadowRepositoryId";
+
+    private final RepoOrGroupComboFormField repoField =
+        new RepoOrGroupComboFormField( REPO_FIELD_ID, "Shadow Repository",
+                                       "Select the repository shadow to assign to this task.", FormField.MANDATORY );
 
     public String getId()
     {
@@ -39,12 +42,12 @@ public class SynchronizeShadowTaskDescriptor
         return "Synchronize Shadow Repository";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        List<ScheduledTaskPropertyDescriptor> properties = new ArrayList<ScheduledTaskPropertyDescriptor>();
+        List<FormField> fields = new ArrayList<FormField>();
 
-        properties.add( shadowId );
+        fields.add( repoField );
 
-        return properties;
+        return fields;
     }
 }
