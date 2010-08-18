@@ -34,7 +34,7 @@ public class NXCM1008SiteDeployIT
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
 
-        repo.setId( "repositoryOrGroupId" );
+        repo.setKey( "repositoryOrGroupId" );
 
         repo.setValue( "repo_fake-central" );
 
