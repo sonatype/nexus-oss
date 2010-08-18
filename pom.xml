@@ -57,7 +57,6 @@
     <dependency>
       <groupId>com.sonatype.nexus.extension</groupId>
       <artifactId>nexus-licensing-extension</artifactId>
-      <version>${nexus-licensing-extension.version}</version>
       <scope>provided</scope>
     </dependency>
 
