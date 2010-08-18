@@ -58,6 +58,11 @@
         <artifactId>plugin-host-api</artifactId>
         <version>1.0.3</version>
       </dependency>
+      <dependency>
+        <groupId>org.sonatype.plugin</groupId>
+        <artifactId>plugin-gleaner</artifactId>
+        <version>1.0.3</version>
+      </dependency>
 
       <!-- Jetty -->
       <dependency>
