@@ -93,6 +93,8 @@ public class Nexus421PlainNotificationIT
 
         // make auto block active
         central.setAutoBlockActive( true );
+        
+        central.setIndexable( false );
 
         repoMessageUtil.updateRepo( central );
     }
@@ -105,6 +107,8 @@ public class Nexus421PlainNotificationIT
 
         // direct the repo to nonexistent maven2 repo
         central.getRemoteStorage().setRemoteStorageUrl( remoteUrl );
+        
+        central.setIndexable( false );
 
         repoMessageUtil.updateRepo( central );
 
