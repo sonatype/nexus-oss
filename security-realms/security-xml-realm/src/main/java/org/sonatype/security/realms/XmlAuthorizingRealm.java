@@ -12,6 +12,7 @@
  */
 package org.sonatype.security.realms;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
+import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
 import org.sonatype.security.usermanagement.UserManager;
@@ -61,7 +63,10 @@ public class XmlAuthorizingRealm
 
     @Inject
     private Logger logger;
-
+    
+    @Inject 
+    private SecuritySystem securitySystem;
+    
     public XmlAuthorizingRealm()
     {
         setCredentialsMatcher( new Sha1CredentialsMatcher() );
@@ -98,6 +103,29 @@ public class XmlAuthorizingRealm
         Set<String> roles = new HashSet<String>();
 
         Set<String> realmNames = new HashSet<String>( principals.getRealmNames() );
+
+        // if the user belongs to this realm, we are most likely using this realm stand alone, or for testing
+        if( !realmNames.contains( this.getName() ) )
+        {
+            // make sure the realm is enabled 
+            Collection<Realm> configureadRealms = this.securitySystem.getSecurityManager().getRealms();
+            boolean foundRealm = false;
+            for ( Realm realm : configureadRealms )
+            {
+                if( realmNames.contains( realm.getName() ) )
+                {
+                    foundRealm = true;
+                    break;
+                }
+            }
+            if( !foundRealm )
+            {
+                // user is from a realm that is NOT enabled
+                throw new AuthorizationException( "User for principals: " + principals.getPrimaryPrincipal()
+                                                  + " belongs to a disabled realm(s): "+ principals.getRealmNames() + ".");
+            }
+        }
+
         // clean up the realm names for processing (replace the Xml*Realm with default)
         cleanUpRealmList( realmNames );
 
@@ -106,7 +134,7 @@ public class XmlAuthorizingRealm
             for ( String realmName : realmNames )
             {
                 try
-                {
+                {   
                     for ( RoleIdentifier roleIdentifier : ( (RoleMappingUserManager) userManager ).getUsersRoles( username,
                                                                                                                   realmName ) )
                     {
@@ -152,8 +180,7 @@ public class XmlAuthorizingRealm
     }
 
     private void cleanUpRealmList( Set<String> realmNames )
-    {
-
+    {   
         for ( UserManager userManager : this.userManagerMap.values() )
         {
             String authRealmName = userManager.getAuthenticationRealmName();

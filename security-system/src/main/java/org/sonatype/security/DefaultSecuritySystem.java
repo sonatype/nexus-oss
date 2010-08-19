@@ -922,7 +922,7 @@ public class DefaultSecuritySystem
 
     }
 
-    private RealmSecurityManager getSecurityManager()
+    public RealmSecurityManager getSecurityManager()
     {
         return this.securityManagers.get( this.securityConfiguration.getSecurityManager() );
     }

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.mgt.RealmSecurityManager;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
@@ -450,4 +451,10 @@ public interface SecuritySystem
      */
     void setSecurityEnabled( boolean enabled );
 
+    /**
+     * Returns the configured shiro SecurityManager
+     * @return
+     */
+    public RealmSecurityManager getSecurityManager();
+    
 }

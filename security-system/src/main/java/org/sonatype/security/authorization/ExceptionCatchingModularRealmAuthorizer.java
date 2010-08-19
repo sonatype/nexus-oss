@@ -108,7 +108,6 @@ public class ExceptionCatchingModularRealmAuthorizer
     {
         for ( Realm realm : this.getRealms() )
         {
-
             // need to catch an AuthorizationException, the user might only belong to on of the realms
             try
             {
