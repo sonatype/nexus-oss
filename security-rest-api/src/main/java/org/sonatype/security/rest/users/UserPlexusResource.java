@@ -227,7 +227,7 @@ public class UserPlexusResource
     protected boolean isCurrentUser( Request request )
     {
         Subject subject = SecurityUtils.getSubject();
-        if ( subject == null )
+        if ( subject == null || subject.getPrincipal() == null )
         {
             return false; // not the current user because there is no current user
         }
