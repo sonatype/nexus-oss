@@ -717,26 +717,20 @@ public abstract class AbstractNexusIntegrationTest
             throw e;
         }
     }
-    
-    protected static void stopNexus()
-        throws Exception
-    {
-        stopNexus( true );
-    }
 
-    protected static void stopNexus( boolean deleteTasks )
+    protected static void stopNexus()
         throws Exception
     {
         log.info( "stopping Nexus" );
 
-        getNexusStatusUtil().stop( deleteTasks );
+        getNexusStatusUtil().stop();
     }
 
     protected void restartNexus()
         throws Exception
     {
         log.info( "RESTARTING Nexus" );
-        stopNexus( false );
+        stopNexus();
         startNexus();
     }
 

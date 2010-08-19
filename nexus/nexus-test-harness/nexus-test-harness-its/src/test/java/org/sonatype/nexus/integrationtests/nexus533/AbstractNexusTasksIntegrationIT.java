@@ -36,8 +36,17 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
 {
 
     public abstract E getTaskScheduled();
-
+    
     @Test
+    public void doTest()
+        throws Exception
+    {
+        scheduleTasks();
+        updateTasks();
+        changeScheduling();
+        deleteTasks();
+    }
+
     public void scheduleTasks()
         throws Exception
     {
@@ -62,7 +71,6 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         Assert.assertEquals( scheduledTask.getTypeId(), task.getType() );
     }
 
-    @Test
     public void updateTasks()
         throws Exception
     {
@@ -79,7 +87,6 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
 
     public abstract void updateTask( E scheduledTask );
 
-    @Test
     public void changeScheduling()
         throws Exception
     {
@@ -123,7 +130,6 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         assertTasks();
     }
 
-    @Test
     public void deleteTasks()
         throws Exception
     {

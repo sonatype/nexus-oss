@@ -127,14 +127,8 @@ public class NexusStatusUtil
         throw new NexusIllegalStateException( "Unable to doHardStart(), nexus still stopped, took 200s" );
 
     }
-    
-    public void stop()
-        throws Exception
-    {
-        stop( true );
-    }
 
-    public void stop( boolean deleteTasks )
+    public void stop()
         throws Exception
     {
         if ( APP_BOOTER_SERVICE == null )
@@ -149,14 +143,7 @@ public class NexusStatusUtil
         {
             // NOTE: We can't kill active tasks, we need to wait for them to stop
             TestContainer.getInstance().getTestContext().useAdminForRequests();
-            if ( deleteTasks )
-            {
-                TaskScheduleUtil.deleteAllTasks();
-            }
-            else
-            {
-                TaskScheduleUtil.waitForAllTasksToStop();
-            }
+            TaskScheduleUtil.waitForAllTasksToStop();
 
             try
             {
