@@ -139,14 +139,16 @@ public class AbstractEnvironmentMojo
     private MavenArtifact emmaArtifact;
 
     /**
-     * Artifact file containing nexus bundle
+     * Nexus plugin artifacts to be installed into the Nexus instance
+     * under test.
      * 
      * @parameter
      */
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
-     * Artifact file containing nexus bundle
+     * Resources to be unpacked and then contents copied into Nexus
+     * default-configs
      * 
      * @parameter
      */
@@ -158,6 +160,13 @@ public class AbstractEnvironmentMojo
      * @parameter default-value="true"
      */
     private boolean setupMaven;
+    
+    /**
+     * When true setup emma
+     * 
+     * @parameter default-value="true"
+     */
+    private boolean setupEmma;
 
     /**
      * Maven used on ITs
@@ -168,7 +177,7 @@ public class AbstractEnvironmentMojo
     private MavenArtifact mavenArtifact;
 
     /**
-     * Where maven instace should be created
+     * Where Maven instance should be created
      * 
      * @parameter default-value="${project.build.directory}/maven"
      * @see EnvironmentMojo#setupMaven
@@ -176,11 +185,17 @@ public class AbstractEnvironmentMojo
     private File mavenLocation;
 
     /**
+     * Resources in the test project can be added beneath this directory
+     * so that
      * @parameter default-value="${basedir}/resources"
      */
     protected File resourcesSourceLocation;
 
     /**
+     * This directory is where the default-configs included inside the
+     * this plugin will be extracted to BEFORE they are copied into
+     * the nexus work dir. A project property 'test-resources-folder'
+     * contains the absolute path of this directory.
      * @parameter default-value="${project.build.directory}/resources"
      */
     private File resourcesDestinationLocation;
@@ -219,7 +234,8 @@ public class AbstractEnvironmentMojo
      * Known ports can be manually set as part of the configuration
      * @parameter
      */
-    private Map staticPorts;
+    @SuppressWarnings("rawtypes")
+	private Map staticPorts;
 
 
 
@@ -249,7 +265,7 @@ public class AbstractEnvironmentMojo
         project.getProperties().put( "proxy-repo-target-dir", getPath( new File( destination, "proxy-repo" ) ) );
 
         Artifact bundle = getNexusBundle();
-
+        // extract the artifact specified in the plugin config
         if ( !this.markerExist( "bundle" ) )
         {
             unpack( bundle.getFile(), destination, bundle.getType() );
@@ -279,15 +295,20 @@ public class AbstractEnvironmentMojo
         project.getProperties().put( "nexus-plexus-config-file", getPath( new File( nexusBaseDir, "conf/plexus.xml" ) ) );
 
         File libFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
-        copyEmma( libFolder );
-        File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
+        if ( setupEmma )
+        {
+        	copyEmma( libFolder );
+        }
 
+        // if any plugin artifacts were specified, install them into runtime
+        File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
         Collection<MavenArtifact> npas = getNexusPluginsArtifacts();
         if ( npas != null )
         {
             setupPlugins( nexusBaseDir, npas, libFolder, pluginFolder );
         }
 
+        // promote any plugins included in the bundle to the runtime install
         if ( promoteOptionalPlugin )
         {
             File optionalPluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/optional-plugins" );
@@ -305,6 +326,7 @@ public class AbstractEnvironmentMojo
             }
         }
 
+        // setup Maven if requested for this test
         if ( setupMaven )
         {
             String mavenVersion = setupMaven().getBaseVersion();
@@ -324,7 +346,7 @@ public class AbstractEnvironmentMojo
             resourcesDestinationLocation.mkdirs();
         }
         project.getProperties().put( "test-resources-folder", getPath( resourcesDestinationLocation ) );
-
+        // ./resources dir at root of project by default, suitable for tests I guess?
         if ( resourcesSourceLocation.isDirectory() )
         {
             project.getProperties().put( "test-resources-source-folder", getPath( resourcesSourceLocation ) );
@@ -752,7 +774,7 @@ public class AbstractEnvironmentMojo
             nexusBundleArtifact = new MavenArtifact( "org.sonatype.nexus", "nexus-webapp", "bundle", "tar.gz" );
         }
 
-        if ( emmaArtifact == null )
+        if ( setupEmma && emmaArtifact == null )
         {
             emmaArtifact = new MavenArtifact( "emma", "emma" );
         }
