@@ -118,6 +118,17 @@ public class TaskScheduleUtil
         return task.getLastRunResult();
     }
 
+    public static void deleteAllTasks()
+        throws Exception
+    {
+        List<ScheduledServiceListResource> tasks = getAllTasks();
+
+        for ( ScheduledServiceListResource task : tasks )
+        {
+            deleteTask( task.getId() );
+        }
+    }
+
     public static void waitForTasks()
         throws Exception
     {
@@ -158,8 +169,7 @@ public class TaskScheduleUtil
 
             for ( ScheduledServiceListResource task : tasks )
             {
-                if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals(
-                                                                                                       TaskState.SLEEPING.name() ) )
+                if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals( TaskState.SLEEPING.name() ) )
                     && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
                 {
                     runninTaskId = task.getId();
@@ -185,8 +195,7 @@ public class TaskScheduleUtil
 
         for ( ScheduledServiceListResource task : tasks )
         {
-            if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals(
-                                                                                                   TaskState.SLEEPING.name() ) )
+            if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals( TaskState.SLEEPING.name() ) )
                 && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
             {
                 runningTasks.add( task.getId() );
