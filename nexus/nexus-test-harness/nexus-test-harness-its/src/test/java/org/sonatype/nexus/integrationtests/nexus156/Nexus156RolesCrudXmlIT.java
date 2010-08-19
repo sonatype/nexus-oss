@@ -15,9 +15,9 @@ package org.sonatype.nexus.integrationtests.nexus156;
 
 import java.io.IOException;
 
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
+import org.testng.annotations.Test;
 
 /**
  * CRUD tests for XML request/response.

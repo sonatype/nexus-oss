@@ -15,11 +15,10 @@ package org.sonatype.nexus.integrationtests.nexus598;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test class name search functionality.
@@ -39,7 +38,7 @@ public class Nexus598ClassnameSearchIT
         List<NexusArtifact> artifacts =
             getSearchMessageUtil().searchForClassname(
                 "org.sonatype.nexus.test.classnamesearch.ClassnameSearchTestHelper" );
-        Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
+        Assert.assertFalse( artifacts.isEmpty(), "Nexus598 artifact was not found" );
     }
 
     @Test
@@ -47,7 +46,7 @@ public class Nexus598ClassnameSearchIT
         throws Exception
     {
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchForClassname( "ClassnameSearchTestHelper" );
-        Assert.assertFalse( "Nexus598 artifact was not found", artifacts.isEmpty() );
+        Assert.assertFalse( artifacts.isEmpty(), "Nexus598 artifact was not found" );
     }
 
     @Test
@@ -63,7 +62,7 @@ public class Nexus598ClassnameSearchIT
         // "I.hope.this.class.name.is.not.available.at.nexus.repo.for.test.issue.Nexus598" );
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchForClassname( "I.hope.this.name.is.not.available" );
-        Assert.assertTrue( "The search found something, but it shouldn't.", artifacts.isEmpty() );
+        Assert.assertTrue( artifacts.isEmpty(), "The search found something, but it shouldn't." );
     }
 
 }

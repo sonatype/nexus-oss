@@ -13,18 +13,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus258;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+import static org.testng.Assert.assertTrue;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.commons.httpclient.HttpStatus;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 
 /**

@@ -13,18 +13,16 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
+import static org.testng.Assert.assertTrue;
 import java.io.IOException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * @author Juven Xu

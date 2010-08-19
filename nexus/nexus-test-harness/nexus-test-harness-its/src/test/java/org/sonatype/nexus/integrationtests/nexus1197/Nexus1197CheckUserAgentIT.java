@@ -14,16 +14,16 @@
 package org.sonatype.nexus.integrationtests.nexus1197;
 
 import java.io.FileNotFoundException;
-
+import static org.hamcrest.MatcherAssert.assertThat;
 import org.hamcrest.CoreMatchers;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
+import org.hamcrest.text.StringContains;
 import org.mortbay.jetty.Server;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1197CheckUserAgentIT
     extends AbstractNexusIntegrationTest
@@ -76,7 +76,7 @@ public class Nexus1197CheckUserAgentIT
 
         Assert.assertNotNull( userAgent );
         Assert.assertTrue( userAgent.startsWith( "Nexus/" ) );
-        Assert.assertThat( userAgent, CoreMatchers.anyOf( StringContains.containsString( "(OSS" ),
+        assertThat( userAgent, CoreMatchers.anyOf( StringContains.containsString( "(OSS" ),
                                                           StringContains.containsString( "(PRO" ) ) );
 
     }

@@ -14,10 +14,9 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.net.ServerSocket;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.Response;
@@ -26,6 +25,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -79,6 +79,7 @@ public class NexusStatusUtil
     public void start( String testId )
         throws Exception
     {
+        System.out.println("################################ Running TEST: " + testId);
         int totalWaitCycles = 200 * 5; // 200 sec
         int retryStartCycles = 50 * 5; // 50 sec
         int pollingFreq = 200; // 200 ms

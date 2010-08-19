@@ -13,14 +13,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus977;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.nexus532.Nexus532GroupsCrudXmlIT;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsCrudIT
     extends Nexus532GroupsCrudXmlIT

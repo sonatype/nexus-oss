@@ -1,12 +1,11 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.MediaType;
@@ -19,6 +18,7 @@ import org.sonatype.nexus.rest.model.ErrorReportRequestDTO;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -44,7 +44,7 @@ public class ErrorReportUtil
         {
             final String text = response.getEntity().getText();
 
-            Assert.assertTrue( text + "\n" + response.getStatus(), response.getStatus().isSuccess() );
+            Assert.assertTrue( response.getStatus().isSuccess(), text + "\n" + response.getStatus() );
 
             XStreamRepresentation representation = new XStreamRepresentation( xstream, text, MediaType.APPLICATION_XML );
 

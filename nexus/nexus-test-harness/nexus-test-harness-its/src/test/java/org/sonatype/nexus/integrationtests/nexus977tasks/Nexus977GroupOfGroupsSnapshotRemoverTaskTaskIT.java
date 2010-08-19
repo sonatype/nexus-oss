@@ -5,15 +5,16 @@ import java.io.FileNotFoundException;
 import java.net.URL;
 
 import org.apache.maven.model.Model;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
     extends AbstractNexusProxyIntegrationTest
@@ -73,18 +74,17 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
             TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,
                                       keepSnapshotsProp, ageProp );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         try
         {
-            downloadFile(
-                          new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
+            downloadFile( new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
                           "target/downloads/nexus977tasks/project-1.0-20100520.154534-88-2.jar" );
             Assert.fail( "snapshot removal should have deleted this" );
         }
         catch ( FileNotFoundException e )
         {
-            Assert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
+            MatcherAssert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
         }
 
     }

@@ -14,16 +14,13 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.After;
-import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -37,6 +34,9 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -107,7 +107,7 @@ public abstract class AbstractPrivilegeTest
         this.groupUtil = new GroupMessageUtil( this,xstream, MediaType.APPLICATION_XML );
     }
 
-    @Before
+    @BeforeMethod
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -305,7 +305,7 @@ public abstract class AbstractPrivilegeTest
 
         if ( role == null )
         {
-            org.junit.Assert.fail( "Role not found: " + roleId );
+            Assert.fail( "Role not found: " + roleId );
         }
 
         // add it
@@ -316,7 +316,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @Override
-    @After
+    @AfterMethod
     public void afterTest()
         throws Exception
     {

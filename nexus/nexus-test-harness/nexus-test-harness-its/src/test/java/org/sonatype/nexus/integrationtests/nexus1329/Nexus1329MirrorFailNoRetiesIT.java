@@ -18,12 +18,12 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1329MirrorFailNoRetiesIT
     extends AbstractMirrorIT
@@ -52,9 +52,9 @@ public class Nexus1329MirrorFailNoRetiesIT
         File originalFile = this.getTestFile( "basic/nexus1329/sample/1.0.0/sample-1.0.0.xml" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
-        Assert.assertFalse( "Nexus should access first mirror " + mirror1Urls, mirror1Urls.isEmpty() );
-        Assert.assertEquals( "Nexus should not retry mirror " + mirror1Urls, 1, mirror1Urls.size() );
-        Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
+        Assert.assertFalse( mirror1Urls.isEmpty(), "Nexus should access first mirror " + mirror1Urls );
+        Assert.assertEquals( mirror1Urls.size(), 1, "Nexus should not retry mirror " + mirror1Urls );
+        Assert.assertTrue( mirror2Urls.isEmpty(), "Nexus should not access second mirror " + mirror2Urls );
 
         MirrorStatusResourceListResponse response = this.messageUtil.getMirrorsStatus( REPO );
 

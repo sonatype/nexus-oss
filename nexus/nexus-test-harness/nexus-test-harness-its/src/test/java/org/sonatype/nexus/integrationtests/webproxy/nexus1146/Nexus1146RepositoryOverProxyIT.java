@@ -18,13 +18,12 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.maven.it.Verifier;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1146RepositoryOverProxyIT
     extends AbstractNexusWebProxyIntegrationTest
@@ -43,10 +42,10 @@ public class Nexus1146RepositoryOverProxyIT
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( jarArtifact, jarFile ) );
 
         String artifactUrl = baseProxyURL + "release-proxy-repo-1/" + getTestId() + "/artifact/1.0/artifact-1.0.jar";
-        Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
+        Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
     }
 
-    @Test( expected = FileNotFoundException.class )
+    @Test( expectedExceptions = FileNotFoundException.class )
     public void unexistentArtifact()
         throws Exception
     {
@@ -62,7 +61,7 @@ public class Nexus1146RepositoryOverProxyIT
                     + "release-proxy-repo-1/"
                     + getTestId()
                     + "/some-artifact-that-dont-exists/4.8.15.16.23.42/some-artifact-that-dont-exists-4.8.15.16.23.42.jar";
-            Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
+            Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
         }
     }
 
@@ -91,7 +90,7 @@ public class Nexus1146RepositoryOverProxyIT
 
         String artifactUrl =
             baseProxyURL + "release-proxy-repo-1/" + getTestId() + "/maven-artifact/1.0/maven-artifact-1.0.jar";
-        Assert.assertTrue( "Proxy was not accessed", server.getAccessedUris().contains( artifactUrl ) );
+        Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
     }
 
 }

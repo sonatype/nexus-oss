@@ -1,13 +1,12 @@
 package org.sonatype.nexus.integrationtests.nexus2641;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.StringUtils;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2641RestApiConfigIT
     extends AbstractNexusIntegrationTest

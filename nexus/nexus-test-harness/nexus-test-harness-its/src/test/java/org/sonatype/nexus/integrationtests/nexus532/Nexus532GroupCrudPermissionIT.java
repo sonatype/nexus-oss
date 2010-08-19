@@ -15,15 +15,14 @@ package org.sonatype.nexus.integrationtests.nexus532;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test Group CRUD privileges.
@@ -51,7 +50,7 @@ public class Nexus532GroupCrudPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -64,20 +63,20 @@ public class Nexus532GroupCrudPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         group = this.groupUtil.getGroup( group.getId() );
 
         // read should succeed (inherited)
         response = this.groupUtil.sendMessage( Method.GET, group );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.groupUtil.sendMessage( Method.DELETE, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
 
@@ -100,7 +99,7 @@ public class Nexus532GroupCrudPermissionIT
         group.addRepository( member );
 
         Response response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -109,7 +108,7 @@ public class Nexus532GroupCrudPermissionIT
         // update repo
         group.setName( "tesUpdatePermission2" );
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -122,19 +121,19 @@ public class Nexus532GroupCrudPermissionIT
 
         // should work now...
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // read should succeed (inherited)
         response = this.groupUtil.sendMessage( Method.GET, group );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.groupUtil.sendMessage( Method.DELETE, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
 
@@ -157,7 +156,7 @@ public class Nexus532GroupCrudPermissionIT
         group.addRepository( member );
 
         Response response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -166,7 +165,7 @@ public class Nexus532GroupCrudPermissionIT
         // update repo
         group.setName( "tesUpdatePermission2" );
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -179,19 +178,19 @@ public class Nexus532GroupCrudPermissionIT
 
         // read should fail
         response = this.groupUtil.sendMessage( Method.GET, group );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // should work now...
         response = this.groupUtil.sendMessage( Method.DELETE, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
 
@@ -214,7 +213,7 @@ public class Nexus532GroupCrudPermissionIT
         group.addRepository( member );
 
         Response response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         group = this.groupUtil.getGroup( group.getId() );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -223,7 +222,7 @@ public class Nexus532GroupCrudPermissionIT
         // update repo
         group.setName( "tesUpdatePermission2" );
         response = this.groupUtil.sendMessage( Method.DELETE, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -236,19 +235,19 @@ public class Nexus532GroupCrudPermissionIT
 
         // read should succeed (inherited)
         response = this.groupUtil.sendMessage( Method.GET, group );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.groupUtil.sendMessage( Method.POST, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.groupUtil.sendMessage( Method.PUT, group );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // should work now...
         response = this.groupUtil.sendMessage( Method.DELETE, group );
-        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 204, "Response status: " );
 
     }
 

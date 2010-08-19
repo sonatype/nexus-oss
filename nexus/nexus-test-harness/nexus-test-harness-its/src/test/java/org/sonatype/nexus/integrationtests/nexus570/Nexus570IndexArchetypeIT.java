@@ -17,11 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus570IndexArchetypeIT extends AbstractNexusIntegrationTest
 {

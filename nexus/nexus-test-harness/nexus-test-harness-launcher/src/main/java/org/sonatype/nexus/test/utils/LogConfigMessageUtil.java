@@ -15,7 +15,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -25,6 +24,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.rest.model.LogConfigResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 

@@ -15,12 +15,11 @@ package org.sonatype.nexus.integrationtests.proxy.nexus1089;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1089SecureProxyIT
     extends AbstractNexusProxyIntegrationTest

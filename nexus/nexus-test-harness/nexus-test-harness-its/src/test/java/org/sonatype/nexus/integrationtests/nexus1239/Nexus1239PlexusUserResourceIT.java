@@ -17,14 +17,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.PlexusUserResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1239PlexusUserResourceIT
     extends AbstractNexusIntegrationTest
@@ -115,7 +114,7 @@ public class Nexus1239PlexusUserResourceIT
         Assert.assertTrue( userIds.contains( "anonymous" ) );
         Assert.assertTrue( userIds.contains( "deployment" ) );
         Assert.assertTrue( userIds.contains( "test-user" ) );
-        Assert.assertEquals( "Users: " + userIds, 4, users.size() );
+        Assert.assertEquals( users.size(), 4, "Users: " + userIds );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -141,7 +140,7 @@ public class Nexus1239PlexusUserResourceIT
 
         // NOTE: this needs to be at least the number of users expected in the default realm, the In-Memory realm add
         // another user locator, and there is no way to disable it.
-        Assert.assertTrue( "Users: " + userIds, users.size() >= 4 );
+        Assert.assertTrue( users.size() >= 4, "Users: " + userIds );
     }
 
     @SuppressWarnings( "unchecked" )

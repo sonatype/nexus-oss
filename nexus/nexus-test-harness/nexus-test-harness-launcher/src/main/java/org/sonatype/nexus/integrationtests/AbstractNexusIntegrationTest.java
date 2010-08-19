@@ -14,8 +14,6 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,8 +28,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -48,10 +44,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
@@ -73,6 +65,12 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import static org.testng.Assert.fail;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -284,7 +282,7 @@ public abstract class AbstractNexusIntegrationTest
      * 
      * @throws Exception
      */
-    @Before
+    @BeforeMethod
     public void oncePerClassSetUp()
         throws Exception
     {
@@ -344,7 +342,7 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    @After
+    @AfterMethod
     public void afterTest()
         throws Exception
     {
@@ -955,14 +953,12 @@ public abstract class AbstractNexusIntegrationTest
         {
             throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
         }
-        Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-                                 + response.getRequest().getResourceRef().toString() + " \n Error: "
-                                 + status.getDescription(), 301,
-                             status.getCode() );
+        Assert.assertEquals( 301, status.getCode(), "Snapshot download should redirect to a new file\n "
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription() );
 
         Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString(), redirectRef );
+        Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
+            + response.getRequest().getResourceRef().toString() );
 
         serviceURI = redirectRef.toString();
 
@@ -1247,7 +1243,6 @@ public abstract class AbstractNexusIntegrationTest
             new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration( baseClass.getName().replace( '.',
                                                                                                                                                 '/' )
                                                                                                                        + ".xml" );
-
         try
         {
             return new DefaultPlexusContainer( containerConfiguration );

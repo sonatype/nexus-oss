@@ -14,13 +14,13 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -44,6 +44,7 @@ import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -126,7 +127,7 @@ public class SearchMessageUtil
 
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Search failure:\n" + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Search failure:\n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
@@ -326,8 +327,8 @@ public class SearchMessageUtil
 
         if ( response.getStatus().isError() )
         {
-            Assert.assertFalse( "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus(),
-                                response.getStatus().isError() );
+            Assert.assertFalse( response.getStatus().isError(),
+                                "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus() );
         }
         String responseText = response.getEntity().getText();
 
@@ -488,7 +489,7 @@ public class SearchMessageUtil
 
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Search failure:\n" + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Search failure:\n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
@@ -643,7 +644,7 @@ public class SearchMessageUtil
 
         Status status = response.getStatus();
 
-        Assert.assertTrue( responseText + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), responseText + status );
 
         XStreamRepresentation re =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );

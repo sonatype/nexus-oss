@@ -13,13 +13,12 @@
  */
 package org.sonatype.nexus.integrationtests.nexus507;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.security.rest.model.RoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.meterware.httpunit.GetMethodWebRequest;
 import com.meterware.httpunit.WebConversation;
@@ -30,13 +29,13 @@ public class Nexus507UserTimeoutIT
     extends AbstractPrivilegeTest
 {
 
-    @Before
+    @BeforeMethod
     public void reduceAdminRoleTimeout()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         RoleResource role = roleUtil.getRole( "test-admin" );
-        Assert.assertEquals( "Invalid test-admin role timeout", 1, role.getSessionTimeout() );
+        Assert.assertEquals( role.getSessionTimeout(), 1, "Invalid test-admin role timeout" );
     }
 
     @Test
@@ -51,12 +50,12 @@ public class Nexus507UserTimeoutIT
         wc.setAuthorization( "test-admin", "admin123" );
         WebRequest req = new GetMethodWebRequest( loginURI );
         WebResponse resp = wc.getResponse( req );
-        Assert.assertEquals( "Unable to login " + resp.getResponseMessage(), 200, resp.getResponseCode() );
+        Assert.assertEquals( resp.getResponseCode(), 200, "Unable to login " + resp.getResponseMessage() );
 
         String userURI = nexusBaseUrl + "service/local/users/admin";
         req = new GetMethodWebRequest( userURI );
         resp = wc.getResponse( req );
-        Assert.assertEquals( "Unable to access users " + resp.getResponseMessage(), 200, resp.getResponseCode() );
+        Assert.assertEquals( resp.getResponseCode(), 200, "Unable to access users " + resp.getResponseMessage() );
 
         this.printKnownErrorButDoNotFail( this.getClass(), "checkHtmlRequest" );
         //FIXME: the timeout was never configurable, this the below is going to fail.

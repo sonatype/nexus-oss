@@ -6,10 +6,12 @@ import java.util.List;
 
 import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.IsCollectionContaining;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsCollectionContaining;
+import org.jmock.expectation.AssertMo;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2810PluginConsoleIT
     extends AbstractPluginConsoleIT
@@ -34,7 +36,7 @@ public class Nexus2810PluginConsoleIT
     {
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
-        Assert.assertThat( getPluginsNames( pluginInfos ),
+        MatcherAssert.assertThat( getPluginsNames( pluginInfos ),
                            IsCollectionContaining.hasItems( "Nexus : Core Plugins : Plugin Console Plugin", "Nexus Broken Plugin" ) );
 
         PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console Plugin" );

@@ -17,14 +17,15 @@ import java.io.File;
 import java.util.Arrays;
 
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.junit.internal.matchers.IsCollectionContaining;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsCollectionContaining;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test task Publish Indexes is working.
@@ -57,10 +58,8 @@ public class Nexus637PublishIndexIT
         if ( index.exists() )
         {
             // can't contain the OSS index
-            Assert.assertThat(
-                               Arrays.asList( index.list() ),
-                               CoreMatchers.not( IsCollectionContaining.hasItems(
-                                                                                  "nexus-maven-repository-index.gz",
+            MatcherAssert.assertThat( Arrays.asList( index.list() ),
+                               CoreMatchers.not( IsCollectionContaining.hasItems( "nexus-maven-repository-index.gz",
                                                                                   "nexus-maven-repository-index.gz.md5",
                                                                                   "nexus-maven-repository-index.gz.sha1",
                                                                                   "nexus-maven-repository-index.properties",
@@ -77,6 +76,6 @@ public class Nexus637PublishIndexIT
 
         TaskScheduleUtil.runTask( PublishIndexesTaskDescriptor.ID, prop );
 
-        Assert.assertTrue( ".index should exists after publish index task was run.", index.exists() );
+        Assert.assertTrue( index.exists(), ".index should exists after publish index task was run." );
     }
 }

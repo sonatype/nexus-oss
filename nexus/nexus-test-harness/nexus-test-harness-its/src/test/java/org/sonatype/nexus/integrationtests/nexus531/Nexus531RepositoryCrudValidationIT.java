@@ -15,10 +15,7 @@ package org.sonatype.nexus.integrationtests.nexus531;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -28,6 +25,8 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.converters.ConversionException;
 
@@ -75,8 +74,8 @@ public class Nexus531RepositoryCrudValidationIT
         {
             Assert.fail( "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
+        Assert.assertTrue( responseText.contains( "<errors>" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -110,8 +109,8 @@ public class Nexus531RepositoryCrudValidationIT
         {
             Assert.fail( "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
+        Assert.assertTrue( responseText.contains( "<errors>" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -141,8 +140,8 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Expected RepoType to default: " + response.getStatus() + "\n" + responseText,
-                           response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Expected RepoType to default: " + response.getStatus() + "\n" + responseText );
         // change in functionality
         // Assert.assertFalse( "Expected failure: "+ response.getStatus()+"\n"+responseText,
         // response.getStatus().isSuccess() );
@@ -210,10 +209,10 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Repo should not have been created: " + response.getStatus() + "\n" + responseText,
-                            response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
+        Assert.assertFalse( response.getStatus().isSuccess(),
+                            "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
+        Assert.assertTrue( responseText.contains( "<errors>" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
 
         // with null
 
@@ -222,10 +221,10 @@ public class Nexus531RepositoryCrudValidationIT
         response = this.messageUtil.sendMessage( Method.POST, resource );
         responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Repo should not have been created: " + response.getStatus() + "\n" + responseText,
-                            response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
+        Assert.assertFalse( response.getStatus().isSuccess(),
+                            "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
+        Assert.assertTrue( responseText.contains( "<errors>" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
 
     }
 
@@ -256,9 +255,9 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Expected name to default." + responseText, response.getStatus().isSuccess() );
-        Assert.assertTrue( "Expected name to default to id",
-                           this.messageUtil.getRepository( "createNoNameTest" ).getName().equals( "createNoNameTest" ) );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Expected name to default." + responseText );
+        Assert.assertTrue( this.messageUtil.getRepository( "createNoNameTest" ).getName().equals( "createNoNameTest" ),
+                           "Expected name to default to id" );
 
         // with null
         resource.setId( "createNoNameTestnull" );
@@ -267,11 +266,11 @@ public class Nexus531RepositoryCrudValidationIT
         response = this.messageUtil.sendMessage( Method.POST, resource );
         responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Expected name to default." + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Expected name to default." + responseText );
         Assert.assertTrue(
-                           "Expected name to default to id",
                            this.messageUtil.getRepository( "createNoNameTestnull" ).getName().equals(
-                                                                                                      "createNoNameTestnull" ) );
+                                                                                                      "createNoNameTestnull" ),
+                           "Expected name to default to id" );
 
     }
 
@@ -302,10 +301,10 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Repo should not have been created: " + response.getStatus() + "\n" + responseText,
-                            response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.contains( "<errors>" ) );
+        Assert.assertFalse( response.getStatus().isSuccess(),
+                            "Repo should not have been created: " + response.getStatus() + "\n" + responseText );
+        Assert.assertTrue( responseText.contains( "<errors>" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -335,8 +334,8 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( Method.POST, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Expected DefaultLocalStorageUrl to be ignored on create" + response.getStatus()
-            + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Expected DefaultLocalStorageUrl to be ignored on create" + response.getStatus()
+                + responseText );
     }
 
     @Test
@@ -425,10 +424,10 @@ public class Nexus531RepositoryCrudValidationIT
             response = this.messageUtil.sendMessage( Method.PUT, resource, "updateValidatioinTest" );
             String responseText = response.getEntity().getText();
 
-            Assert.assertFalse( "Repo should not have been updated: " + response.getStatus() + "\n" + responseText,
-                                response.getStatus().isSuccess() );
-            Assert.assertTrue( "Response text did not contain an error message. Status: " + response.getStatus()
-                + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
+            Assert.assertFalse( response.getStatus().isSuccess(),
+                                "Repo should not have been updated: " + response.getStatus() + "\n" + responseText );
+            Assert.assertTrue( responseText.contains( "<errors>" ), "Response text did not contain an error message. Status: " + response.getStatus()
+                    + "\nResponse Text:\n " + responseText );
             resource.setId( "updateValidatioinTest" );
 
         }
@@ -440,10 +439,10 @@ public class Nexus531RepositoryCrudValidationIT
         Response response = this.messageUtil.sendMessage( method, resource );
         String responseText = response.getEntity().getText();
 
-        Assert.assertFalse( "Repo should not have been updated: " + response.getStatus() + "\n" + responseText,
-                            response.getStatus().isSuccess() );
-        Assert.assertTrue( "Response text did not contain an error message. " + response.getStatus()
-            + "\nResponse Text:\n " + responseText, responseText.contains( "<errors>" ) );
+        Assert.assertFalse( response.getStatus().isSuccess(),
+                            "Repo should not have been updated: " + response.getStatus() + "\n" + responseText );
+        Assert.assertTrue( responseText.contains( "<errors>" ), "Response text did not contain an error message. " + response.getStatus()
+                + "\nResponse Text:\n " + responseText );
     }
 
 }

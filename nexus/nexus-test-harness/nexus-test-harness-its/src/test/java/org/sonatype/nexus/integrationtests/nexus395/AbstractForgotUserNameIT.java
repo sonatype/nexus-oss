@@ -15,8 +15,8 @@ package org.sonatype.nexus.integrationtests.nexus395;
 
 import javax.mail.internet.MimeMessage;
 
-import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
+import org.testng.Assert;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 

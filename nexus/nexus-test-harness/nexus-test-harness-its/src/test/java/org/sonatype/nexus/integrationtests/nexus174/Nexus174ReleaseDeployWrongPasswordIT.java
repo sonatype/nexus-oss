@@ -16,13 +16,12 @@ package org.sonatype.nexus.integrationtests.nexus174;
 import java.io.File;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.maven.it.VerificationException;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test deploying artifacts using the wrong password. (expected to fail)

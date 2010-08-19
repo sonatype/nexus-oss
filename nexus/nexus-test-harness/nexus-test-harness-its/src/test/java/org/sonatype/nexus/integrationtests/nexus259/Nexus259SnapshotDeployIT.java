@@ -17,12 +17,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.commons.httpclient.HttpStatus;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Deploys a snapshot artifact using a wagon and REST (both gav and pom) REST should fail 
@@ -73,7 +72,7 @@ public class Nexus259SnapshotDeployIT
             fileWasUploaded = false;
         }
 
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
 
     }
 
@@ -114,6 +113,6 @@ public class Nexus259SnapshotDeployIT
             fileWasUploaded = false;
         }
 
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
     }
 }

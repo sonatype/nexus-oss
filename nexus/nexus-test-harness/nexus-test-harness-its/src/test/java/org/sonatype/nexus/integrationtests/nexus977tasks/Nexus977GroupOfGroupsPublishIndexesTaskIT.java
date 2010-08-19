@@ -2,8 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus977tasks;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
@@ -11,6 +9,8 @@ import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsPublishIndexesTaskIT
     extends AbstractNexusProxyIntegrationTest
@@ -30,14 +30,14 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         repo.setValue( "repository_r4" );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( "r4", DownloadIndexesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repository_r5" );
         task = TaskScheduleUtil.runTask( "r5", DownloadIndexesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
     }
 
     @Test
@@ -56,7 +56,7 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
             TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, 200,
                                       repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         Assert.assertTrue( new File( nexusWorkDir, "storage/r1/.index" ).exists() );
         Assert.assertTrue( new File( nexusWorkDir, "storage/r2/.index" ).exists() );

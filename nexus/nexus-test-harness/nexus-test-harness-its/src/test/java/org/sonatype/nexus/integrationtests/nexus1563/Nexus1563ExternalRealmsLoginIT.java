@@ -1,14 +1,14 @@
 package org.sonatype.nexus.integrationtests.nexus1563;
 
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.security.rest.model.RoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1563ExternalRealmsLoginIT
     extends AbstractPrivilegeTest
@@ -38,6 +38,6 @@ public class Nexus1563ExternalRealmsLoginIT
         testContext.setUsername( "admin-simple" );
         testContext.setPassword( "admin123" );
         Status status = UserCreationUtil.login();
-        Assert.assertTrue( "Unable to login " + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to login " + status );
     }
 }

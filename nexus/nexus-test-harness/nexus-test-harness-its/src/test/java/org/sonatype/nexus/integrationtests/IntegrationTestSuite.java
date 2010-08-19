@@ -15,15 +15,13 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
 
-import org.codehaus.plexus.util.FileUtils;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 
-@RunWith( Suite.class )
-@SuiteClasses( { IntegrationTestSuiteClasses.class/*, IntegrationTestSuiteClassesSecurity.class*/ } )
+import org.codehaus.plexus.util.FileUtils;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
+//@RunWith( Suite.class )
+//@SuiteClasses( { IntegrationTestSuiteClasses.class/*, IntegrationTestSuiteClassesSecurity.class*/ } )
 public class IntegrationTestSuite
 {
 

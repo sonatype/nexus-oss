@@ -14,12 +14,9 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
+
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.After;
-import org.junit.Before;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.artifact.Gav;
@@ -30,6 +27,9 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractNexusProxyIntegrationTest
     extends AbstractNexusIntegrationTest
@@ -57,7 +57,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
     }
 
-    @Before
+    @BeforeMethod
     public void startProxy()
         throws Exception
     {
@@ -65,7 +65,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.proxyServer.start();
     }
 
-    @After
+    @AfterMethod
     public void stopProxy()
         throws Exception
     {

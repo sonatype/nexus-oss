@@ -15,14 +15,13 @@ package org.sonatype.nexus.integrationtests.nexus385;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test the privilege for CRUD operations.
@@ -45,7 +44,7 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -59,20 +58,20 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         route = this.routeUtil.getResourceFromResponse( response );
 
         // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
 
@@ -92,7 +91,7 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -102,7 +101,7 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         route.setPattern( ".*testUpdatePermission2.*" );
         response = this.routeUtil.sendMessage( Method.PUT, route );
 //        log.debug( "PROBLEM: "+ this.userUtil.getUser( TEST_USER_NAME ) );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -118,19 +117,19 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 204, "Response status: " );
 
         // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         
     }
@@ -150,14 +149,14 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -173,19 +172,19 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // read should fail
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         
     }
@@ -206,7 +205,7 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         route.setRuleType( "blocking" );
 
         Response response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         route = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -214,7 +213,7 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
 
 
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().setUsername( "admin" );
@@ -230,19 +229,19 @@ public class Nexus385RoutesPermissionIT extends AbstractPrivilegeTest
         
         // update user
         response = this.routeUtil.sendMessage( Method.PUT, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // read should succeed (inherited)
         response = this.routeUtil.sendMessage( Method.GET, route );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
         
         // update should fail
         response = this.routeUtil.sendMessage( Method.POST, route );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         // delete should fail
         response = this.routeUtil.sendMessage( Method.DELETE, route );
-        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 204, "Response status: " );
         
         
     }

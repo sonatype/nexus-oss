@@ -13,10 +13,6 @@
  */
 package org.sonatype.nexus.integrationtests.nexus504;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -26,6 +22,9 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -44,7 +43,7 @@ public class Nexus504ChangeRoleIT
 
     private RoleMessageUtil roleUtil;
 
-    @Before
+    @BeforeMethod
     public void init()
     {
         XStream xstream = this.getXMLXStream();
@@ -66,7 +65,7 @@ public class Nexus504ChangeRoleIT
         testContext.setPassword( TEST_USER_PASSWORD );
 
         Status status = UserCreationUtil.login();
-        Assert.assertEquals( "User should not be able to login ", 403, status.getCode() );
+        Assert.assertEquals( status.getCode(), 403, "User should not be able to login " );
 
         // add login privilege to role
         testContext.useAdminForRequests();
@@ -74,13 +73,13 @@ public class Nexus504ChangeRoleIT
         RoleResource role = roleUtil.getRole( NEXUS504_ROLE );
         role.addPrivilege( "2"/* login */);
         status = RoleMessageUtil.update( role );
-        Assert.assertTrue( "Unable to add login privilege to role " + NEXUS504_ROLE + "\n" + status.getDescription(),
-                           status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(),
+                           "Unable to add login privilege to role " + NEXUS504_ROLE + "\n" + status.getDescription() );
 
         // try to login again
         testContext.setUsername( NEXUS504_USER );
         testContext.setPassword( TEST_USER_PASSWORD );
         status = UserCreationUtil.login();
-        Assert.assertEquals( "User should be able to login ", 200, status.getCode() );
+        Assert.assertEquals( status.getCode(), 200, "User should be able to login " );
     }
 }

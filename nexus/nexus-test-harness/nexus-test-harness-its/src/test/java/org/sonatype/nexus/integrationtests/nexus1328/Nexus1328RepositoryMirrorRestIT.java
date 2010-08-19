@@ -2,9 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus1328;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.MirrorResource;
@@ -13,6 +10,8 @@ import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1328RepositoryMirrorRestIT
     extends AbstractNexusIntegrationTest

@@ -16,8 +16,6 @@ package org.sonatype.nexus.integrationtests.nexus930;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -29,6 +27,8 @@ import org.sonatype.nexus.rest.model.PlexusComponentListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -79,15 +79,15 @@ public class Nexus930AutoDiscoverComponentIT
         // do admin
         List<PlexusComponentListResource> result1 =
             this.getResult( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        Assert.assertTrue( "Expected list larger then 1.", result1.size() > 1 );
+        Assert.assertTrue( result1.size() > 1, "Expected list larger then 1." );
 
         // 403 test
         this.overwriteUserRole( TEST_USER_NAME, "login-only" + role, "2" );
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
         Response response = sendMessage( role, this.getXMLXStream(), MediaType.APPLICATION_XML );
-        Assert.assertTrue( "Expected Error: Status was: " + response.getStatus().getCode(),
-                           response.getStatus().isClientError() );
+        Assert.assertTrue( response.getStatus().isClientError(),
+                           "Expected Error: Status was: " + response.getStatus().getCode() );
         Assert.assertEquals( 403, response.getStatus().getCode() );
 
         // only content class priv

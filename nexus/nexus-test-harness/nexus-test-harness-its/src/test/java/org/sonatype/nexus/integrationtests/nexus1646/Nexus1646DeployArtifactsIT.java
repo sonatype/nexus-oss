@@ -7,13 +7,12 @@ import org.apache.log4j.Logger;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.codehaus.plexus.util.IOUtil;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -30,11 +29,11 @@ public class Nexus1646DeployArtifactsIT
         File artifact = getTestFile( "artifact.jar" );
 
         int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
-        Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
+        Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
 
         File metadataFile =
             new File( nexusWorkDir, "storage/nexus-test-harness-release-repo/nexus1646/artifact/maven-metadata.xml" );
-        Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
+        Assert.assertTrue( metadataFile.isFile(), "Metadata file not found " + metadataFile.getAbsolutePath() );
 
         FileInputStream input = new FileInputStream( metadataFile );
         Metadata md = MetadataBuilder.read( input );
@@ -55,7 +54,7 @@ public class Nexus1646DeployArtifactsIT
         File artifact = getTestFile( "artifact.jar" );
         int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
 
-        Assert.assertEquals( "Unable to deploy artifact " + code, 400, code );
+        Assert.assertEquals( code, 400, "Unable to deploy artifact " + code );
     }
 
     @Test
@@ -67,7 +66,7 @@ public class Nexus1646DeployArtifactsIT
         File artifact = getTestFile( "artifact.jar" );
         int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_SNAPSHOT_REPO, gav, artifact );
 
-        Assert.assertEquals( "Unable to deploy artifact " + code, 400, code );
+        Assert.assertEquals( code, 400, "Unable to deploy artifact " + code );
     }
 
     @Test
@@ -78,19 +77,19 @@ public class Nexus1646DeployArtifactsIT
         File pom = getTestFile( "changelog-maven-plugin-2.0-beta-1.pom" );
 
         int code = getDeployUtils().deployUsingPomWithRest( REPO_TEST_HARNESS_RELEASE_REPO, artifact, pom, null, null );
-        Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
+        Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
 
         // validate group metadata
         File metadataFile =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_RELEASE_REPO
                 + "/org/codehaus/mojo/maven-metadata.xml" );
-        Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
-        
+        Assert.assertTrue( metadataFile.isFile(), "Metadata file not found " + metadataFile.getAbsolutePath() );
+
         // validate artifact metadata
         metadataFile =
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_RELEASE_REPO
                 + "/org/codehaus/mojo/changelog-maven-plugin/maven-metadata.xml" );
-        Assert.assertTrue( "Metadata file not found " + metadataFile.getAbsolutePath(), metadataFile.isFile() );
+        Assert.assertTrue( metadataFile.isFile(), "Metadata file not found " + metadataFile.getAbsolutePath() );
 
         FileInputStream input = new FileInputStream( metadataFile );
         Metadata md = MetadataBuilder.read( input );

@@ -20,11 +20,10 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class ProxyTest
     extends AbstractNexusWebProxyIntegrationTest

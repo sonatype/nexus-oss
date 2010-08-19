@@ -15,27 +15,26 @@ package org.sonatype.nexus.integrationtests.nexus1071;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
- *
  * @author Juven Xu
- *
  */
 public class Nexus1071DeployToRepoAnonCannotAccessIT
     extends AbstractMavenNexusIT
 {
-    public Nexus1071DeployToRepoAnonCannotAccessIT()
-    {
+    @BeforeClass
+    public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    
+
     @Test
     public void deployRepeatly()
         throws Exception
@@ -102,7 +101,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     @Test
     public void deployToAnotherRepo()
         throws Exception
-    {   
+    {
         File mavenProject2 = getTestFile( "maven-project-2" );
 
         File settings2 = getTestFile( "settings2.xml" );
@@ -126,7 +125,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
     @Test
     public void anonDeploy()
         throws Exception
-    {   
+    {
         File mavenProjectAnon = getTestFile( "maven-project-anon" );
 
         File settingsAnon = getTestFile( "settings-anon.xml" );
@@ -148,5 +147,5 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
             // test pass
         }
     }
-
+    
 }

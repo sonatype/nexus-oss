@@ -14,12 +14,11 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+
 import java.net.URL;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -38,6 +37,7 @@ import org.sonatype.nexus.rest.model.RepositoryRouteResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -100,8 +100,8 @@ public class RoutesMessageUtil
         String responseString = response.getEntity().getText();
         LOG.debug( "responseText: " + responseString );
 
-        Assert.assertFalse( "Response text was empty.", StringUtils.isEmpty( responseString ) );
-        Assert.assertTrue( response.getStatus() + "\n" + responseString, response.getStatus().isSuccess() );
+        Assert.assertFalse( StringUtils.isEmpty( responseString ), "Response text was empty." );
+        Assert.assertTrue( response.getStatus().isSuccess(), response.getStatus() + "\n" + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
@@ -152,10 +152,10 @@ public class RoutesMessageUtil
             "Should be the same route. \n Expected:\n" + new XStream().toXML( resource ) + " \n \n Got: \n"
                 + new XStream().toXML( cRoute );
 
-        Assert.assertEquals( msg, resource.getId(), cRoute.getId() );
-        Assert.assertEquals( msg, resource.getGroupId(), cRoute.getGroupId() );
-        Assert.assertEquals( msg, Collections.singletonList( resource.getPattern() ), cRoute.getRoutePatterns() );
-        Assert.assertEquals( msg, resource.getRuleType(), cRoute.getRouteType() );
+        Assert.assertEquals( cRoute.getId(), resource.getId(), msg );
+        Assert.assertEquals( cRoute.getGroupId(), resource.getGroupId(), msg );
+        Assert.assertEquals( cRoute.getRoutePatterns(), Collections.singletonList( resource.getPattern() ), msg );
+        Assert.assertEquals( cRoute.getRouteType(), resource.getRuleType(), msg );
 
         this.validateSameRepoIds( resource.getRepositories(), cRoute.getRepositories() );
 
@@ -166,12 +166,12 @@ public class RoutesMessageUtil
 
         ErrorResponse errorResponse = (ErrorResponse) xstream.fromXML( xml, new ErrorResponse() );
 
-        Assert.assertTrue( "Error response is empty.", errorResponse.getErrors().size() > 0 );
+        Assert.assertTrue( errorResponse.getErrors().size() > 0, "Error response is empty." );
 
         for ( Iterator<ErrorMessage> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
             ErrorMessage error = iter.next();
-            Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
+            Assert.assertFalse( StringUtils.isEmpty( error.getMsg() ), "Response Error message is empty." );
 
         }
 
@@ -185,11 +185,11 @@ public class RoutesMessageUtil
 
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
-        Assert.assertTrue( "Unable to get routes: " + status.getDescription(), status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to get routes: " + status.getDescription() );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), response.getEntity().getText(),
-                MediaType.APPLICATION_XML );
+                                       MediaType.APPLICATION_XML );
 
         RepositoryRouteListResourceResponse resourceResponse =
             (RepositoryRouteListResourceResponse) representation.getPayload( new RepositoryRouteListResourceResponse() );
@@ -204,8 +204,8 @@ public class RoutesMessageUtil
         for ( RepositoryRouteListResource route : routes )
         {
             Status status = delete( route.getResourceURI() ).getStatus();
-            Assert.assertTrue( "Unable to delete route: '" + route.getResourceURI() + "', due to: "
-                + status.getDescription(), status.isSuccess() );
+            Assert.assertTrue( status.isSuccess(), "Unable to delete route: '" + route.getResourceURI() + "', due to: "
+                                                       + status.getDescription() );
         }
     }
 

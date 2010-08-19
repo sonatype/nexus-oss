@@ -14,9 +14,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-import java.util.List;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -42,6 +41,7 @@ import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -132,16 +132,16 @@ public class RepositoryMessageUtil
             // TODO: sometimes the storage dir ends with a '/' SEE: NEXUS-542
             if ( actual.getDefaultLocalStorageUrl().endsWith( "/" ) )
             {
-                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl(),
-                    actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ) );
+                Assert.assertTrue( actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() + "/" ),
+                                   "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+                                       + repo.getId() + "/  <actual>" + actual.getDefaultLocalStorageUrl() );
             }
             // NOTE one of these blocks should be removed
             else
             {
-                Assert.assertTrue( "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
-                    + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl(),
-                    actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ) );
+                Assert.assertTrue( actual.getDefaultLocalStorageUrl().endsWith( "/storage/" + repo.getId() ),
+                                   "Unexpected defaultLocalStorage: <expected to end with> " + "/storage/"
+                                       + repo.getId() + "  <actual>" + actual.getDefaultLocalStorageUrl() );
             }
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), actual.getNotFoundCacheTTL() );
@@ -154,7 +154,7 @@ public class RepositoryMessageUtil
             else
             {
                 Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                    actual.getRemoteStorage().getRemoteStorageUrl() );
+                                     actual.getRemoteStorage().getRemoteStorageUrl() );
             }
 
             Assert.assertEquals( expected.getRepoPolicy(), actual.getRepoPolicy() );
@@ -325,8 +325,9 @@ public class RepositoryMessageUtil
 
             ContentClass expectedCc =
                 repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
-            Assert.assertNotNull( "Unknown shadow repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint()
-                + "'!", expectedCc );
+            Assert.assertNotNull( expectedCc,
+                                  "Unknown shadow repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint()
+                                      + "'!" );
             Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
         }
         else
@@ -340,8 +341,8 @@ public class RepositoryMessageUtil
 
             ContentClass expectedCc =
                 repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
-            Assert.assertNotNull( "Unknown repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint() + "'!",
-                expectedCc );
+            Assert.assertNotNull( expectedCc, "Unknown repo type='" + cRepo.getProviderRole() + cRepo.getProviderHint()
+                + "'!" );
             Assert.assertEquals( expected.getFormat(), expectedCc.getId() );
 
             Assert.assertEquals( expected.getNotFoundCacheTTL(), cRepo.getNotFoundCacheTTL() );
@@ -349,16 +350,16 @@ public class RepositoryMessageUtil
             if ( expected.getOverrideLocalStorageUrl() == null )
             {
                 Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
-                    cRepo.getLocalStorage().getUrl() );
+                                   cRepo.getLocalStorage().getUrl() );
             }
             else
             {
                 String actualLocalStorage =
                     cRepo.getLocalStorage().getUrl().endsWith( "/" ) ? cRepo.getLocalStorage().getUrl()
-                        : cRepo.getLocalStorage().getUrl() + "/";
+                                    : cRepo.getLocalStorage().getUrl() + "/";
                 String overridLocalStorage =
                     expected.getOverrideLocalStorageUrl().endsWith( "/" ) ? expected.getOverrideLocalStorageUrl()
-                        : expected.getOverrideLocalStorageUrl() + "/";
+                                    : expected.getOverrideLocalStorageUrl() + "/";
                 Assert.assertEquals( overridLocalStorage, actualLocalStorage );
             }
 
@@ -369,7 +370,7 @@ public class RepositoryMessageUtil
             else
             {
                 Assert.assertEquals( expected.getRemoteStorage().getRemoteStorageUrl(),
-                    cRepo.getRemoteStorage().getUrl() );
+                                     cRepo.getRemoteStorage().getUrl() );
             }
 
             // check maven repo props (for not just check everything that is a Repository
@@ -411,7 +412,7 @@ public class RepositoryMessageUtil
 
             Response response = RequestFacade.sendMessage( serviceURI, Method.DELETE );
             Status status = response.getStatus();
-            Assert.assertTrue( "Fail to update " + repo + " repository index " + status, status.isSuccess() );
+            Assert.assertTrue( status.isSuccess(), "Fail to update " + repo + " repository index " + status );
         }
 
         // let s w8 a few time for indexes
@@ -443,7 +444,7 @@ public class RepositoryMessageUtil
 
         Response response = RequestFacade.sendMessage( uri, Method.GET );
         Status status = response.getStatus();
-        Assert.assertTrue( "Fail to getStatus for '" + repoId + "' repository" + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Fail to getStatus for '" + repoId + "' repository" + status );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( this.xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
@@ -466,13 +467,12 @@ public class RepositoryMessageUtil
 
         Response response = RequestFacade.sendMessage( uriPart, Method.PUT, representation );
         Status status = response.getStatus();
-        Assert.assertTrue( "Fail to update '" + repoStatus.getId() + "' repository status " + status + "\nResponse:\n"
-            + response.getEntity().getText() + "\nrepresentation:\n" + representation.getText(), status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Fail to update '" + repoStatus.getId() + "' repository status " + status + "\nResponse:\n"
+                + response.getEntity().getText() + "\nrepresentation:\n" + representation.getText() );
 
     }
 
     /**
-     * 
      * @param repoId
      * @return
      * @throws IOException
@@ -486,7 +486,7 @@ public class RepositoryMessageUtil
         Response response = RequestFacade.doGetRequest( serviceURI );
         String responseText = response.getEntity().getText();
         Status status = response.getStatus();
-        Assert.assertTrue( responseText + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), responseText + status );
 
         XStreamRepresentation re =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );

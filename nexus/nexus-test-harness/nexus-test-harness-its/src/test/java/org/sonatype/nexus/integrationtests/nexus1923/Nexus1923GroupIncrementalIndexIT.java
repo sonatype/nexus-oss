@@ -1,9 +1,8 @@
 package org.sonatype.nexus.integrationtests.nexus1923;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1923GroupIncrementalIndexIT
     extends AbstractNexus1923

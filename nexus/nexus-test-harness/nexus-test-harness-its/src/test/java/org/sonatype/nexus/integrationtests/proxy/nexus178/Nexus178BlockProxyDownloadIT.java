@@ -19,13 +19,12 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Create an http server. Create a proxy repo to http server. Test if connection works. block proxy, change file on http

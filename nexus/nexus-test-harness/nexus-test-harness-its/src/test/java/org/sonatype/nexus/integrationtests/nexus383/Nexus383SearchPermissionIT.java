@@ -15,12 +15,12 @@ package org.sonatype.nexus.integrationtests.nexus383;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test the privilege for search operations.

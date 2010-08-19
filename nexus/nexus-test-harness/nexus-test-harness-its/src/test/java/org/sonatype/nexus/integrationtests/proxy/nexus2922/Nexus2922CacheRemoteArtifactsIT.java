@@ -4,11 +4,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
@@ -16,17 +11,16 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus2922CacheRemoteArtifactsIT
     extends AbstractNexusProxyIntegrationTest
 {
 
-    static
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-
-    @Before
+    @BeforeMethod 
     public void enableSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
@@ -78,9 +72,9 @@ public class Nexus2922CacheRemoteArtifactsIT
         }
 
         File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.toString(), file.exists() );
+        Assert.assertFalse( file.exists(), file.toString() );
 
-        Assert.assertTrue( msg, msg.contains( "401" ) );
+        Assert.assertTrue( msg.contains( "401" ), msg );
     }
 
     @Test
@@ -104,9 +98,9 @@ public class Nexus2922CacheRemoteArtifactsIT
 
         File file =
             new File( nexusWorkDir, "storage/nexus-test-harness-repo/nexus2922/artifact/1.0.0/artifact-1.0.0.jar" );
-        Assert.assertFalse( file.toString(), file.exists() );
+        Assert.assertFalse( file.exists(), file.toString() );
 
-        Assert.assertTrue( msg, msg.contains( "401" ) );
+        Assert.assertTrue( msg.contains( "401" ), msg );
     }
 
     @Test
@@ -118,6 +112,6 @@ public class Nexus2922CacheRemoteArtifactsIT
         this.downloadArtifactFromRepository( REPO_RELEASE_PROXY_REPO1, GAV2, "target/downloads" );
 
         File file = new File( nexusWorkDir, "storage/release-proxy-repo-1/nexus2922/artifact/2.0.0/artifact-2.0.0.jar" );
-        Assert.assertTrue( file.toString(), file.exists() );
+        Assert.assertTrue( file.exists(), file.toString() );
     }
 }

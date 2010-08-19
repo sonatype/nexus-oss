@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -32,6 +30,7 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -101,8 +100,8 @@ public class GroupMessageUtil
     public void validateRepoLists( List<RepositoryGroupMemberRepository> expected, List<?> actual )
     {
 
-        Assert.assertEquals( "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )
-            + "\nactual: " + this.repoListToStringList( actual ) + "\n", expected.size(), actual.size() );
+        Assert.assertEquals( actual.size(), expected.size(), "Size of groups repository list, \nexpected: " + this.repoListToStringList( expected )
+                + "\nactual: " + this.repoListToStringList( actual ) + "\n" );
 
         for ( int ii = 0; ii < expected.size(); ii++ )
         {
@@ -152,8 +151,8 @@ public class GroupMessageUtil
         String responseText = response.getEntity().getText();
         LOG.debug( "responseText: \n" + responseText );
 
-        Assert.assertTrue( "Failed to return Group: " + groupId + "\nResponse:\n" + responseText,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+            "Failed to return Group: " + groupId + "\nResponse:\n" + responseText );
 
         // this should use call to: getResourceFromResponse
         XStreamRepresentation representation =

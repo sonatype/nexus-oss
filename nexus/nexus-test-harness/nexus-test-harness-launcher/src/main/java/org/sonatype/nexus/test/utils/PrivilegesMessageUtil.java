@@ -14,10 +14,9 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+
 import java.util.Iterator;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,6 +34,7 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.PrivilegeStatusResourceResponse;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -163,12 +163,12 @@ public class PrivilegesMessageUtil
 
         ErrorResponse errorResponse = (ErrorResponse) xstream.fromXML( xml, new ErrorResponse() );
 
-        Assert.assertTrue( "Error response is empty.", errorResponse.getErrors().size() > 0 );
+        Assert.assertTrue( errorResponse.getErrors().size() > 0, "Error response is empty." );
 
         for ( Iterator<ErrorMessage> iter = errorResponse.getErrors().iterator(); iter.hasNext(); )
         {
             ErrorMessage error = iter.next();
-            Assert.assertFalse( "Response Error message is empty.", StringUtils.isEmpty( error.getMsg() ) );
+            Assert.assertFalse( StringUtils.isEmpty( error.getMsg() ), "Response Error message is empty." );
 
         }
 

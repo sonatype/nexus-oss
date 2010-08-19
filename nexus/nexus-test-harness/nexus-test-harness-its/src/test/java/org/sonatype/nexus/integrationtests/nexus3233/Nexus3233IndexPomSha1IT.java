@@ -3,11 +3,8 @@ package org.sonatype.nexus.integrationtests.nexus3233;
 import java.io.File;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.apache.commons.httpclient.HttpMethod;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -22,6 +19,8 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3233IndexPomSha1IT
     extends AbstractNexusIntegrationTest
@@ -48,7 +47,8 @@ public class Nexus3233IndexPomSha1IT
     {
         final File pom = getTestFile( "maven.pom" );
         MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3233", "maven", "1.0.0", "pom" ),
-                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null, "-DgeneratePom=false" ).verifyErrorFreeLog();
+                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null,
+                                            "-DgeneratePom=false" ).verifyErrorFreeLog();
         searchFor( pom );
     }
 
@@ -58,8 +58,8 @@ public class Nexus3233IndexPomSha1IT
     {
         final File pom = getTestFile( "rest.pom" );
         HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
-        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText(),
-                           Status.isSuccess( r.getStatusCode() ) );
+        Assert.assertTrue( Status.isSuccess( r.getStatusCode() ), "Unable to deploy artifact " + r.getStatusCode()
+            + ": " + r.getStatusText() );
         searchFor( pom );
     }
 
@@ -107,6 +107,6 @@ public class Nexus3233IndexPomSha1IT
         throws Exception
     {
         NexusArtifact result = getSearchMessageUtil().identify( sha1 );
-        Assert.assertNotNull( "Pom with " + sha1 + " not found " + msg, result );
+        Assert.assertNotNull( result, "Pom with " + sha1 + " not found " + msg );
     }
 }

@@ -15,15 +15,14 @@ package org.sonatype.nexus.integrationtests.nexus970;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  *When deleting a repository folders related to it is should be removed from disk
@@ -50,20 +49,20 @@ public class Nexus970DeleteRepositoryIT
 
         String uri = "service/local/repositories/nexus970-default";
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
-        Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to delete nexus970-default repository" );
 
         // give a chance to wait for task to start
         Thread.sleep( 500 );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertFalse( "Artifacts shouldn't exists on deleted repo", artifactFile.exists() );
-        Assert.assertFalse( "Storage dir should be deleted", storageDir.exists() );
+        Assert.assertFalse( artifactFile.exists(), "Artifacts shouldn't exists on deleted repo" );
+        Assert.assertFalse( storageDir.exists(), "Storage dir should be deleted" );
 
         File trashStorageDir = new File( nexusWorkDir, "trash/nexus970-default" );
         File trashArtifactFile = new File( trashStorageDir, "nexus970/artifact/1.0.0/artifact-1.0.0.jar" );
 
-        Assert.assertTrue( "Storage should be moved to trash", trashStorageDir.isDirectory() );
-        Assert.assertTrue( "Artifacts should be moved to trash", trashArtifactFile.isFile() );
+        Assert.assertTrue( trashStorageDir.isDirectory(), "Storage should be moved to trash" );
+        Assert.assertTrue( trashArtifactFile.isFile(), "Artifacts should be moved to trash" );
     }
 
     /*
@@ -82,20 +81,20 @@ public class Nexus970DeleteRepositoryIT
 
         String uri = "service/local/repositories/nexus970-overwrote";
         Status status = RequestFacade.sendMessage( uri, Method.DELETE ).getStatus();
-        Assert.assertTrue( "Unable to delete nexus970-default repository", status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to delete nexus970-default repository" );
 
         // give a chance to wait for task to start
         Thread.sleep( 500 );
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        Assert.assertTrue( "Artifacts should exists on deleted repo", artifactFile.isFile() );
-        Assert.assertTrue( "Storage dir shouldn't be deleted", storageDir.isDirectory() );
+        Assert.assertTrue( artifactFile.isFile(), "Artifacts should exists on deleted repo" );
+        Assert.assertTrue( storageDir.isDirectory(), "Storage dir shouldn't be deleted" );
 
         File trashStorageDir = new File( nexusWorkDir, "trash/nexus970-overwrote" );
         File trashArtifactFile = new File( trashStorageDir, "nexus970/artifact/1.0.0/artifact-1.0.0.jar" );
 
-        Assert.assertFalse( "Storage shouldn't be moved to trash", trashStorageDir.exists() );
-        Assert.assertFalse( "Artifacts shouldn't be moved to trash", trashArtifactFile.exists() );
+        Assert.assertFalse( trashStorageDir.exists(), "Storage shouldn't be moved to trash" );
+        Assert.assertFalse( trashArtifactFile.exists(), "Artifacts shouldn't be moved to trash" );
     }
 
     @BeforeClass

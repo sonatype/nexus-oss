@@ -13,19 +13,15 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.sonatype.nexus.integrationtests.nexus166.Nexus166SampleIT;
 
 /**
  *
  */
-@RunWith( Suite.class )
-@SuiteClasses( {
-    Nexus166SampleIT.class,
-    Nexus166SampleIT.class
-} )
+//@RunWith( Suite.class )
+//@SuiteClasses( {
+//    Nexus166SampleIT.class,
+//    Nexus166SampleIT.class
+//} )
 public class IntegrationTestSuiteClasses
 {
 

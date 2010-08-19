@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -30,6 +28,8 @@ import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -151,7 +151,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         File artifact = getTestFile( "artifact.jar" );
         Gav gav = GavUtil.newGav( "nexus3567", "artifact", "1.0.0" );
         int code = getDeployUtils().deployUsingGavWithRest( repoId, gav, artifact );
-        Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
+        Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
     }
     
     private IndexBrowserTreeNode getIndexContent( String repoId ) 
@@ -162,7 +162,7 @@ public class Nexus3567GroupMemberChangesIndexIT
         Response response = RequestFacade.doGetRequest( serviceURI );
         String responseText = response.getEntity().getText();
         Status status = response.getStatus();
-        Assert.assertTrue( responseText + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), responseText + status );
 
         XStream xstream = XStreamFactory.getXmlXStream();
         

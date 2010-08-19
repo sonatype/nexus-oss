@@ -15,14 +15,13 @@ package org.sonatype.nexus.integrationtests.nexus133;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test the privileges for CRUD operations.
@@ -44,7 +43,7 @@ public class Nexus133TargetPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -57,20 +56,20 @@ public class Nexus133TargetPermissionIT
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
 
         response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         target = this.targetUtil.getResourceFromResponse( response );
 
         // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
 
@@ -87,7 +86,7 @@ public class Nexus133TargetPermissionIT
         target.addPattern( ".*testUpdatePermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -96,7 +95,7 @@ public class Nexus133TargetPermissionIT
         // update user
         target.setName( "tesUpdatePermission2" );
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -109,19 +108,19 @@ public class Nexus133TargetPermissionIT
 
         // should work now...
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
     
@@ -138,7 +137,7 @@ public class Nexus133TargetPermissionIT
         target.addPattern( ".*testReadPermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -147,7 +146,7 @@ public class Nexus133TargetPermissionIT
         // update user
         target.setName( "tesUpdatePermission2" );
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -160,19 +159,19 @@ public class Nexus133TargetPermissionIT
 
         // read should fail
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
      // should work now...
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
     
@@ -190,7 +189,7 @@ public class Nexus133TargetPermissionIT
         target.addPattern( ".*testDeletePermission.*" );
 
         Response response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 201, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 201, "Response status: " );
         target = this.targetUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -199,7 +198,7 @@ public class Nexus133TargetPermissionIT
         // update user
         target.setName( "tesUpdatePermission2" );
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // use admin
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -212,19 +211,19 @@ public class Nexus133TargetPermissionIT
 
         // read should succeed (inherited)
         response = this.targetUtil.sendMessage( Method.GET, target );
-        Assert.assertEquals( "Response status: ", 200, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 200, "Response status: " );
 
         // update should fail
         response = this.targetUtil.sendMessage( Method.POST, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
         // delete should fail
         response = this.targetUtil.sendMessage( Method.PUT, target );
-        Assert.assertEquals( "Response status: ", 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
         
      // should work now...
         response = this.targetUtil.sendMessage( Method.DELETE, target );
-        Assert.assertEquals( "Response status: ", 204, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 204, "Response status: " );
 
     }
 

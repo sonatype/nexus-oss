@@ -16,16 +16,15 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 import java.util.Collection;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractSnapshotRemoverIT
     extends AbstractNexusIntegrationTest
@@ -46,7 +45,7 @@ public abstract class AbstractSnapshotRemoverIT
         super( "nexus-test-harness-snapshot-repo" );
     }
 
-    @Before
+    @BeforeMethod
     public void deploySnapshotArtifacts()
         throws Exception
     {

@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2692EvictGroupTaskIT
     extends AbstractEvictTaskIt
@@ -32,26 +31,26 @@ public class Nexus2692EvictGroupTaskIT
 
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
-        Assert.assertTrue( "The following files where deleted and should not have been: "
-            + this.prettyList( expectedResults ), expectedResults.isEmpty() );
+        Assert.assertTrue( expectedResults.isEmpty(), "The following files where deleted and should not have been: "
+                + this.prettyList( expectedResults ) );
 
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         expectedResults.removeAll( resultAttributeFiles );
-        Assert.assertTrue( "The following attribute files where deleted and should not have been: "
-            + this.prettyList( expectedResults ), expectedResults.isEmpty() );
+        Assert.assertTrue( expectedResults.isEmpty(), "The following attribute files where deleted and should not have been: "
+                + this.prettyList( expectedResults ) );
 
         // now the other way
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         resultStorageFiles.removeAll( expectedResults );
         Assert.assertTrue(
-            "The following files should have been deleted: " + this.prettyList( resultStorageFiles ),
-            resultStorageFiles.isEmpty() );
+            resultStorageFiles.isEmpty(),
+            "The following files should have been deleted: " + this.prettyList( resultStorageFiles ) );
 
         expectedResults = this.buildListOfExpectedFiles( days, nonPublicGroupMembers );
         resultAttributeFiles.removeAll( expectedResults );
         Assert.assertTrue(
-            "The following files should have been deleted: " + this.prettyList( resultAttributeFiles ),
-            resultAttributeFiles.isEmpty() );
+            resultAttributeFiles.isEmpty(),
+            "The following files should have been deleted: " + this.prettyList( resultAttributeFiles ) );
 
         // make sure we don't have any empty directories
         this.checkForEmptyDirectories();

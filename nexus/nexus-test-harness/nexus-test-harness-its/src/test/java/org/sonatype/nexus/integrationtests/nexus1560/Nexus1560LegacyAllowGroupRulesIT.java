@@ -1,15 +1,15 @@
 package org.sonatype.nexus.integrationtests.nexus1560;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus1560LegacyAllowGroupRulesIT
     extends AbstractLegacyRulesIT
 {
 
-    @Before
+    @BeforeMethod
     public void init()
         throws Exception
     {

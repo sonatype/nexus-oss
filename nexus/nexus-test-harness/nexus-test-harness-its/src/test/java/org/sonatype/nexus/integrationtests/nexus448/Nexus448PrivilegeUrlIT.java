@@ -15,42 +15,41 @@ package org.sonatype.nexus.integrationtests.nexus448;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
- * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will work.
- *
+ * GETS for application privileges where returning an error, so this is a really simple test to make sure the GET will
+ * work.
  */
-public class Nexus448PrivilegeUrlIT extends AbstractNexusIntegrationTest
+public class Nexus448PrivilegeUrlIT
+    extends AbstractNexusIntegrationTest
 {
 
     private PrivilegesMessageUtil messageUtil;
 
     public Nexus448PrivilegeUrlIT()
     {
-        this.messageUtil =
-            new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
-    
+
     @Test
-    public void testUrls() throws IOException
+    public void testUrls()
+        throws IOException
     {
-        
+
         PrivilegeStatusResource resource = this.messageUtil.getPrivilegeResource( "T2" );
-        Assert.assertEquals( "Type", TargetPrivilegeDescriptor.TYPE, resource.getType() );
-        
+        Assert.assertEquals( resource.getType(), TargetPrivilegeDescriptor.TYPE, "Type" );
+
         resource = this.messageUtil.getPrivilegeResource( "1" );
-        Assert.assertEquals( "Type", ApplicationPrivilegeDescriptor.TYPE, resource.getType() );
-        
+        Assert.assertEquals( resource.getType(), ApplicationPrivilegeDescriptor.TYPE, "Type" );
+
     }
-    
-    
+
 }

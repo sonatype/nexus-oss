@@ -1,12 +1,12 @@
 package org.sonatype.nexus.integrationtests.nexus2178;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2178ErrorReportingConfigRestIT
     extends AbstractNexusIntegrationTest
@@ -18,8 +18,8 @@ public class Nexus2178ErrorReportingConfigRestIT
         // Default config
         GlobalConfigurationResource resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertFalse( "Error reporting should be null by default",
-                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
+        Assert.assertFalse( resource.getErrorReportingSettings().isReportErrorsAutomatically(),
+                            "Error reporting should be null by default" );
 
         // Set some values
         ErrorReportingSettings settings = resource.getErrorReportingSettings();
@@ -31,7 +31,7 @@ public class Nexus2178ErrorReportingConfigRestIT
 
         resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertNotNull( "Error reporting should not be null", resource.getErrorReportingSettings() );
+        Assert.assertNotNull( resource.getErrorReportingSettings(), "Error reporting should not be null" );
         Assert.assertEquals( "someusername", resource.getErrorReportingSettings().getJiraUsername() );
         Assert.assertEquals( AbstractNexusPlexusResource.PASSWORD_PLACE_HOLDER,
                              resource.getErrorReportingSettings().getJiraPassword() );
@@ -43,7 +43,7 @@ public class Nexus2178ErrorReportingConfigRestIT
 
         resource = SettingsMessageUtil.getCurrentSettings();
 
-        Assert.assertFalse( "Error reporting should be null",
-                            resource.getErrorReportingSettings().isReportErrorsAutomatically() );
+        Assert.assertFalse( resource.getErrorReportingSettings().isReportErrorsAutomatically(),
+                            "Error reporting should be null" );
     }
 }

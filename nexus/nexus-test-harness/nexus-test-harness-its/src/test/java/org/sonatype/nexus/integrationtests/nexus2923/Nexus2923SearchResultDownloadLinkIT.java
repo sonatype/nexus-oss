@@ -4,11 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.util.StringUtils;
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -18,6 +15,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test the 'pom' and 'artifact' download link in the search result panel
@@ -54,7 +53,7 @@ public class Nexus2923SearchResultDownloadLinkIT
         throws Exception
     {
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "xbean-server" );
-        Assert.assertEquals( "The artifact should be indexed", 3, artifacts.size() );
+        Assert.assertEquals( artifacts.size(), 3, "The artifact should be indexed" );
 
         for ( NexusArtifact artifact : artifacts )
         {
@@ -76,8 +75,8 @@ public class Nexus2923SearchResultDownloadLinkIT
         Response response = RequestFacade.sendMessage( new URL( link ), Method.GET, null );
 
         Assert.assertEquals(
-            "Invalid link: '" + link + "' response code is '" + response.getStatus().getCode() + "'",
+            response.getStatus().getCode(),
             301,
-            response.getStatus().getCode() );
+            "Invalid link: '" + link + "' response code is '" + response.getStatus().getCode() + "'" );
     }
 }

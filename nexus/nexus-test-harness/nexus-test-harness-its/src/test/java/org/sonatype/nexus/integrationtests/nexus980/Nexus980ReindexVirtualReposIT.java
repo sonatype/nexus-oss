@@ -15,9 +15,6 @@ package org.sonatype.nexus.integrationtests.nexus980;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -26,6 +23,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Reindex a virtual repo should fail
@@ -45,7 +44,7 @@ public class Nexus980ReindexVirtualReposIT
         }
         String serviceURI = "service/local/data_index/repositories/nexus-test-harness-shadow/content";
         Status status = RequestFacade.sendMessage( serviceURI, Method.DELETE ).getStatus();
-        Assert.assertFalse( "Should not being able to reindex a shadow repo", status.isSuccess() );
+        Assert.assertFalse( status.isSuccess(), "Should not being able to reindex a shadow repo" );
     }
 
     @Test
@@ -69,7 +68,7 @@ public class Nexus980ReindexVirtualReposIT
         scheduledTask.setSchedule( "manual" );
         scheduledTask.addProperty( prop );
         Status status = TaskScheduleUtil.create( scheduledTask );
-        Assert.assertFalse( "Should not be able to create a reindex task to a virtual repo", status.isSuccess() );
+        Assert.assertFalse( status.isSuccess(), "Should not be able to create a reindex task to a virtual repo" );
     }
 
 }

@@ -13,13 +13,12 @@
  */
 package org.sonatype.nexus.integrationtests.client.nexus758;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
@@ -64,7 +63,7 @@ public class Nexus758StatusService
 
         // restart Nexus
         client.restartNexus(); // this is blocking
-        Assert.assertTrue( "Expected Nexus to be Started", client.isNexusStarted( false ) );
+        Assert.assertTrue( client.isNexusStarted( false ), "Expected Nexus to be Started" );
 
         client.disconnect();
     }

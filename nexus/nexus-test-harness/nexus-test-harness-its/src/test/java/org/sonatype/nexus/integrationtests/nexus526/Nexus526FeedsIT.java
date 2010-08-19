@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.FeedUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
@@ -55,8 +54,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 2 );
+        Assert.assertTrue( entries.size() >= 2,
+                           "Expected more then 2 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -77,8 +76,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 2 );
+        Assert.assertTrue( entries.size() >= 2,
+                           "Expected more then 2 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -99,8 +98,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 2 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 2 );
+        Assert.assertTrue( entries.size() >= 2,
+                           "Expected more then 2 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 2 );
 
@@ -121,8 +120,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 1 );
+        Assert.assertTrue( entries.size() >= 1,
+                           "Expected more then 1 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -141,8 +140,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 1 );
+        Assert.assertTrue( entries.size() >= 1,
+                           "Expected more then 1 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -161,8 +160,8 @@ public class Nexus526FeedsIT
 
         List<SyndEntry> entries = feed.getEntries();
 
-        Assert.assertTrue( "Expected more then 1 entries, but got " + entries.size() + " - " + entries,
-                           entries.size() >= 1 );
+        Assert.assertTrue( entries.size() >= 1,
+                           "Expected more then 1 entries, but got " + entries.size() + " - " + entries );
 
         List<SyndEntry> latestEntries = new ArrayList<SyndEntry>( 1 );
 
@@ -183,14 +182,14 @@ public class Nexus526FeedsIT
             // check if the title contains the groupid, artifactid, and version
             String title = entry.getTitle();
 
-            Assert.assertTrue( "Feed title does not contain the groupId. Title was: " + title,
-                               title.contains( gav.getGroupId() ) );
+            Assert.assertTrue( title.contains( gav.getGroupId() ),
+                               "Feed title does not contain the groupId. Title was: " + title );
 
-            Assert.assertTrue( "Feed title does not contain the artifactId. Title was: " + title,
-                               title.contains( gav.getArtifactId() ) );
+            Assert.assertTrue( title.contains( gav.getArtifactId() ),
+                               "Feed title does not contain the artifactId. Title was: " + title );
 
-            Assert.assertTrue( "Feed title does not contain the version. Title was: " + title,
-                               title.contains( gav.getVersion() ) );
+            Assert.assertTrue( title.contains( gav.getVersion() ),
+                               "Feed title does not contain the version. Title was: " + title );
 
             Assert.assertEquals( link, entry.getLink() );
         }
@@ -214,14 +213,14 @@ public class Nexus526FeedsIT
 
     private void validateLinksInFeeds( SyndFeed feed )
     {
-        Assert.assertTrue( "Feed link is wrong", feed.getLink().startsWith( this.getBaseNexusUrl() ) );
+        Assert.assertTrue( feed.getLink().startsWith( this.getBaseNexusUrl() ), "Feed link is wrong" );
 
         List<SyndEntry> entries = feed.getEntries();
 
         for ( SyndEntry syndEntry : entries )
         {
-            Assert.assertTrue( "Feed item link is wrong, is: " + syndEntry.getLink(),
-                               syndEntry.getLink().startsWith( this.getBaseNexusUrl() ) );
+            Assert.assertTrue( syndEntry.getLink().startsWith( this.getBaseNexusUrl() ),
+                               "Feed item link is wrong, is: " + syndEntry.getLink() );
         }
     }
 }

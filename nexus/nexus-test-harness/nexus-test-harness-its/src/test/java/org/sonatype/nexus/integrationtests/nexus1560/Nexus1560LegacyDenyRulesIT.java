@@ -1,6 +1,6 @@
 package org.sonatype.nexus.integrationtests.nexus1560;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class Nexus1560LegacyDenyRulesIT
     extends AbstractLegacyRulesIT

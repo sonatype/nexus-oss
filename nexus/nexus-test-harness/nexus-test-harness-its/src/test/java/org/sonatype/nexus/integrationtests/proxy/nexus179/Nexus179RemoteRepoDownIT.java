@@ -17,9 +17,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
@@ -27,6 +24,8 @@ import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Create an http server. Create a proxy repo to http server. Access a file from http server. Stop http server. access
@@ -58,7 +57,7 @@ public class Nexus179RemoteRepoDownIT
         File localFile = this.getLocalFile( REPO_RELEASE_PROXY_REPO1, gav );
 
         // make sure this exists first, or the test is invalid anyway.
-        Assert.assertTrue( "The File: " + localFile + " does not exist.", localFile.exists() );
+        Assert.assertTrue( localFile.exists(), "The File: " + localFile + " does not exist." );
 
         try
         {

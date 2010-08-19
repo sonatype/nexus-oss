@@ -15,12 +15,7 @@ package org.sonatype.nexus.integrationtests.nexus634;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -30,6 +25,10 @@ import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 /**
  * Tests SnapshotRemoverTask to not go remote when checking for release existence.
@@ -60,7 +59,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
             new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
     }
 
-    @Before
+    @BeforeMethod
     public void deploySnapshotArtifacts()
         throws Exception
     {
@@ -75,7 +74,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
         // RepositoryMessageUtil.updateIndexes( "nexus-test-harness-snapshot-repo" );
     }
 
-    @Before
+    @BeforeMethod
     public void startProxy()
         throws Exception
     {
@@ -85,7 +84,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
         server.start();
     }
 
-    @After
+    @AfterMethod  
     public void stopProxy()
         throws Exception
     {
@@ -123,7 +122,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
 
         // check is proxy touched
         Assert.assertEquals(
-            "Proxy should not be touched! It was asked for " + touchTrackingHandler.getTouchedTargets(), 0,
-            touchTrackingHandler.getTouchedTargets().size() );
+            touchTrackingHandler.getTouchedTargets().size(), 0,
+            "Proxy should not be touched! It was asked for " + touchTrackingHandler.getTouchedTargets() );
     }
 }

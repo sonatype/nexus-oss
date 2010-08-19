@@ -7,25 +7,25 @@ import java.net.URL;
 
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus1560LegacyAllowRulesIT
     extends AbstractLegacyRulesIT
 {
 
-    @Before
+    @BeforeMethod
     public void init()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         addPriv( TEST_USER_NAME, REPO_TEST_HARNESS_REPO + "-priv", TargetPrivilegeDescriptor.TYPE, "1",
                  REPO_TEST_HARNESS_REPO, null, "read" );
-        
+
         // Now need the view priv as well
         addPrivilege( TEST_USER_NAME, "repository-" + REPO_TEST_HARNESS_REPO );
     }
@@ -38,7 +38,7 @@ public class Nexus1560LegacyAllowRulesIT
             REPOSITORY_RELATIVE_URL + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
         Status status = download( downloadUrl ).getStatus();
-        Assert.assertTrue( "Unable to download artifact from repository " + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to download artifact from repository " + status );
     }
 
     @Test
@@ -49,10 +49,10 @@ public class Nexus1560LegacyAllowRulesIT
             GROUP_REPOSITORY_RELATIVE_URL + NEXUS1560_GROUP + "/" + getRelitiveArtifactPath( gavArtifact1 );
 
         Status status = download( downloadUrl ).getStatus();
-        Assert.assertEquals( "Unable to download artifact from repository: " + status, 403, status.getCode() );
+        Assert.assertEquals( status.getCode(), 403, "Unable to download artifact from repository: " + status );
     }
 
-    @Test( expected = FileNotFoundException.class )
+    @Test( expectedExceptions = FileNotFoundException.class )
     public void checkMetadataOnGroup()
         throws Exception
     {
@@ -77,7 +77,7 @@ public class Nexus1560LegacyAllowRulesIT
         Xpp3Dom[] versions = dom.getChild( "versioning" ).getChild( "versions" ).getChildren( "version" );
         for ( Xpp3Dom version : versions )
         {
-            Assert.assertEquals( "Invalid version available on metadata" + dom.toString(), "1.0", version.getValue() );
+            Assert.assertEquals( version.getValue(), "1.0", "Invalid version available on metadata" + dom.toString() );
         }
     }
 

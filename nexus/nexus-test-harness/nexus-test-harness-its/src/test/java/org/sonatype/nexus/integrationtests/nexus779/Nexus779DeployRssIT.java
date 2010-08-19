@@ -15,7 +15,7 @@ package org.sonatype.nexus.integrationtests.nexus779;
 
 import java.io.File;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 public class Nexus779DeployRssIT
     extends AbstractRssIT

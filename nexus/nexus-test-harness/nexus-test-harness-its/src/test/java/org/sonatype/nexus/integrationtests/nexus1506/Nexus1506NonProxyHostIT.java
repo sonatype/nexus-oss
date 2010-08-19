@@ -1,13 +1,12 @@
 package org.sonatype.nexus.integrationtests.nexus1506;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.rest.model.RemoteHttpProxySettings;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1506NonProxyHostIT
 extends AbstractNexusIntegrationTest

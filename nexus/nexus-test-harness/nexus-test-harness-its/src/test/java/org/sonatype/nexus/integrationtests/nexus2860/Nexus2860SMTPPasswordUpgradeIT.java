@@ -1,8 +1,8 @@
 package org.sonatype.nexus.integrationtests.nexus2860;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2860SMTPPasswordUpgradeIT
     extends AbstractNexusIntegrationTest

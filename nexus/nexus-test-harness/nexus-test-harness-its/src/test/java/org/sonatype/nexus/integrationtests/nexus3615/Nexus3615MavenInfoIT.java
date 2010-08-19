@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -14,6 +11,8 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResource;
 import org.sonatype.nexus.rest.model.Maven2ArtifactInfoResourceRespose;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -108,7 +107,7 @@ public class Nexus3615MavenInfoIT
             RequestFacade.doGetRequest( "service/local/repositories/" + getTestRepositoryId() + "/content/"
                 + "foo/bar" + "?describe=maven2" );
         String responseText = response.getEntity().getText();
-        Assert.assertEquals( "Response was: " + responseText, 404, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 404, "Response was: " + responseText );
 
     }
 
@@ -126,13 +125,13 @@ public class Nexus3615MavenInfoIT
         Gav releaseNotFoundGav =
             new Gav( "nexus3615", "notFound", "1.0.1", null, "jar", null, null, null, false, false, null, false, null );
         Response response = downloadView( releaseNotFoundGav, "maven2", getTestRepositoryId() );
-        Assert.assertEquals( "Status found: " + response.getStatus(), 404, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
 
         Gav snapshotNotFoundGav =
             new Gav( "nexus3615", "notFound", "1.0.1-SNAPSHOT", null, "jar", 1, System.currentTimeMillis(), null, true,
                 false, null, false, null );
         response = downloadView( snapshotNotFoundGav, "maven2", getTestRepositoryId() );
-        Assert.assertEquals( "Status found: " + response.getStatus(), 404, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 404, "Status found: " + response.getStatus() );
     }
 
     private void downloadAndVerify( Gav gav, String repoId )

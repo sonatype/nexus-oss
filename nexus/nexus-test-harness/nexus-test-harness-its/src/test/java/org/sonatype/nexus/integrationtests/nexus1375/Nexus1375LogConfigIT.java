@@ -15,14 +15,14 @@ package org.sonatype.nexus.integrationtests.nexus1375;
 
 import java.io.File;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.LogConfigResource;
 import org.sonatype.nexus.test.utils.LogConfigMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author juven
@@ -33,12 +33,13 @@ public class Nexus1375LogConfigIT
 
     protected LogConfigMessageUtil messageUtil;
 
-    public Nexus1375LogConfigIT()
+    @BeforeClass
+    public void setSecureTest()
     {
         messageUtil = new LogConfigMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
 
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-
+        
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
