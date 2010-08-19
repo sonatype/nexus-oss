@@ -131,6 +131,7 @@
         <version>2.5</version>
         <configuration>
           <argLine>-Xmx512M</argLine>
+          <forkMode>always</forkMode>
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START This are start/stop tests, shouldn't be runned -->
