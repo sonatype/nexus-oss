@@ -17,11 +17,13 @@ import java.io.IOException;
 
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -36,7 +38,12 @@ public class Nexus448PrivilegeUrlIT
 
     public Nexus448PrivilegeUrlIT()
     {
-        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){ 
+    	this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

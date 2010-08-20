@@ -23,6 +23,7 @@ import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -42,6 +43,11 @@ public class Nexus504ChangeRoleIT
     private static final String NEXUS504_ROLE = "nexus504-role";
 
     private RoleMessageUtil roleUtil;
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @BeforeMethod
     public void init()

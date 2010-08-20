@@ -26,6 +26,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ConfigurationsListResource;
 import org.sonatype.nexus.rest.model.ConfigurationsListResourceResponse;
 import org.sonatype.nexus.rest.model.LogsListResource;
@@ -33,6 +34,7 @@ import org.sonatype.nexus.rest.model.LogsListResourceResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -42,6 +44,11 @@ public class Nexus606DownloadLogsAndConfigFilesIT
     extends AbstractNexusIntegrationTest
 {
 
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @SuppressWarnings( "unchecked" )
     @Test
     public void getLogsTest()

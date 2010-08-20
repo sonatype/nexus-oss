@@ -19,16 +19,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.it.Verifier;
+import org.codehaus.plexus.util.FileUtils;
+import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus1146RepositoryOverProxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
-
     @Test
     public void downloadArtifactOverWebProxy()
         throws Exception

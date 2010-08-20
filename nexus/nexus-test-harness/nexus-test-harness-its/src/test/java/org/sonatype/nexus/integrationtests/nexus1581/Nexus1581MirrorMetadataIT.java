@@ -20,6 +20,7 @@ import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus1581MirrorMetadataIT
@@ -31,7 +32,12 @@ public class Nexus1581MirrorMetadataIT
     
     public Nexus1581MirrorMetadataIT()
     {
-        mirrorUtils = new MirrorMessageUtils( this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        
+    }
+    
+    @BeforeClass
+    public void startUp(){
+    	mirrorUtils = new MirrorMessageUtils( this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Test

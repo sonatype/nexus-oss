@@ -19,6 +19,8 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
@@ -28,6 +30,10 @@ import org.testng.annotations.Test;
 //@RunWith( ConsoleLoggingRunner.class )
 public class Nexus166SampleIT extends AbstractNexusIntegrationTest
 {
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void sampleTest() throws IOException

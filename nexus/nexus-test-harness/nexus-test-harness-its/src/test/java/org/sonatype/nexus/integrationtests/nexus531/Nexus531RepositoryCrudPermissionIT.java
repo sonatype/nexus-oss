@@ -22,6 +22,7 @@ import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -30,7 +31,10 @@ import org.testng.annotations.Test;
 public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
 {
 
-
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
     @Test
     public void testCreatePermission()
         throws IOException

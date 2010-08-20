@@ -22,9 +22,11 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -38,6 +40,11 @@ public class Nexus179RemoteRepoDownIT
     public Nexus179RemoteRepoDownIT()
     {
         super( REPO_RELEASE_PROXY_REPO1 );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

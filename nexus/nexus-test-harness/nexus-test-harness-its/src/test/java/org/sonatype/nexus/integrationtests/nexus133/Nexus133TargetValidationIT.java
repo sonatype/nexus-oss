@@ -22,9 +22,11 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -36,10 +38,11 @@ public class Nexus133TargetValidationIT
 
     protected TargetMessageUtil messageUtil;
 
-    public Nexus133TargetValidationIT()
-    {
-        this.messageUtil =
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil =
             new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

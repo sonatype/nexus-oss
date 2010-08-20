@@ -22,6 +22,7 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -40,9 +42,10 @@ public class Nexus233PrivilegesCrudXMLIT
 
     protected PrivilegesMessageUtil messageUtil;
 
-    public Nexus233PrivilegesCrudXMLIT()
-    {
-        this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil = new PrivilegesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @SuppressWarnings( "unchecked" )

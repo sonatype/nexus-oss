@@ -119,7 +119,7 @@ public class GroupMessageUtil
                 actualRepoId = tmpObj.toString();
             }
 
-            Assert.assertEquals( "Repo Id:", expectedRepo.getId(), actualRepoId );
+            Assert.assertEquals( actualRepoId, expectedRepo.getId(), "Repo Id:" );
         }
     }
 

@@ -18,7 +18,9 @@ import java.io.IOException;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -26,7 +28,11 @@ import org.testng.annotations.Test;
  */
 public class Nexus810PackageNamesInRestMessagesIT extends AbstractNexusIntegrationTest
 {
-
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void checkForPackageNamesInResponse() throws IOException
     {

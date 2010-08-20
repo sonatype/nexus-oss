@@ -20,11 +20,13 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -36,13 +38,13 @@ public class Nexus379VirtualRepoSameIdIT
 
     protected RepositoryMessageUtil messageUtil;
 
-    public Nexus379VirtualRepoSameIdIT()
-        throws ComponentLookupException
-    {
-        this.messageUtil = new RepositoryMessageUtil(
+    @BeforeClass
+    public void setSecureTest() throws ComponentLookupException{
+    	this.messageUtil = new RepositoryMessageUtil(
             this, this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             getRepositoryTypeRegistry() );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

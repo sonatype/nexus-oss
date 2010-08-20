@@ -32,6 +32,7 @@ import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -54,8 +55,13 @@ public class Nexus725InitialRestClientIT
 
         return client;
     }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-    @Test
+    @Test(description = "Simple Test Description - getRepoListTest")
     public void getRepoListTest()
         throws Exception
     {
@@ -86,7 +92,7 @@ public class Nexus725InitialRestClientIT
     public void isValidRepositoryTest()
         throws Exception
     {
-
+    	Thread.sleep(30000);
         NexusClient client = this.getConnectedNexusClient();
 
         Assert.assertTrue( client.isValidRepository( "nexus-test-harness-repo" ),

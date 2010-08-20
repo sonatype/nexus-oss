@@ -21,6 +21,7 @@ import java.util.Arrays;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -30,6 +31,7 @@ import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus688ReindexOnRepoAddIT
@@ -43,12 +45,12 @@ public class Nexus688ReindexOnRepoAddIT
 
     private static final String INDEX_PROPERTIES = ".index/nexus-maven-repository-index.properties";
 
-    public Nexus688ReindexOnRepoAddIT()
-        throws ComponentLookupException
-    {
-        messageUtil =
+    @BeforeClass
+    public void setSecureTest() throws ComponentLookupException{ 
+    	messageUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
                 getRepositoryTypeRegistry() );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

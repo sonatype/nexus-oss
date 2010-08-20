@@ -16,8 +16,10 @@ package org.sonatype.nexus.integrationtests.nexus384;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -26,6 +28,12 @@ import org.testng.annotations.Test;
 public class Nexus384DotAndDashSearchIT
     extends AbstractNexusIntegrationTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void searchAll()
         throws Exception

@@ -17,6 +17,7 @@ import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 /**
@@ -26,6 +27,11 @@ public class Nexus758ServiceStability
     extends AbstractNexusIntegrationTest
 {
     private static NexusClient client;
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @BeforeMethod
     public void init()

@@ -19,9 +19,11 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -33,9 +35,10 @@ public class Nexus142UserValidationIT
 
     protected UserMessageUtil messageUtil;
 
-    public Nexus142UserValidationIT()
-    {
-        this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

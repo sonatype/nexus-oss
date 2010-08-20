@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
 public class Nexus1563ExternalRealmsLoginIT
     extends AbstractPrivilegeTest
 {
-
+	
     @BeforeClass
     public static void security()
     {

@@ -19,8 +19,10 @@ import java.util.Date;
 import org.apache.maven.it.VerificationException;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -35,6 +37,11 @@ public class Nexus174ReleaseDeployWrongPasswordIT
     public Nexus174ReleaseDeployWrongPasswordIT()
     {
         super( TEST_RELEASE_REPO );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

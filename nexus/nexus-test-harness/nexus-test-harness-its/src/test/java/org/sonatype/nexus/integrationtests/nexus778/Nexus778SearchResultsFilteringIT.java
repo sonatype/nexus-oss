@@ -29,6 +29,7 @@ import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
@@ -38,6 +39,12 @@ import org.testng.annotations.Test;
 public class Nexus778SearchResultsFilteringIT
     extends AbstractPrivilegeTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void simpleSearch()
         throws Exception

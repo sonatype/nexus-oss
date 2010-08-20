@@ -15,7 +15,9 @@ package org.sonatype.nexus.integrationtests.nexus531;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.annotations.BeforeClass;
 
 public class Nexus531RepositoryCrudXMLIT
     extends Nexus531RepositoryCrudJsonIT
@@ -28,5 +30,9 @@ public class Nexus531RepositoryCrudXMLIT
             this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             getRepositoryTypeRegistry() );
+    }
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 }

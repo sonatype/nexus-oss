@@ -26,6 +26,7 @@ import org.apache.maven.it.Verifier;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -37,6 +38,7 @@ import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -92,9 +94,9 @@ public class Nexus537RepoTargetsIT
 
     private static final String GROUP_ID = "test-group";
 
-    public Nexus537RepoTargetsIT()
-        throws Exception
-    {
+    
+    @BeforeClass
+    public void setSecureTest() throws IllegalArtifactCoordinateException{    
         repo1BarArtifact =
             new Gav( this.getTestId(), "repo1-bar-artifact", "1.0.0", null, "jar", 0, new Date().getTime(),
                      "repo1-bar-artifact", false, false, null, false, null );
@@ -120,6 +122,7 @@ public class Nexus537RepoTargetsIT
         repo2FooArtifactDelete =
             new Gav( this.getTestId(), "repo2-foo-artifact-delete", "1.0.0", null, "jar", 0, new Date().getTime(),
                      "repo2-foo-artifact-delete", false, false, null, false, null );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Override

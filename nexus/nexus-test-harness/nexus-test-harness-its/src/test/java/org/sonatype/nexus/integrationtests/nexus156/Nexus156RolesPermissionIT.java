@@ -21,6 +21,7 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.security.rest.model.RoleResource;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -28,6 +29,11 @@ import org.testng.annotations.Test;
  */
 public class Nexus156RolesPermissionIT extends AbstractPrivilegeTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
     
     @Test
     public void testCreatePermission()

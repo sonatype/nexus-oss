@@ -17,8 +17,10 @@ import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 
@@ -31,6 +33,11 @@ public class Nexus262SimpleProxyIT extends AbstractNexusProxyIntegrationTest
     public Nexus262SimpleProxyIT()
     {
         super( "release-proxy-repo-1" );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
     @Test

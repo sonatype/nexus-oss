@@ -335,9 +335,9 @@ public class RepositoryMessageUtil
             RepositoryResource expected = (RepositoryResource) repo;
             CRepository cRepo = getTest().getNexusConfigUtil().getRepo( repo.getId() );
 
-            Assert.assertEquals( expected.getId(), cRepo.getId() );
+            Assert.assertEquals( cRepo.getId(), expected.getId()  );
 
-            Assert.assertEquals( expected.getName(), cRepo.getName() );
+            Assert.assertEquals(  cRepo.getName(), expected.getName() );
 
             ContentClass expectedCc =
                 repositoryTypeRegistry.getRepositoryContentClass( cRepo.getProviderRole(), cRepo.getProviderHint() );
@@ -349,8 +349,7 @@ public class RepositoryMessageUtil
 
             if ( expected.getOverrideLocalStorageUrl() == null )
             {
-                Assert.assertNull( "Expected CRepo localstorage url not be set, because it is the default.",
-                                   cRepo.getLocalStorage().getUrl() );
+                Assert.assertNull( cRepo.getLocalStorage().getUrl() ,"Expected CRepo localstorage url not be set, because it is the default." );
             }
             else
             {

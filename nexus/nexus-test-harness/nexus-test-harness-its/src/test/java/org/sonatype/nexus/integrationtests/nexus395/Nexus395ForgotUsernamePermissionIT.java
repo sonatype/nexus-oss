@@ -18,6 +18,7 @@ import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.ForgotUsernameUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -26,6 +27,10 @@ import org.testng.annotations.Test;
 public class Nexus395ForgotUsernamePermissionIT
     extends AbstractPrivilegeTest
 {
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void withPermission()

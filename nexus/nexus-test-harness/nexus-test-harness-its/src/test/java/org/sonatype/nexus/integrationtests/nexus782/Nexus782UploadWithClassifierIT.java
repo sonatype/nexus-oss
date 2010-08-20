@@ -23,7 +23,9 @@ import org.apache.commons.httpclient.HttpException;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus782UploadWithClassifierIT
@@ -39,6 +41,10 @@ public class Nexus782UploadWithClassifierIT
     public Nexus782UploadWithClassifierIT()
         throws Exception
     {
+    }
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

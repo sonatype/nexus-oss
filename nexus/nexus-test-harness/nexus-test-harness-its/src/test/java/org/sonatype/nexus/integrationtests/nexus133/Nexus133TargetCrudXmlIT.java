@@ -16,7 +16,9 @@ package org.sonatype.nexus.integrationtests.nexus133;
 import java.io.IOException;
 
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -26,11 +28,12 @@ public class Nexus133TargetCrudXmlIT
     extends Nexus133TargetCrudJsonIT
 {
 
-    public Nexus133TargetCrudXmlIT()
-    {
-        this.messageUtil =
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil =
             new TargetMessageUtil( this, this.getXMLXStream(),
                                  MediaType.APPLICATION_XML );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
     

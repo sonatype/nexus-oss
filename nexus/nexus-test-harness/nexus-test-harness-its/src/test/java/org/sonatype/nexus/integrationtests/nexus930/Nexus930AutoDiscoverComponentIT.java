@@ -28,6 +28,7 @@ import org.sonatype.nexus.rest.model.RepositoryContentClassListResource;
 import org.sonatype.nexus.rest.model.RepositoryContentClassListResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
@@ -38,6 +39,11 @@ import com.thoughtworks.xstream.XStream;
 public class Nexus930AutoDiscoverComponentIT
     extends AbstractPrivilegeTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void testInvalidRole()

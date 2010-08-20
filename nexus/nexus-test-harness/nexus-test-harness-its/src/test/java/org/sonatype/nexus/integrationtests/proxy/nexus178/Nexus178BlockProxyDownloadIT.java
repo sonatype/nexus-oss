@@ -22,8 +22,10 @@ import java.util.Date;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -39,6 +41,11 @@ public class Nexus178BlockProxyDownloadIT
     public Nexus178BlockProxyDownloadIT()
     {
         super( TEST_RELEASE_REPO );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

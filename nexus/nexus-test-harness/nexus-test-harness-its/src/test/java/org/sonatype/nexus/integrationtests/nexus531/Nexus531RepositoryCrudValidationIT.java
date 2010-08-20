@@ -20,12 +20,14 @@ import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.converters.ConversionException;
@@ -36,11 +38,11 @@ public class Nexus531RepositoryCrudValidationIT
 
     private RepositoryMessageUtil messageUtil;
 
-    public Nexus531RepositoryCrudValidationIT()
-        throws ComponentLookupException
-    {
-        this.messageUtil =
+    @BeforeClass
+    public void setSecureTest() throws ComponentLookupException{ 
+    	this.messageUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

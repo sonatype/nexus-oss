@@ -34,12 +34,12 @@ import org.testng.annotations.BeforeClass;
 //    Nexus262SimpleProxyIT.class,
 //    Nexus133TargetCrudJsonIT.class,
 //    Nexus133TargetCrudXmlIT.class,
-//    /*
-//      Depends on https://issues.sonatype.org/browse/NEXUS-1302
-//
-//      Nexus142UserCrudJsonTests.class,
-//      Nexus142UserCrudXmlTests.class,
-//     */
+////    /*
+////      Depends on https://issues.sonatype.org/browse/NEXUS-1302
+////
+////      Nexus142UserCrudJsonTests.class,
+////      Nexus142UserCrudXmlTests.class,
+////     */
 //    Nexus156RolesCrudJsonIT.class,
 //    Nexus156RolesCrudXmlIT.class,
 //    Nexus142UserValidationIT.class,

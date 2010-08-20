@@ -122,10 +122,11 @@
     <artifactId>maven-failsafe-plugin</artifactId>
     <version>2.5</version>
     <configuration>
+    	<argLine>-Xmx512M</argLine>
 <!--      <suiteXmlFiles>-->
 <!--        <suiteXmlFile>resources/testng.xml</suiteXmlFile>-->
 <!--      </suiteXmlFiles>-->
-                <excludes>
+        <excludes>
             <exclude>**Suite*</exclude>-->
             <!-- START This are start/stop tests, shouldn't be runned -->
             <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
@@ -134,7 +135,17 @@
             <!-- END This are start/stop tests, shouldn't be runned -->
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
-          </excludes>
+        </excludes>
+        <properties>
+            <property>
+          		<name>usedefaultlisteners</name>
+          		<value>false</value> <!-- disabling default listeners is optional -->
+        	</property>
+        	<property>
+          		<name>reporter</name>
+          		<value>org.uncommons.reportng.HTMLReporter</value>
+        	</property>
+        </properties>
     </configuration>
   </plugin>
 
@@ -269,6 +280,19 @@
   		<artifactId>hamcrest-integration</artifactId>
   		<version>1.0</version>
 	</dependency>
+	
+	<dependency>
+  		<groupId>org.uncommons</groupId>
+  		<artifactId>reportng</artifactId>
+  		<version>1.1.2</version>
+  		<exclusions>
+  			<exclusion>
+  				<artifactId>velocity</artifactId>
+  				<groupId>velocity</groupId>
+  			</exclusion>
+  		</exclusions>
+	</dependency>
+	
   </dependencies>
   
   <profiles>

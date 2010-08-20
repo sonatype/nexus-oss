@@ -20,7 +20,9 @@ import java.util.Date;
 import org.apache.commons.httpclient.HttpStatus;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -35,6 +37,11 @@ public class Nexus259SnapshotDeployIT
     public Nexus259SnapshotDeployIT()
     {
         super( TEST_SNAPSHOT_REPO );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
