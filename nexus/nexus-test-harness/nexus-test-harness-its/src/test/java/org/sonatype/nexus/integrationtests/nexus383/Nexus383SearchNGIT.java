@@ -29,6 +29,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -48,7 +49,12 @@ public class Nexus383SearchNGIT
 
     public Nexus383SearchNGIT()
     {
-        this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        
+    }
+    
+    @BeforeClass
+    public void prepare(){
+    	this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Override
@@ -81,7 +87,7 @@ public class Nexus383SearchNGIT
 
         // groupId
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "nexus383" );
-        Assert.assertEquals( 2, results.getData().size() );
+        Assert.assertEquals( results.getData().size(), 2  );
 
         // 3. negative test
         results = getSearchMessageUtil().searchNGFor( "nexus-383" );

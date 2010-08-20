@@ -36,6 +36,7 @@ import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
@@ -88,13 +89,16 @@ public abstract class AbstractPrivilegeTest
             Assert.fail( e.getMessage() );
         }
     }
+    
+    @BeforeClass
+    public void enableSecurity(){
+        // turn on security for the test
+        TestContainer.getInstance().getTestContext().setSecureTest( true );    	
+    }
 
     private void init()
         throws ComponentLookupException
     {
-        // turn on security for the test
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-
         XStream xstream = this.getXMLXStream();
 
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );

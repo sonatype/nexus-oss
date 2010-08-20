@@ -12,12 +12,17 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus1765RepositoryServicesIT
     extends AbstractPrivilegeTest
 {
-
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void testGetRepoStatus()
         throws Exception
