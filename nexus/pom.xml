@@ -233,7 +233,6 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-annotations</artifactId>
         <version>1.5.4</version>
-        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
