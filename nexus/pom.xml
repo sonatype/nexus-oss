@@ -143,6 +143,7 @@
     <plexus-security.version>1.1.8</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <nexus.indexer.version>3.0.4-SNAPSHOT</nexus.indexer.version>
+    <nexus.indexer.artifact.version>1.0.1-SNAPSHOT</nexus.indexer.artifact.version>
     <nexus.repository.metadata.version>1.0.3-SNAPSHOT</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.16</plexus.restlet.bridge.version>
@@ -863,6 +864,11 @@
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-indexer</artifactId>
         <version>${nexus.indexer.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-artifact</artifactId>
+        <version>${nexus.indexer.artifact.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
