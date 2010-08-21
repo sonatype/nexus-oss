@@ -41,6 +41,6 @@ public final class NexusBooterCustomizer
 
     public void customizeContainer( final PlexusAppBooter booter, final PlexusContainer container )
     {
-        container.setLookupRealm( null );
+        // nothing to customize
     }
 }
