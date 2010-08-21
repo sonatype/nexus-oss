@@ -118,7 +118,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 
@@ -144,7 +144,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 
@@ -160,18 +160,18 @@ public class ExceptionCatchingModularRealmAuthorizer
             {
                 if ( realm.isPermitted( subjectPrincipal, permission ) )
                 {
-                    this.logger.debug( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" has permisison: "+ permission );
+                    this.logger.trace( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" has permisison: "+ permission );
                     return true;
                 }
                 else
                 {
-                    this.logger.debug( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" does NOT have permisison: "+ permission );
+                    this.logger.trace( "Realm: "+ realm.getName() +" user: "+ subjectPrincipal.iterator().next() +" does NOT have permisison: "+ permission );
                 }
 
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 
@@ -192,7 +192,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 
@@ -217,7 +217,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 
@@ -242,7 +242,7 @@ public class ExceptionCatchingModularRealmAuthorizer
             }
             catch ( AuthorizationException e )
             {
-                logger.debug( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
+                logger.trace( "Realm: '" + realm.getName() + "', caused: " + e.getMessage(), e );
             }
         }
 

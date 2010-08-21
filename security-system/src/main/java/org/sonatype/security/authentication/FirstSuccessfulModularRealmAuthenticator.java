@@ -29,15 +29,18 @@ public class FirstSuccessfulModularRealmAuthenticator
     @Override
     protected AuthenticationInfo doMultiRealmAuthentication( Collection<Realm> realms, AuthenticationToken token )
     {
-        log.debug( "Iterating through [" + realms.size() + "] realms for PAM authentication" );
+        log.trace( "Iterating through [" + realms.size() + "] realms for PAM authentication" );
 
         for ( Realm realm : realms )
         {
             // check if the realm supports this token
             if ( realm.supports( token ) )
             {
-                log.debug( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm + "]" );
-
+                if ( log.isTraceEnabled() )
+                {
+                    log.trace( "Attempting to authenticate token [" + token + "] " + "using realm of type [" + realm + "]" );
+                }
+                
                 try
                 {
                     // try to login
@@ -65,8 +68,11 @@ public class FirstSuccessfulModularRealmAuthenticator
             }
             else
             {
-                log.debug( "Realm of type [" + realm + "] does not support token " + "[" + token
-                    + "].  Skipping realm." );
+                if ( log.isTraceEnabled() )
+                {
+                    log.trace( "Realm of type [" + realm + "] does not support token " + "[" + token
+                        + "].  Skipping realm." );
+                }
             }
         }
         throw new org.apache.shiro.authc.AuthenticationException( "Authentication token of type [" + token.getClass() + "] "

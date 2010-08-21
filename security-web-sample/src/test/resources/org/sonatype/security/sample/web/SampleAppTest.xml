@@ -69,7 +69,7 @@
 				authcBasic.applicationName = Sample Application
 				#authcBasic.fakeAuthScheme = true
 				
-				perms = org.sonatype.security.web.filter.authz.HttpVerbMappingAuthorizationFilter
+				perms = org.apache.shiro.web.filter.authz.HttpMethodPermissionFilter
 				
                     </value>
                   </property>
