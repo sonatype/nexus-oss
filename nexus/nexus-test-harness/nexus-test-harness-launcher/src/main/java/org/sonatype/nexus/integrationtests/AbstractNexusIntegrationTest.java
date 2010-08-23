@@ -61,7 +61,6 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
@@ -291,13 +290,13 @@ public abstract class AbstractNexusIntegrationTest
             log.debug( "oncePerClassSetUp is init: " + NEEDS_INIT );
             if ( NEEDS_INIT )
             {
+                // this will trigger PlexusContainer creation when test is instantiated, but only if needed
+                getITPlexusContainer( getClass() );
+                
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + getClass().getSimpleName() );
 
-                setupLog4j();
-
-                // this will trigger PlexusContainer creation when test is instantiated, but only if needed
-                getITPlexusContainer( getClass() );
+                setupLog4j();                
 
                 // clean common work dir
                 beforeStartClean();
@@ -348,8 +347,6 @@ public abstract class AbstractNexusIntegrationTest
     {
         // reset this for each test
         TestContainer.getInstance().getTestContext().useAdminForRequests();
-
-        killITPlexusContainer();
     }
 
     @AfterClass
@@ -363,6 +360,9 @@ public abstract class AbstractNexusIntegrationTest
         stopNexus();
 
         takeSnapshot();
+
+        // kill existing container if around
+        killITPlexusContainer();
     }
 
     protected void runOnce()
@@ -1183,24 +1183,24 @@ public abstract class AbstractNexusIntegrationTest
 
     // == IT Container management
 
-    private PlexusContainer itPlexusContainer;
+    private static PlexusContainer itPlexusContainer;
 
     public PlexusContainer getITPlexusContainer()
     {
         return getITPlexusContainer( getClass() );
     }
 
-    public PlexusContainer getITPlexusContainer( Class<?> clazz )
+    public synchronized PlexusContainer getITPlexusContainer( Class<?> clazz )
     {
         if ( itPlexusContainer == null )
         {
-            itPlexusContainer = setupContainer( getClass() );
+            itPlexusContainer = setupContainer( clazz );
         }
 
         return itPlexusContainer;
     }
 
-    public void killITPlexusContainer()
+    public static synchronized void killITPlexusContainer()
     {
         if ( itPlexusContainer != null )
         {
@@ -1210,7 +1210,11 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    private static PlexusContainer setupContainer( Class<?> baseClass )
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+    }
+
+    private PlexusContainer setupContainer( Class<?> baseClass )
     {
         // ----------------------------------------------------------------------------
         // Context Setup
@@ -1240,9 +1244,10 @@ public abstract class AbstractNexusIntegrationTest
         // ----------------------------------------------------------------------------
 
         ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration( baseClass.getName().replace( '.',
-                                                                                                                                                '/' )
-                                                                                                                       + ".xml" );
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context )
+                .setContainerConfiguration( baseClass.getName().replace( '.', '/' ) + ".xml" );
+        customizeContainerConfiguration( containerConfiguration );
+
         try
         {
             return new DefaultPlexusContainer( containerConfiguration );

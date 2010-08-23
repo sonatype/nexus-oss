@@ -324,6 +324,11 @@
           <artifactId>yuicompressor-maven-plugin</artifactId>
           <version>0.0.1</version>
         </plugin>
+        <plugin>
+          <groupId>org.sonatype.plugins</groupId>
+          <artifactId>nexus-test-environment-maven-plugin</artifactId>
+          <version>1.5</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>

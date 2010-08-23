@@ -26,7 +26,7 @@ public class PurgeTimelineTaskDescriptor
 {
     public static final String ID = "PurgeTimeline";
 
-    public static final String OLDER_THAN_FIELD_ID = "EmptyTrashItemsOlderThan";
+    public static final String OLDER_THAN_FIELD_ID = "purgeOlderThan";
 
     private final NumberTextFormField olderThanField =
         new NumberTextFormField(

@@ -139,6 +139,7 @@ public class NexusStatusUtil
         }
 
         final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
+        
         try
         {
             // NOTE: We can't kill active tasks, we need to wait for them to stop

@@ -52,10 +52,11 @@ public class PlexusContainerContextListener
                 AppContext plexusContext = createContainerContext( context );
 
                 ContainerConfiguration plexusConfiguration =
-                    new DefaultContainerConfiguration().setName( context.getServletContextName() )
-                        .setContainerConfigurationURL(
-                            buildConfigurationURL( context, PLEXUS_CONFIG_PARAM, DEFAULT_PLEXUS_CONFIG ) ).setContext(
-                            plexusContext );
+                    new DefaultContainerConfiguration().setName( context.getServletContextName() ).setContainerConfigurationURL(
+                        buildConfigurationURL( context, PLEXUS_CONFIG_PARAM, DEFAULT_PLEXUS_CONFIG ) ).setContext(
+                        plexusContext ).setClassPathScanning( true ).setComponentVisibility(
+                        PlexusConstants.GLOBAL_VISIBILITY );
+                ;
 
                 plexusContainer = new DefaultPlexusContainer( plexusConfiguration );
 
@@ -108,7 +109,7 @@ public class PlexusContainerContextListener
 
         // if ( servletContextName != null )
         // {
-        //     request.setName( context.getServletContextName() );
+        // request.setName( context.getServletContextName() );
         // }
         // TODO: ^^^^
 

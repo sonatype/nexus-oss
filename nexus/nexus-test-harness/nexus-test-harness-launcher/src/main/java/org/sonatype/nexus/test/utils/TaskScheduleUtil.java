@@ -118,6 +118,17 @@ public class TaskScheduleUtil
         return task.getLastRunResult();
     }
 
+    public static void deleteAllTasks()
+        throws Exception
+    {
+        List<ScheduledServiceListResource> tasks = getAllTasks();
+
+        for ( ScheduledServiceListResource task : tasks )
+        {
+            deleteTask( task.getId() );
+        }
+    }
+
     public static void waitForTasks()
         throws Exception
     {
@@ -325,7 +336,7 @@ public class TaskScheduleUtil
                                                         ScheduledServicePropertyResource... properties )
         throws Exception
     {
-        return runTask( taskName, typeId, 100, properties );
+        return runTask( taskName, typeId, 200, properties );
     }
 
     public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )

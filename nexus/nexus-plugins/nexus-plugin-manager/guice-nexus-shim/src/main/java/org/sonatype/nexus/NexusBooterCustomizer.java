@@ -29,9 +29,9 @@ public final class NexusBooterCustomizer
     // Public methods
     // ----------------------------------------------------------------------
 
-    public void customizeContainerConfiguration( final PlexusAppBooter booter, final ContainerConfiguration configuration )
+    public void customizeContainerConfiguration( final PlexusAppBooter booter, final ContainerConfiguration config )
     {
-        configuration.setClassPathScanning( true ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
+        config.setClassPathScanning( true ).setComponentVisibility( PlexusConstants.GLOBAL_VISIBILITY );
     }
 
     public void customizeContext( final PlexusAppBooter booter, final AppContext context )

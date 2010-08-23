@@ -71,6 +71,12 @@
     </dependency>
 
     <dependency>
+      <groupId>org.sonatype.plexus.appevents</groupId>
+      <artifactId>plexus-app-events-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-api</artifactId>
       <version>${plexus-security.version}</version>
@@ -81,6 +87,12 @@
       <groupId>org.sonatype.security.realms.ldap</groupId>
       <artifactId>ldap-common</artifactId>
       <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -101,6 +113,12 @@
       <artifactId>commons-collections</artifactId>
       <version>${commons-collections.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <!-- TESTING -->
