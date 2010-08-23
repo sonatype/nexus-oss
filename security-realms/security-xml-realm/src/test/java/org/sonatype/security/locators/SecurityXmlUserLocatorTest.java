@@ -21,13 +21,14 @@ import junit.framework.Assert;
 import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
+import org.sonatype.security.AbstractSecurityTestCase;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.User;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserSearchCriteria;
 
 public class SecurityXmlUserLocatorTest
-    extends PlexusTestCase
+    extends AbstractSecurityTestCase
 {
 
     @Override
