@@ -58,6 +58,7 @@ public abstract class AbstractNexusTestCase
     @Override
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
+        super.customizeContainerConfiguration( configuration );
         configuration.setClassPathScanning( true );
     }
 

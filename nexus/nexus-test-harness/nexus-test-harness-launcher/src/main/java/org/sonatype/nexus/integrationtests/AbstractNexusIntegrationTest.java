@@ -1214,7 +1214,11 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    private static PlexusContainer setupContainer( Class<?> baseClass )
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+    }
+
+    private PlexusContainer setupContainer( Class<?> baseClass )
     {
         // ----------------------------------------------------------------------------
         // Context Setup
@@ -1244,9 +1248,10 @@ public abstract class AbstractNexusIntegrationTest
         // ----------------------------------------------------------------------------
 
         ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration( baseClass.getName().replace( '.',
-                                                                                                                                                '/' )
-                                                                                                                       + ".xml" );
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context )
+                .setContainerConfiguration( baseClass.getName().replace( '.', '/' ) + ".xml" );
+
+        customizeContainerConfiguration( containerConfiguration );
 
         try
         {
