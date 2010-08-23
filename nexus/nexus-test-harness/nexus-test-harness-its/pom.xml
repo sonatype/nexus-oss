@@ -123,7 +123,7 @@
     <version>2.5</version>
     <configuration>
       <argLine>-Xmx512M</argLine>
-      <forkMode>always<forkMode>
+      <forkMode>always</forkMode>
 <!--      <suiteXmlFiles>-->
 <!--        <suiteXmlFile>resources/testng.xml</suiteXmlFile>-->
 <!--      </suiteXmlFiles>-->
