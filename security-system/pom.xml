@@ -21,17 +21,9 @@
       <version>${shiro.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
-      <artifactId>guice-plexus-shim</artifactId>
+      <groupId>org.sonatype.spice</groupId>
+      <artifactId>spice-inject-plexus</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
-      <artifactId>guice-bean-containers</artifactId>
-    </dependency>
-    <!--<dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>-->
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>plexus-ehcache</artifactId>
