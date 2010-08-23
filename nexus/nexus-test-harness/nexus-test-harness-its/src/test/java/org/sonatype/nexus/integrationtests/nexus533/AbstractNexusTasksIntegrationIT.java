@@ -31,108 +31,102 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
-    extends AbstractNexusIntegrationTest
-{
+		extends AbstractNexusIntegrationTest {
 
-    public abstract E getTaskScheduled();
+	public abstract E getTaskScheduled();
 
-    @Test
-    public void scheduleTasks()
-        throws Exception
-    {
-        Status status = TaskScheduleUtil.create( getTaskScheduled() );
-        Assert.assertTrue( status.isSuccess() );
+	@Test
+	public void doTest() throws Exception {
+		scheduleTasks();
+		updateTasks();
+		changeScheduling();
+		deleteTasks();
+	}
 
-        assertTasks();
-    }
+	public void scheduleTasks() throws Exception {
+		Status status = TaskScheduleUtil.create(getTaskScheduled());
+		Assert.assertTrue(status.isSuccess());
 
-    protected void assertTasks()
-        throws IOException
-    {
-        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
+		assertTasks();
+	}
 
-        List<CScheduledTask> tasks = nexusConfig.getTasks();
-        Assert.assertEquals( 1, tasks.size() );
+	protected void assertTasks() throws IOException {
+		Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
 
-        CScheduledTask task = tasks.get( 0 );
-        E scheduledTask = getTaskScheduled();
+		List<CScheduledTask> tasks = nexusConfig.getTasks();
+		Assert.assertEquals(1, tasks.size());
 
-        Assert.assertEquals( scheduledTask.getName(), task.getName() );
-        Assert.assertEquals( scheduledTask.getTypeId(), task.getType() );
-    }
+		CScheduledTask task = tasks.get(0);
+		E scheduledTask = getTaskScheduled();
 
-    @Test
-    public void updateTasks()
-        throws Exception
-    {
-        E scheduledTask = getTaskScheduled();
-        ScheduledServiceListResource task = TaskScheduleUtil.getTask( scheduledTask.getName() );
+		Assert.assertEquals(scheduledTask.getName(), task.getName());
+		Assert.assertEquals(scheduledTask.getTypeId(), task.getType());
+	}
 
-        scheduledTask.setId( task.getId() );
-        updateTask( scheduledTask );
-        Status status = TaskScheduleUtil.update( scheduledTask );
-        Assert.assertTrue( status.isSuccess() );
+	public void updateTasks() throws Exception {
+		E scheduledTask = getTaskScheduled();
+		ScheduledServiceListResource task = TaskScheduleUtil
+				.getTask(scheduledTask.getName());
 
-        assertTasks();
-    }
+		scheduledTask.setId(task.getId());
+		updateTask(scheduledTask);
+		Status status = TaskScheduleUtil.update(scheduledTask);
+		Assert.assertTrue(status.isSuccess());
 
-    public abstract void updateTask( E scheduledTask );
+		assertTasks();
+	}
 
-    @Test( enabled = false )
-    public void changeScheduling()
-        throws Exception
-    {
-        E scheduledTask = getTaskScheduled();
-        ScheduledServiceListResource task = TaskScheduleUtil.getTask( scheduledTask.getName() );
+	public abstract void updateTask(E scheduledTask);
 
-        // if we have a manual task we can't change the schedule to be manual again
-        if ( !task.getSchedule().equals( "manual" ) )
-        {
+	public void changeScheduling() throws Exception {
+		E scheduledTask = getTaskScheduled();
+		ScheduledServiceListResource task = TaskScheduleUtil
+				.getTask(scheduledTask.getName());
 
-            ScheduledServiceBaseResource taskManual = new ScheduledServiceBaseResource();
-            taskManual.setId( task.getId() );
-            taskManual.setName( scheduledTask.getName() );
-            taskManual.setEnabled( true );
-            taskManual.setTypeId( scheduledTask.getTypeId() );
-            taskManual.setProperties( scheduledTask.getProperties() );
-            taskManual.setSchedule( "manual" );
+		// if we have a manual task we can't change the schedule to be manual
+		// again
+		if (!task.getSchedule().equals("manual")) {
 
-            Status status = TaskScheduleUtil.update( taskManual );
-            Assert.assertTrue( status.isSuccess() );
+			ScheduledServiceBaseResource taskManual = new ScheduledServiceBaseResource();
+			taskManual.setId(task.getId());
+			taskManual.setName(scheduledTask.getName());
+			taskManual.setEnabled(true);
+			taskManual.setTypeId(scheduledTask.getTypeId());
+			taskManual.setProperties(scheduledTask.getProperties());
+			taskManual.setSchedule("manual");
 
-        }
-        else
-        {
-            ScheduledServiceOnceResource updatedTask = new ScheduledServiceOnceResource();
-            updatedTask.setId( task.getId() );
-            updatedTask.setName( scheduledTask.getName() );
-            updatedTask.setEnabled( task.isEnabled() );
-            updatedTask.setTypeId( scheduledTask.getTypeId() );
-            updatedTask.setProperties( scheduledTask.getProperties() );
-            updatedTask.setSchedule( "once" );
-            Date startDate = DateUtils.addDays( new Date(), 10 );
-            startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
-            updatedTask.setStartDate( String.valueOf( startDate.getTime() ) );
-            updatedTask.setStartTime( "03:30" );
+			Status status = TaskScheduleUtil.update(taskManual);
+			Assert.assertTrue(status.isSuccess());
 
-            Status status = TaskScheduleUtil.update( updatedTask );
-            Assert.assertTrue( status.isSuccess() );
-        }
+		} else {
+			ScheduledServiceOnceResource updatedTask = new ScheduledServiceOnceResource();
+			updatedTask.setId(task.getId());
+			updatedTask.setName(scheduledTask.getName());
+			updatedTask.setEnabled(task.isEnabled());
+			updatedTask.setTypeId(scheduledTask.getTypeId());
+			updatedTask.setProperties(scheduledTask.getProperties());
+			updatedTask.setSchedule("once");
+			Date startDate = DateUtils.addDays(new Date(), 10);
+			startDate = DateUtils.round(startDate, Calendar.DAY_OF_MONTH);
+			updatedTask.setStartDate(String.valueOf(startDate.getTime()));
+			updatedTask.setStartTime("03:30");
 
-        assertTasks();
-    }
+			Status status = TaskScheduleUtil.update(updatedTask);
+			Assert.assertTrue(status.isSuccess());
+		}
 
-    @Test
-    public void deleteTasks()
-        throws Exception
-    {
-        ScheduledServiceListResource task = TaskScheduleUtil.getTask( getTaskScheduled().getName() );
-        Status status = TaskScheduleUtil.deleteTask( task.getId() );
-        Assert.assertTrue( status.isSuccess() );
+		assertTasks();
+	}
 
-        // delete is not working, see NEXUS-572
-        Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
-        Assert.assertTrue( nexusConfig.getTasks().isEmpty() );
-    }
+	public void deleteTasks() throws Exception {
+		ScheduledServiceListResource task = TaskScheduleUtil
+				.getTask(getTaskScheduled().getName());
+		Status status = TaskScheduleUtil.deleteTask(task.getId());
+		Assert.assertTrue(status.isSuccess());
+
+		// delete is not working, see NEXUS-572
+		Configuration nexusConfig = getNexusConfigUtil().getNexusConfig();
+		Assert.assertTrue(nexusConfig.getTasks().isEmpty());
+	}
 
 }
