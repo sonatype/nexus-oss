@@ -139,7 +139,7 @@
         <properties>
             <property>
           		<name>usedefaultlisteners</name>
-          		<value>false</value> <!-- disabling default listeners is optional -->
+          		<value>true</value>
         	</property>
         	<property>
           		<name>reporter</name>
@@ -149,29 +149,6 @@
     </configuration>
   </plugin>
 
-		<!--
-      <plugin>
-       
-        <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <argLine>-Xmx512M</argLine>
-          <excludes>
-            <exclude>**Suite*</exclude>-->
-            <!-- START This are start/stop tests, shouldn't be runned -->
-            <!-- 
-            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
-            <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>**/Nexus748MultipleStartTest.*</exclude>
-             -->
-            <!-- END This are start/stop tests, shouldn't be runned -->
-            <!-- inner classes -->
-            <!--
-            <exclude>**/*$*.*</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-       -->
     </plugins>
   </build>
 

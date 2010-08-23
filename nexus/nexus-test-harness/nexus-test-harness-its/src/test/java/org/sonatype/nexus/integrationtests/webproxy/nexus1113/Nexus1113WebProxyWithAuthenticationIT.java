@@ -18,6 +18,8 @@ import java.io.File;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Nexus1113WebProxyWithAuthenticationIT
@@ -25,6 +27,7 @@ public class Nexus1113WebProxyWithAuthenticationIT
 {
 
     @Override
+    @BeforeMethod
     public void startWebProxy()
         throws Exception
     {
@@ -52,6 +55,7 @@ public class Nexus1113WebProxyWithAuthenticationIT
     }
 
     @Override
+    @AfterMethod
     public void stopWebProxy()
         throws Exception
     {

@@ -19,6 +19,8 @@ import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Nexus1089SecureProxyIT
@@ -26,6 +28,7 @@ public class Nexus1089SecureProxyIT
 {
 
     @Override
+    @BeforeMethod
     public void startProxy()
         throws Exception
     {
@@ -34,6 +37,7 @@ public class Nexus1089SecureProxyIT
     }
 
     @Override
+    @AfterMethod
     public void stopProxy()
         throws Exception
     {

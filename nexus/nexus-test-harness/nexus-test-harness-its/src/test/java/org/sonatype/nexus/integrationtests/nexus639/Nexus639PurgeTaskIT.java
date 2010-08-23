@@ -52,7 +52,7 @@ public class Nexus639PurgeTaskIT
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
 
         Assert.assertNotNull( task );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        Assert.assertEquals( task.getStatus(), "SUBMITTED"  );
 
         // validate the feeds contain nothing.
 

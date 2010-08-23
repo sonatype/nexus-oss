@@ -17,6 +17,7 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public abstract class AbstractDeleteArtifactsIT
@@ -50,7 +51,8 @@ public abstract class AbstractDeleteArtifactsIT
         super( testRepositoryId );
     }
 
-    @BeforeClass
+    //@BeforeClass
+    @BeforeMethod
     public void init()
         throws IllegalArtifactCoordinateException
     {

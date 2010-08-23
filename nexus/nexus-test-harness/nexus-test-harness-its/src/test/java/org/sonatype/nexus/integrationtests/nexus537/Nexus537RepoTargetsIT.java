@@ -39,6 +39,7 @@ import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeM
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -134,6 +135,7 @@ public class Nexus537RepoTargetsIT
     }
 
     @Override
+    @BeforeMethod
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -477,6 +479,7 @@ public class Nexus537RepoTargetsIT
     }
 
     @Override
+    @BeforeMethod
     public void oncePerClassSetUp()
         throws Exception
     {

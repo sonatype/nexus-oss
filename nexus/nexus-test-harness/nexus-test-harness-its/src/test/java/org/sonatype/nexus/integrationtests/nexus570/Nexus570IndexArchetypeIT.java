@@ -24,41 +24,40 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class Nexus570IndexArchetypeIT extends AbstractNexusIntegrationTest
-{
-	
-    @BeforeClass
-    public void setSecureTest(){
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
+public class Nexus570IndexArchetypeIT extends AbstractNexusIntegrationTest {
 
-    @Test
-    public void searchForArchetype() throws Exception
-    {
-        Map<String, String> args = new HashMap<String, String>();
-        args.put( "a", "simple-archetype" );
-        args.put( "g", "nexus570" );
-        
-        List<NexusArtifact> results = getSearchMessageUtil().searchFor( args );
-        
-        Assert.assertEquals( 1, results.size() );
-        Assert.assertEquals("Expected maven-archetype packaging: "+ results.get( 0 ).getPackaging(), "maven-archetype", results.get( 0 ).getPackaging() );
-        
-    }
-    
-    @Test
-    public void searchForjar() throws Exception
-    {
-        Map<String, String> args = new HashMap<String, String>();
-        args.put( "a", "normal" );
-        args.put( "g", "nexus570" );
-        
-        List<NexusArtifact> results = getSearchMessageUtil().searchFor( args );
-        
-        Assert.assertEquals( 1, results.size() );
-        Assert.assertEquals("Expected jar packaging: "+ results.get( 0 ).getPackaging(), "jar", results.get( 0 ).getPackaging() );
-        
-        
-    }
-    
+	@BeforeClass
+	public void setSecureTest() {
+		TestContainer.getInstance().getTestContext().setSecureTest(true);
+	}
+
+	@Test
+	public void searchForArchetype() throws Exception {
+		Map<String, String> args = new HashMap<String, String>();
+		args.put("a", "simple-archetype");
+		args.put("g", "nexus570");
+
+		List<NexusArtifact> results = getSearchMessageUtil().searchFor(args);
+
+		Assert.assertEquals(1, results.size());
+		Assert.assertEquals(results.get(0).getPackaging(), "maven-archetype",
+				"Expected maven-archetype packaging: "
+						+ results.get(0).getPackaging());
+
+	}
+
+	@Test
+	public void searchForjar() throws Exception {
+		Map<String, String> args = new HashMap<String, String>();
+		args.put("a", "normal");
+		args.put("g", "nexus570");
+
+		List<NexusArtifact> results = getSearchMessageUtil().searchFor(args);
+
+		Assert.assertEquals(results.size(), 1);
+		Assert.assertEquals(results.get(0).getPackaging(), "jar",
+				"Expected jar packaging: " + results.get(0).getPackaging());
+
+	}
+
 }

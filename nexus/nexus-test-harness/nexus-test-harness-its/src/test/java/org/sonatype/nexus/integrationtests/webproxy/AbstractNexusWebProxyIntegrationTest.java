@@ -16,7 +16,7 @@ package org.sonatype.nexus.integrationtests.webproxy;
 import org.sonatype.jettytestsuite.ProxyServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
-import org.testng.annotations.AfterTest;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 public abstract class AbstractNexusWebProxyIntegrationTest
@@ -40,7 +40,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
         server.start();
     }
 
-    @AfterTest
+    @AfterMethod
     public void stopWebProxy()
         throws Exception
     {

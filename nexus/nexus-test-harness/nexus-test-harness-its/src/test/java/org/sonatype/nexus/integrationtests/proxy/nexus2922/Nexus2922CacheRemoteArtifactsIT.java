@@ -63,7 +63,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         try
         {
             this.downloadArtifactFromRepository( REPO_RELEASE_PROXY_REPO1, GAV1, "target/downloads" );
-            Assert.fail( "Should fail to downlo artifact" );
+            Assert.fail( "Should fail to download artifact" );
         }
         catch ( FileNotFoundException e )
         {
@@ -88,7 +88,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         try
         {
             this.downloadArtifactFromRepository( REPO_TEST_HARNESS_REPO, GAV1, "target/downloads" );
-            Assert.fail( "Should fail to downlo artifact" );
+            Assert.fail( "Should fail to download artifact" );
         }
         catch ( FileNotFoundException e )
         {
