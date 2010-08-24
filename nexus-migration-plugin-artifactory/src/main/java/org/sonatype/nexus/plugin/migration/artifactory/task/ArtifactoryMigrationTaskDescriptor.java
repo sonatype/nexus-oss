@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.tasks.descriptors.AbstractScheduledTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
-import org.sonatype.nexus.tasks.descriptors.properties.ScheduledTaskPropertyDescriptor;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "ArtifactoryMigration", description = "Artifactory Migration" )
 public class ArtifactoryMigrationTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    
+
     public static final String ID = "ArtifactoryMigrationTask";
 
     public String getId()
@@ -25,9 +25,9 @@ public class ArtifactoryMigrationTaskDescriptor
         return "Artifactory Migration";
     }
 
-    public List<ScheduledTaskPropertyDescriptor> getPropertyDescriptors()
+    public List<FormField> formFields()
     {
-        return new ArrayList<ScheduledTaskPropertyDescriptor>();
+        return new ArrayList<FormField>();
     }
 
     @Override
@@ -36,6 +36,4 @@ public class ArtifactoryMigrationTaskDescriptor
         return false;
     }
 
-    
-    
 }
