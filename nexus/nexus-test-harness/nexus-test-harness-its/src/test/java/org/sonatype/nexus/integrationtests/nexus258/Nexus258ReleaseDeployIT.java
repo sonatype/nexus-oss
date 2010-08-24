@@ -88,7 +88,7 @@ public class Nexus258ReleaseDeployIT
     {
 
         Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithPom", "1.0.0", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy

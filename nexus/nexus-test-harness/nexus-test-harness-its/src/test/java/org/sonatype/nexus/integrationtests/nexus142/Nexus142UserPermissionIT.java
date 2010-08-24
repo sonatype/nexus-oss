@@ -30,9 +30,10 @@ import org.testng.annotations.Test;
 public class Nexus142UserPermissionIT
     extends AbstractPrivilegeTest
 {
-	
+
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -63,7 +64,7 @@ public class Nexus142UserPermissionIT
         this.giveUserPrivilege( "test-user", "38" );
 
         // print out the users privs
-//        this.printUserPrivs( "test-user" );
+        // this.printUserPrivs( "test-user" );
 
         // now.... it should work...
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
@@ -142,7 +143,7 @@ public class Nexus142UserPermissionIT
         Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
-    
+
     @Test
     public void testReadPermission()
         throws IOException
@@ -198,8 +199,8 @@ public class Nexus142UserPermissionIT
         Assert.assertEquals( response.getStatus().getCode(), 403, "Response status: " );
 
     }
-    
-    @Test
+
+    @Test( dependsOnMethods = { "testCreatePermission", "testUpdatePermission", "testReadPermission" } )
     public void testDeletePermission()
         throws IOException
     {

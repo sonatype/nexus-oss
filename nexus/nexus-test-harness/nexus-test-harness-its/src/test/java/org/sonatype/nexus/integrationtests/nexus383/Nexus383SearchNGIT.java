@@ -30,6 +30,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -49,12 +50,13 @@ public class Nexus383SearchNGIT
 
     public Nexus383SearchNGIT()
     {
-        
+
     }
-    
+
     @BeforeClass
-    public void prepare(){
-    	this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    public void prepare()
+    {
+        this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @Override
@@ -62,7 +64,7 @@ public class Nexus383SearchNGIT
         throws Exception
     {
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_RELEASE_REPO, NEXUS_TEST_HARNESS_REPO2,
-            NEXUS_TEST_HARNESS_REPO );
+                                             NEXUS_TEST_HARNESS_REPO );
 
         TaskScheduleUtil.waitForAllTasksToStop();
 
@@ -87,7 +89,7 @@ public class Nexus383SearchNGIT
 
         // groupId
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "nexus383" );
-        Assert.assertEquals( results.getData().size(), 2  );
+        Assert.assertEquals( results.getData().size(), 2 );
 
         // 3. negative test
         results = getSearchMessageUtil().searchNGFor( "nexus-383" );
@@ -219,7 +221,8 @@ public class Nexus383SearchNGIT
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
-    @Test
+    @Test( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
+        "disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
     public void crossRepositorySearch()
         throws Exception
@@ -235,40 +238,40 @@ public class Nexus383SearchNGIT
 
         Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                new Date().getTime(), model.getName(), false, false, null, false, null );
+                     new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // Multi repository deploy
         getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http", deployUrl, pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
-            NEXUS_TEST_HARNESS_RELEASE_REPO );
+                                             NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         TaskScheduleUtil.waitForTasks();
 

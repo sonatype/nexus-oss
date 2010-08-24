@@ -26,29 +26,30 @@ import org.codehaus.plexus.util.IOUtil;
 
 /**
  * Abstract test case for nexus tests. It is customizing the context and helps with nexus configurations.
- *
+ * 
  * @author cstamas
  */
 public abstract class AbstractNexusTestCase
     extends org.sonatype.nexus.configuration.AbstractNexusTestCase
 {
     public static final String PROXY_SERVER_PORT = "proxy.server.port";
+
     public static final String SECURITY_XML_FILE = "security-xml-file";
-    
+
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
-        
+
         ctx.put( PROXY_SERVER_PORT, String.valueOf( allocatePort() ) );
         ctx.put( SECURITY_XML_FILE, new File( getConfHomeDir(), "security.xml" ).getAbsolutePath() );
     }
-    
+
     protected String getNexusSecurityConfiguration()
     {
         return getConfHomeDir().getAbsolutePath() + "/security.xml";
     }
-    
+
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {
