@@ -12,53 +12,46 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.testng.Assert;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 public class Nexus2922CacheRemoteArtifactsIT
     extends AbstractNexusProxyIntegrationTest
 {
-
-    @BeforeMethod 
-    public void enableSecurity()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-
     private static Gav GAV1;
 
     private static Gav GAV2;
-
-    @BeforeClass
-    public static void init()
-        throws IllegalArtifactCoordinateException
-    {
-        GAV1 = GavUtil.newGav( "nexus2922", "artifact", "1.0.0" );
-        GAV2 = GavUtil.newGav( "nexus2922", "artifact", "2.0.0" );
-    }
 
     @Override
     protected void runOnce()
         throws Exception
     {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
         settings.setSecurityAnonymousAccessEnabled( false );
         SettingsMessageUtil.save( settings );
     }
 
     public Nexus2922CacheRemoteArtifactsIT()
+        throws IllegalArtifactCoordinateException
     {
         super( "release-proxy-repo-1" );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+        GAV1 = GavUtil.newGav( "nexus2922", "artifact", "1.0.0" );
+        GAV2 = GavUtil.newGav( "nexus2922", "artifact", "2.0.0" );
+    }
+    
+    protected void clearCredentials()
+    {
+        TestContainer.getInstance().getTestContext().setUsername("");
+        TestContainer.getInstance().getTestContext().setPassword("");
     }
 
     @Test
     public void downloadNoPriv()
         throws IOException
     {
-        TestContainer.getInstance().getTestContext().setSecureTest( false );
-
         String msg = null;
+        clearCredentials();
 
         try
         {
@@ -81,9 +74,8 @@ public class Nexus2922CacheRemoteArtifactsIT
     public void downloadNoPrivFromProxy()
         throws IOException
     {
-        TestContainer.getInstance().getTestContext().setSecureTest( false );
-
         String msg = null;
+        clearCredentials();
 
         try
         {
