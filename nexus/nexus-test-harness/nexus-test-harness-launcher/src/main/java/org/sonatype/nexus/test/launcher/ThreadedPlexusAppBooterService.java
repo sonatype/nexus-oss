@@ -36,8 +36,13 @@ public class ThreadedPlexusAppBooterService
         System.setProperty( "plexus.appbooter.customizers",
                             "org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer,org.sonatype.nexus.NexusBooterCustomizer" );
 
+        ClassLoader systemClassLoader = this.launcher.getSystemClassLoader();
+
+        this.launcher.setSystemClassLoader( null );
         this.launcher.configure( new FileInputStream( classworldsConf ) );
         this.launcher.setAppMain( "org.sonatype.appbooter.PlexusAppBooter", "plexus.core" );
+
+        this.launcher.getMainRealm().importFrom( systemClassLoader, "org.codehaus.plexus.classworlds" );
     }
 
     public boolean isShutdown()
