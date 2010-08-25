@@ -5,18 +5,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.credential.AllowAllCredentialsMatcher;
-import org.jsecurity.authc.credential.CredentialsMatcher;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.SimpleAuthorizationInfo;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.subject.PrincipalCollection;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.subject.PrincipalCollection;
 
 public class PlexusConfiguredRealm
     extends AuthorizingRealm

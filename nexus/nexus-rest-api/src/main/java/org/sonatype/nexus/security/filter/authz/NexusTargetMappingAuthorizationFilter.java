@@ -20,7 +20,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
-import org.jsecurity.web.WebUtils;
+import org.apache.shiro.web.util.WebUtils;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RequestContext;
@@ -95,13 +95,13 @@ public class NexusTargetMappingAuthorizationFilter
 
         return rsr;
     }
-
+    
     @Override
-    protected Action getActionFromHttpVerb( ServletRequest request )
-    {
-        String action = ( (HttpServletRequest) request ).getMethod().toLowerCase();
-
-        if ( "put".equals( action ) )
+    protected String getHttpMethodAction(ServletRequest request) {
+        
+        String method = ((HttpServletRequest) request).getMethod().toLowerCase();
+            
+        if ( "put".equals( method ) )
         {
             // heavy handed thing
             // doing a LOCAL ONLY request to check is this exists?
@@ -112,12 +112,12 @@ public class NexusTargetMappingAuthorizationFilter
             catch ( ItemNotFoundException e )
             {
                 // the path does not exists, it is a CREATE
-                action = "post";
+                method = "post";
             }
             catch ( AccessDeniedException e )
             {
                 // no access for read, so chances are post or put doesnt matter
-                action = "post";
+                method = "post";
             }
             catch ( Exception e )
             {
@@ -126,11 +126,11 @@ public class NexusTargetMappingAuthorizationFilter
             }
 
             // the path exists, this is UPDATE
-            return super.getActionFromHttpVerb( action );
+            return super.getHttpMethodAction( method );
         }
         else
         {
-            return super.getActionFromHttpVerb( request );
+            return super.getHttpMethodAction( request );
         }
     }
 
@@ -152,7 +152,8 @@ public class NexusTargetMappingAuthorizationFilter
             }
         }
 
-        Action action = getActionFromHttpVerb( request );
+        String actionVerb = getHttpMethodAction( request );
+        Action action = Action.valueOf( actionVerb );
 
         if ( null == action )
         {

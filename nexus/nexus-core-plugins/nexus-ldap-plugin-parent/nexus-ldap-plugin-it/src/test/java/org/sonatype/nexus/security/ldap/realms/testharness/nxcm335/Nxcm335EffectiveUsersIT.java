@@ -102,6 +102,10 @@ public class Nxcm335EffectiveUsersIT
     {
         int defaultUserCount = this.doSearch( "", false, "default" ).size();
         defaultUserCount += this.doSearch( "", false, "Simple" ).size(); // the OSS ITs have a memory realm too
+        
+        // the xmlrealm tests bring in a couple too ( now that classpath scanning is enabled )
+        defaultUserCount += this.doSearch( "", false, "MockUserManagerA" ).size();
+        defaultUserCount += this.doSearch( "", false, "MockUserManagerB" ).size();
 
         // by default we should have 2 effective users ( using the developer role )
         List<PlexusUserResource> users = this.doSearch( "", false, "LDAP" );

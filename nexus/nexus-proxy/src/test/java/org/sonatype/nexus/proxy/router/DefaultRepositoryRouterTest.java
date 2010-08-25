@@ -8,10 +8,10 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.DefaultCRepository;
@@ -106,7 +106,7 @@ public class DefaultRepositoryRouterTest
         Assert.assertEquals( "repo1", collectionItem.list().iterator().next().getName() );
 
         // logout user
-        this.securitySystem.logout( subject.getPrincipals() );
+        this.securitySystem.logout( subject );
     }
 
     public void testRouterWithNoViewAccess()
@@ -124,7 +124,7 @@ public class DefaultRepositoryRouterTest
         Assert.assertEquals( "User should not have access to any repos", 0, collectionItem.list().size() );
 
         // logout user
-        this.securitySystem.logout( subject.getPrincipals() );
+        this.securitySystem.logout( subject );
     }
 
     public void testFilterOutNonExposedRepositories()
@@ -165,7 +165,7 @@ public class DefaultRepositoryRouterTest
         Assert.assertFalse( repoIds.contains( "repo5-notexposed-shadow" ) );
 
         // logout user
-        this.securitySystem.logout( subject.getPrincipals() );
+        this.securitySystem.logout( subject );
     }
 
     public void testFilterOutNonExposedGroups()
@@ -192,7 +192,7 @@ public class DefaultRepositoryRouterTest
         Assert.assertFalse( repoIds.contains( "repo5-notexposed-shadow" ) );
 
         // logout user
-        this.securitySystem.logout( subject.getPrincipals() );
+        this.securitySystem.logout( subject );
     }
 
     public void testFilterOutNonExposedShadows()
@@ -219,7 +219,7 @@ public class DefaultRepositoryRouterTest
         Assert.assertFalse( repoIds.contains( "group3-notexposed" ) );
 
         // logout user
-        this.securitySystem.logout( subject.getPrincipals() );
+        this.securitySystem.logout( subject );
     }
 
     private Repository buildRepository( String repoId, boolean exposed )

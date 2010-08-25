@@ -28,8 +28,8 @@ import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jsecurity.realm.ldap.AbstractLdapRealm;
-import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.apache.shiro.realm.ldap.AbstractLdapRealm;
+import org.apache.shiro.realm.ldap.LdapContextFactory;
 
 /**
  * <p>Default implementation of {@link LdapContextFactory} that can be configured or extended to

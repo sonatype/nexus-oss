@@ -14,6 +14,7 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.FileUtils;
@@ -28,6 +29,13 @@ import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";

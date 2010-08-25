@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.StringWriter;
 import java.util.TimeZone;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
@@ -33,6 +34,12 @@ import org.sonatype.security.configuration.source.SecurityConfigurationSource;
 public class DefaultApplicationConfigurationUpgraderTest
     extends AbstractNexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
 
     protected ApplicationConfigurationUpgrader configurationUpgrader;
 
@@ -201,11 +208,11 @@ public class DefaultApplicationConfigurationUpgraderTest
         TimeZone.setDefault( TimeZone.getTimeZone( "UTC" ) );
 
         copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/nexus-103.xml",
-                                 getNexusConfiguration() );
+            getNexusConfiguration() );
 
         // trick: copying by nexus.xml the tasks.xml too
-        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml",
-                                 new File( new File( getNexusConfiguration() ).getParentFile(), "tasks.xml" ) );
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-1/tasks.xml", new File( new File(
+            getNexusConfiguration() ).getParentFile(), "tasks.xml" ) );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -228,7 +235,7 @@ public class DefaultApplicationConfigurationUpgraderTest
     {
         // same as above, but we have no tasks.xml
         copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/103-2/nexus-103.xml",
-                                 getNexusConfiguration() );
+            getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -273,7 +280,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus1710/nexus.xml",
-                                 getNexusConfiguration() );
+            getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -322,7 +329,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
         copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml",
-                                 getNexusConfiguration() );
+            getNexusConfiguration() );
 
         Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
 
@@ -330,7 +337,7 @@ public class DefaultApplicationConfigurationUpgraderTest
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-108-with-mirrors.xml", configuration );
     }
-    
+
     public void testFrom108()
         throws Exception
     {

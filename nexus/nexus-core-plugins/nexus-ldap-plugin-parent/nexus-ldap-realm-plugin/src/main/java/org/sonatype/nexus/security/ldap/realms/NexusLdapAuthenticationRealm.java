@@ -7,7 +7,7 @@
 package org.sonatype.nexus.security.ldap.realms;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.jsecurity.realm.Realm;
+import org.apache.shiro.realm.Realm;
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
 
 @Component( role = Realm.class, hint = NexusLdapAuthenticationRealm.ROLE, description = "OSS LDAP Authentication Realm")
@@ -17,10 +17,4 @@ public class NexusLdapAuthenticationRealm
 
     public static final String ROLE = "NexusLdapAuthenticationRealm";
     
-    @Override
-    public String getName()
-    {
-        return ROLE;
-    }
-
 }

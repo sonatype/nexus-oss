@@ -16,7 +16,7 @@ package org.sonatype.nexus.configuration;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.jsecurity.subject.Subject;
+import org.apache.shiro.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**

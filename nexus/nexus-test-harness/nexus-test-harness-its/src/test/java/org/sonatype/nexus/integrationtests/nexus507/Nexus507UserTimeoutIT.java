@@ -36,7 +36,7 @@ public class Nexus507UserTimeoutIT
     {
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         RoleResource role = roleUtil.getRole( "test-admin" );
-        Assert.assertEquals( "Invalid test-admin role timeout", 1, role.getSessionTimeout() );
+        Assert.assertNotNull( "Invalid test-admin role timeout", role );
     }
 
     @Test

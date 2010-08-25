@@ -30,7 +30,7 @@
 		</component>
 
 		<component>
-		    <role>org.jsecurity.realm.Realm</role>
+		    <role>org.apache.shiro.realm.Realm</role>
 		    <implementation>org.sonatype.nexus.proxy.security.PlexusConfiguredRealm</implementation>
 		    <configuration>
 		    	<userPrivilageMap>

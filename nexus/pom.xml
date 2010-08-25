@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -140,7 +139,7 @@
   <properties>
     <plexus.appbooter.version>2.1.1-SNAPSHOT</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.8</plexus-security.version>
+    <plexus-security.version>2.0.0-SNAPSHOT</plexus-security.version>
     <slf4j.version>1.5.6</slf4j.version>
     <nexus.indexer.version>3.0.4-SNAPSHOT</nexus.indexer.version>
     <nexus.indexer.artifact.version>1.0.1-SNAPSHOT</nexus.indexer.artifact.version>
@@ -157,7 +156,7 @@
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
-    <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
+    <shiro.version>1.0.0-incubating</shiro.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.3</plexus-ehcache.version>
@@ -406,7 +405,7 @@
         </exclusions>
       </dependency>
 
-      <!-- JSecurity -->
+      <!-- shiro -->
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
@@ -420,12 +419,24 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.security</groupId>
-        <artifactId>security-system</artifactId>
+        <artifactId>security-web</artifactId>
         <version>${plexus-security.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+        <scope>compile</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -478,9 +489,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.jsecurity</groupId>
-        <artifactId>jsecurity</artifactId>
-        <version>${jsecurity.version}</version>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${shiro.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1010,8 +1021,7 @@
             <goals>
               <goal>enforce</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the 
-              way of m2eclipse. <phase>compile</phase> -->
+            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
             <id>enforce</id>
             <configuration>
               <rules>
@@ -1047,6 +1057,12 @@
                     dependency
                     that is plexus component made with older plexus container.
                   </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
                 </bannedDependencies>
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
@@ -1284,8 +1300,7 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <!-- Skin disabled, until we come up with a proper skin -->
-              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0-SNAPSHOT</version> 
-                </dependency -->
+              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0-SNAPSHOT</version> </dependency -->
               <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>

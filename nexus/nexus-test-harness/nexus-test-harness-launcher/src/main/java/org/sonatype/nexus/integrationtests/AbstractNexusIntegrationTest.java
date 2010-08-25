@@ -255,8 +255,8 @@ public abstract class AbstractNexusIntegrationTest
         SLF4JBridgeHandler.install();
 
         // redirect filePrefs
-        FilePreferencesFactory.setPreferencesFile( ITAppBooterCustomizer.getFilePrefsFile( new File( getNexusBaseDir() ),
-                                                                                           getTestId() ) );
+        FilePreferencesFactory.setPreferencesFile( ITAppBooterCustomizer.getFilePrefsFile(
+            new File( getNexusBaseDir() ), getTestId() ) );
     }
 
     // == Test "lifecycle" (@Before/@After...)
@@ -326,8 +326,9 @@ public abstract class AbstractNexusIntegrationTest
                 }
 
                 // the validation needs to happen before we enable security it triggers an upgrade.
-                getNexusConfigUtil().enableSecurity( TestContainer.getInstance().getTestContext().isSecureTest()
-                                                         || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
+                getNexusConfigUtil().enableSecurity(
+                    TestContainer.getInstance().getTestContext().isSecureTest()
+                        || Boolean.valueOf( System.getProperty( "secure.test" ) ) );
 
                 // start nexus
                 startNexus();
@@ -438,7 +439,7 @@ public abstract class AbstractNexusIntegrationTest
         properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
         properties.putIfNew( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
         properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
-                             "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
         File testMigrationLog = new File( nexusLogDir, getTestId() + "/migration.log" );
         testMigrationLog.getParentFile().mkdirs();
@@ -451,12 +452,12 @@ public abstract class AbstractNexusIntegrationTest
 
         properties.putIfNew( "log4j.appender.migrationlogfile", "org.apache.log4j.DailyRollingFileAppender" );
         properties.putIfNew( "log4j.appender.migrationlogfile.File",
-                             testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
+            testMigrationLog.getAbsolutePath().replace( '\\', '/' ) );
         properties.putIfNew( "log4j.appender.migrationlogfile.Append", "true" );
         properties.putIfNew( "log4j.appender.migrationlogfile.DatePattern", "'.'yyyy-MM-dd" );
         properties.putIfNew( "log4j.appender.migrationlogfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
         properties.putIfNew( "log4j.appender.migrationlogfile.layout.ConversionPattern",
-                             "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
+            "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
     }
 
@@ -625,7 +626,7 @@ public abstract class AbstractNexusIntegrationTest
 
         Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                     new Date().getTime(), model.getName(), false, false, null, false, null );
+                new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // the Restlet Client does not support multipart forms:
         // http://restlet.tigris.org/issues/show_bug.cgi?id=71
@@ -650,29 +651,29 @@ public abstract class AbstractNexusIntegrationTest
             if ( artifactSha1.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactSha1,
-                                                  this.getRelitiveArtifactPath( gav ) + ".sha1" );
+                    this.getRelitiveArtifactPath( gav ) + ".sha1" );
             }
             if ( artifactMd5.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactMd5,
-                                                  this.getRelitiveArtifactPath( gav ) + ".md5" );
+                    this.getRelitiveArtifactPath( gav ) + ".md5" );
             }
             if ( artifactAsc.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactAsc,
-                                                  this.getRelitiveArtifactPath( gav ) + ".asc" );
+                    this.getRelitiveArtifactPath( gav ) + ".asc" );
             }
 
             if ( artifactFile.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, artifactFile,
-                                                  this.getRelitiveArtifactPath( gav ) );
+                    this.getRelitiveArtifactPath( gav ) );
             }
 
             if ( pomSha1.exists() )
             {
                 getDeployUtils().deployWithWagon( wagonHint, deployUrl, pomSha1,
-                                                  this.getRelitivePomPath( gav ) + ".sha1" );
+                    this.getRelitivePomPath( gav ) + ".sha1" );
             }
             if ( pomMd5.exists() )
             {
@@ -956,9 +957,8 @@ public abstract class AbstractNexusIntegrationTest
             throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
         }
         Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-                                 + response.getRequest().getResourceRef().toString() + " \n Error: "
-                                 + status.getDescription(), 301,
-                             status.getCode() );
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
+            status.getCode() );
 
         Reference redirectRef = response.getRedirectRef();
         Assert.assertNotNull( "Snapshot download should redirect to a new file "
@@ -1010,7 +1010,7 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         return this.downloadArtifact( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+            gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String groupId, String artifact, String version, String type, String classifier,
@@ -1018,25 +1018,23 @@ public abstract class AbstractNexusIntegrationTest
         throws IOException
     {
         return this.downloadArtifact( this.getNexusTestRepoUrl(), groupId, artifact, version, type, classifier,
-                                      targetDirectory );
+            targetDirectory );
     }
 
     protected File downloadArtifactFromRepository( String repoId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + repoId
-                                          + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                      gav.getExtension(), gav.getClassifier(),
-                                      targetDirectory );
+            + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), gav.getClassifier(),
+            targetDirectory );
     }
 
     protected File downloadArtifactFromGroup( String groupId, Gav gav, String targetDirectory )
         throws IOException
     {
         return this.downloadArtifact( AbstractNexusIntegrationTest.nexusBaseUrl + GROUP_REPOSITORY_RELATIVE_URL
-                                          + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(),
-                                      gav.getExtension(),
-                                      gav.getClassifier(), targetDirectory );
+            + groupId + "/", gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+            gav.getClassifier(), targetDirectory );
     }
 
     protected File downloadArtifact( String baseUrl, String groupId, String artifact, String version, String type,
@@ -1216,6 +1214,7 @@ public abstract class AbstractNexusIntegrationTest
 
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
+        configuration.setClassPathScanning( true );
     }
 
     private PlexusContainer setupContainer( Class<?> baseClass )
