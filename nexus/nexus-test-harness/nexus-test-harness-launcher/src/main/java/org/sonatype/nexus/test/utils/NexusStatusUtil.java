@@ -14,15 +14,15 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.File;
-
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
 import org.testng.Assert;
@@ -35,8 +35,6 @@ import com.thoughtworks.xstream.XStream;
 public class NexusStatusUtil
 {
     protected static Logger log = Logger.getLogger( NexusStatusUtil.class );
-
-    private static final String STATUS_STARTED = "STARTED";
 
     private ThreadedPlexusAppBooterService APP_BOOTER_SERVICE = null;
 
@@ -93,18 +91,10 @@ public class NexusStatusUtil
                 getAppBooterService( testId ).start();
             }
 
-            // log.debug( "wait for Nexus start, attempt: " + i );
-            try
+            if ( isNexusRunning() )
             {
-                if ( isNexusRunning() )
-                {
-                    // nexus started
-                    return;
-                }
-            }
-            catch ( NexusIllegalStateException e )
-            {
-                // let's give it more time
+                // nexus started
+                return;
             }
 
             try
@@ -142,10 +132,6 @@ public class NexusStatusUtil
         
         try
         {
-            // NOTE: We can't kill active tasks, we need to wait for them to stop
-            TestContainer.getInstance().getTestContext().useAdminForRequests();
-            TaskScheduleUtil.waitForAllTasksToStop();
-
             try
             {
                 appBooterService.stop();
@@ -174,61 +160,54 @@ public class NexusStatusUtil
         }
     }
 
-    public boolean isNexusAlive()
+    public boolean isNexusRunning()
     {
-        return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort,
-            AbstractNexusIntegrationTest.nexusApplicationPort } );
-    }
-
-    public boolean isNexusControllerPortAlive()
-    {
-        return isNexusAlive( new int[] { AbstractNexusIntegrationTest.nexusControlPort } );
-    }
-
-    public boolean isNexusAlive( int[] ports )
-    {
-        ServerSocket ss = null;
-        for ( int i = 0; i < ports.length; i++ )
+        Socket sock = null;
+        try
         {
-            int port = ports[i];
-            try
-            {
-                ss = new ServerSocket( port );
-            }
-            catch ( IOException e )
-            {
-                // ok, port in use, means nexus is active
-                return true;
-            }
-            finally
+            sock = new Socket("localhost", AbstractNexusIntegrationTest.nexusApplicationPort);
+        }
+        catch ( UnknownHostException e1 )
+        {
+            log.debug( "nexus application port isn't open." );
+            return false;
+        }
+        catch ( IOException e1 )
+        {
+            log.debug( "nexus application port isn't open." );
+            return false;
+        }
+        finally
+        {
+            if ( sock != null )
             {
                 try
                 {
-                    if ( ss != null )
-                    {
-                        ss.close();
-                    }
+                    sock.close();
                 }
                 catch ( IOException e )
                 {
-                    // just closing
                 }
             }
         }
-
-        return false;
-    }
-
-    public boolean isNexusRunning()
-        throws NexusIllegalStateException
-    {
-        return isNexusAlive() && ( STATUS_STARTED.equals( getNexusStatus().getData().getState() ) );
+        
+        try
+        {
+            getNexusStatus();
+            log.debug( "nexus is running." );
+            return true;
+        }
+        catch ( NexusIllegalStateException e )
+        {
+            log.debug( "nexus application port is open, but not yet responding to requests." );
+            return false;
+        }
     }
 
     public boolean isNexusStopped()
         throws NexusIllegalStateException
     {
-        return !isNexusAlive();
+        return !isNexusRunning();
     }
 
     public boolean waitForStop()
@@ -242,7 +221,7 @@ public class NexusStatusUtil
         for ( int i = 0; i < totalWaitTime / pollingFreq; i++ )
         {
             log.debug( "wait for Nexus stop, attempt: " + i );
-            if ( !isNexusAlive() )
+            if ( !isNexusRunning() )
             {
                 // nexus stopped!
                 return true;
