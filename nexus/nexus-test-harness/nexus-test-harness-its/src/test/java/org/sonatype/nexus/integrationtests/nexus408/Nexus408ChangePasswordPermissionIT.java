@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus408;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -27,12 +29,12 @@ import org.testng.annotations.Test;
 public class Nexus408ChangePasswordPermissionIT
     extends AbstractPrivilegeTest
 {
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
-    @Test
+    @Test(groups = SECURITY)
     public void withPermission()
         throws Exception
     {
@@ -52,7 +54,7 @@ public class Nexus408ChangePasswordPermissionIT
 
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void withoutPermission()
         throws Exception
     {

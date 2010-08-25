@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1239;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +34,7 @@ public class Nexus1239UserSearchPermissionIT
     extends AbstractPrivilegeTest
 {
 
-    @Test
+    @Test(groups = SECURITY)
     public void userExactSearchTest()
         throws IOException
     {
@@ -60,7 +62,7 @@ public class Nexus1239UserSearchPermissionIT
         Assert.assertEquals( "default", role.getSource() );
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void userSearchTest()
         throws IOException
     {
@@ -85,7 +87,7 @@ public class Nexus1239UserSearchPermissionIT
         Assert.assertTrue( userIds.contains( "anonymous" ) );
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void emptySearchTest()
         throws IOException
     {

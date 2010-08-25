@@ -2,6 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus3011;
 
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.collection.IsCollectionContaining.hasItems;
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 
 import org.hamcrest.MatcherAssert;
 import org.restlet.data.MediaType;
@@ -35,7 +36,7 @@ public class Nexus3011DeletePrivilegeIT
 
     private static final String[] PRIVS = new String[] { READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID };
 
-    @Test
+    @Test(groups = SECURITY)
     public void deletePriv()
         throws Exception
     {

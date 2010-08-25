@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus531;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.IOException;
 
 import org.restlet.data.Method;
@@ -31,11 +33,11 @@ import org.testng.annotations.Test;
 public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
 {
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
-    @Test
+    @Test(groups = SECURITY)
     public void testCreatePermission()
         throws IOException
     {
@@ -85,7 +87,7 @@ public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
 
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void testUpdatePermission()
         throws IOException
     {
@@ -143,7 +145,7 @@ public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
 
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void testReadPermission()
         throws IOException
     {
@@ -202,7 +204,7 @@ public class Nexus531RepositoryCrudPermissionIT extends AbstractPrivilegeTest
     }
 
 
-    @Test
+    @Test(groups = SECURITY)
     public void testDeletePermission()
         throws IOException
     {

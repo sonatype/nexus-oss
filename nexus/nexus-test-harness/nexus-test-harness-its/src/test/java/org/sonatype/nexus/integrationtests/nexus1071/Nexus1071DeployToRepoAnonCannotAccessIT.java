@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.File;
 
 import org.apache.maven.it.VerificationException;
@@ -30,12 +32,12 @@ import org.testng.annotations.Test;
 public class Nexus1071DeployToRepoAnonCannotAccessIT
     extends AbstractMavenNexusIT
 {
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void deployRepeatly()
         throws Exception
     {
@@ -73,7 +75,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void deploySnapshot()
         throws Exception
     {
@@ -98,7 +100,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void deployToAnotherRepo()
         throws Exception
     {
@@ -122,7 +124,7 @@ public class Nexus1071DeployToRepoAnonCannotAccessIT
         }
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void anonDeploy()
         throws Exception
     {

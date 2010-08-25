@@ -12,6 +12,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus2922CacheRemoteArtifactsIT
@@ -30,12 +31,16 @@ public class Nexus2922CacheRemoteArtifactsIT
         settings.setSecurityAnonymousAccessEnabled( false );
         SettingsMessageUtil.save( settings );
     }
+    
+    @BeforeClass
+    public void enableSecurity(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     public Nexus2922CacheRemoteArtifactsIT()
         throws IllegalArtifactCoordinateException
     {
         super( "release-proxy-repo-1" );
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
         GAV1 = GavUtil.newGav( "nexus2922", "artifact", "1.0.0" );
         GAV2 = GavUtil.newGav( "nexus2922", "artifact", "2.0.0" );
     }

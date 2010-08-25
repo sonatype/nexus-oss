@@ -11,6 +11,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,7 +34,12 @@ public class Nexus2351DisableRedeployMaven2IT
     }
 
     public Nexus2351DisableRedeployMaven2IT()
-        throws ComponentLookupException
+    {
+
+    }
+
+    @BeforeClass
+    public void init() throws ComponentLookupException
     {
         this.repoUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
@@ -50,19 +56,19 @@ public class Nexus2351DisableRedeployMaven2IT
         this.createM2Repo( repoId, RepositoryWritePolicy.ALLOW_WRITE, RepositoryPolicy.RELEASE );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar" );
 
         // now test checksums
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
+                                          "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseAllowRedeploy-1.0.0.jar.md5" );
     }
 
     @Test
@@ -74,16 +80,16 @@ public class Nexus2351DisableRedeployMaven2IT
         this.createM2Repo( repoId, RepositoryWritePolicy.ALLOW_WRITE_ONCE, RepositoryPolicy.RELEASE );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
+                                          "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
 
         // checksum should work
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar.md5" );
+                                          "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar.md5" );
 
         try
         {
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
+                                              "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
             Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
@@ -94,7 +100,7 @@ public class Nexus2351DisableRedeployMaven2IT
         try
         {
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
+                                              "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar" );
             Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
@@ -105,7 +111,7 @@ public class Nexus2351DisableRedeployMaven2IT
         try
         {
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                         "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar.md5" );
+                                              "testM2Repo/group/testM2ReleaseNoRedeploy/1.0.0/testM2ReleaseNoRedeploy-1.0.0.jar.md5" );
             Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
@@ -123,12 +129,12 @@ public class Nexus2351DisableRedeployMaven2IT
         this.createM2Repo( repoId, RepositoryWritePolicy.ALLOW_WRITE_ONCE, RepositoryPolicy.RELEASE );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.0/testM2ReleaseNoRedeployMultipleVersions-1.0.0.jar" );
+                                          "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.0/testM2ReleaseNoRedeployMultipleVersions-1.0.0.jar" );
 
         try
         {
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.0/testM2ReleaseNoRedeployMultipleVersions-1.0.0.jar" );
+                                              "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.0/testM2ReleaseNoRedeployMultipleVersions-1.0.0.jar" );
             Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
@@ -137,12 +143,12 @@ public class Nexus2351DisableRedeployMaven2IT
         }
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.1/testM2ReleaseNoRedeployMultipleVersions-1.0.1.jar" );
+                                          "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.1/testM2ReleaseNoRedeployMultipleVersions-1.0.1.jar" );
 
         try
         {
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.1/testM2ReleaseNoRedeployMultipleVersions-1.0.1.jar" );
+                                              "testM2Repo/group/testM2ReleaseNoRedeployMultipleVersions/1.0.1/testM2ReleaseNoRedeployMultipleVersions-1.0.1.jar" );
             Assert.fail( "expected TransferFailedException" );
         }
         catch ( TransferFailedException e )
@@ -164,7 +170,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2ReleaseReadOnly/1.0.0/testM2ReleaseReadOnly-1.0.0.jar" );
+                                              "testM2Repo/group/testM2ReleaseReadOnly/1.0.0/testM2ReleaseReadOnly-1.0.0.jar" );
             Assert.fail( "expected TransferFailedException" );
 
         }
@@ -177,7 +183,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                         "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseReadOnly-1.0.0.jar.md5" );
+                                              "testM2Repo/group/testM2ReleaseAllowRedeploy/1.0.0/testM2ReleaseReadOnly-1.0.0.jar.md5" );
             Assert.fail( "expected TransferFailedException" );
 
         }
@@ -197,33 +203,33 @@ public class Nexus2351DisableRedeployMaven2IT
         this.createM2Repo( repoId, RepositoryWritePolicy.ALLOW_WRITE, RepositoryPolicy.SNAPSHOT );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-216.jar" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-216.jar" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-217.jar" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-217.jar" );
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-218.jar" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-218.jar" );
 
         // now for the MD5
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-217.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-217.jar.md5" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-218.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-20090729.054915-218.jar.md5" );
 
         // now for just the -SNAPSHOT
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar" );
 
         // MD5
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar.md5" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotAllowRedeploy/1.0.0-SNAPSHOT/testM2SnapshotAllowRedeploy-SNAPSHOT.jar.md5" );
 
     }
 
@@ -236,25 +242,25 @@ public class Nexus2351DisableRedeployMaven2IT
         this.createM2Repo( repoId, RepositoryWritePolicy.ALLOW_WRITE_ONCE, RepositoryPolicy.SNAPSHOT );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-218.jar" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-218.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-219.jar" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-219.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-220.jar" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-20090729.054915-220.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
 
         getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                     "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
+                                          "testM2Repo/group/testM2SnapshotNoRedeploy/1.0.0-SNAPSHOT/testM2SnapshotNoRedeploy-SNAPSHOT.jar.md5" );
     }
 
     @Test
@@ -270,7 +276,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar" );
+                                              "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar" );
             Assert.fail( "expected TransferFailedException" );
 
         }
@@ -282,7 +288,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                         "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar.md5" );
+                                              "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-20090729.054915-218.jar.md5" );
             Assert.fail( "expected TransferFailedException" );
 
         }
@@ -294,7 +300,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifactMD5,
-                                         "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar.md5" );
+                                              "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar.md5" );
             Assert.fail( "expected TransferFailedException" );
 
         }
@@ -306,7 +312,7 @@ public class Nexus2351DisableRedeployMaven2IT
         {
 
             getDeployUtils().deployWithWagon( "http", this.getRepositoryUrl( repoId ), artifact,
-                                         "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar" );
+                                              "testM2Repo/group/testM2SnapshotReadOnly/1.0.0-SNAPSHOT/testM2SnapshotReadOnly-SNAPSHOT.jar" );
             Assert.fail( "expected TransferFailedException" );
 
         }

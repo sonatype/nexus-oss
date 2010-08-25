@@ -23,16 +23,17 @@ public class Nexus531RepositoryCrudXMLIT
     extends Nexus531RepositoryCrudJsonIT
 {
     public Nexus531RepositoryCrudXMLIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
-        this.messageUtil = new RepositoryMessageUtil(
-            this,
-            this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            getRepositoryTypeRegistry() );
-    }
-    @BeforeClass
-    public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+        this.messageUtil =
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
+                                       getRepositoryTypeRegistry() );
     }
 }

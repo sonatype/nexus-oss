@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
-import java.io.File;
 import static org.testng.Assert.assertTrue;
+import static org.sonatype.nexus.integrationtests.ITGroups.*;
+import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -38,7 +39,7 @@ public class Nexus1071AnonAccessIT
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void downloadArtifactFromPublicGroup()
         throws Exception
     {
@@ -58,7 +59,7 @@ public class Nexus1071AnonAccessIT
 
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void downloadArtifactFromInternalRepo()
         throws Exception
     {

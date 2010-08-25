@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus175;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.File;
 import java.util.Date;
 
@@ -39,12 +41,12 @@ public class Nexus175SnapshotDeployWrongPasswordIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void deployWithMaven()
         throws Exception
     {

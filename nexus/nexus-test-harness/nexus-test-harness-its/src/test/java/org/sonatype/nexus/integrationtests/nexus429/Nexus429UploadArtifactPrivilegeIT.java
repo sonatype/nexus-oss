@@ -13,11 +13,13 @@
  */
 package org.sonatype.nexus.integrationtests.nexus429;
 
+
 import java.io.File;
 import java.util.Date;
 
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import static org.sonatype.nexus.integrationtests.ITGroups.*;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -26,6 +28,7 @@ import org.testng.annotations.Test;
 /**
  * Test the privilege for manual artifact upload.
  */
+@Test(groups = SECURITY)
 public class Nexus429UploadArtifactPrivilegeIT
     extends AbstractPrivilegeTest
 {
@@ -36,12 +39,11 @@ public class Nexus429UploadArtifactPrivilegeIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
     public void deployPrivWithPom()
         throws Exception
     {
@@ -81,7 +83,6 @@ public class Nexus429UploadArtifactPrivilegeIT
         Assert.assertEquals( status, 201, "Status should have been 201" );
     }
 
-    @Test
     public void deployPrivWithGav()
         throws Exception
     {

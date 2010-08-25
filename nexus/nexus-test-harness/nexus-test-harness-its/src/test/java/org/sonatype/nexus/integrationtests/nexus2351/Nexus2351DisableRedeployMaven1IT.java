@@ -12,6 +12,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -26,8 +27,12 @@ public class Nexus2351DisableRedeployMaven1IT
     private File artifactMD5;
 
     public Nexus2351DisableRedeployMaven1IT()
-        throws ComponentLookupException
     {
+        
+    }
+    
+    @BeforeClass
+    public void init() throws ComponentLookupException{
         this.repoUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
                                        this.getRepositoryTypeRegistry() );

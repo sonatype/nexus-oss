@@ -14,7 +14,6 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -90,7 +89,7 @@ public abstract class AbstractPrivilegeTest
         }
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void enableSecurity(){
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );    	
@@ -111,7 +110,7 @@ public abstract class AbstractPrivilegeTest
         this.groupUtil = new GroupMessageUtil( this,xstream, MediaType.APPLICATION_XML );
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -320,7 +319,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @Override
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void afterTest()
         throws Exception
     {

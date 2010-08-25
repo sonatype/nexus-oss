@@ -20,6 +20,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus2351DisableRedeployUploadIT
@@ -29,6 +30,13 @@ public class Nexus2351DisableRedeployUploadIT
     private RepositoryMessageUtil repoUtil = null;
 
     public Nexus2351DisableRedeployUploadIT()
+        throws ComponentLookupException
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
         this.repoUtil =
@@ -63,16 +71,18 @@ public class Nexus2351DisableRedeployUploadIT
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( firstDeployDate.before( secondDeployDate ), "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: "
-                + secondDeployDate );
+        Assert.assertTrue( firstDeployDate.before( secondDeployDate ),
+                           "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: "
+                               + secondDeployDate );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
 
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ), "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
-                + secondDeployDate );
+        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ),
+                           "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
+                               + secondDeployDate );
 
         this.deployWithMavenExpectSuccess( mavenProject2, repoId );
         metadata = this.downloadMetadataFromRepository( gav2, repoId );
@@ -107,16 +117,18 @@ public class Nexus2351DisableRedeployUploadIT
         Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( firstDeployDate.before( secondDeployDate ), "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: "
-                + secondDeployDate );
+        Assert.assertTrue( firstDeployDate.before( secondDeployDate ),
+                           "deploy date was not updated, or is incorrect, first: " + firstDeployDate + " second: "
+                               + secondDeployDate );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
 
         Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         metadata = this.downloadMetadataFromRepository( gav, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
-        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ), "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
-                + secondDeployDate );
+        Assert.assertTrue( secondDeployDate.before( thirdDeployDate ),
+                           "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
+                               + secondDeployDate );
     }
 
     @Test

@@ -17,6 +17,7 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 public class Nexus2556BrandNewRepositorySearchIT
@@ -26,6 +27,12 @@ public class Nexus2556BrandNewRepositorySearchIT
     private RepositoryMessageUtil repoUtil;
 
     public Nexus2556BrandNewRepositorySearchIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
         this.repoUtil =

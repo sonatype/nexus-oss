@@ -259,7 +259,7 @@ public abstract class AbstractNexusIntegrationTest
 
     // == Test "lifecycle" (@Before/@After...)
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public static void staticOncePerClassSetUp()
         throws Exception
     {
@@ -281,7 +281,7 @@ public abstract class AbstractNexusIntegrationTest
      * 
      * @throws Exception
      */
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void oncePerClassSetUp()
         throws Exception
     {
@@ -341,7 +341,7 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void afterTest()
         throws Exception
     {
@@ -349,7 +349,7 @@ public abstract class AbstractNexusIntegrationTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
     public static void oncePerClassTearDown()
         throws Exception
     {

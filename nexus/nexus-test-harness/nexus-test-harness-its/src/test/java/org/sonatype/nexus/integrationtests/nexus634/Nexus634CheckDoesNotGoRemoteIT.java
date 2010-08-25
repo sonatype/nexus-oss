@@ -16,6 +16,7 @@ package org.sonatype.nexus.integrationtests.nexus634;
 import java.io.File;
 
 import org.apache.commons.io.FileUtils;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
@@ -27,6 +28,7 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -53,10 +55,14 @@ public class Nexus634CheckDoesNotGoRemoteIT
     {
         super();
 
+    }
+    
+    @BeforeClass
+    public void init() throws ComponentLookupException{
         this.localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
         this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
         this.repositoryMessageUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );        
     }
 
     @BeforeMethod

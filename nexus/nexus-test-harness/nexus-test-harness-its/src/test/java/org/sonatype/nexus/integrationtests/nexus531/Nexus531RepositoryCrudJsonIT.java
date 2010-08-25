@@ -45,14 +45,22 @@ public class Nexus531RepositoryCrudJsonIT
     protected RepositoryMessageUtil messageUtil;
 
     public Nexus531RepositoryCrudJsonIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
         this.messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
+                                       getRepositoryTypeRegistry() );
     }
-    
+
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -231,10 +239,12 @@ public class Nexus531RepositoryCrudJsonIT
                 String storageURL =
                     repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
                                     : repo.getOverrideLocalStorageUrl();
-                    
+
                 storageURL = storageURL.endsWith( "/" ) ? storageURL : storageURL + "/";
-                String effectiveLocalStorage = listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl() : listRepo.getEffectiveLocalStorageUrl() + "/";
-                    
+                String effectiveLocalStorage =
+                    listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl()
+                                    : listRepo.getEffectiveLocalStorageUrl() + "/";
+
                 Assert.assertEquals( storageURL, effectiveLocalStorage );
             }
 
@@ -257,7 +267,8 @@ public class Nexus531RepositoryCrudJsonIT
             }
             else
             {
-                M2LayoutedM1ShadowRepositoryConfiguration cShadow = getNexusConfigUtil().getRepoShadow( listRepo.getId() );
+                M2LayoutedM1ShadowRepositoryConfiguration cShadow =
+                    getNexusConfigUtil().getRepoShadow( listRepo.getId() );
 
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );
