@@ -1,14 +1,14 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.security.DefaultSecurityConfigConvertor.TargetSuite;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 
 public class SecurityConfigConvertorRequest
 {
@@ -24,7 +24,7 @@ public class SecurityConfigConvertorRequest
     private boolean resolvePermission = true;
 
     // converted users
-    private List<SecurityUser> users = new ArrayList<SecurityUser>();
+    private Map<CUser, CUserRoleMapping> users = new LinkedHashMap<CUser, CUserRoleMapping>();
 
     // Mapping between the target id and target suite
     private Map<String, TargetSuite> mapping = new HashMap<String, TargetSuite>();
@@ -71,7 +71,7 @@ public class SecurityConfigConvertorRequest
         this.resolvePermission = resolvePermission;
     }
 
-    public List<SecurityUser> getMigratedUsers()
+    public Map<CUser, CUserRoleMapping> getMigratedUsers()
     {
         return users;
     }

@@ -23,8 +23,8 @@
 
   <properties>
     <plexus.version>1.2.1</plexus.version>
-    <spice-inject-plexus.version>1.3.3</spice-inject-plexus.version>
     <nexus.version>1.7.3-SNAPSHOT</nexus.version>
+    <spice-inject.version>1.3.3-SNAPSHOT</spice-inject.version>
   </properties>
 
   <dependencyManagement>
@@ -48,11 +48,11 @@
           </exclusion>
         </exclusions>
       </dependency>
-      
+
       <dependency>
         <groupId>org.sonatype.spice</groupId>
         <artifactId>spice-inject-plexus</artifactId>
-        <version>${spice-inject-plexus.version}</version>
+        <version>${spice-inject.version}</version>
         <scope>provided</scope>
       </dependency>
 
@@ -61,6 +61,36 @@
 
   <build>
     <plugins>
+      <plugin>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>1.0-alpha-4</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <id>enforce</id>
+            <configuration>
+              <rules>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>org.codehaus.plexus:plexus-container-default:*</exclude>
+                  </excludes>
+                  <message>The Plexus Container is banned, use org.sonatype.spice:spice-inject-plexus. 
+                  </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
+                </bannedDependencies>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
