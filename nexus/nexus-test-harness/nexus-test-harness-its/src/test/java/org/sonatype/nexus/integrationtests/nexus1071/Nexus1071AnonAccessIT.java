@@ -34,7 +34,7 @@ public class Nexus1071AnonAccessIT
     extends AbstractPrivilegeTest
 {
 	
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
