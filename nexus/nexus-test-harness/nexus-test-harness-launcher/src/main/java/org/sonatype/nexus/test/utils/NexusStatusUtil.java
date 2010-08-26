@@ -162,6 +162,7 @@ public class NexusStatusUtil
 
     public boolean isNexusRunning()
     {
+        // first check to see if the nexus app is accepting connections
         Socket sock = null;
         try
         {
@@ -191,6 +192,7 @@ public class NexusStatusUtil
             }
         }
         
+        // if accepting connections, try getting status
         try
         {
             getNexusStatus();
