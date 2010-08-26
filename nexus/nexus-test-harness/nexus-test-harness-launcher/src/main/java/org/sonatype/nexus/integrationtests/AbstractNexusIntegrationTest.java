@@ -52,6 +52,7 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.integrationtests.rt.prefs.FilePreferencesFactory;
+import org.sonatype.nexus.log4j.ConcisePatternLayout;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.test.utils.DeployUtils;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -434,7 +435,7 @@ public abstract class AbstractNexusIntegrationTest
         properties.putIfNew( "log4j.appender.logfile.Append", "true" );
         properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
         properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
-        properties.putIfNew( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
+        properties.putIfNew( "log4j.appender.logfile.layout", ConcisePatternLayout.class.getName() );
         properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
                              "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
