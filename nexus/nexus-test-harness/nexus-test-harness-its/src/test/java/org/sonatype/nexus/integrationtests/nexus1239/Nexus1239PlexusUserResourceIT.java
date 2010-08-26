@@ -46,7 +46,7 @@ public class Nexus1239PlexusUserResourceIT
         PlexusUserResource user = userUtil.getPlexusUser( "default", "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getName() );
+        Assert.assertEquals( "Administrator", user.getFirstName() );
         Assert.assertEquals( "default", user.getSource() );
 
         List<PlexusRoleResource> roles = user.getRoles();
@@ -68,7 +68,7 @@ public class Nexus1239PlexusUserResourceIT
         PlexusUserResource user = userUtil.getPlexusUser( null, "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getName() );
+        Assert.assertEquals( "Administrator", user.getFirstName() );
         Assert.assertEquals( "default", user.getSource() );
 
         List<PlexusRoleResource> roles = user.getRoles();
@@ -90,7 +90,7 @@ public class Nexus1239PlexusUserResourceIT
         PlexusUserResource user = userUtil.getPlexusUser( "all", "admin" );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getName() );
+        Assert.assertEquals( "Administrator", user.getFirstName() );
         Assert.assertEquals( "default", user.getSource() );
 
         List<PlexusRoleResource> roles = user.getRoles();

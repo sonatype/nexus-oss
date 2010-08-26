@@ -1,6 +1,6 @@
 package org.sonatype.security.ldap;
 
-import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.apache.shiro.realm.ldap.LdapContextFactory;
 
 public class LdapConnectionUtil
 {

@@ -16,11 +16,11 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
-import org.sonatype.security.model.CRole;
-import org.sonatype.security.model.Configuration;
-import org.sonatype.security.model.io.xpp3.SecurityConfigurationXpp3Reader;
+import org.sonatype.security.model.v2_0_2.CPrivilege;
+import org.sonatype.security.model.v2_0_2.CProperty;
+import org.sonatype.security.model.v2_0_2.CRole;
+import org.sonatype.security.model.v2_0_2.Configuration;
+import org.sonatype.security.model.v2_0_2.io.xpp3.SecurityConfigurationXpp3Reader;
 import org.sonatype.security.model.upgrade.AbstractDataUpgrader;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
 

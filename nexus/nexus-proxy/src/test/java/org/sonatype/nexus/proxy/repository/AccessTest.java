@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 import junit.framework.Assert;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.util.FileUtils;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.subject.Subject;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
@@ -141,7 +141,7 @@ public class AccessTest
 
         // not sure if we really need to log the user out, we are not using a remember me,
         // but what can it hurt?
-        securitySystem.logout( subject.getPrincipals() );
+        securitySystem.logout( subject );
 
         return item;
     }

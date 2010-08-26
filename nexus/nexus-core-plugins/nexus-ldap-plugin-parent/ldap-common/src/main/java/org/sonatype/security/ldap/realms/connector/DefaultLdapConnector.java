@@ -8,7 +8,7 @@ import java.util.TreeSet;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
-import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.security.ldap.dao.LdapAuthConfiguration;

@@ -50,7 +50,7 @@ public class Nexus1239UserSearchPermissionIT
         PlexusUserResource user = users.get( 0 );
         Assert.assertEquals( "admin", user.getUserId() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
-        Assert.assertEquals( "Administrator", user.getName() );
+        Assert.assertEquals( "Administrator", user.getFirstName() );
         Assert.assertEquals( "default", user.getSource() );
 
         List<PlexusRoleResource> roles = user.getRoles();

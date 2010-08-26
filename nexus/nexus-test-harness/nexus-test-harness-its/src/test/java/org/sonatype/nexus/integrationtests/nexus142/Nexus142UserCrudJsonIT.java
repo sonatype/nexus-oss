@@ -49,7 +49,7 @@ public class Nexus142UserCrudJsonIT
 
         UserResource resource = new UserResource();
 
-        resource.setName( "Create User" );
+        resource.setFirstName( "Create User" );
         resource.setUserId( "createUser" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -66,7 +66,7 @@ public class Nexus142UserCrudJsonIT
 
         UserResource resource = new UserResource();
         String password = "defaultPassword";
-        resource.setName( "Create User" );
+        resource.setFirstName( "Create User" );
         resource.setUserId( "createTestWithPassword" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -90,7 +90,7 @@ public class Nexus142UserCrudJsonIT
     {
         UserResource resource = new UserResource();
 
-        resource.setName( "list Test" );
+        resource.setFirstName( "list Test" );
         resource.setUserId( "listTest" );
         resource.setStatus( "active" );
         resource.setEmail( "listTest@user.com" );
@@ -113,7 +113,7 @@ public class Nexus142UserCrudJsonIT
 
         UserResource resource = new UserResource();
 
-        resource.setName( "Read User" );
+        resource.setFirstName( "Read User" );
         resource.setUserId( "readUser" );
         resource.setStatus( "active" );
         resource.setEmail( "read@user.com" );
@@ -132,7 +132,7 @@ public class Nexus142UserCrudJsonIT
         // get the Resource object
         UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getName(), responseResource.getName() );
+        Assert.assertEquals( resource.getFirstName(), responseResource.getFirstName() );
         Assert.assertEquals( resource.getUserId(), responseResource.getUserId() );
         Assert.assertEquals( "active", responseResource.getStatus() );
         Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
@@ -146,7 +146,7 @@ public class Nexus142UserCrudJsonIT
 
         UserResource resource = new UserResource();
 
-        resource.setName( "Update User" );
+        resource.setFirstName( "Update User" );
         resource.setUserId( "updateUser" );
         resource.setStatus( "active" );
         resource.setEmail( "updateUser@user.com" );
@@ -156,7 +156,7 @@ public class Nexus142UserCrudJsonIT
 
         // update the user
         // TODO: add tests that changes the userId
-        resource.setName( "Update UserAgain" );
+        resource.setFirstName( "Update UserAgain" );
         resource.setUserId( "updateUser" );
         resource.setStatus( "active" );
         resource.setEmail( "updateUser@user2.com" );
@@ -175,7 +175,7 @@ public class Nexus142UserCrudJsonIT
 
         UserResource resource = new UserResource();
 
-        resource.setName( "Delete User" );
+        resource.setFirstName( "Delete User" );
         resource.setUserId( "deleteUser" );
         resource.setStatus( "active" );
         resource.setEmail( "deleteUser@user.com" );

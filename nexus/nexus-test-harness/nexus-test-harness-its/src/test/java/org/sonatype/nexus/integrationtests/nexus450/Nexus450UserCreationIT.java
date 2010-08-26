@@ -67,7 +67,7 @@ public class Nexus450UserCreationIT
         // create user,
         UserResource resource = new UserResource();
         resource.setUserId( USER_ID );
-        resource.setName( "Marvin Velo" );
+        resource.setFirstName( "Marvin Velo" );
         resource.setEmail( "velo@earth.com" );
         resource.setStatus( "active" );
         resource.addRole( "admin" );

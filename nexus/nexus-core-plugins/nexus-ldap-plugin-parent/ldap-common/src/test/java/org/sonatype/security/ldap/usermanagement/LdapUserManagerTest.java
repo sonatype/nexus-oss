@@ -15,6 +15,7 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
@@ -29,6 +30,12 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 public class LdapUserManagerTest
     extends AbstractLdapTestEnvironment
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
 
     public static final String SECURITY_CONFIG_KEY = "security-xml-file";
     public static final String LDAP_CONFIGURATION_KEY = "application-conf";

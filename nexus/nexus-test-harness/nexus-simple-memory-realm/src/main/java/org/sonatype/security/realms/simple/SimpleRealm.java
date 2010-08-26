@@ -11,18 +11,19 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.jsecurity.realms.simple;
+package org.sonatype.security.realms.simple;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.realm.Realm;
-import org.jsecurity.subject.PrincipalCollection;
 
 /**
  * All this class really needs to do is return an AuthorizationInfo. You could go go all out and implement Realm, but
@@ -43,7 +44,17 @@ public class SimpleRealm
     {
         // Unless your realm is very specific the XmlAuthorizingRealm will take
         // care of this. (provided you implement the PlexusUserLocator interface).
-        return null;
+        String username = principals.getPrimaryPrincipal().toString();
+        final SimpleUser user = this.userStore.getUser( username );
+        if ( user != null )
+        {
+            return new SimpleAuthorizationInfo( user.getRoles() );
+        }
+        else
+        {
+            return null;
+        }
+
     }
 
     @Override
@@ -70,5 +81,10 @@ public class SimpleRealm
 
         return new SimpleAuthenticationInfo( user.getUserId(), user.getPassword(), getName() );
     }
-
+    
+    @Override
+    public String getName()
+    {
+        return "Simple";
+    }
 }

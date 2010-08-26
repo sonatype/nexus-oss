@@ -118,7 +118,6 @@ public class Nexus156RolesCrudJsonIT
         Assert.assertEquals( resource.getId(), responseResource.getId() );
         Assert.assertEquals( resource.getDescription(), responseResource.getDescription() );
         Assert.assertEquals( resource.getName(), responseResource.getName() );
-        Assert.assertEquals( resource.getSessionTimeout(), responseResource.getSessionTimeout() );
         Assert.assertEquals( resource.getPrivileges(), responseResource.getPrivileges() );
         Assert.assertEquals( resource.getRoles(), responseResource.getRoles() );
     }

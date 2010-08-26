@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -45,11 +46,18 @@ public abstract class AbstractNexusTestCase
         ctx.put( SECURITY_XML_FILE, new File( getConfHomeDir(), "security.xml" ).getAbsolutePath() );
     }
 
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+
     protected String getNexusSecurityConfiguration()
     {
         return getConfHomeDir().getAbsolutePath() + "/security.xml";
     }
 
+    @Override
     protected void copyDefaultSecurityConfigToPlace()
         throws IOException
     {

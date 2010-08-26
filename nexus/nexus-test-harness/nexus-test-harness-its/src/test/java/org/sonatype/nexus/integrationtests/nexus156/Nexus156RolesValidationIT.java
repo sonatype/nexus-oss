@@ -134,27 +134,6 @@ public class Nexus156RolesValidationIT extends AbstractNexusIntegrationTest
     }
 
     @Test
-    public void createWithNoTimeout()
-        throws IOException
-    {
-
-        RoleResource resource = new RoleResource();
-
-        resource.setDescription( "roleWithNoName" );
-        resource.setName( "roleWithNoName" );
-//        resource.setSessionTimeout( 30 );
-        resource.addPrivilege( "1" );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "Role should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
-    }
-
-    @Test
     public void createRecursiveContainment()
         throws IOException
     {

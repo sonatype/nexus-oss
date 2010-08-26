@@ -33,9 +33,9 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>org.jsecurity</groupId>
-        <artifactId>jsecurity</artifactId>
-        <version>${jsecurity.version}</version>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>

@@ -2,16 +2,18 @@ package org.sonatype.nexus.scheduling;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authz.AuthorizationException;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.session.Session;
-import org.jsecurity.subject.PrincipalCollection;
-import org.jsecurity.subject.SimplePrincipalCollection;
-import org.jsecurity.subject.Subject;
-import org.jsecurity.util.ThreadContext;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authz.AuthorizationException;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.ExecutionException;
+import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 
 public class TaskSecuritySubject implements Subject
 {
@@ -148,6 +150,62 @@ public class TaskSecuritySubject implements Subject
     public void logout()
     {
        ThreadContext.unbindSubject();
+    }
+
+    public boolean isRemembered()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public <V> V execute( Callable<V> callable )
+        throws ExecutionException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void execute( Runnable runnable )
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public <V> Callable<V> associateWith( Callable<V> callable )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Runnable associateWith( Runnable runnable )
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void runAs( PrincipalCollection principals )
+        throws NullPointerException, IllegalStateException
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    public boolean isRunAs()
+    {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public PrincipalCollection getPreviousPrincipals()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public PrincipalCollection releaseRunAs()
+    {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

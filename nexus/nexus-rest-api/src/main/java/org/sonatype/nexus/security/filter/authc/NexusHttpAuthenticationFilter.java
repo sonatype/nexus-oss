@@ -21,18 +21,18 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.ExpiredCredentialsException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.codec.Base64;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.ExpiredCredentialsException;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.codec.Base64;
-import org.jsecurity.subject.Subject;
-import org.jsecurity.web.WebUtils;
-import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
@@ -323,6 +323,7 @@ public class NexusHttpAuthenticationFilter
                             + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         recordAuthcEvent( request, msg );
+        getLogger().debug( msg, ae );
 
         postAuthcEvent( request, token.getPrincipal().toString(), false );
 
@@ -436,5 +437,10 @@ public class NexusHttpAuthenticationFilter
         String[] parts = decoded.split( ":" );
 
         return new String[] { parts[0], decoded.substring( parts[0].length() + 1 ) };
+    }
+    
+    protected Object getAttribute( String key )
+    {
+        return this.getFilterConfig().getServletContext().getAttribute( key );
     }
 }

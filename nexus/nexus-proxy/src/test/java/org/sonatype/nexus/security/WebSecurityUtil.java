@@ -7,7 +7,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.easymock.EasyMock;
-import org.jsecurity.web.WebUtils;
 
 public class WebSecurityUtil
 {
@@ -25,7 +24,8 @@ public class WebSecurityUtil
         replay( mockRequest );
 
         // we need to bind for the "web" impl of the RealmSecurityManager to work
-        WebUtils.bind( mockRequest );
-        WebUtils.bind( mockResponse );
+        // TODO this method no longer exists on shiro! org.apache.shiro.web.util.WebUtils
+        // WebUtils.bind( mockRequest );
+        // WebUtils.bind( mockResponse );
     }
 }

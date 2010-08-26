@@ -13,10 +13,8 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
-import java.net.InetAddress;
-
+import org.apache.shiro.authc.AuthenticationToken;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.jsecurity.authc.AuthenticationToken;
 
 public class NexusSecureHttpAuthenticationFilter
     extends NexusHttpAuthenticationFilter
@@ -55,8 +53,8 @@ public class NexusSecureHttpAuthenticationFilter
     }
 
     @Override
-    protected AuthenticationToken createToken( String username, String password, boolean rememberMe, InetAddress inet )
+    protected AuthenticationToken createToken( String username, String password, boolean rememberMe, String address )
     {
-        return super.createToken( username, decryptPasswordIfNeeded( password ), rememberMe, inet );
+        return super.createToken( username, decryptPasswordIfNeeded( password ), rememberMe, address );
     }
 }

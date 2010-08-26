@@ -25,7 +25,7 @@ public class UserTest
     public void testRequest()
         throws Exception
     {
-        String jsonString = "{\"data\":{\"userId\":\"myuser\",\"name\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\","
+        String jsonString = "{\"data\":{\"userId\":\"myuser\",\"firstName\":\"johnny test\",\"email\":\"test@email.com\",\"status\":\"active\","
             + "\"roles\":[\"roleId\"]}}}";
         XStreamRepresentation representation = new XStreamRepresentation(
             xstream,
@@ -35,7 +35,7 @@ public class UserTest
         UserResourceRequest request = (UserResourceRequest) representation.getPayload( new UserResourceRequest() );
 
         assert request.getData().getUserId().equals( "myuser" );
-        assert request.getData().getName().equals( "johnny test" );
+        assert request.getData().getFirstName().equals( "johnny test" );
         assert request.getData().getEmail().equals( "test@email.com" );
         assert request.getData().getStatus().equals( "active" );
         assert request.getData().getRoles().size() == 1;

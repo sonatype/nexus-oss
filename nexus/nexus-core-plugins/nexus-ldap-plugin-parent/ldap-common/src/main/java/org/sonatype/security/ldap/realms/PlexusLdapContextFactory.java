@@ -17,7 +17,7 @@ import javax.naming.ldap.LdapContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.sonatype.security.ldap.realms.persist.LdapConfiguration;
 import org.sonatype.security.ldap.realms.tools.LdapURL;
 

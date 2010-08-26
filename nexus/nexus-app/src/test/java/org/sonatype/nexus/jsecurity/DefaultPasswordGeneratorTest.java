@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.jsecurity;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.sonatype.security.usermanagement.DefaultPasswordGenerator;
 import org.sonatype.security.usermanagement.PasswordGenerator;
@@ -20,8 +21,16 @@ import org.sonatype.security.usermanagement.PasswordGenerator;
 public class DefaultPasswordGeneratorTest
     extends PlexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+
     protected DefaultPasswordGenerator pwGenerator;
 
+    @Override
     protected void setUp()
         throws Exception
     {
