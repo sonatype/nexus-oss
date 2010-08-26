@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -17,6 +16,18 @@
     <nexus-version>${nexusVersion}</nexus-version>
   </properties>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-webapp-dependencies</artifactId>
+        <version>${nexus-version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
 
     <!--
@@ -31,29 +42,25 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${nexus-version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- This dependency is only needed if you want to include REST Resources -->
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${nexus-version}</version>
-      <scope>provided</scope>
     </dependency>
 
     <!-- Basic testing -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-plugin-test-api</artifactId>
-      <version>${nexus-version}</version>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <version>1.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.5</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-test-api</artifactId>
+      <version>${nexus-version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -63,28 +70,13 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <scope>test</scope>
       <version>${nexus-version}</version>
+      <scope>test</scope>
     </dependency>
     <!-- #ITSet ENDS -->
 
   </dependencies>
 
-  <!-- #ITSet BEGINS -->
-  <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
-  <!-- There are plugins and dependencies connected to this import, see below and above! -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus-version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-  <!-- #ITSet ENDS -->
 
   <build>
     <plugins>
@@ -118,31 +110,114 @@
       <!-- Nexus IT setup (dependencies below are needed if you have extensive ITs and you want to use Nexus Environment) -->
       <!-- There are dependencies connected to this set of plugin, see above! -->
       <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma-maven-plugin</artifactId>
+        <version>1.1</version>
+        <executions>
+          <execution>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.7-SNAPSHOT</version>
+        <configuration>
+          <classesDirectory>${project.build.directory}/generated-classes/emma/classes</classesDirectory>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.3</version>
+        <version>1.5</version>
         <executions>
           <execution>
             <goals>
               <goal>setup-nexus-plugin-environment</goal>
+              <goal>package</goal>
             </goals>
           </execution>
         </executions>
         <configuration>
+          <nexusBundleArtifact>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-oss-webapp</artifactId>
+            <version>${nexus-version}</version>
+            <classifier>bundle</classifier>
+            <type>zip</type>
+          </nexusBundleArtifact>
           <nexusVersion>${nexus-version}</nexusVersion>
         </configuration>
       </plugin>
 
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>failsafe-maven-plugin</artifactId>
-        <version>2.4.3-alpha-1</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.7-SNAPSHOT</version>
         <executions>
           <execution>
             <goals>
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.maven.plugin</groupId>
+        <artifactId>emma4it-maven-plugin</artifactId>
+        <version>1.3</version>
+        <executions>
+          <execution>
+            <id>merge</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>merge</goal>
+            </goals>
+            <configuration>
+              <searchPath>${basedir}</searchPath>
+            </configuration>
+          </execution>
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+            <configuration>
+              <sourceSets>
+                <sourceSet>
+                  <directory>${basedir}</directory>
+                  <includes>
+                    <include>**/src/main/java/</include>
+                  </includes>
+                </sourceSet>
+              </sourceSets>
+            </configuration>
+          </execution>
+          <execution>
+            <phase>pre-integration-test</phase>
+            <id>instrument</id>
+            <goals>
+              <goal>instrument</goal>
+            </goals>
+            <configuration>
+              <jarSets>
+                <jarSet>
+                  <directory>${project.build.directory}/nexus</directory>
+                  <includes>
+                    <include>**/nexus-kungfu-virusscanner-plugin-${project.version}.jar</include>
+                  </includes>
+                </jarSet>
+              </jarSets>
+            </configuration>
           </execution>
         </executions>
       </plugin>
