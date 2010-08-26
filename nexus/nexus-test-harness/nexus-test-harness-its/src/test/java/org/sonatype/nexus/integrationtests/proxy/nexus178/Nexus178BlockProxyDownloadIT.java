@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus178;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -43,12 +45,12 @@ public class Nexus178BlockProxyDownloadIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void blockProxy()
         throws Exception
     {

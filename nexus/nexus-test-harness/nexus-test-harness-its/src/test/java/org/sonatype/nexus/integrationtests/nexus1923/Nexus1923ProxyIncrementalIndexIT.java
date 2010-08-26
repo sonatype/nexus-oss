@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus1923;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
@@ -16,7 +18,7 @@ public class Nexus1923ProxyIncrementalIndexIT
         super();
     }
     
-    @Test
+    @Test(groups = INDEX)
     public void validateIncrementalIndexesDownloaded()
         throws Exception
     {

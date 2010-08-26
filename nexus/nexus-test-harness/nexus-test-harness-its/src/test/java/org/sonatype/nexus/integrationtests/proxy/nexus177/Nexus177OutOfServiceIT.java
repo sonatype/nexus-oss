@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus177;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
@@ -40,12 +42,12 @@ public class Nexus177OutOfServiceIT
         super( TEST_RELEASE_REPO );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void outOfServiceTest()
         throws Exception
     {

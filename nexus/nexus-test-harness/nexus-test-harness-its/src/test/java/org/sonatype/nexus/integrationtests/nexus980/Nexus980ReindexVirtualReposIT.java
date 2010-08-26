@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus980;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.IOException;
 
 import org.restlet.data.Method;
@@ -33,7 +35,7 @@ public class Nexus980ReindexVirtualReposIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test
+    @Test(groups = INDEX)
     public void manualReindex()
         throws IOException
     {
@@ -47,7 +49,7 @@ public class Nexus980ReindexVirtualReposIT
         Assert.assertFalse( status.isSuccess(), "Should not being able to reindex a shadow repo" );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void taskReindex()
         throws Exception
     {

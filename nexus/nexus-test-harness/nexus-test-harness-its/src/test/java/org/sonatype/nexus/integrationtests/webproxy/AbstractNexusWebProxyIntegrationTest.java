@@ -32,7 +32,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
         webProxyPort = TestProperties.getInteger( "webproxy.server.port" );
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void startWebProxy()
         throws Exception
     {
@@ -40,7 +40,7 @@ public abstract class AbstractNexusWebProxyIntegrationTest
         server.start();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopWebProxy()
         throws Exception
     {

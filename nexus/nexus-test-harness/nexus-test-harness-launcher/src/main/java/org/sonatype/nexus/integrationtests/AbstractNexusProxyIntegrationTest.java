@@ -57,7 +57,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void startProxy()
         throws Exception
     {
@@ -65,7 +65,7 @@ public abstract class AbstractNexusProxyIntegrationTest
         this.proxyServer.start();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopProxy()
         throws Exception
     {

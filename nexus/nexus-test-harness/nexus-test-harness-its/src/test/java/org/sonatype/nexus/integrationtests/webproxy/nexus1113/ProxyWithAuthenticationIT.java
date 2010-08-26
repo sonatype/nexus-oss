@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1113;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -36,7 +38,7 @@ public class ProxyWithAuthenticationIT
 {
 
     @Override
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void startWebProxy()
         throws Exception
     {
@@ -48,7 +50,7 @@ public class ProxyWithAuthenticationIT
         server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void validUser()
         throws Exception
     {
@@ -79,7 +81,7 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test( expectedExceptions = IOException.class )
+    @Test(groups = PROXY, expectedExceptions = IOException.class )
     public void invalidUser()
         throws Exception
     {
@@ -96,7 +98,7 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test( expectedExceptions = IOException.class )
+    @Test(groups = PROXY, expectedExceptions = IOException.class )
     public void withoutUser()
         throws Exception
     {
@@ -112,7 +114,7 @@ public class ProxyWithAuthenticationIT
     }
 
     @Override
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopWebProxy()
         throws Exception
     {

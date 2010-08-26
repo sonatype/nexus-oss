@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1101;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
@@ -24,7 +26,7 @@ public class Nexus1101NexusOverWebproxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadArtifactOverWebProxy()
         throws Exception
     {

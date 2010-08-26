@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus1111;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -38,7 +40,7 @@ public class Nexus1111ProxyRemote500ErrorIT
         super( "release-proxy-repo-1" );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void remote500Error()
         throws Exception
     {

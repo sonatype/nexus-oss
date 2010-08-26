@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1113;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
@@ -27,7 +29,7 @@ public class Nexus1113WebProxyWithAuthenticationIT
 {
 
     @Override
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void startWebProxy()
         throws Exception
     {
@@ -36,7 +38,7 @@ public class Nexus1113WebProxyWithAuthenticationIT
         server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
@@ -55,7 +57,7 @@ public class Nexus1113WebProxyWithAuthenticationIT
     }
 
     @Override
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopWebProxy()
         throws Exception
     {

@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1146;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import org.testng.annotations.Test;
 public class Nexus1146RepositoryOverProxyIT
     extends AbstractNexusWebProxyIntegrationTest
 {
-    @Test
+    @Test(groups = PROXY)
     public void downloadArtifactOverWebProxy()
         throws Exception
     {
@@ -47,7 +49,7 @@ public class Nexus1146RepositoryOverProxyIT
         Assert.assertTrue( server.getAccessedUris().contains( artifactUrl ), "Proxy was not accessed" );
     }
 
-    @Test( expectedExceptions = FileNotFoundException.class )
+    @Test(groups = PROXY, expectedExceptions = FileNotFoundException.class )
     public void unexistentArtifact()
         throws Exception
     {
@@ -67,7 +69,7 @@ public class Nexus1146RepositoryOverProxyIT
         }
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void proxyWithMaven()
         throws Exception
     {

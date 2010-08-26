@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.proxy.nexus2922;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -32,7 +34,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         SettingsMessageUtil.save( settings );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void enableSecurity(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -51,7 +53,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         TestContainer.getInstance().getTestContext().setPassword("");
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadNoPriv()
         throws IOException
     {
@@ -75,7 +77,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         Assert.assertTrue( msg.contains( "401" ), msg );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadNoPrivFromProxy()
         throws IOException
     {
@@ -100,7 +102,7 @@ public class Nexus2922CacheRemoteArtifactsIT
         Assert.assertTrue( msg.contains( "401" ), msg );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadAdmin()
         throws Exception
     {

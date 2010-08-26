@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus635;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class Nexus635ExpireCacheTaskIT
         MavenDeployer.deployAndGetVerifier( GAV, repositoryUrl, fileToDeploy, null );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void expireCacheTask()
         throws Exception
     {

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus3233;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -8,6 +10,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -25,7 +28,7 @@ import org.testng.annotations.Test;
 public class Nexus3233IndexPomSha1IT
     extends AbstractNexusIntegrationTest
 {
-    @Test
+    @Test(groups = INDEX)
     public void wagonDeploy()
         throws Exception
     {
@@ -41,7 +44,7 @@ public class Nexus3233IndexPomSha1IT
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void mavenDeploy()
         throws Exception
     {
@@ -52,7 +55,7 @@ public class Nexus3233IndexPomSha1IT
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void restDeploy()
         throws Exception
     {
@@ -63,7 +66,7 @@ public class Nexus3233IndexPomSha1IT
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void manualStorage()
         throws Exception
     {

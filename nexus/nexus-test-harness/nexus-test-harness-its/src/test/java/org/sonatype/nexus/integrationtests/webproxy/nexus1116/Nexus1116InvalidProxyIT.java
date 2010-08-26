@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1116;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +31,7 @@ public class Nexus1116InvalidProxyIT
     implements Runnable
 {
 
-    @Test
+    @Test(groups = PROXY)
     public void checkInvalidProxy()
         throws Exception
     {

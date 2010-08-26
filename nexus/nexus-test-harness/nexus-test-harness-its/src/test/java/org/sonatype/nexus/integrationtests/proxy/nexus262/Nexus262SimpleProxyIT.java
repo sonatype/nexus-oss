@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus262;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -35,12 +37,12 @@ public class Nexus262SimpleProxyIT extends AbstractNexusProxyIntegrationTest
         super( "release-proxy-repo-1" );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
-    @Test
+    @Test(groups = PROXY)
     public void downloadFromProxy() throws IOException
     {
         File localFile = this.getLocalFile( "release-proxy-repo-1", "simple.artifact", "simpleXMLArtifact", "1.0.0", "xml" );

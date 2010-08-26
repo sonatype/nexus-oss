@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus983;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 import java.util.List;
 
@@ -30,7 +32,7 @@ import org.testng.annotations.Test;
 public class Nexus983IndexArtifactsWihoutPomIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
+    @Test(groups = INDEX)
     public void deployPomlessArtifact()
         throws Exception
     {
@@ -41,7 +43,7 @@ public class Nexus983IndexArtifactsWihoutPomIT
         Assert.assertEquals( artifacts.size(), 1, "Should find one artifact" );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void copyPomlessArtifact()
         throws Exception
     {

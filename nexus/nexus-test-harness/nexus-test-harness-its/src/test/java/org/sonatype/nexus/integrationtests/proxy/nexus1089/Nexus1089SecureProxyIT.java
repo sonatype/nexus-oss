@@ -13,10 +13,13 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus1089;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.ITGroups;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -28,7 +31,7 @@ public class Nexus1089SecureProxyIT
 {
 
     @Override
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void startProxy()
         throws Exception
     {
@@ -37,7 +40,7 @@ public class Nexus1089SecureProxyIT
     }
 
     @Override
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void stopProxy()
         throws Exception
     {
@@ -45,7 +48,7 @@ public class Nexus1089SecureProxyIT
         server.stop();
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadArtifact()
         throws Exception
     {

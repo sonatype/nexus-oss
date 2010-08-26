@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus179;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
@@ -42,12 +44,12 @@ public class Nexus179RemoteRepoDownIT
         super( REPO_RELEASE_PROXY_REPO1 );
     }
     
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public void setSecureTest(){
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void downloadFromDisconnectedProxy()
         throws Exception
     {

@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.nexus3670;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -51,7 +53,7 @@ public class Nexus3670IndexTreeViewIT
                              REPO_TEST_HARNESS_REPO, "Where got it deployed?" );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void testTreeWithoutHint()
         throws Exception
     {
@@ -86,7 +88,7 @@ public class Nexus3670IndexTreeViewIT
         Assert.assertEquals( node.getType(), TreeNode.Type.V, "The path should be V node" );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void testTreeWithHint()
         throws Exception
     {

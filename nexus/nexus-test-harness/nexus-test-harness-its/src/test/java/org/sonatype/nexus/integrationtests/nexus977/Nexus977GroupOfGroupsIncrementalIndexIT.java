@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus977;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 import java.util.Properties;
 
@@ -26,7 +28,7 @@ public class Nexus977GroupOfGroupsIncrementalIndexIT
         return "nexus1923";
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void validateIncrementalIndexesCreated()
         throws Exception
     {
