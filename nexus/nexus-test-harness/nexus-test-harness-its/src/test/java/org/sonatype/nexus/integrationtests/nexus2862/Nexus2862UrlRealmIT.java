@@ -23,17 +23,6 @@ public class Nexus2862UrlRealmIT
 
     private static AuthenticationServer server;
 
-    @BeforeClass
-    public static void startServer()
-        throws Exception
-    {
-        proxyPort = TestProperties.getInteger( "proxy.server.port" );
-        // System.setProperty( "plexus.authentication-url", "http://localhost:" + proxyPort );
-        // System.setProperty( "plexus.url-authentication-default-role", "admin" );
-        // System.setProperty( "plexus.url-authentication-email-domain", "sonatype.com" );
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-
     @Override
     protected void copyConfigFiles()
         throws IOException
@@ -47,6 +36,11 @@ public class Nexus2862UrlRealmIT
     public static void startServer()
         throws Exception
     {
+        proxyPort = TestProperties.getInteger( "proxy.server.port" );
+        // System.setProperty( "plexus.authentication-url", "http://localhost:" + proxyPort );
+        // System.setProperty( "plexus.url-authentication-default-role", "admin" );
+        // System.setProperty( "plexus.url-authentication-email-domain", "sonatype.com" );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
         server = new AuthenticationServer( proxyPort );
         server.addUser( "juka", "juk@", "admin" );
         server.start();
