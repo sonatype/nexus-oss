@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.feeds;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -109,7 +110,7 @@ public class DefaultFeedRecorder
 
     @Requirement
     private Logger logger;
-    
+
     /**
      * The timeline for persistent events and feeds.
      */
@@ -121,7 +122,7 @@ public class DefaultFeedRecorder
      */
     @Requirement
     private FeedArtifactEventFilter feedArtifactEventFilter;
-    
+
     protected Logger getLogger()
     {
         return logger;
@@ -306,6 +307,21 @@ public class DefaultFeedRecorder
         return result;
     }
 
+    protected void releaseResult( TimelineResult result )
+    {
+        if ( result != null )
+        {
+            try
+            {
+                result.release();
+            }
+            catch ( IOException e )
+            {
+                getLogger().error( "Unable to release result set", e );
+            }
+        }
+    }
+
     public TimelineResult getEvents( Set<String> types, Set<String> subtypes, Integer from, Integer count,
                                      TimelineFilter filter )
     {
@@ -324,24 +340,64 @@ public class DefaultFeedRecorder
     public List<NexusArtifactEvent> getNexusArtifectEvents( Set<String> subtypes, Integer from, Integer count,
                                                             TimelineFilter filter )
     {
-        return getAisFromMaps( getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+        TimelineResult result = null;
+
+        try
+        {
+            result = getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter );
+            return getAisFromMaps( result );
+        }
+        finally
+        {
+            releaseResult( result );
+        }
     }
 
     public List<SystemEvent> getSystemEvents( Set<String> subtypes, Integer from, Integer count, TimelineFilter filter )
     {
-        return getSesFromMaps( getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+        TimelineResult result = null;
+
+        try
+        {
+            result = getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter );
+            return getSesFromMaps( result );
+        }
+        finally
+        {
+            releaseResult( result );
+        }
     }
 
     public List<AuthcAuthzEvent> getAuthcAuthzEvents( Set<String> subtypes, Integer from, Integer count,
                                                       TimelineFilter filter )
     {
-        return getAaesFromMaps( getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+        TimelineResult result = null;
+
+        try
+        {
+            result = getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter );
+            return getAaesFromMaps( result );
+        }
+        finally
+        {
+            releaseResult( result );
+        }
     }
 
     public List<ErrorWarningEvent> getErrorWarningEvents( Set<String> subtypes, Integer from, Integer count,
                                                           TimelineFilter filter )
     {
-        return getEwesFromMaps( getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter ) );
+        TimelineResult result = null;
+
+        try
+        {
+            result = getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter );
+            return getEwesFromMaps( result );
+        }
+        finally
+        {
+            releaseResult( result );
+        }
     }
 
     public void addSystemEvent( String action, String message )
