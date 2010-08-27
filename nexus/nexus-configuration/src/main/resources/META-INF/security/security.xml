@@ -3,11 +3,11 @@
 <!-- Default nexus security configuration -->
 <!-- used as default config source -->
 <security>
-	<version>2.0.3</version>
+	<version>2.0.4</version>
 	<users>
 		<user>
 			<id>admin</id>
-			<name>Administrator</name>
+			<firstName>Administrator</firstName>
 			<!-- admin123 -->
 			<password>f865b53623b121fd34ee5426c792e5c33af8c227</password>
 			<status>active</status>
@@ -15,7 +15,7 @@
 		</user>
 		<user>
 			<id>deployment</id>
-			<name>Deployment User</name>
+			<firstName>Deployment User</firstName>
 			<!-- deployment123 -->
 			<password>b2a0e378437817cebdf753d7dff3dd75483af9e0</password>
 			<status>active</status>
@@ -23,7 +23,7 @@
 		</user>
 		<user>
 			<id>anonymous</id>
-			<name>Nexus Anonynmous User</name>
+			<firstName>Nexus Anonynmous User</firstName>
 			<!-- anonymous -->
 			<password>0a92fab3230134cca6eadd9898325b9b2ae67998</password>
 			<status>active</status>
