@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>guice-nexus</artifactId>
-    <version>1.7.3-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
   </parent>
 
   <packaging>bundle</packaging>
