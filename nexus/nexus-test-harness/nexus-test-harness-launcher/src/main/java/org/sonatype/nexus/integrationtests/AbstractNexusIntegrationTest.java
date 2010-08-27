@@ -1214,7 +1214,6 @@ public abstract class AbstractNexusIntegrationTest
 
     protected void customizeContainerConfiguration( ContainerConfiguration configuration )
     {
-        configuration.setClassPathScanning( true );
     }
 
     private PlexusContainer setupContainer( Class<?> baseClass )
@@ -1249,7 +1248,8 @@ public abstract class AbstractNexusIntegrationTest
         ContainerConfiguration containerConfiguration =
             new DefaultContainerConfiguration().setName( "test" ).setContext( context )
                 .setContainerConfiguration( baseClass.getName().replace( '.', '/' ) + ".xml" );
-
+        containerConfiguration.setClassPathScanning( true );
+        
         customizeContainerConfiguration( containerConfiguration );
 
         try
