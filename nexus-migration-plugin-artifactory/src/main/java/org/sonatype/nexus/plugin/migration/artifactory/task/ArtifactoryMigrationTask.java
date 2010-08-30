@@ -4,12 +4,12 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrator;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 @Component( role = SchedulerTask.class, hint = ArtifactoryMigrationTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class ArtifactoryMigrationTask
-    extends AbstractNexusTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
 
     private static final String ACTION = "ARTIFACTORY_MIGRATION";
