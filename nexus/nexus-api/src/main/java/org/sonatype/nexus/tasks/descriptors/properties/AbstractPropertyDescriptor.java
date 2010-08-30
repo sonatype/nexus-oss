@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.tasks.descriptors.properties;
 
+@Deprecated
 public abstract class AbstractPropertyDescriptor
     implements ScheduledTaskPropertyDescriptor
 {
