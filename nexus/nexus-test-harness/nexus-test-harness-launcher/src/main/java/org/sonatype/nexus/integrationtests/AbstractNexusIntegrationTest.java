@@ -294,11 +294,11 @@ public abstract class AbstractNexusIntegrationTest
             {
                 // this will trigger PlexusContainer creation when test is instantiated, but only if needed
                 getITPlexusContainer( getClass() );
-                
+
                 // tell the console what we are doing, now that there is no output its
                 log.info( "Running Test: " + getClass().getSimpleName() );
 
-                setupLog4j();                
+                setupLog4j();
 
                 // clean common work dir
                 beforeStartClean();
@@ -425,12 +425,12 @@ public abstract class AbstractNexusIntegrationTest
 
         properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
 
-        properties.putIfNew( "log4j.logger.org.apache.commons", "WARN" );
-        properties.putIfNew( "log4j.logger.httpclient", "WARN" );
-        properties.putIfNew( "log4j.logger.org.apache.http", "WARN" );
-        properties.putIfNew( "log4j.logger.org.sonatype.nexus", "INFO" );
-        properties.putIfNew( "log4j.logger.org.sonatype.nexus.rest.NexusApplication", "WARN" );
-        properties.putIfNew( "log4j.logger.org.restlet", "WARN" );
+        properties.remove( "log4j.logger.org.apache.commons" );
+        properties.remove( "log4j.logger.httpclient" );
+        properties.remove( "log4j.logger.org.apache.http" );
+        properties.remove( "log4j.logger.org.sonatype.nexus" );
+        properties.remove( "log4j.logger.org.sonatype.nexus.rest.NexusApplication" );
+        properties.remove( "log4j.logger.org.restlet" );
 
         properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
         properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
@@ -935,7 +935,7 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     @SuppressWarnings( "deprecation" )
-    protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
+    public File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
         throws IOException
     {
         // @see http://issues.sonatype.org/browse/NEXUS-599
@@ -1047,7 +1047,7 @@ public abstract class AbstractNexusIntegrationTest
         return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type );
     }
 
-    protected File downloadFile( URL url, String targetFile )
+    public File downloadFile( URL url, String targetFile )
         throws IOException
     {
 
@@ -1246,10 +1246,10 @@ public abstract class AbstractNexusIntegrationTest
         // ----------------------------------------------------------------------------
 
         ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context )
-                .setContainerConfiguration( baseClass.getName().replace( '.', '/' ) + ".xml" );
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
+                baseClass.getName().replace( '.', '/' ) + ".xml" );
         containerConfiguration.setClassPathScanning( true );
-        
+
         customizeContainerConfiguration( containerConfiguration );
 
         try

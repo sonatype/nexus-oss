@@ -41,7 +41,7 @@ public abstract class AbstractNexusProxyIntegrationTest
 
     protected Integer proxyPort;
     
-    private ServletServer proxyServer = null;
+    protected ServletServer proxyServer = null;
 
     protected AbstractNexusProxyIntegrationTest()
     {
