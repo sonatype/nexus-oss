@@ -77,7 +77,6 @@ public class NexusStatusUtil
     public void start( String testId )
         throws Exception
     {
-        System.out.println("################################ Running TEST: " + testId);
         int totalWaitCycles = 200 * 5; // 200 sec
         int retryStartCycles = 50 * 5; // 50 sec
         int pollingFreq = 200; // 200 ms

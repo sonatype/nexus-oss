@@ -8,14 +8,14 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.prefs.Preferences;
 
-import org.junit.After;
-import org.junit.Before;
 import org.sonatype.ldaptestsuite.LdapServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.api.XStreamInitalizer;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -27,6 +27,12 @@ public abstract class AbstractLdapIntegrationIT
     private LdapServer ldapServer;
 
     public AbstractLdapIntegrationIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void setSecureTest()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
@@ -45,7 +51,7 @@ public abstract class AbstractLdapIntegrationIT
 
     protected boolean deleteLdapConfig()
     {
-        File ldapConfig = new File( WORK_CONF_DIR , "ldap.xml" );
+        File ldapConfig = new File( WORK_CONF_DIR, "ldap.xml" );
         if ( ldapConfig.exists() )
         {
             return ldapConfig.delete();
@@ -53,7 +59,7 @@ public abstract class AbstractLdapIntegrationIT
         return true;
     }
 
-    @Before
+    @BeforeMethod
     public void beforeLdapTests()
         throws Exception
     {
@@ -65,7 +71,7 @@ public abstract class AbstractLdapIntegrationIT
 
     }
 
-    @After
+    @AfterMethod
     public void afterLdapTests()
         throws Exception
     {

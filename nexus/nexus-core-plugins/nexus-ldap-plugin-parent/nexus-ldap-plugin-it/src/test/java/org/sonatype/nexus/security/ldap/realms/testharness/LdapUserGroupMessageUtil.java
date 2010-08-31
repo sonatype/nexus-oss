@@ -8,8 +8,6 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -23,6 +21,8 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 
 import org.sonatype.security.ldap.realms.persist.model.CUserAndGroupAuthConfiguration;
+import org.testng.Assert;
+
 import com.thoughtworks.xstream.XStream;
 
 public class LdapUserGroupMessageUtil

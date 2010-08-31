@@ -6,22 +6,16 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
 import org.sonatype.nexus.integrationtests.AbstractNexusTestSuite;
-import org.sonatype.nexus.security.ldap.realms.testharness.nxcm147.Nxcm147SavedPasswordConnectionJsonIT;
-import org.sonatype.nexus.security.ldap.realms.testharness.nxcm335.Nxcm335EffectiveUsersIT;
-import org.sonatype.nexus.security.ldap.realms.testharness.nxcm355.Nxcm355UserSubTreeNotSavedIT;
-import org.sonatype.nexus.security.ldap.realms.testharness.nxcm58.Nxcm58NexusCommonUseJsonIT;
 
 
-@RunWith( Suite.class )
-@SuiteClasses( {
-    Nxcm58NexusCommonUseJsonIT.class,
-    Nxcm147SavedPasswordConnectionJsonIT.class,
-    Nxcm355UserSubTreeNotSavedIT.class,
-    Nxcm335EffectiveUsersIT.class/*,
+//@RunWith( Suite.class )
+//@SuiteClasses( {
+//    Nxcm58NexusCommonUseJsonIT.class,
+//    Nxcm147SavedPasswordConnectionJsonIT.class,
+//    Nxcm355UserSubTreeNotSavedIT.class,
+//    Nxcm335EffectiveUsersIT.class
+    /*,
     Nexus758StatusService.class,
     Nexus169ReleaseMetaDataInSnapshotRepoTest.class,
     Nexus258ReleaseDeployTest.class,
@@ -98,7 +92,7 @@ import org.sonatype.nexus.security.ldap.realms.testharness.nxcm58.Nxcm58NexusCom
     Nexus999SetUsersPassword.class,
     Nexus537RepoTargetsTests.class //*/
 
-} )
+//} )
 public class LdapTestSuite extends AbstractNexusTestSuite
 {
 

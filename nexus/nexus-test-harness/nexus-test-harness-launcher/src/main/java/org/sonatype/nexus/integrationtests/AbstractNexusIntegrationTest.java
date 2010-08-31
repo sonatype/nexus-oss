@@ -44,6 +44,8 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.junit.After;
+import org.junit.Before;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
@@ -261,6 +263,7 @@ public abstract class AbstractNexusIntegrationTest
     // == Test "lifecycle" (@Before/@After...)
 
     @BeforeClass(alwaysRun = true)
+    @org.junit.BeforeClass
     public static void staticOncePerClassSetUp()
         throws Exception
     {
@@ -283,6 +286,7 @@ public abstract class AbstractNexusIntegrationTest
      * @throws Exception
      */
     @BeforeMethod(alwaysRun = true)
+    @Before
     public void oncePerClassSetUp()
         throws Exception
     {
@@ -344,6 +348,7 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     @AfterMethod(alwaysRun = true)
+    @After
     public void afterTest()
         throws Exception
     {
@@ -352,6 +357,7 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     @AfterClass(alwaysRun = true)
+    @org.junit.AfterClass
     public static void oncePerClassTearDown()
         throws Exception
     {

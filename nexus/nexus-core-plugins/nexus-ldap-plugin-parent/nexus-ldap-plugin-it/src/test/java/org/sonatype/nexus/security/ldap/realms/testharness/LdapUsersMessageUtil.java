@@ -9,8 +9,6 @@ package org.sonatype.nexus.security.ldap.realms.testharness;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
@@ -24,6 +22,7 @@ import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.rest.model.UserToRoleResource;
 import org.sonatype.security.rest.model.UserToRoleResourceRequest;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 

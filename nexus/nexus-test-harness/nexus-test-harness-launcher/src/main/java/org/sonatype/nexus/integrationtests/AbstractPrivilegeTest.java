@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.junit.After;
+import org.junit.Before;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.PrivilegeResource;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
@@ -90,7 +92,8 @@ public abstract class AbstractPrivilegeTest
     }
     
     @BeforeClass(alwaysRun = true)
-    public void enableSecurity(){
+    @org.junit.BeforeClass
+    public static void enableSecurity(){
         // turn on security for the test
         TestContainer.getInstance().getTestContext().setSecureTest( true );    	
     }
@@ -111,6 +114,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @BeforeMethod(alwaysRun = true)
+    @Before
     public void resetTestUserPrivs()
         throws Exception
     {
@@ -320,6 +324,7 @@ public abstract class AbstractPrivilegeTest
 
     @Override
     @AfterMethod(alwaysRun = true)
+    @After
     public void afterTest()
         throws Exception
     {

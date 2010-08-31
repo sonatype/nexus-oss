@@ -38,6 +38,7 @@ public abstract class AbstractEmailServerNexusIT
     protected static GreenMail server;
 
     @BeforeClass
+    @org.junit.BeforeClass
     public static void startEmailServer()
     {
         // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
@@ -50,6 +51,7 @@ public abstract class AbstractEmailServerNexusIT
     }
 
     @AfterClass
+    @org.junit.AfterClass
     public static void stopEmailServer()
     {
         LOG.debug( "Stoping e-mail server" );

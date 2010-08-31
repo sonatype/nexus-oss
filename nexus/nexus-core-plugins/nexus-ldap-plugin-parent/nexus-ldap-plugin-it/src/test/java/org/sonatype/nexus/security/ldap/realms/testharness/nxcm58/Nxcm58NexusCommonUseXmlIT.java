@@ -7,7 +7,7 @@
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm58;
 
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.annotations.BeforeClass;
 
 public class Nxcm58NexusCommonUseXmlIT
     extends Nxcm58NexusCommonUseJsonIT
@@ -16,6 +16,11 @@ public class Nxcm58NexusCommonUseXmlIT
     public Nxcm58NexusCommonUseXmlIT()
     {
         super();
+    }
+
+    @BeforeClass
+    public void init()
+    {
         this.xstream = this.getXMLXStream();
         this.mediaType = MediaType.APPLICATION_XML;
     }
