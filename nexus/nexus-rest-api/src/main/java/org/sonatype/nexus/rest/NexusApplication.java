@@ -533,7 +533,7 @@ public class NexusApplication
         attach( root, true, "/", new NexusPlexusResourceFinder( getContext(), indexRedirectingResource ) );
 
         // the indexTemplateResource
-        attach( root, true, indexTemplateResource );
+        attach( root, false, indexTemplateResource );
 
         // publish the WAR contents
         Directory rootDir = new NexusDirectory( getContext(), "war:///" );

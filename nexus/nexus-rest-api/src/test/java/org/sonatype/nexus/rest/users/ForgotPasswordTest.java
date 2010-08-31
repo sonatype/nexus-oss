@@ -51,7 +51,7 @@ public class ForgotPasswordTest
         NexusConfiguration nexusConfig = this.lookup( NexusConfiguration.class );
         nexusConfig.loadConfiguration( true );
         
-        String username = "jcoder";
+        String username = "admin";
 
         PlexusResource resetEmailPR = this.lookup( PlexusResource.class, "UserResetPlexusResource" );
 
