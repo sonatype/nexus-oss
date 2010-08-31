@@ -409,7 +409,7 @@ public abstract class AbstractProxyRepository
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") throwed an "
+            sb.append( "Remote peer of proxy repository \"" + getName() + "\" (id=" + getId() + ") threw a "
                 + cause.getClass().getName() + " exception." );
 
             if ( cause instanceof RemoteAccessException )

@@ -24,7 +24,7 @@ Sonatype.repoServer.RoutesEditPanel = function(config) {
   this.repoDataStore = new Ext.data.JsonStore({
         root : 'data',
         id : 'id',
-        url : Sonatype.config.repos.urls.repositories,
+        url : Sonatype.config.repos.urls.allRepositories,
         sortInfo : {
           field : 'name',
           direction : 'ASC'

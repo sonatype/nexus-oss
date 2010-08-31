@@ -56,7 +56,12 @@ public abstract class AbstractNexusRepositoriesTask<T>
         return repositoryRegistry;
     }
 
-    protected abstract String getRepositoryFieldId();
+    // This is simply a default to help for old api tasks
+    // This method SHOULD be overridden in new task impls
+    protected String getRepositoryFieldId()
+    {
+        return "repositoryOrGroupId";
+    }
 
     public String getRepositoryId()
     {

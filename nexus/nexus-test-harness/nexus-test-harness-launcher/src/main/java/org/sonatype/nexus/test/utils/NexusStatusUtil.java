@@ -128,7 +128,7 @@ public class NexusStatusUtil
         }
 
         final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
-        
+
         try
         {
             try
@@ -161,7 +161,6 @@ public class NexusStatusUtil
 
     public boolean isNexusRunning()
     {
-        // first check to see if the nexus app is accepting connections
         Socket sock = null;
         try
         {
@@ -190,8 +189,7 @@ public class NexusStatusUtil
                 }
             }
         }
-        
-        // if accepting connections, try getting status
+
         try
         {
             getNexusStatus();
@@ -203,6 +201,7 @@ public class NexusStatusUtil
             log.debug( "nexus application port is open, but not yet responding to requests." );
             return false;
         }
+
     }
 
     public boolean isNexusStopped()
