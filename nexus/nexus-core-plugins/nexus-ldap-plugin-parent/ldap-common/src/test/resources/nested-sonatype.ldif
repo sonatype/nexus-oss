@@ -21,7 +21,7 @@ objectClass: top
 ou: peopleB
 description: Contains entries which describe persons in org B
 
-dn: cn=cstamas,ou=peopleA,ou=people,o=sonatype
+dn: uid=cstamas,ou=peopleA,ou=people,o=sonatype
 objectclass: inetOrgPerson
 cn: cstamas
 sn: Tamas Cservenak
@@ -30,7 +30,7 @@ userpassword: cstamas123
 mail: cstamas@sonatype.com
 description: This is Tamas
 
-dn: cn=brianf,ou=peopleB,ou=people,o=sonatype
+dn: uid=brianf,ou=peopleB,ou=people,o=sonatype
 objectclass: inetOrgPerson
 cn: brianf
 sn: Brian Fox
@@ -39,7 +39,7 @@ userpassword: brianf123
 mail: brianf@sonatype.com
 description: This is Brian
 
-dn: cn=jvanzyl,ou=peopleA,ou=people,o=sonatype
+dn: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype
 objectclass: inetOrgPerson
 cn: jvanzyl
 sn: Jason Van Zyl
@@ -57,21 +57,21 @@ description: Contains entries which describe groups
 dn: cn=public,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: public
-uniqueMember: uid=cstamas,ou=peopleA,ou=people,o=sonatype 
-uniqueMember: uid=brianf,ou=peopleB,ou=people,o=sonatype 
-uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype 
+uniqueMember: uid=cstamas,ou=peopleA,ou=people,o=sonatype
+uniqueMember: uid=brianf,ou=peopleB,ou=people,o=sonatype
+uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype
 description: Public group
 
 dn: cn=releases,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: releases
-uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype 
-uniqueMember: uid=brianf,ou=peopleB,ou=people,o=sonatype 
+uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype
+uniqueMember: uid=brianf,ou=peopleB,ou=people,o=sonatype
 description: Releases group
 
 dn: cn=snapshots,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: snapshots
-uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype 
+uniqueMember: uid=jvanzyl,ou=peopleA,ou=people,o=sonatype
 uniqueMember: uid=cstamas,ou=peopleA,ou=people,o=sonatype 
 description: Snapshots group

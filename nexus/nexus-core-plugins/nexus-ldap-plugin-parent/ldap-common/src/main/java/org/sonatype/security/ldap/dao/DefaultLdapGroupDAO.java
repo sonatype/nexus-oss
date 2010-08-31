@@ -201,7 +201,22 @@ public class DefaultLdapGroupDAO
         if ( groupMemberFormat != null )
         {
             String member = StringUtils.replace( groupMemberFormat, "${username}", username );
-
+            
+            if( groupMemberFormat.contains( "${dn}" ) )
+            {
+                LdapUser user;
+                try
+                {
+                    user = this.ldapUserManager.getUser( username, context, configuration );
+                }
+                catch ( NoSuchLdapUserException e )
+                {
+                    String message = "Failed to retrieve role information from ldap for user: " + username;
+                    throw new LdapDAOException( message, e );
+                }
+                member = StringUtils.replace( member, "${dn}",user.getDn()  );   
+            }
+            
             filter += groupMemberAttribute + "=" + member + ")))";
         }
         else
