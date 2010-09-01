@@ -37,7 +37,9 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -66,7 +68,7 @@ import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 public class CommonsHttpClientRemoteStorage
     extends AbstractRemoteRepositoryStorage
     implements RemoteRepositoryStorage
-{
+{   
     public static final String PROVIDER_STRING = "apacheHttpClient3x";
 
     public static final String CTX_KEY = PROVIDER_STRING;
@@ -76,6 +78,8 @@ public class CommonsHttpClientRemoteStorage
     public static final String CTX_KEY_HTTP_CONFIGURATION = CTX_KEY + ".httpConfiguration";
 
     public static final String CTX_KEY_S3_FLAG = CTX_KEY + ".remoteIsAmazonS3";
+    
+    public static final String NEXUS_MISSING_ARTIFACT_HEADER = "x-nexus-missing-artifact";
 
     // ===============================================================================
     // RemoteStorage iface
@@ -408,6 +412,9 @@ public class CommonsHttpClientRemoteStorage
             resultCode = httpClient.executeMethod( httpConfiguration, method );
 
             checkForRemotePeerAmazonS3Storage( repository, method );
+            
+            Header proxyReturnedErrorHeader = method.getResponseHeader( NEXUS_MISSING_ARTIFACT_HEADER );
+            boolean proxyReturnedError = proxyReturnedErrorHeader != null && Boolean.valueOf( proxyReturnedErrorHeader.getValue() );
 
             if ( resultCode == HttpStatus.SC_FORBIDDEN )
             {
@@ -418,6 +425,10 @@ public class CommonsHttpClientRemoteStorage
             {
                 throw new RemoteAuthenticationNeededException( repository, HttpStatus
                                 .getStatusText( HttpStatus.SC_UNAUTHORIZED ) );
+            }
+            else if( resultCode == HttpStatus.SC_OK  && proxyReturnedError )
+            {   
+                throw new RemoteStorageException( "Invalid artifact found, most likely a proxy redirected to an HTML error page." );
             }
         }
         catch ( StorageException e )
