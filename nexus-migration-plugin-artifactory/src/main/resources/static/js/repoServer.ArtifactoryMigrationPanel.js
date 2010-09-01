@@ -243,7 +243,7 @@ Sonatype.repoServer.ArtifactoryMigrationPanel = function( config ) {
       {
         style: 'padding: 10px;',
         cls: 'x-form-item',
-        html: 'The Artifactory Import is used to import an existing Artifactory System Export into Nexus.  It is tested against Artifactory 1.2.5 and 2.0.6, but it should be compatible with other versions.<br/><br/>' +
+        html: 'The Artifactory Import is used to import an existing Artifactory System Export into Nexus.  It is tested against Artifactory 1.2.5 and 2.2.5, but it should be compatible with other versions.<br/><br/>' +
           '1 - Create an Artifactory "Entire System Export", the same used to migrate between Artifactory versions.  It can be zipped or not, both are supported.  The options "Include metadata" and "Create a .m2 compatible export" aren\'t relevant<br>' +
           '2 - Place this System Export on the server where Nexus is running.<br>' +
           '3 - Specify its location in Step 1. Load Artifactory Configuration, and then you will be presented with a list of available repositories and import options, which is customizable in Step 2. Customize Import on Artifactory Import.'
