@@ -479,6 +479,11 @@ Ext.override(Ext.form.TextField, {
           // in some cases the action mode seems to change after rendering,
           // so we may need to clean up the disabled class from this.el
           this.el.removeClass(this.disabledClass);
+          
+          //also check for wrap
+          if ( this.wrap ) {
+            this.wrap.removeClass(this.disabledClass);
+          }
         }
         this.el.dom.readOnly = false;
       },
