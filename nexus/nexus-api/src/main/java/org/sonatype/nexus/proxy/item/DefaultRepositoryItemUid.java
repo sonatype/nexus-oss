@@ -33,7 +33,7 @@ public class DefaultRepositoryItemUid
 {
     private static enum LockStep
     {
-        READ, WRITE, READ_WRITE_UPGRADE, SAME_AS_BEFORE;
+        READ, WRITE;
 
         public boolean isReadLockLastLocked()
         {
@@ -129,49 +129,52 @@ public class DefaultRepositoryItemUid
 
     // ==
 
-    protected LockStep getLastStep( String lockKey )
+    protected Stack<LockStep> getPreviousSteps( String lockKey )
     {
         Map<String, Stack<LockStep>> threadMap = threadCtx.get();
 
         if ( !threadMap.containsKey( lockKey ) )
         {
+            threadMap.put( lockKey, new Stack<LockStep>() );
+        }
+
+        return threadMap.get( lockKey );
+    }
+
+    protected LockStep getLastStep( String lockKey )
+    {
+        Stack<LockStep> steps = getPreviousSteps( lockKey );
+        if ( steps.isEmpty() )
+        {
             return null;
         }
-        else
+
+        try
         {
-            try
-            {
-                return threadMap.get( lockKey ).peek();
-            }
-            catch ( EmptyStackException e )
-            {
-                return null;
-            }
+            return steps.peek();
+        }
+        catch ( EmptyStackException e )
+        {
+            return null;
         }
     }
 
     protected void putLastStep( String lockKey, LockStep lock )
     {
-        Map<String, Stack<LockStep>> threadMap = threadCtx.get();
+        Stack<LockStep> steps = getPreviousSteps( lockKey );
 
         if ( lock != null )
         {
-            if ( !threadMap.containsKey( lockKey ) )
-            {
-                threadMap.put( lockKey, new Stack<LockStep>() );
-            }
-
-            threadMap.get( lockKey ).push( lock );
+            steps.push( lock );
         }
         else
         {
-            Stack<LockStep> stack = threadMap.get( lockKey );
-
-            stack.pop();
+            steps.pop();
 
             // cleanup if stack is empty
-            if ( stack.isEmpty() )
+            if ( steps.isEmpty() )
             {
+                Map<String, Stack<LockStep>> threadMap = threadCtx.get();
                 threadMap.remove( lockKey );
             }
         }
@@ -179,62 +182,33 @@ public class DefaultRepositoryItemUid
 
     protected void doLock( Action action, String lockKey, ReentrantReadWriteLock rwLock )
     {
-        // we always go from "weaker" to "stronger" lock (read is shared, while write is exclusive lock)
-        // because of Nexus nature (wrong nature?), the calls are heavily boxed, hence a thread once acquired write
-        // may re-lock with read action. In this case, we keep the write lock, since it is "stronger"
-        // The proper downgrade of locks happens in unlock method, while unraveling the stack of locking steps.
-        LockStep step = getLastStep( lockKey );
-
-        if ( step != null && step.isReadLockLastLocked() && !action.isReadAction() )
+        // if a write lock, needs to release all read locks first
+        if ( !action.isReadAction() )
         {
-            // we need lock upgrade (r->w)
-            try
+            boolean needToReleaseRead = true;
+            Stack<LockStep> steps = getPreviousSteps( lockKey );
+            for ( LockStep step : steps )
             {
-                getActionLock( rwLock, true ).unlock();
-            }
-            catch ( IllegalMonitorStateException e )
-            {
-                // increasing the details level
-                IllegalMonitorStateException ie =
-                    new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' caused by: "
-                        + e.getMessage() );
-                ie.initCause( e );
-                throw ie;
+                if ( !step.isReadLockLastLocked() )
+                {
+                    needToReleaseRead = false;
+                    break;
+                }
             }
 
-            getActionLock( rwLock, action.isReadAction() ).lock();
-
-            step = LockStep.READ_WRITE_UPGRADE;
+            if ( needToReleaseRead )
+            {
+                for ( LockStep lockStep : steps )
+                {
+                    getActionLock( rwLock, true ).unlock();
+                }
+            }
         }
-        else if ( step == null )
-        {
-            // just lock it, this is first timer
-            getActionLock( rwLock, action.isReadAction() ).lock();
 
-            step = action.isReadAction() ? LockStep.READ : LockStep.WRITE;
-        }
-        else
-        {
-            // just DO NOT lock it, we already own the needed lock, and upgrade/dowgrade
-            // becomes unmaneagable if we have reentrant locks!
-            // 
-            // example code (the call tree actually, this code may be in multiple, even recursive calls):
-            //
-            // lock(read);
-            // ...
-            // lock(read);
-            // ...
-            // lock(write); <- This call will stumble and lockup on itself, see above about upgrade
-            // ...
-            // ...
-            // unlock();
-            // ...
-            // unlock();
-            // ...
-            // unlock();
+        // lock it according to the action
+        getActionLock( rwLock, action.isReadAction() ).lock();
 
-            step = LockStep.SAME_AS_BEFORE;
-        }
+        LockStep step = action.isReadAction() ? LockStep.READ : LockStep.WRITE;
 
         putLastStep( lockKey, step );
     }
@@ -250,27 +224,40 @@ public class DefaultRepositoryItemUid
                 + "\" was tried to be unlocked but had no step-history..." );
         }
 
-        if ( LockStep.READ.equals( step ) )
+        switch ( step )
         {
-            getActionLock( rwLock, true ).unlock();
-        }
-        else if ( LockStep.WRITE.equals( step ) )
-        {
-            getActionLock( rwLock, false ).unlock();
-        }
-        else if ( LockStep.READ_WRITE_UPGRADE.equals( step ) )
-        {
-            // now we need to downgrade (w->r)
-            getActionLock( rwLock, true ).lock();
-
-            getActionLock( rwLock, false ).unlock();
-        }
-        else if ( LockStep.SAME_AS_BEFORE.equals( step ) )
-        {
-            // simply do nothing
+            case READ:
+                getActionLock( rwLock, true ).unlock();
+                break;
+            case WRITE:
+                getActionLock( rwLock, false ).unlock();
+                break;
         }
 
         putLastStep( lockKey, null );
+
+        // if a write lock is released, it does need to redo all read locks
+        if ( !step.isReadLockLastLocked() )
+        {
+            boolean needToReleaseRead = true;
+            Stack<LockStep> steps = getPreviousSteps( lockKey );
+            for ( LockStep lockStep : steps )
+            {
+                if ( !lockStep.isReadLockLastLocked() )
+                {
+                    needToReleaseRead = false;
+                    break;
+                }
+            }
+
+            if ( needToReleaseRead )
+            {
+                for ( LockStep lockStep : steps )
+                {
+                    getActionLock( rwLock, true ).lock();
+                }
+            }
+        }
     }
 
     private Lock getActionLock( ReadWriteLock rwLock, boolean isReadAction )
