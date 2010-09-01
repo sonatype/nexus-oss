@@ -690,8 +690,11 @@ public class DefaultNexusConfiguration
         throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
-
+        //put out of service so wont be accessed any longer
         repository.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        //disable indexing for same purpose
+        repository.setIndexable( false );
+        repository.setSearchable( false );
 
         // remove dependants too
 
