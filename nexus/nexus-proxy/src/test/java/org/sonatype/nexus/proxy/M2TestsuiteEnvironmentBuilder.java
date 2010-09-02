@@ -50,6 +50,7 @@ public class M2TestsuiteEnvironmentBuilder
         super( servletServer );
     }
 
+    @Override
     public void buildEnvironment( AbstractProxyTestEnvironment env )
         throws ConfigurationException,
             IOException,
@@ -79,7 +80,14 @@ public class M2TestsuiteEnvironmentBuilder
             Xpp3Dom ex = new Xpp3Dom( "externalConfiguration" );
             repoConf.setExternalConfiguration( ex );
             M2RepositoryConfiguration exConf = new M2RepositoryConfiguration( ex );
-            exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            if ( remoteRepo.getName().endsWith( "-snapshot" ) )
+            {
+                exConf.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
+            }
+            else
+            {
+                exConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+            }
             exConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
             repoConf.setRemoteStorage( new CRemoteStorage() );
