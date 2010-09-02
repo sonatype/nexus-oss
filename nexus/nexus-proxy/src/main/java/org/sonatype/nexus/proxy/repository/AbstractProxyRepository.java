@@ -215,6 +215,16 @@ public abstract class AbstractProxyRepository
         return itemContentValidators;
     }
 
+    public boolean isFileTypeValidation()
+    {
+        return getExternalConfiguration( false ).isFileTypeValidation();
+    }
+
+    public void setFileTypeValidation( boolean doValidate )
+    {
+        getExternalConfiguration( true ).setFileTypeValidation( doValidate );
+    }
+    
     public boolean isItemAgingActive()
     {
         return getExternalConfiguration( false ).isItemAgingActive();

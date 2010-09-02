@@ -263,7 +263,7 @@ public abstract class AbstractMavenRepository
     {
         getExternalConfiguration( true ).setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
     }
-
+    
     public ChecksumPolicy getChecksumPolicy()
     {
         return getExternalConfiguration( false ).getChecksumPolicy();

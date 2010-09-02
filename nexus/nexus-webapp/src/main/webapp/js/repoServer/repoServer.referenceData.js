@@ -115,6 +115,7 @@
         defaultLocalStorageUrl : "",
         downloadRemoteIndexes : true,
         autoBlockActive : true,
+        fileTypeValidation : false,
         exposed : true,
         checksumPolicy : "",
         remoteStorage : {

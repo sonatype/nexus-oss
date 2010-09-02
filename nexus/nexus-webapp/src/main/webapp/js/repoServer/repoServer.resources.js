@@ -166,6 +166,7 @@
       downloadRemoteIndexes : 'Indicates if the index stored on the remote repository should be downloaded and used for local searches.',
       autoBlockActive : 'Flag to enable Auto Blocking for this proxy repository. If enabled, Nexus will auto-block outbound connections on this repository if remote peer is detected as unreachable/unresponsive. Auto-blocked repositories will still try to detect remote peer availability, and will auto-unblock the proxy if remote peer detected as reachable/healthy. Auto-blocked repositories behaves exactly the same as user blocked proxy repositories, except they will auto-unblock themselves too.',
       checksumPolicy : 'The checksum policy for this repository: Ignore: Don\'t check remote checksums. Warn: Log a warning if the checksum is bad but serve the artifact anyway. (Default...there are currently known checksum errors on Central). StrictIfExists: Do not serve the artifact if the checksum exists but is invalid. Strict: Require that a checksum exists on the remote repository and that it is valid.',
+      fileTypeValidation : 'Flag to check the remote file\'s content to see if it is valid. (e.g. not html error page), handy when you cannot enable strict checksum checking.',
       // remote
       remoteUsername : 'The username used for authentication to the remote repository.',
       remotePassword : 'The password used for authentication to the remote repository.',

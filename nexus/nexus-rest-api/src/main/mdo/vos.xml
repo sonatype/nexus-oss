@@ -933,6 +933,13 @@
       <fields>
         <!-- Proxy specific -->
         <field>
+          <name>fileTypeValidation</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>true</required>
+          <description>Check the remote file content to see if it is valid. (e.g. not html error page) handy when you cannot enable strict checksum.</description>
+        </field>
+        <field>
           <name>artifactMaxAge</name>
           <version>1.0.0+</version>
           <type>int</type>

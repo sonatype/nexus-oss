@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -354,7 +355,7 @@ public abstract class AbstractRepositoryPlexusResource
         {
             resource.setOverrideLocalStorageUrl( overrideLocalStorageUrl );
         }
-
+        
         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
         {
             resource.setRepoPolicy( repository.adaptToFacet( MavenRepository.class ).getRepositoryPolicy().toString() );
@@ -405,6 +406,9 @@ public abstract class AbstractRepositoryPlexusResource
 
         // set auto block
         resource.setAutoBlockActive( repository.isAutoBlockActive() );
+        
+        // set content validation
+        resource.setFileTypeValidation( repository.isFileTypeValidation() );
 
         if ( repository.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
         {

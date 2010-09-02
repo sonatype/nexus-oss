@@ -291,6 +291,8 @@ public class RepositoryListPlexusResource
             exConf.setChecksumPolicy( EnumUtil.valueOf( model.getChecksumPolicy(), ChecksumPolicy.class ) );
         }
 
+        exConf.setFileTypeValidation( model.isFileTypeValidation() );
+        
         exConf.setDownloadRemoteIndex( model.isDownloadRemoteIndexes() );
 
         exConf.setArtifactMaxAge( model.getArtifactMaxAge() );
