@@ -601,7 +601,7 @@ public class CommonsHttpClientRemoteStorage
      * @return true only if we know that ProxyRepository in question points to Amazon S3 storage.
      * @throws StorageException in case of some error.
      */
-    protected boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
+    public boolean isRemotePeerAmazonS3Storage( ProxyRepository repository )
         throws StorageException
     {
         RemoteStorageContext ctx = getRemoteStorageContext( repository );

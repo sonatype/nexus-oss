@@ -32,6 +32,7 @@ import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.InvalidItemContentException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.RemoteStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -54,6 +55,7 @@ import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
+import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClientRemoteStorage;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
@@ -395,6 +397,29 @@ public abstract class AbstractProxyRepository
      */
     protected void autoBlockProxying( Throwable cause )
     {
+        RemoteRepositoryStorage remoteStorage = getRemoteStorage();
+        
+        /**
+         * Special case here to handle Amazon S3 storage.  Problem is that if we do a request against a folder, a 403 will
+         * always be returned, as S3 doesn't support that.  So we simple check if its s3 and if so, we ignore the fact that
+         * 403 was returned (only in regards to auto-blocking, rest of system will still handle 403 response as expected)
+         */
+        try
+        {
+            if ( remoteStorage instanceof CommonsHttpClientRemoteStorage 
+                            && ((CommonsHttpClientRemoteStorage) remoteStorage).isRemotePeerAmazonS3Storage(this)
+                            && cause instanceof RemoteAccessDeniedException )
+            {
+                getLogger().debug( "Not autoblocking repository id " + getId() + "since this is Amazon S3 proxy repo" );
+                return;
+            }
+        }
+        catch ( StorageException e )
+        {
+            // This shouldn't occur, since we are just checking the context
+            getLogger().debug( "Unable to validate if proxy repository id " + getId() + "is Amazon S3", e );
+        }
+        
         // invalidate remote status
         setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
 
