@@ -7,6 +7,7 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.IOUtil;
+import org.sonatype.nexus.proxy.registry.validation.FileTypeValidationUtil;
 
 public class FileTypeValidationUtilTest extends PlexusTestCase
 {

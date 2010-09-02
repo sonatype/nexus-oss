@@ -1,4 +1,4 @@
-package org.sonatype.nexus.proxy.utils;
+package org.sonatype.nexus.proxy.registry.validation;
 
 import java.io.BufferedInputStream;
 import java.io.InputStream;
@@ -47,7 +47,6 @@ public abstract class AbstractFileTypeValidator implements FileTypeValidator
     protected boolean isExpectedFileType( InputStream inputStream, Set<String> expectedMimeTypes )
     {
         Collection<MimeType> magicMimeTypes = magicMimeUtil.getMimeTypes( new BufferedInputStream( inputStream ) );
-        System.out.println( "magicMimeTypes: " + magicMimeTypes );
 
         for ( MimeType magicMimeType : magicMimeTypes )
         {

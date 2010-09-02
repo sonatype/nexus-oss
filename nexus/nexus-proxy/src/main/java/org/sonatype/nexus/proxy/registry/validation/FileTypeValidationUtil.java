@@ -1,4 +1,4 @@
-package org.sonatype.nexus.proxy.utils;
+package org.sonatype.nexus.proxy.registry.validation;
 
 import java.io.File;
 import java.io.InputStream;

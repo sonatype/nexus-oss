@@ -16,7 +16,6 @@ import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
-import org.sonatype.nexus.proxy.utils.FileTypeValidationUtil;
 
 @Component( role = ItemContentValidator.class, hint = "FileTypeItemContentValidator" )
 public class FileTypeItemContentValidator
@@ -33,9 +32,9 @@ public class FileTypeItemContentValidator
                                              AbstractStorageItem item, List<NexusArtifactEvent> events )
         throws StorageException
     {
-        if ( !proxy.getRepositoryKind().isFacetAvailable( MavenProxyRepository.class ) )
+        if ( !proxy.isFileTypeValidation() )
         {
-            // we work only with maven proxy reposes, all others are neglected
+            // make sure this is enabled before we check.
             return true;
         }
 
