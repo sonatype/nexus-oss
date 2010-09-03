@@ -1254,6 +1254,10 @@
               <groupId>commons-logging</groupId>
               <artifactId>commons-logging</artifactId>
             </exclusion>
+            <exclusion>
+              <groupId>com.sun</groupId>
+              <artifactId>tools</artifactId>
+            </exclusion>
           </exclusions>
         </dependency>
         <dependency>
