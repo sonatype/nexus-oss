@@ -85,6 +85,10 @@ public class MavenDeployer
         args.put( "artifactId", gav.getArtifactId() );
         args.put( "version", gav.getVersion() );
         args.put( "packaging", gav.getExtension() );
+        if ( gav.getClassifier() != null )
+        {
+            args.put( "classifier", gav.getClassifier() );
+        }
 
         Properties props = new Properties();
         props.putAll( args );
