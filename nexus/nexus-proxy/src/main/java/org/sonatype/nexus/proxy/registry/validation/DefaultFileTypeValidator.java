@@ -20,10 +20,7 @@ import org.slf4j.Logger;
 public class DefaultFileTypeValidator
     extends AbstractFileTypeValidator
 {
-    Map<String, String> supportedTypeMap = new HashMap<String, String>();
-
-    @Requirement
-    private Logger logger;
+    private Map<String, String> supportedTypeMap = new HashMap<String, String>();
 
     public DefaultFileTypeValidator()
     {

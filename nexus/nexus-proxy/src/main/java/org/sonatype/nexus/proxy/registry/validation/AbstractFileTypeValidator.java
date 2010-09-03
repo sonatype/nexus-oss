@@ -8,12 +8,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.slf4j.Logger;
+
 import eu.medsea.mimeutil.MimeType;
 import eu.medsea.mimeutil.MimeUtil2;
 import eu.medsea.mimeutil.detector.MagicMimeMimeDetector;
 
 public abstract class AbstractFileTypeValidator implements FileTypeValidator
 {
+
+    @Requirement
+    private Logger logger;
 
     private MimeUtil2 magicMimeUtil = new MimeUtil2();
 
@@ -40,6 +46,10 @@ public abstract class AbstractFileTypeValidator implements FileTypeValidator
             }
         }
         
+        if( this.logger.isDebugEnabled() )
+        {
+            this.logger.debug( "Checking if file: "+ actualFileName + " is of one of the types: "+ expectedMimeTypes );
+        }
         return isExpectedFileType( inputStream, expectedMimeTypes );
     }
 
@@ -48,6 +58,11 @@ public abstract class AbstractFileTypeValidator implements FileTypeValidator
     {
         Collection<MimeType> magicMimeTypes = magicMimeUtil.getMimeTypes( new BufferedInputStream( inputStream ) );
 
+        if( this.logger.isDebugEnabled() )
+        {
+            this.logger.debug( "Expected mime types: "+ expectedMimeTypes + ", Actual mime types: "+ magicMimeTypes );
+        }
+        
         for ( MimeType magicMimeType : magicMimeTypes )
         {
             if ( expectedMimeTypes.contains( magicMimeType.toString() ) )
