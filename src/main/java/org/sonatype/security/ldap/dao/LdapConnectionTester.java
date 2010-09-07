@@ -4,7 +4,7 @@ import java.util.SortedSet;
 
 import javax.naming.NamingException;
 
-import org.apache.shiro.realm.ldap.LdapContextFactory;
+import org.jsecurity.realm.ldap.LdapContextFactory;
 
 public interface LdapConnectionTester
 {
