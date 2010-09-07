@@ -11,7 +11,7 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.security.realms.simple;
+package org.sonatype.jsecurity.realms.simple;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,15 +22,14 @@ import java.io.OutputStream;
 
 import junit.framework.Assert;
 
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
+import org.jsecurity.authc.AuthenticationInfo;
+import org.jsecurity.authc.AuthenticationToken;
+import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.subject.PrincipalCollection;
+import org.jsecurity.subject.SimplePrincipalCollection;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -38,13 +37,6 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 public class SimpleRealmTest
     extends PlexusTestCase
 {
-
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( true );
-    }
-
     private static java.io.File confdir = new File( "target/app-conf" );
     // Realm Tests
     /**
@@ -117,11 +109,13 @@ public class SimpleRealmTest
     {
         SecuritySystem plexusSecurity = this.lookup( SecuritySystem.class );
 
-        PrincipalCollection principal =
-            new SimplePrincipalCollection( "admin-simple", new SimpleRealm().getName() );
+        PrincipalCollection principal = new SimplePrincipalCollection( "admin-simple", SecuritySystem.class
+            .getSimpleName() );
 
-        // test one of the privleges that the admin user has Repositories - (create,read)
-        Assert.assertTrue( plexusSecurity.isPermitted( principal, "nexus:repositories:create" ) );
+        // test one of the privleges that the admin user has
+        Assert.assertTrue( plexusSecurity.isPermitted( principal, "nexus:repositories:create" ) );// Repositories -
+        // (create,read)
+
     }
 
     /**

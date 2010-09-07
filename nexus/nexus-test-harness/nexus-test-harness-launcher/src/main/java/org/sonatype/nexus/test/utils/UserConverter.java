@@ -23,8 +23,7 @@ public class UserConverter
     {
         UserResource resource = new UserResource();
         resource.setEmail( user.getEmail() );
-        resource.setFirstName( user.getFirstName() );
-        resource.setLastName( user.getLastName() );
+        resource.setName( user.getName() );
         resource.setStatus( user.getStatus() );
         resource.setUserId( user.getId() );
 
@@ -41,8 +40,7 @@ public class UserConverter
         CUser user = new CUser();
 
         user.setEmail( resource.getEmail() );
-        user.setFirstName( resource.getFirstName() );
-        user.setLastName( resource.getLastName() );
+        user.setName( resource.getName() );
         user.setStatus( resource.getStatus() );
         user.setId( resource.getUserId() );
 

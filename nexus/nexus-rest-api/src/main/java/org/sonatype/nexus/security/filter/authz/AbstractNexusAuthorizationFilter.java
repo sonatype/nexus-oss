@@ -8,7 +8,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 
 public class AbstractNexusAuthorizationFilter
-    extends FailureLoggingHttpMethodPermissionFilter
+    extends HttpVerbMappingAuthorizationFilter
 {
     private Pattern pathPrefixPattern;
 
@@ -57,10 +57,5 @@ public class AbstractNexusAuthorizationFilter
     protected Pattern getPathPrefixPattern()
     {
         return pathPrefixPattern;
-    }
-
-    protected Object getAttribute( String key )
-    {
-        return this.getFilterConfig().getServletContext().getAttribute( key );
     }
 }

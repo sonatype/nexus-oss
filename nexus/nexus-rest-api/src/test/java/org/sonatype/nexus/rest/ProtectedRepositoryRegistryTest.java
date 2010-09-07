@@ -11,8 +11,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
+import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.subject.Subject;
 import org.sonatype.nexus.AbstractNexusTestCase;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -113,7 +113,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertEquals( "repo1", repositories.get( 0 ).getId() );
 
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRegistryWithViewAccessFacet()
@@ -128,7 +128,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertEquals( "repo1", repositories.get( 0 ).getId() );
 
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRegistryWithViewAccessById()
@@ -142,7 +142,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertEquals( "repo1", repository.getId() );
 
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRegistryWithViewAccessByIdNoAccess()
@@ -160,7 +160,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRegistryWithViewAccessFacetById()
@@ -174,7 +174,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertEquals( "repo1", repository.getId() );
 
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRegistryWithViewAccessFacetByIdNoAccess()
@@ -192,7 +192,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRemoveWithAccess()
@@ -211,7 +211,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRemoveWithoutAccess()
@@ -229,7 +229,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRemoveSilentlyWithAccess()
@@ -248,7 +248,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testRemoveSilentlyWithoutAccess()
@@ -266,7 +266,7 @@ public class ProtectedRepositoryRegistryTest
             // expected
         }
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
     }
 
     public void testGetGroupsWithAccess()
@@ -290,7 +290,7 @@ public class ProtectedRepositoryRegistryTest
         Assert.assertEquals( 3, groups.size() );
 
         // logout user
-        this.securitySystem.logout( subject );
+        this.securitySystem.logout( subject.getPrincipals() );
 
     }
 

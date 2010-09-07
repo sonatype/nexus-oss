@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
-import org.sonatype.security.web.ShiroSecurityFilter;
+import org.sonatype.security.web.PlexusJSecurityFilter;
 
 /**
  * This filter simply behaves according Nexus configuration.
@@ -25,7 +25,7 @@ import org.sonatype.security.web.ShiroSecurityFilter;
  * @author cstamas
  */
 public class NexusJSecurityFilter
-    extends ShiroSecurityFilter
+    extends PlexusJSecurityFilter
 {
     public static final String REQUEST_IS_AUTHZ_REJECTED = "request.is.authz.rejected";
 
@@ -39,10 +39,5 @@ public class NexusJSecurityFilter
         throws ServletException
     {
         return !( (NexusConfiguration) getAttribute( NexusConfiguration.class.getName() ) ).isSecurityEnabled();
-    }
-
-    protected Object getAttribute( String key )
-    {
-        return this.getFilterConfig().getServletContext().getAttribute( key );
     }
 }

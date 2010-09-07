@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.junit.Assert;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
 import org.sonatype.configuration.validation.ValidationRequest;
 import org.sonatype.configuration.validation.ValidationResponse;
@@ -58,7 +59,8 @@ public class NexusConfigUtil
         catch ( Exception e )
         {
             log.error( e.getMessage(), e );
-            throw new RuntimeException( e );
+            Assert.fail( "Unable to load config " + e.getMessage() );
+            config = null;
         }
         return config.getConfigurationModel();
     }

@@ -286,8 +286,7 @@
 
     users : {
       userId : "",
-      firstName : "",
-      lastName : "",
+      name : "",
       email : "",
       status : "",
       roles : []
@@ -295,8 +294,7 @@
 
     userNew : {
       userId : "",
-      firstName : "",
-      lastName : "",
+      name : "",
       email : "",
       status : "",
       password : "",

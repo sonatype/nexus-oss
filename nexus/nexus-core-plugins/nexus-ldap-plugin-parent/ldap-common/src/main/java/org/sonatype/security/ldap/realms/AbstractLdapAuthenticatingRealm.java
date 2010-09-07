@@ -6,27 +6,20 @@
  */
 package org.sonatype.security.ldap.realms;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.naming.NamingException;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
-import org.apache.shiro.authc.credential.CredentialsMatcher;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
-import org.apache.shiro.realm.ldap.AbstractLdapRealm;
-import org.apache.shiro.realm.ldap.LdapContextFactory;
-import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.security.ldap.dao.LdapDAOException;
-import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;
+import org.jsecurity.authc.AuthenticationInfo;
+import org.jsecurity.authc.AuthenticationToken;
+import org.jsecurity.authc.SimpleAuthenticationInfo;
+import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.authc.credential.AllowAllCredentialsMatcher;
+import org.jsecurity.authc.credential.CredentialsMatcher;
+import org.jsecurity.authz.AuthorizationInfo;
+import org.jsecurity.realm.ldap.AbstractLdapRealm;
+import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.jsecurity.subject.PrincipalCollection;
 
 //@Component( role = AbstractLdapAuthenticatingRealm.class, hint = "ConfigurableLdapRealm" )
 public abstract class AbstractLdapAuthenticatingRealm
@@ -59,7 +52,7 @@ public abstract class AbstractLdapAuthenticatingRealm
             {
                 this.logger.debug( "User: " + username + " could not be authenticated ", e );
             }
-            throw new org.apache.shiro.authc.AuthenticationException( e.getMessage() );
+            throw new org.jsecurity.authc.AuthenticationException( e.getMessage() );
         }
     }
 
@@ -68,30 +61,7 @@ public abstract class AbstractLdapAuthenticatingRealm
         LdapContextFactory ldapContextFactory )
         throws NamingException
     {
-        // only authorize users from this realm
-        if( principals.getRealmNames().contains( this.getName() ))
-        {
-        
-            Set<String> roles = new HashSet<String>();
-            String username = principals.getPrimaryPrincipal().toString();
-            try
-            {
-                roles = this.ldapManager.getUserRoles(username  );
-            }
-            catch ( LdapDAOException e )
-            {
-                this.logger.error( e.getMessage(), e );
-                throw new NamingException(e.getMessage());
-            }
-            catch ( NoLdapUserRolesFoundException e )
-            {
-                this.logger.debug( "User: " + username + " does not have any ldap roles.", e );
-            }
-            
-            return new SimpleAuthorizationInfo( roles );
-        }
         return null;
-        
     }
 
     protected AuthenticationInfo buildAuthenticationInfo( String username, char[] password )
@@ -103,12 +73,12 @@ public abstract class AbstractLdapAuthenticatingRealm
     @Override
     public String getName()
     {
-        return "LdapAuthenticatingRealm";
+        return "LDAP";
     }
 
     /*
      * (non-Javadoc)
-     * @see org.apache.shiro.realm.AuthenticatingRealm#getCredentialsMatcher()
+     * @see org.jsecurity.realm.AuthenticatingRealm#getCredentialsMatcher()
      */
     @Override
     public CredentialsMatcher getCredentialsMatcher()

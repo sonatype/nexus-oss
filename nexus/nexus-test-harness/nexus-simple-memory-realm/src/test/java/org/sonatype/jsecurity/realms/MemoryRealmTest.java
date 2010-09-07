@@ -11,15 +11,14 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.security.realms;
+package org.sonatype.jsecurity.realms;
 
 import org.codehaus.plexus.PlexusTestCase;
-import org.sonatype.security.realms.MemoryRealm;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.permission.WildcardPermission;
-import org.apache.shiro.realm.Realm;
+import org.jsecurity.authc.AuthenticationException;
+import org.jsecurity.authc.AuthenticationInfo;
+import org.jsecurity.authc.UsernamePasswordToken;
+import org.jsecurity.authz.permission.WildcardPermission;
+import org.jsecurity.realm.Realm;
 
 public class MemoryRealmTest
     extends PlexusTestCase

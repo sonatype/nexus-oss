@@ -46,7 +46,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "createUserWithNoRoles" );
+        resource.setName( "createUserWithNoRoles" );
         resource.setUserId( "createUserWithNoRoles" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -71,7 +71,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "updateUsersPasswordTest" );
+        resource.setName( "updateUsersPasswordTest" );
         resource.setUserId( "updateUsersPasswordTest" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -96,7 +96,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "createUserWithNoUserId" );
+        resource.setName( "createUserWithNoUserId" );
         // resource.setUserId( "createUserWithNoUserId" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -118,7 +118,7 @@ public class Nexus142UserValidationIT
     {
         UserResource resource = new UserResource();
 
-        // resource.setFirstName( "createUserWithNoUserName" );
+        // resource.setName( "createUserWithNoUserName" );
         resource.setUserId( "createUserWithNoUserName" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -141,7 +141,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "createUserWithNoEmail" );
+        resource.setName( "createUserWithNoEmail" );
         resource.setUserId( "createUserWithNoEmail" );
         resource.setStatus( "active" );
         // resource.setEmail( "nexus@user.com" );
@@ -163,7 +163,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "createUserInvalidRole" );
+        resource.setName( "createUserInvalidRole" );
         resource.setUserId( "createUserInvalidRole" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -185,7 +185,7 @@ public class Nexus142UserValidationIT
         UserResource resource = new UserResource();
 
         resource.setEmail( "test@email.com" );
-        resource.setFirstName( "name" );
+        resource.setName( "name" );
         resource.setStatus( "active" );
         resource.setUserId( "dup-user" );
         resource.addRole( "role1" );
@@ -200,7 +200,7 @@ public class Nexus142UserValidationIT
         resource = new UserResource();
 
         resource.setEmail( "test2@email.com" );
-        resource.setFirstName( "name" );
+        resource.setName( "name" );
         resource.setStatus( "active" );
         resource.setUserId( "dup-user" );
         resource.addRole( "role1" );
@@ -220,7 +220,7 @@ public class Nexus142UserValidationIT
         UserResource resource = new UserResource();
 
         resource.setEmail( "dup@email.com" );
-        resource.setFirstName( "name" );
+        resource.setName( "name" );
         resource.setStatus( "active" );
         resource.setUserId( "user1" );
         resource.addRole( "role1" );
@@ -235,7 +235,7 @@ public class Nexus142UserValidationIT
         resource = new UserResource();
 
         resource.setEmail( "dup@email.com" );
-        resource.setFirstName( "name" );
+        resource.setName( "name" );
         resource.setStatus( "active" );
         resource.setUserId( "user2" );
         resource.addRole( "role1" );
@@ -256,7 +256,7 @@ public class Nexus142UserValidationIT
 
         UserResource resource = new UserResource();
 
-        resource.setFirstName( "updateValidation" );
+        resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -272,7 +272,7 @@ public class Nexus142UserValidationIT
         // get the Resource object
         UserResource responseResource = this.messageUtil.getResourceFromResponse( response );
 
-        Assert.assertEquals( resource.getFirstName(), responseResource.getFirstName() );
+        Assert.assertEquals( resource.getName(), responseResource.getName() );
         Assert.assertEquals( resource.getUserId(), responseResource.getUserId() );
         Assert.assertEquals( resource.getStatus(), responseResource.getStatus() );
         Assert.assertEquals( resource.getEmail(), responseResource.getEmail() );
@@ -282,7 +282,7 @@ public class Nexus142UserValidationIT
 
         // update the user
 
-        resource.setFirstName( "updateValidation" );
+        resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
         resource.setStatus( "active" );
         resource.setEmail( "" );
@@ -299,7 +299,7 @@ public class Nexus142UserValidationIT
         /**
          * NO STATUS
          */
-        resource.setFirstName( "updateValidation" );
+        resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
         resource.setStatus( "" );
         resource.setEmail( "nexus@user.com" );
@@ -320,7 +320,7 @@ public class Nexus142UserValidationIT
         // /**
         // * NO ROLES
         // */
-        // resource.setFirstName( "updateValidation" );
+        // resource.setName( "updateValidation" );
         // resource.setUserId( "updateValidation" );
         // resource.setStatus( "active" );
         // resource.setEmail( "nexus@user.com" );
@@ -338,7 +338,7 @@ public class Nexus142UserValidationIT
         /**
          * INVALID ROLE
          */
-        resource.setFirstName( "updateValidation" );
+        resource.setName( "updateValidation" );
         resource.setUserId( "updateValidation" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -355,7 +355,7 @@ public class Nexus142UserValidationIT
         /**
          * NO NAME
          */
-        resource.setFirstName( "" );
+        resource.setName( "" );
         resource.setUserId( "updateValidation" );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -372,7 +372,7 @@ public class Nexus142UserValidationIT
         /**
          * NO USER ID
          */
-        resource.setFirstName( "updateValidation" );
+        resource.setName( "updateValidation" );
         resource.setUserId( null );
         resource.setStatus( "active" );
         resource.setEmail( "nexus@user.com" );
@@ -395,7 +395,7 @@ public class Nexus142UserValidationIT
         UserResource duplicateResource = new UserResource();
 
         duplicateResource.setEmail( "dup@email.com" );
-        duplicateResource.setFirstName( "dupname" );
+        duplicateResource.setName( "dupname" );
         duplicateResource.setStatus( "active" );
         duplicateResource.setUserId( "dup-user2" );
         duplicateResource.addRole( "role1" );

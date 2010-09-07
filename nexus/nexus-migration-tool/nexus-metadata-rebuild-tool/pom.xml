@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <!-- Parent POM -->
   <parent>
@@ -18,7 +19,7 @@
 
   <!-- a short but descriptive name for the project -->
   <name>Nexus : Migration Tools : Maven Metadata Rebuild</name>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
@@ -77,8 +78,8 @@
           <artifactId>lucene-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-core</artifactId>
+          <groupId>org.jsecurity</groupId>
+          <artifactId>jsecurity</artifactId>
         </exclusion>
         <exclusion>
           <groupId>commons-beanutils</groupId>
