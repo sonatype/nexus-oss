@@ -14,22 +14,21 @@ package org.sonatype.nexus.plugin.migration.artifactory.security;
 
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CRole;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 public interface SecurityConfigReceiver
 {
     void receiveRepositoryTarget( CRepositoryTarget repoTarget )
         throws ArtifactoryMigrationException;
 
-    void receiveSecurityPrivilege( CPrivilege privilege )
+    void receiveSecurityPrivilege( SecurityPrivilege privilege )
         throws ArtifactoryMigrationException;
 
-    void receiveSecurityRole( CRole role )
+    void receiveSecurityRole( SecurityRole role )
         throws ArtifactoryMigrationException;
 
-    void receiveSecurityUser( CUser user, CUserRoleMapping map )
+    void receiveSecurityUser( SecurityUser user )
         throws ArtifactoryMigrationException;
 }

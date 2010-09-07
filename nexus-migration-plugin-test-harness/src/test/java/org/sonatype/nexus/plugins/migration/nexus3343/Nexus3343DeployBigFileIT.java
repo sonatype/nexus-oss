@@ -19,7 +19,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.shiro.codec.Base64;
+import org.jsecurity.codec.Base64;
 import org.junit.Assert;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.TestContainer;

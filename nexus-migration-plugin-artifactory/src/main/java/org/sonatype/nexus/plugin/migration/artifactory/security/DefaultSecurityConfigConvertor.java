@@ -23,11 +23,10 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.plugin.migration.artifactory.ArtifactoryMigrationException;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
-import org.sonatype.security.model.CPrivilege;
-import org.sonatype.security.model.CProperty;
-import org.sonatype.security.model.CRole;
-import org.sonatype.security.model.CUser;
-import org.sonatype.security.model.CUserRoleMapping;
+import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
+import org.sonatype.security.realms.tools.dao.SecurityProperty;
+import org.sonatype.security.realms.tools.dao.SecurityRole;
+import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 @Component( role = SecurityConfigConvertor.class )
 public class DefaultSecurityConfigConvertor
@@ -64,7 +63,7 @@ public class DefaultSecurityConfigConvertor
     {
         for ( ArtifactoryGroup group : request.getConfig().getGroups() )
         {
-            CRole role = new CRole();
+            SecurityRole role = new SecurityRole();
 
             role.setId( group.getName() );
 
@@ -154,25 +153,19 @@ public class DefaultSecurityConfigConvertor
         ArtifactoryPermissionTarget target, TargetSuite targetSuite, String repoKey )
         throws ArtifactoryMigrationException
     {
-        CPrivilege createPrivilege =
-            buildSecurityPrivilege( request, target, repoKey, targetSuite
+        SecurityPrivilege createPrivilege = buildSecurityPrivilege( request, target, repoKey, targetSuite
             .getRepositoryTarget(), "create" );
-        CPrivilege readPrivilege =
-            buildSecurityPrivilege( request, target, repoKey, targetSuite
+        SecurityPrivilege readPrivilege = buildSecurityPrivilege( request, target, repoKey, targetSuite
             .getRepositoryTarget(), "read" );
-        CPrivilege updatePrivilege =
-            buildSecurityPrivilege( request, target, repoKey, targetSuite
+        SecurityPrivilege updatePrivilege = buildSecurityPrivilege( request, target, repoKey, targetSuite
             .getRepositoryTarget(), "update" );
-        CPrivilege deletePrivilege =
-            buildSecurityPrivilege( request, target, repoKey, targetSuite
+        SecurityPrivilege deletePrivilege = buildSecurityPrivilege( request, target, repoKey, targetSuite
             .getRepositoryTarget(), "delete" );
 
-        CRole readerRole = buildSecurityRoleFromPrivilege( request, target, repoKey, "reader", readPrivilege );
-        CRole deployerRole =
-            buildSecurityRoleFromPrivilege( request, target, repoKey, "deployer", createPrivilege, updatePrivilege );
-        CRole deleteRole = buildSecurityRoleFromPrivilege( request, target, repoKey, "delete", deletePrivilege );
-        CRole adminRole =
-            buildSecurityRoleFromPrivilege( request, target, repoKey, "admin", updatePrivilege, deletePrivilege );
+        SecurityRole readerRole = buildSecurityRoleFromPrivilege( request, target, repoKey,"reader", readPrivilege );
+        SecurityRole deployerRole = buildSecurityRoleFromPrivilege( request, target,repoKey, "deployer", createPrivilege, updatePrivilege );
+        SecurityRole deleteRole = buildSecurityRoleFromPrivilege( request, target, repoKey,"delete", deletePrivilege );
+        SecurityRole adminRole = buildSecurityRoleFromPrivilege( request, target, repoKey,"admin", updatePrivilege, deletePrivilege );
 
         targetSuite.addPrivilege( repoKey, createPrivilege );
         targetSuite.addPrivilege( repoKey, readPrivilege );
@@ -210,11 +203,11 @@ public class DefaultSecurityConfigConvertor
         return repoTarget;
     }
 
-    private CPrivilege buildSecurityPrivilege( SecurityConfigConvertorRequest request,
+    private SecurityPrivilege buildSecurityPrivilege( SecurityConfigConvertorRequest request,
         ArtifactoryPermissionTarget permissionTarget, String repoKey, CRepositoryTarget repoTarget, String method )
         throws ArtifactoryMigrationException
     {
-        CPrivilege privilege = new CPrivilege();
+        SecurityPrivilege privilege = new SecurityPrivilege();
 
         privilege.setName( permissionTarget.getId() + "-" + repoKey + "-" + method );
 
@@ -222,12 +215,12 @@ public class DefaultSecurityConfigConvertor
 
         privilege.setType( "target" );
 
-        CProperty prop = new CProperty();
+        SecurityProperty prop = new SecurityProperty();
         prop.setKey( "method" );
         prop.setValue( method );
         privilege.addProperty( prop );
 
-        prop = new CProperty();
+        prop = new SecurityProperty();
         prop.setKey( "repositoryTargetId" );
         prop.setValue( repoTarget.getId() );
         privilege.addProperty( prop );
@@ -235,12 +228,12 @@ public class DefaultSecurityConfigConvertor
         // for creating privs with a repoTarget to all repos, set the repoId and repoGroupId to be empty
         if ( repoKey.equals( "ANY" ) )
         {
-            prop = new CProperty();
+            prop = new SecurityProperty();
             prop.setKey( "repositoryGroupId" );
             prop.setValue( "" );
             privilege.addProperty( prop );
 
-            prop = new CProperty();
+            prop = new SecurityProperty();
             prop.setKey( "repositoryId" );
             prop.setValue( "" );
             privilege.addProperty( prop );
@@ -255,7 +248,7 @@ public class DefaultSecurityConfigConvertor
         return privilege;
     }
 
-    private CProperty buildRepoIdGroupIdProperty( SecurityConfigConvertorRequest request, String repoKey )
+    private SecurityProperty buildRepoIdGroupIdProperty( SecurityConfigConvertorRequest request, String repoKey )
         throws ArtifactoryMigrationException
 
     {
@@ -275,7 +268,7 @@ public class DefaultSecurityConfigConvertor
             throw new ArtifactoryMigrationException( "Cannot find the mapping repo/repoGroup id for key '"
                 + artiRepoKey + "'." );
         }
-        CProperty prop = new CProperty();
+        SecurityProperty prop = new SecurityProperty();
 
         if ( !StringUtils.isEmpty( mapping.getNexusGroupId() ) )
         {
@@ -298,12 +291,11 @@ public class DefaultSecurityConfigConvertor
         return prop;
     }
 
-    private CRole buildSecurityRoleFromPrivilege( SecurityConfigConvertorRequest request,
-                                                  ArtifactoryPermissionTarget target, String repoKey, String key,
-                                                  CPrivilege... privileges )
+    private SecurityRole buildSecurityRoleFromPrivilege( SecurityConfigConvertorRequest request,
+        ArtifactoryPermissionTarget target, String repoKey, String key, SecurityPrivilege... privileges )
         throws ArtifactoryMigrationException
     {
-        CRole role = new CRole();
+        SecurityRole role = new SecurityRole();
 
         role.setId( target.getId() + "-" + repoKey + "-" + key );
 
@@ -313,7 +305,7 @@ public class DefaultSecurityConfigConvertor
 
         List<String> privIds = new ArrayList<String>( privileges.length );
 
-        for ( CPrivilege priv : privileges )
+        for ( SecurityPrivilege priv : privileges )
         {
             privIds.add( priv.getId() );
         }
@@ -343,56 +335,54 @@ public class DefaultSecurityConfigConvertor
             }
             else
             {
-                CUser user = buildSecurityUser( request, artifactoryUser );
-                CUserRoleMapping map = new CUserRoleMapping();
-                map.setUserId( user.getId() );
+                SecurityUser user = buildSecurityUser( request, artifactoryUser );
 
                 if ( artifactoryUser.isAdmin() )
                 {
-                    map.addRole( "admin" );
+                    user.addRole( "admin" );
                 }
                 else
                 {
-                    buildUserAclRole( request, user, map );
+                    buildUserAclRole( request, user );
                 }
 
                 // add group roles
                 for ( ArtifactoryGroup group : artifactoryUser.getGroups() )
                 {
-                    map.addRole( group.getName() );
+                    user.addRole( group.getName() );
                 }
 
                 // nexus doesn't allow a user has no role assigned
-                if ( map.getRoles().isEmpty() )
+                if ( user.getRoles().isEmpty() )
                 {
-                    map.addRole( "anonymous" );
+                    user.addRole( "anonymous" );
                 }
                 // save the user
                 try
                 {
-                    request.getPersistor().receiveSecurityUser( user, map );
+                    request.getPersistor().receiveSecurityUser( user );
                 }
                 catch ( ArtifactoryMigrationException e )
                 {
                     request.getMigrationResult().addErrorMessage( "Failed to import user: '" + user.getId() + "'.", e );
                 }
 
-                request.getMigratedUsers().put( user, map );
+                request.getMigratedUsers().add( user );
 
                 request.getMigrationResult().addDebugMessage( "User '" + user.getId() + "' was imported successfully" );
             }
         }
     }
 
-    private CUser buildSecurityUser( SecurityConfigConvertorRequest request, ArtifactoryUser artifactoryUser )
+    private SecurityUser buildSecurityUser( SecurityConfigConvertorRequest request, ArtifactoryUser artifactoryUser )
     {
-        CUser securityUser = new CUser();
+        SecurityUser securityUser = new SecurityUser();
 
         securityUser.setId( artifactoryUser.getUsername() );
 
         securityUser.setPassword( artifactoryUser.getPassword() );
 
-        securityUser.setFirstName( artifactoryUser.getUsername() );
+        securityUser.setName( artifactoryUser.getUsername() );
 
         securityUser.setEmail( artifactoryUser.getEmail() );
 
@@ -401,7 +391,7 @@ public class DefaultSecurityConfigConvertor
         return securityUser;
     }
 
-    private void buildUserAclRole( SecurityConfigConvertorRequest request, CUser user, CUserRoleMapping map )
+    private void buildUserAclRole( SecurityConfigConvertorRequest request, SecurityUser user )
     {
         if ( !request.isResolvePermission() )
         {
@@ -410,9 +400,9 @@ public class DefaultSecurityConfigConvertor
 
         for ( ArtifactoryAcl acl : request.getConfig().getAcls() )
         {
-            if ( acl.getUser() != null && acl.getUser().getUsername().equals( user.getFirstName() ) )
+            if ( acl.getUser() != null && acl.getUser().getUsername().equals( user.getName() ) )
             {
-                map.getRoles().addAll( getRoleListByAcl( request, acl ) );
+                user.getRoles().addAll( getRoleListByAcl( request, acl ) );
             }
         }
     }
@@ -421,7 +411,7 @@ public class DefaultSecurityConfigConvertor
     {
         List<String> roleList = new ArrayList<String>();
 
-        for ( List<CRole> repositoryRoles : request
+        for ( List<SecurityRole> repositoryRoles : request
             .getMapping().get( acl.getPermissionTarget().getId() ).listAllRepositoryRoles() )
         {
             if ( acl.getPermissions().contains( ArtifactoryPermission.READER ) )
@@ -457,9 +447,9 @@ public class DefaultSecurityConfigConvertor
          */
         private CRepositoryTarget repositoryTarget;
 
-        private Map<String, List<CPrivilege>> privileges = new HashMap<String, List<CPrivilege>>();
+        private Map<String, List<SecurityPrivilege>> privileges = new HashMap<String, List<SecurityPrivilege>>();
 
-        private Map<String, List<CRole>> roles = new HashMap<String, List<CRole>>();
+        private Map<String, List<SecurityRole>> roles = new HashMap<String, List<SecurityRole>>();
 
         public CRepositoryTarget getRepositoryTarget()
         {
@@ -471,37 +461,37 @@ public class DefaultSecurityConfigConvertor
             this.repositoryTarget = repositoryTarget;
         }
 
-        public List<CPrivilege> getPrivileges( String repokey )
+        public List<SecurityPrivilege> getPrivileges( String repokey )
         {
             return privileges.get( repokey );
         }
 
-        public List<CRole> getRoles( String repoKey )
+        public List<SecurityRole> getRoles( String repoKey )
         {
             return roles.get( repoKey );
         }
 
-        public void addPrivilege( String repoKey, CPrivilege privilege )
+        public void addPrivilege( String repoKey, SecurityPrivilege privilege )
         {
             if ( privileges.get( repoKey ) == null )
             {
-                privileges.put( repoKey, new ArrayList<CPrivilege>() );
+                privileges.put( repoKey, new ArrayList<SecurityPrivilege>() );
             }
 
             privileges.get( repoKey ).add( privilege );
         }
 
-        public void addRole( String repoKey, CRole role )
+        public void addRole( String repoKey, SecurityRole role )
         {
             if ( roles.get( repoKey ) == null )
             {
-                roles.put( repoKey, new ArrayList<CRole>() );
+                roles.put( repoKey, new ArrayList<SecurityRole>() );
             }
 
             roles.get( repoKey ).add( role );
         }
         
-        public Collection<List<CRole>> listAllRepositoryRoles()
+        public Collection<List<SecurityRole>> listAllRepositoryRoles()
         {
             return roles.values();
         }
