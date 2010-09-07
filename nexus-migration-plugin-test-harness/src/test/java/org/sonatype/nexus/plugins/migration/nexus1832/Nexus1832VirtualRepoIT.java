@@ -27,7 +27,9 @@ public class Nexus1832VirtualRepoIT
         checkGroup( "repo" );
 
         TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
-        checkIndex( "repo", "nexus1832", "plugins-release", "1.0" );
+        checkIndex( "plugins-releases", "nexus1832", "plugins-releases", "1.0" );
+        checkIndex( "repo", "nexus1832", "plugins-releases", "1.0" );
+        checkIndex( "ext-snapshots", "nexus1832", "ext-snapshots", "1.0-SNAPSHOT" );
         checkIndex( "repo", "nexus1832", "ext-snapshots", "1.0-SNAPSHOT" );
 
         checkArtifactOnGroup( "repo", "nexus1832", "ext-releases", "1.0" );

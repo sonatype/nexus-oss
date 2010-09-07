@@ -50,6 +50,12 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <dependency>
@@ -70,6 +76,12 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-task-scheduler</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -110,7 +122,7 @@
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-inject-plexus</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
