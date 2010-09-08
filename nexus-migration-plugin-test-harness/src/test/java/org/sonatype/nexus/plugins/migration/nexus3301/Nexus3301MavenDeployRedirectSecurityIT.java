@@ -22,12 +22,12 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.plugins.migration.AbstractMigrationPrivilegeTest;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 
 public class Nexus3301MavenDeployRedirectSecurityIT
@@ -45,6 +45,8 @@ public class Nexus3301MavenDeployRedirectSecurityIT
         throws Exception
     {
         Assert.assertTrue( doMigration().isSuccess() );
+
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     @Before
@@ -73,7 +75,7 @@ public class Nexus3301MavenDeployRedirectSecurityIT
     }
 
     private void deploy()
-        throws IOException, VerificationException, IllegalArtifactCoordinateException
+        throws Exception
     {
         File artifact = getTestFile( "artifact.jar" );
 

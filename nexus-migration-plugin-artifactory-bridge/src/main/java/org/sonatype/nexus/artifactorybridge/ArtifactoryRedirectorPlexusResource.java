@@ -181,6 +181,7 @@ public class ArtifactoryRedirectorPlexusResource
             }
             catch ( IOException e )
             {
+                getLogger().debug( "Error retrieving response code", e );
             }
         }
         return 500;
