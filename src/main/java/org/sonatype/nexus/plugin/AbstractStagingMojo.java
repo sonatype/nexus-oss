@@ -26,6 +26,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.codehaus.plexus.components.interactivity.PrompterException;
 import org.sonatype.nexus.restlight.common.RESTLightClientException;
 import org.sonatype.nexus.restlight.stage.StageClient;
+import org.sonatype.nexus.restlight.stage.StageProfile;
 import org.sonatype.nexus.restlight.stage.StageRepository;
 
 public abstract class AbstractStagingMojo
@@ -146,6 +147,16 @@ public abstract class AbstractStagingMojo
             builder.append( "\n   Description: " ).append( repo.getDescription() );
         }
         
+        return builder;
+    }
+
+    protected CharSequence listProfile( final StageProfile profile )
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append( "Id: " ).append( profile.getProfileId() ).append( "\tname: " ).append( profile.getName() ).append(
+            "\tmode: " ).append( profile.getMode() );
+
         return builder;
     }
 
