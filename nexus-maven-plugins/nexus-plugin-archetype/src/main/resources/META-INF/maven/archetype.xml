@@ -8,12 +8,4 @@
     <source>src/main/java/VirusScannerRepositoryCustomizer.java</source>
     <source>src/main/java/VirusScannerRequestProcessor.java</source>
   </sources>
-  <testSources>
-    <source>src\test\java\VirusScannerIT.java</source>
-    <source>src\test\java\VirusScannerTest.java</source>
-  </testSources>
-  <resources>
-    <resource>resources\proxyRepo\release-proxy-repo-1\kungfu\artifact\1.0\artifact-1.0.jar</resource>
-    <resource>resources\proxyRepo\release-proxy-repo-1\kungfu\infected-artifact\1.0\infected-artifact-1.0.jar</resource>
-  </resources>
 </archetype>
