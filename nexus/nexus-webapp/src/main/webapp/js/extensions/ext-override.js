@@ -471,7 +471,7 @@ Ext.override(Ext.form.Field, {
       }
     });
 
-Ext.override(Ext.form.TextField, {
+Ext.override(Ext.form.Field, {
       onEnable : function() {
         this.getActionEl().removeClass(this.disabledClass);
         if (this.actionMode == 'container')
