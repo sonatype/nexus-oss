@@ -64,12 +64,12 @@ public class ListStageProfilesMojo
             if ( !profiles.isEmpty() )
             {
                 Formatter formatter = new Formatter( builder );
-                String format = "| %1$-15s| %2$-30s| %3$-7s|\n";
-                formatter.format( Locale.getDefault(), format, "Id", "Name", "Mode" );
+                String format = "| %1$-30s| %2$-16s| %3$-15s|\n";
+                formatter.format( Locale.getDefault(), format, "Name", "Type", "Id" );
                 for ( StageProfile profile : profiles )
                 {
-                    formatter.format( Locale.getDefault(), format, profile.getProfileId(), profile.getName(),
-                        profile.getMode() );
+                    formatter.format( Locale.getDefault(), format, profile.getName(),
+                        "GROUP".equals( profile.getMode() ) ? "Build Promotion" : "Staging", profile.getProfileId() );
                     // builder.append( listProfile( profile ) );
                 }
             }

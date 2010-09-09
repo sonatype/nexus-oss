@@ -25,9 +25,7 @@
       <url>${pluginsSiteBaseUrl}/${project.artifactId}</url>
     </site>
   </distributionManagement>
-  <description>
-	  Maven plugin used to interact with Nexus and Nexus Professional instances.
-	</description>
+  <description>Maven plugin used to interact with Nexus and Nexus Professional instances.</description>
   <properties>
     <forgeSiteUrl>dav:https://sites.sonatype.com/plugins/nexus-maven-plugin</forgeSiteUrl>
     <restlight.version>1.8.0-SNAPSHOT</restlight.version>
