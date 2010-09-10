@@ -33,11 +33,63 @@ public class DefaultRepositoryItemUid
 {
     private static enum LockStep
     {
-        READ, WRITE, READ_WRITE_UPGRADE, READ_AS_BEFORE, WRITE_AS_BEFORE;
+        READ( true ), WRITE( true ), READ_WRITE_UPGRADE( true ), READ_AS_BEFORE( false ), WRITE_AS_BEFORE( false );
+
+        private final boolean mustAct;
+
+        private LockStep( boolean mustAct )
+        {
+            this.mustAct = mustAct;
+        }
+
+        public boolean isMustAct()
+        {
+            return mustAct;
+        }
 
         public boolean isReadLockLastLocked()
         {
             return READ.equals( this ) || READ_AS_BEFORE.equals( this );
+        }
+
+        public LockStep getFollowingLockstep( Action action )
+        {
+            // sanity check, "action" and "this" must be aligned:
+            // reading actions may be with both locks (because WRITE will be not downgraded)
+            // writing actions may be with WRITE_* and upgrade steps only
+            if ( !action.isReadAction() )
+            {
+                // write action can be together with LockSteps: WRITE, WRITE_AS_BEFORE, READ_WRITE_UPGRADE
+                switch ( this )
+                {
+                    case WRITE:
+                    case WRITE_AS_BEFORE:
+                    case READ_WRITE_UPGRADE:
+                        break;
+
+                    default:
+                        throw new IllegalStateException( "Illegal combination of action \"" + action.toString()
+                            + "\" with lockstep " + this.toString() );
+                }
+            }
+
+            // return the appropriate "same as" step
+            switch ( this )
+            {
+                case READ:
+                case READ_AS_BEFORE:
+
+                    return READ_AS_BEFORE;
+
+                case WRITE:
+                case WRITE_AS_BEFORE:
+                case READ_WRITE_UPGRADE:
+
+                    return WRITE_AS_BEFORE;
+
+                default:
+                    throw new IllegalStateException( "Unknown lockstep " + this.toString() );
+            }
         }
     }
 
@@ -197,13 +249,13 @@ public class DefaultRepositoryItemUid
             {
                 // increasing the details level
                 IllegalMonitorStateException ie =
-                    new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' caused by: "
-                        + e.getMessage() );
+                    new IllegalMonitorStateException( "Unable to upgrade lock for: '" + lockKey + "' on "
+                        + this.toString() + " caused by: " + e.getMessage() );
                 ie.initCause( e );
                 throw ie;
             }
 
-            getActionLock( rwLock, action.isReadAction() ).lock();
+            getActionLock( rwLock, false ).lock();
 
             step = LockStep.READ_WRITE_UPGRADE;
         }
@@ -216,6 +268,9 @@ public class DefaultRepositoryItemUid
         }
         else
         {
+            // not a first timer (we already have some lock) and no lock upgrade needed, hence we have the proper lock
+            // already, just do nothing but note the fact in Stack
+
             // just DO NOT lock it, we already own the needed lock, and upgrade/dowgrade
             // becomes unmaneagable if we have reentrant locks!
             //
@@ -234,7 +289,7 @@ public class DefaultRepositoryItemUid
             // ...
             // unlock();
 
-            step = action.isReadAction() ? LockStep.READ_AS_BEFORE : LockStep.WRITE_AS_BEFORE;
+            step = step.getFollowingLockstep( action );
         }
 
         putLastStep( lockKey, step );
@@ -251,25 +306,24 @@ public class DefaultRepositoryItemUid
                 + "\" was tried to be unlocked but had no step-history..." );
         }
 
-        if ( LockStep.READ.equals( step ) )
+        if ( step.isMustAct() )
         {
-            getActionLock( rwLock, true ).unlock();
-        }
-        else if ( LockStep.WRITE.equals( step ) )
-        {
-            getActionLock( rwLock, false ).unlock();
-        }
-        else if ( LockStep.READ_WRITE_UPGRADE.equals( step ) )
-        {
-            // now we need to downgrade (w->r)
-            // java5+ supports this direction, do it by the "book"
-            getActionLock( rwLock, true ).lock();
+            if ( LockStep.READ.equals( step ) )
+            {
+                getActionLock( rwLock, true ).unlock();
+            }
+            else if ( LockStep.WRITE.equals( step ) )
+            {
+                getActionLock( rwLock, false ).unlock();
+            }
+            else if ( LockStep.READ_WRITE_UPGRADE.equals( step ) )
+            {
+                // now we need to downgrade (w->r)
+                // java5+ supports this direction, do it by the "book"
+                getActionLock( rwLock, true ).lock();
 
-            getActionLock( rwLock, false ).unlock();
-        }
-        else if ( LockStep.READ_AS_BEFORE.equals( step ) || LockStep.WRITE_AS_BEFORE.equals( step ) )
-        {
-            // simply do nothing
+                getActionLock( rwLock, false ).unlock();
+            }
         }
 
         putLastStep( lockKey, null );
@@ -312,4 +366,19 @@ public class DefaultRepositoryItemUid
 
         return false;
     }
+
+    // for Debug/tests vvv
+
+    protected ReentrantReadWriteLock getContentLock()
+    {
+        return contentLock;
+    }
+
+    protected ReentrantReadWriteLock getAttributesLock()
+    {
+        return attributesLock;
+    }
+
+    // for Debug/tests ^^^
+
 }
