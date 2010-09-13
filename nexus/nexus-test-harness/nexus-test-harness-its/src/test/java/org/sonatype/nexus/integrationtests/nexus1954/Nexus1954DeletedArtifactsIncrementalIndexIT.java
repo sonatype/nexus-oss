@@ -12,6 +12,9 @@ public class Nexus1954DeletedArtifactsIncrementalIndexIT
         throws Exception
     {
         RepositoryMessageUtil.updateIncrementalIndexes( REPO_TEST_HARNESS_REPO );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         RepositoryMessageUtil.updateIncrementalIndexes( REPO_TEST_HARNESS_PROXY );
 
         TaskScheduleUtil.waitForAllTasksToStop();
