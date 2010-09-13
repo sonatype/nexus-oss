@@ -12,6 +12,9 @@ public class Nexus1954DeletedArtifactsFullIndexIT
         throws Exception
     {
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_PROXY );
 
         TaskScheduleUtil.waitForAllTasksToStop();
