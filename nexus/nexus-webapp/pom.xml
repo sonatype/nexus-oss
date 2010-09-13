@@ -552,7 +552,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>provided-dependencies-maven-plugin</artifactId>
-        <version>1.4-SNAPSHOT</version>
+        <version>1.4</version>
         <executions>
           <execution>
             <goals>
