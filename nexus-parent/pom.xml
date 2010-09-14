@@ -11,15 +11,15 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>17</version>
+  <version>18-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-parent-17</connection>
-    <url>http://svn.sonatype.org/nexus/tags/nexus-parent-17</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-parent-17</developerConnection>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-parent</connection>
+    <url>http://svn.sonatype.org/nexus/trunk/nexus-parent</url>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-parent</developerConnection>
   </scm>
 
   <properties>
