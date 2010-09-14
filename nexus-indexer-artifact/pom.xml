@@ -33,4 +33,11 @@
       </plugin>
     </plugins>
   </build>
+  
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</developerConnection>
+    <url>http://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</url>
+  </scm>  
+
 </project>
