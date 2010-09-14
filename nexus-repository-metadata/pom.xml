@@ -106,4 +106,11 @@
       <timezone>-6</timezone>
     </developer>
   </developers>
+
+  <scm>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</developerConnection>
+    <url>http://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</url>
+  </scm>
+ 
 </project>
