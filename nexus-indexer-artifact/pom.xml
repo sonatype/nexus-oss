@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -9,7 +8,7 @@
   </parent>
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-indexer-artifact</artifactId>
-  <version>1.0.1-SNAPSHOT</version>
+  <version>1.0.1</version>
 
   <!-- a short but descriptive name for the project -->
   <name>Sonatype Nexus Indexer Artifact</name>
@@ -35,9 +34,9 @@
   </build>
   
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</developerConnection>
-    <url>http://svn.sonatype.org/nexus/trunk/nexus-indexer-artifact</url>
+    <connection>scm:svn:http://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.1</connection>
+    <developerConnection>scm:svn:https://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.1</developerConnection>
+    <url>http://svn.sonatype.org/nexus/tags/nexus-indexer-artifact-1.0.1</url>
   </scm>  
 
 </project>
