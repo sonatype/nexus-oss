@@ -9,7 +9,7 @@
 
   <artifactId>nexus-maven-site-plugin</artifactId>
 
-  <version>1.4.4</version>
+  <version>1.4.5-SNAPSHOT</version>
 
   <packaging>nexus-plugin</packaging>
 
@@ -207,10 +207,4 @@
       </build>
     </profile>
   </profiles>
-
-  <scm>
-    <connection>scm:svn:https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-maven-site-plugin-1.4.4</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-maven-site-plugin-1.4.4</developerConnection>
-    <url>https://svn.sonatype.com/repos/code/products/nexus-enterprise/tags/nexus-maven-site-plugin-1.4.4</url>
-  </scm>
 </project>
