@@ -37,12 +37,12 @@ public class SynchronizeShadowsTask
 
     public String getShadowRepositoryId()
     {
-        return getParameter( SynchronizeShadowTaskDescriptor.REPO_FIELD_ID );
+        return getRepositoryId();
     }
 
     public void setShadowRepositoryId( String shadowRepositoryId )
     {
-        getParameters().put( SynchronizeShadowTaskDescriptor.REPO_FIELD_ID, shadowRepositoryId );
+        setRepositoryId( shadowRepositoryId );
     }
 
     @Override
