@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-plugins</artifactId>
-    <version>1.8.1-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <packaging>pom</packaging>
