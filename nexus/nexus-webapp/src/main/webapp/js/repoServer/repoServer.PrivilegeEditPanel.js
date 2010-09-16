@@ -352,6 +352,9 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
         repositoryGroupId : function(val, fpanel) {
           var v = fpanel.form.findField('repositoryOrGroup').getValue();
           return v.indexOf('group_') == 0 ? v.substring('group_'.length) : '';
+        },
+        type : function(val, fpanel) {
+          return 'target';
         }
       }
     },
@@ -413,28 +416,6 @@ Sonatype.repoServer.PrivilegeEditor = function(config) {
 
   if (this.isNew)
   {
-    items.push({
-          xtype : 'combo',
-          fieldLabel : 'Type',
-          itemCls : 'required-field',
-          helpText : ht.type,
-          name : 'type',
-          store : this.privilegeTypeStore,
-          displayField : 'name',
-          valueField : 'id',
-          editable : false,
-          forceSelection : true,
-          mode : 'local',
-          triggerAction : 'all',
-          emptyText : 'Select...',
-          selectOnFocus : true,
-          allowBlank : false,
-          width : this.COMBO_WIDTH,
-          value : 'target',
-          lazyInit : false,
-          disabled : true
-        });
-
     // clone the target store
     var targetStore2 = new Ext.data.JsonStore({
           root : 'data',
