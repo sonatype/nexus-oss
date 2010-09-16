@@ -14,6 +14,7 @@
 package org.sonatype.nexus.tasks;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
@@ -43,6 +44,21 @@ public class SynchronizeShadowsTask
     public void setShadowRepositoryId( String shadowRepositoryId )
     {
         setRepositoryId( shadowRepositoryId );
+    }
+    
+    @Override
+    public String getRepositoryId()
+    {
+        return getParameters().get( getRepositoryFieldId() );
+    }
+    
+    @Override
+    public void setRepositoryId( String repositoryId )
+    {
+        if ( !StringUtils.isEmpty( repositoryId ) )
+        {
+            getParameters().put( getRepositoryFieldId(), repositoryId );
+        }
     }
 
     @Override
