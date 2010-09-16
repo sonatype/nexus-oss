@@ -55,6 +55,11 @@ public class DefaultPasswordEncoderManager
 
     public boolean isPasswordValid( String encodedPassword, String password, Object salt )
     {
+        if( encodedPassword == null )
+        {
+            return false;
+        }
+        
         String encoding = preferredEncoding;
 
         Matcher matcher = ENCODING_SPEC_PATTERN.matcher( encodedPassword );

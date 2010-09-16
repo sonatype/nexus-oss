@@ -68,9 +68,12 @@ public class PasswordEcoderTest
         Assert.assertTrue( this.passwordEncoderManager.isPasswordValid( cryptPassword, password, null ) );       
     }
     
-    public void testQuick()
+    public void testNull()
     {
-        System.out.println( "MD5 'md5123': "+ new MD5CryptPasswordEncoder().encodePassword( "md5123", null ) );
+        Assert.assertFalse( this.passwordEncoderManager.isPasswordValid( null, "non null string", null ) );
+        Assert.assertFalse( this.passwordEncoderManager.isPasswordValid( null, null, null ) );
     }
+    
+    
     
 }
