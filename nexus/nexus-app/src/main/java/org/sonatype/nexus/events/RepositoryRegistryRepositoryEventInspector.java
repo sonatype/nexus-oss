@@ -19,6 +19,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -38,11 +39,14 @@ import org.sonatype.plexus.appevents.Event;
  * Toni: Split {@link RepositoryRegistryRepositoryEventInspector} into two parts. One is this and the other is the
  * extracted indexer logic. This indexer related inspector now sits IndexingRepositoryRegistryRepositoryEventInspector.
  * 
+ * TODO: this is mixed logic here, separate this into two EventInspectors.
+ * 
  * @author Juven Xu
  */
 @Component( role = EventInspector.class, hint = "RepositoryRegistryRepositoryEvent" )
 public class RepositoryRegistryRepositoryEventInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
 
     @Requirement
@@ -50,7 +54,7 @@ public class RepositoryRegistryRepositoryEventInspector
 
     @Requirement
     private NexusScheduler nexusScheduler;
-    
+
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
 

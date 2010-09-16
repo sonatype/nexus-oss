@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -32,6 +33,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "LuceneIndexerManagerEventInspector" )
 public class IndexerManagerEventInspector
     extends AbstractEventInspector
+    implements AsynchronousEventInspector
 {
     @Requirement
     private IndexerManager indexerManager;
@@ -45,8 +47,7 @@ public class IndexerManagerEventInspector
     {
         // listen for STORE, CACHE, DELETE only
         return ( RepositoryItemEventStore.class.isAssignableFrom( evt.getClass() )
-            || RepositoryItemEventCache.class.isAssignableFrom( evt.getClass() ) || RepositoryItemEventDelete.class
-            .isAssignableFrom( evt.getClass() ) );
+            || RepositoryItemEventCache.class.isAssignableFrom( evt.getClass() ) || RepositoryItemEventDelete.class.isAssignableFrom( evt.getClass() ) );
     }
 
     public void inspect( Event<?> evt )
