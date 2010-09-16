@@ -14,10 +14,14 @@
 package org.sonatype.nexus.events;
 
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
@@ -35,24 +39,23 @@ public class DefaultEventInspectorHost
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
+    private Executor executor = Executors.newCachedThreadPool();
+
     public void processEvent( Event<?> evt )
     {
         for ( Map.Entry<String, EventInspector> entry : eventInspectors.entrySet() )
         {
             EventInspector ei = entry.getValue();
 
-            try
+            EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
+
+            if ( ei instanceof AsynchronousEventInspector )
             {
-                if ( ei.accepts( evt ) )
-                {
-                    ei.inspect( evt );
-                }
+                executor.execute( handler );
             }
-            catch ( Throwable e )
+            else
             {
-                getLogger().warn(
-                                  "EventInspector hint='" + entry.getKey() + "' class='" + ei.getClass().getName()
-                                      + "' had problem inspecting an event='" + evt.getClass() + "'", e );
+                handler.run();
             }
         }
     }
@@ -62,4 +65,40 @@ public class DefaultEventInspectorHost
         processEvent( evt );
     }
 
+    // ==
+
+    public static class EventInspectorHandler
+        implements Runnable
+    {
+        private final Logger logger;
+
+        private final EventInspector ei;
+
+        private final Event<?> evt;
+
+        public EventInspectorHandler( Logger logger, EventInspector ei, Event<?> evt )
+        {
+            super();
+            this.logger = logger;
+            this.ei = ei;
+            this.evt = evt;
+        }
+
+        public void run()
+        {
+            try
+            {
+                if ( ei.accepts( evt ) )
+                {
+                    ei.inspect( evt );
+                }
+            }
+            catch ( Throwable e )
+            {
+                logger.warn( "EventInspector implementation='" + ei.getClass().getName()
+                    + "' had problem inspecting an event='" + evt.getClass() + "'", e );
+            }
+        }
+
+    }
 }
