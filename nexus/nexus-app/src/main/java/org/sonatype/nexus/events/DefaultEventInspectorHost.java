@@ -14,32 +14,60 @@
 package org.sonatype.nexus.events;
 
 import java.util.Map;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
 /**
  * A default implementation of EventInspectorHost, a component simply collecting all EventInspectors and re-emitting
- * events towards them in they wants to receive it.
+ * events towards them in they wants to receive it. TODO: count inspector exceptions, and stop using them after some
+ * threshold (like 3 exceptions).
  * 
  * @author cstamas
  */
 @Component( role = EventInspectorHost.class )
 public class DefaultEventInspectorHost
     extends AbstractLogEnabled
-    implements EventInspectorHost
+    implements EventInspectorHost, Startable
 {
     @Requirement( role = EventInspector.class )
     private Map<String, EventInspector> eventInspectors;
 
-    private Executor executor = Executors.newCachedThreadPool();
+    private ExecutorService executor;
+
+    // == Startable iface, to manage ExecutorService lifecycle
+
+    public void start()
+        throws StartingException
+    {
+        // set up executor
+        executor = Executors.newCachedThreadPool( new EventInspectorThreadFactory() );
+    }
+
+    public void stop()
+        throws StoppingException
+    {
+        shutdown();
+    }
+
+    // ==
+
+    public void shutdown()
+    {
+        // we need clean shutdown, wait all bg event inspectors to finish to have consistent state
+        executor.shutdown();
+    }
+
+    // ==
 
     public void processEvent( Event<?> evt )
     {
@@ -49,14 +77,24 @@ public class DefaultEventInspectorHost
 
             EventInspectorHandler handler = new EventInspectorHandler( getLogger(), ei, evt );
 
-            if ( ei instanceof AsynchronousEventInspector )
-            {
-                executor.execute( handler );
-            }
-            else
-            {
-                handler.run();
-            }
+            // NEXUS-3800: async execution
+            // For now, turned off. Our core is happy and snappy with it, but some of our ITs are still unprepared for
+            // this
+            // since they do deploy-askIndexer and usually fail, since now indexer maintenance is async!
+            // Commenting this out all puts back into "old state". Later, we should review ITs and reenable this.
+            // ==
+
+            handler.run();
+
+            // ==
+            // if ( ei instanceof AsynchronousEventInspector && !executor.isShutdown() )
+            // {
+            // executor.execute( handler );
+            // }
+            // else
+            // {
+            // handler.run();
+            // }
         }
     }
 

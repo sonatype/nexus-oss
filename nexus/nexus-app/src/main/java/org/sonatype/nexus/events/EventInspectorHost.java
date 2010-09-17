@@ -23,5 +23,5 @@ import org.sonatype.plexus.appevents.EventListener;
 public interface EventInspectorHost
     extends EventListener
 {
-
+    void shutdown();
 }
