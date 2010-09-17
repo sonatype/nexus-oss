@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.8</version>
+    <version>1.4.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
@@ -107,54 +107,6 @@
             <artifactId>nexus-test-environment-maven-plugin</artifactId>
             <configuration>
               <testSkip>true</testSkip>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>obfuscation</id>
-      <activation>
-        <property>
-          <name>!skip-obfuscation</name>
-        </property>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-          </plugin>
-          <plugin>
-            <groupId>com.pyx4me</groupId>
-            <artifactId>proguard-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <phase>process-classes</phase>
-                <goals>
-                  <goal>proguard</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <injar>classes</injar>
-              <options>
-                <option>-keep public class com.sonatype.nexus.unpack.license.UnpackPlexusFeature { *; }</option>
-                <option>-keep public interface * { public *; }</option>
-                <option>-dontusemixedcaseclassnames</option>
-                <option>-keepattributes *Annotation*,Exceptions,InnerClasses,Signature,SourceFile,LineNumberTable</option>
-                <option>-printmapping ${project.build.directory}/out.map</option>
-                <option>-dontoptimize</option>
-                <option>-dontshrink</option>
-                <option>-repackageclasses 'codeguard.nexusunpackplugin'</option>
-                <option>-allowaccessmodification</option>
-                <option>-useuniqueclassmembernames</option>
-                <option>-obfuscationdictionary ${project.build.directory}/dictionary.txt</option>
-                <option>-classobfuscationdictionary ${project.build.directory}/dictionary.txt</option>
-              </options>
-              <libs>
-                <lib>${java-runtime}</lib>
-              </libs>
             </configuration>
           </plugin>
         </plugins>
