@@ -46,6 +46,7 @@
           </execution>
         </executions>
       </plugin>
+      <!-- 
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
@@ -75,10 +76,10 @@
        	  </nexusPluginsArtifacts>
         </configuration>
       </plugin>
-
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
+ -->
 
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -112,6 +113,7 @@
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
@@ -120,11 +122,12 @@
       <classifier>bundle</classifier>
       <scope>provided</scope>
     </dependency>
+     -->
 
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
-      <version>1.7.3</version>
+      <version>1.7.5</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -157,7 +160,7 @@
       <scope>test</scope>
       <version>${project.version}</version>
     </dependency>
-    
+
 	<dependency>
 	  <groupId>org.sonatype.appbooter.plexus-booters</groupId>
 	  <artifactId>plexus-app-booter</artifactId>
