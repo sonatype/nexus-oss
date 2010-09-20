@@ -103,7 +103,7 @@ public class DefaultUrlRealmConfiguration
             
             File configFile = this.getConfigFile();
             // make the parent dirs first
-            configFile.mkdirs();
+            configFile.getParentFile().mkdirs();
             
             fileWriter = new FileWriter( configFile );
 
