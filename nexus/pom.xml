@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>17</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
@@ -1226,7 +1226,8 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.19</enunciate.version>
+        <enunciate.version>1.20</enunciate.version>
+        <enunciate.plugin.version>1.20-SONATYPE-r919</enunciate.plugin.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
@@ -1272,7 +1273,7 @@
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-plugin</artifactId>
-            <version>${enunciate.version}</version>
+            <version>${enunciate.plugin.version}</version>
             <executions>
               <execution>
                 <phase>process-classes</phase>

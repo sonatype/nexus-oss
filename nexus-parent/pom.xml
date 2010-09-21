@@ -249,6 +249,29 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>quick</id>
+      <properties>
+        <test>void</test>
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+        <invoker.skip>true</invoker.skip>
+        <source.skip>true</source.skip>
+        <enunciate.skip>true</enunciate.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <configuration>
+              <testSkip>true</testSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
