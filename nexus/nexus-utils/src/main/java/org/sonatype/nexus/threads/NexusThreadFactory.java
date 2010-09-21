@@ -10,12 +10,12 @@
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the Apache License Version 2.0 for the specific language governing permissions and limitations there under.
  */
-package org.sonatype.nexus.events;
+package org.sonatype.nexus.threads;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class EventInspectorThreadFactory
+public class NexusThreadFactory
     implements ThreadFactory
 {
     private static final AtomicInteger poolNumber = new AtomicInteger( 1 );
@@ -28,20 +28,20 @@ public class EventInspectorThreadFactory
 
     private int threadPriority;
 
-    public EventInspectorThreadFactory()
+    public NexusThreadFactory( String poolId, String name )
     {
-        this( Thread.NORM_PRIORITY );
+        this( poolId, name, Thread.NORM_PRIORITY );
     }
 
-    public EventInspectorThreadFactory( int threadPriority )
+    public NexusThreadFactory( final String poolId, final String threadGroupName, final int threadPriority )
     {
         super();
 
         int poolNum = poolNumber.getAndIncrement();
 
-        this.schedulerThreadGroup = new ThreadGroup( "EventInspector scheduler #" + poolNum );
+        this.schedulerThreadGroup = new ThreadGroup( threadGroupName + " #" + poolNum );
 
-        this.namePrefix = "eipool-" + poolNum + "-thread-";
+        this.namePrefix = poolId + "-" + poolNum + "-thread-";
 
         this.threadPriority = threadPriority;
     }

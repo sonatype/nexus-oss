@@ -32,6 +32,7 @@ import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CHttpProxyCoreConfiguration;
 import org.sonatype.nexus.configuration.model.CHttpProxySettings;
+import org.sonatype.nexus.threads.NexusThreadFactory;
 
 /**
  * A default HTTP Proxy service. A very simple network service based on Java 5 ExecutorService.
@@ -190,7 +191,7 @@ public class DefaultHttpProxyService
 
             serverSocket = new ServerSocket( getPort() );
 
-            pool = Executors.newFixedThreadPool( poolSize );
+            pool = Executors.newFixedThreadPool( poolSize, new NexusThreadFactory( "nxhttpproxy", "Nexus HTTP Proxy" ) );
 
             serverThread = new Thread( new Server( this ) );
 

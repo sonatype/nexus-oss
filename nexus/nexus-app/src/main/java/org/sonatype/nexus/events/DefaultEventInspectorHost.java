@@ -25,6 +25,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.nexus.proxy.events.EventInspector;
+import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -50,7 +51,7 @@ public class DefaultEventInspectorHost
         throws StartingException
     {
         // set up executor
-        executor = Executors.newCachedThreadPool( new EventInspectorThreadFactory() );
+        executor = Executors.newCachedThreadPool( new NexusThreadFactory( "nxevthost", "Event Inspector Host" ) );
     }
 
     public void stop()

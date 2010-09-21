@@ -59,6 +59,7 @@ import org.sonatype.nexus.proxy.storage.remote.commonshttpclient.CommonsHttpClie
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
 import org.sonatype.nexus.proxy.walker.WalkerException;
 import org.sonatype.nexus.proxy.walker.WalkerFilter;
+import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.nexus.util.ConstantNumberSequence;
 import org.sonatype.nexus.util.FibonacciNumberSequence;
 import org.sonatype.nexus.util.NumberSequence;
@@ -84,7 +85,8 @@ public abstract class AbstractProxyRepository
      */
     private static final long AUTO_BLOCK_STATUS_MAX_RETAIN_TIME = 60L * 60L * 1000L;
 
-    private static final ExecutorService exec = Executors.newCachedThreadPool();
+    private static final ExecutorService remoteStatusUpdateExecutorService =
+        Executors.newCachedThreadPool( new NexusThreadFactory( "nxproxy", "Remote Status Update" ) );
 
     /** if remote url changed, need special handling after save */
     private boolean remoteUrlChanged = false;
@@ -224,7 +226,7 @@ public abstract class AbstractProxyRepository
     {
         getExternalConfiguration( true ).setFileTypeValidation( doValidate );
     }
-    
+
     public boolean isItemAgingActive()
     {
         return getExternalConfiguration( false ).isItemAgingActive();
@@ -408,17 +410,18 @@ public abstract class AbstractProxyRepository
     protected void autoBlockProxying( Throwable cause )
     {
         RemoteRepositoryStorage remoteStorage = getRemoteStorage();
-        
+
         /**
-         * Special case here to handle Amazon S3 storage.  Problem is that if we do a request against a folder, a 403 will
-         * always be returned, as S3 doesn't support that.  So we simple check if its s3 and if so, we ignore the fact that
-         * 403 was returned (only in regards to auto-blocking, rest of system will still handle 403 response as expected)
+         * Special case here to handle Amazon S3 storage. Problem is that if we do a request against a folder, a 403
+         * will always be returned, as S3 doesn't support that. So we simple check if its s3 and if so, we ignore the
+         * fact that 403 was returned (only in regards to auto-blocking, rest of system will still handle 403 response
+         * as expected)
          */
         try
         {
-            if ( remoteStorage instanceof CommonsHttpClientRemoteStorage 
-                            && ((CommonsHttpClientRemoteStorage) remoteStorage).isRemotePeerAmazonS3Storage(this)
-                            && cause instanceof RemoteAccessDeniedException )
+            if ( remoteStorage instanceof CommonsHttpClientRemoteStorage
+                && ( (CommonsHttpClientRemoteStorage) remoteStorage ).isRemotePeerAmazonS3Storage( this )
+                && cause instanceof RemoteAccessDeniedException )
             {
                 getLogger().debug( "Not autoblocking repository id " + getId() + "since this is Amazon S3 proxy repo" );
                 return;
@@ -429,7 +432,7 @@ public abstract class AbstractProxyRepository
             // This shouldn't occur, since we are just checking the context
             getLogger().debug( "Unable to validate if proxy repository id " + getId() + "is Amazon S3", e );
         }
-        
+
         // invalidate remote status
         setRemoteStatus( RemoteStatus.UNAVAILABLE, cause );
 
@@ -641,7 +644,7 @@ public abstract class AbstractProxyRepository
             // check for thread and go check it
             _remoteStatusChecking = true;
 
-            exec.submit( new RemoteStatusUpdateCallable( request ) );
+            remoteStatusUpdateExecutorService.submit( new RemoteStatusUpdateCallable( request ) );
         }
 
         return remoteStatus;
