@@ -1265,5 +1265,48 @@ public abstract class AbstractNexusIntegrationTest
             return null;
         }
     }
+    
+    protected void installOptionalPlugin( final String plugin )
+        throws IOException
+    {
+        File pluginDir = getOptionalPluginDirectory( plugin );
+
+        if ( pluginDir != null )
+        {
+            File target = new File( getNexusBaseDir(), "runtime/apps/nexus/plugin-repository/" + pluginDir.getName() );
+            FileUtils.copyDirectory( pluginDir, target );
+        }
+    }
+
+    protected File getOptionalPluginDirectory( final String plugin )
+    {
+        File optionalPluginDir = new File( getNexusBaseDir(), "runtime/apps/nexus/optional-plugins/" );
+
+        if ( optionalPluginDir.exists() && optionalPluginDir.isDirectory() )
+        {
+            File[] files = optionalPluginDir.listFiles( new FilenameFilter()
+            {
+                public boolean accept( File dir, String name )
+                {
+                    if ( name.startsWith( plugin ) )
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            } );
+
+            if ( files == null || files.length > 1 )
+            {
+                log.error( "Unable to lookup plugin: " + plugin );
+                return null;
+            }
+
+            return files[0];
+        }
+
+        return null;
+    }
 
 }

@@ -29,6 +29,9 @@ public class Nexus3699CapabilityIT
         super.copyConfigFiles();
 
         this.copyConfigFile( "capabilities.xml", WORK_CONF_DIR );
+        
+        //also need to move the plugin from optional to used
+        installOptionalPlugin( "nexus-capabilities-plugin" );
     }
 
     // @Test
