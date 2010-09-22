@@ -45,7 +45,7 @@ public class EventInspectorsUtil
                 return;
             }
 
-            Thread.sleep( 500 );
+            Thread.sleep( 800 );
         }
 
         throw new IOException( "Was not able to get to calm period even afer " + RETRIES + " retries!" );
