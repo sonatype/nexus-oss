@@ -16,6 +16,8 @@ package org.sonatype.nexus.events;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -69,6 +71,11 @@ public class DefaultEventInspectorHost
         executor.shutdown();
     }
 
+    public boolean isCalmPeriod()
+    {
+        return ( (ThreadPoolExecutor) executor ).getActiveCount() == 0;
+    }
+
     // ==
 
     public void processEvent( Event<?> evt )
@@ -89,9 +96,18 @@ public class DefaultEventInspectorHost
             // handler.run();
 
             // ==
-            if ( ei instanceof AsynchronousEventInspector && !executor.isShutdown() )
+            if ( ei instanceof AsynchronousEventInspector && executor != null && !executor.isShutdown() )
             {
-                executor.execute( handler );
+                try
+                {
+                    executor.execute( handler );
+                }
+                catch ( RejectedExecutionException e )
+                {
+                    // execute it in sync mode, executor is either full or shutdown (?)
+                    // in case executor is full, this "slowdown" will make it able consume and build up
+                    handler.run();
+                }
             }
             else
             {

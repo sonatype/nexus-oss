@@ -268,6 +268,8 @@ public class Nexus383SearchIT
             NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         TaskScheduleUtil.waitForTasks();
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // Keyword search does collapse results, so we need _1_
         // Not since NEXUS-3595, because we have only 3 hits, collapse will be overridden
