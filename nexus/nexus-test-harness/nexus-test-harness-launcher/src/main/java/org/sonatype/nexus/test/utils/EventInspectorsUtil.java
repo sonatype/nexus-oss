@@ -18,10 +18,19 @@ public class EventInspectorsUtil
     public boolean isCalmPeriod()
         throws IOException
     {
-        Response response = RequestFacade.doGetRequest( "service/local/eventInspectors/isCalmPeriod" );
+        final Response response = RequestFacade.doGetRequest( "service/local/eventInspectors/isCalmPeriod" );
 
-        return response.getStatus().getCode() == Status.SUCCESS_OK.getCode(); // only 200 Ok means calm period,
-                                                                              // otherwise 202 Accepted is returned
+        if ( response.getStatus().isSuccess() )
+        {
+            // only 200 Ok means calm period,
+            // otherwise 202 Accepted is returned
+            return response.getStatus().getCode() == Status.SUCCESS_OK.getCode();
+        }
+        else
+        {
+            throw new IOException( "The isCalmPeriod REST resource reported an error ("
+                + response.getStatus().toString() + "), bailing out!" );
+        }
     }
 
     public void waitForCalmPeriod()
