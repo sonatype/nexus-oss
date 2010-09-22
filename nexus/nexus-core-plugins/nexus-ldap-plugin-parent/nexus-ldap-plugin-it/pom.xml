@@ -159,6 +159,10 @@
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-exception-plugin</artifactId>
+            </plugin>
+            <plugin>
+              <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-test-harness-launcher</artifactId>
             </plugin>
           </nexusPluginsArtifacts>
