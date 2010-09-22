@@ -24,6 +24,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.threads.NexusThreadFactory;
 import org.sonatype.plexus.appevents.Event;
@@ -85,17 +86,17 @@ public class DefaultEventInspectorHost
             // Commenting this out all puts back into "old state". Later, we should review ITs and reenable this.
             // ==
 
-            handler.run();
+            // handler.run();
 
             // ==
-            // if ( ei instanceof AsynchronousEventInspector && !executor.isShutdown() )
-            // {
-            // executor.execute( handler );
-            // }
-            // else
-            // {
-            // handler.run();
-            // }
+            if ( ei instanceof AsynchronousEventInspector && !executor.isShutdown() )
+            {
+                executor.execute( handler );
+            }
+            else
+            {
+                handler.run();
+            }
         }
     }
 
