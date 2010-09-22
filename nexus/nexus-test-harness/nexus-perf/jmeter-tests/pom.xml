@@ -1,0 +1,95 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-perf</artifactId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>jmeter-tests</artifactId>
+  <packaging>pom</packaging>
+  <name>jmeter-tests</name>
+  <description></description>
+  <modules>
+    <module>ui-welcome</module>
+  </modules>
+
+  <properties>
+    <!-- Below is the "product", the subject of the tests -->
+    <product-groupId>org.sonatype.nexus</product-groupId>
+    <product-artifactId>nexus-oss-webapp</product-artifactId>
+    <product-version>${project.version}</product-version>
+    <product-classifier>bundle</product-classifier>
+    <product-type>zip</product-type>
+
+    <jmeter.version>2.4</jmeter.version>
+    <jmeter.packaging>tgz</jmeter.packaging>
+    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter-version}</jmeter.home>
+  </properties>
+
+
+  <!--
+  Steps to deploy Nexus and run a Test
+  ** We only perform tests on bundles **
+  ** CI Job takes care of parsing jtl files and failing if required **
+  ** our only goal here is to install Nexus and run a test against it **
+  1. Download and extract Nexus bundle
+  2. Copy any test resources to Nexus Bundle from the test resources dir
+  3. Extract required test plans and copy test datasets into place
+  4. Download and install JMeter binaries (optional profile)
+  3. Launch Nexus using exec-plugin,forked,jsw script
+  4. Check Nexus logs for errors, if any fail before running tests
+  5. Run jmeter extracted test plan/dataset, recording to jtl files
+  6. Check Nexus logs for any errors(??)
+  7. Shutdown Nexus using exec-plugin, forked, jsw-script
+   -->
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.1</version>
+          <executions>
+            <execution>
+              <id>unpack-jmeter</id>
+              <phase>pre-integration-test</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.apache.jmeter</groupId>
+                    <artifactId>jakarta-jmeter</artifactId>
+                    <version>${jmeter.version}</version>
+                    <type>${jmeter.packaging}</type>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                  </artifactItem>
+                </artifactItems>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <jmeter.packaging>zip</jmeter.packaging>
+      </properties>
+    </profile>
+  </profiles>
+
+</project>
