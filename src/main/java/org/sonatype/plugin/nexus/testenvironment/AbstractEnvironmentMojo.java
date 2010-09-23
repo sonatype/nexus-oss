@@ -1,8 +1,5 @@
 package org.sonatype.plugin.nexus.testenvironment;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.MapConstraints;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -55,14 +52,18 @@ import org.codehaus.plexus.util.io.RawInputStreamFacade;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+import com.google.common.collect.MapConstraints;
 
 public class AbstractEnvironmentMojo
     extends AbstractMojo
     implements Contextualizable
 {
 
-    public final static List<String> DEFAULT_PORT_NAMES = Collections.unmodifiableList(Arrays.asList(new String[]{"proxy-repo-port","proxy-repo-control-port","nexus-application-port","nexus-proxy-port","nexus-control-port","email-server-port","webproxy-server-port"}));
+    public final static List<String> DEFAULT_PORT_NAMES = Collections.unmodifiableList( Arrays.asList( new String[] {
+        "proxy-repo-port", "proxy-repo-control-port", "nexus-application-port", "nexus-proxy-port",
+        "nexus-control-port", "email-server-port", "webproxy-server-port" } ) );
 
     /**
      * Max times to try and allocate unique port values
@@ -124,12 +125,12 @@ public class AbstractEnvironmentMojo
     protected MavenArtifact nexusBundleArtifact;
 
     /**
-     * Name of teh directory created out of nexus artifact bundle.
-     * Default is ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
-     *
+     * Name of teh directory created out of nexus artifact bundle. Default is
+     * ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
+     * 
      * @parameter
      */
-    protected String nexusBundleName;    
+    protected String nexusBundleName;
 
     /**
      * Emma used on ITs
@@ -139,16 +140,14 @@ public class AbstractEnvironmentMojo
     private MavenArtifact emmaArtifact;
 
     /**
-     * Nexus plugin artifacts to be installed into the Nexus instance
-     * under test.
+     * Nexus plugin artifacts to be installed into the Nexus instance under test.
      * 
      * @parameter
      */
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
-     * Resources to be unpacked and then contents copied into Nexus
-     * default-configs
+     * Resources to be unpacked and then contents copied into Nexus default-configs
      * 
      * @parameter
      */
@@ -160,7 +159,7 @@ public class AbstractEnvironmentMojo
      * @parameter default-value="true"
      */
     private boolean setupMaven;
-    
+
     /**
      * When true setup emma
      * 
@@ -185,17 +184,17 @@ public class AbstractEnvironmentMojo
     private File mavenLocation;
 
     /**
-     * Resources in the test project can be added beneath this directory
-     * so that
+     * Resources in the test project can be added beneath this directory so that
+     * 
      * @parameter default-value="${basedir}/resources"
      */
     protected File resourcesSourceLocation;
 
     /**
-     * This directory is where the default-configs included inside the
-     * this plugin will be extracted to BEFORE they are copied into
-     * the nexus work dir. A project property 'test-resources-folder'
-     * contains the absolute path of this directory.
+     * This directory is where the default-configs included inside the this plugin will be extracted to BEFORE they are
+     * copied into the nexus work dir. A project property 'test-resources-folder' contains the absolute path of this
+     * directory.
+     * 
      * @parameter default-value="${project.build.directory}/resources"
      */
     private File resourcesDestinationLocation;
@@ -232,12 +231,11 @@ public class AbstractEnvironmentMojo
 
     /**
      * Known ports can be manually set as part of the configuration
+     * 
      * @parameter
      */
-    @SuppressWarnings("rawtypes")
-	private Map staticPorts;
-
-
+    @SuppressWarnings( "rawtypes" )
+    private Map staticPorts;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -253,14 +251,10 @@ public class AbstractEnvironmentMojo
         allocatePorts();
 
         project.getProperties().put( "jetty-application-host", "0.0.0.0" );
-        project.getProperties().put(
-                                     "nexus-base-url",
-                                     "http://localhost:"
-                                         + project.getProperties().getProperty( "nexus-application-port" ) + "/nexus/" );
-        project.getProperties().put(
-                                     "proxy-repo-base-url",
-                                     "http://localhost:" + project.getProperties().getProperty( "proxy-repo-port" )
-                                         + "/remote/" );
+        project.getProperties().put( "nexus-base-url",
+            "http://localhost:" + project.getProperties().getProperty( "nexus-application-port" ) + "/nexus/" );
+        project.getProperties().put( "proxy-repo-base-url",
+            "http://localhost:" + project.getProperties().getProperty( "proxy-repo-port" ) + "/remote/" );
         project.getProperties().put( "proxy-repo-base-dir", getPath( new File( destination, "proxy-repo" ) ) );
         project.getProperties().put( "proxy-repo-target-dir", getPath( new File( destination, "proxy-repo" ) ) );
 
@@ -273,7 +267,7 @@ public class AbstractEnvironmentMojo
         }
 
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
-        if( nexusBundleName != null )
+        if ( nexusBundleName != null )
         {
             nexusBaseDir = new File( destination, nexusBundleName );
         }
@@ -297,7 +291,7 @@ public class AbstractEnvironmentMojo
         File libFolder = new File( nexusBaseDir, "runtime/apps/nexus/lib" );
         if ( setupEmma )
         {
-        	copyEmma( libFolder );
+            copyEmma( libFolder );
         }
 
         // if any plugin artifacts were specified, install them into runtime
@@ -499,8 +493,7 @@ public class AbstractEnvironmentMojo
         catch ( Exception e )
         {
             throw new MojoExecutionException(
-                                              "Error adding properties '" + baseTestProperties.getAbsolutePath() + "'.",
-                                              e );
+                "Error adding properties '" + baseTestProperties.getAbsolutePath() + "'.", e );
         }
         finally
         {
@@ -510,30 +503,40 @@ public class AbstractEnvironmentMojo
     }
 
     // todo add this as a constraint
-    static final Pattern PORT_PATTERN = Pattern.compile("^(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)$");
+    static final Pattern PORT_PATTERN =
+        Pattern.compile( "^(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)$" );
 
-    private void validateStaticPorts() throws MojoExecutionException, MojoFailureException{
-        if(this.staticPorts != null){
-            try{
-                BiMap staticPortMap = HashBiMap.create(this.staticPorts.size());
-                staticPortMap = MapConstraints.constrainedBiMap(staticPortMap, MapConstraints.notNull());
-                staticPortMap.putAll(this.staticPorts);
+    private void validateStaticPorts()
+        throws MojoExecutionException, MojoFailureException
+    {
+        if ( this.staticPorts != null )
+        {
+            try
+            {
+                BiMap staticPortMap = HashBiMap.create( this.staticPorts.size() );
+                staticPortMap = MapConstraints.constrainedBiMap( staticPortMap, MapConstraints.notNull() );
+                staticPortMap.putAll( this.staticPorts );
                 this.staticPorts = staticPortMap;
-            } catch ( NullPointerException npe){
-                throw new MojoExecutionException("Port names and values must not be null.", npe);
-            } catch( IllegalArgumentException iae){
-                throw new MojoExecutionException("Port names and values must not be duplicated.", iae);
+            }
+            catch ( NullPointerException npe )
+            {
+                throw new MojoExecutionException( "Port names and values must not be null.", npe );
+            }
+            catch ( IllegalArgumentException iae )
+            {
+                throw new MojoExecutionException( "Port names and values must not be duplicated.", iae );
             }
         }
     }
 
-
     /**
-     * Call this to allocate the port values and store as project properties
-     * so that they can be filtered into the Nexus config files
+     * Call this to allocate the port values and store as project properties so that they can be filtered into the Nexus
+     * config files
      */
-    private void allocatePorts() throws MojoExecutionException, MojoFailureException{
-        allocatePorts(0);
+    private void allocatePorts()
+        throws MojoExecutionException, MojoFailureException
+    {
+        allocatePorts( 0 );
     }
 
     /**
@@ -541,26 +544,29 @@ public class AbstractEnvironmentMojo
      * @throws MojoFailureException if methodEntryCount exceeds {@link #MAX_PORT_ALLOCATION_RETRY}
      * @param entryNum a value less than {@link #MAX_PORT_ALLOCATION_RETRY}
      */
-    private void allocatePorts(int methodEntryCount)
+    private void allocatePorts( int methodEntryCount )
         throws MojoExecutionException, MojoFailureException
     {
-        if(methodEntryCount >= MAX_PORT_ALLOCATION_RETRY){
-            throw new MojoFailureException("Exceeded the maximum number of port allocation retries (" + MAX_PORT_ALLOCATION_RETRY + ")");
+        if ( methodEntryCount >= MAX_PORT_ALLOCATION_RETRY )
+        {
+            throw new MojoFailureException( "Exceeded the maximum number of port allocation retries ("
+                + MAX_PORT_ALLOCATION_RETRY + ")" );
         }
         methodEntryCount++;
 
         // calc dynamic and static ports
         List<Port> portsList = new ArrayList<Port>();
-        for (String portName : DEFAULT_PORT_NAMES){
-            Port port = new Port(portName);
-            if(this.staticPorts != null && this.staticPorts.containsKey(portName)){
+        for ( String portName : DEFAULT_PORT_NAMES )
+        {
+            Port port = new Port( portName );
+            if ( this.staticPorts != null && this.staticPorts.containsKey( portName ) )
+            {
                 // this prevents assigning random port and instead
                 // tests the static port for availability
-                String portNum = String.valueOf(this.staticPorts.get(portName));
-                getLog().debug("Statically defining port '"
-                            + portName + "' with value '" + portNum + "'.");
-                port.setPortNumber(Integer.valueOf(portNum));
-                port.setFailIfOccupied(true);
+                String portNum = String.valueOf( this.staticPorts.get( portName ) );
+                getLog().debug( "Statically defining port '" + portName + "' with value '" + portNum + "'." );
+                port.setPortNumber( Integer.valueOf( portNum ) );
+                port.setFailIfOccupied( true );
             }
             portsList.add( port );
         }
@@ -571,23 +577,23 @@ public class AbstractEnvironmentMojo
         portAllocator.setLog( getLog() );
         portAllocator.setPorts( portsList.toArray( new Port[0] ) );
         portAllocator.execute();
-        
 
         // detect port collisions from dynamic port assignment
         List<String> portNums = new ArrayList<String>();
-        for (String portName : DEFAULT_PORT_NAMES){
-            String portNum = String.valueOf(project.getProperties().get( portName ));
-            assert !"null".equals(portNum);
-            if(portNums.contains(portNum)){
+        for ( String portName : DEFAULT_PORT_NAMES )
+        {
+            String portNum = String.valueOf( project.getProperties().get( portName ) );
+            assert !"null".equals( portNum );
+            if ( portNums.contains( portNum ) )
+            {
                 // duplicate ports generated by port allocator, try again
-                getLog().debug("Duplicate port value of " + portNum +
-                        " is defined. Trying to re-allocate non-duplicate port values.");
-                allocatePorts(methodEntryCount);
+                getLog().debug(
+                    "Duplicate port value of " + portNum
+                        + " is defined. Trying to re-allocate non-duplicate port values." );
+                allocatePorts( methodEntryCount );
             }
-            portNums.add(portNum);
+            portNums.add( portNum );
         }
-
-        
 
     }
 
@@ -693,14 +699,14 @@ public class AbstractEnvironmentMojo
 
             File tempFile = File.createTempFile( name, extension );
             FileUtils.copyStreamToFile( new RawInputStreamFacade( getClass().getResourceAsStream( sourceUrl ) ),
-                                        tempFile );
+                tempFile );
             mavenFileFilter.copyFile( tempFile, destinationFile, true, project, null, true, "UTF-8", session );
             tempFile.delete();
         }
         catch ( Exception e )
         {
             throw new MojoExecutionException( "Unable to copy resouce " + sourceUrl + " to " + name + "." + extension,
-                                              e );
+                e );
         }
     }
 
@@ -797,6 +803,21 @@ public class AbstractEnvironmentMojo
                                File pluginsFolder )
         throws MojoFailureException, MojoExecutionException
     {
+
+        Set<Artifact> plugins = new LinkedHashSet<Artifact>();
+        for ( MavenArtifact plugin : nexusPluginsArtifacts )
+        {
+            Artifact pluginArtifact = getMavenArtifact( plugin );
+            plugins.add( pluginArtifact );
+        }
+
+        nexusPluginsArtifacts = new LinkedHashSet<MavenArtifact>( nexusPluginsArtifacts );
+        Collection<Artifact> nonTransitivePlugins = getNonTransitivePlugins( plugins );
+        for ( Artifact artifact : nonTransitivePlugins )
+        {
+            nexusPluginsArtifacts.add( new MavenArtifact( artifact.getGroupId(), artifact.getArtifactId(),
+                artifact.getClassifier(), artifact.getType() ) );
+        }
 
         for ( MavenArtifact plugin : nexusPluginsArtifacts )
         {
@@ -917,15 +938,14 @@ public class AbstractEnvironmentMojo
         {
             artifact =
                 artifactFactory.createArtifactWithClassifier( mavenArtifact.getGroupId(),
-                                                              mavenArtifact.getArtifactId(),
-                                                              mavenArtifact.getVersion(), mavenArtifact.getType(),
-                                                              mavenArtifact.getClassifier() );
+                    mavenArtifact.getArtifactId(), mavenArtifact.getVersion(), mavenArtifact.getType(),
+                    mavenArtifact.getClassifier() );
         }
         else
         {
             Set<Artifact> projectArtifacts =
                 getFilteredArtifacts( mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(),
-                                      mavenArtifact.getType(), mavenArtifact.getClassifier() );
+                    mavenArtifact.getType(), mavenArtifact.getClassifier() );
 
             if ( projectArtifacts.isEmpty() )
             {
@@ -945,7 +965,7 @@ public class AbstractEnvironmentMojo
         {
             artifact =
                 artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
-                                                              artifact.getVersion(), "zip", "bundle" );
+                    artifact.getVersion(), "zip", "bundle" );
         }
 
         return resolve( artifact );
@@ -1038,8 +1058,7 @@ public class AbstractEnvironmentMojo
         {
             Artifact ra =
                 artifactFactory.createArtifactWithClassifier( artifact.getGroupId(), artifact.getArtifactId(),
-                                                              artifact.getVersion(), artifact.getType(),
-                                                              artifact.getClassifier() );
+                    artifact.getVersion(), artifact.getType(), artifact.getClassifier() );
 
             resolvedArtifacts.add( resolve( ra ) );
         }
@@ -1057,7 +1076,7 @@ public class AbstractEnvironmentMojo
         {
             Artifact pomArtifact =
                 artifactFactory.createArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(),
-                                                artifact.getClassifier(), "pom" );
+                    artifact.getClassifier(), "pom" );
             Set<Artifact> result;
             try
             {
@@ -1067,7 +1086,7 @@ public class AbstractEnvironmentMojo
                 Set<Artifact> artifacts = pomProject.createArtifacts( artifactFactory, null, null );
                 ArtifactResolutionResult arr =
                     resolver.resolveTransitively( artifacts, pomArtifact, localRepository, remoteRepositories,
-                                                  artifactMetadataSource, null );
+                        artifactMetadataSource, null );
                 result = arr.getArtifacts();
             }
             catch ( Exception e )
@@ -1105,15 +1124,15 @@ public class AbstractEnvironmentMojo
             if ( !marker.createNewFile() )
             {
                 this.getLog().warn(
-                                    "Failed to create marker file: " + marker.getAbsolutePath()
-                                        + " bundle will be extracted every time you run the build." );
+                    "Failed to create marker file: " + marker.getAbsolutePath()
+                        + " bundle will be extracted every time you run the build." );
             }
         }
         catch ( IOException e )
         {
             this.getLog().warn(
-                                "Failed to create marker file: " + marker.getAbsolutePath()
-                                    + " bundle will be extracted every time you run the build." );
+                "Failed to create marker file: " + marker.getAbsolutePath()
+                    + " bundle will be extracted every time you run the build." );
         }
     }
 
