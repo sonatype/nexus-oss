@@ -55,6 +55,13 @@
       <type>zip</type>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-archetype-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.runtime.itars</groupId>
       <artifactId>itar-plexus-jsw-app-booter</artifactId>
       <version>${itar-plexus-jsw-app-booter.version}</version>
