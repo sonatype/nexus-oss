@@ -73,7 +73,10 @@ public class DefaultEventInspectorHost
 
     public boolean isCalmPeriod()
     {
-        return ( (ThreadPoolExecutor) executor ).getActiveCount() == 0;
+        final ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
+
+        // "calm period" is when we have no active threads, neither queued ones
+        return tpe.getActiveCount() == 0 && tpe.getQueue().isEmpty();
     }
 
     // ==
