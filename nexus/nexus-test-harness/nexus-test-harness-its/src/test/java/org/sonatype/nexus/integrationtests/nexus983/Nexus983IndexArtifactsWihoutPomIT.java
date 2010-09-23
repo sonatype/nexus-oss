@@ -36,8 +36,12 @@ public class Nexus983IndexArtifactsWihoutPomIT
         throws Exception
     {
         File artifactFile = getTestFile( "artifact.jar" );
-        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "content/repositories/"
-            + REPO_TEST_HARNESS_REPO, artifactFile, "nexus983/nexus983-artifact1/1.0.0/nexus983-artifact1-1.0.0.jar" );
+        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "content/repositories/" + REPO_TEST_HARNESS_REPO,
+            artifactFile, "nexus983/nexus983-artifact1/1.0.0/nexus983-artifact1-1.0.0.jar" );
+
+        // wait to index up the changes
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact1", SearchType.EXACT );
         Assert.assertEquals( "Should find one artifact", 1, artifacts.size() );
     }
@@ -50,6 +54,9 @@ public class Nexus983IndexArtifactsWihoutPomIT
         FileUtils.copyFile( artifactFile, new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO
             + "/nexus983/nexus983-artifact2/1.0.0/nexus983-artifact2-1.0.0.jar" ) );
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
+
+        // wait to index up the changes
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact2", SearchType.EXACT );
         Assert.assertEquals( "Should find one artifact", 1, artifacts.size() );
