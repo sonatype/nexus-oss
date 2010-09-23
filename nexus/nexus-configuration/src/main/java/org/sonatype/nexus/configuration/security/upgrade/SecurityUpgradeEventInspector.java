@@ -8,6 +8,7 @@ import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.nexus.ApplicationStatusSource;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
@@ -16,12 +17,10 @@ import org.sonatype.security.events.SecurityConfigurationChangedEvent;
 import org.sonatype.security.model.Configuration;
 import org.sonatype.security.model.source.SecurityModelConfigurationSource;
 import org.sonatype.security.model.upgrade.SecurityDataUpgrader;
-import org.sonatype.security.realms.tools.ConfigurationManager;
 
 @Component( role = EventInspector.class, hint = "SecurityUpgradeEventInspector" )
 public class SecurityUpgradeEventInspector
-    extends AbstractLogEnabled
-    implements EventInspector
+    extends AbstractEventInspector
 {
 
     @Requirement
@@ -42,11 +41,7 @@ public class SecurityUpgradeEventInspector
 
     public boolean accepts( Event<?> evt )
     {
-        if ( evt instanceof NexusStartedEvent )
-        {
-            return true;
-        }
-        return false;
+        return ( evt instanceof NexusStartedEvent );
     }
 
     public void inspect( Event<?> evt )

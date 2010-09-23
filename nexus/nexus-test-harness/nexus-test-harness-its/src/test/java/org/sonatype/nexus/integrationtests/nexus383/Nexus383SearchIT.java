@@ -72,6 +72,11 @@ public class Nexus383SearchIT
         getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, true );
         getSearchMessageUtil().allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
+
+        // config changes may result in tasks spawned like reindex(!)
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     @Test

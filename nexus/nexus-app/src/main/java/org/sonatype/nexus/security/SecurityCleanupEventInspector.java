@@ -5,11 +5,11 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
@@ -23,8 +23,7 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 
 @Component( role = EventInspector.class, hint = "SecurityCleanupEventInspector" )
 public class SecurityCleanupEventInspector
-    extends AbstractLogEnabled
-    implements EventInspector
+    extends AbstractEventInspector
 {
     @Requirement( hint = "default" )
     private ConfigurationManager configManager;
