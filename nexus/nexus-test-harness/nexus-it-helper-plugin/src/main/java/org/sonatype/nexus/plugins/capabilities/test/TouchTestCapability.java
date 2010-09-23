@@ -1,4 +1,4 @@
-package org.sonatype.nexus.test;
+package org.sonatype.nexus.plugins.capabilities.test;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;

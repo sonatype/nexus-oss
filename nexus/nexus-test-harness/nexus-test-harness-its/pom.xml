@@ -92,24 +92,13 @@
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>
             <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-simple-memory-realm</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-exception-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.security.realms</groupId>
-              <artifactId>security-url-realm</artifactId>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>cp</classifier>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-capability-plugin</artifactId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
@@ -147,14 +136,6 @@
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-capability-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-
     <!-- Needed to make it "win" -->
     <dependency>
       <groupId>junit</groupId>

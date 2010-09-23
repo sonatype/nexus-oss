@@ -1,4 +1,4 @@
-package org.sonatype.nexus.test;
+package org.sonatype.nexus.plugins.capabilities.test;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;

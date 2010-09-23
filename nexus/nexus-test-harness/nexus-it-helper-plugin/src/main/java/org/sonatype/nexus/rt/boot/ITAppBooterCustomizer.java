@@ -1,11 +1,11 @@
-package org.sonatype.nexus.integrationtests.rt.boot;
+package org.sonatype.nexus.rt.boot;
 
 import java.io.File;
 
 import org.sonatype.appbooter.AbstractPlexusAppBooterCustomizer;
 import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.appcontext.AppContext;
-import org.sonatype.nexus.integrationtests.rt.prefs.FilePreferencesFactory;
+import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 
 public class ITAppBooterCustomizer
     extends AbstractPlexusAppBooterCustomizer

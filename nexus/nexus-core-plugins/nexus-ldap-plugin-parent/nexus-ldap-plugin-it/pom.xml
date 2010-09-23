@@ -159,7 +159,15 @@
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-exception-plugin</artifactId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <version>${project.version}</version>
+              <classifier>cp</classifier>
+            </plugin>
+            <plugin>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>bundle</classifier>
+              <type>zip</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>

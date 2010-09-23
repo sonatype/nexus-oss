@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.rt.prefs;
+package org.sonatype.nexus.rt.prefs;
 
 import java.io.File;
 import java.util.prefs.Preferences;

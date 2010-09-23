@@ -1,4 +1,4 @@
-package org.sonatype.nexus.test;
+package org.sonatype.nexus.plugins.capabilities.test;
 
 import java.util.ArrayList;
 import java.util.List;

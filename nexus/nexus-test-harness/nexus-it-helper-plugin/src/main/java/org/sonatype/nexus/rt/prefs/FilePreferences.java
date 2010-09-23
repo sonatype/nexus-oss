@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.rt.prefs;
+package org.sonatype.nexus.rt.prefs;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -53,6 +53,7 @@ public class FilePreferences
         }
     }
 
+    @Override
     protected void putSpi( String key, String value )
     {
         root.put( key, value );
@@ -66,11 +67,13 @@ public class FilePreferences
         }
     }
 
+    @Override
     protected String getSpi( String key )
     {
         return root.get( key );
     }
 
+    @Override
     protected void removeSpi( String key )
     {
         root.remove( key );
@@ -84,6 +87,7 @@ public class FilePreferences
         }
     }
 
+    @Override
     protected void removeNodeSpi()
         throws BackingStoreException
     {
@@ -91,18 +95,21 @@ public class FilePreferences
         flush();
     }
 
+    @Override
     protected String[] keysSpi()
         throws BackingStoreException
     {
         return root.keySet().toArray( new String[root.keySet().size()] );
     }
 
+    @Override
     protected String[] childrenNamesSpi()
         throws BackingStoreException
     {
         return children.keySet().toArray( new String[children.keySet().size()] );
     }
 
+    @Override
     protected FilePreferences childSpi( String name )
     {
         FilePreferences child = children.get( name );
@@ -114,16 +121,21 @@ public class FilePreferences
         return child;
     }
 
+    @Override
     protected void syncSpi()
         throws BackingStoreException
     {
         if ( isRemoved() )
+        {
             return;
+        }
 
         final File file = FilePreferencesFactory.getPreferencesFile();
 
         if ( !file.exists() )
+        {
             return;
+        }
 
         synchronized ( file )
         {
@@ -162,12 +174,15 @@ public class FilePreferences
     {
         final FilePreferences parent = (FilePreferences) parent();
         if ( parent == null )
+        {
             return;
+        }
 
         parent.getPath( sb );
         sb.append( name() ).append( '.' );
     }
 
+    @Override
     protected void flushSpi()
         throws BackingStoreException
     {

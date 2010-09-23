@@ -349,7 +349,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>1.5</version>
+          <version>1.6-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>
