@@ -3,20 +3,19 @@ package org.sonatype.plexus.components.ehcache;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
 
+import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.config.Configuration;
 import net.sf.ehcache.config.ConfigurationFactory;
 
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.context.Context;
-import org.codehaus.plexus.context.ContextException;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.interpolation.InterpolationException;
+import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.RegexBasedInterpolator;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Contextualizable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
+import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 
@@ -25,41 +24,25 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
  */
 @Component( role = PlexusEhCacheWrapper.class )
 public class DefaultEhCacheWrapper
-    extends AbstractLogEnabled
-    implements PlexusEhCacheWrapper, Contextualizable, Disposable
+    implements PlexusEhCacheWrapper, Startable
 {
+    @Requirement
+    private Logger logger;
 
-    /**
-     * The application interpolation service.
-     */
-    private RegexBasedInterpolator regexBasedInterpolator = new RegexBasedInterpolator();
+    @Requirement
+    private PlexusContainer plexusContainer;
 
     /** The eh cache manager. */
-    private net.sf.ehcache.CacheManager ehCacheManager;
+    private CacheManager ehCacheManager;
 
-    private Map<?, ?> variables;
-
-    public net.sf.ehcache.CacheManager getEhCacheManager()
+    protected Logger getLogger()
     {
-        if ( this.ehCacheManager == null )
-        {
-            try
-            {
-                this.constructEhCacheManager();
-            }
-            catch ( InterpolationException e )
-            {
-                this.getLogger().error( "Failed to initialize EHCache: " + e.getMessage(), e );
-            }
-        }
-
-        return this.ehCacheManager;
+        return logger;
     }
 
-    public void start()
-        throws StartingException
+    public synchronized CacheManager getEhCacheManager()
     {
-        if ( this.ehCacheManager == null )
+        if ( ehCacheManager == null )
         {
             try
             {
@@ -67,112 +50,33 @@ public class DefaultEhCacheWrapper
             }
             catch ( InterpolationException e )
             {
-                throw new StartingException( "Could not start " + this.getClass().getSimpleName() + ":", e );
+                getLogger().error( "Failed to initialize EHCache: " + e.getMessage(), e );
+
+                throw new IllegalStateException( "Failed to initialize EHCache manager!", e );
             }
         }
-        else
-        {
-            this.getLogger().debug( "DefaultEhCacheManager is already started." );
-        }
 
+        return ehCacheManager;
+    }
+
+    public void start()
+        throws StartingException
+    {
+        try
+        {
+            // just "fetch" it to force it's creation
+            getEhCacheManager();
+        }
+        catch ( IllegalStateException e )
+        {
+            throw new StartingException( e.getMessage(), e );
+        }
     }
 
     public void stop()
         throws StoppingException
     {
-        dispose();
-    }
-
-    private void constructEhCacheManager()
-        throws InterpolationException
-    {
-        InputStream configStream = this.getClass().getResourceAsStream( "/ehcache.xml" );
-
-        if ( configStream != null )
-        {
-            Configuration ehConfig =
-                ConfigurationFactory.parseConfiguration( new InterpolatingInputStream( configStream, variables ) );
-
-            configureDiskStore( ehConfig );
-
-            getLogger().info(
-                              "Creating and configuring EHCache manager with classpath:/ehcache.xml, using disk store '"
-                                  + ( ehConfig.getDiskStoreConfiguration() == null ? "none" : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
-
-            ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
-        }
-        else
-        {
-            configStream = this.getClass().getResourceAsStream( "/ehcache-default.xml" );
-
-            if ( configStream != null )
-            {
-                getLogger().info(
-                                  "No user EHCache configuration found, creating EHCache manager and configuring it with classpath:/ehcache-default.xml." );
-
-                Configuration ehConfig =
-                    ConfigurationFactory.parseConfiguration( new InterpolatingInputStream( configStream, variables ) );
-
-                configureDiskStore( ehConfig );
-
-                getLogger().info(
-                                  "Creating and configuring EHCache manager with Nexus Default EHCache Configuration, using disk store '"
-                                      + ( ehConfig.getDiskStoreConfiguration() == null ? "none" : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
-
-                ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
-            }
-            else
-            {
-                getLogger().warn(
-                                  "Creating 'default' EHCache manager since no user or default ehcache.xml configuration found on classpath root." );
-
-                ehCacheManager = new net.sf.ehcache.CacheManager();
-            }
-        }
-    }
-
-    private void configureDiskStore( Configuration ehConfig )
-        throws InterpolationException
-    {
-        //if disk store isn't configured, don't muck with it
-        if ( ehConfig.getDiskStoreConfiguration() != null
-            && ehConfig.getDiskStoreConfiguration().getPath() != null )
-        {
-            // add plexus awareness with interpolation
-            String path = ehConfig.getDiskStoreConfiguration().getPath();
-    
-            try
-            {
-                path = this.regexBasedInterpolator.interpolate( path, "" );
-    
-                path = new File( path ).getCanonicalPath();
-            }
-            catch ( IOException e )
-            {
-                getLogger().warn( "Could not canonize the path '" + path + "'!", e );
-            }
-    
-            ehConfig.getDiskStoreConfiguration().setPath( path );
-        }
-    }
-
-    public void contextualize( Context context )
-        throws ContextException
-    {
-        Map<Object, Object> vars = new HashMap<Object, Object>();
-
-        vars.putAll( context.getContextData() );
-        // FIXME: bad, everything should come from Plexus context
-        vars.putAll( System.getenv() );
-        // FIXME: bad, everything should come from Plexus context
-        vars.putAll( System.getProperties() );
-
-        this.variables = vars;
-    }
-
-    public void dispose()
-    {
-        if ( this.ehCacheManager != null )
+        if ( ehCacheManager != null )
         {
             getLogger().info( "Shutting down EHCache manager." );
 
@@ -184,4 +88,86 @@ public class DefaultEhCacheWrapper
         }
     }
 
+    // ==
+
+    private void constructEhCacheManager()
+        throws InterpolationException
+    {
+        InputStream configStream = getClass().getResourceAsStream( "/ehcache.xml" );
+
+        if ( configStream != null )
+        {
+            Configuration ehConfig =
+                ConfigurationFactory.parseConfiguration( new InterpolatingInputStream( configStream,
+                    plexusContainer.getContext().getContextData() ) );
+
+            configureDiskStore( ehConfig );
+
+            getLogger().info(
+                "Creating and configuring EHCache manager with classpath:/ehcache.xml, using disk store '"
+                    + ( ehConfig.getDiskStoreConfiguration() == null ? "none"
+                        : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
+
+            ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
+        }
+        else
+        {
+            configStream = getClass().getResourceAsStream( "/ehcache-default.xml" );
+
+            if ( configStream != null )
+            {
+                getLogger().info(
+                    "No user EHCache configuration found, creating EHCache manager and configuring it with classpath:/ehcache-default.xml." );
+
+                Configuration ehConfig =
+                    ConfigurationFactory.parseConfiguration( new InterpolatingInputStream( configStream,
+                        plexusContainer.getContext().getContextData() ) );
+
+                configureDiskStore( ehConfig );
+
+                getLogger().info(
+                    "Creating and configuring EHCache manager with Nexus Default EHCache Configuration, using disk store '"
+                        + ( ehConfig.getDiskStoreConfiguration() == null ? "none"
+                            : ehConfig.getDiskStoreConfiguration().getPath() ) + "'" );
+
+                ehCacheManager = new net.sf.ehcache.CacheManager( ehConfig );
+            }
+            else
+            {
+                getLogger().warn(
+                    "Creating 'default' EHCache manager since no user or default ehcache.xml configuration found on classpath root." );
+
+                ehCacheManager = new net.sf.ehcache.CacheManager();
+            }
+        }
+    }
+
+    private void configureDiskStore( Configuration ehConfig )
+        throws InterpolationException
+    {
+        // if disk store isn't configured, don't muck with it
+        if ( ehConfig.getDiskStoreConfiguration() != null && ehConfig.getDiskStoreConfiguration().getPath() != null )
+        {
+            // add plexus awareness with interpolation
+            String path = ehConfig.getDiskStoreConfiguration().getPath();
+
+            final RegexBasedInterpolator regexBasedInterpolator = new RegexBasedInterpolator();
+
+            regexBasedInterpolator.addValueSource( new MapBasedValueSource(
+                plexusContainer.getContext().getContextData() ) );
+
+            try
+            {
+                path = regexBasedInterpolator.interpolate( path, "" );
+
+                path = new File( path ).getCanonicalPath();
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Could not canonize the path '" + path + "'!", e );
+            }
+
+            ehConfig.getDiskStoreConfiguration().setPath( path );
+        }
+    }
 }

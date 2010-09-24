@@ -1,50 +1,76 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
   <parent>
     <artifactId>spice-parent</artifactId>
     <groupId>org.sonatype.spice</groupId>
-    <version>15</version>
+    <version>16</version>
+    <relativePath>../spice-parent/pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.sonatype.spice</groupId>
   <artifactId>plexus-ehcache</artifactId>
-  <name>plexus-ehcache</name>
   <version>1.4-SNAPSHOT</version>
+
+  <name>plexus-ehcache</name>
   <description>plexus-ehcache</description>
+
+  <properties>
+    <ehcache.version>2.2.0</ehcache.version>
+    <slf4j.version>1.6.1</slf4j.version>
+    <plexus.version>1.5.4</plexus.version>
+  </properties>
+
   <dependencies>
+
+    <!-- Actual dependencies -->
     <dependency>
       <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache</artifactId>
-      <version>1.5.0</version>
-      <type>jar</type>
-      <scope>compile</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-component-annotations</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-container-default</artifactId>
+      <artifactId>ehcache-core</artifactId>
+      <version>${ehcache.version}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-interpolation</artifactId>
-      <version>1.7</version>
+      <version>1.9</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
 
-    <!-- need logging for the tests -->
+    <!-- Provided stuff (but as optional to not have the "creep in") -->
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-component-annotations</artifactId>
+      <version>${plexus.version}</version>
+      <type>jar</type>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-container-default</artifactId>
+      <version>${plexus.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- Test stuff -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.8.1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>
@@ -52,15 +78,23 @@
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
-        <version>1.0-beta-3.0.1</version>
+        <version>${plexus.version}</version>
         <executions>
           <execution>
+            <id>process-classes</id>
             <goals>
               <goal>generate-metadata</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>process-test-classes</id>
+            <goals>
+              <goal>generate-test-metadata</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>

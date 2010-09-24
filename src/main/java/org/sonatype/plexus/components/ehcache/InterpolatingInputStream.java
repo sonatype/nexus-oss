@@ -8,7 +8,6 @@ import java.util.Map;
 public class InterpolatingInputStream
     extends FilterInputStream
 {
-
     /** Character marking the beginning of a token. */
     private String beginToken;
 
