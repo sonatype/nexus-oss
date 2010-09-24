@@ -116,6 +116,15 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-groovy-console-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <scope>test</scope>
+    </dependency>
+
     <!-- The bundle -->
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
