@@ -3,47 +3,18 @@
   <hashTree>
     <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="External Resources" enabled="true">
       <collectionProp name="Arguments.arguments">
-        <elementProp name="resultDir" elementType="Argument">
-          <stringProp name="Argument.name">resultDir</stringProp>
-          <stringProp name="Argument.value">${scriptbase}/results</stringProp>
+        <elementProp name="result.dir" elementType="Argument">
+          <stringProp name="Argument.name">result.dir</stringProp>
+          <stringProp name="Argument.value">${__P(result.dir,.)}</stringProp>
           <stringProp name="Argument.metadata">=</stringProp>
         </elementProp>
-        <elementProp name="repoNames" elementType="Argument">
-          <stringProp name="Argument.name">repoNames</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/repository/repoNames.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="repoPaths" elementType="Argument">
-          <stringProp name="Argument.name">repoPaths</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/repository/repoPaths.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="filePaths" elementType="Argument">
-          <stringProp name="Argument.name">filePaths</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/repository/filePaths.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchComplexTerms" elementType="Argument">
-          <stringProp name="Argument.name">searchComplexTerms</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/search/complexTerms.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchSimpleTerms" elementType="Argument">
-          <stringProp name="Argument.name">searchSimpleTerms</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/search/simpleTerms.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchEyeQLTerms" elementType="Argument">
-          <stringProp name="Argument.name">searchEyeQLTerms</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/search/eyeqlTerms.csv</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="rssPaths" elementType="Argument">
-          <stringProp name="Argument.name">rssPaths</stringProp>
-          <stringProp name="Argument.value">${resourcedir}/rss/rssPaths.csv</stringProp>
+        <elementProp name="contentPaths.csv" elementType="Argument">
+          <stringProp name="Argument.name">contentPaths.csv</stringProp>
+          <stringProp name="Argument.value">${__P(data.dir,.)}/contentPaths.csv</stringProp>
           <stringProp name="Argument.metadata">=</stringProp>
         </elementProp>
       </collectionProp>
+      <stringProp name="TestPlan.comments">Define file paths as variables, using JMeter system properties as base</stringProp>
     </Arguments>
     <hashTree/>
   </hashTree>

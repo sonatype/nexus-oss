@@ -3,57 +3,23 @@
   <hashTree>
     <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Thread Details" enabled="true">
       <collectionProp name="Arguments.arguments">
-        <elementProp name="threadsReader" elementType="Argument">
-          <stringProp name="Argument.name">threadsReader</stringProp>
-          <stringProp name="Argument.value">${__P(threads.reader,20)}</stringProp>
+        <elementProp name="VerifyContent.threads" elementType="Argument">
+          <stringProp name="Argument.name">VerifyContent.threads</stringProp>
+          <stringProp name="Argument.value">${__P(VerifyContent.threads,1)}</stringProp>
           <stringProp name="Argument.metadata">=</stringProp>
         </elementProp>
-        <elementProp name="threadsSearcher" elementType="Argument">
-          <stringProp name="Argument.name">threadsSearcher</stringProp>
-          <stringProp name="Argument.value">${__P(threads.searcher,20)}</stringProp>
+        <elementProp name="Warmup.pause" elementType="Argument">
+          <stringProp name="Argument.name">Warmup.pause</stringProp>
+          <stringProp name="Argument.value">${__P(Warmup.pause,2000)}</stringProp>
           <stringProp name="Argument.metadata">=</stringProp>
         </elementProp>
-        <elementProp name="pauseReader" elementType="Argument">
-          <stringProp name="Argument.name">pauseReader</stringProp>
-          <stringProp name="Argument.value">${__P(pause.reader,2000)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="pauseSearcher" elementType="Argument">
-          <stringProp name="Argument.name">pauseSearcher</stringProp>
-          <stringProp name="Argument.value">${__P(pause.searcher,2000)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="pauseFirstHitReader" elementType="Argument">
-          <stringProp name="Argument.name">pauseFirstHitReader</stringProp>
-          <stringProp name="Argument.value">${__P(pause.firsthitreader,2000)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchSimplePercentage" elementType="Argument">
-          <stringProp name="Argument.name">searchSimplePercentage</stringProp>
-          <stringProp name="Argument.value">${__P(searcher.simple.percentage,40)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchComplexPercentage" elementType="Argument">
-          <stringProp name="Argument.name">searchComplexPercentage</stringProp>
-          <stringProp name="Argument.value">${__P(searcher.complex.percentage,40)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="searchEyeQLPercentage" elementType="Argument">
-          <stringProp name="Argument.name">searchEyeQLPercentage</stringProp>
-          <stringProp name="Argument.value">${__P(searcher.eyeql.percentage,20)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="pauseRss" elementType="Argument">
-          <stringProp name="Argument.name">pauseRss</stringProp>
-          <stringProp name="Argument.value">${__P(pause.rss,30000)}</stringProp>
-          <stringProp name="Argument.metadata">=</stringProp>
-        </elementProp>
-        <elementProp name="threadsRss" elementType="Argument">
-          <stringProp name="Argument.name">threadsRss</stringProp>
-          <stringProp name="Argument.value">${__P(threads.rss,30)}</stringProp>
+        <elementProp name="VerifyContent.duration" elementType="Argument">
+          <stringProp name="Argument.name">VerifyContent.duration</stringProp>
+          <stringProp name="Argument.value">${__P(VerifyContent.duration)}</stringProp>
           <stringProp name="Argument.metadata">=</stringProp>
         </elementProp>
       </collectionProp>
+      <stringProp name="TestPlan.comments">Variables for configuring thread pools, throughput controllers, etc. - anything that controls thread execution</stringProp>
     </Arguments>
     <hashTree/>
   </hashTree>
