@@ -50,6 +50,10 @@
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>simple-event-multicaster</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-system</artifactId>
+    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -72,10 +76,6 @@
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jsecurity</groupId>
-      <artifactId>jsecurity</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
