@@ -194,6 +194,7 @@
       <artifactId>nexus-it-helper-plugin</artifactId>
       <version>${project.version}</version>
       <classifier>cp</classifier>
+      <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

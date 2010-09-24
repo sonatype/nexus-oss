@@ -95,6 +95,7 @@
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-it-helper-plugin</artifactId>
               <classifier>cp</classifier>
+              <type>jar</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
@@ -176,12 +177,6 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-it-helper-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>
