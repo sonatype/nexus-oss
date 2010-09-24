@@ -17,7 +17,6 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "RepositoryConfigurationUpdatedEventInspector" )
 public class RepositoryConfigurationUpdatedEventInspector
     extends AbstractEventInspector
-    implements AsynchronousEventInspector
 {
     @Requirement
     private NexusScheduler nexusScheduler;
