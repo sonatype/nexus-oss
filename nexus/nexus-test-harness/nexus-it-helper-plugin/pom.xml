@@ -49,10 +49,64 @@
       <artifactId>plexus-forked-app-booter</artifactId>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-url-realm</artifactId>
+      <version>1.1.8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.security.realms</groupId>
+          <artifactId>security-xml-realm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jsecurity</groupId>
+          <artifactId>jsecurity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-component-annotations</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.restlet</groupId>
+          <artifactId>org.restlet</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.noelios.restlet</groupId>
+          <artifactId>com.noelios.restlet</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.noelios.restlet</groupId>
+          <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>1.4</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <artifactSet>
+                <includes>
+                  <include>org.sonatype.security.realms:security-url-realm</include>
+                </includes>
+              </artifactSet>
+              <transformers>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer" />
+              </transformers>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
@@ -60,6 +114,7 @@
         <configuration>
           <excludes>
             <exclude>org/sonatype/nexus/rt/**</exclude>
+            <exclude>org/sonatype/jsecurity/realms/**</exclude>
           </excludes>
         </configuration>
         <executions>
@@ -70,6 +125,7 @@
             <configuration>
               <includes>
                 <include>org/sonatype/nexus/rt/**</include>
+                <include>org/sonatype/jsecurity/realms/**</include>
               </includes>
               <excludes>
                 <exclude>void/void/void</exclude>
