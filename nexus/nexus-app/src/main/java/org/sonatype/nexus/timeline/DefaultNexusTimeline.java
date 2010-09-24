@@ -124,7 +124,15 @@ public class DefaultNexusTimeline
 
     public void add( long timestamp, String type, String subType, Map<String, String> data )
     {
-        timeline.add( timestamp, type, subType, data );
+        //FIXME shouldn't handle this exception here, must handle the shutdown cycle properly
+        try
+        {
+            timeline.add( timestamp, type, subType, data );
+        }
+        catch ( Exception e )
+        {
+            getLogger().warn( "Failed to add a timeline record", e );
+        }
     }
 
     public TimelineResult retrieve( int fromItem, int count, Set<String> types, Set<String> subtypes,
