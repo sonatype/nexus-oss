@@ -56,8 +56,6 @@ public class DeployUtils
             new WagonDeployer( getTest().getITPlexusContainer(), wagonHint, null, null, repositoryUrl, fileToDeploy,
                 artifactPath ).deploy();
         }
-
-        getTest().getEventInspectorsUtil().waitForCalmPeriod();
         //
         // new WagonDeployer( wagonHint, TestContainer.getInstance().getTestContext().getUsername(),
         // TestContainer.getInstance().getTestContext().getPassword(), repositoryUrl, fileToDeploy,
@@ -90,22 +88,7 @@ public class DeployUtils
 
         filePost.setRequestEntity( new MultipartRequestEntity( parts, filePost.getParams() ) );
 
-        try
-        {
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost ).getStatusCode();
-        }
-        finally
-        {
-            try
-            {
-                getTest().getEventInspectorsUtil().waitForCalmPeriod();
-            }
-            catch ( InterruptedException e )
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
 
     }
 
@@ -151,22 +134,8 @@ public class DeployUtils
         LOG.debug( "\thasPom: true" );
         LOG.debug( "\tpom: " + pomFile );
         LOG.debug( "\tfileToDeploy: " + fileToDeploy );
-        try
-        {
+
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
-        }
-        finally
-        {
-            try
-            {
-                getTest().getEventInspectorsUtil().waitForCalmPeriod();
-    }
-            catch ( InterruptedException e )
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
     }
 
     public int deployUsingPomWithRest( String restServiceURL, String repositoryId, File fileToDeploy, File pomFile,
@@ -198,21 +167,6 @@ public class DeployUtils
         LOG.debug( "\thasPom: true" );
         LOG.debug( "\tpom: " + pomFile );
 
-        try
-        {
         return RequestFacade.executeHTTPClientMethod( new URL( restServiceURL ), filePost );
-        }
-        finally
-        {
-            try
-            {
-                getTest().getEventInspectorsUtil().waitForCalmPeriod();
-            }
-            catch ( InterruptedException e )
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
     }
 }
