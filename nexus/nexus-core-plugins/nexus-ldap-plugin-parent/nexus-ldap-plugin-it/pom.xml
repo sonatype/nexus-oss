@@ -169,10 +169,6 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
-            <plugin>
-              <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
-            </plugin>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>

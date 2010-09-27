@@ -87,7 +87,7 @@ public class Nexus3699CapabilityIT
         assertTrue( touch.exists() );
 
         String content = FileUtils.readFileToString( touch );
-        assertThat( content, StringContains.containsString( "test-capability" ) );
+        assertThat( content, StringContains.containsString( "capabilities test!" ) );
         assertThat( content, StringContains.containsString( "repo_nexus-test-harness-repo" ) );
 
         CapabilityResource cap = CapabilitiesMessageUtil.read( "4fde59a80f4" );
