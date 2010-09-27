@@ -214,12 +214,12 @@
       <id>jmeter-nexus-perf</id>
       <activation>
         <file>
-          <exists>/opt/nexus-perf/jmeter-2x</exists>
+          <exists>/opt/nexus-perf/jmeter/jakarta-jmeter-${jmeter.version}</exists>
           <missing>/opt/grid/data/slave/tools/jmeter-2x</missing>
         </file>
       </activation>
       <properties>
-        <jmeter.home>/opt/nexus-perf/jmeter-2x</jmeter.home>
+        <jmeter.home>/opt/nexus-perf/jmeter/jakarta-jmeter-${jmeter.version}</jmeter.home>
       </properties>
     </profile>
     <!-- profile to install jmeter into target dir and run from there only needed if you don't have your own jmeter install -->
