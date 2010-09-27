@@ -62,7 +62,7 @@
             <configuration>
               <target>
               <mkdir dir="${perf.result.dir}" />
-                <java fork="true" jar="${jmeter.home}/bin/ApacheJMeter.jar">
+                <java fork="true" jar="${jmeter.home}/bin/ApacheJMeter.jar" failonerror="true">
                   <jvmarg value="-Duser.dir=${jmeter.home}/bin" />
                   <jvmarg value="-server" />
                   <jvmarg
@@ -91,7 +91,6 @@
                   <!-- jmeter.log -->
                   <arg value="-j" />
                   <arg path="${jmeter.runlog.file}" />
-
                 </java>
               </target>
             </configuration>
