@@ -102,7 +102,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -111,7 +111,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Where nexus instance should be extracted
-     * 
+     *
      * @parameter default-value="${project.build.directory}/nexus"
      * @required
      */
@@ -119,7 +119,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Artifact file containing nexus bundle
-     * 
+     *
      * @parameter
      */
     protected MavenArtifact nexusBundleArtifact;
@@ -127,49 +127,49 @@ public class AbstractEnvironmentMojo
     /**
      * Name of teh directory created out of nexus artifact bundle. Default is
      * ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
-     * 
+     *
      * @parameter
      */
     protected String nexusBundleName;
 
     /**
      * Emma used on ITs
-     * 
+     *
      * @parameter
      */
     private MavenArtifact emmaArtifact;
 
     /**
      * Nexus plugin artifacts to be installed into the Nexus instance under test.
-     * 
+     *
      * @parameter
      */
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
      * Resources to be unpacked and then contents copied into Nexus default-configs
-     * 
+     *
      * @parameter
      */
     private MavenArtifact[] extraResourcesArtifacts;
 
     /**
      * When true setup a maven instance
-     * 
+     *
      * @parameter default-value="true"
      */
     private boolean setupMaven;
 
     /**
      * When true setup emma
-     * 
+     *
      * @parameter default-value="true"
      */
     private boolean setupEmma;
 
     /**
      * Maven used on ITs
-     * 
+     *
      * @parameter
      * @see EnvironmentMojo#setupMaven
      */
@@ -177,7 +177,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Where Maven instance should be created
-     * 
+     *
      * @parameter default-value="${project.build.directory}/maven"
      * @see EnvironmentMojo#setupMaven
      */
@@ -185,7 +185,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Resources in the test project can be added beneath this directory so that
-     * 
+     *
      * @parameter default-value="${basedir}/resources"
      */
     protected File resourcesSourceLocation;
@@ -194,7 +194,7 @@ public class AbstractEnvironmentMojo
      * This directory is where the default-configs included inside the this plugin will be extracted to BEFORE they are
      * copied into the nexus work dir. A project property 'test-resources-folder' contains the absolute path of this
      * directory.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/resources"
      */
     private File resourcesDestinationLocation;
@@ -231,7 +231,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Known ports can be manually set as part of the configuration
-     * 
+     *
      * @parameter
      */
     @SuppressWarnings( "rawtypes" )
@@ -296,6 +296,8 @@ public class AbstractEnvironmentMojo
 
         // if any plugin artifacts were specified, install them into runtime
         File pluginFolder = new File( nexusBaseDir, "runtime/apps/nexus/plugin-repository" );
+        project.getProperties().put( "plugin-repository", getPath( pluginFolder ) );
+
         Collection<MavenArtifact> npas = getNexusPluginsArtifacts();
         if ( npas != null )
         {
