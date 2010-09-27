@@ -13,7 +13,7 @@
 package org.sonatype.plugin.metadata;
 
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 
 /**
  * Trivial Group:Artifact:Version identifier.

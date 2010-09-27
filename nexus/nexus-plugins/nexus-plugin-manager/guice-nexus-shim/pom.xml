@@ -31,6 +31,10 @@
       <artifactId>plugin-model-api</artifactId>
     </dependency>
     <dependency>
+        <groupId>org.sonatype.nexus</groupId>
+        <artifactId>nexus-indexer-artifact</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
       <exclusions>

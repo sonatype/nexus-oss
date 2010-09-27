@@ -1,4 +1,5 @@
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.artifact;
+
 /**
  * Sonatype Nexus (TM) Open Source Version.
  * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
@@ -13,7 +14,6 @@ package org.sonatype.nexus.proxy.maven;
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
 
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,10 +22,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
  * A very simple artifact packaging mapper, that has everyting for quick-start wired in this class. Also, it takes into
@@ -34,15 +32,14 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
  * 
  * @author cstamas
  */
-@Component(role=ArtifactPackagingMapper.class)
+@Component( role = ArtifactPackagingMapper.class )
 public class DefaultArtifactPackagingMapper
     extends AbstractLogEnabled
     implements ArtifactPackagingMapper
 {
     public static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
-    @Requirement
-    private ApplicationConfiguration applicationConfiguration;
+    private File propertiesFile;
 
     private Map<String, String> packaging2extensionMapping;
 
@@ -67,6 +64,12 @@ public class DefaultArtifactPackagingMapper
         defaults.put( "test-jar", "jar" );
     }
 
+    public void setPropertiesFile( File propertiesFile )
+    {
+        this.propertiesFile = propertiesFile;
+        this.packaging2extensionMapping = null;
+    }
+
     public Map<String, String> getPackaging2extensionMapping()
     {
         if ( packaging2extensionMapping == null )
@@ -76,12 +79,7 @@ public class DefaultArtifactPackagingMapper
             // merge defaults
             packaging2extensionMapping.putAll( defaults );
 
-            // if user file exists, add it too
-            File propertiesFile = new File(
-                applicationConfiguration.getConfigurationDirectory(),
-                MAPPING_PROPERTIES_FILE );
-
-            if ( propertiesFile.exists() )
+            if ( propertiesFile != null && propertiesFile.exists() )
             {
                 getLogger().info( "Found user mappings file, applying it..." );
 
@@ -102,9 +100,9 @@ public class DefaultArtifactPackagingMapper
                             packaging2extensionMapping.put( key.toString(), userMappings.getProperty( key.toString() ) );
                         }
 
-                        getLogger().info(
-                            propertiesFile.getAbsolutePath() + " user mapping file contained "
-                                + userMappings.keySet().size() + " mappings, applied them all succesfully." );
+                        getLogger().info( propertiesFile.getAbsolutePath() + " user mapping file contained "
+                                              + userMappings.keySet().size()
+                                              + " mappings, applied them all succesfully." );
                     }
                 }
                 catch ( IOException e )
@@ -138,6 +136,11 @@ public class DefaultArtifactPackagingMapper
 
     public String getExtensionForPackaging( String packaging )
     {
+        if ( packaging == null )
+        {
+            return "jar";
+        }
+        
         if ( getPackaging2extensionMapping().containsKey( packaging ) )
         {
             return getPackaging2extensionMapping().get( packaging );

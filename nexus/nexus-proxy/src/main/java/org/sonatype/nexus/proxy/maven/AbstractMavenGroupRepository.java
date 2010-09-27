@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;

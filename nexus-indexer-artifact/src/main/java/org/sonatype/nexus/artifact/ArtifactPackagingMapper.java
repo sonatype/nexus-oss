@@ -1,4 +1,7 @@
-package org.sonatype.nexus.proxy.maven;
+package org.sonatype.nexus.artifact;
+
+import java.io.File;
+
 /**
  * Sonatype Nexus (TM) Open Source Version.
  * Copyright (c) 2008 Sonatype, Inc. All rights reserved.
@@ -23,4 +26,6 @@ package org.sonatype.nexus.proxy.maven;
 public interface ArtifactPackagingMapper
 {
     String getExtensionForPackaging( String packaging );
+    
+    void setPropertiesFile( File file );
 }
