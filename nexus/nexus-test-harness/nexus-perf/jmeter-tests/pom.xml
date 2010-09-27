@@ -321,8 +321,6 @@
                           <contains string="${os.name}"
                             substring="linux" casesensitive="false" />
                           <contains string="${os.arch}"
-                            substring="x86" />
-                          <contains string="${os.arch}"
                             substring="64" />
                         </and>
                       </condition>
@@ -331,8 +329,6 @@
                         <and>
                           <contains string="${os.name}"
                             substring="linux" casesensitive="false" />
-                          <contains string="${os.arch}"
-                            substring="x86" />
                           <contains string="${os.arch}"
                             substring="32" />
                         </and>
