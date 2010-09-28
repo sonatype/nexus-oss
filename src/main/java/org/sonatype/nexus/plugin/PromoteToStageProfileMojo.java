@@ -49,12 +49,12 @@ public class PromoteToStageProfileMojo
     /**
      * @parameter
      */
-    private List<String> repositoryIds;
+    private Set<String> repositoryIds = new LinkedHashSet<String>();
 
     /**
      * @parameter expression="${description}"
      */
-    private String description; 
+    private String description;
 
     /**
      * @parameter expression="${stagingBuildPromotionProfileId}"
@@ -98,23 +98,23 @@ public class PromoteToStageProfileMojo
             getLog().info( "\n\nNo closed repositories found. Nothing to do!\n\n" );
             return;
         }
-        
-        if( profiles == null || profiles.isEmpty() )
+
+        if ( profiles == null || profiles.isEmpty() )
         {
             getLog().info( "\n\nNo build promotion profiles found. Nothing to do!\n\n" );
             return;
         }
-        
+
         // select build promotion profile
         promptForStagingBuildPromotionProfileId( profiles );
-        
+
         // select repositories
         // prompt if not already set
-        if( (this.getRepositoryIds() == null || this.getRepositoryIds().isEmpty()) )
+        if ( ( this.getRepositoryIds() == null || this.getRepositoryIds().isEmpty() ) )
         {
             promptForRepositoryIds( repos );
         }
-        
+
         // enter description
         promptForDescription();
 
@@ -124,9 +124,9 @@ public class PromoteToStageProfileMojo
         builder.append( "\n\n" );
         for ( String repoId : getRepositoryIds() )
         {
-            builder.append( "-  " ).append( repoId );    
+            builder.append( "-  " ).append( repoId );
         }
-        
+
         builder.append( "\n\n" );
 
         getLog().info( builder.toString() );
@@ -178,9 +178,9 @@ public class PromoteToStageProfileMojo
             {
                 throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
             }
-            catch( NumberFormatException e )
+            catch ( NumberFormatException e )
             {
-                this.getLog().debug( "Invalid entry: "+ e.getMessage() );
+                this.getLog().debug( "Invalid entry: " + e.getMessage() );
             }
         }
     }
@@ -213,7 +213,8 @@ public class PromoteToStageProfileMojo
         for ( int ii = 0; ii < allClosedRepos.size(); ii++ )
         {
             StageRepository repo = allClosedRepos.get( ii );
-            buffer.append( ii + 1 ).append( ".  " ).append( repo.getRepositoryId() ).append( " - " ).append( repo.getDescription() ).append( "\n" );
+            buffer.append( ii + 1 ).append( ".  " ).append( repo.getRepositoryId() ).append( " - " ).append(
+                repo.getDescription() ).append( "\n" );
         }
 
         while ( !finished )
@@ -221,7 +222,7 @@ public class PromoteToStageProfileMojo
             try
             {
                 getPrompter().showMessage( buffer.toString() );
-                
+
                 String answer = getPrompter().prompt( "Repository: " );
                 int pos = Integer.parseInt( answer ) - 1;
 
@@ -229,7 +230,7 @@ public class PromoteToStageProfileMojo
                 if ( pos >= 0 && pos < allClosedRepos.size() )
                 {
                     getRepositoryIds().add( allClosedRepos.get( pos ).getRepositoryId() );
-                    
+
                     if ( !PromptUtil.booleanPrompt( getPrompter(), "Add another Repository? [Y/n]", Boolean.TRUE ) )
                     {
                         // signal end of loop
@@ -242,9 +243,9 @@ public class PromoteToStageProfileMojo
             {
                 throw new MojoExecutionException( "Failed to read from CLI prompt: " + e.getMessage(), e );
             }
-            catch( NumberFormatException e )
+            catch ( NumberFormatException e )
             {
-                this.getLog().debug( "Invalid entry: "+ e.getMessage() );
+                this.getLog().debug( "Invalid entry: " + e.getMessage() );
             }
         }
     }
@@ -253,14 +254,15 @@ public class PromoteToStageProfileMojo
     {
         if ( ( repositoryIds == null || repositoryIds.isEmpty() ) && super.getRepositoryId() != null )
         {
-            this.repositoryIds = Collections.singletonList( getRepositoryId() );
+            this.repositoryIds = Collections.singleton( getRepositoryId() );
         }
-        return new LinkedHashSet<String>( repositoryIds );
+
+        return repositoryIds;
     }
 
     public void setRepositoryIds( Set<String> repositoryIds )
     {
-        this.repositoryIds = new ArrayList<String>( repositoryIds );
+        this.repositoryIds = repositoryIds;
     }
 
     public String getDescription()
