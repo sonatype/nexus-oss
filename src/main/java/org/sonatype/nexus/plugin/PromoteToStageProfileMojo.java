@@ -47,9 +47,9 @@ public class PromoteToStageProfileMojo
 {
 
     /**
-     * @parameter expression="${repositoryIds}"
+     * @parameter
      */
-    private Set<String> repositoryIds = new LinkedHashSet<String>();
+    private List<String> repositoryIds;
 
     /**
      * @parameter expression="${description}"
@@ -253,14 +253,14 @@ public class PromoteToStageProfileMojo
     {
         if ( ( repositoryIds == null || repositoryIds.isEmpty() ) && super.getRepositoryId() != null )
         {
-            this.repositoryIds = Collections.singleton( getRepositoryId() );
+            this.repositoryIds = Collections.singletonList( getRepositoryId() );
         }
-        return repositoryIds;
+        return new LinkedHashSet<String>( repositoryIds );
     }
 
     public void setRepositoryIds( Set<String> repositoryIds )
     {
-        this.repositoryIds = new LinkedHashSet<String>( repositoryIds );
+        this.repositoryIds = new ArrayList<String>( repositoryIds );
     }
 
     public String getDescription()
