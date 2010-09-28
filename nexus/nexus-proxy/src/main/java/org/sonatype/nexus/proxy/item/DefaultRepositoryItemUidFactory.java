@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -77,6 +78,7 @@ public class DefaultRepositoryItemUidFactory
 
         if ( toBeReturned != null )
         {
+            // we have an UID instance found "alive" in the map
             cleanUpItemUidMap( false );
 
             return toBeReturned;
@@ -85,6 +87,8 @@ public class DefaultRepositoryItemUidFactory
         {
             synchronized ( itemUidMap )
             {
+                // we have not found an UID instance in the map, we have to make one and stick in into map
+
                 // try it again, since we were maybe sitting there waiting for someone who already did the job
                 itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
 
@@ -163,23 +167,42 @@ public class DefaultRepositoryItemUidFactory
 
     private volatile long lastClearedItemUidMap;
 
-    private synchronized void cleanUpItemUidMap( boolean force )
+    private final ReentrantLock cleanupLock = new ReentrantLock();
+
+    private void cleanUpItemUidMap( boolean force )
     {
-        long now = System.currentTimeMillis();
-
-        if ( force || ( now - lastClearedItemUidMap > ITEM_UID_MAP_RETENTION_TIME ) )
+        // just try to lock it. If we cannot lock it, leave it, since some other thread is
+        // already doing cleanup. But even if we do succeed in locking the cleanupLock, we have the
+        // time barrier, that have to be true, to do actual cleanup.
+        if ( cleanupLock.tryLock() )
         {
-            lastClearedItemUidMap = now;
-
-            for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
-                itemUidMap.entrySet().iterator(); i.hasNext(); )
+            // we are in, that means no one else is doing cleanup, and also that
+            // we acquired the lock in the same time.
+            // still, it is undecided yet, will we actually perform the cleanup, since
+            // we have a time barrier to pass also (unless force=true).
+            try
             {
-                ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
+                long now = System.currentTimeMillis();
 
-                if ( entry.getValue().get() == null )
+                if ( force || ( now - lastClearedItemUidMap > ITEM_UID_MAP_RETENTION_TIME ) )
                 {
-                    i.remove();
+                    lastClearedItemUidMap = now;
+
+                    for ( Iterator<ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>>> i =
+                        itemUidMap.entrySet().iterator(); i.hasNext(); )
+                    {
+                        ConcurrentMap.Entry<String, WeakReference<RepositoryItemUid>> entry = i.next();
+
+                        if ( entry.getValue().get() == null )
+                        {
+                            i.remove();
+                        }
+                    }
                 }
+            }
+            finally
+            {
+                cleanupLock.unlock();
             }
         }
     }
