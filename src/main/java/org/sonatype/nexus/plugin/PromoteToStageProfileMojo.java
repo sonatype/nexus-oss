@@ -20,7 +20,6 @@ package org.sonatype.nexus.plugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class PromoteToStageProfileMojo
     /**
      * @parameter expression="${repositoryIds}"
      */
-    private LinkedHashSet<String> repositoryIds = new LinkedHashSet<String>();
+    private Set<String> repositoryIds = new LinkedHashSet<String>();
 
     /**
      * @parameter expression="${description}"
@@ -252,6 +251,10 @@ public class PromoteToStageProfileMojo
 
     public Set<String> getRepositoryIds()
     {
+        if ( ( repositoryIds == null || repositoryIds.isEmpty() ) && super.getRepositoryId() != null )
+        {
+            this.repositoryIds = Collections.singleton( getRepositoryId() );
+        }
         return repositoryIds;
     }
 
