@@ -81,7 +81,7 @@ public class DefaultArtifactPackagingMapper
 
             if ( propertiesFile != null && propertiesFile.exists() )
             {
-                getLogger().info( "Found user mappings file, applying it..." );
+                getLogger().info( "Found user artifact packaging mapping file, applying it..." );
 
                 Properties userMappings = new Properties();
 
@@ -100,9 +100,9 @@ public class DefaultArtifactPackagingMapper
                             packaging2extensionMapping.put( key.toString(), userMappings.getProperty( key.toString() ) );
                         }
 
-                        getLogger().info( propertiesFile.getAbsolutePath() + " user mapping file contained "
-                                              + userMappings.keySet().size()
-                                              + " mappings, applied them all succesfully." );
+                        getLogger().info(
+                            propertiesFile.getAbsolutePath() + " user artifact packaging mapping file contained "
+                                + userMappings.keySet().size() + " mappings, applied them all succesfully." );
                     }
                 }
                 catch ( IOException e )
@@ -117,7 +117,8 @@ public class DefaultArtifactPackagingMapper
             }
             else
             {
-                getLogger().info( "User mappings file not found, will work with defaults..." );
+                // make it silent if using defaults
+                getLogger().debug( "User artifact packaging mappings file not found, will work with defaults..." );
             }
         }
 
@@ -140,7 +141,7 @@ public class DefaultArtifactPackagingMapper
         {
             return "jar";
         }
-        
+
         if ( getPackaging2extensionMapping().containsKey( packaging ) )
         {
             return getPackaging2extensionMapping().get( packaging );
