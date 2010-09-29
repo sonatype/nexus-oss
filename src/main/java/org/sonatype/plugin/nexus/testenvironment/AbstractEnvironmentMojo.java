@@ -49,6 +49,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.io.RawInputStreamFacade;
+import org.sonatype.plugin.nexus.testenvironment.filter.TestScopeFilter;
 import org.sonatype.plugins.portallocator.Port;
 import org.sonatype.plugins.portallocator.PortAllocatorMojo;
 
@@ -236,6 +237,13 @@ public class AbstractEnvironmentMojo
      */
     @SuppressWarnings( "rawtypes" )
     private Map staticPorts;
+
+    /**
+     * If true plugin won't include nexus-plugin dependencies with scope test
+     * 
+     * @parameter
+     */
+    private boolean excludeTestDependencies;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -817,8 +825,9 @@ public class AbstractEnvironmentMojo
         Collection<Artifact> nonTransitivePlugins = getNonTransitivePlugins( plugins );
         for ( Artifact artifact : nonTransitivePlugins )
         {
-            final MavenArtifact ma = new MavenArtifact( artifact.getGroupId(), artifact.getArtifactId(),
-                artifact.getClassifier(), artifact.getType() );
+            final MavenArtifact ma =
+                new MavenArtifact( artifact.getGroupId(), artifact.getArtifactId(), artifact.getClassifier(),
+                    artifact.getType() );
             ma.setVersion( artifact.getVersion() );
             nexusPluginsArtifacts.add( ma );
         }
@@ -1026,6 +1035,11 @@ public class AbstractEnvironmentMojo
         {
             filter.addFilter( new ArtifactIdFilter( artifactId, null ) );
         }
+
+        if ( excludeTestDependencies )
+        {
+            filter.addFilter( new TestScopeFilter() );
+        }
         return filter;
     }
 
@@ -1102,6 +1116,14 @@ public class AbstractEnvironmentMojo
             plugins.addAll( filtterArtifacts( result, getFilters( null, null, "nexus-plugin", null ) ) );
             plugins.addAll( filtterArtifacts( result, getFilters( null, null, "zip", "bundle" ) ) );
             plugins.addAll( getNonTransitivePlugins( plugins ) );
+
+            if ( !plugins.isEmpty() )
+            {
+                getLog().debug(
+                    "Adding non-transitive dependencies for: " + artifact + " -\n"
+                        + plugins.toString().replace( ',', '\n' ) );
+            }
+
             deps.addAll( plugins );
         }
 
