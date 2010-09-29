@@ -89,8 +89,8 @@
 
     <!-- Plexus -->
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     
     <!-- Needed for CLI assembly only, to make it work in "standalone" CLI mode -->
@@ -197,12 +197,12 @@
                   <include>org.apache.maven:maven-model</include>
                   <include>org.apache.maven:maven-plugin-api</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
-                  <include>org.sonatype.spice:spice-inject-plexus</include>
+                  <include>org.sonatype.sisu:sisu-inject-plexus</include>
                   <include>org.codehaus.plexus:plexus-component-annotations</include>
                   <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-utils</include>
-                  <include>org.sonatype.spice:spice-inject-bean</include>
-                  <include>org.sonatype.spice.inject:guice-patches:jar:noaop</include>
+                  <include>org.sonatype.sisu:sisu-inject-bean</include>
+                  <include>org.sonatype.sisu:sisu-guice:jar:noaop</include>
                 </includes>
               </artifactSet>
             </configuration>

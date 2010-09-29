@@ -83,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>spice-inject-nexus</artifactId>
+      <artifactId>sisu-inject-nexus</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

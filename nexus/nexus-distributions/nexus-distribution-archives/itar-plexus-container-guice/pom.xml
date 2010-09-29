@@ -17,8 +17,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
   </dependencies>
 
@@ -41,7 +41,7 @@
             </goals>
             <configuration>
               <includeArtifactIds>
-                guice-patches,spice-inject-bean,spice-inject-plexus
+                sisu-guice,sisu-inject-bean,sisu-inject-plexus
               </includeArtifactIds>
               <outputDirectory>${data.directory}/${libraryDir}</outputDirectory>
             </configuration>

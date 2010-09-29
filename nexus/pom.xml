@@ -144,7 +144,7 @@
     <slf4j.version>1.5.6</slf4j.version>
     <nexus.indexer.version>3.1-SNAPSHOT</nexus.indexer.version>
     <nexus.indexer.artifact.version>1.1-SNAPSHOT</nexus.indexer.artifact.version>
-    <nexus.repository.metadata.version>1.0.3</nexus.repository.metadata.version>
+    <nexus.repository.metadata.version>1.1-SNAPSHOT</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.16</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
@@ -970,7 +970,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>spice-inject-nexus</artifactId>
+        <artifactId>sisu-inject-nexus</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1044,7 +1044,7 @@
                   <excludes>
                     <exclude>*:plexus-container-default</exclude>
                   </excludes>
-                  <message>Plexus IoC container is phased out, use Spice Inject Plexus instead!</message>
+                  <message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
