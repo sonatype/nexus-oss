@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus261;
 
-import java.io.File;
 import static org.testng.Assert.assertTrue;
+
+import java.io.File;
 import java.util.Date;
 
 import org.sonatype.nexus.artifact.Gav;

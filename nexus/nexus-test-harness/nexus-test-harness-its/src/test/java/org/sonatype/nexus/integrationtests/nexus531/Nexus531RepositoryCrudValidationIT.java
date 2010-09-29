@@ -27,6 +27,7 @@ import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.testng.Assert;
+import org.testng.SkipException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -49,7 +50,6 @@ public class Nexus531RepositoryCrudValidationIT
     public void createNoCheckSumTest()
         throws IOException
     {
-
         RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "createNoCheckSumTest" );
@@ -81,10 +81,8 @@ public class Nexus531RepositoryCrudValidationIT
     }
 
     @Test
-    public void createNoRepoPolicyTest()
-        throws IOException
+    public void createNoRepoPolicyTest() throws IOException
     {
-
         RepositoryResource resource = new RepositoryResource();
 
         resource.setId( "createNoRepoPolicyTest" );

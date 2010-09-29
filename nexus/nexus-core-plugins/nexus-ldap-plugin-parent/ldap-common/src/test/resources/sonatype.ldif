@@ -45,21 +45,21 @@ description: Contains entries which describe groups
 dn: cn=public,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: public
-uniqueMember: uid=cstamas,ou=people,o=sonatype 
-uniqueMember: uid=brianf,ou=people,o=sonatype 
-uniqueMember: uid=jvanzyl,ou=people,o=sonatype 
+uniqueMember: cn=cstamas,ou=people,o=sonatype 
+uniqueMember: cn=brianf,ou=people,o=sonatype
+uniqueMember: cn=jvanzyl,ou=people,o=sonatype
 description: Public group
 
 dn: cn=releases,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: releases
-uniqueMember: uid=jvanzyl,ou=people,o=sonatype 
-uniqueMember: uid=brianf,ou=people,o=sonatype 
+uniqueMember: cn=jvanzyl,ou=people,o=sonatype
+uniqueMember: cn=brianf,ou=people,o=sonatype
 description: Releases group
 
 dn: cn=snapshots,ou=groups,o=sonatype
 objectClass: groupOfUniqueNames
 cn: snapshots
-uniqueMember: uid=jvanzyl,ou=people,o=sonatype 
-uniqueMember: uid=cstamas,ou=people,o=sonatype 
+uniqueMember: cn=jvanzyl,ou=people,o=sonatype
+uniqueMember: cn=cstamas,ou=people,o=sonatype
 description: Snapshots group

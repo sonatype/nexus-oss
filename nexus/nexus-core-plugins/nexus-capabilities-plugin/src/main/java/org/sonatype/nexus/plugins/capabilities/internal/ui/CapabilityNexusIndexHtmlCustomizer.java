@@ -17,7 +17,7 @@ public class CapabilityNexusIndexHtmlCustomizer
     public String getPostHeadContribution( final Map<String, Object> ctx )
     {
         final String version =
-            getVersionFromJarFile( "/META-INF/maven/com.sonatype.nexus.plugin/org.sonatype.nexus.plugins.capabilities.imp/pom.properties" );
+            getVersionFromJarFile( "/META-INF/maven/org.sonatype.nexus.plugins/nexus-capabilities-plugin/pom.properties" );
 
         if ( System.getProperty( "useOriginalJS" ) == null )
         {

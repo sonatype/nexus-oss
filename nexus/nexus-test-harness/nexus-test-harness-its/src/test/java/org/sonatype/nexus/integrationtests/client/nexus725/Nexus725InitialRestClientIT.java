@@ -61,7 +61,7 @@ public class Nexus725InitialRestClientIT
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Test(description = "Simple Test Description - getRepoListTest")
+    @Test
     public void getRepoListTest()
         throws Exception
     {

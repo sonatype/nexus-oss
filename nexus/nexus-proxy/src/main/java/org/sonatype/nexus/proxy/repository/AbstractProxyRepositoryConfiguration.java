@@ -14,6 +14,8 @@ public abstract class AbstractProxyRepositoryConfiguration
     private static final String ITEM_AGING_ACTIVE = "itemAgingActive";
 
     private static final String AUTO_BLOCK_ACTIVE = "autoBlockActive";
+    
+    public static final String FILE_TYPE_VALIDATION = "fileTypeValidation";
 
     public AbstractProxyRepositoryConfiguration( Xpp3Dom configuration )
     {
@@ -28,6 +30,17 @@ public abstract class AbstractProxyRepositoryConfiguration
     public void setProxyMode( ProxyMode mode )
     {
         setNodeValue( getRootNode(), PROXY_MODE, mode.toString() );
+    }
+    
+
+    public boolean isFileTypeValidation()
+    {
+        return Boolean.valueOf( getNodeValue( getRootNode(), FILE_TYPE_VALIDATION, "false" ) );
+    }
+
+    public void setFileTypeValidation( boolean doValidate )
+    {
+        setNodeValue( getRootNode(), FILE_TYPE_VALIDATION, Boolean.toString( doValidate ) );
     }
 
     public RepositoryStatusCheckMode getRepositoryStatusCheckMode()

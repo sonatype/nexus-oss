@@ -252,6 +252,40 @@ public class GroupMetadataMergeTest
         }
     }
 
+    public void testReleasePolicy()
+        throws Exception
+    {
+        String mdPath = "/md-merge/release/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( "1.3.2", md.getVersioning().getLatest() );
+        assertEquals( "1.3.2", md.getVersioning().getRelease() );
+        String[] versions = { "1.3.0", "1.3.2" };
+        assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
+        assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
+    }
+
+    public void testSnapshotPolicy()
+        throws Exception
+    {
+        String mdPath = "/md-merge/snapshot/maven-metadata.xml";
+
+        StorageItem item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test" + mdPath, false ) );
+        assertTrue( StorageFileItem.class.isAssignableFrom( item.getClass() ) );
+
+        Metadata md = parseMetadata( (StorageFileItem) item );
+
+        assertEquals( "1.4.1-SNAPSHOT", md.getVersioning().getLatest() );
+        assertNull( md.getVersioning().getRelease() );
+        String[] versions = { "1.4.1-SNAPSHOT" };
+        assertEquals( Arrays.asList( versions ), md.getVersioning().getVersions() );
+        assertEquals( "20090720231210", md.getVersioning().getLastUpdated() );
+    }
+
     protected Metadata parseMetadata( File file )
         throws Exception
     {
@@ -291,4 +325,5 @@ public class GroupMetadataMergeTest
             }
         }
     }
+
 }

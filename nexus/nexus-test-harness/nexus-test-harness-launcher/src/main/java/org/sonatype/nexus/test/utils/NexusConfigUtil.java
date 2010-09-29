@@ -59,7 +59,8 @@ public class NexusConfigUtil
         catch ( Exception e )
         {
             log.error( e.getMessage(), e );
-            throw new RuntimeException( e );
+            Assert.fail( "Unable to load config " + e.getMessage() );
+            config = null;
         }
         return config.getConfigurationModel();
     }

@@ -3,7 +3,6 @@ package org.sonatype.nexus.integrationtests.nexus1923;
 import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.integrationtests.ITGroups;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 

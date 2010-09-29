@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
@@ -26,6 +27,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "ConfigurationChangeEvent" )
 public class ConfigurationChangeEventInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
 
     public boolean accepts( Event<?> evt )
@@ -54,15 +56,15 @@ public class ConfigurationChangeEventInspector
 
         msg.append( "Nexus server configuration was changed" );
 
-        //TODO: refine _what_ is changed
-/*        for ( Configurable change : event.getChanges() )
-        {
-            msg.append( " '" ).append( change.getName() ).append( "', " );
-        }*/
+        // TODO: refine _what_ is changed
+        /*
+         * for ( Configurable change : event.getChanges() ) { msg.append( " '" ).append( change.getName() ).append(
+         * "', " ); }
+         */
 
-        if ( event.getSubject() != null && event.getSubject().getPrincipal() != null )
+        if ( event.getPrincipal() != null )
         {
-            msg.append( ", change was made by [" + event.getSubject().getPrincipal().toString() + "]" );
+            msg.append( ", change was made by [" + event.getPrincipal() + "]" );
         }
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, msg.toString() );

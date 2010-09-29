@@ -14,6 +14,8 @@
  */
 package org.sonatype.nexus.integrationtests;
 
+import static org.testng.Assert.fail;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -52,11 +54,12 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer;
-import org.sonatype.nexus.integrationtests.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.log4j.ConcisePatternLayout;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
+import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
+import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
 import org.sonatype.nexus.test.utils.DeployUtils;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenProjectFileFilter;
@@ -64,6 +67,7 @@ import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.SearchMessageUtil;
 import org.sonatype.nexus.test.utils.SecurityConfigUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
@@ -72,7 +76,6 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
-import static org.testng.Assert.fail;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -217,6 +220,18 @@ public abstract class AbstractNexusIntegrationTest
         return searchMessageUtil;
     }
 
+    private EventInspectorsUtil eventInspectorsUtil;
+
+    public EventInspectorsUtil getEventInspectorsUtil()
+    {
+        if ( eventInspectorsUtil == null )
+        {
+            eventInspectorsUtil = new EventInspectorsUtil( this );
+        }
+
+        return eventInspectorsUtil;
+    }
+
     // == Constructors
 
     protected AbstractNexusIntegrationTest()
@@ -344,6 +359,8 @@ public abstract class AbstractNexusIntegrationTest
                 // TODO: we can remove this now that we have the soft restart
                 NEEDS_INIT = false;
             }
+
+            getEventInspectorsUtil().waitForCalmPeriod();
         }
     }
 
@@ -361,6 +378,16 @@ public abstract class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
+        TaskScheduleUtil.waitForAllTasksToStop();
+        try
+        {
+            new EventInspectorsUtil( null ).waitForCalmPeriod();
+        }
+        catch ( IOException e )
+        {
+            // throw if server is already stopped, not a problem for me
+        }
+
         // turn off security, of the current IT with security on won't affect the next IT
         TestContainer.getInstance().getTestContext().setSecureTest( false );
 
@@ -430,12 +457,12 @@ public abstract class AbstractNexusIntegrationTest
 
         properties.putIfNew( "log4j.rootLogger", "DEBUG, logfile" );
 
-        properties.putIfNew( "log4j.logger.org.apache.commons", "WARN" );
-        properties.putIfNew( "log4j.logger.httpclient", "WARN" );
-        properties.putIfNew( "log4j.logger.org.apache.http", "WARN" );
-        properties.putIfNew( "log4j.logger.org.sonatype.nexus", "INFO" );
-        properties.putIfNew( "log4j.logger.org.sonatype.nexus.rest.NexusApplication", "WARN" );
-        properties.putIfNew( "log4j.logger.org.restlet", "WARN" );
+        properties.remove( "log4j.logger.org.apache.commons" );
+        properties.remove( "log4j.logger.httpclient" );
+        properties.remove( "log4j.logger.org.apache.http" );
+        properties.remove( "log4j.logger.org.sonatype.nexus" );
+        properties.remove( "log4j.logger.org.sonatype.nexus.rest.NexusApplication" );
+        properties.remove( "log4j.logger.org.restlet" );
 
         properties.putIfNew( "log4j.appender.logfile", "org.apache.log4j.RollingFileAppender" );
         properties.putIfNew( "log4j.appender.logfile.File", nexusLog.getAbsolutePath().replace( '\\', '/' ) );
@@ -701,7 +728,7 @@ public abstract class AbstractNexusIntegrationTest
     protected void startNexus()
         throws Exception
     {
-
+        System.out.println("######## Running Test: " + getTestId() + " - Class: " + this.getClass());
         log.info( "starting nexus" );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -940,7 +967,7 @@ public abstract class AbstractNexusIntegrationTest
     }
 
     @SuppressWarnings( "deprecation" )
-    protected File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
+    public File downloadSnapshotArtifact( String repository, Gav gav, File parentDir )
         throws IOException
     {
         // @see http://issues.sonatype.org/browse/NEXUS-599
@@ -1052,7 +1079,7 @@ public abstract class AbstractNexusIntegrationTest
         return this.downloadFile( url, targetDirectory + "/" + artifact + "-" + version + classifierPart + "." + type );
     }
 
-    protected File downloadFile( URL url, String targetFile )
+    public File downloadFile( URL url, String targetFile )
         throws IOException
     {
 
@@ -1251,8 +1278,8 @@ public abstract class AbstractNexusIntegrationTest
         // ----------------------------------------------------------------------------
 
         ContainerConfiguration containerConfiguration =
-            new DefaultContainerConfiguration().setName( "test" ).setContext( context )
-                .setContainerConfiguration( baseClass.getName().replace( '.', '/' ) + ".xml" );
+            new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
+                baseClass.getName().replace( '.', '/' ) + ".xml" );
 
         containerConfiguration.setClassPathScanning( true );
 
@@ -1268,6 +1295,49 @@ public abstract class AbstractNexusIntegrationTest
             fail( "Failed to create plexus container." );
             return null;
         }
+    }
+
+    protected void installOptionalPlugin( final String plugin )
+        throws IOException
+    {
+        File pluginDir = getOptionalPluginDirectory( plugin );
+
+        if ( pluginDir != null )
+        {
+            File target = new File( getNexusBaseDir(), "runtime/apps/nexus/plugin-repository/" + pluginDir.getName() );
+            FileUtils.copyDirectory( pluginDir, target );
+        }
+    }
+
+    protected File getOptionalPluginDirectory( final String plugin )
+    {
+        File optionalPluginDir = new File( getNexusBaseDir(), "runtime/apps/nexus/optional-plugins/" );
+
+        if ( optionalPluginDir.exists() && optionalPluginDir.isDirectory() )
+        {
+            File[] files = optionalPluginDir.listFiles( new FilenameFilter()
+            {
+                public boolean accept( File dir, String name )
+                {
+                    if ( name.startsWith( plugin ) )
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+            } );
+
+            if ( files == null || files.length > 1 )
+            {
+                log.error( "Unable to lookup plugin: " + plugin );
+                return null;
+            }
+
+            return files[0];
+        }
+
+        return null;
     }
 
 }

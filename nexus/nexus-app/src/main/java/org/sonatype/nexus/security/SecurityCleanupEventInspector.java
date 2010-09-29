@@ -5,17 +5,17 @@ import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeGroupPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryPropertyDescriptor;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeRepositoryTargetPropertyDescriptor;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
+import org.sonatype.security.authorization.NoSuchAuthorizationManager;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
@@ -23,8 +23,7 @@ import org.sonatype.security.realms.tools.ConfigurationManager;
 
 @Component( role = EventInspector.class, hint = "SecurityCleanupEventInspector" )
 public class SecurityCleanupEventInspector
-    extends AbstractLogEnabled
-    implements EventInspector
+    extends AbstractEventInspector
 {
     @Requirement( hint = "default" )
     private ConfigurationManager configManager;
@@ -55,7 +54,7 @@ public class SecurityCleanupEventInspector
             {
                 getLogger().error( "Unable to clean privileges attached to repository", e );
             }
-            catch ( NoSuchAuthorizationManagerException e )
+            catch ( NoSuchAuthorizationManager e )
             {
                 getLogger().error( "Unable to clean privileges attached to repository", e );
             }
@@ -74,7 +73,7 @@ public class SecurityCleanupEventInspector
             {
                 getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
             }
-            catch ( NoSuchAuthorizationManagerException e )
+            catch ( NoSuchAuthorizationManager e )
             {
                 getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
             }
@@ -82,7 +81,7 @@ public class SecurityCleanupEventInspector
     }
 
     protected void cleanupPrivileges( String propertyId, String propertyValue )
-        throws NoSuchPrivilegeException, NoSuchAuthorizationManagerException
+        throws NoSuchPrivilegeException, NoSuchAuthorizationManager
     {
         Set<Privilege> privileges = security.listPrivileges();
 

@@ -8,7 +8,6 @@ import org.apache.maven.it.util.StringUtils;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionContaining;
-import org.jmock.expectation.AssertMo;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
 import org.testng.Assert;
 import org.testng.annotations.Test;

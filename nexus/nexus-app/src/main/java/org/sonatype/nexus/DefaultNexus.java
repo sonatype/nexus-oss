@@ -33,6 +33,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.StoppingException;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
 import org.sonatype.nexus.events.EventInspectorHost;
@@ -173,6 +174,11 @@ public class DefaultNexus
 
     @Requirement
     private PlexusEhCacheWrapper cacheWrapper;
+
+    @Requirement
+    private ArtifactPackagingMapper artifactPackagingMapper;
+
+    private static final String MAPPING_PROPERTIES_FILE = "packaging2extension-mapping.properties";
 
     // ----------------------------------------------------------------------------------------------------------
     // SystemStatus
@@ -388,8 +394,11 @@ public class DefaultNexus
     public void reindexAllRepositories( String path, boolean fullReindex )
         throws IOException
     {
-        this.applicationEventMulticaster.notifyEventListeners( new ReindexRepositoriesEvent( this,
-                        new ReindexRepositoriesRequest( path, fullReindex ) ) );
+        this.applicationEventMulticaster.notifyEventListeners( new ReindexRepositoriesEvent(
+                                                                                             this,
+                                                                                             new ReindexRepositoriesRequest(
+                                                                                                                             path,
+                                                                                                                             fullReindex ) ) );
     }
 
     public Collection<String> evictAllUnusedProxiedItems( ResourceStoreRequest req, long timestamp )
@@ -523,10 +532,10 @@ public class DefaultNexus
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents(
-                        new HashSet<String>( Arrays.asList( new String[] { NexusArtifactEvent.ACTION_CACHED,
-                            NexusArtifactEvent.ACTION_DEPLOYED, NexusArtifactEvent.ACTION_DELETED } ) ), from, count,
-                        filter );
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
+                                                        NexusArtifactEvent.ACTION_CACHED,
+                                                        NexusArtifactEvent.ACTION_DEPLOYED,
+                                                        NexusArtifactEvent.ACTION_DELETED } ) ), from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyDeployedOrCachedArtifacts( Integer from, Integer count,
@@ -537,7 +546,8 @@ public class DefaultNexus
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
-            NexusArtifactEvent.ACTION_CACHED, NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
+                                                        NexusArtifactEvent.ACTION_CACHED,
+                                                        NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyCachedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
@@ -546,8 +556,9 @@ public class DefaultNexus
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-                        .asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ), from, count, filter );
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>(
+                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_CACHED } ) ),
+                                                    from, count, filter );
     }
 
     public List<NexusArtifactEvent> getRecentlyDeployedArtifacts( Integer from, Integer count, Set<String> repositoryIds )
@@ -556,8 +567,9 @@ public class DefaultNexus
             ( repositoryIds == null || repositoryIds.isEmpty() ) ? null
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
-        return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays
-                        .asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ), from, count, filter );
+        return feedRecorder.getNexusArtifectEvents( new HashSet<String>(
+                                                                         Arrays.asList( new String[] { NexusArtifactEvent.ACTION_DEPLOYED } ) ),
+                                                    from, count, filter );
     }
 
     public List<NexusArtifactEvent> getBrokenArtifacts( Integer from, Integer count, Set<String> repositoryIds )
@@ -567,15 +579,18 @@ public class DefaultNexus
                             : new RepositoryIdTimelineFilter( repositoryIds );
 
         return feedRecorder.getNexusArtifectEvents( new HashSet<String>( Arrays.asList( new String[] {
-            NexusArtifactEvent.ACTION_BROKEN, NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ), from,
-                        count, filter );
+                                                        NexusArtifactEvent.ACTION_BROKEN,
+                                                        NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM } ) ),
+                                                    from, count, filter );
     }
 
     public List<SystemEvent> getRepositoryStatusChanges( Integer from, Integer count )
     {
         return feedRecorder.getSystemEvents( new HashSet<String>( Arrays.asList( new String[] {
-            FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION, FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
-            FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from, count, null );
+                                                 FeedRecorder.SYSTEM_REPO_LSTATUS_CHANGES_ACTION,
+                                                 FeedRecorder.SYSTEM_REPO_PSTATUS_CHANGES_ACTION,
+                                                 FeedRecorder.SYSTEM_REPO_PSTATUS_AUTO_CHANGES_ACTION } ) ), from,
+                                             count, null );
     }
 
     public List<SystemEvent> getSystemEvents( Integer from, Integer count )
@@ -604,13 +619,14 @@ public class DefaultNexus
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------\n" );
         sysInfoLog.append( "\n" );
-        sysInfoLog.append( "Initializing Nexus (" )
-                        .append( applicationStatusSource.getSystemStatus().getEditionShort() ).append( "), Version " )
-                        .append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
+        sysInfoLog.append( "Initializing Nexus (" ).append( applicationStatusSource.getSystemStatus().getEditionShort() ).append( "), Version " ).append( applicationStatusSource.getSystemStatus().getVersion() ).append( "\n" );
         sysInfoLog.append( "\n" );
         sysInfoLog.append( "-------------------------------------------------" );
 
         getLogger().info( sysInfoLog.toString() );
+
+        artifactPackagingMapper.setPropertiesFile( new File( nexusConfiguration.getConfigurationDirectory(),
+                                                             MAPPING_PROPERTIES_FILE ) );
 
         // EventInspectorHost
         applicationEventMulticaster.addEventListener( eventInspectorHost );
@@ -689,7 +705,7 @@ public class DefaultNexus
 
             // notify about start
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( nexusConfiguration, null,
-                            null ) );
+                                                                                            null ) );
 
             addSystemEvent( FeedRecorder.SYSTEM_BOOT_ACTION, "Starting Nexus (version "
                 + getSystemStatus().getVersion() + " " + getSystemStatus().getEditionShort() + ")" );
@@ -700,8 +716,7 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setInstanceUpgraded( nexusConfiguration.isInstanceUpgraded() );
 
-            applicationStatusSource.getSystemStatus().setConfigurationUpgraded(
-                            nexusConfiguration.isConfigurationUpgraded() );
+            applicationStatusSource.getSystemStatus().setConfigurationUpgraded( nexusConfiguration.isConfigurationUpgraded() );
 
             if ( applicationStatusSource.getSystemStatus().isFirstStart() )
             {
@@ -724,13 +739,11 @@ public class DefaultNexus
 
             applicationStatusSource.getSystemStatus().setStartedAt( new Date() );
 
-            getLogger().info(
-                            "Nexus Work Directory : "
-                                + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
+            getLogger().info( "Nexus Work Directory : "
+                                  + nexusConfiguration.getWorkingDirectory().getAbsolutePath().toString() );
 
-            getLogger().info(
-                            "Started Nexus (version " + getSystemStatus().getVersion() + " "
-                                + getSystemStatus().getEditionShort() + ")" );
+            getLogger().info( "Started Nexus (version " + getSystemStatus().getVersion() + " "
+                                  + getSystemStatus().getEditionShort() + ")" );
 
             applicationEventMulticaster.notifyEventListeners( new NexusStartedEvent( this ) );
         }
@@ -774,9 +787,8 @@ public class DefaultNexus
 
         applicationStatusSource.getSystemStatus().setState( SystemState.STOPPED );
 
-        getLogger().info(
-                        "Stopped Nexus (version " + getSystemStatus().getVersion() + " "
-                            + getSystemStatus().getEditionShort() + ")" );
+        getLogger().info( "Stopped Nexus (version " + getSystemStatus().getVersion() + " "
+                              + getSystemStatus().getEditionShort() + ")" );
     }
 
     private void synchronizeShadowsAtStartup()

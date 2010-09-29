@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.RepoComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "SynchronizeShadow", description = "Synchronize Shadow Repository" )
 public class SynchronizeShadowTaskDescriptor
@@ -28,8 +28,8 @@ public class SynchronizeShadowTaskDescriptor
 
     public static final String REPO_FIELD_ID = "shadowRepositoryId";
 
-    private final RepoOrGroupComboFormField repoField =
-        new RepoOrGroupComboFormField( REPO_FIELD_ID, "Shadow Repository",
+    private final RepoComboFormField repoField =
+        new RepoComboFormField( REPO_FIELD_ID, "Shadow Repository",
                                        "Select the repository shadow to assign to this task.", FormField.MANDATORY );
 
     public String getId()

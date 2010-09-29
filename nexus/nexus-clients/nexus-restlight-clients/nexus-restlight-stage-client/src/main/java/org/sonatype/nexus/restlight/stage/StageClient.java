@@ -61,6 +61,8 @@ public class StageClient
 
     private static final String PROFILE_NAME_ELEMENT = "name";
 
+    private static final String PROFILE_MODE_ELEMENT = "mode";
+
     private static final String REPO_ID_ELEMENT = "repositoryId";
 
     private static final String REPO_URI_ELEMENT = "repositoryURI";
@@ -544,5 +546,47 @@ public class StageClient
         Document doc = get( PROFILES_PATH );
 
         return parseStageRepositories( doc, STAGE_REPO_LIST_XPATH, false, false );
+    }
+
+    /**
+     * Returns a list of all the staging profile Ids.
+     * 
+     * @return
+     * @throws RESTLightClientException
+     */
+    @SuppressWarnings( "unchecked" )
+    public List<StageProfile> getStageProfiles()
+        throws RESTLightClientException
+    {
+        Document doc = get( PROFILES_PATH );
+
+        // heavy lifting is done with xpath
+        XPath profileXp = newXPath( STAGE_REPO_XPATH );
+
+        List<Element> profiles;
+        try
+        {
+            profiles = profileXp.selectNodes( doc.getRootElement() );
+        }
+        catch ( JDOMException e )
+        {
+            throw new RESTLightClientException( "XPath selection failed: '" + STAGE_REPO_XPATH + "' (Root node: "
+                + doc.getRootElement().getName() + ").", e );
+        }
+
+        List<StageProfile> result = new ArrayList<StageProfile>();
+        if ( profiles != null )
+        {
+            for ( Element profile : profiles )
+            {
+                // just pull out the id and name.
+                String profileId = profile.getChild( PROFILE_ID_ELEMENT ).getText();
+                String name = profile.getChild( PROFILE_NAME_ELEMENT ).getText();
+                String mode = profile.getChild( PROFILE_MODE_ELEMENT ).getText();
+
+                result.add( new StageProfile( profileId, name, mode ) );
+            }
+        }
+        return result;
     }
 }

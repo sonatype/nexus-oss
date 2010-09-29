@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import static org.testng.Assert.assertTrue;
-import static org.sonatype.nexus.integrationtests.ITGroups.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;

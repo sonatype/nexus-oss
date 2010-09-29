@@ -15,9 +15,6 @@ import javax.naming.Context;
 import javax.naming.ldap.InitialLdapContext;
 
 import org.sonatype.ldaptestsuite.AbstractLdapTestEnvironment;
-import org.sonatype.security.ldap.dao.LdapAuthConfiguration;
-import org.sonatype.security.ldap.dao.LdapGroupDAO;
-
 
 public class LdapGroupDAOTest
     extends AbstractLdapTestEnvironment
@@ -26,6 +23,16 @@ public class LdapGroupDAOTest
     public void testSimple()
         throws Exception
     {
+        doTestWithGroupMemberFormat( "cn=${username},ou=people,o=sonatype" );
+    }
+
+    public void testUsingDNInGroupMemberFormat()
+        throws Exception
+    {
+        doTestWithGroupMemberFormat( "${dn}" );
+    }
+
+    protected void doTestWithGroupMemberFormat(String groupMemberFormat) throws Exception {
         Map<String, Object> env = new HashMap<String, Object>();
         // Create a new context pointing to the overseas partition
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
@@ -45,7 +52,7 @@ public class LdapGroupDAOTest
         configuration.setGroupBaseDn( "ou=groups" );
         configuration.setGroupObjectClass( "groupOfUniqueNames" );
         configuration.setGroupMemberAttribute( "uniqueMember" );
-        configuration.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
+        configuration.setGroupMemberFormat( groupMemberFormat );
         configuration.setUserMemberOfAttribute( "" );
 
         LdapGroupDAO lgm = (LdapGroupDAO) lookup( LdapGroupDAO.class.getName() );

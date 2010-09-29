@@ -431,7 +431,7 @@ public class DefaultIndexingContext
             }
             else
             {
-                return indexWriter.hasUncommitedChanges();
+                return indexWriter.hasUncommittedChanges();
             }
         }
     }

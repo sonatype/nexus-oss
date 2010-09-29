@@ -9,6 +9,7 @@ package org.sonatype.nexus.index.updater;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -779,6 +780,85 @@ public class DefaultIndexUpdaterTest
             will( returnValue( newInputStream( "/index-updater/server-root/nexus-maven-repository-index.gz" ) ) );
             
 
+            never( tempContext ).merge( with( any( Directory.class ) ) );
+
+            never( tempContext ).merge( with( any( Directory.class ) ) );
+
+            oneOf( tempContext ).replace( with( any( Directory.class ) ) );
+
+            oneOf( mockFetcher ).disconnect();
+        }});
+
+        // tempContext.updateTimestamp( true, contextTimestamp );
+
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
+
+        updateRequest.setResourceFetcher( mockFetcher );
+
+        updateRequest.setForceFullUpdate( true );
+
+        updater.fetchAndUpdateIndex( updateRequest );
+
+        mockery.assertIsSatisfied();
+    }
+    
+    public void testUpdateForceFullUpdateNoGZ() throws Exception
+    {
+        Mockery mockery = new Mockery();
+
+        final String indexUrl = repositoryUrl + ".index";
+        final Date contextTimestamp = df.parse( "20081128000000.000 -0600" );
+
+        final ResourceFetcher mockFetcher = mockery.mock( ResourceFetcher.class );
+
+        final IndexingContext tempContext = mockery.mock( IndexingContext.class );
+
+        mockery.checking(new Expectations()
+        {{
+            allowing( tempContext ).getIndexDirectoryFile();
+            will( new ReturnValueAction (
+                testBasedir ) );
+
+            allowing( tempContext ).getTimestamp();
+            will( returnValue( contextTimestamp ) );
+
+            allowing( tempContext ).getId();
+            will( returnValue( repositoryId ) );
+
+            allowing( tempContext ).getIndexUpdateUrl();
+            will( returnValue( indexUrl ) );
+
+            allowing( tempContext ).getIndexCreators();
+            will( returnValue( DEFAULT_CREATORS ) );
+
+            oneOf( mockFetcher ).connect( repositoryId, indexUrl );
+
+            oneOf( mockFetcher ).retrieve( //
+                with( IndexingContext.INDEX_FILE + ".properties" ) );
+            will(new PropertiesAction()
+            {
+                @Override
+                Properties getProperties()
+                {
+                    Properties properties = new Properties();
+                    properties.setProperty( IndexingContext.INDEX_ID, "central" );
+                    properties.setProperty( IndexingContext.INDEX_LEGACY_TIMESTAMP, "20081129174241.859 -0600" );
+                    return properties;
+                }
+            });
+
+            never( tempContext ).getIndexDirectoryFile();
+
+            oneOf( mockFetcher ).retrieve( 
+                with( IndexingContext.INDEX_FILE + ".gz" ) );
+            
+            will( throwException( new FileNotFoundException() ) );
+
+            oneOf( mockFetcher ).retrieve(
+                with( IndexingContext.INDEX_FILE + ".zip" ) );
+            
+            will( returnValue( newInputStream( "/index-updater/server-root/legacy/nexus-maven-repository-index.zip" ) ) );
+            
             never( tempContext ).merge( with( any( Directory.class ) ) );
 
             never( tempContext ).merge( with( any( Directory.class ) ) );

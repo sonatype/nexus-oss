@@ -10,7 +10,6 @@ import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.integrationtests.ITGroups;
 import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
@@ -50,8 +49,7 @@ public class Nexus3233IndexPomSha1IT
     {
         final File pom = getTestFile( "maven.pom" );
         MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3233", "maven", "1.0.0", "pom" ),
-                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null,
-                                            "-DgeneratePom=false" ).verifyErrorFreeLog();
+            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null, "-DgeneratePom=false" ).verifyErrorFreeLog();
         searchFor( pom );
     }
 
@@ -61,8 +59,8 @@ public class Nexus3233IndexPomSha1IT
     {
         final File pom = getTestFile( "rest.pom" );
         HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
-        Assert.assertTrue( Status.isSuccess( r.getStatusCode() ), "Unable to deploy artifact " + r.getStatusCode()
-            + ": " + r.getStatusText() );
+        Assert.assertTrue( Status.isSuccess( r.getStatusCode() ),
+        "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText() );
         searchFor( pom );
     }
 
@@ -97,6 +95,9 @@ public class Nexus3233IndexPomSha1IT
     private void searchFor( final File pom )
         throws IOException, Exception
     {
+        // wait to index up the changes
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         String sha1 = FileTestingUtils.createSHA1FromFile( pom );
         Assert.assertNotNull( sha1 );
         doSearch( sha1, "" );
@@ -109,6 +110,9 @@ public class Nexus3233IndexPomSha1IT
     private void doSearch( String sha1, String msg )
         throws Exception
     {
+        // wait to index up the changes
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         NexusArtifact result = getSearchMessageUtil().identify( sha1 );
         Assert.assertNotNull( result, "Pom with " + sha1 + " not found " + msg );
     }

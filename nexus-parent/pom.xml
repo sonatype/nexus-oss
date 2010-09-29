@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -12,7 +11,7 @@
 
   <groupId>org.sonatype.nexus</groupId>
   <artifactId>nexus-parent</artifactId>
-  <version>17-SNAPSHOT</version>
+  <version>18-SNAPSHOT</version>
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
@@ -250,6 +249,29 @@
         </plugins>
       </build>
     </profile>
+
+    <profile>
+      <id>quick</id>
+      <properties>
+        <test>void</test>
+        <it.test>void</it.test>
+        <failIfNoTests>false</failIfNoTests>
+        <invoker.skip>true</invoker.skip>
+        <source.skip>true</source.skip>
+        <enunciate.skip>true</enunciate.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-test-environment-maven-plugin</artifactId>
+            <configuration>
+              <testSkip>true</testSkip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
@@ -327,7 +349,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>1.5</version>
+          <version>1.6-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>

@@ -83,6 +83,18 @@ public interface ProxyRepository
     void setItemMaxAge( int itemMaxAge );
 
     /**
+     * Gets the content validation setting.
+     * @return
+     */
+    public boolean isFileTypeValidation();
+
+    /**
+     * Sets the content validation setting.
+     * @param doValidate
+     */
+    public void setFileTypeValidation( boolean doValidate );
+    
+    /**
      * Gets the RepositoryStatusCheckMode.
      * 
      * @return

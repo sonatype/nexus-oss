@@ -14,12 +14,13 @@
 package org.sonatype.nexus.integrationtests.nexus429;
 
 
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.File;
 import java.util.Date;
 
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
-import static org.sonatype.nexus.integrationtests.ITGroups.*;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

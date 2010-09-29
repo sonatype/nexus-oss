@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
@@ -96,6 +97,9 @@ public class Nexus3626SimpleSearchIT
     private void searchFor( final File pom )
         throws IOException, Exception
     {
+        // wait for calm period, since we do content mods and want to see that on index!
+        getEventInspectorsUtil().waitForCalmPeriod();
+        
         String sha1 = FileTestingUtils.createSHA1FromFile( pom );
         Assert.assertNotNull( sha1 );
         doSearch( sha1, "" );
@@ -108,6 +112,9 @@ public class Nexus3626SimpleSearchIT
     private void doSearch( String sha1, String msg )
         throws Exception
     {
+        // wait for calm period, since we do content mods and want to see that on index!
+        getEventInspectorsUtil().waitForCalmPeriod();
+        
         SearchNGResponse result = getSearchMessageUtil().searchSha1NGFor( sha1 );
         Assert.assertEquals( result.getTotalCount(), 1, "Pom with " + sha1 + " not found " + msg );
         Assert.assertEquals( result.getData().size(), 1, "Pom with " + sha1 + " not found " + msg );

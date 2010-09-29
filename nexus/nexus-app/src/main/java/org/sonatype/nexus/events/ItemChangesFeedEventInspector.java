@@ -17,6 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.feeds.NexusArtifactEvent;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;
@@ -35,6 +36,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "ItemChangesFeedEventInspector" )
 public class ItemChangesFeedEventInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
     public boolean accepts( Event<?> evt )
     {

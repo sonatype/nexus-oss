@@ -16,6 +16,7 @@ package org.sonatype.nexus.events;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventProxyModeChanged;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
@@ -27,6 +28,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "RepositoryEventProxyModeChanged" )
 public class RepositoryEventProxyModeChangedInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
 
     public boolean accepts( Event<?> evt )

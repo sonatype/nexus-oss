@@ -22,7 +22,6 @@ import org.apache.maven.it.Verifier;
 import org.sonatype.nexus.integrationtests.AbstractMavenNexusIT;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;
-import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

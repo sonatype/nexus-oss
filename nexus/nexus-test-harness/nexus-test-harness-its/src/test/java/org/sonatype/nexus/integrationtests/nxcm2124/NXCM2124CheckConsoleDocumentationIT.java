@@ -1,7 +1,6 @@
 package org.sonatype.nexus.integrationtests.nxcm2124;
 
 import java.io.IOException;
-
 import java.net.URL;
 import java.util.List;
 

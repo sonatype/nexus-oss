@@ -17,7 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
@@ -26,7 +26,7 @@ import org.sonatype.plexus.appevents.Event;
  */
 @Component( role = EventInspector.class, hint = "LuceneIndexerConfigurationChangeEventInspector" )
 public class IndexerConfigurationChangeEventInspector
-    extends AbstractFeedRecorderEventInspector
+    extends AbstractEventInspector
 {
     @Requirement
     private IndexerManager indexerManager;

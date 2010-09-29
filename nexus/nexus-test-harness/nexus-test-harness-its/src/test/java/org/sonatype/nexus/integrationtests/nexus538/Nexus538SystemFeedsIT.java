@@ -45,7 +45,7 @@ public class Nexus538SystemFeedsIT
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
     }
 
-    @Test
+    @Test(dependsOnMethods = {"bootEventTest"})
     public void updateRepoTest()
         throws Exception
     {
@@ -67,7 +67,7 @@ public class Nexus538SystemFeedsIT
                            "Update repo feed not found\r\n\r\n" + feed );
     }
 
-    @Test
+    @Test(dependsOnMethods = {"updateRepoTest"})
     public void changeProxyStatusTest()
         throws Exception
     {

@@ -16,6 +16,7 @@ package org.sonatype.nexus.events;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryEventLocalStatusChanged;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -27,6 +28,7 @@ import org.sonatype.plexus.appevents.Event;
 @Component( role = EventInspector.class, hint = "RepositoryEventLocalStatusChanged" )
 public class RepositoryEventLocalStatusChangedInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
 
     public boolean accepts( Event<?> evt )
@@ -49,7 +51,7 @@ public class RepositoryEventLocalStatusChangedInspector
         sb.append( "' (ID='" ).append( revt.getRepository().getId() ).append( "') was put " );
 
         LocalStatus newStatus = revt.getNewLocalStatus();
-        
+
         if ( LocalStatus.IN_SERVICE.equals( newStatus ) )
         {
             sb.append( "IN SERVICE." );

@@ -13,8 +13,9 @@
  */
 package org.sonatype.nexus.integrationtests.nexus258;
 
-import java.io.File;
 import static org.testng.Assert.assertTrue;
+
+import java.io.File;
 import java.util.Date;
 
 import org.apache.commons.httpclient.HttpStatus;

@@ -1,12 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness</artifactId>
@@ -14,12 +13,8 @@
   <name>Nexus : Test Harness</name>
 
   <profiles>
-    <profile>
-      <id>selenium-tests</id>
-      <modules>
-        <module>nexus-test-harness-selenium</module>
-      </modules>
-    </profile>
+    <!-- until nexus-mock is again working, we cant have this module -->
+    <!--profile> <id>selenium-tests</id> <modules> <module>nexus-test-harness-selenium</module> </modules> </profile -->
 
     <profile>
       <id>its</id>
@@ -29,16 +24,11 @@
         </property>
       </activation>
       <modules>
-        <module>nexus-exception-plugin</module>
-        <module>nexus-timeout-plugin</module>
-        <module>nexus-simple-memory-realm</module>
+        <module>nexus-it-helper-plugin</module>
         <module>nexus-test-harness-launcher</module>
         <module>nexus-test-harness-its</module>
       </modules>
     </profile>
   </profiles>
-  <modules>
-  	<module>nexus-test-harness-capability-plugin</module>
-  </modules>
 
 </project>

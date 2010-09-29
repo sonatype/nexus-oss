@@ -9,7 +9,9 @@ package org.sonatype.nexus.index;
 import java.io.File;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -29,6 +31,9 @@ import org.sonatype.nexus.index.locator.PomLocator;
 public class DefaultArtifactContextProducer
     implements ArtifactContextProducer
 {
+    @Requirement
+    ArtifactPackagingMapper mapper;
+    
     private GavHelpedLocator pl = new PomLocator();
 
     private Locator ml = new MetadataLocator();
@@ -67,7 +72,7 @@ public class DefaultArtifactContextProducer
 
         if ( file.getName().endsWith( ".pom" ) )
         {
-            ArtifactLocator al = new ArtifactLocator( context );
+            ArtifactLocator al = new ArtifactLocator( mapper );
             artifact = al.locate( file, context.getGavCalculator(), gav );
             
             //If we found the matching artifact, switch over to indexing that, instead of the pom

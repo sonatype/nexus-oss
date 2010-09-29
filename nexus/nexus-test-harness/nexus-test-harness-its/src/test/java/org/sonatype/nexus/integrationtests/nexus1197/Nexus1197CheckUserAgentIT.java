@@ -13,8 +13,10 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1197;
 
-import java.io.FileNotFoundException;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.io.FileNotFoundException;
+
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.text.StringContains;
 import org.mortbay.jetty.Server;

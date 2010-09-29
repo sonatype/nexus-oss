@@ -1,7 +1,8 @@
 package org.sonatype.nexus.integrationtests.nexus977privilege;
 
-import java.io.File;
 import static org.testng.Assert.assertTrue;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.sonatype.nexus.artifact.Gav;

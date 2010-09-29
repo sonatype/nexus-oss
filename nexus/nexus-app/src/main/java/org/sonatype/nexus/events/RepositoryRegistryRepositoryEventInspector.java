@@ -19,6 +19,7 @@ import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractFeedRecorderEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -30,27 +31,21 @@ import org.sonatype.nexus.proxy.repository.HostedRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
-import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
- * Toni: Split {@link RepositoryRegistryRepositoryEventInspector} into two parts. One is this and the other is the
- * extracted indexer logic. This indexer related inspector now sits IndexingRepositoryRegistryRepositoryEventInspector.
+ * Creates timeline entries (for feeds) about repository configuration related changes.
  * 
  * @author Juven Xu
  */
 @Component( role = EventInspector.class, hint = "RepositoryRegistryRepositoryEvent" )
 public class RepositoryRegistryRepositoryEventInspector
     extends AbstractFeedRecorderEventInspector
+    implements AsynchronousEventInspector
 {
-
     @Requirement
     private RepositoryRegistry repoRegistry;
 
-    @Requirement
-    private NexusScheduler nexusScheduler;
-    
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
 
@@ -75,13 +70,11 @@ public class RepositoryRegistryRepositoryEventInspector
 
         try
         {
-            // check registry for existance, wont be able to do much
+            // check registry for existence, wont be able to do much
             // if doesn't exist yet
             repoRegistry.getRepository( repository.getId() );
 
             inspectForTimeline( evt, repository );
-
-            inspectForRepositoryRemoval( evt, repository );
         }
         catch ( NoSuchRepositoryException e )
         {
@@ -158,30 +151,4 @@ public class RepositoryRegistryRepositoryEventInspector
             getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, sb.toString() );
         }
     }
-
-    private void inspectForRepositoryRemoval( Event<?> evt, Repository repository )
-    {
-        try
-        {
-            if ( evt instanceof RepositoryRegistryEventRemove )
-            {
-                // remove the storage folders for the repository
-                DeleteRepositoryFoldersTask task =
-                    nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
-
-                task.setRepository( repository );
-
-                nexusScheduler.submit( "Deleting repository folder for repository \"" + repository.getName()
-                    + "\" (id=" + repository.getId() + ").", task );
-            }
-
-        }
-        catch ( Exception e )
-        {
-            getLogger().error(
-                "Could not remove repository folders for repository \"" + repository.getName() + "\" (id="
-                    + repository.getId() + ")!", e );
-        }
-    }
-
 }

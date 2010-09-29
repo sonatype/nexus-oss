@@ -30,7 +30,6 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
@@ -78,10 +77,15 @@ public class Nexus383SearchNGIT
         getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, true );
         getSearchMessageUtil().allowBrowsing( NEXUS_TEST_HARNESS_REPO, true );
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
+
+        // config changes may result in tasks spawned like reindex(!)
+        TaskScheduleUtil.waitForAllTasksToStop();
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
-    @Test
     // 1. deploy an known artifact. and search for it. using group Id and artifact Id.
+    @Test
     public void searchFor()
         throws Exception
     {
@@ -121,8 +125,8 @@ public class Nexus383SearchNGIT
         Assert.assertEquals( 1, results.getData().size() );
     }
 
-    @Test
     // 2. search using SHA1
+    @Test
     public void searchForSHA1()
         throws Exception
     {
@@ -146,6 +150,9 @@ public class Nexus383SearchNGIT
     {
         // Disabling default repo
         getSearchMessageUtil().allowSearch( NEXUS_TEST_HARNESS_REPO, false );
+
+        // config change spawns a lot of events
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // groupId
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "nexus383" );
@@ -274,6 +281,8 @@ public class Nexus383SearchNGIT
                                              NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         TaskScheduleUtil.waitForTasks();
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // Keyword search does collapse results, so we need _1_
         // Since the top level is GAV now only

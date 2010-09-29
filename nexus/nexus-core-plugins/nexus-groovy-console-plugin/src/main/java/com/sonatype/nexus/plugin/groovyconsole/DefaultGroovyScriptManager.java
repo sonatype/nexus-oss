@@ -15,43 +15,22 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
 
 import com.sonatype.nexus.plugin.groovyconsole.rest.dto.GroovyScriptDTO;
 
 @Component( role = GroovyScriptManager.class, instantiationStrategy = "singleton" )
 public class DefaultGroovyScriptManager
     extends AbstractLogEnabled
-    implements EventListener, Initializable, Disposable, GroovyScriptManager
+    implements GroovyScriptManager
 {
-
     @Requirement
     private ScriptStorage storage;
 
     @Requirement
     private PlexusContainer plexus;
 
-    @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
-
-    public void initialize()
-        throws InitializationException
-    {
-        applicationEventMulticaster.addEventListener( this );
-    }
-
-    public void dispose()
-    {
-        applicationEventMulticaster.removeEventListener( this );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public void onEvent( Event<?> evt )
+    public void actUponEvent( Event<?> evt )
     {
         Class<? extends Event<?>> c = (Class<? extends Event<?>>) evt.getClass();
         String script = storage.getScript( c );

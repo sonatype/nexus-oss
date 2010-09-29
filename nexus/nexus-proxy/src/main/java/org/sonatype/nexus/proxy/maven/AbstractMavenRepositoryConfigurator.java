@@ -28,6 +28,9 @@ public abstract class AbstractMavenRepositoryConfigurator
     @Requirement( hint = "ChecksumContentValidator" )
     private ItemContentValidator checksumValidator;
 
+    @Requirement( hint = "FileTypeItemContentValidator" )
+    private ItemContentValidator fileTypeItemContentValidator;
+    
     @Override
     public void doApplyConfiguration( Repository repository, ApplicationConfiguration configuration,
                                       CRepositoryCoreConfiguration coreConfiguration )
@@ -40,6 +43,7 @@ public abstract class AbstractMavenRepositoryConfigurator
             ProxyRepository proxy = repository.adaptToFacet( ProxyRepository.class );
 
             proxy.getItemContentValidators().put( "checksum", checksumValidator );
+            proxy.getItemContentValidators().put( "filetypevalidator", fileTypeItemContentValidator );
         }
     }
 }

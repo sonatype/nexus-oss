@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.sonatype.nexus.tools</groupId>
     <artifactId>nexus-migration-tool</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <!-- the version of maven's project object model -->
@@ -18,7 +18,7 @@
 
   <!-- a short but descriptive name for the project -->
   <name>Nexus : Migration Tools : Maven Metadata Rebuild</name>
-
+  
   <dependencies>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
@@ -77,8 +77,8 @@
           <artifactId>lucene-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.shiro</groupId>
-          <artifactId>shiro-core</artifactId>
+          <groupId>org.jsecurity</groupId>
+          <artifactId>jsecurity</artifactId>
         </exclusion>
         <exclusion>
           <groupId>commons-beanutils</groupId>

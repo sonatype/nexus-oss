@@ -22,7 +22,7 @@ public abstract class AbstractMavenRepositoryConfiguration
     public static final String REPOSITORY_POLICY = "repositoryPolicy";
 
     public static final String CHECKSUM_POLICY = "checksumPolicy";
-
+    
     public static final String ARTIFACT_MAX_AGE = "artifactMaxAge";
 
     public static final String METADATA_MAX_AGE = "metadataMaxAge";
@@ -56,7 +56,7 @@ public abstract class AbstractMavenRepositoryConfiguration
     {
         setNodeValue( getRootNode(), CHECKSUM_POLICY, policy.toString() );
     }
-
+    
     public int getArtifactMaxAge()
     {
         return Integer.parseInt( getNodeValue( getRootNode(), ARTIFACT_MAX_AGE, "1440" ) );

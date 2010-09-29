@@ -221,8 +221,12 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
+            final String principal =
+                securitySystem.getSubject() != null && securitySystem.getSubject().getPrincipal() != null ? securitySystem.getSubject().getPrincipal().toString()
+                    : null;
+
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
-                securitySystem.getSubject() ) );
+                principal ) );
 
             return true;
         }
@@ -690,8 +694,11 @@ public class DefaultNexusConfiguration
         throws NoSuchRepositoryException, IOException, ConfigurationException
     {
         Repository repository = repositoryRegistry.getRepository( id );
-
+        // put out of service so wont be accessed any longer
         repository.setLocalStatus( LocalStatus.OUT_OF_SERVICE );
+        // disable indexing for same purpose
+        repository.setIndexable( false );
+        repository.setSearchable( false );
 
         // remove dependants too
 

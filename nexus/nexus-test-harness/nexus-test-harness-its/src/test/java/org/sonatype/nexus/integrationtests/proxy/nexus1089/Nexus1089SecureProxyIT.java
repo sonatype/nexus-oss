@@ -19,7 +19,6 @@ import java.io.File;
 
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.integrationtests.ITGroups;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;

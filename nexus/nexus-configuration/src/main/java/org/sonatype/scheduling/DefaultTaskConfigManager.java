@@ -92,7 +92,7 @@ public class DefaultTaskConfigManager
     public void initializeConfiguration()
         throws ConfigurationException
     {
-        if ( getApplicationConfiguration().getConfigurationModel() != null )
+        if ( getApplicationConfiguration() != null && getApplicationConfiguration().getConfigurationModel() != null )
         {
             configure( getApplicationConfiguration() );
         }

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.maven.ArtifactPackagingMapper;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 

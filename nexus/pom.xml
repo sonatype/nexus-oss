@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../nexus-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus</artifactId>
   <packaging>pom</packaging>
   <name>Sonatype Nexus Repository Manager</name>
-  <version>1.8.0-SNAPSHOT</version>
+  <version>1.9-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
   <inceptionYear>2007</inceptionYear>
   <mailingLists />
@@ -137,17 +137,18 @@
 
   <!-- Shortcuts for outnumbered deps :) -->
   <properties>
-    <plexus.appbooter.version>2.1.1-SNAPSHOT</plexus.appbooter.version>
+    <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>2.0.0-SNAPSHOT</plexus-security.version>
+    <plexus-security.version>1.1.8</plexus-security.version>
+    <plexus-security-rest.version>1.1.8.1</plexus-security-rest.version>
     <slf4j.version>1.5.6</slf4j.version>
-    <nexus.indexer.version>3.0.4-SNAPSHOT</nexus.indexer.version>
-    <nexus.indexer.artifact.version>1.0.1-SNAPSHOT</nexus.indexer.artifact.version>
-    <nexus.repository.metadata.version>1.0.3-SNAPSHOT</nexus.repository.metadata.version>
+    <nexus.indexer.version>3.1-SNAPSHOT</nexus.indexer.version>
+    <nexus.indexer.artifact.version>1.1-SNAPSHOT</nexus.indexer.artifact.version>
+    <nexus.repository.metadata.version>1.0.3</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.16</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
-    <mercury.version>1.0-alpha-6</mercury.version>
+    <mercury.version>1.0-alpha-6-SONATYPE</mercury.version>
     <restlet.version>1.1.6-SONATYPE-5348-V4</restlet.version>
     <plexus-jetty6.version>1.7</plexus-jetty6.version>
     <plexus-task-scheduler.version>1.3</plexus-task-scheduler.version>
@@ -156,13 +157,13 @@
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
-    <shiro.version>1.0.0-incubating</shiro.version>
+    <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.3</plexus-ehcache.version>
-    <plexus-jetty-testsuite.version>1.3</plexus-jetty-testsuite.version>
+    <plexus-jetty-testsuite.version>1.7</plexus-jetty-testsuite.version>
     <plexus-app-events.version>1.0.0</plexus-app-events.version>
-    <spice-timeline.version>1.1.2-SNAPSHOT</spice-timeline.version>
+    <spice-timeline.version>1.1.2</spice-timeline.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <spice-utils.version>1.0.0</spice-utils.version>
   </properties>
@@ -323,6 +324,10 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -405,7 +410,7 @@
         </exclusions>
       </dependency>
 
-      <!-- shiro -->
+      <!-- JSecurity -->
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
@@ -419,7 +424,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.security</groupId>
-        <artifactId>security-web</artifactId>
+        <artifactId>security-system</artifactId>
         <version>${plexus-security.version}</version>
         <exclusions>
           <exclusion>
@@ -429,21 +434,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-core</artifactId>
-        <version>${shiro.version}</version>
-        <scope>compile</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-rest-api</artifactId>
-        <version>${plexus-security.version}</version>
+        <version>${plexus-security-rest.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
@@ -486,12 +479,16 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>servlet-api-2.5</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.apache.shiro</groupId>
-        <artifactId>shiro-web</artifactId>
-        <version>${shiro.version}</version>
+        <groupId>org.jsecurity</groupId>
+        <artifactId>jsecurity</artifactId>
+        <version>${jsecurity.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1058,12 +1055,6 @@
                     that is plexus component made with older plexus container.
                   </message>
                 </bannedDependencies>
-                <bannedDependencies>
-                  <excludes>
-                    <exclude>*:jsecurity</exclude>
-                  </excludes>
-                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
-                </bannedDependencies>
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
               <fail>true</fail>
@@ -1238,7 +1229,8 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.19</enunciate.version>
+        <enunciate.version>1.20</enunciate.version>
+        <enunciate.plugin.version>1.20-SONATYPE-r919</enunciate.plugin.version>
       </properties>
       <dependencies>
         <!-- Dependencies needed to annotate classes -->
@@ -1253,6 +1245,10 @@
             <exclusion>
               <groupId>commons-logging</groupId>
               <artifactId>commons-logging</artifactId>
+            </exclusion>
+            <exclusion>
+              <groupId>com.sun</groupId>
+              <artifactId>tools</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
@@ -1280,7 +1276,7 @@
           <plugin>
             <groupId>org.codehaus.enunciate</groupId>
             <artifactId>maven-enunciate-plugin</artifactId>
-            <version>${enunciate.version}</version>
+            <version>${enunciate.plugin.version}</version>
             <executions>
               <execution>
                 <phase>process-classes</phase>
@@ -1300,7 +1296,7 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <!-- Skin disabled, until we come up with a proper skin -->
-              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0-SNAPSHOT</version> </dependency -->
+              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0</version> </dependency -->
               <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>

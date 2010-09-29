@@ -21,6 +21,7 @@ import java.util.Map;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
@@ -263,7 +264,7 @@ public abstract class AbstractMavenRepository
     {
         getExternalConfiguration( true ).setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
     }
-
+    
     public ChecksumPolicy getChecksumPolicy()
     {
         return getExternalConfiguration( false ).getChecksumPolicy();

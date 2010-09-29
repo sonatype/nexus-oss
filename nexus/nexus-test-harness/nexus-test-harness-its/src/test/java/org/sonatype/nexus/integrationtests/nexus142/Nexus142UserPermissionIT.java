@@ -31,12 +31,6 @@ public class Nexus142UserPermissionIT
     extends AbstractPrivilegeTest
 {
 
-    @BeforeClass
-    public void setSecureTest()
-    {
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-
     @Test
     public void testCreatePermission()
         throws IOException
@@ -45,7 +39,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "tesCreatePermission@foo.org" );
-        user.setFirstName( "tesCreatePermission" );
+        user.setName( "tesCreatePermission" );
         user.setUserId( "tesCreatePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -87,7 +81,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test
+    @Test( dependsOnMethods = "testCreatePermission" )
     public void testUpdatePermission()
         throws IOException
     {
@@ -97,7 +91,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "tesUpdatePermission@foo.org" );
-        user.setFirstName( "tesUpdatePermission" );
+        user.setName( "tesUpdatePermission" );
         user.setUserId( "tesUpdatePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -144,7 +138,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test
+    @Test( dependsOnMethods = "testUpdatePermission" )
     public void testReadPermission()
         throws IOException
     {
@@ -154,7 +148,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "testReadPermission@foo.org" );
-        user.setFirstName( "testReadPermission" );
+        user.setName( "testReadPermission" );
         user.setUserId( "testReadPermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -200,7 +194,7 @@ public class Nexus142UserPermissionIT
 
     }
 
-    @Test( dependsOnMethods = { "testCreatePermission", "testUpdatePermission", "testReadPermission" } )
+    @Test( dependsOnMethods = { "testReadPermission" } )
     public void testDeletePermission()
         throws IOException
     {
@@ -210,7 +204,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "testDeletePermission@foo.org" );
-        user.setFirstName( "testDeletePermission" );
+        user.setName( "testDeletePermission" );
         user.setUserId( "testDeletePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );

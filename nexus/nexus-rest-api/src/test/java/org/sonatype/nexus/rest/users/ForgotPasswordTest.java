@@ -9,7 +9,8 @@ import javax.mail.internet.MimeMessage;
 
 import junit.framework.Assert;
 
-import org.codehaus.plexus.ContainerConfiguration;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.restlet.data.Request;
@@ -31,12 +32,6 @@ public class ForgotPasswordTest
     extends AbstractNexusTestCase
 {
 
-    @Override
-    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
-    {
-        configuration.setClassPathScanning( true );
-    }
-
     private GreenMail server;
 
     private int emailServerPort;
@@ -51,7 +46,7 @@ public class ForgotPasswordTest
         NexusConfiguration nexusConfig = this.lookup( NexusConfiguration.class );
         nexusConfig.loadConfiguration( true );
         
-        String username = "jcoder";
+        String username = "admin";
 
         PlexusResource resetEmailPR = this.lookup( PlexusResource.class, "UserResetPlexusResource" );
 
@@ -120,7 +115,6 @@ public class ForgotPasswordTest
         }
     }
 
-    @Override
     public void setUp()
         throws Exception
     {
@@ -138,7 +132,6 @@ public class ForgotPasswordTest
         this.lookup( SecuritySystem.class ).start();
     }
 
-    @Override
     public void tearDown()
     {
         server.stop();

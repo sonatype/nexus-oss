@@ -37,14 +37,10 @@ public class UserComparator implements Comparator<CUser>
         if ( user1.getEmail() == null )
         {
             if ( user2.getEmail() != null )
-            {
                 return -1;
-            }
         }
         else if ( !user1.getEmail().equals( user2.getEmail() ) )
-        {
             return -1;
-        }
         /*if ( user1.getModelEncoding() == null )
         {
             if ( user2.getModelEncoding() != null )
@@ -52,17 +48,13 @@ public class UserComparator implements Comparator<CUser>
         }
         else if ( !user1.getModelEncoding().equals( user2.getModelEncoding() ) )
             return -1;*/
-        if ( user1.getFirstName() == null )
+        if ( user1.getName() == null )
         {
-            if ( user2.getFirstName() != null )
-            {
+            if ( user2.getName() != null )
                 return -1;
-            }
         }
-        else if ( !user1.getFirstName().equals( user2.getFirstName() ) )
-        {
+        else if ( !user1.getName().equals( user2.getName() ) )
             return -1;
-        }
 //        if ( user1.getPassword() == null )
 //        {
 //            if ( user2.getPassword() != null )
@@ -80,25 +72,17 @@ public class UserComparator implements Comparator<CUser>
         if ( user1.getStatus() == null )
         {
             if ( user2.getStatus() != null )
-            {
                 return -1;
-            }
         }
         else if ( !user1.getStatus().equals( user2.getStatus() ) )
-        {
             return -1;
-        }
         if ( user1.getId() == null )
         {
             if ( user2.getId() != null )
-            {
                 return -1;
-            }
         }
         else if ( !user1.getId().equals( user2.getId() ) )
-        {
             return -1;
-        }
         return 0;
     }
 }

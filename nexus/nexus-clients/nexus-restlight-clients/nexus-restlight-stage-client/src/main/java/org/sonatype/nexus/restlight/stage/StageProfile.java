@@ -17,11 +17,22 @@ public class StageProfile
      */
     private String name;
 
+    /**
+     * The profile mode
+     */
+    private String mode;
+
     public StageProfile( String profileId, String name )
+    {
+        this( profileId, name, null );
+    }
+
+    public StageProfile( String profileId, String name, String mode )
     {
         super();
         this.profileId = profileId;
         this.name = name;
+        this.mode = mode;
     }
 
     public String getProfileId()
@@ -32,6 +43,11 @@ public class StageProfile
     public String getName()
     {
         return name;
+    }
+
+    public String getMode()
+    {
+        return mode;
     }
 
 }

@@ -7,10 +7,10 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
@@ -36,8 +36,7 @@ import org.sonatype.plexus.appevents.Event;
 
 @Component( role = EventInspector.class, hint = "NexusRepositoryMetadataEventInspector" )
 public class NexusRepositoryMetadataEventInspector
-    extends AbstractLogEnabled
-    implements EventInspector
+    extends AbstractEventInspector
 {
     @Requirement( hint = "maven1" )
     private ContentClass maven1ContentClass;

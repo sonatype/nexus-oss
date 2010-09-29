@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.codehaus.plexus.classworlds.launcher.Launcher;
 import org.sonatype.appbooter.ctl.AppBooterServiceException;
 import org.sonatype.appbooter.ctl.Service;
-import org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer;
+import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 
 public class ThreadedPlexusAppBooterService
     implements Service
@@ -33,8 +33,8 @@ public class ThreadedPlexusAppBooterService
 
         // we are "tricking" this line:
         // set plexus.appbooter.customizers default org.sonatype.nexus.NexusBooterCustomizer
-        System.setProperty( "plexus.appbooter.customizers",
-                            "org.sonatype.nexus.integrationtests.rt.boot.ITAppBooterCustomizer,org.sonatype.nexus.NexusBooterCustomizer" );
+        System.setProperty( "plexus.appbooter.customizers", ITAppBooterCustomizer.class.getName()
+            + ",org.sonatype.nexus.NexusBooterCustomizer" );
 
         ClassLoader systemClassLoader = this.launcher.getSystemClassLoader();
 
@@ -145,7 +145,7 @@ public class ThreadedPlexusAppBooterService
         private Launcher launcher;
 
         private int controlPortArg;
-        
+
         private String testIdArg;
 
         private Exception exception;

@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-test-harness</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-test-harness-launcher</artifactId>
@@ -207,26 +207,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-simple-memory-realm</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-exception-plugin</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-url-realm</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <!-- NEXUS-3699 -->
@@ -235,19 +217,34 @@
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-logging-extras</artifactId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
       <version>${project.version}</version>
+      <classifier>cp</classifier>
+      <type>jar</type>
     </dependency>
-
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.5</version>
-      <scope>compile</scope>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-it-helper-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
-
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${project.version}</version>
+      <classifier>bundle</classifier>
+      <type>zip</type>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -255,6 +252,11 @@
       <scope>compile</scope>
     </dependency>
 
+    <dependency>
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3_min</artifactId>
+      <version>1.1.4c</version>
+    </dependency>
   </dependencies>
 
 </project>

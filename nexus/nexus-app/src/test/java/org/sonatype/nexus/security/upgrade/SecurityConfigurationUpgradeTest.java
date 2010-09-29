@@ -30,8 +30,6 @@ public class SecurityConfigurationUpgradeTest
     public void testSecurityUpgradeAndEvent()
         throws Exception
     {
-        testLoadComponent();
-
         this.copySecurityConfigToPlace();
 
         this.lookup( Nexus.class );

@@ -6,12 +6,11 @@
  */
 package org.sonatype.nexus.plugin.lucene.security;
 
-import javax.inject.Named;
-
+import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.security.realms.tools.AbstractStaticSecurityResource;
 import org.sonatype.security.realms.tools.StaticSecurityResource;
 
-@Named( "IndexerLuceneSecurityResource" )
+@Component( role = StaticSecurityResource.class, hint = "IndexerLuceneSecurityResource" )
 public class IndexerLuceneSecurityResource
     extends AbstractStaticSecurityResource
     implements StaticSecurityResource

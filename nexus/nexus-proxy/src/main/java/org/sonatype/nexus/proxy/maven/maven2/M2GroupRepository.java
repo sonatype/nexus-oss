@@ -20,6 +20,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
@@ -36,6 +37,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.artifact.M2ArtifactRecognizer;
 import org.sonatype.nexus.artifact.NexusItemInfo;
+import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.Configurator;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryExternalConfigurationHolderFactory;
@@ -53,6 +55,8 @@ import org.sonatype.nexus.proxy.item.StorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.maven.AbstractMavenGroupRepository;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -113,6 +117,7 @@ public class M2GroupRepository
         return m2GroupRepositoryConfigurator;
     }
 
+    @Override
     public boolean isMavenMetadataPath( String path )
     {
         return M2ArtifactRecognizer.isMetadata( path );
@@ -149,16 +154,56 @@ public class M2GroupRepository
     {
         InputStream inputStream = null;
 
+        Metadata metadata;
         try
         {
             inputStream = fileItem.getInputStream();
 
-            return MetadataBuilder.read( inputStream );
+            metadata = MetadataBuilder.read( inputStream );
         }
         finally
         {
             IOUtil.close( inputStream );
         }
+
+        MavenRepository repo = fileItem.getRepositoryItemUid().getRepository().adaptToFacet( MavenRepository.class );
+        RepositoryPolicy policy = repo.getRepositoryPolicy();
+        if ( metadata != null && metadata.getVersioning() != null )
+        {
+            List<String> versions = metadata.getVersioning().getVersions();
+            if ( RepositoryPolicy.RELEASE.equals( policy ) )
+            {
+                metadata.getVersioning().setSnapshot( null );
+                String latest = filterMetadata( versions, false );
+                metadata.getVersioning().setLatest( latest );
+            }
+            else if ( RepositoryPolicy.SNAPSHOT.equals( policy ) )
+            {
+                metadata.getVersioning().setRelease( null );
+                String latest = filterMetadata( versions, true );
+                metadata.getVersioning().setLatest( latest );
+            }
+        }
+
+        return metadata;
+    }
+
+    private String filterMetadata( List<String> versions, boolean allowSnapshot )
+    {
+        String latest = null;
+        for ( Iterator<String> it = versions.iterator(); it.hasNext(); )
+        {
+            String version = it.next();
+            if ( allowSnapshot ^ VersionUtils.isSnapshot( version ) )
+            {
+                it.remove();
+            }
+            else
+            {
+                latest = version;
+            }
+        }
+        return latest;
     }
 
     /**

@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;

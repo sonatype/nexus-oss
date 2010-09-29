@@ -40,6 +40,7 @@ import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.repository.AbstractProxyRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
@@ -259,8 +260,12 @@ public class RepositoryPlexusResource
 
                             // set auto block
                             proxyRepo.setAutoBlockActive( ( (RepositoryProxyResource) model ).isAutoBlockActive() );
+                            
+                            // set type validation
+                            proxyRepo.setFileTypeValidation( ( (RepositoryProxyResource) model ).isFileTypeValidation() );
+                            
                         }
-
+                        
                         if ( repository.getRepositoryKind().isFacetAvailable( MavenRepository.class ) )
                         {
                             RepositoryPolicy repoPolicy =

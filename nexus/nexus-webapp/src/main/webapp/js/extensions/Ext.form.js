@@ -197,7 +197,8 @@ Ext.extend(Ext.form.Action.sonatypeSubmit, Ext.form.Action, {
   success : function(response) {
     var result = this.processResponse(response);
 
-    if (result === true || result.data)
+    // if a 204 response, we arent looking at errors, it should go through ok
+    if (result === true || result.data || response.status == 204)
     {
       this.form.afterAction(this, true);
       return;
