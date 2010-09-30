@@ -995,7 +995,7 @@ public class DefaultIndexUpdater
             }
             return timestamp;
         }
-        catch( FileNotFoundException ex )
+        catch( IOException ex )
         {
             // try to look for legacy index transfer format
             return target.setIndexFile( source, IndexingContext.INDEX_FILE + ".zip" );
