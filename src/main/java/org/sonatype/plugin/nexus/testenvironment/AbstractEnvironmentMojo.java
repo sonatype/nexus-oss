@@ -103,7 +103,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * The maven project.
-     * 
+     *
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -112,7 +112,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Where nexus instance should be extracted
-     * 
+     *
      * @parameter default-value="${project.build.directory}/nexus"
      * @required
      */
@@ -120,7 +120,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Artifact file containing nexus bundle
-     * 
+     *
      * @parameter
      */
     protected MavenArtifact nexusBundleArtifact;
@@ -128,49 +128,49 @@ public class AbstractEnvironmentMojo
     /**
      * Name of teh directory created out of nexus artifact bundle. Default is
      * ${nexusBundleArtifactId}-${nexusBundleArtifactVersion}.
-     * 
+     *
      * @parameter
      */
     protected String nexusBundleName;
 
     /**
      * Emma used on ITs
-     * 
+     *
      * @parameter
      */
     private MavenArtifact emmaArtifact;
 
     /**
      * Nexus plugin artifacts to be installed into the Nexus instance under test.
-     * 
+     *
      * @parameter
      */
     private MavenArtifact[] nexusPluginsArtifacts;
 
     /**
      * Resources to be unpacked and then contents copied into Nexus default-configs
-     * 
+     *
      * @parameter
      */
     private MavenArtifact[] extraResourcesArtifacts;
 
     /**
      * When true setup a maven instance
-     * 
+     *
      * @parameter default-value="true"
      */
     private boolean setupMaven;
 
     /**
      * When true setup emma
-     * 
+     *
      * @parameter default-value="true"
      */
     private boolean setupEmma;
 
     /**
      * Maven used on ITs
-     * 
+     *
      * @parameter
      * @see EnvironmentMojo#setupMaven
      */
@@ -178,7 +178,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Where Maven instance should be created
-     * 
+     *
      * @parameter default-value="${project.build.directory}/maven"
      * @see EnvironmentMojo#setupMaven
      */
@@ -186,7 +186,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Resources in the test project can be added beneath this directory so that
-     * 
+     *
      * @parameter default-value="${basedir}/resources"
      */
     protected File resourcesSourceLocation;
@@ -195,7 +195,7 @@ public class AbstractEnvironmentMojo
      * This directory is where the default-configs included inside the this plugin will be extracted to BEFORE they are
      * copied into the nexus work dir. A project property 'test-resources-folder' contains the absolute path of this
      * directory.
-     * 
+     *
      * @parameter default-value="${project.build.directory}/resources"
      */
     private File resourcesDestinationLocation;
@@ -232,7 +232,7 @@ public class AbstractEnvironmentMojo
 
     /**
      * Known ports can be manually set as part of the configuration
-     * 
+     *
      * @parameter
      */
     @SuppressWarnings( "rawtypes" )
@@ -240,10 +240,18 @@ public class AbstractEnvironmentMojo
 
     /**
      * If true plugin won't include nexus-plugin dependencies with scope test
-     * 
+     *
      * @parameter
      */
     private boolean excludeTestDependencies;
+
+    /**
+     * Comma separated list of patterns to delete from an unpacked Nexus bundle. Patterns are deleted before any
+     * optional plugins or other external resources are installed
+     *
+     * @parameter
+     */
+    private String nexusBundleExcludes;
 
     public void execute()
         throws MojoExecutionException, MojoFailureException
@@ -272,6 +280,14 @@ public class AbstractEnvironmentMojo
         {
             unpack( bundle.getFile(), destination, bundle.getType() );
             this.createMarkerFile( "bundle" );
+        }
+
+        // since specifying excludes/includes is not implemented for all archive types (tar.gz for example)
+        // remove files and dirs based on specified pattern after all of the files were unpacked, rather than during the unpack
+        // the use case for this is that a plugin we are installing later may include a plugin that is already included with bundle
+        if ( nexusBundleExcludes != null )
+        {
+            deleteFromDirectory( destination, nexusBundleExcludes );
         }
 
         File nexusBaseDir = new File( destination, bundle.getArtifactId() + "-" + bundle.getBaseVersion() );
@@ -404,6 +420,29 @@ public class AbstractEnvironmentMojo
         }
     }
 
+    /**
+     * Delete file patterns from a base directory
+     */
+    @SuppressWarnings( "unchecked" )
+    protected void deleteFromDirectory( final File bundleUnpackDirectory, final String patternsToDelete )
+        throws MojoExecutionException
+    {
+        try
+        {
+            final List<File> filesToDelete =
+                FileUtils.getFileAndDirectoryNames( bundleUnpackDirectory, patternsToDelete, null, true, true, true,
+                    true );
+            for ( File fileToDelete : filesToDelete )
+            {
+                FileUtils.forceDelete( fileToDelete );
+            }
+        }
+        catch ( IOException e1 )
+        {
+            throw new MojoExecutionException( e1.getMessage(), e1 );
+        }
+    }
+
     protected Collection<MavenArtifact> getNexusPluginsArtifacts()
         throws MojoExecutionException
     {
@@ -516,6 +555,7 @@ public class AbstractEnvironmentMojo
     static final Pattern PORT_PATTERN =
         Pattern.compile( "^(6553[0-5]|655[0-2]\\d|65[0-4]\\d\\d|6[0-4]\\d{3}|[1-5]\\d{4}|[1-9]\\d{0,3}|0)$" );
 
+    @SuppressWarnings( "unchecked" )
     private void validateStaticPorts()
         throws MojoExecutionException, MojoFailureException
     {
@@ -523,6 +563,7 @@ public class AbstractEnvironmentMojo
         {
             try
             {
+                @SuppressWarnings( "rawtypes" )
                 BiMap staticPortMap = HashBiMap.create( this.staticPorts.size() );
                 staticPortMap = MapConstraints.constrainedBiMap( staticPortMap, MapConstraints.notNull() );
                 staticPortMap.putAll( this.staticPorts );
