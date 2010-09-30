@@ -17,6 +17,7 @@
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     <itar-plexus-jsw-app-booter.version>2.1.1-v0001</itar-plexus-jsw-app-booter.version>
     <itar-plexus-app-booter.version>2.1.1-v0001</itar-plexus-app-booter.version>
+    <bar-jsw.version>3.2.3-v0004-SNAPSHOT</bar-jsw.version>
   </properties>
 
   <dependencies>
@@ -119,7 +120,7 @@
     <dependency>
       <groupId>org.sonatype.runtime.bars</groupId>
       <artifactId>bar-jsw</artifactId>
-      <version>3.2.3-v0002</version>
+      <version>${bar-jsw.version}</version>
       <type>zip</type>
     </dependency>
     <dependency>
