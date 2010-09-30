@@ -424,15 +424,15 @@ public class AbstractEnvironmentMojo
      * Delete file patterns from a base directory
      */
     @SuppressWarnings( "unchecked" )
-    protected void deleteFromDirectory( final File bundleUnpackDirectory, final String patternsToDelete )
+    protected void deleteFromDirectory( final File baseDirectory, final String patternsToDelete )
         throws MojoExecutionException
     {
         try
         {
-            final List<File> filesToDelete =
-                FileUtils.getFileAndDirectoryNames( bundleUnpackDirectory, patternsToDelete, null, true, true, true,
+            final List<String> filesToDelete =
+                FileUtils.getFileAndDirectoryNames( baseDirectory, patternsToDelete, null, true, true, true,
                     true );
-            for ( File fileToDelete : filesToDelete )
+            for ( String fileToDelete : filesToDelete )
             {
                 FileUtils.forceDelete( fileToDelete );
             }
