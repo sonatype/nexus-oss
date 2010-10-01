@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?><ldapConfiguration>
+  
+  <userAndGroupConfig>
+    
+    <groupMemberFormat>${username}</groupMemberFormat>
+    <groupObjectClass>groupOfUniqueNames</groupObjectClass>
+    <groupBaseDn>ou=groups</groupBaseDn>
+    <groupIdAttribute>cn</groupIdAttribute>
+    <groupMemberAttribute>uniqueMember</groupMemberAttribute>
+    <userObjectClass>inetOrgPerson</userObjectClass>
+    <userBaseDn>ou=people</userBaseDn>
+    <userIdAttribute>uid</userIdAttribute>
+    <!-- <userPasswordAttribute>userPassword</userPasswordAttribute> --> <!-- Default to empty -->
+    <userRealNameAttribute>cn</userRealNameAttribute>
+    <emailAddressAttribute>mail</emailAddressAttribute>
+    <!-- <websiteAttribute>labeledUri</websiteAttribute>
+    <websiteUriLabel>Web Site</websiteUriLabel>
+    <isWebsiteAttributeLabelUri>true</isWebsiteAttributeLabelUri> -->
+    <preferredPasswordEncoding>crypt</preferredPasswordEncoding>
+    <ldapGroupsAsRoles>true</ldapGroupsAsRoles>
+    <userSubtree>false</userSubtree>
+    <groupSubtree>false</groupSubtree>
+    
+  </userAndGroupConfig>
+</ldapConfiguration>

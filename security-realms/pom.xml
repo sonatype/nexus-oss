@@ -14,5 +14,6 @@
   	<module>security-xml-realm</module>
   	<module>security-url-realm</module>
   	<module>security-public-key-realm</module>
+  	<module>security-ldap-common</module>
   </modules>
 </project>
