@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <AuthManager guiclass="AuthPanel" testclass="AuthManager" testname="HTTP Authorization Manager" enabled="false">
+      <collectionProp name="AuthManager.auth_list">
+        <elementProp name="" elementType="Authorization">
+          <stringProp name="Authorization.url">${protocol}://${host}:${port}${context}</stringProp>
+          <stringProp name="Authorization.username">admin</stringProp>
+          <stringProp name="Authorization.password">admin123</stringProp>
+          <stringProp name="Authorization.domain"></stringProp>
+          <stringProp name="Authorization.realm"></stringProp>
+        </elementProp>
+      </collectionProp>
+    </AuthManager>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

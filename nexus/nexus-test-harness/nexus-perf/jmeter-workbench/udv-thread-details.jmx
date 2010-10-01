@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="Thread Details" enabled="true">
+      <collectionProp name="Arguments.arguments">
+        <elementProp name="VerifyContent.threads" elementType="Argument">
+          <stringProp name="Argument.name">VerifyContent.threads</stringProp>
+          <stringProp name="Argument.value">${__P(VerifyContent.threads,1)}</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="Warmup.pause" elementType="Argument">
+          <stringProp name="Argument.name">Warmup.pause</stringProp>
+          <stringProp name="Argument.value">${__P(Warmup.pause,2000)}</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="VerifyContent.duration" elementType="Argument">
+          <stringProp name="Argument.name">VerifyContent.duration</stringProp>
+          <stringProp name="Argument.value">${__P(VerifyContent.duration)}</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+      </collectionProp>
+      <stringProp name="TestPlan.comments">Variables for configuring thread pools, throughput controllers, etc. - anything that controls thread execution</stringProp>
+    </Arguments>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

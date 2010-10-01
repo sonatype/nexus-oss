@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="External Resources" enabled="true">
+      <collectionProp name="Arguments.arguments">
+        <elementProp name="result.dir" elementType="Argument">
+          <stringProp name="Argument.name">result.dir</stringProp>
+          <stringProp name="Argument.value">${__P(result.dir,.)}</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+        <elementProp name="contentPaths.csv" elementType="Argument">
+          <stringProp name="Argument.name">contentPaths.csv</stringProp>
+          <stringProp name="Argument.value">${__P(data.dir,.)}/contentPaths.csv</stringProp>
+          <stringProp name="Argument.metadata">=</stringProp>
+        </elementProp>
+      </collectionProp>
+      <stringProp name="TestPlan.comments">Define file paths as variables, using JMeter system properties as base</stringProp>
+    </Arguments>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

@@ -1,0 +1,54 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-perf</artifactId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
+  <artifactId>jmeter-plans</artifactId>
+  <packaging>pom</packaging>
+  <name>jmeter-plans</name>
+  <modules>
+    <module>ui-welcome</module>
+  </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.2-beta-5</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>jmeter-plan-assembly-descriptor</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <tarLongFileMode>gnu</tarLongFileMode>
+            <appendAssemblyId>false</appendAssemblyId>
+          </configuration>
+          <executions>
+            <execution>
+              <id>assemble-test-plan</id>
+              <phase>package</phase>
+              <goals>
+                <goal>single</goal>
+              </goals>
+              <configuration>
+              <!-- This is where we use our shared assembly descriptor -->
+                <descriptors>
+                  <descriptor>jmeter-plan.xml</descriptor>
+                </descriptors>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+
+</project>
