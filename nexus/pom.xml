@@ -142,9 +142,9 @@
     <plexus-security.version>1.1.8</plexus-security.version>
     <plexus-security-rest.version>1.1.8.1</plexus-security-rest.version>
     <slf4j.version>1.5.6</slf4j.version>
-    <nexus.indexer.version>3.0.4</nexus.indexer.version>
-    <nexus.indexer.artifact.version>1.0.1</nexus.indexer.artifact.version>
-    <nexus.repository.metadata.version>1.0.3</nexus.repository.metadata.version>
+    <nexus.indexer.version>3.1-SNAPSHOT</nexus.indexer.version>
+    <nexus.indexer.artifact.version>1.1-SNAPSHOT</nexus.indexer.artifact.version>
+    <nexus.repository.metadata.version>1.1-SNAPSHOT</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.16</plexus.restlet.bridge.version>
     <micromailer.version>1.1.0</micromailer.version>
@@ -478,6 +478,10 @@
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>servlet-api-2.5</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -966,7 +970,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>spice-inject-nexus</artifactId>
+        <artifactId>sisu-inject-nexus</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1014,8 +1018,7 @@
             <goals>
               <goal>enforce</goal>
             </goals>
-            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the 
-              way of m2eclipse. <phase>compile</phase> -->
+            <!-- we don't need these until JUST BEFORE integration testing, so moving to a later phase to get out of the way of m2eclipse. <phase>compile</phase> -->
             <id>enforce</id>
             <configuration>
               <rules>
@@ -1041,7 +1044,7 @@
                   <excludes>
                     <exclude>*:plexus-container-default</exclude>
                   </excludes>
-                  <message>Plexus IoC container is phased out, use Spice Inject Plexus instead!</message>
+                  <message>Plexus IoC container is phased out, use Sisu Inject Plexus instead!</message>
                 </bannedDependencies>
                 <bannedDependencies>
                   <excludes>
@@ -1293,8 +1296,7 @@
                 <version>${enunciate.version}</version>
               </dependency>
               <!-- Skin disabled, until we come up with a proper skin -->
-              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0</version> 
-                </dependency -->
+              <!--dependency> <groupId>org.sonatype.templates</groupId> <artifactId>enunciate-doc-template</artifactId> <version>1.0</version> </dependency -->
               <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>

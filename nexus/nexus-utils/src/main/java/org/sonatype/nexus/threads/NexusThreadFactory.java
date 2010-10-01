@@ -26,6 +26,8 @@ public class NexusThreadFactory
 
     private final ThreadGroup schedulerThreadGroup;
 
+    private final boolean deamonThread;
+
     private int threadPriority;
 
     public NexusThreadFactory( String poolId, String name )
@@ -35,6 +37,12 @@ public class NexusThreadFactory
 
     public NexusThreadFactory( final String poolId, final String threadGroupName, final int threadPriority )
     {
+        this( poolId, threadGroupName, threadPriority, false );
+    }
+
+    public NexusThreadFactory( final String poolId, final String threadGroupName, final int threadPriority,
+                               final boolean daemonThread )
+    {
         super();
 
         int poolNum = poolNumber.getAndIncrement();
@@ -43,6 +51,8 @@ public class NexusThreadFactory
 
         this.namePrefix = poolId + "-" + poolNum + "-thread-";
 
+        this.deamonThread = daemonThread;
+
         this.threadPriority = threadPriority;
     }
 
@@ -50,7 +60,7 @@ public class NexusThreadFactory
     {
         Thread result = new Thread( schedulerThreadGroup, r, namePrefix + threadNumber.getAndIncrement() );
 
-        result.setDaemon( false );
+        result.setDaemon( this.deamonThread );
 
         result.setPriority( this.threadPriority );
 

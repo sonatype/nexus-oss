@@ -273,8 +273,7 @@ public class DefaultNexusIndexer
         }
         catch ( Exception ex )
         {
-            getLogger().warn( "Error scanning context: " + context.getId(), ex );
-            throw new IOException( "Error scanning context " + context.getId() + ": " + ex.getMessage() );
+            throw (IOException) new IOException( "Error scanning context " + context.getId() + ": " + ex ).initCause( ex );
         }
         finally
         {

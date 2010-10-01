@@ -16,26 +16,27 @@ package org.sonatype.nexus.scheduling;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.email.NexusPostOffice;
+import org.sonatype.nexus.proxy.events.AbstractEventInspector;
+import org.sonatype.nexus.proxy.events.AsynchronousEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.plexus.appevents.Event;
 
 /**
  * {@link EventInspector} that will send alert email (if necessary) in case of a failing {@link NexusTask}.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @Component( role = EventInspector.class, hint = "nexusTaskFailureAlertEmailSender" )
 public class NexusTaskFailureAlertEmailSender
-    implements EventInspector
+    extends AbstractEventInspector
+    implements AsynchronousEventInspector
 {
 
     @Requirement
     private NexusPostOffice m_postOffice;
 
     /**
-     * Accepts events of type {@link NexusTaskFailureEvent}.
-     *
-     * {@inheritDoc}
+     * Accepts events of type {@link NexusTaskFailureEvent}. {@inheritDoc}
      */
     public boolean accepts( final Event<?> evt )
     {
@@ -43,24 +44,22 @@ public class NexusTaskFailureAlertEmailSender
     }
 
     /**
-     * Sends alert emails if necessary.
-     * {@inheritDoc}
+     * Sends alert emails if necessary. {@inheritDoc}
      */
     public void inspect( final Event<?> evt )
     {
-        if( !accepts( evt ) )
+        if ( !accepts( evt ) )
         {
             return;
         }
         final NexusTaskFailureEvent<?> failureEvent = (NexusTaskFailureEvent<?>) evt;
         final NexusTask<?> failedTask = failureEvent.getNexusTask();
-        if( failedTask == null || !failedTask.shouldSendAlertEmail() )
+        if ( failedTask == null || !failedTask.shouldSendAlertEmail() )
         {
             return;
         }
-        m_postOffice.sendNexusTaskFailure(
-            failedTask.getAlertEmail(), failedTask.getId(), failedTask.getName(), failureEvent.getCause()
-        );
+        m_postOffice.sendNexusTaskFailure( failedTask.getAlertEmail(), failedTask.getId(), failedTask.getName(),
+            failureEvent.getCause() );
     }
 
 }

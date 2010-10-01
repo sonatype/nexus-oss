@@ -152,6 +152,8 @@ public class Nexus3567GroupMemberChangesIndexIT
         Gav gav = GavUtil.newGav( "nexus3567", "artifact", "1.0.0" );
         int code = getDeployUtils().deployUsingGavWithRest( repoId, gav, artifact );
         Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
     
     private IndexBrowserTreeNode getIndexContent( String repoId ) 

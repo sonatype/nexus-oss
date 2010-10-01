@@ -25,6 +25,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 /**
@@ -41,6 +42,8 @@ public class Nexus3670IndexTreeViewIT
 
         // just making sure all tasks are finished
         TaskScheduleUtil.waitForAllTasksToStop();
+        
+        new EventInspectorsUtil( this ).waitForCalmPeriod();
 
         // this is just a "preflight", that all is there what we want, not a real test
 

@@ -92,24 +92,14 @@
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>
             <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-simple-memory-realm</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-exception-plugin</artifactId>
-            </plugin>
-            <plugin>
-              <groupId>org.sonatype.security.realms</groupId>
-              <artifactId>security-url-realm</artifactId>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>cp</classifier>
+              <type>jar</type>
             </plugin>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-capability-plugin</artifactId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
@@ -143,18 +133,24 @@
           </excludes>
         </configuration>
       </plugin>
+
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.1</version>
+        <extensions>true</extensions>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
     </plugins>
   </build>
 
   <dependencies>
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-test-harness-capability-plugin</artifactId>
-      <version>${project.version}</version>
-      <classifier>bundle</classifier>
-      <type>zip</type>
-    </dependency>
-
     <!-- Needed to make it "win" -->
     <dependency>
       <groupId>junit</groupId>

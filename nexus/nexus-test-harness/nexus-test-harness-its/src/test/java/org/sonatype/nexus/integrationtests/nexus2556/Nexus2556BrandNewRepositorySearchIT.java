@@ -15,8 +15,10 @@ import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.RepositoryResource;
+import org.sonatype.nexus.scheduling.TaskUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 
 public class Nexus2556BrandNewRepositorySearchIT
@@ -59,9 +61,14 @@ public class Nexus2556BrandNewRepositorySearchIT
 
         repo = (RepositoryResource) repoUtil.getRepository( repoId );
         Assert.assertTrue( repo.isIndexable() );
+        
+        TaskScheduleUtil.waitForAllTasksToStop();
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         Gav gav = GavUtil.newGav( "nexus2556", "artifact", "1.0" );
         getDeployUtils().deployUsingGavWithRest( repoId, gav, getTestFile( "artifact.jar" ) );
+
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> result = getSearchMessageUtil().searchForGav( gav, repoId );
         Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );

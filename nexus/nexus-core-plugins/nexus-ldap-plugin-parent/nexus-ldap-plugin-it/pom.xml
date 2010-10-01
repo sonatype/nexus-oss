@@ -15,8 +15,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
 
     <dependency>
@@ -159,7 +159,15 @@
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
-              <artifactId>nexus-test-harness-launcher</artifactId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <version>${project.version}</version>
+              <classifier>cp</classifier>
+            </plugin>
+            <plugin>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>bundle</classifier>
+              <type>zip</type>
             </plugin>
           </nexusPluginsArtifacts>
         </configuration>

@@ -15,7 +15,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.spice.inject</groupId>
+      <groupId>org.sonatype.sisu.inject</groupId>
       <artifactId>guice-plexus-scanners</artifactId>
     </dependency>
     <dependency>

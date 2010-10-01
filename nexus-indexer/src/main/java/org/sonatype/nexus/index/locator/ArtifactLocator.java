@@ -6,18 +6,14 @@
 package org.sonatype.nexus.index.locator;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.lucene.document.Document;
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
-import org.codehaus.plexus.util.StringUtils;
+import org.apache.maven.model.Model;
+import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexCreator;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.ArtifactContext.ModelReader;
 
 /**
  * Artifact locator.
@@ -27,77 +23,49 @@ import org.sonatype.nexus.index.context.IndexingContext;
 public class ArtifactLocator
     implements GavHelpedLocator
 {
-    private IndexingContext context = null;
-    
-    public ArtifactLocator( IndexingContext context )
+    private final ArtifactPackagingMapper mapper;
+
+    public ArtifactLocator( ArtifactPackagingMapper mapper )
     {
-        this.context = context;
+        this.mapper = mapper;
     }
-    
+
     public File locate( File source, GavCalculator gavCalculator, Gav gav )
     {
-        if ( context != null )
+        // if we dont have this data, nothing we can do
+        if ( source == null || !source.exists() || gav == null || gav.getArtifactId() == null
+            || gav.getVersion() == null )
         {
-            // we store this full version, so we can use it below to retrieve the proper file
-            // this only matters in timestamped snapshot artifacts, where the baseVersion is 1.0-SNAPSHOT (for example)
-            // where the file is actaully named 1.0-200908081234 (again for example)
-            String fullVersion = gav.getVersion();
-            
-            ArtifactInfo ai = new ArtifactInfo( 
-                null, 
-                gav.getGroupId(), 
-                gav.getArtifactId(), 
-                gav.getBaseVersion(), 
-                gav.getClassifier() );
-            
-            Term term = new Term( ArtifactInfo.UINFO, ai.getUinfo() );
-            
-            try
-            {
-                if( context.getIndexSearcher() == null )
-                {
-                    return new File(
-                        source.getParentFile(),
-                        gavCalculator.gavToPath( gav )
-                    );
-                }
-                
-                TopDocs topdocs = context.getIndexSearcher().search( new TermQuery( term ), null, 1 );
-                
-                if ( topdocs != null
-                    && topdocs.scoreDocs != null
-                    && topdocs.scoreDocs.length > 0 )
-                {
-                    Document doc = context.getIndexReader().document( topdocs.scoreDocs[0].doc );
-                    
-                    if ( doc != null )
-                    {
-                        for ( IndexCreator indexCreator : context.getIndexCreators() )
-                        {
-                            indexCreator.updateArtifactInfo( doc, ai );
-                        }
-                        
-                        if ( !StringUtils.isEmpty( ai.artifactId )
-                            && !StringUtils.isEmpty( fullVersion )
-                            && !StringUtils.isEmpty( ai.fextension ) )
-                        {
-                            return new File( 
-                                source.getParentFile(), 
-                                ai.artifactId 
-                                    + "-" 
-                                    + fullVersion 
-                                    + ( StringUtils.isEmpty( ai.classifier ) ? "" : ( "-" + ai.classifier ) )
-                                    + "." 
-                                    + ai.fextension );
-                        }
-                    }
-                }
-            }
-            catch ( IOException e )
-            {
-                // problem reading index, so no artifact returned
-            }
+            return null;
         }
-        return null;
+
+        try
+        {
+            // need to read the pom model to get packaging
+            Model model = new ModelReader().readModel( new FileInputStream( source ) );
+            
+            if ( model == null )
+            {
+                return null;
+            }
+
+            // now generate the artifactname
+            String artifactName =
+                gav.getArtifactId() + "-" + gav.getVersion() + "."
+                    + mapper.getExtensionForPackaging( model.getPackaging() );
+
+            File artifact = new File( source.getParent(), artifactName );
+
+            if ( !artifact.exists() )
+            {
+                return null;
+            }
+
+            return artifact;
+        }
+        catch ( IOException e )
+        {
+            return null;
+        }
     }
 }

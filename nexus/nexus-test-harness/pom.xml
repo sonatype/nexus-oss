@@ -14,12 +14,7 @@
 
   <profiles>
     <!-- until nexus-mock is again working, we cant have this module -->
-    <!--profile>
-      <id>selenium-tests</id>
-      <modules>
-        <module>nexus-test-harness-selenium</module>
-      </modules>
-    </profile-->
+    <!--profile> <id>selenium-tests</id> <modules> <module>nexus-test-harness-selenium</module> </modules> </profile -->
 
     <profile>
       <id>its</id>
@@ -29,16 +24,11 @@
         </property>
       </activation>
       <modules>
-        <module>nexus-exception-plugin</module>
-        <module>nexus-timeout-plugin</module>
-        <module>nexus-simple-memory-realm</module>
+        <module>nexus-it-helper-plugin</module>
         <module>nexus-test-harness-launcher</module>
         <module>nexus-test-harness-its</module>
       </modules>
     </profile>
   </profiles>
-  <modules>
-  	<module>nexus-test-harness-capability-plugin</module>
-  </modules>
 
 </project>

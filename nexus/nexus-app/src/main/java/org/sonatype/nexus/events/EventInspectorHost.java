@@ -23,5 +23,16 @@ import org.sonatype.plexus.appevents.EventListener;
 public interface EventInspectorHost
     extends EventListener
 {
+    /**
+     * Shuts down event inspector cleanly (mainly maintains the thread pool).
+     */
     void shutdown();
+
+    /**
+     * Debug only: returns true if it is "calm period", and no async event inspector is running in the thread pool.
+     * False otherwise.
+     * 
+     * @return
+     */
+    boolean isCalmPeriod();
 }

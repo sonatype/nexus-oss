@@ -57,8 +57,8 @@
   <dependencies>
 
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -131,7 +131,7 @@
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
       <artifactId>plexus-ldap-testsuite</artifactId>
-      <version>1.1</version>
+      <version>${plexus-ldap-testsuite.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
