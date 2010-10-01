@@ -21,6 +21,7 @@ public class TestScopeFilter
         return true;
     }
 
+    @SuppressWarnings( "rawtypes" )
     public Set filter( Set artifacts )
         throws ArtifactFilterException
     {

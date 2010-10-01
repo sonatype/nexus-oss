@@ -71,6 +71,8 @@ public class AbstractEnvironmentMojo
      */
     public static final int MAX_PORT_ALLOCATION_RETRY = 3;
 
+    protected static final String PROP_NEXUS_BASE_DIR = "nexus-base-dir";
+
     /** @component */
     protected org.apache.maven.artifact.factory.ArtifactFactory artifactFactory;
 
@@ -253,6 +255,14 @@ public class AbstractEnvironmentMojo
      */
     private String nexusBundleExcludes;
 
+    /**
+     * If there is one or more *-webapp.zip files in runtime/apps/nexus/plugin-repository, then unpack that zip to nexus
+     * base dir and delete the original file
+     *
+     * @parameter
+     */
+    private boolean unpackPluginWebapps;
+
     public void execute()
         throws MojoExecutionException, MojoFailureException
     {
@@ -283,8 +293,10 @@ public class AbstractEnvironmentMojo
         }
 
         // since specifying excludes/includes is not implemented for all archive types (tar.gz for example)
-        // remove files and dirs based on specified pattern after all of the files were unpacked, rather than during the unpack
-        // the use case for this is that a plugin we are installing later may include a plugin that is already included with bundle
+        // remove files and dirs based on specified pattern after all of the files were unpacked, rather than during the
+        // unpack
+        // the use case for this is that a plugin we are installing later may include a plugin that is already included
+        // with bundle
         if ( nexusBundleExcludes != null )
         {
             deleteFromDirectory( destination, nexusBundleExcludes );
@@ -296,7 +308,7 @@ public class AbstractEnvironmentMojo
             nexusBaseDir = new File( destination, nexusBundleName );
         }
         File nexusWorkDir = new File( destination, "nexus-work-dir" );
-        project.getProperties().put( "nexus-base-dir", getPath( nexusBaseDir ) );
+        project.getProperties().put( PROP_NEXUS_BASE_DIR, getPath( nexusBaseDir ) );
         project.getProperties().put( "nexus-work-dir", getPath( nexusWorkDir ) );
 
         // conf dir
@@ -344,6 +356,26 @@ public class AbstractEnvironmentMojo
             {
                 throw new MojoExecutionException( "Failed to promote optinal plugins", e );
             }
+        }
+
+        if ( unpackPluginWebapps )
+        {
+            try
+            {
+                // now if we have *-webapp.zip in pluginfolder, unpack that to nexus-work-dir and delete zip file
+                @SuppressWarnings( "unchecked" )
+                List<File> webapps = FileUtils.getFiles( pluginFolder, "*-webapp.zip", null );
+                for ( File webapp : webapps )
+                {
+                    unpack( webapp, new File( (String) project.getProperties().get( PROP_NEXUS_BASE_DIR ) ), "zip" );
+                    webapp.delete();
+                }
+            }
+            catch ( IOException e )
+            {
+                throw new MojoExecutionException( "Failed to unpack webapp plugins:", e );
+            }
+
         }
 
         // setup Maven if requested for this test
@@ -430,8 +462,7 @@ public class AbstractEnvironmentMojo
         try
         {
             final List<String> filesToDelete =
-                FileUtils.getFileAndDirectoryNames( baseDirectory, patternsToDelete, null, true, true, true,
-                    true );
+                FileUtils.getFileAndDirectoryNames( baseDirectory, patternsToDelete, null, true, true, true, true );
             for ( String fileToDelete : filesToDelete )
             {
                 FileUtils.forceDelete( fileToDelete );
@@ -1156,6 +1187,7 @@ public class AbstractEnvironmentMojo
             LinkedHashSet<Artifact> plugins = new LinkedHashSet<Artifact>();
             plugins.addAll( filtterArtifacts( result, getFilters( null, null, "nexus-plugin", null ) ) );
             plugins.addAll( filtterArtifacts( result, getFilters( null, null, "zip", "bundle" ) ) );
+
             plugins.addAll( getNonTransitivePlugins( plugins ) );
 
             if ( !plugins.isEmpty() )
