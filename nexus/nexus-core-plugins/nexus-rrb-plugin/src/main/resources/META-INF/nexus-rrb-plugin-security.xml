@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<security>
+	<version>2.0.3</version>
+
+	<roles>
+		<!-- this role is contributing to the existing UI: Repository Browser role -->
+		<role>
+			<id>ui-repo-browser</id>
+			<privileges>
+				<privilege>browse-remote-repo</privilege>
+			</privileges>
+		</role>
+	</roles>
+
+	<privileges>
+		<privilege>
+			<id>browse-remote-repo</id>
+			<type>method</type>
+			<name>Browse Remote Repository - (read)</name>
+			<description>Give permission to browse remote repositories</description>
+			<properties>
+				<property>
+					<key>method</key>
+					<value>read</value>
+				</property>
+				<property>
+					<key>permission</key>
+					<value>nexus:browseremote</value>
+				</property>
+			</properties>
+		</privilege>
+	</privileges>
+</security>

@@ -63,7 +63,8 @@ public class RemoteBrowserResource
     public PathProtectionDescriptor getResourceProtection()
     {
         // Allow anonymous access for now
-        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
+        //return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
+        return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "authcBasic,perms[nexus:browseremote]" );
     }
 
     @Override
