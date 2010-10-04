@@ -42,14 +42,6 @@
           </execution>
         </executions>
       </plugin>
-      <!-- <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>chronos-maven-plugin</artifactId>
-        <configuration>
-          <input>${project.build.directory}/test-plan/ui-welcome.jmx</input>
-        </configuration>
-      </plugin>
-      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -102,11 +94,10 @@
   </build>
   <profiles>
     <profile>
-      <id>dataset-1</id>
+      <id>example-1</id>
       <properties>
-
+        <perf.data.id>example-1</perf.data.id>
       </properties>
     </profile>
   </profiles>
-
 </project>
