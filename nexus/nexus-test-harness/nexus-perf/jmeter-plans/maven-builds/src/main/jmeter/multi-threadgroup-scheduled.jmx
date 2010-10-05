@@ -167,7 +167,7 @@
           </elementProp>
           <elementProp name="csv.recycleOnEOF" elementType="Argument">
             <stringProp name="Argument.name">csv.recycleOnEOF</stringProp>
-            <stringProp name="Argument.value">${__P(csv.recycleOnEOF,False)}</stringProp>
+            <stringProp name="Argument.value">${__P(csv.recycleOnEOF,True)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
