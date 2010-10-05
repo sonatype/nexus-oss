@@ -10,6 +10,7 @@
   <packaging>pom</packaging>
   <name>jmeter-plans</name>
   <modules>
+    <module>maven-builds</module>
     <module>ui-welcome</module>
   </modules>
 
