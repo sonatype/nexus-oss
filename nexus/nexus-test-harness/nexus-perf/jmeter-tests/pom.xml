@@ -12,9 +12,13 @@
   <packaging>pom</packaging>
   <name>jmeter-tests</name>
   <description></description>
+
+  <!-- ci should run test modules as performance is specific to machine -->
+  <!--
   <modules>
     <module>ui-welcome</module>
   </modules>
+  -->
 
   <properties>
     <!-- Below is the "product", the subject of the tests -->
@@ -94,20 +98,6 @@
           <configuration>
             <outputDirectory>${project.build.directory}</outputDirectory>
           </configuration>
-        </plugin>
-        <!--  dont build tests jar on package phase -->
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <executions>
-            <execution>
-              <configuration>
-                <skip>true</skip>
-              </configuration>
-              <goals>
-                <goal>test-jar</goal>
-              </goals>
-            </execution>
-          </executions>
         </plugin>
         <!--  defaults for chronos plugin which will execute jmeter -->
         <!--  BUG: chronos plugin can't handle nested httpSamples in *.jtl -->
