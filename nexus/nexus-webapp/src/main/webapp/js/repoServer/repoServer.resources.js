@@ -111,7 +111,8 @@
     // Users help
     users : {
       userId : 'The ID assigned to this user, will be used as the username.',
-      name : 'The name of the user.',
+      firstName : 'The first name of the user.',
+      lastName : 'The last name of the user.',
       email : 'Email address, to notify user when necessary.',
       status : 'The current status of the user.',
       roles : 'The roles assigned to this user.',

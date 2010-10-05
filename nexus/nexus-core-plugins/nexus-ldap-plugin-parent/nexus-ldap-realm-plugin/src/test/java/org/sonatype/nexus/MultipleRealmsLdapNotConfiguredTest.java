@@ -13,12 +13,14 @@ import junit.framework.Assert;
 
 import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.util.IOUtil;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.subject.SimplePrincipalCollection;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
 import org.sonatype.security.ldap.realms.AbstractLdapAuthenticatingRealm;
+import org.sonatype.security.realms.XmlAuthenticatingRealm;
 
 public class MultipleRealmsLdapNotConfiguredTest
     extends AbstractNexusTestCase
@@ -58,7 +60,7 @@ public class MultipleRealmsLdapNotConfiguredTest
 
         // LDAP should fail
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         // if realm is not configured, the user should not be able to be authorized        
         Assert.assertFalse( security.hasRole( principals, "developer" ) );
@@ -66,7 +68,7 @@ public class MultipleRealmsLdapNotConfiguredTest
         
      // xml user
         principals = new SimplePrincipalCollection();
-        principals.add( "deployment", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "deployment", new XmlAuthenticatingRealm().getName() );
         
         Assert.assertTrue( security.hasRole( principals, "deployment" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
@@ -80,14 +82,14 @@ public class MultipleRealmsLdapNotConfiguredTest
 
         // LDAP
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         // if realm is not configured, the user should not be able to be authorized
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:create" ) );
         
         // XML
         principals = new SimplePrincipalCollection();
-        principals.add( "test-user", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "test-user", new XmlAuthenticatingRealm().getName() );
         
         Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );

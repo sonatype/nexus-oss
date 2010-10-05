@@ -18,7 +18,7 @@
 
   <!-- a short but descriptive name for the project -->
   <name>Nexus : Migration Tools : Maven Metadata Rebuild</name>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.sonatype.sisu</groupId>
@@ -77,8 +77,8 @@
           <artifactId>lucene-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jsecurity</groupId>
-          <artifactId>jsecurity</artifactId>
+          <groupId>org.apache.shiro</groupId>
+          <artifactId>shiro-core</artifactId>
         </exclusion>
         <exclusion>
           <groupId>commons-beanutils</groupId>

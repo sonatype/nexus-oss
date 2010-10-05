@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -221,12 +222,10 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            final String principal =
-                securitySystem.getSubject() != null && securitySystem.getSubject().getPrincipal() != null ? securitySystem.getSubject().getPrincipal().toString()
-                    : null;
+            final Subject subject = securitySystem.getSubject();
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
-                principal ) );
+                subject ) );
 
             return true;
         }

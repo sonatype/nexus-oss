@@ -39,7 +39,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "tesCreatePermission@foo.org" );
-        user.setName( "tesCreatePermission" );
+        user.setFirstName( "tesCreatePermission" );
         user.setUserId( "tesCreatePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -91,7 +91,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "tesUpdatePermission@foo.org" );
-        user.setName( "tesUpdatePermission" );
+        user.setFirstName( "tesUpdatePermission" );
         user.setUserId( "tesUpdatePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -148,7 +148,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "testReadPermission@foo.org" );
-        user.setName( "testReadPermission" );
+        user.setFirstName( "testReadPermission" );
         user.setUserId( "testReadPermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );
@@ -204,7 +204,7 @@ public class Nexus142UserPermissionIT
 
         UserResource user = new UserResource();
         user.setEmail( "testDeletePermission@foo.org" );
-        user.setName( "testDeletePermission" );
+        user.setFirstName( "testDeletePermission" );
         user.setUserId( "testDeletePermission" );
         user.setStatus( "active" );
         user.addRole( "anonymous" );

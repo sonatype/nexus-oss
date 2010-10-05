@@ -15,7 +15,7 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.plexus.appevents.Event;
 import org.sonatype.security.SecuritySystem;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.NoSuchPrivilegeException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.authorization.xml.SecurityXmlAuthorizationManager;
@@ -54,7 +54,7 @@ public class SecurityCleanupEventInspector
             {
                 getLogger().error( "Unable to clean privileges attached to repository", e );
             }
-            catch ( NoSuchAuthorizationManager e )
+            catch ( NoSuchAuthorizationManagerException e )
             {
                 getLogger().error( "Unable to clean privileges attached to repository", e );
             }
@@ -73,7 +73,7 @@ public class SecurityCleanupEventInspector
             {
                 getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
             }
-            catch ( NoSuchAuthorizationManager e )
+            catch ( NoSuchAuthorizationManagerException e )
             {
                 getLogger().error( "Unable to clean privileges attached to target: " + targetId, e );
             }
@@ -81,7 +81,7 @@ public class SecurityCleanupEventInspector
     }
 
     protected void cleanupPrivileges( String propertyId, String propertyValue )
-        throws NoSuchPrivilegeException, NoSuchAuthorizationManager
+        throws NoSuchPrivilegeException, NoSuchAuthorizationManagerException
     {
         Set<Privilege> privileges = security.listPrivileges();
 

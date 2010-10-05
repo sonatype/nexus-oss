@@ -26,10 +26,19 @@ public class Nexus2862UrlRealmIT
     static
     {
         proxyPort = TestProperties.getInteger( "proxy.server.port" );
-        System.setProperty( "plexus.authentication-url", "http://localhost:" + proxyPort );
-        System.setProperty( "plexus.url-authentication-default-role", "admin" );
-        System.setProperty( "plexus.url-authentication-email-domain", "sonatype.com" );
+        // System.setProperty( "plexus.authentication-url", "http://localhost:" + proxyPort );
+        // System.setProperty( "plexus.url-authentication-default-role", "admin" );
+        // System.setProperty( "plexus.url-authentication-email-domain", "sonatype.com" );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+
+    @Override
+    protected void copyConfigFiles()
+        throws IOException
+    {
+        super.copyConfigFiles();
+
+        this.copyConfigFile( "url-realm.xml", WORK_CONF_DIR );
     }
 
     @BeforeClass

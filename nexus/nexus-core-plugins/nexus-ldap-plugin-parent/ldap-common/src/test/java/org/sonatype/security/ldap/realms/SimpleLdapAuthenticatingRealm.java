@@ -7,7 +7,7 @@
 package org.sonatype.security.ldap.realms;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.jsecurity.realm.Realm;
+import org.apache.shiro.realm.Realm;
 
 @Component( role = Realm.class, hint = SimpleLdapAuthenticatingRealm.ROLE, description = "Test Authentication LDAP Realm" )
 public class SimpleLdapAuthenticatingRealm

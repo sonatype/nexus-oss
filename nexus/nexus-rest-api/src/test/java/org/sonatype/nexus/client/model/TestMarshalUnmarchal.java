@@ -1246,7 +1246,7 @@ public class TestMarshalUnmarchal
         user1.setResourceURI( "ResourceURI1" );
         user1.setEmail( "Email1" );
         user1.setUserId( "UserId1" );
-        user1.setName( "Name1" );
+        user1.setFirstName( "Name1" );
         user1.setStatus( "Status1" );
         user1.addRole( "role1" );
         user1.addRole( "role2" );
@@ -1256,7 +1256,7 @@ public class TestMarshalUnmarchal
         user2.setResourceURI( "ResourceURI2" );
         user2.setEmail( "Email2" );
         user2.setUserId( "UserId2" );
-        user2.setName( "Name2" );
+        user2.setFirstName( "Name2" );
         user2.setStatus( "Status2" );
         user2.addRole( "role3" );
         user2.addRole( "role4" );
@@ -1275,7 +1275,7 @@ public class TestMarshalUnmarchal
         user1.setResourceURI( "ResourceURI1" );
         user1.setEmail( "Email1" );
         user1.setUserId( "UserId1" );
-        user1.setName( "Name1" );
+        user1.setFirstName( "Name1" );
         user1.setStatus( "Status1" );
         user1.addRole( "role1" );
         user1.addRole( "role2" );
@@ -1293,7 +1293,7 @@ public class TestMarshalUnmarchal
         user1.setResourceURI( "ResourceURI1" );
         user1.setEmail( "Email1" );
         user1.setUserId( "UserId1" );
-        user1.setName( "Name1" );
+        user1.setFirstName( "Name1" );
         user1.setStatus( "Status1" );
         user1.addRole( "role1" );
         user1.addRole( "role2" );
@@ -1719,16 +1719,10 @@ public class TestMarshalUnmarchal
         RepositoryContentClassListResource item1 = new RepositoryContentClassListResource();
         item1.setContentClass( "ContentClass1" );
         item1.setName( "Name1" );
-        item1.addCompatibleType( "test1" );
-        item1.addCompatibleType( "test2" );
-        item1.setGroupable( true );
 
         RepositoryContentClassListResource item2 = new RepositoryContentClassListResource();
         item2.setContentClass( "ContentClass2" );
         item2.setName( "Name2" );
-        item2.addCompatibleType( "test3" );
-        item2.addCompatibleType( "test4" );
-        item2.setGroupable( false );
 
         resourceResponse.addData( item1 );
         resourceResponse.addData( item2 );

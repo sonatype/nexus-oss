@@ -1,22 +1,29 @@
 package org.sonatype.nexus.configuration;
 
 import java.io.File;
-import java.util.List;
 
 import junit.framework.Assert;
 
+import org.codehaus.plexus.ContainerConfiguration;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 import org.sonatype.nexus.configuration.model.CRemoteAuthentication;
 import org.sonatype.nexus.configuration.model.CRemoteHttpProxySettings;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.configuration.source.ApplicationConfigurationSource;
 
 import com.thoughtworks.xstream.XStream;
 
 public class ClearPasswordTest
     extends AbstractNexusTestCase
 {
+
+    @Override
+    protected void customizeContainerConfiguration( ContainerConfiguration configuration )
+    {
+        configuration.setClassPathScanning( true );
+    }
+
     private ApplicationConfigurationSource getConfigSource()
         throws Exception
     {
@@ -113,7 +120,7 @@ public class ClearPasswordTest
 
     private CRepository getCentralRepo( Configuration config )
     {
-        for ( CRepository repo : (List<CRepository>) config.getRepositories() )
+        for ( CRepository repo : config.getRepositories() )
         {
             if ( repo.getId().equals( "central" ) )
             {

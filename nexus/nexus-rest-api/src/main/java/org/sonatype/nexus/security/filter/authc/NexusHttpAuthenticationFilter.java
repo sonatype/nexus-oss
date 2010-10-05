@@ -21,18 +21,18 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.ExpiredCredentialsException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.codec.Base64;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
+import org.apache.shiro.web.util.WebUtils;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.ExpiredCredentialsException;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.codec.Base64;
-import org.jsecurity.subject.Subject;
-import org.jsecurity.web.WebUtils;
-import org.jsecurity.web.filter.authc.BasicHttpAuthenticationFilter;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.auth.AuthenticationItem;
 import org.sonatype.nexus.auth.NexusAuthenticationEvent;
@@ -203,8 +203,8 @@ public class NexusHttpAuthenticationFilter
         Subject subject = getSubject( request, response );
 
         UsernamePasswordToken usernamePasswordToken =
-            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(), getNexusConfiguration()
-                            .getAnonymousPassword() );
+            new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
+                                       getNexusConfiguration().getAnonymousPassword() );
 
         try
         {
@@ -223,9 +223,8 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
-            getLogger().info(
-                "Unable to authenticate user [anonymous] from IP Address "
-                                + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
+            getLogger().info( "Unable to authenticate user [anonymous] from IP Address "
+                                  + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -244,7 +243,7 @@ public class NexusHttpAuthenticationFilter
     {
         String msg =
             "Successfully authenticated user [" + token.getPrincipal() + "] from IP Address "
-                            + RemoteIPFinder.findIP( (HttpServletRequest) request );
+                + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         recordAuthcEvent( request, msg );
 
@@ -259,14 +258,12 @@ public class NexusHttpAuthenticationFilter
         {
             ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
 
-            multicaster
-                            .notifyEventListeners( new NexusAuthenticationEvent(
-                                                                                 this,
-                                                                                 new AuthenticationItem(
-                                                                                                         username,
-                                                                                                         RemoteIPFinder
-                                                                                                                         .findIP( (HttpServletRequest) request ),
-                                                                                                         success ) ) );
+            multicaster.notifyEventListeners( new NexusAuthenticationEvent(
+                                                                            this,
+                                                                            new AuthenticationItem(
+                                                                                                    username,
+                                                                                                    RemoteIPFinder.findIP( (HttpServletRequest) request ),
+                                                                                                    success ) ) );
         }
         catch ( ComponentLookupException e )
         {
@@ -306,7 +303,7 @@ public class NexusHttpAuthenticationFilter
         }
 
         if ( currentAuthcEvt.getMessage().equals( msg )
-             && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
+            && ( System.currentTimeMillis() - currentAuthcEvt.getEventDate().getTime() < 2000L ) )
         {
             return true;
         }
@@ -320,10 +317,10 @@ public class NexusHttpAuthenticationFilter
     {
         String msg =
             "Unable to authenticate user [" + token.getPrincipal() + "] from IP Address "
-                            + RemoteIPFinder.findIP( (HttpServletRequest) request );
+                + RemoteIPFinder.findIP( (HttpServletRequest) request );
 
         recordAuthcEvent( request, msg );
-        getLogger().trace( msg, ae );
+        getLogger().debug( msg, ae );
 
         postAuthcEvent( request, token.getPrincipal().toString(), false );
 
@@ -374,10 +371,7 @@ public class NexusHttpAuthenticationFilter
                     username = subject.getPrincipal().toString();
                 }
 
-                getLogger()
-                                .info(
-                                    "Request processing is rejected because user \"" + username
-                                                    + "\" lacks permissions." );
+                getLogger().info( "Request processing is rejected because user \"" + username + "\" lacks permissions." );
 
                 sendForbidden( request, response );
             }
@@ -432,6 +426,12 @@ public class NexusHttpAuthenticationFilter
     @Override
     protected String[] getPrincipalsAndCredentials( String scheme, String encoded )
     {
+        // no credentials, no auth
+        if ( StringUtils.isEmpty( encoded ) )
+        {
+            return null;
+        }
+        
         String decoded = Base64.decodeToString( encoded );
         
         // no credentials, no auth

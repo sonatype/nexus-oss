@@ -28,9 +28,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jsecurity</groupId>
-      <artifactId>jsecurity</artifactId>
-      <version>${jsecurity.version}</version>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
     </dependency>
 
     <dependency>

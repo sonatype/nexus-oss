@@ -103,6 +103,10 @@
               <classifier>bundle</classifier>
               <type>zip</type>
             </plugin>
+            <jar>
+		      <groupId>org.sonatype.security.realms</groupId>
+		      <artifactId>security-url-realm</artifactId>
+            </jar>
           </nexusPluginsArtifacts>
         </configuration>
       </plugin>
@@ -193,6 +197,13 @@
       <artifactId>nexus-capabilities-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-url-realm</artifactId>
+      <version>${plexus-security.version}</version>
+    </dependency>
+    
   </dependencies>
 
   <profiles>

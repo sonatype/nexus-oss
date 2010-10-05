@@ -8,8 +8,9 @@ package org.sonatype.nexus;
 
 import junit.framework.Assert;
 
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.subject.SimplePrincipalCollection;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.sonatype.nexus.security.ldap.realms.NexusLdapAuthenticationRealm;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authentication.AuthenticationException;
 
@@ -51,7 +52,7 @@ public class LdapNexusTest
         security.start();
 
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         Assert.assertTrue( security.hasRole( principals, "developer" ) );
         Assert.assertFalse( security.hasRole( principals, "JUNK" ) );
@@ -64,7 +65,7 @@ public class LdapNexusTest
         security.start();
 
         SimplePrincipalCollection principals = new SimplePrincipalCollection();
-        principals.add( "cstamas", AbstractLdapAuthenticatingRealm.class.getName() );
+        principals.add( "cstamas", new NexusLdapAuthenticationRealm().getName() );
 
         Assert.assertTrue( security.isPermitted( principals, "security:usersforgotpw:create" ) );
         Assert.assertFalse( security.isPermitted( principals, "security:usersforgotpw:delete" ) );

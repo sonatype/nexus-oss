@@ -139,8 +139,8 @@
   <properties>
     <plexus.appbooter.version>2.1.1</plexus.appbooter.version>
     <jsw.binaries.version>3.2.3.5</jsw.binaries.version>
-    <plexus-security.version>1.1.8</plexus-security.version>
-    <plexus-security-rest.version>1.1.8.1</plexus-security-rest.version>
+    <plexus-security.version>2.0.0-SNAPSHOT</plexus-security.version>
+    <shiro.version>1.0.0-incubating</shiro.version>
     <slf4j.version>1.5.6</slf4j.version>
     <nexus.indexer.version>3.1-SNAPSHOT</nexus.indexer.version>
     <nexus.indexer.artifact.version>1.1-SNAPSHOT</nexus.indexer.artifact.version>
@@ -157,7 +157,6 @@
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
-    <jsecurity.version>0.9.0-RC2-sonatype</jsecurity.version>
     <commons-beanutils.version>1.7.0</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.3</plexus-ehcache.version>
@@ -410,7 +409,7 @@
         </exclusions>
       </dependency>
 
-      <!-- JSecurity -->
+      <!-- shiro -->
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
@@ -424,7 +423,7 @@
       </dependency>
       <dependency>
         <groupId>org.sonatype.security</groupId>
-        <artifactId>security-system</artifactId>
+        <artifactId>security-web</artifactId>
         <version>${plexus-security.version}</version>
         <exclusions>
           <exclusion>
@@ -434,19 +433,21 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-rest-api</artifactId>
-        <version>${plexus-security-rest.version}</version>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+        <scope>compile</scope>
         <exclusions>
           <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>servlet-api-2.5</artifactId>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.sonatype.security</groupId>
+        <artifactId>security-rest-api</artifactId>
+        <version>${plexus-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.security</groupId>
@@ -471,24 +472,9 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.security</groupId>
-        <artifactId>security-legacy-adapter</artifactId>
-        <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>servlet-api-2.5</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.jsecurity</groupId>
-        <artifactId>jsecurity</artifactId>
-        <version>${jsecurity.version}</version>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${shiro.version}</version>
         <exclusions>
           <exclusion>
             <groupId>commons-logging</groupId>
@@ -1054,6 +1040,12 @@
                     dependency
                     that is plexus component made with older plexus container.
                   </message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>*:jsecurity</exclude>
+                  </excludes>
+                  <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
                 </bannedDependencies>
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>

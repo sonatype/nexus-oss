@@ -37,7 +37,7 @@ import org.sonatype.nexus.rest.model.PrivilegeResourceRequest;
 import org.sonatype.plexus.rest.resource.PathProtectionDescriptor;
 import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.PlexusResourceException;
-import org.sonatype.security.authorization.NoSuchAuthorizationManager;
+import org.sonatype.security.authorization.NoSuchAuthorizationManagerException;
 import org.sonatype.security.authorization.Privilege;
 import org.sonatype.security.realms.privileges.application.ApplicationPrivilegeMethodPropertyDescriptor;
 import org.sonatype.security.rest.model.PrivilegeListResourceResponse;
@@ -148,7 +148,7 @@ public class TargetPrivilegePlexusResource
                     // build and throw exctption
                     handleInvalidConfigurationException( e );
                 }
-                catch ( NoSuchAuthorizationManager e )
+                catch ( NoSuchAuthorizationManagerException e )
                 {
                     // we should not get here
                     this.getLogger().warn( "Could not find the default AuthorizationManager", e );

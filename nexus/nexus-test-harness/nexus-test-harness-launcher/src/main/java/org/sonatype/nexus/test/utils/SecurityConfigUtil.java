@@ -328,7 +328,6 @@ public class SecurityConfigUtil
         }
         catch ( Exception e )
         {
-            e.printStackTrace();
             Assert.fail( "could not parse nexus.xml: " + e.getMessage() );
         }
         return configuration;

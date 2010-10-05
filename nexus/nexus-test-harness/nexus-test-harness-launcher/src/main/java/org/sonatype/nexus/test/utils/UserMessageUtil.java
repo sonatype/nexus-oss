@@ -72,7 +72,8 @@ public class UserMessageUtil
             responseResource.getUserId() );
         user.setUserId( responseResource.getUserId() );
 
-        Assert.assertEquals( user.getName(), responseResource.getName() );
+        Assert.assertEquals( user.getFirstName(), responseResource.getFirstName() );
+        Assert.assertEquals( user.getLastName(), responseResource.getLastName() );
         Assert.assertEquals( user.getUserId(), responseResource.getUserId() );
         Assert.assertEquals( user.getStatus(), responseResource.getStatus() );
         Assert.assertEquals( user.getEmail(), responseResource.getEmail() );
@@ -119,7 +120,8 @@ public class UserMessageUtil
 
         // make sure the id != null
 
-        Assert.assertEquals( user.getName(), responseResource.getName() );
+        Assert.assertEquals( user.getFirstName(), responseResource.getFirstName() );
+        Assert.assertEquals( user.getLastName(), responseResource.getLastName() );
         Assert.assertEquals( user.getUserId(), responseResource.getUserId() );
         Assert.assertEquals( user.getStatus(), responseResource.getStatus() );
         Assert.assertEquals( user.getEmail(), responseResource.getEmail() );

@@ -11,27 +11,27 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.jsecurity.realms;
+package org.sonatype.security.realms;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Permission;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermission;
+import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.codehaus.plexus.component.annotations.Component;
-import org.jsecurity.authc.AuthenticationException;
-import org.jsecurity.authc.AuthenticationInfo;
-import org.jsecurity.authc.AuthenticationToken;
-import org.jsecurity.authc.SimpleAuthenticationInfo;
-import org.jsecurity.authc.UsernamePasswordToken;
-import org.jsecurity.authc.credential.SimpleCredentialsMatcher;
-import org.jsecurity.authz.AuthorizationInfo;
-import org.jsecurity.authz.Permission;
-import org.jsecurity.authz.SimpleAuthorizationInfo;
-import org.jsecurity.authz.permission.WildcardPermission;
-import org.jsecurity.cache.HashtableCache;
-import org.jsecurity.realm.AuthorizingRealm;
-import org.jsecurity.subject.PrincipalCollection;
 
 /**
  * This is a pretty simple sample of how you can completely override the nexus
@@ -47,7 +47,7 @@ import org.jsecurity.subject.PrincipalCollection;
  * use the role-hint of MemoryRealm.
  * 
  */
-@Component(role=org.jsecurity.realm.Realm.class, hint="MemoryRealm")
+@Component(role=Realm.class, hint="MemoryRealm")
 public class MemoryRealm
     extends AuthorizingRealm
 {
@@ -72,8 +72,6 @@ public class MemoryRealm
         // As this is a simple test realm, only using simple credentials
         // just a string compare, no hashing involved
         setCredentialsMatcher( new SimpleCredentialsMatcher() );
-        
-        setAuthorizationCache( new HashtableCache( null ) );
         
         authenticationMap.put( "admin", "admin123" );
         authenticationMap.put( "deployment", "deployment123" );

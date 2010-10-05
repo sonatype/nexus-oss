@@ -1,4 +1,4 @@
-package org.sonatype.jsecurity.realms.simple;
+package org.sonatype.security.realms.simple;
 
 import java.util.HashSet;
 import java.util.Set;

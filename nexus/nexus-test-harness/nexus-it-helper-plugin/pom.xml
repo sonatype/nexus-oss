@@ -14,9 +14,20 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.shiro</groupId>
+          <artifactId>shiro-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -42,17 +53,25 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.sonatype.security</groupId>
+      <artifactId>security-system</artifactId>
+      <version>${plexus-security.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.shiro</groupId>
+          <artifactId>shiro-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-url-realm</artifactId>
-      <version>1.1.8</version>
+      <version>${plexus-security.version}</version>
       <exclusions>
         <exclusion>
           <groupId>org.sonatype.security.realms</groupId>
           <artifactId>security-xml-realm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jsecurity</groupId>
-          <artifactId>jsecurity</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.codehaus.plexus</groupId>
@@ -71,7 +90,7 @@
           <artifactId>com.noelios.restlet.ext.httpclient</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
+    </dependency> -->
   </dependencies>
 
   <build>

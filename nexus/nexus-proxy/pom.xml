@@ -50,10 +50,6 @@
       <groupId>org.sonatype.plexus.appevents</groupId>
       <artifactId>simple-event-multicaster</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.security</groupId>
-      <artifactId>security-system</artifactId>
-    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -76,6 +72,10 @@
     <dependency>
       <groupId>net.sf.ehcache</groupId>
       <artifactId>ehcache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-core</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -146,6 +146,11 @@
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-configuration</artifactId>
       <classifier>tests</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.shiro</groupId>
+      <artifactId>shiro-web</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

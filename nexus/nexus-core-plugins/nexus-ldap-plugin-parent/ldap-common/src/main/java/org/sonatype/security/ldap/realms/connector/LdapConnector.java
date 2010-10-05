@@ -9,7 +9,7 @@ package org.sonatype.security.ldap.realms.connector;
 import java.util.Set;
 import java.util.SortedSet;
 
-import org.jsecurity.realm.ldap.LdapContextFactory;
+import org.apache.shiro.realm.ldap.LdapContextFactory;
 import org.sonatype.security.ldap.dao.LdapDAOException;
 import org.sonatype.security.ldap.dao.LdapUser;
 import org.sonatype.security.ldap.dao.NoLdapUserRolesFoundException;

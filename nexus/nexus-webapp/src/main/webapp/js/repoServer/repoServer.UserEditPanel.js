@@ -16,6 +16,8 @@
  * User Edit/Create panel layout and controller
  */
 
+var WHITE_SPACE_REGEX = /^\S/;
+
 Sonatype.repoServer.UserEditPanel = function(config) {
   var config = config || {};
   var defaultConfig = {
@@ -110,6 +112,10 @@ Sonatype.repoServer.UserEditPanel = function(config) {
         dataAutoLoad : true,
         dataId : 'userId',
         dataBookmark : 'userId',
+        dataSortInfo : {
+	      field : 'firstName',
+	      direction : 'asc'
+	    },
         columns : [{
               name : 'resourceURI',
               mapping : 'userId',
@@ -126,12 +132,16 @@ Sonatype.repoServer.UserEditPanel = function(config) {
               header : 'Realm',
               width : 50
             }, {
-              name : 'name',
+              name : 'firstName',
               sortType : Ext.data.SortTypes.asUCString,
-              header : 'Name',
+              header : 'First Name',
               width : 175
-            }, {
-              name : 'email',
+            },{
+              name : 'lastName',
+              sortType : Ext.data.SortTypes.asUCString,
+              header : 'Last Name',
+              width : 175
+            }, {              name : 'email',
               header : 'Email',
               width : 175
             }, {
@@ -639,13 +649,42 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
         validator : Sonatype.utils.validateId
       }, {
         xtype : 'textfield',
-        fieldLabel : 'Name',
+        fieldLabel : 'First Name',
         itemCls : 'required-field',
         labelStyle : 'margin-left: 15px; width: 185px;',
-        helpText : ht.name,
-        name : 'name',
-        allowBlank : false,
-        width : this.COMBO_WIDTH
+        helpText : ht.firstName,
+        name : 'firstName',
+        allowBlank : true,
+        width : this.COMBO_WIDTH,
+        validator : function(v) {
+          if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
+          {
+            return true;
+          }
+          else
+          {
+            return 'First Name cannot start with whitespace.';
+          }
+        }
+      }, {
+        xtype : 'textfield',
+        fieldLabel : 'Last Name',
+        itemCls : 'required-field',
+        labelStyle : 'margin-left: 15px; width: 185px;',
+        helpText : ht.lastName,
+        name : 'lastName',
+        allowBlank : true,
+        width : this.COMBO_WIDTH,
+        validator : function(v) {
+          if (v && v.length != 0 && v.match(WHITE_SPACE_REGEX))
+          {
+            return true;
+          }
+          else
+          {
+            return 'Last Name cannot start with whitespace.';
+          }
+        }
       }, {
         xtype : 'textfield',
         fieldLabel : 'Email',
@@ -777,7 +816,8 @@ Ext.extend(Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
 
         var rec = this.payload;
         rec.beginEdit();
-        rec.set('name', receivedData.name);
+        rec.set('firstName', receivedData.firstName);
+        rec.set('lastName', receivedData.lastName);
         rec.set('email', receivedData.email);
         rec.set('displayRoles', this.combineRoles(receivedData.roles));
         rec.commit();
@@ -906,10 +946,19 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
               width : this.COMBO_WIDTH
             }, {
               xtype : 'textfield',
-              fieldLabel : 'Name',
+              fieldLabel : 'First Name',
               itemCls : 'required-field',
               labelStyle : 'margin-left: 15px; width: 185px;',
-              name : 'name',
+              name : 'firstName',
+              disabled : true,
+              allowBlank : false,
+              width : this.COMBO_WIDTH
+            }, {
+              xtype : 'textfield',
+              fieldLabel : 'Last Name',
+              itemCls : 'required-field',
+              labelStyle : 'margin-left: 15px; width: 185px;',
+              name : 'lastName',
               disabled : true,
               allowBlank : false,
               width : this.COMBO_WIDTH
@@ -1036,7 +1085,7 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
           {
             var resourceURI = Sonatype.config.host + Sonatype.config.repos.urls.plexusUser + '/' + this.loadedUserData.userId;
             var rec = new store.reader.recordType({
-                  name : this.loadedUserData.name,
+//                  name : this.loadedUserData.name,
                   email : this.loadedUserData.email,
                   source : this.loadedUserData.source,
                   userId : this.loadedUserData.userId,
