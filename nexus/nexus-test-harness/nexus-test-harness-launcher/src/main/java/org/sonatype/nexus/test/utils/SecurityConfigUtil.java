@@ -324,6 +324,7 @@ public class SecurityConfigUtil
              */
             addStaticSecurity( configuration, reader, "/META-INF/nexus-indexer-lucene-static-security.xml" );
             addStaticSecurity( configuration, reader, "/META-INF/nexus-archive-browser-plugin-security.xml" );
+            addStaticSecurity( configuration, reader, "/META-INF/nexus-rrb-plugin-security.xml" );
 
         }
         catch ( Exception e )
