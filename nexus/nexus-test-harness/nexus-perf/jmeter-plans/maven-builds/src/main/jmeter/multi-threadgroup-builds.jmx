@@ -236,7 +236,7 @@
         <hashTree>
           <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="maven3.csv" enabled="true">
             <stringProp name="TestPlan.comments">file that contains repo paths of artifacts to fetch for simulating a build</stringProp>
-            <stringProp name="filename">${data.dir}/builds/maven.csv</stringProp>
+            <stringProp name="filename">${data.dir}/builds/maven3.csv</stringProp>
             <stringProp name="fileEncoding">${fileEncoding}</stringProp>
             <stringProp name="variableNames">resourcePath</stringProp>
             <stringProp name="delimiter">,</stringProp>
