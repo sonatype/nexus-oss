@@ -20,7 +20,7 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.jsecurity.codec.Base64;
+import org.apache.shiro.codec.Base64;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;

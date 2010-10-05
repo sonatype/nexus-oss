@@ -12,6 +12,8 @@
  */
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
+import java.util.LinkedHashSet;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.configuration.ConfigurationException;
@@ -23,10 +25,11 @@ import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.proxy.target.Target;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
 
 @Component( role = SecurityConfigReceiver.class )
 public class DefaultSecurityConfigReceiver
@@ -68,7 +71,7 @@ public class DefaultSecurityConfigReceiver
         }
     }
 
-    public void receiveSecurityPrivilege( SecurityPrivilege privilege )
+    public void receiveSecurityPrivilege( CPrivilege privilege )
         throws ArtifactoryMigrationException
     {
         try
@@ -86,7 +89,7 @@ public class DefaultSecurityConfigReceiver
 
     }
 
-    public void receiveSecurityRole( SecurityRole role )
+    public void receiveSecurityRole( CRole role )
         throws ArtifactoryMigrationException
     {
         try
@@ -102,12 +105,12 @@ public class DefaultSecurityConfigReceiver
 
     }
 
-    public void receiveSecurityUser( SecurityUser user )
+    public void receiveSecurityUser( CUser user, CUserRoleMapping map )
         throws ArtifactoryMigrationException
     {
         try
         {
-            manager.createUser( user );
+            manager.createUser( user, new LinkedHashSet<String>( map.getRoles() ) );
 
             manager.save();
         }

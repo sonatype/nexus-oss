@@ -13,7 +13,11 @@
 package org.sonatype.nexus.plugin.migration.artifactory.security;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import junit.framework.Assert;
 
@@ -27,10 +31,10 @@ import org.sonatype.nexus.plugin.migration.artifactory.MigrationResult;
 import org.sonatype.nexus.plugin.migration.artifactory.dto.MigrationSummaryDTO;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.MappingConfiguration;
 import org.sonatype.nexus.plugin.migration.artifactory.persist.model.CMapping;
-import org.sonatype.security.realms.tools.dao.SecurityPrivilege;
-import org.sonatype.security.realms.tools.dao.SecurityProperty;
-import org.sonatype.security.realms.tools.dao.SecurityRole;
-import org.sonatype.security.realms.tools.dao.SecurityUser;
+import org.sonatype.security.model.CPrivilege;
+import org.sonatype.security.model.CRole;
+import org.sonatype.security.model.CUser;
+import org.sonatype.security.model.CUserRoleMapping;
 
 public class SecurityConfigConvertorTest
 {
@@ -39,11 +43,11 @@ public class SecurityConfigConvertorTest
 
     protected List<CRepositoryTarget> repoTargetList;
 
-    protected List<SecurityPrivilege> privList;
+    protected List<CPrivilege> privList;
 
-    protected List<SecurityRole> roleList;
+    protected List<CRole> roleList;
 
-    protected List<SecurityUser> userList;
+    protected Map<CUser, CUserRoleMapping> userList;
 
     protected ArtifactorySecurityConfig config;
 
@@ -55,9 +59,9 @@ public class SecurityConfigConvertorTest
         config = new ArtifactorySecurityConfig();
 
         repoTargetList = new ArrayList<CRepositoryTarget>();
-        privList = new ArrayList<SecurityPrivilege>();
-        roleList = new ArrayList<SecurityRole>();
-        userList = new ArrayList<SecurityUser>();
+        privList = new ArrayList<CPrivilege>();
+        roleList = new ArrayList<CRole>();
+        userList = new LinkedHashMap<CUser, CUserRoleMapping>();
 
         // groups
         ArtifactoryGroup group = new ArtifactoryGroup( "group", "test" );
@@ -111,11 +115,9 @@ public class SecurityConfigConvertorTest
     public void assertRepositoryTarget()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
 
         configConvertor.convert( request );
 
@@ -138,11 +140,9 @@ public class SecurityConfigConvertorTest
     public void assertPrivilege()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
 
         configConvertor.convert( request );
 
@@ -152,40 +152,33 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( "apachePermTarget-apache-create", privList.get( 0 ).getDescription() );
         Assert.assertEquals( "target", privList.get( 0 ).getType() );
 
-        Assert.assertEquals( "method", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 0 ) ).getKey() );
-        Assert.assertEquals( "create", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 0 ) ).getValue() );
-        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 1 ) )
-            .getKey() );
-        Assert.assertEquals( "apachePermTarget", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 1 ) )
-            .getValue() );
-        Assert
-            .assertEquals( "repositoryId", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 2 ) ).getKey() );
-        Assert.assertEquals( "apache", ( (SecurityProperty) privList.get( 0 ).getProperties().get( 2 ) ).getValue() );
+        Assert.assertEquals( "method", ( privList.get( 0 ).getProperties().get( 0 ) ).getKey() );
+        Assert.assertEquals( "create", ( privList.get( 0 ).getProperties().get( 0 ) ).getValue() );
+        Assert.assertEquals( "repositoryTargetId", ( privList.get( 0 ).getProperties().get( 1 ) ).getKey() );
+        Assert.assertEquals( "apachePermTarget", ( privList.get( 0 ).getProperties().get( 1 ) ).getValue() );
+        Assert.assertEquals( "repositoryId", ( privList.get( 0 ).getProperties().get( 2 ) ).getKey() );
+        Assert.assertEquals( "apache", ( privList.get( 0 ).getProperties().get( 2 ) ).getValue() );
 
         Assert.assertNotNull( privList.get( 7 ).getId() );
         Assert.assertTrue( privList.get( 7 ).getName().endsWith( "delete" ) );
         Assert.assertEquals( privList.get( 7 ).getDescription(), privList.get( 7 ).getName() );
         Assert.assertEquals( "target", privList.get( 7 ).getType() );
 
-        Assert.assertEquals( "method", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 0 ) ).getKey() );
-        Assert.assertEquals( "delete", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 0 ) ).getValue() );
-        Assert.assertEquals( "repositoryTargetId", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 1 ) )
-            .getKey() );
-        Assert.assertNotNull( ( (SecurityProperty) privList.get( 7 ).getProperties().get( 1 ) ).getValue() );
-        Assert
-            .assertEquals( "repositoryId", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 2 ) ).getKey() );
-        Assert.assertEquals( "jvnet", ( (SecurityProperty) privList.get( 7 ).getProperties().get( 2 ) ).getValue() );
+        Assert.assertEquals( "method", ( privList.get( 7 ).getProperties().get( 0 ) ).getKey() );
+        Assert.assertEquals( "delete", ( privList.get( 7 ).getProperties().get( 0 ) ).getValue() );
+        Assert.assertEquals( "repositoryTargetId", ( privList.get( 7 ).getProperties().get( 1 ) ).getKey() );
+        Assert.assertNotNull( ( privList.get( 7 ).getProperties().get( 1 ) ).getValue() );
+        Assert.assertEquals( "repositoryId", ( privList.get( 7 ).getProperties().get( 2 ) ).getKey() );
+        Assert.assertEquals( "jvnet", ( privList.get( 7 ).getProperties().get( 2 ) ).getValue() );
     }
 
     @Test
     public void assertRole()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
 
         configConvertor.convert( request );
 
@@ -218,65 +211,67 @@ public class SecurityConfigConvertorTest
     public void assertAdmin()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
 
         configConvertor.convert( request );
 
-        SecurityUser admin = userList.get( 0 );
+        final Entry<CUser, CUserRoleMapping> entry = userList.entrySet().iterator().next();
+        CUser user = entry.getKey();
+        CUserRoleMapping map = entry.getValue();
 
-        Assert.assertEquals( "arti-admin", admin.getId() );
-        Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", admin.getPassword() );
-        Assert.assertEquals( "arti-admin", admin.getName() );
-        Assert.assertEquals( "changeme@yourcompany.com", admin.getEmail() );
-        Assert.assertEquals( "active", admin.getStatus() );
+        Assert.assertEquals( "arti-admin", user.getId() );
+        Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword() );
+        Assert.assertEquals( "arti-admin", user.getFirstName() );
+        Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
+        Assert.assertEquals( "active", user.getStatus() );
 
-        Assert.assertTrue( admin.getRoles().contains( "admin" ) );
+        Assert.assertTrue( map.getRoles().contains( "admin" ) );
     }
 
     @Test
     public void assertUser()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
 
         configConvertor.convert( request );
 
-        SecurityUser user = userList.get( 1 );
+        final Iterator<Entry<CUser, CUserRoleMapping>> entries = userList.entrySet().iterator();
+        entries.next();
+        final Entry<CUser, CUserRoleMapping> entry = entries.next();
+        CUser user = entry.getKey();
+        CUserRoleMapping map = entry.getValue();
 
         Assert.assertEquals( "arti-user", user.getId() );
-        Assert.assertEquals( "arti-user", user.getName() );
+        Assert.assertEquals( "arti-user", user.getFirstName() );
         Assert.assertEquals( "5f4dcc3b5aa765d61d8327deb882cf99", user.getPassword() );
         Assert.assertEquals( "changeme@yourcompany.com", user.getEmail() );
         Assert.assertEquals( "active", user.getStatus() );
 
-        Assert.assertEquals( 5, user.getRoles().size() );
-        Assert.assertFalse( user.getRoles().contains( "apachePermTarget-apache-admin" ) );
-        Assert.assertTrue( user.getRoles().contains( "apachePermTarget-apache-reader" ) );
-        Assert.assertTrue( user.getRoles().contains( roleList.get( 5 ).getId() ) );
+        Assert.assertEquals( 5, map.getRoles().size() );
+        Assert.assertFalse( map.getRoles().contains( "apachePermTarget-apache-admin" ) );
+        Assert.assertTrue( map.getRoles().contains( "apachePermTarget-apache-reader" ) );
+        Assert.assertTrue( map.getRoles().contains( roleList.get( 5 ).getId() ) );
         // for group
-        Assert.assertTrue( user.getRoles().contains( "group" ) );
+        Assert.assertTrue( map.getRoles().contains( "group" ) );
 
-        SecurityUser user1 = userList.get( 2 );
-        Assert.assertEquals( 2, user1.getRoles().size() );
+        final Entry<CUser, CUserRoleMapping> entry1 = entries.next();
+        CUser user1 = entry1.getKey();
+        CUserRoleMapping map1 = entry1.getValue();
+        Assert.assertEquals( 2, map1.getRoles().size() );
     }
 
     @Test
     public void disableResolvePermission()
         throws Exception
     {
-        SecurityConfigConvertorRequest request = new SecurityConfigConvertorRequest(
-            config,
-            new FakeReceiver(),
-            new FakeMappingConfiguration(),
-            new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
+        SecurityConfigConvertorRequest request =
+            new SecurityConfigConvertorRequest( config, new FakeReceiver(), new FakeMappingConfiguration(),
+                new MigrationResult( new ConsoleLogger( Logger.LEVEL_DEBUG, "console" ), new MigrationSummaryDTO() ) );
         request.setResolvePermission( false );
         configConvertor.convert( request );
 
@@ -285,9 +280,10 @@ public class SecurityConfigConvertorTest
         Assert.assertEquals( 0, privList.size() );
         Assert.assertEquals( 0, repoTargetList.size() );
 
-        Assert.assertTrue( userList.get( 0 ).getRoles().contains( "admin" ) );
-        Assert.assertTrue( userList.get( 1 ).getRoles().contains( "group" ) );
-        Assert.assertTrue( userList.get( 2 ).getRoles().contains( "anonymous" ) );
+        final Iterator<Entry<CUser, CUserRoleMapping>> entries = userList.entrySet().iterator();
+        Assert.assertTrue( entries.next().getValue().getRoles().contains( "admin" ) );
+        Assert.assertTrue( entries.next().getValue().getRoles().contains( "group" ) );
+        Assert.assertTrue( entries.next().getValue().getRoles().contains( "anonymous" ) );
 
         Assert.assertTrue( roleList.get( 0 ).getPrivileges().isEmpty() );
         Assert.assertTrue( roleList.get( 0 ).getRoles().contains( "anonymous" ) );
@@ -303,7 +299,7 @@ public class SecurityConfigConvertorTest
             repoTargetList.add( repoTarget );
         }
 
-        public void receiveSecurityPrivilege( SecurityPrivilege privilege )
+        public void receiveSecurityPrivilege( CPrivilege privilege )
         {
             privilege.setId( "privilege-" + privilegeIdCount );
             privilegeIdCount++;
@@ -311,12 +307,12 @@ public class SecurityConfigConvertorTest
             privList.add( privilege );
         }
 
-        public void receiveSecurityRole( SecurityRole role )
+        public void receiveSecurityRole( CRole role )
         {
             roleList.add( role );
         }
 
-        public void receiveSecurityUser( SecurityUser user )
+        public void receiveSecurityUser( CUser user, CUserRoleMapping map )
             throws ArtifactoryMigrationException
         {
             // simulate an exception while receiving user
@@ -325,7 +321,7 @@ public class SecurityConfigConvertorTest
                 throw new ArtifactoryMigrationException( "User 'wrong-user' could not be imported" );
             }
 
-            userList.add( user );
+            userList.put( user, map );
         }
     }
 
