@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <CacheManager guiclass="CacheManagerGui" testclass="CacheManager" testname="HTTP Cache Manager" enabled="false">
+      <boolProp name="clearEachIteration">false</boolProp>
+      <boolProp name="useExpires">false</boolProp>
+    </CacheManager>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

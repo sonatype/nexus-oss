@@ -1,0 +1,382 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-perf</artifactId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
+  <groupId>org.sonatype.nexus</groupId>
+  <artifactId>jmeter-tests</artifactId>
+  <packaging>pom</packaging>
+  <name>jmeter-tests</name>
+  <description></description>
+  <modules>
+    <module>ui-welcome</module>
+  </modules>
+
+  <properties>
+    <!-- Below is the "product", the subject of the tests -->
+    <product-groupId>org.sonatype.nexus</product-groupId>
+    <product-artifactId>nexus-oss-webapp</product-artifactId>
+    <product-version>${project.version}</product-version>
+    <product-classifier>bundle</product-classifier>
+    <product-type>tar.gz</product-type>
+    <product-control.script></product-control.script>
+
+<!--
+     For each test run there are several key directories
+     perf.history.dir = where the history of each jmeter test execution is backed up, unique per test profile.
+         The default value is only suitable for testing and should be overridden on the ci machine.
+     perf.results.dir = where plan output (jtl,logs) of the specific jmeter test execution is written during the execution
+         We cannot control where the default output file is located by chronos plugin. It's in target/chronos.
+     perf.data.dir = where the datasets (csv data files) for the specific test plan execution can be found. Remember any included with the test plan package
+         are defaults
+     perf.data.id  = unique id per Maven 'dataset' profile used by the test execution. chronos plugin uses this as 'dataid'
+     -->
+    <perf.data.id>performancetest</perf.data.id>
+    <perf.history.dir>${project.build.directory}/test-plan-history/nexus/${project.version}</perf.history.dir>
+    <perf.result.dir>${project.build.directory}/test-plan-result</perf.result.dir>
+    <perf.data.dir>${project.build.directory}/test-classes/${perf.data.id}</perf.data.dir>
+    <perf.plan.dir>${project.build.directory}/test-plan</perf.plan.dir>
+
+    <!-- these apply when installing jmeter during the build -->
+    <jmeter.version>2.4</jmeter.version>
+    <jmeter.packaging>tgz</jmeter.packaging>
+    <jmeter.unpack.dir>${project.build.directory}</jmeter.unpack.dir>
+    <!-- jmeter runtime cruft -->
+    <jmeter.home>${jmeter.unpack.dir}/jakarta-jmeter-${jmeter.version}</jmeter.home>
+    <jmeter.loggc>${perf.result.dir}/gclog-${perf.data.id}.txt</jmeter.loggc>
+    <jmeter.testplan.dir>${project.build.directory}/test-plan</jmeter.testplan.dir>
+    <jmeter.test.file>${jmeter.testplan.dir}/ui-welcome.jmx</jmeter.test.file>
+    <jmeter.log.file>${perf.result.dir}/performance-${perf.data.id}.jtl</jmeter.log.file>
+    <jmeter.runlog.file>${perf.result.dir}/jmeter-${perf.data.id}.log</jmeter.runlog.file>
+
+    <!-- Nexus standard jmeter test plan properties -->
+    <nexus.host>localhost</nexus.host>
+    <nexus.context>/nexus</nexus.context>
+    <nexus.protocol>http</nexus.protocol>
+
+  </properties>
+
+  <!--
+  Steps to deploy Nexus and run a Test
+  ** We only perform tests on bundles **
+  ** CI Job takes care of parsing jtl files and failing if required **
+  ** our only goal here is to install Nexus and run a test against it **
+  CI Step 1 - mvn
+  1. Download and extract Nexus bundle using NTEMP plugin. Each test execution profile can customize the NTEMP config
+     to install optional plugins as needed.
+  2. Extract any test scope Nexus config dependencies on top of the extracted Nexus bundle (optional, specified by execution profile)
+  3. Extract the jmeter-plans that the test execution depends on. Plans are regular test scope dependencies, extracted using dependency plugin.
+  4. (Optional) Download and install JMeter binaries to the target directory. If test is being executed by the grid, this will be skipped if the
+     JMeter binaries are already located in the expected location.
+  CI Step 2 - shell
+  5. Execute Nexus using exec-plugin,forked,jsw script
+  6. Sleep xxx seconds waiting for Nexus to startup, proceed when get 200 response
+  7. (TODO) Check Nexus logs for errors, if any fail build before running tests
+  CI Step 3 - mvn
+  8. Run jmeter extracted test plan/dataset using chronos plugin, perform cehcks recording to jtl files the output
+  9. Check Nexus logs for any errors(??)
+  CI Step 4 - shell
+  10. Shutdown Nexus using exec-plugin, forked, jsw-script
+  11. Backup test run logs to history dir
+  12. Hudson Performance plugin fails build if outside acceptable params
+   -->
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <!-- by default output to the target directory  -->
+        <plugin>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <configuration>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+          </configuration>
+        </plugin>
+        <!--  dont build tests jar on package phase -->
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <executions>
+            <execution>
+              <configuration>
+                <skip>true</skip>
+              </configuration>
+              <goals>
+                <goal>test-jar</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!--  defaults for chronos plugin which will execute jmeter -->
+        <!--  BUG: chronos plugin can't handle nested httpSamples in *.jtl -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>chronos-maven-plugin</artifactId>
+          <version>1.0-SNAPSHOT</version>
+          <configuration>
+            <!-- home of unpacked jmeter binary -->
+            <jmeterhome>${jmeter.home}</jmeterhome>
+            <!-- used by savehistory goal to store historical data -->
+            <historydir>${perf.history.dir}</historydir>
+            <!-- used by chronos when naming some ouput files -->
+            <dataid>${perf.data.id}</dataid>
+            <!-- java system properties added with dashD, available to test plan using  __P function -->
+            <sysproperties>
+              <property>
+                <name>result.dir</name>
+                <value>${perf.result.dir}</value>
+              </property>
+              <property>
+                <name>data.dir</name>
+                <value>${perf.data.dir}</value>
+              </property>
+              <property>
+                <name>nexus.port</name>
+                <value>8081</value>
+              </property>
+            </sysproperties>
+            <!-- JMeter jvm additional options, not JMeter arguments -->
+            <options>
+              <option>-XX:+UseParallelGC</option>
+              <option>-XX:+UseParallelOldGC</option>
+            </options>
+            <heap>756m</heap>
+            <newsize>256m</newsize>
+            <permsize>192m</permsize>
+            <survivorratio>8</survivorratio>
+          </configuration>
+          <executions>
+            <execution>
+              <id>execute-chronos</id>
+              <phase>integration-test</phase>
+              <goals>
+                <goal>jmeter</goal>
+<!--            <goal>check</goal>-->
+               <!--  <goal>savehistory</goal> -->
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <!-- <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.2</version>
+          <configuration>
+            <workingDirectory>${nexus-base-dir}</workingDirectory>
+          </configuration>
+          <executions>
+            <execution>
+              <id>60_start-nexus</id>
+              <phase>pre-integration-test</phase>
+              <configuration>
+                <executable>${nexis-base-dir}/bin/start.sh</executable>
+              </configuration>
+              <goals>
+                <goal>exec</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+         -->
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <!--  the line endings in the jmeter files change depending on packaging -->
+    <profile>
+      <id>win</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <jmeter.packaging>zip</jmeter.packaging>
+      </properties>
+    </profile>
+    <!--  jmeter.home detection for benson vault -->
+    <profile>
+      <id>jmeter-vault</id>
+      <activation>
+        <file>
+          <exists>/opt/grid/data/slave/tools/jmeter-2x</exists>
+        </file>
+      </activation>
+      <properties>
+        <jmeter.home>/opt/grid/data/slave/tools/jmeter-2x</jmeter.home>
+      </properties>
+    </profile>
+    <!--  jmeter installed manually on perf server until benson vault is used -->
+    <profile>
+      <id>jmeter-nexus-perf</id>
+      <activation>
+        <file>
+          <exists>/opt/nexus-perf/jmeter/jakarta-jmeter-${jmeter.version}</exists>
+          <missing>/opt/grid/data/slave/tools/jmeter-2x</missing>
+        </file>
+      </activation>
+      <properties>
+        <jmeter.home>/opt/nexus-perf/jmeter/jakarta-jmeter-${jmeter.version}</jmeter.home>
+      </properties>
+    </profile>
+    <!-- profile to install jmeter into target dir and run from there only needed if you don't have your own jmeter install -->
+    <profile>
+      <id>jmeter-install</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <artifactId>maven-dependency-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>unpack-jmeter</id>
+                  <phase>initialize</phase>
+                  <goals>
+                    <goal>unpack</goal>
+                  </goals>
+                  <configuration>
+                    <artifactItems>
+                      <artifactItem>
+                        <groupId>org.apache.jmeter</groupId>
+                        <artifactId>jakarta-jmeter</artifactId>
+                        <version>${jmeter.version}</version>
+                        <type>${jmeter.packaging}</type>
+                        <outputDirectory>${jmeter.unpack.dir}</outputDirectory>
+                      </artifactItem>
+                    </artifactItems>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <!-- we may want to run the test against an already installed and running Nexus -->
+    <!-- by default though that is unlikely so this profile active by default -->
+    <profile>
+      <id>nexus-local</id>
+      <activation>
+        <property>
+          <name>!skipNexus</name>
+        </property>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.sonatype.plugins</groupId>
+              <artifactId>nexus-test-environment-maven-plugin</artifactId>
+              <version>1.6-SNAPSHOT</version>
+              <configuration>
+                <setupMaven>false</setupMaven>
+                <setupEmma>false</setupEmma>
+                <nexusBundleArtifact>
+                  <groupId>${product-groupId}</groupId>
+                  <artifactId>${product-artifactId}</artifactId>
+                  <version>${product-version}</version>
+                  <type>${product-type}</type>
+                  <classifier>${product-classifier}</classifier>
+                </nexusBundleArtifact>
+              </configuration>
+              <executions>
+                <execution>
+                  <id>unpack-nexus</id>
+                  <phase>initialize</phase>
+                  <goals>
+                    <goal>setup-environment</goal>
+                  </goals>
+                </execution>
+              </executions>
+            </plugin>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <version>1.5</version>
+              <executions>
+                <!-- FIXME HACK HACK HACK -->
+                <execution>
+                  <id>nexus-executable-fishing</id>
+                  <!-- make sure this runs after NTEMP plugin due to project properties that plugin sets -->
+                  <phase>pre-integration-test</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <condition property="nexus.jsw.dir"
+                        value="macosx-universal-64">
+                        <and>
+                          <contains string="${os.name}"
+                            substring="mac os x" casesensitive="false" />
+                          <contains string="${os.arch}"
+                            substring="64" />
+                        </and>
+                      </condition>
+                      <condition property="nexus.jsw.dir"
+                        value="linux-x86-64">
+                        <and>
+                          <contains string="${os.name}"
+                            substring="linux" casesensitive="false" />
+                          <contains string="${os.arch}"
+                            substring="64" />
+                        </and>
+                      </condition>
+                      <condition property="nexus.jsw.dir"
+                        value="linux-x86-32">
+                        <and>
+                          <contains string="${os.name}"
+                            substring="linux" casesensitive="false" />
+                          <contains string="${os.arch}"
+                            substring="32" />
+                        </and>
+                      </condition>
+                      <echo
+                        file="${project.build.directory}/antrun/nexus.exec">${nexus-base-dir}/bin/jsw/${nexus.jsw.dir}/nexus</echo>
+                    </target>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>nexus-start</id>
+                  <phase>pre-integration-test</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <loadfile property="nexus.exec"
+                        srcFile="${project.build.directory}/antrun/nexus.exec" />
+                      <exec executable="${nexus.exec}">
+                        <arg value="restart" />
+                      </exec>
+                      <sleep seconds="10" />
+                    </target>
+                  </configuration>
+                </execution>
+                <execution>
+                  <id>nexus-stop</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                      <loadfile property="nexus.exec"
+                        srcFile="${project.build.directory}/antrun/nexus.exec" />
+                      <!-- FIXME fail if we can't stop -->
+                      <exec executable="${nexus.exec}">
+                        <arg value="stop" />
+                      </exec>
+                    </target>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+</project>

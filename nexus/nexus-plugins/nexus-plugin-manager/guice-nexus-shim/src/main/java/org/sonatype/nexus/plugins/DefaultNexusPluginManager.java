@@ -26,7 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.codehaus.plexus.MutablePlexusContainer;
+import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
@@ -82,7 +82,7 @@ public final class DefaultNexusPluginManager
     private MimeUtil mimeUtil;
 
     @Inject
-    private MutablePlexusContainer container;
+    private DefaultPlexusContainer container;
 
     @Inject
     @Parameters

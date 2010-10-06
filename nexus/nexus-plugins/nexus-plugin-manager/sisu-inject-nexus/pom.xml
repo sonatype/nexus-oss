@@ -11,7 +11,7 @@
 
   <packaging>bundle</packaging>
 
-  <artifactId>spice-inject-nexus</artifactId>
+  <artifactId>sisu-inject-nexus</artifactId>
 
   <name>Nexus : Plugins : Manager : Nexus bean support</name>
 
@@ -24,7 +24,7 @@
         <configuration>
           <excludeDependencies>
             <!-- fragment host and external dependencies -->
-            spice-inject-*,nexus-*;groupId=org.sonatype.nexus
+            sisu-inject-*,nexus-*;groupId=org.sonatype.nexus
           </excludeDependencies>
           <instructions>
             <Bundle-SymbolicName>
@@ -123,8 +123,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>

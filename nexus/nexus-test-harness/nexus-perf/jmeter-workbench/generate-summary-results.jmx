@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="2.1">
+  <hashTree>
+    <Summariser guiclass="SummariserGui" testclass="Summariser" testname="Display Summary Results During Run" enabled="true"/>
+    <hashTree/>
+  </hashTree>
+</jmeterTestPlan>

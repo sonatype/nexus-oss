@@ -9,8 +9,8 @@ package org.sonatype.nexus.index.updater;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -852,7 +852,7 @@ public class DefaultIndexUpdaterTest
             oneOf( mockFetcher ).retrieve( 
                 with( IndexingContext.INDEX_FILE + ".gz" ) );
             
-            will( throwException( new FileNotFoundException() ) );
+            will( throwException( new IOException() ) );
 
             oneOf( mockFetcher ).retrieve(
                 with( IndexingContext.INDEX_FILE + ".zip" ) );

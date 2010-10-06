@@ -27,7 +27,7 @@
     <bar>
       <groupId>org.sonatype.runtime.bars</groupId>
       <artifactId>bar-jsw</artifactId>
-      <version>3.2.3-v0002</version>
+      <version>${bar-jsw.version}</version>
       <type>zip</type>
     </bar>
 

@@ -58,16 +58,13 @@ public class Nexus2351DisableRedeployUploadIT
         Gav gav2 =
             new Gav( this.getTestId(), "release-deploy", "1.0.1", null, "jar", 0, new Date().getTime(),
                      "release-deploy", false, false, null, false, null );
-
         File mavenProject1 = getTestFile( "maven-project-1" );
         File mavenProject2 = getTestFile( "maven-project-2" );
-
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         Metadata metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date firstDeployDate = this.getLastDeployTimeStamp( metadata );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
-
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date secondDeployDate = this.getLastDeployTimeStamp( metadata );
@@ -76,22 +73,20 @@ public class Nexus2351DisableRedeployUploadIT
                                + secondDeployDate );
         // we need to sleep 1 second, because we are dealing with a one second accuracy
         Thread.sleep( 1000 );
-
         this.deployWithMavenExpectSuccess( mavenProject1, repoId );
         metadata = this.downloadMetadataFromRepository( gav1, repoId );
         Date thirdDeployDate = this.getLastDeployTimeStamp( metadata );
         Assert.assertTrue( secondDeployDate.before( thirdDeployDate ),
                            "deploy date was not updated, or is incorrect, second: " + firstDeployDate + " third: "
                                + secondDeployDate );
-
         this.deployWithMavenExpectSuccess( mavenProject2, repoId );
         metadata = this.downloadMetadataFromRepository( gav2, repoId );
-
         // now check the metadata for both versions
         Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.0" ) );
         Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.1" ) );
 
         Assert.assertEquals( 2, metadata.getVersioning().getVersions().size() );
+        
 
     }
 
@@ -146,12 +141,14 @@ public class Nexus2351DisableRedeployUploadIT
 
         Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        
     }
 
     @Test
     public void disableReleaseReadOnlyWithMavenTest()
         throws Exception
     {
+        
         String repoId = "nexus2351disableReleaseReadOnlyWithMavenTest";
         setWritePolicy( repoId, RepositoryWritePolicy.READ_ONLY );
 
@@ -159,12 +156,14 @@ public class Nexus2351DisableRedeployUploadIT
 
         this.deployWithMavenExpectFailure( mavenProject, repoId );
         this.deployWithMavenExpectFailure( mavenProject, repoId );
+        
     }
 
     @Test
     public void disableReleaseNoRedeployWithUploadTest()
         throws Exception
     {
+        
         String repoId = "nexus2351disableReleaseNoRedeployWithUploadTest";
         setWritePolicy( repoId, RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
@@ -177,12 +176,14 @@ public class Nexus2351DisableRedeployUploadIT
         Assert.assertEquals( 201, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
         Assert.assertEquals( 400, getDeployUtils().deployUsingGavWithRest( repoId, gav, fileToDeploy ) );
+        
     }
 
     @Test
     public void disableReleaseNoRedeployWithMavenTest()
         throws Exception
     {
+        
         String repoId = "nexus2351disableReleaseNoRedeployWithMavenTest";
         setWritePolicy( repoId, RepositoryWritePolicy.ALLOW_WRITE_ONCE );
 
@@ -218,6 +219,7 @@ public class Nexus2351DisableRedeployUploadIT
         Assert.assertTrue( metadata.getVersioning().getVersions().contains( "1.0.1" ) );
 
         Assert.assertEquals( 2, metadata.getVersioning().getVersions().size() );
+        
     }
 
     private Date getLastDeployTimeStamp( Metadata metadata )
@@ -246,12 +248,9 @@ public class Nexus2351DisableRedeployUploadIT
             File logs = new File( nexusLogDir );
             File bkp = new File( "./target/logs/nexus2351-bkp" );
             bkp.mkdirs();
-
             FileUtils.copyDirectory( logs, bkp );
-
             failTest( verifier );
         }
-
     }
 
     private void deployWithMavenExpectFailure( File mavenProject, String targetRepoId )

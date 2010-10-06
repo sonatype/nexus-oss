@@ -513,12 +513,22 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                     id : formId + '_' + 'globalHttpProxySettings.authentication',
                     name : 'globalHttpProxySettings.authentication',
                     title : 'Authentication (optional)',
-                    // collapsible: false,
+                    anchor : Sonatype.view.FIELDSET_OFFSET,
                     autoHeight : true,
                     layoutConfig : {
                       labelSeparator : ''
                     },
-
+                    listeners : {
+                      'expand' : {
+                        fn : this.optionalFieldsetExpandHandler,
+                        scope : this
+                      },
+                      'collapse' : {
+                        fn : this.optionalFieldsetCollapseHandler,
+                        scope : this,
+                        delay : 100
+                      }
+                    },
                     items : [{
                           xtype : 'textfield',
                           fieldLabel : 'Username',

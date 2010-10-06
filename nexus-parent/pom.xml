@@ -26,8 +26,8 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <jetty.version>6.1.19</jetty.version>
-    <spice-inject.version>1.3.4</spice-inject.version>
-    <spice-inject-plexus.version>${spice-inject.version}</spice-inject-plexus.version>
+    <sisu-inject.version>1.4.2</sisu-inject.version>
+    <sisu-inject-plexus.version>${sisu-inject.version}</sisu-inject-plexus.version>
     <plexus-component-metadata.version>1.5.4</plexus-component-metadata.version>
 
     <maven.version>2.2.1</maven.version>
@@ -36,9 +36,9 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.sonatype.spice</groupId>
-        <artifactId>spice-inject-plexus</artifactId>
-        <version>${spice-inject-plexus.version}</version>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
+        <version>${sisu-inject-plexus.version}</version>
       </dependency>
       <!-- This below is actually tied to this above, but some modules like modello only modules does need p-u only as dependency -->
       <dependency>
