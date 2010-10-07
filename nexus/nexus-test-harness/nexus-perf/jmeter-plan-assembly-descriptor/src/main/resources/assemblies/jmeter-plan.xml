@@ -27,15 +27,16 @@
         <include>**/*</include>
       </includes>
     </fileSet>
+    <!--  hack to create empty results directory -->
     <fileSet>
-      <directory>results</directory>
+      <directory>target</directory>
       <lineEnding>keep</lineEnding>
       <filtered>false</filtered>
       <outputDirectory>./results</outputDirectory>
       <useDefaultExcludes>true</useDefaultExcludes>
-      <includes>
-        <include>**/*</include>
-      </includes>
+      <excludes>
+        <exclude>**/*</exclude>
+      </excludes>
     </fileSet>
   </fileSets>
 </assembly>
