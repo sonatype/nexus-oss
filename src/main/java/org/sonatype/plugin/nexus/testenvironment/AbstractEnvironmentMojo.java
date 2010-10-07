@@ -381,6 +381,7 @@ public class AbstractEnvironmentMojo
         // setup Maven if requested for this test
         if ( setupMaven )
         {
+            mavenLocation.mkdirs();
             String mavenVersion = setupMaven().getBaseVersion();
             project.getProperties().put( "maven-version", mavenVersion );
             if ( this.mavenBaseDir == null )
@@ -840,6 +841,10 @@ public class AbstractEnvironmentMojo
     private Artifact setupMaven()
         throws MojoExecutionException, MojoFailureException
     {
+        if ( mavenArtifact == null )
+        {
+            mavenArtifact = new MavenArtifact( "org.apache.maven", "apache-maven", "bin", "tar.gz" );
+        }
         Artifact artifact = getMavenArtifact( mavenArtifact );
 
         if ( !this.markerExist( "maven" ) )
@@ -854,7 +859,6 @@ public class AbstractEnvironmentMojo
     private void init()
     {
         destination.mkdirs();
-        mavenLocation.mkdirs();
         resourcesDestinationLocation.mkdirs();
 
         if ( nexusBundleArtifact == null )
@@ -867,10 +871,7 @@ public class AbstractEnvironmentMojo
             emmaArtifact = new MavenArtifact( "emma", "emma" );
         }
 
-        if ( mavenArtifact == null )
-        {
-            mavenArtifact = new MavenArtifact( "org.apache.maven", "apache-maven", "bin", "tar.gz" );
-        }
+
 
     }
 
