@@ -46,7 +46,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="result.dir" elementType="Argument">
             <stringProp name="Argument.name">result.dir</stringProp>
-            <stringProp name="Argument.value">${__P(result.dir,.)}</stringProp>
+            <stringProp name="Argument.value">${__P(result.dir,results)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
           <elementProp name="data.dir" elementType="Argument">
@@ -334,7 +334,7 @@
           <hashTree/>
         </hashTree>
       </hashTree>
-      <Summariser guiclass="SummariserGui" testclass="Summariser" testname="Summary Console" enabled="false"/>
+      <Summariser guiclass="SummariserGui" testclass="Summariser" testname="Summary Console" enabled="true"/>
       <hashTree/>
       <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
