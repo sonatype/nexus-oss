@@ -263,7 +263,7 @@ public abstract class AbstractMigrationIntegrationTest
     protected void waitForCompletion()
         throws Exception
     {
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
         new EventInspectorsUtil( this ).waitForCalmPeriod();
     }
 }

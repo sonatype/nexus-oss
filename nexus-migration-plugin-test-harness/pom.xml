@@ -18,7 +18,7 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-test-environment-maven-plugin</artifactId>
-        <version>1.5</version>
+        <version>1.6-SNAPSHOT</version>
         <configuration>
           <nexusPluginsArtifacts>
             <plugin>
@@ -173,6 +173,21 @@
   </reporting>
 
   <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-it-helper-plugin</artifactId>
+          <version>${nexus.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
     <profile>
       <!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
       <id>yourkit-profile</id>
