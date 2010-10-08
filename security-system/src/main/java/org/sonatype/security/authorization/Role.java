@@ -23,7 +23,24 @@ public class Role implements Comparable<Role>
     private Set<String> roles = new HashSet<String>();
     
     private Set<String> privileges = new HashSet<String>();
-
+    
+    public Role()
+    {
+        
+    }
+    
+    public Role( String roleId, String name, String description, String source, boolean readOnly, Set<String> roles,
+                 Set<String> privileges )
+    {
+        super();
+        this.roleId = roleId;
+        this.name = name;
+        this.description = description;
+        this.source = source;
+        this.readOnly = readOnly;
+        this.roles = roles;
+        this.privileges = privileges;
+    }
 
     public String getRoleId()
     {

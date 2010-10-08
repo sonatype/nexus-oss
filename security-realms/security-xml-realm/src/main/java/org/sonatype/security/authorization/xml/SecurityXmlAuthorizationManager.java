@@ -86,8 +86,25 @@ public class SecurityXmlAuthorizationManager
         secRole.setName( role.getName() );
         secRole.setDescription( role.getDescription() );
         secRole.setReadOnly( role.isReadOnly() );
-        secRole.setPrivileges( new ArrayList<String>( role.getPrivileges() ) );
-        secRole.setRoles( new ArrayList<String>( role.getRoles() ) );
+        // null check
+        if( role.getPrivileges() != null )
+        {
+            secRole.setPrivileges( new ArrayList<String>( role.getPrivileges() ) );
+        }
+        else
+        {
+            secRole.setPrivileges( new ArrayList<String>() );
+        }
+        
+        // null check
+        if( role.getRoles() != null )
+        {
+            secRole.setRoles( new ArrayList<String>( role.getRoles() ) );
+        }
+        else
+        {
+            secRole.setRoles( new ArrayList<String>() );
+        }
 
         return secRole;
     }
@@ -101,7 +118,7 @@ public class SecurityXmlAuthorizationManager
         secPriv.setReadOnly( privilege.isReadOnly() );
         secPriv.setType( privilege.getType() );
 
-        if ( privilege.getProperties().entrySet() != null )
+        if ( privilege.getProperties() != null && privilege.getProperties().entrySet() != null )
         {
             for ( Entry<String, String> entry : privilege.getProperties().entrySet() )
             {
