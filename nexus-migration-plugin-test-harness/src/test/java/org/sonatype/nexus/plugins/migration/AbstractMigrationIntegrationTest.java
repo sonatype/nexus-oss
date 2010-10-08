@@ -36,6 +36,8 @@ import org.sonatype.nexus.rest.model.RepositoryGroupListResource;
 import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryListResource;
+import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -66,7 +68,7 @@ public abstract class AbstractMigrationIntegrationTest
         {
             this.repositoryUtil =
                 new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML,
-                                           this.getRepositoryTypeRegistry() );
+                    this.getRepositoryTypeRegistry() );
         }
         catch ( ComponentLookupException e )
         {
@@ -146,7 +148,7 @@ public abstract class AbstractMigrationIntegrationTest
         }
 
         Assert.assertTrue( "Downloaded artifact was not right, checksum comparation fail " + artifactId,
-                           FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
+            FileTestingUtils.compareFileSHA1s( artifact, downloaded ) );
     }
 
     protected void checkArtifactNotPresent( String repositoryId, String groupId, String artifactId, String version )
@@ -238,10 +240,7 @@ public abstract class AbstractMigrationIntegrationTest
         Status status = ImportMessageUtil.commitImport( migrationSummary ).getStatus();
         Assert.assertTrue( "Unable to commit import " + status, status.isSuccess() );
 
-        // the import is scheduled task now, so we need to wait for it to finish
-        TaskScheduleUtil.waitForAllTasksToStop( ArtifactoryMigrationTaskDescriptor.ID );
-
-        Thread.sleep( 1000 );
+        waitForCompletion();
     }
 
     protected void checkNotAvailable( String repositoryId, String groupId, String artifactId, String version )
@@ -259,5 +258,12 @@ public abstract class AbstractMigrationIntegrationTest
             // expected
         }
 
+    }
+
+    protected void waitForCompletion()
+        throws Exception
+    {
+        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        new EventInspectorsUtil( this ).waitForCalmPeriod();
     }
 }

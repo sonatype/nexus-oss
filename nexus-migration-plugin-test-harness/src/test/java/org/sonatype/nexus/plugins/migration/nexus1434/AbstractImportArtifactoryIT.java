@@ -25,9 +25,6 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.tasks.ReindexTask;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
-import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 
 public abstract class AbstractImportArtifactoryIT
     extends AbstractMigrationIntegrationTest
@@ -39,8 +36,6 @@ public abstract class AbstractImportArtifactoryIT
     {
         MigrationSummaryDTO migrationSummary = prepareMigration( getBackupFile() );
         commitMigration( migrationSummary );
-        
-        waitForCompletion();
 
         checkCreation();
         checkLocalRepo();
@@ -137,12 +132,5 @@ public abstract class AbstractImportArtifactoryIT
         checkRepository( "java.net" );
 
         checkGroup( "snapshots-only" );
-    }
-
-    private void waitForCompletion()
-        throws Exception
-    {
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
-        new EventInspectorsUtil( this ).waitForCalmPeriod();
     }
 }
