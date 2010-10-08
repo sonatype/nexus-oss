@@ -28,10 +28,9 @@ import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.sonatype.inject.Description;
 import org.sonatype.security.model.CUser;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.tools.Sha1ThenMd5CredentialsMatcher;
@@ -46,7 +45,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = XmlAuthenticatingRealm.ROLE )
-//@Description( value = "Xml Authenticating Realm" )
+@Description( value = "Xml Authenticating Realm" )
 public class XmlAuthenticatingRealm
     extends AuthorizingRealm
     implements Initializable, Realm
