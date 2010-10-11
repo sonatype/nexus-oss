@@ -69,6 +69,10 @@ public class StageClient
 
     private static final String REPO_DESCRIPTION_ELEMENT = "description";
 
+    private static final String REPO_IP_ADDRESS_ELEMENT = "ipAddress";
+
+    private static final String REPO_USER_AGENT_ELEMENT = "userAgent";
+
     private static final String USER_ID_ELEMENT = "userId";
 
     private static final String OPEN_STAGE_REPOS_XPATH = "stagingRepositoryIds/string/text()";
@@ -204,7 +208,7 @@ public class StageClient
     {
         String descElementName =
             getVocabulary().getProperty( VocabularyKeys.PROMOTE_STAGE_REPO_DESCRIPTION_ELEMENT,
-                                         VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
+                VocabularyKeys.SUPPRESS_ELEMENT_VALUE );
 
         List<Element> extras;
         if ( !VocabularyKeys.SUPPRESS_ELEMENT_VALUE.equals( descElementName ) )
@@ -256,13 +260,13 @@ public class StageClient
         if ( stagedRepositoryIds == null || stagedRepositoryIds.isEmpty() )
         {
             throw new RESTLightClientException(
-                                                "No staging repositories specified. Please provide a valid staged repository ids." );
+                "No staging repositories specified. Please provide a valid staged repository ids." );
         }
 
         if ( StringUtils.isEmpty( stagingProfileGroup ) )
         {
             throw new RESTLightClientException(
-                                                "No build promotion profile specified. Please provide a build promotion profile." );
+                "No build promotion profile specified. Please provide a build promotion profile." );
         }
 
         String rootElement = this.getVocabulary().getProperty( VocabularyKeys.BULK_ACTION_REQUEST_ROOT_ELEMENT );
@@ -323,7 +327,7 @@ public class StageClient
                 // just pull out the id and name.
                 String profileId = profile.getChild( PROFILE_ID_ELEMENT ).getText();
                 String name = profile.getChild( PROFILE_NAME_ELEMENT ).getText();
-                
+
                 result.add( new StageProfile( profileId, name ) );
             }
         }
@@ -375,9 +379,8 @@ public class StageClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put(
-                                                       profileId + "/" + txt.getText(),
-                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
+                                    txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
@@ -397,9 +400,8 @@ public class StageClient
                         {
                             for ( Text txt : repoIds )
                             {
-                                matchingRepoStubs.put(
-                                                       profileId + "/" + txt.getText(),
-                                                       new StageRepository( profileId, txt.getText(), findOpen ).setProfileName( profileName ) );
+                                matchingRepoStubs.put( profileId + "/" + txt.getText(), new StageRepository( profileId,
+                                    txt.getText(), findOpen ).setProfileName( profileName ) );
                             }
                         }
                     }
@@ -483,6 +485,18 @@ public class StageClient
                 {
                     repo.setDescription( desc.getText() );
                 }
+
+                Element ipAddress = detail.getChild( REPO_IP_ADDRESS_ELEMENT );
+                if ( ipAddress != null )
+                {
+                    repo.setIpAddress( ipAddress.getText() );
+                }
+
+                Element userAgent = detail.getChild( REPO_USER_AGENT_ELEMENT );
+                if ( userAgent != null )
+                {
+                    repo.setUserAgent( userAgent.getText() );
+                }
             }
         }
     }
@@ -507,7 +521,7 @@ public class StageClient
         if ( repo == null )
         {
             throw new RESTLightClientException(
-                                                "No staging-repository details specified. Please provide a valid StageRepository instance." );
+                "No staging-repository details specified. Please provide a valid StageRepository instance." );
         }
 
         Map<String, String> params = new HashMap<String, String>();

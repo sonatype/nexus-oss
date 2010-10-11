@@ -32,14 +32,18 @@ public class StageRepository
     private final String repositoryId;
 
     private String url;
-    
+
     private String profileName;
-    
+
     private String description;
 
     private final boolean isOpen;
 
     private String user;
+
+    private String ipAddress;
+
+    private String userAgent;
 
     public StageRepository( final String profileId, final String repositoryId, final boolean isOpen )
     {
@@ -66,7 +70,8 @@ public class StageRepository
     @Override
     public String toString()
     {
-        return ( url == null ? "(No URI)" : url ) + "\n[profile: '" + profileId + "', repository: '" + repositoryId + "', open? " + isOpen + "]";
+        return ( url == null ? "(No URI)" : url ) + "\n[profile: '" + profileId + "', repository: '" + repositoryId
+            + "', open? " + isOpen + "]";
     }
 
     /**
@@ -118,6 +123,28 @@ public class StageRepository
     public StageRepository setDescription( final String description )
     {
         this.description = description;
+        return this;
+    }
+
+    public String getIpAddress()
+    {
+        return ipAddress;
+    }
+
+    public StageRepository setIpAddress( String ipAddress )
+    {
+        this.ipAddress = ipAddress;
+        return this;
+    }
+
+    public String getUserAgent()
+    {
+        return userAgent;
+    }
+
+    public StageRepository setUserAgent( String userAgent )
+    {
+        this.userAgent = userAgent;
         return this;
     }
 
