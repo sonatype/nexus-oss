@@ -133,7 +133,8 @@ public class PromoteToStageProfileMojo
 
         try
         {
-            client.promoteRepositories( stagingBuildPromotionProfileId, description, new ArrayList( repositoryIds ) );
+            client.promoteRepositories( stagingBuildPromotionProfileId, description, new ArrayList<String>(
+                repositoryIds ) );
         }
         catch ( RESTLightClientException e )
         {
