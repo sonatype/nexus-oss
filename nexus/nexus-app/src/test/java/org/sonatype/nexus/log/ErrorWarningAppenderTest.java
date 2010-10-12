@@ -33,7 +33,7 @@ public class ErrorWarningAppenderTest
 
         eventInspectorHost = this.lookup( EventInspectorHost.class );
 
-        eventInspector = this.lookup( EventInspector.class, "NexusStartedEvent" );
+        eventInspector = this.lookup( EventInspector.class, "LoggingToFeedEventInspector" );
 
         File logFile = new File( getBasedir(), "target/test-classes/log/error-warning-appender-log4j.properties" );
 
