@@ -222,10 +222,15 @@ public class DefaultNexusConfiguration
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
-            final Subject subject = securitySystem.getSubject();
+            
+            String userId = null;
+            Subject subject = securitySystem.getSubject();
+            if( subject != null && subject.getPrincipal() != null )
+            {
+                userId = subject.getPrincipal().toString();
+            }
 
-            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(),
-                subject ) );
+            applicationEventMulticaster.notifyEventListeners( new ConfigurationChangeEvent( this, prepare.getChanges(), userId ) );
 
             return true;
         }

@@ -62,9 +62,9 @@ public class ConfigurationChangeEventInspector
          * "', " ); }
          */
 
-        if ( event.getSubject() != null )
+        if ( event.getUserId() != null )
         {
-            msg.append( ", change was made by [" + event.getSubject().getPrincipal() + "]" );
+            msg.append( ", change was made by [" + event.getUserId() + "]" );
         }
 
         getFeedRecorder().addSystemEvent( FeedRecorder.SYSTEM_CONFIG_ACTION, msg.toString() );

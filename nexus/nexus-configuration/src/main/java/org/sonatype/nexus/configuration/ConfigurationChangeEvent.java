@@ -16,8 +16,6 @@ package org.sonatype.nexus.configuration;
 import java.util.Collection;
 import java.util.Collections;
 
-
-import org.apache.shiro.subject.Subject;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 
 /**
@@ -32,10 +30,9 @@ public class ConfigurationChangeEvent
 {
     private final Collection<Configurable> changes;
 
-    private final Subject subject;
+    private final String userId;
 
-    public ConfigurationChangeEvent( ApplicationConfiguration configuration, Collection<Configurable> changes,
-        Subject subject )
+    public ConfigurationChangeEvent( ApplicationConfiguration configuration, Collection<Configurable> changes, String userId )
     {
         super( configuration );
 
@@ -46,7 +43,7 @@ public class ConfigurationChangeEvent
 
         this.changes = Collections.unmodifiableCollection( changes );
 
-        this.subject = subject;
+        this.userId = userId;
     }
 
     public Collection<Configurable> getChanges()
@@ -54,8 +51,8 @@ public class ConfigurationChangeEvent
         return changes;
     }
 
-    public Subject getSubject()
+    public String getUserId()
     {
-        return subject;
+        return userId;
     }
 }
