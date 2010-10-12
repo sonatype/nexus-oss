@@ -61,7 +61,7 @@ public class ForgotPasswordTest
         resetEmailPR.delete( null, request, response );
 
         // Need 1 message
-        server.waitForIncomingEmail( 1000, 1 );
+        server.waitForIncomingEmail( 5000, 1 );
 
         
         MimeMessage[] msgs = server.getReceivedMessages();

@@ -75,7 +75,7 @@ public class Nexus450UserCreationIT
 
         // get email
         // two e-mails (first confirming user creating and second with users pw)
-        server.waitForIncomingEmail( 1000, 2 );
+        waitForMail( 2 );
         Thread.sleep( 1000 ); //w8 a few more
 
         MimeMessage[] msgs = server.getReceivedMessages();

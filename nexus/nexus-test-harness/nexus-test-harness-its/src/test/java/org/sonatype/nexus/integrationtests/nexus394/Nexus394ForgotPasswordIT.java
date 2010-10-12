@@ -40,7 +40,7 @@ public class Nexus394ForgotPasswordIT
             response.getStatus().getCode() );
 
         // Need 1 message
-        server.waitForIncomingEmail( 1000, 1 );
+        waitForMail( 1 );
 
         MimeMessage[] msgs = server.getReceivedMessages();
 

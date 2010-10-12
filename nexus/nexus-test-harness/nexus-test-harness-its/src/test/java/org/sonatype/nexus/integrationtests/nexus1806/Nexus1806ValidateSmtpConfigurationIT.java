@@ -120,7 +120,7 @@ public class Nexus1806ValidateSmtpConfigurationIT
         Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
         Assert.assertTrue( "Unable to validate e-mail " + status, status.isSuccess() );
 
-        server.waitForIncomingEmail( 2000, 1 );
+        server.waitForIncomingEmail( 5000, 1 );
 
         MimeMessage[] msgs = server.getReceivedMessages();
         Assert.assertEquals( 1, msgs.length );

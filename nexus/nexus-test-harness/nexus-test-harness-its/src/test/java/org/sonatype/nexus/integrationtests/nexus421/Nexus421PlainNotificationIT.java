@@ -133,7 +133,7 @@ public class Nexus421PlainNotificationIT
         // See "fibonacci" calculation above!
         for ( int retryCount = 0; retryCount < 30; retryCount++ )
         {
-            if ( server.waitForIncomingEmail( 15000, expectedBlockedMails + expectedUnblockedMails ) )
+            if ( waitForMail( expectedBlockedMails + expectedUnblockedMails, 15000 ) )
             {
                 break;
             }

@@ -55,5 +55,22 @@ public abstract class AbstractEmailServerNexusIT
         LOG.debug( "Stoping e-mail server" );
         server.stop();
     }
+    
+    protected boolean waitForMail( int count )
+    {
+        return waitForMail( count, 5000 );
+    }
+    
+    protected boolean waitForMail( int count, long timeout )
+    {
+        try
+        {
+            return server.waitForIncomingEmail( timeout, 1 );
+        }
+        catch ( InterruptedException e )
+        {
+            return false;
+        }
+    }
 
 }

@@ -40,7 +40,7 @@ public class Nexus393ResetPasswordIT
         Assert.assertTrue( "Status: "+ response.getStatus() +"\n"+ response.getEntity().getText(), response.getStatus().isSuccess() );
 
         // Need 1 message
-        server.waitForIncomingEmail( 1000, 1 );
+        waitForMail( 1 );
 
         MimeMessage[] msgs = server.getReceivedMessages();
         Assert.assertTrue( "Expected email.", msgs != null && msgs.length > 0 );

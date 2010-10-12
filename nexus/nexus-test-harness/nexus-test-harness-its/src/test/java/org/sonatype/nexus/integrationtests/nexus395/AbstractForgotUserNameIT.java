@@ -30,7 +30,7 @@ public abstract class AbstractForgotUserNameIT
         throws Exception
     {
         // Need 1 message
-        server.waitForIncomingEmail( 1000, 1 );
+        waitForMail( 1 );
 
         MimeMessage[] msgs = server.getReceivedMessages();
 
