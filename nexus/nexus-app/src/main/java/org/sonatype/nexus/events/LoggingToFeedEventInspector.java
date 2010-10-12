@@ -14,13 +14,14 @@ import org.sonatype.nexus.log.LogManager;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
+import org.sonatype.nexus.proxy.events.NexusStoppedEvent;
 import org.sonatype.plexus.appevents.Event;
 
 /**
  * @author juven
  */
-@Component( role = EventInspector.class, hint = "NexusStartedEvent" )
-public class NexusStartedEventInspector
+@Component( role = EventInspector.class, hint = "LoggingToFeedEventInspector" )
+public class LoggingToFeedEventInspector
     extends AbstractEventInspector
 {
     @Requirement
@@ -39,21 +40,48 @@ public class NexusStartedEventInspector
 
     public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof NexusStartedEvent );
+        return ( evt instanceof NexusStartedEvent || evt instanceof NexusStoppedEvent );
     }
 
     public void inspect( Event<?> evt )
     {
         if ( logConfigEnabled() )
         {
-            ensureErrorWarningAppender();
+            if ( evt instanceof NexusStartedEvent )
+            {
+                ensureErrorWarningAppender();
 
-            startToRecordErrorWarningLog();
+                startToRecordErrorWarningLog();
+            }
+            else if ( evt instanceof NexusStoppedEvent )
+            {
+                stopRecordErrorWarningLog();
+            }
+        }
+    }
+
+    private void startToRecordErrorWarningLog()
+    {
+        ErrorWarningRecordAppender appender = getAppender();
+
+        if ( appender != null )
+        {
+            appender.setFeedRecorder( feedRecorder );
+        }
+    }
+
+    private void stopRecordErrorWarningLog()
+    {
+        ErrorWarningRecordAppender appender = getAppender();
+
+        if ( appender != null )
+        {
+            appender.close();
         }
     }
 
     @SuppressWarnings( "unchecked" )
-    private void startToRecordErrorWarningLog()
+    private ErrorWarningRecordAppender getAppender()
     {
         Enumeration<Appender> appenders = Logger.getRootLogger().getAllAppenders();
 
@@ -63,11 +91,11 @@ public class NexusStartedEventInspector
 
             if ( appender instanceof ErrorWarningRecordAppender )
             {
-                ( (ErrorWarningRecordAppender) appender ).setFeedRecorder( feedRecorder );
-
-                return;
+                return (ErrorWarningRecordAppender) appender;
             }
         }
+
+        return null;
     }
 
     private void ensureErrorWarningAppender()

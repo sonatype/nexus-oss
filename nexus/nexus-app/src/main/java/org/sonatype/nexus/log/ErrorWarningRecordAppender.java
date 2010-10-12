@@ -20,7 +20,11 @@ public class ErrorWarningRecordAppender
     @Override
     protected void append( LoggingEvent event )
     {
-        if ( feedRecorder == null )
+        // we get local instance, just in case another thread comes in and closes the appender
+        // (thus nullifying the feedRecorder object) before we attempt to add to it below
+        FeedRecorder localRecorder = feedRecorder;
+        
+        if ( localRecorder == null )
         {
             return;
         }
@@ -54,11 +58,11 @@ public class ErrorWarningRecordAppender
         {
             if ( event.getThrowableInformation() != null )
             {
-                feedRecorder.addErrorWarningEvent( action, message, event.getThrowableInformation().getThrowable() );
+                localRecorder.addErrorWarningEvent( action, message, event.getThrowableInformation().getThrowable() );
             }
             else
             {
-                feedRecorder.addErrorWarningEvent( action, message );
+                localRecorder.addErrorWarningEvent( action, message );
             }
         }
     }
@@ -66,7 +70,7 @@ public class ErrorWarningRecordAppender
     @Override
     public void close()
     {
-        // do nothing
+        feedRecorder = null;
     }
 
     @Override
