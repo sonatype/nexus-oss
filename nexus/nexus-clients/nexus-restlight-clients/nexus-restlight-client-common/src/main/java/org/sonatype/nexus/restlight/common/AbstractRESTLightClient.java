@@ -20,6 +20,17 @@
  */
 package org.sonatype.nexus.restlight.common;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.StringTokenizer;
+
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethodBase;
@@ -42,29 +53,16 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.StringTokenizer;
-
 /**
  * <p>
- * Parent class for all restlight clients which implements basic version-vocabulary loading, along 
- * with generic GET and POST calls that should standardize and simplify most communication with the
- * Nexus server.
+ * Parent class for all restlight clients which implements basic version-vocabulary loading, along with generic GET and
+ * POST calls that should standardize and simplify most communication with the Nexus server.
  * </p>
  * <p>
- * Vocabularies allow the client to capture slight api changes from version to version,
- * and load the appropriate terms for the specific Nexus server we're attempting to reach. Terms may
- * be element names, XPaths, etc. but may not (currently) capture differences in the HTTP conversations
- * that take place (i.e. we cannot capture the case where a new version requires an extra API call
- * that an older version didn't require).
+ * Vocabularies allow the client to capture slight api changes from version to version, and load the appropriate terms
+ * for the specific Nexus server we're attempting to reach. Terms may be element names, XPaths, etc. but may not
+ * (currently) capture differences in the HTTP conversations that take place (i.e. we cannot capture the case where a
+ * new version requires an extra API call that an older version didn't require).
  * </p>
  */
 public abstract class AbstractRESTLightClient
@@ -97,18 +95,19 @@ public abstract class AbstractRESTLightClient
 
     /**
      * <p>
-     * Classpath resource that contains pointers to the specific vocabulary files used for each
-     * version of Nexus.
+     * Classpath resource that contains pointers to the specific vocabulary files used for each version of Nexus.
      * </p>
      * <p>
      * Each version of Nexus has its own line, and the whole file looks something like this:
      * </p>
      * <p>
+     * 
      * <pre>
      * # comment
      * default=default
      * 1.3.2=default,1.3.2
      * </pre>
+     * 
      * </p>
      * <p>
      * The above file will require the following classpath resources:
@@ -117,8 +116,10 @@ public abstract class AbstractRESTLightClient
      * <li>default.vocabulary.properties</li>
      * <li>1.3.2.vocabulary.properties</li>
      * </ul>
-     * <p><b>NOTE:</b> At a MINIMUM, you should include the default mappings, even if the default
-     * vocabulary properties are empty.</p>
+     * <p>
+     * <b>NOTE:</b> At a MINIMUM, you should include the default mappings, even if the default vocabulary properties are
+     * empty.
+     * </p>
      */
     protected static final String VOCAB_MANIFEST = "vocabulary.lst";
 
@@ -135,12 +136,12 @@ public abstract class AbstractRESTLightClient
     private final String vocabBasepath;
 
     /**
-     * Instantiate and connect new REST client. For now, connecting simply means retrieving the Nexus
-     * server's apiVersion, so we can load the appropriate vocabulary items.
+     * Instantiate and connect new REST client. For now, connecting simply means retrieving the Nexus server's
+     * apiVersion, so we can load the appropriate vocabulary items.
      */
     protected AbstractRESTLightClient( final String baseUrl, final String user, final String password,
-                                        final String vocabBasepath )
-    throws RESTLightClientException
+                                       final String vocabBasepath )
+        throws RESTLightClientException
     {
         this.baseUrl = baseUrl;
         this.user = user;
@@ -164,7 +165,7 @@ public abstract class AbstractRESTLightClient
 
     /**
      * Retrieve the base URL used to connect to Nexus. This URL contains everything <b>up to, but not including</b> the
-     * {@link AbstractRESTLightClient#SVC_BASE} base-path. 
+     * {@link AbstractRESTLightClient#SVC_BASE} base-path.
      */
     protected final String getBaseURL()
     {
@@ -180,7 +181,7 @@ public abstract class AbstractRESTLightClient
     }
 
     private void connect()
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         client = new HttpClient();
 
@@ -201,8 +202,8 @@ public abstract class AbstractRESTLightClient
     }
 
     /**
-     * Retrieve the {@link Properties} instance that stores vocabulary items specific to the version
-     * of Nexus we're currently talking to.
+     * Retrieve the {@link Properties} instance that stores vocabulary items specific to the version of Nexus we're
+     * currently talking to.
      */
     protected final Properties getVocabulary()
     {
@@ -210,16 +211,16 @@ public abstract class AbstractRESTLightClient
     }
 
     private void loadVocabulary()
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         ClassLoader cloader = Thread.currentThread().getContextClassLoader();
         InputStream stream = cloader.getResourceAsStream( vocabBasepath + VOCAB_MANIFEST );
 
         if ( stream == null )
         {
-            LogManager.getLogger( getClass() ).debug( "Cannot locate REST vocabulary variants manifest on classpath: "
-                                                      + vocabBasepath + VOCAB_MANIFEST
-                                                          + ". Vocabularies will not be loaded." );
+            LogManager.getLogger( getClass() ).debug(
+                "Cannot locate REST vocabulary variants manifest on classpath: " + vocabBasepath + VOCAB_MANIFEST
+                    + ". Vocabularies will not be loaded." );
             return;
         }
 
@@ -249,7 +250,7 @@ public abstract class AbstractRESTLightClient
         catch ( IOException e )
         {
             throw new RESTLightClientException( "Failed to load REST vocabulary manifest from classpath: "
-                                                 + vocabBasepath + VOCAB_MANIFEST, e );
+                + vocabBasepath + VOCAB_MANIFEST, e );
         }
         finally
         {
@@ -262,7 +263,7 @@ public abstract class AbstractRESTLightClient
             version = version.substring( 0, version.length() - "-SNAPSHOT".length() );
         }
 
-        List<String> vocabs = vocabManifest.get( version );
+        List<String> vocabs = getVocabilary( vocabManifest, version );
         if ( vocabs == null )
         {
             vocabs = vocabManifest.get( "default" );
@@ -283,15 +284,15 @@ public abstract class AbstractRESTLightClient
                     throw new RESTLightClientException( "Failed to load REST vocabulary from classpath: "
                         + vocabResource );
                 }
-                
+
                 try
                 {
                     props.load( stream );
                 }
                 catch ( IOException e )
                 {
-                    throw new RESTLightClientException( "Failed to load REST vocabulary from classpath: " + vocabResource,
-                                                         e );
+                    throw new RESTLightClientException( "Failed to load REST vocabulary from classpath: "
+                        + vocabResource, e );
                 }
 
                 loadedVocabulary.putAll( props );
@@ -302,19 +303,43 @@ public abstract class AbstractRESTLightClient
         else
         {
             LogManager.getLogger( getClass() ).debug(
-                                                      "Cannot locate REST vocabulary variants in manifest file: "
-                                                          + vocabBasepath + VOCAB_MANIFEST
-                                                          + ". No vocabulary will be loaded." );
+                "Cannot locate REST vocabulary variants in manifest file: " + vocabBasepath + VOCAB_MANIFEST
+                    + ". No vocabulary will be loaded." );
         }
+    }
+
+    private List<String> getVocabilary( Map<String, List<String>> vocabManifest, String version )
+    {
+        if ( vocabManifest.containsKey( version ) )
+        {
+            return vocabManifest.get( version );
+        }
+
+        String matchVocabilary = "default";
+        for ( String key : vocabManifest.keySet() )
+        {
+            if ( "default".equals( key ) )
+            {
+                continue;
+            }
+
+            if ( version.compareTo( key ) >= 0 )
+            {
+                matchVocabilary = key;
+            }
+        }
+
+        return vocabManifest.get( matchVocabilary );
     }
 
     /**
      * Retrieve the Nexus REST API version currently in use.
-     * @throws RESTLightClientException When the /status/data/apiVersion/text() XPath fails to
-     * select a version from the response. 
+     * 
+     * @throws RESTLightClientException When the /status/data/apiVersion/text() XPath fails to select a version from the
+     *             response.
      */
     public String getApiVersion()
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         Document doc = get( STATUS_PATH );
         String xpath = "/status/data/apiVersion/text()";
@@ -336,17 +361,18 @@ public abstract class AbstractRESTLightClient
         catch ( JDOMException e )
         {
             throw new RESTLightClientException( "XPath selection failed: '" + xpath + "' (Root node: "
-                                                 + doc.getRootElement().getName() + ").", e );
+                + doc.getRootElement().getName() + ").", e );
         }
 
         return result.getText();
     }
 
     /**
-     * Inject the appropriate HTTP request parameters to capture the given artifact coordinate in
-     * the provided parameters map.
+     * Inject the appropriate HTTP request parameters to capture the given artifact coordinate in the provided
+     * parameters map.
      */
-    protected void mapCoord( final String groupId, final String artifactId, final String version, final Map<String, String> params )
+    protected void mapCoord( final String groupId, final String artifactId, final String version,
+                             final Map<String, String> params )
     {
         params.put( GROUP_ID_PARAM, groupId );
         params.put( ARTIFACT_ID_PARAM, artifactId );
@@ -355,43 +381,42 @@ public abstract class AbstractRESTLightClient
     }
 
     /**
-     * Submit a GET request to the absolute URL given, and parse the response as an XML 
-     * {@link Document} (JDOM) instance.
+     * Submit a GET request to the absolute URL given, and parse the response as an XML {@link Document} (JDOM)
+     * instance.
      */
     protected Document getAbsolute( final String url )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         return get( url, null, true );
     }
 
     /**
-     * Submit a GET request to the absolute URL given, and parse the response as an XML 
-     * {@link Document} (JDOM) instance. Use the given requestParams map to inject into the HTTP
-     * GET method.
+     * Submit a GET request to the absolute URL given, and parse the response as an XML {@link Document} (JDOM)
+     * instance. Use the given requestParams map to inject into the HTTP GET method.
      */
     protected Document getAbsolute( final String url, final Map<String, ? extends Object> requestParams )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         return get( url, requestParams, true );
     }
 
     /**
-     * Submit a GET request to the URL <b>path</b> given (relative to the Nexus base-URL given in 
-     * the constructor), and parse the response as an XML {@link Document} (JDOM) instance.
+     * Submit a GET request to the URL <b>path</b> given (relative to the Nexus base-URL given in the constructor), and
+     * parse the response as an XML {@link Document} (JDOM) instance.
      */
     protected Document get( final String path )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         return get( path, null, false );
     }
 
     /**
-     * Submit a GET request to the URL <b>path</b> given (relative to the Nexus base-URL given in 
-     * the constructor), and parse the response as an XML {@link Document} (JDOM) instance. Use the 
-     * given requestParams map to inject into the HTTP GET method.
+     * Submit a GET request to the URL <b>path</b> given (relative to the Nexus base-URL given in the constructor), and
+     * parse the response as an XML {@link Document} (JDOM) instance. Use the given requestParams map to inject into the
+     * HTTP GET method.
      */
     protected Document get( final String path, final Map<String, ? extends Object> requestParams )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         return get( path, requestParams, false );
     }
@@ -401,14 +426,15 @@ public abstract class AbstractRESTLightClient
      * Low-level GET implementation.
      * </p>
      * <p>
-     * Submit a GET request to the URL given (absolute or relative-to-base-URL depends on 
-     * urlIsAbsolute flag), and parse the response as an XML {@link Document} (JDOM) instance. Use the 
-     * given requestParams map to inject into the HTTP GET method.
+     * Submit a GET request to the URL given (absolute or relative-to-base-URL depends on urlIsAbsolute flag), and parse
+     * the response as an XML {@link Document} (JDOM) instance. Use the given requestParams map to inject into the HTTP
+     * GET method.
      * </p>
      */
     @SuppressWarnings( "unchecked" )
-    protected Document get( final String url, final Map<String, ? extends Object> requestParams, final boolean urlIsAbsolute )
-    throws RESTLightClientException
+    protected Document get( final String url, final Map<String, ? extends Object> requestParams,
+                            final boolean urlIsAbsolute )
+        throws RESTLightClientException
     {
         GetMethod method = urlIsAbsolute ? new GetMethod( url ) : new GetMethod( formatUrl( baseUrl, url ) );
         method.addRequestHeader( "Content-Type", "application/xml" );
@@ -479,45 +505,44 @@ public abstract class AbstractRESTLightClient
     }
 
     /**
-     * Submit a POST request to the relative URL-path given (relative to the base-URL used to 
-     * construct the client), ignore the response body. Use the given requestParams map to inject 
-     * into the HTTP POST method.
+     * Submit a POST request to the relative URL-path given (relative to the base-URL used to construct the client),
+     * ignore the response body. Use the given requestParams map to inject into the HTTP POST method.
      */
     protected void post( final String path, final Map<String, ? extends Object> requestParams, final Document body )
-    throws RESTLightClientException
+        throws RESTLightClientException
     {
         doPost( path, requestParams, body, false );
     }
 
     /**
-     * Submit a POST request to the relative URL-path given (relative to the base-URL used to 
-     * construct the client), and parse the response as an XML {@link Document} (JDOM) instance. 
-     * Use the given requestParams map to inject into the HTTP POST method.
+     * Submit a POST request to the relative URL-path given (relative to the base-URL used to construct the client), and
+     * parse the response as an XML {@link Document} (JDOM) instance. Use the given requestParams map to inject into the
+     * HTTP POST method.
      */
-    protected Document postWithResponse( final String path, final Map<String, ? extends Object> requestParams, final Document body )
-    throws RESTLightClientException
+    protected Document postWithResponse( final String path, final Map<String, ? extends Object> requestParams,
+                                         final Document body )
+        throws RESTLightClientException
     {
         return doPost( path, requestParams, body, true );
     }
 
     /**
-    /**
+     * /**
      * <p>
-     * Low-level POST implementation to a relative URL (relative to the base-URL given in the client 
-     * constructor).
+     * Low-level POST implementation to a relative URL (relative to the base-URL given in the client constructor).
      * </p>
      * <p>
-     * Submit a POST request to the relative URL given, and parse the response as an XML 
-     * {@link Document} (JDOM) instance <b>if</b> expectResponseBody == true. Use the given 
-     * requestParams map to inject into the HTTP POST method.
+     * Submit a POST request to the relative URL given, and parse the response as an XML {@link Document} (JDOM)
+     * instance <b>if</b> expectResponseBody == true. Use the given requestParams map to inject into the HTTP POST
+     * method.
      * </p>
      * 
      * @return null if expectResponseBody == false, the result {@link Document} otherwise.
      * @throws RESTLightClientException
      */
-    protected Document doPost( final String path, final Map<String, ? extends Object> requestParams, final Document body,
-                               final boolean expectResponseBody )
-    throws RESTLightClientException
+    protected Document doPost( final String path, final Map<String, ? extends Object> requestParams,
+                               final Document body, final boolean expectResponseBody )
+        throws RESTLightClientException
     {
         LogManager.getLogger( getClass().getName() ).debug( "Posting to: '" + path + "'" );
 
@@ -530,8 +555,7 @@ public abstract class AbstractRESTLightClient
             try
             {
                 method.setRequestEntity( new StringRequestEntity(
-                                                                 new XMLOutputter( Format.getCompactFormat() ).outputString( body ),
-                                                                 "text/plain", "UTF-8" ) );
+                    new XMLOutputter( Format.getCompactFormat() ).outputString( body ), "text/plain", "UTF-8" ) );
             }
             catch ( UnsupportedEncodingException e )
             {
@@ -588,7 +612,7 @@ public abstract class AbstractRESTLightClient
             return null;
         }
     }
-    
+
     /**
      * Submit a PUT request to the relative URL-path given (relative to the base-URL used to construct the client),
      * ignore the response body. Use the given requestParams map to inject into the HTTP PUT method.
@@ -605,14 +629,14 @@ public abstract class AbstractRESTLightClient
      * HTTP PUT method.
      */
     protected Document putWithResponse( final String path, final Map<String, ? extends Object> requestParams,
-        final Document body )
+                                        final Document body )
         throws RESTLightClientException
     {
         return doPut( path, requestParams, body, true );
     }
-    
+
     protected Document doPut( final String path, final Map<String, ? extends Object> requestParams,
-        final Document body, final boolean expectResponseBody )
+                              final Document body, final boolean expectResponseBody )
         throws RESTLightClientException
     {
         LogManager.getLogger( getClass().getName() ).debug( "Putting to: '" + path + "'" );
@@ -625,8 +649,8 @@ public abstract class AbstractRESTLightClient
         {
             try
             {
-                method.setRequestEntity( new StringRequestEntity( new XMLOutputter( Format.getCompactFormat() )
-                    .outputString( body ), "text/plain", "UTF-8" ) );
+                method.setRequestEntity( new StringRequestEntity(
+                    new XMLOutputter( Format.getCompactFormat() ).outputString( body ), "text/plain", "UTF-8" ) );
             }
             catch ( UnsupportedEncodingException e )
             {
@@ -695,8 +719,8 @@ public abstract class AbstractRESTLightClient
             return null;
         }
     }
-    
-    @SuppressWarnings("unchecked")
+
+    @SuppressWarnings( "unchecked" )
     private void addRequestParams( final HttpMethodBase method, final Map<String, ? extends Object> requestParams )
     {
         if ( requestParams == null )
@@ -727,8 +751,7 @@ public abstract class AbstractRESTLightClient
             }
         }
     }
-    
-    
+
     /**
      * Submit a DELETE request to the relative URL-path given (relative to the base-URL used to construct the client),
      * ignore the response body. Use the given requestParams map to inject into the HTTP DELETE method.
@@ -745,7 +768,7 @@ public abstract class AbstractRESTLightClient
      * the HTTP DELETE method.
      */
     protected Document deleteWithResponse( final String path, final Map<String, ? extends Object> requestParams,
-        final Document body )
+                                           final Document body )
         throws RESTLightClientException
     {
         return doDelete( path, requestParams, true );
@@ -757,7 +780,7 @@ public abstract class AbstractRESTLightClient
      * given requestParams map to inject into the HTTP DELETE method.
      */
     protected Document doDelete( final String url, final Map<String, ? extends Object> requestParams,
-        final boolean expectResponseBody )
+                                 final boolean expectResponseBody )
         throws RESTLightClientException
     {
         return doDelete( url, requestParams, false, expectResponseBody );
@@ -774,7 +797,7 @@ public abstract class AbstractRESTLightClient
      * </p>
      */
     protected Document doDelete( final String url, final Map<String, ? extends Object> requestParams,
-        final boolean urlIsAbsolute, final boolean expectResponseBody )
+                                 final boolean urlIsAbsolute, final boolean expectResponseBody )
         throws RESTLightClientException
     {
         DeleteMethod method = urlIsAbsolute ? new DeleteMethod( url ) : new DeleteMethod( baseUrl + url );
