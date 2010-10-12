@@ -65,7 +65,7 @@ public abstract class AbstractEmailServerNexusIT
     {
         try
         {
-            return server.waitForIncomingEmail( timeout, 1 );
+            return server.waitForIncomingEmail( timeout, count );
         }
         catch ( InterruptedException e )
         {
