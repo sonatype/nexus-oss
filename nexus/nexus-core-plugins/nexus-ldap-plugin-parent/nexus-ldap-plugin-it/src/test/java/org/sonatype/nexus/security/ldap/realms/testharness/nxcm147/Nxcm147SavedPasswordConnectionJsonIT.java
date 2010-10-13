@@ -6,9 +6,6 @@
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm147;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -19,23 +16,34 @@ import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrati
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapConnMessageUtil;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageUtil;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUsersMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
-public class Nxcm147SavedPasswordConnectionJsonIT extends AbstractLdapIntegrationIT
+public class Nxcm147SavedPasswordConnectionJsonIT
+    extends AbstractLdapIntegrationIT
 {
     private XStream xstream;
+
     private MediaType mediaType;
 
     public Nxcm147SavedPasswordConnectionJsonIT()
     {
         super();
+    }
+
+    @BeforeClass
+    public void init()
+    {
         this.xstream = this.getJsonXStream();
         this.mediaType = MediaType.APPLICATION_JSON;
     }
 
     @Test
-    public void connectionTestWithFakePassword() throws Exception
+    public void connectionTestWithFakePassword()
+        throws Exception
     {
 
         LdapConnMessageUtil connUtil = new LdapConnMessageUtil( this.xstream, this.mediaType );
@@ -58,7 +66,7 @@ public class Nxcm147SavedPasswordConnectionJsonIT extends AbstractLdapIntegratio
         Response testResponse = connUtil.sendTestMessage( dto );
         Assert.assertEquals( Status.SUCCESS_NO_CONTENT.getCode(), testResponse.getStatus().getCode() );
 
-     // configure LDAP user/group config
+        // configure LDAP user/group config
         LdapUserAndGroupConfigTestRequestDTO userGroupTestDto = new LdapUserAndGroupConfigTestRequestDTO();
         userGroupTestDto.setAuthScheme( dto.getAuthScheme() );
         userGroupTestDto.setHost( dto.getHost() );
@@ -88,8 +96,6 @@ public class Nxcm147SavedPasswordConnectionJsonIT extends AbstractLdapIntegratio
 
         testResponse = userGroupUtil.sendTestMessage( userGroupTestDto );
         Assert.assertEquals( Status.SUCCESS_OK.getCode(), testResponse.getStatus().getCode() );
-
-
 
     }
 }

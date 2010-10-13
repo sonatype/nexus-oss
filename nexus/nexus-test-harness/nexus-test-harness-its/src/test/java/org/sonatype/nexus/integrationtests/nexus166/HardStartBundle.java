@@ -2,9 +2,9 @@ package org.sonatype.nexus.integrationtests.nexus166;
 
 import java.io.File;
 
-import org.junit.Test;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.annotations.Test;
 
 public class HardStartBundle
 {

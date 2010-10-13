@@ -13,11 +13,12 @@
  */
 package org.sonatype.nexus.integrationtests.client.nexus758;
 
-import org.junit.Before;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 /**
  * Tests the Soft Start, Stop, Restart, and isNexusStarted methods in the rest-client.
@@ -26,8 +27,13 @@ public class Nexus758ServiceStability
     extends AbstractNexusIntegrationTest
 {
     private static NexusClient client;
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-    @Before
+    @BeforeMethod
     public void init()
         throws Exception
     {

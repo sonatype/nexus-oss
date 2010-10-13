@@ -1,8 +1,5 @@
 package org.sonatype.nexus.integrationtests.nexus1765;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -14,11 +11,18 @@ import org.sonatype.nexus.rest.model.RepositoryStatusResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResourceResponse;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1765RepositoryServicesIT
     extends AbstractPrivilegeTest
 {
-
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void testGetRepoStatus()
         throws Exception
@@ -32,7 +36,7 @@ public class Nexus1765RepositoryServicesIT
         String repoId = this.getTestRepositoryId();
         Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/status" );
 
-        Assert.assertEquals( "Status: " + response.getStatus(), 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
     }
 
     @Test
@@ -65,7 +69,7 @@ public class Nexus1765RepositoryServicesIT
             Method.PUT,
             representation );
 
-        Assert.assertEquals( "Status: " + response.getStatus(), 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
     }
 
     @Test
@@ -81,7 +85,7 @@ public class Nexus1765RepositoryServicesIT
         String repoId = this.getTestRepositoryId();
         Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/meta" );
 
-        Assert.assertEquals( "Status: " + response.getStatus(), 403, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 403, "Status: " + response.getStatus() );
     }
     
     @Test
@@ -98,7 +102,7 @@ public class Nexus1765RepositoryServicesIT
         Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/content/" );
 
         // NOTE this will succeed, as you don't need view priv to retrieve content from repo
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
     }
     
     @Test
@@ -115,7 +119,7 @@ public class Nexus1765RepositoryServicesIT
         Response response = RequestFacade.doGetRequest( RepositoryMessageUtil.SERVICE_PART + "/" + repoId + "/index_content/" );
 
         // NOTE this will succeed, as you don't need view priv to retrieve index content from repo
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
     }
     
 }

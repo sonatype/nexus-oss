@@ -13,19 +13,22 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus178;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Create an http server. Create a proxy repo to http server. Test if connection works. block proxy, change file on http
@@ -41,8 +44,13 @@ public class Nexus178BlockProxyDownloadIT
     {
         super( TEST_RELEASE_REPO );
     }
+    
+    @BeforeClass(alwaysRun = true)
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-    @Test
+    @Test(groups = PROXY)
     public void blockProxy()
         throws Exception
     {

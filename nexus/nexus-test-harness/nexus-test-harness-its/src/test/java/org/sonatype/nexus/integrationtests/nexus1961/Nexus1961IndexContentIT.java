@@ -2,8 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus1961;
 
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -15,6 +13,8 @@ import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -41,20 +41,19 @@ public class Nexus1961IndexContentIT
         Response response = RequestFacade.doGetRequest( serviceURI );
         String responseText = response.getEntity().getText();
         Status status = response.getStatus();
-        Assert.assertTrue( responseText + status, status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), responseText + status );
 
         XStream xstream = XStreamFactory.getXmlXStream();
-        
+
         xstream.processAnnotations( IndexBrowserTreeNode.class );
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
 
-        XStreamRepresentation re =
-            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+        XStreamRepresentation re = new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
 
         IndexBrowserTreeNode content = resourceResponse.getData();
-        
+
         List<TreeNode> children = content.getChildren();
         for ( TreeNode child : children )
         {

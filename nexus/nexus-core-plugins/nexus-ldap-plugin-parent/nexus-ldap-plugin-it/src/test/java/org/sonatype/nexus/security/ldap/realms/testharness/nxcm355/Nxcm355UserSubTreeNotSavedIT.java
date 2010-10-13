@@ -1,40 +1,48 @@
 /**
  * Sonatype NexusTM Professional.
- * Copyright © 2008 Sonatype, Inc. All rights reserved.
+ * Copyright ï¿½ 2008 Sonatype, Inc. All rights reserved.
  * Includes the third-party code listed at ${thirdpartyurl}.
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm355;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.security.ldap.realms.api.dto.LdapUserAndGroupConfigurationDTO;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
-public class Nxcm355UserSubTreeNotSavedIT extends AbstractLdapIntegrationIT
+public class Nxcm355UserSubTreeNotSavedIT
+    extends AbstractLdapIntegrationIT
 {
     private XStream xstream;
+
     private MediaType mediaType;
-    
+
     public Nxcm355UserSubTreeNotSavedIT()
-    {   
+    {
         super();
+    }
+
+    @BeforeClass
+    public void init()
+    {
         this.xstream = this.getJsonXStream();
         this.mediaType = MediaType.APPLICATION_JSON;
     }
-    
+
     @Test
-    public void saveUserAndGroupConfigWithUserSubtree() throws Exception
-    {        
+    public void saveUserAndGroupConfigWithUserSubtree()
+        throws Exception
+    {
         LdapUserGroupMessageUtil userGroupUtil = new LdapUserGroupMessageUtil( this.xstream, this.mediaType );
-        
-     // configure LDAP user/group config
+
+        // configure LDAP user/group config
         LdapUserAndGroupConfigurationDTO userGroupDto = new LdapUserAndGroupConfigurationDTO();
-        
+
         userGroupDto.setGroupMemberFormat( "uid=${username},ou=people,o=sonatype" );
         userGroupDto.setGroupObjectClass( "groupOfUniqueNames" );
         userGroupDto.setGroupBaseDn( "ou=groups" );
@@ -51,11 +59,9 @@ public class Nxcm355UserSubTreeNotSavedIT extends AbstractLdapIntegrationIT
         userGroupDto.setUserSubtree( true );
         userGroupDto.setGroupSubtree( false );
         userGroupDto.setUserMemberOfAttribute( "" );
-        
+
         LdapUserAndGroupConfigurationDTO result = userGroupUtil.updateUserGroupConfig( userGroupDto );
         Assert.assertEquals( userGroupDto, result );
-        
-        
-        
+
     }
 }

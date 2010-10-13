@@ -17,15 +17,13 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
@@ -33,6 +31,9 @@ import org.sonatype.nexus.rest.model.RepositoryListResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * CRUD tests for JSON request/response.
@@ -44,10 +45,23 @@ public class Nexus531RepositoryCrudJsonIT
     protected RepositoryMessageUtil messageUtil;
 
     public Nexus531RepositoryCrudJsonIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
         this.messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
+                                       getRepositoryTypeRegistry() );
+    }
+
+    @BeforeClass
+    public void setSecureTest()
+    {
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -225,10 +239,12 @@ public class Nexus531RepositoryCrudJsonIT
                 String storageURL =
                     repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
                                     : repo.getOverrideLocalStorageUrl();
-                    
+
                 storageURL = storageURL.endsWith( "/" ) ? storageURL : storageURL + "/";
-                String effectiveLocalStorage = listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl() : listRepo.getEffectiveLocalStorageUrl() + "/";
-                    
+                String effectiveLocalStorage =
+                    listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl()
+                                    : listRepo.getEffectiveLocalStorageUrl() + "/";
+
                 Assert.assertEquals( storageURL, effectiveLocalStorage );
             }
 
@@ -251,7 +267,8 @@ public class Nexus531RepositoryCrudJsonIT
             }
             else
             {
-                M2LayoutedM1ShadowRepositoryConfiguration cShadow = getNexusConfigUtil().getRepoShadow( listRepo.getId() );
+                M2LayoutedM1ShadowRepositoryConfiguration cShadow =
+                    getNexusConfigUtil().getRepoShadow( listRepo.getId() );
 
                 Assert.assertEquals( cRepo.getId(), listRepo.getId() );
                 Assert.assertEquals( cRepo.getName(), listRepo.getName() );

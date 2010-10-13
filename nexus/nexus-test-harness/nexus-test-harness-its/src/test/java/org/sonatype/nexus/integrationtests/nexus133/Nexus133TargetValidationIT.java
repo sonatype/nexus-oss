@@ -17,16 +17,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.StringUtils;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Extra CRUD validation tests.
@@ -37,10 +38,11 @@ public class Nexus133TargetValidationIT
 
     protected TargetMessageUtil messageUtil;
 
-    public Nexus133TargetValidationIT()
-    {
-        this.messageUtil =
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil =
             new TargetMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -66,8 +68,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -92,8 +94,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -118,8 +120,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -144,8 +146,8 @@ public class Nexus133TargetValidationIT
         {
             Assert.fail( "Target should not have been created: " + response.getStatus() + "\n" + responseText );
         }
-        Assert.assertTrue( "Response text did not contain an error message. \nResponse Text:\n " + responseText,
-                           responseText.startsWith( "{\"errors\":" ) );
+        Assert.assertTrue( responseText.startsWith( "{\"errors\":" ),
+                           "Response text did not contain an error message. \nResponse Text:\n " + responseText );
     }
 
     @Test
@@ -246,7 +248,7 @@ public class Nexus133TargetValidationIT
             Assert.fail( "Target should not have been created: " + response.getStatus() );
         }
         String responseText = response.getEntity().getText();
-        Assert.assertTrue("responseText does not contain an error message:\n"+ responseText, responseText.startsWith( "{\"errors\":" ) );
+        Assert.assertTrue(responseText.startsWith( "{\"errors\":" ), "responseText does not contain an error message:\n"+ responseText );
 
         /*
          * Invalid RegEx

@@ -1,10 +1,10 @@
 package org.sonatype.nexus.integrationtests.nexus3082;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ErrorReportResponse;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3082GenerateProblemReportIT
     extends AbstractNexusIntegrationTest

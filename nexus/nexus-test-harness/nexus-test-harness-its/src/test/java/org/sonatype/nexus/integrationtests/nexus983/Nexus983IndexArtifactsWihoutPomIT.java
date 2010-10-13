@@ -13,17 +13,18 @@
  */
 package org.sonatype.nexus.integrationtests.nexus983;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Copy (filesystem copy) a jar to a nexus repo and run reindex to see what happens
@@ -31,7 +32,7 @@ import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 public class Nexus983IndexArtifactsWihoutPomIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
+    @Test(groups = INDEX)
     public void deployPomlessArtifact()
         throws Exception
     {
@@ -43,10 +44,10 @@ public class Nexus983IndexArtifactsWihoutPomIT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact1", SearchType.EXACT );
-        Assert.assertEquals( "Should find one artifact", 1, artifacts.size() );
+        Assert.assertEquals( artifacts.size(), 1, "Should find one artifact" );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void copyPomlessArtifact()
         throws Exception
     {
@@ -59,7 +60,7 @@ public class Nexus983IndexArtifactsWihoutPomIT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> artifacts = getSearchMessageUtil().searchFor( "nexus983-artifact2", SearchType.EXACT );
-        Assert.assertEquals( "Should find one artifact", 1, artifacts.size() );
+        Assert.assertEquals( artifacts.size(), 1, "Should find one artifact" );
     }
 
 }

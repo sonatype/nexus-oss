@@ -14,11 +14,10 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -35,6 +34,7 @@ import org.sonatype.nexus.rest.model.ScheduledServiceResourceResponse;
 import org.sonatype.nexus.scheduling.NexusTask;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.scheduling.TaskState;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -202,7 +202,7 @@ public class TaskScheduleUtil
             }
         }
 
-        Assert.assertTrue( "Some tasks still running after w8 period " + runningTasks, runningTasks.isEmpty() );
+        Assert.assertTrue( runningTasks.isEmpty(), "Some tasks still running after w8 period " + runningTasks );
     }
 
     public static void waitForTasks( int maxAttempts )
@@ -323,11 +323,11 @@ public class TaskScheduleUtil
         }
 
         Status status = TaskScheduleUtil.create( scheduledTask );
-        Assert.assertTrue( "Unable to create task:" + scheduledTask.getTypeId(), status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to create task:" + scheduledTask.getTypeId() );
 
         String taskId = TaskScheduleUtil.getTask( scheduledTask.getName() ).getId();
         status = TaskScheduleUtil.run( taskId );
-        Assert.assertTrue( "Unable to run task:" + scheduledTask.getTypeId(), status.isSuccess() );
+        Assert.assertTrue( status.isSuccess(), "Unable to run task:" + scheduledTask.getTypeId() );
 
         return waitForTask( taskName, maxAttempts );
     }

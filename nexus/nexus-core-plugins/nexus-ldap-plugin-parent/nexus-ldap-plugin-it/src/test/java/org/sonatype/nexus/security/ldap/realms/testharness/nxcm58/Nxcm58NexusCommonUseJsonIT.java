@@ -8,9 +8,6 @@ package org.sonatype.nexus.security.ldap.realms.testharness.nxcm58;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -27,6 +24,9 @@ import org.sonatype.nexus.security.ldap.realms.testharness.LdapUserGroupMessageU
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUsersMessageUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.security.rest.model.UserToRoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -41,6 +41,11 @@ public class Nxcm58NexusCommonUseJsonIT
     public Nxcm58NexusCommonUseJsonIT()
     {
         super();
+    }
+
+    @BeforeClass
+    public void init()
+    {
         this.xstream = this.getJsonXStream();
         this.mediaType = MediaType.APPLICATION_JSON;
     }
@@ -55,7 +60,7 @@ public class Nxcm58NexusCommonUseJsonIT
         // this.copyConfigFile( "ldap.xml", RELATIVE_WORK_CONF_DIR );
 
         // delete the ldap file.
-        Assert.assertTrue( "Failed to delete the ldap.xml config file", this.deleteLdapConfig() );
+        Assert.assertTrue( this.deleteLdapConfig(), "Failed to delete the ldap.xml config file" );
 
         this.copyConfigFile( "test.ldif", LDIF_DIR );
     }
@@ -117,8 +122,8 @@ public class Nxcm58NexusCommonUseJsonIT
 
         // test
         testResponse = userGroupUtil.sendTestMessage( userGroupTestDto );
-        Assert.assertEquals( "Test connection failed: " + testResponse.getEntity().getText(), Status.SUCCESS_OK
-            .getCode(), testResponse.getStatus().getCode() );
+        Assert.assertEquals( testResponse.getStatus().getCode(), Status.SUCCESS_OK.getCode(),
+                             "Test connection failed: " + testResponse.getEntity().getText() );
         // TODO: check result
 
         LdapUserAndGroupConfigurationDTO userGroupConfig = new LdapUserAndGroupConfigurationDTO();
@@ -146,23 +151,21 @@ public class Nxcm58NexusCommonUseJsonIT
         Status status = SettingsMessageUtil.save( globalConfig );
         Assert.assertTrue( status.isSuccess() );
 
-     // configure users
+        // configure users
         UserToRoleResource ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "cstamas" );
         ldapUser.setSource( "LDAP" );
         ldapUser.addRole( "admin" );
         Response response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
-        Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\nresponse: "
+            + response.getEntity().getText() );
 
         // login/do something with an ldap user
         TestContainer.getInstance().getTestContext().setUsername( "cstamas" );
         TestContainer.getInstance().getTestContext().setPassword( "cstamas123" );
         response = RequestFacade.sendMessage( "service/local/global_settings/current", Method.GET );
-        Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse Text: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\nresponse Text: "
+            + response.getEntity().getText() );
 
         // wrong password
         TestContainer.getInstance().getTestContext().setPassword( "WRONG-PASSWORD" );

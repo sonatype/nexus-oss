@@ -9,10 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import junit.framework.Assert;
-
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.BeforeClass;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -31,6 +29,8 @@ import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 
 public abstract class AbstractNexus1923
     extends AbstractNexusIntegrationTest
@@ -68,10 +68,13 @@ public abstract class AbstractNexus1923
     protected static final String GROUP_REINDEX_TASK_NAME = "incremental_reindex_group";
 
     public AbstractNexus1923()
-        throws Exception
     {
         super();
+    }
 
+    @BeforeClass(alwaysRun = true)
+    public void init() throws ComponentLookupException
+    {
         this.repoUtils =
             new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
                                        getRepositoryTypeRegistry() );
@@ -607,7 +610,7 @@ public abstract class AbstractNexus1923
         }
     }
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
     public static void clean()
         throws Exception
     {

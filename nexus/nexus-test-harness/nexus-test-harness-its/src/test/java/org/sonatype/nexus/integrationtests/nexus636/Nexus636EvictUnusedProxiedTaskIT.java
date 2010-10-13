@@ -21,11 +21,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
@@ -35,6 +31,9 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -54,7 +53,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         super( REPO_RELEASE_PROXY_REPO1 );
     }
 
-    @Before
+    @BeforeMethod
     public void deployOldArtifacts()
         throws Exception
     {
@@ -102,7 +101,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
                 isAllDotFiles = isAllDotFiles && file.getName().startsWith( "." );
             }
 
-            Assert.assertTrue( "The only files left should be \"dotted\" files! We have: " + files, isAllDotFiles );
+            Assert.assertTrue( isAllDotFiles, "The only files left should be \"dotted\" files! We have: " + files );
         }
     }
 
@@ -113,7 +112,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         executeTask( "keepTestDeployedFiles", "repo_release-proxy-repo-1", 2 );
 
         File artifact = new File( repositoryPath, "nexus636/artifact-new/1.0/artifact-new-1.0.jar" );
-        Assert.assertTrue( "The files deployed by this test should be young enought to be kept", artifact.exists() );
+        Assert.assertTrue( artifact.exists(), "The files deployed by this test should be young enought to be kept" );
 
     }
 
@@ -126,7 +125,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         // expect 3 files in repo
         File groupDirectory = new File( repositoryPath, this.getTestId() );
         File[] files = groupDirectory.listFiles();
-        Assert.assertEquals( "Expected 3 artifacts in repo:\n" + Arrays.asList( files ), 3, files.length );
+        Assert.assertEquals( files.length, 3, "Expected 3 artifacts in repo:\n" + Arrays.asList( files ) );
 
         // edit dates on files
         File oldJar = new File( this.attributesPath, "nexus636/artifact-old/2.1/artifact-old-2.1.jar" );
@@ -141,7 +140,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
 
         // check file list
         files = groupDirectory.listFiles();
-        Assert.assertEquals( "Expected 2 artifacts in repo:\n" + Arrays.asList( files ), 2, files.length );
+        Assert.assertEquals( files.length, 2, "Expected 2 artifacts in repo:\n" + Arrays.asList( files ) );
     }
 
     private void executeTask( String taskName, String repository, int cacheAge )
@@ -157,7 +156,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         // clean unused
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, repo, age );
-        Assert.assertNotNull( "Task '" + taskName + "' didn't execute!", task );
+        Assert.assertNotNull( task, "Task '" + taskName + "' didn't execute!" );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );
     }
 

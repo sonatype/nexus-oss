@@ -34,53 +34,59 @@ public abstract class AbstractNexusTestCase
     extends PlexusTestCase
 {
     public static final String WORK_CONFIGURATION_KEY = "nexus-work";
+
     public static final String APPS_CONFIGURATION_KEY = "apps";
+
     public static final String CONF_DIR_KEY = "application-conf";
-    
+
     private static File plexusHomeDir = null;
+
     private static File appsHomeDir = null;
+
     private static File workHomeDir = null;
+
     private static File confHomeDir = null;
 
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
-        
-        plexusHomeDir = new File( getBasedir(), "target/plexus-home-" + new Random( System.currentTimeMillis() ).nextLong() );
+
+        plexusHomeDir =
+            new File( getBasedir(), "target/plexus-home-" + new Random( System.currentTimeMillis() ).nextLong() );
         appsHomeDir = new File( plexusHomeDir, "apps" );
         workHomeDir = new File( plexusHomeDir, "nexus-work" );
         confHomeDir = new File( workHomeDir, "conf" );
-        
+
         ctx.put( WORK_CONFIGURATION_KEY, workHomeDir.getAbsolutePath() );
         ctx.put( APPS_CONFIGURATION_KEY, appsHomeDir.getAbsolutePath() );
         ctx.put( CONF_DIR_KEY, confHomeDir.getAbsolutePath() );
     }
-    
+
     @Override
     protected void setUp()
         throws Exception
     {
         super.setUp();
-        
+
         // simply to make sure customizeContext is handled before anything else
         getContainer();
-        
+
         plexusHomeDir.mkdirs();
         appsHomeDir.mkdirs();
         workHomeDir.mkdirs();
         confHomeDir.mkdirs();
     }
-    
+
     @Override
     protected void tearDown()
         throws Exception
     {
         super.tearDown();
-        
+
         cleanDir( plexusHomeDir );
     }
-    
+
     protected void cleanDir( File dir )
     {
         if ( dir != null )
@@ -91,21 +97,21 @@ public abstract class AbstractNexusTestCase
             }
             catch ( IOException e )
             {
-                //couldn't delete directory, too bad
+                // couldn't delete directory, too bad
             }
         }
     }
-    
+
     public static File getPlexusHomeDir()
     {
         return plexusHomeDir;
     }
-    
+
     public static File getWorkHomeDir()
     {
         return workHomeDir;
     }
-    
+
     public static File getConfHomeDir()
     {
         return confHomeDir;

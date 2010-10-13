@@ -4,14 +4,14 @@ import java.io.File;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsReindexTaskIT
     extends AbstractNexusProxyIntegrationTest
@@ -44,7 +44,7 @@ public class Nexus977GroupOfGroupsReindexTaskIT
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "ReindexTaskDescriptor-snapshot", ReindexTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         result = getSearchMessageUtil().searchForGav( getTestId(), "project", null, "g4" );
         Assert.assertEquals( 8, result.size() );

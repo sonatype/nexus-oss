@@ -1,12 +1,13 @@
 package org.sonatype.nexus.integrationtests.nexus1923;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1923HostedIncrementalIndexIT
     extends AbstractNexus1923
@@ -17,7 +18,7 @@ public class Nexus1923HostedIncrementalIndexIT
         super();
     }
     
-    @Test
+    @Test(groups = INDEX)
     public void validateIncrementalIndexesCreated()
         throws Exception
     {

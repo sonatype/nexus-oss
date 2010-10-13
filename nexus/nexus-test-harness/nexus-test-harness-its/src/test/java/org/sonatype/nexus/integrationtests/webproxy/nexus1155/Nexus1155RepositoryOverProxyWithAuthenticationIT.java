@@ -14,12 +14,15 @@
 package org.sonatype.nexus.integrationtests.webproxy.nexus1155;
 
 import org.sonatype.nexus.integrationtests.webproxy.nexus1146.Nexus1146RepositoryOverProxyIT;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 
 public class Nexus1155RepositoryOverProxyWithAuthenticationIT
     extends Nexus1146RepositoryOverProxyIT
 {
 
     @Override
+    @BeforeMethod
     public void startWebProxy()
         throws Exception
     {
@@ -29,6 +32,7 @@ public class Nexus1155RepositoryOverProxyWithAuthenticationIT
     }
 
     @Override
+    @AfterMethod
     public void stopWebProxy()
         throws Exception
     {

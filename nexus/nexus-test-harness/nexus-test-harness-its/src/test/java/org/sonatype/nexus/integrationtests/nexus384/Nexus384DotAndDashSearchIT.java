@@ -15,11 +15,12 @@ package org.sonatype.nexus.integrationtests.nexus384;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.NexusArtifact;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Searches for artifact that has a '.' and a '-' in the artifact name.
@@ -27,6 +28,12 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 public class Nexus384DotAndDashSearchIT
     extends AbstractNexusIntegrationTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void searchAll()
         throws Exception

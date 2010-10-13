@@ -1,16 +1,16 @@
 package org.sonatype.nexus.integrationtests.nexus2379;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus2379MultipleErrorReportIT
     extends AbstractNexusIntegrationTest
 {
-    @Before
+    @BeforeMethod
     public void cleanDirs()
         throws Exception
     {

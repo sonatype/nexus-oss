@@ -5,11 +5,8 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.text.StringContains;
 import org.sonatype.jettytestsuite.ControlledServer;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -17,6 +14,10 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus3638IndexProxiedMavenPluginIT
     extends AbstractNexusIntegrationTest
@@ -24,7 +25,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
 
     private ControlledServer server;
 
-    @Before
+    @BeforeMethod
     public void start()
         throws Exception
     {
@@ -33,7 +34,7 @@ public class Nexus3638IndexProxiedMavenPluginIT
         server.start();
     }
 
-    @After
+    @AfterMethod
     public void stop()
         throws Exception
     {
@@ -92,9 +93,9 @@ public class Nexus3638IndexProxiedMavenPluginIT
 
         String logContent = FileUtils.readFileToString( nexusLog );
         // NEXUS-3707
-        Assert.assertThat(
+        MatcherAssert.assertThat(
             logContent,
             CoreMatchers.not( StringContains.containsString( "Rename operation failed after -1 retries in -1 ms intervals" ) ) );
-        Assert.assertThat( logContent, CoreMatchers.not( StringContains.containsString( "java.util.zip.ZipException" ) ) );
+        MatcherAssert.assertThat( logContent, CoreMatchers.not( StringContains.containsString( "java.util.zip.ZipException" ) ) );
     }
 }

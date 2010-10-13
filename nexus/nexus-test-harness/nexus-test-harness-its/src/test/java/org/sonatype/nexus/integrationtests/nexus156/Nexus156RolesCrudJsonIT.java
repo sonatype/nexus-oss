@@ -16,15 +16,16 @@ package org.sonatype.nexus.integrationtests.nexus156;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * CRUD tests for JSON request/response.
@@ -35,10 +36,11 @@ public class Nexus156RolesCrudJsonIT
 
     protected RoleMessageUtil messageUtil;
 
-    public Nexus156RolesCrudJsonIT()
-    {
-        this.messageUtil =
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil =
             new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test

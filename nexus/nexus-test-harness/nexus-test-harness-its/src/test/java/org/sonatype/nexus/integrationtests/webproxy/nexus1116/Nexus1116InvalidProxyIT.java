@@ -13,24 +13,25 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1116;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1116InvalidProxyIT
     extends AbstractNexusWebProxyIntegrationTest
     implements Runnable
 {
 
-    @Test
+    @Test(groups = PROXY)
     public void checkInvalidProxy()
         throws Exception
     {

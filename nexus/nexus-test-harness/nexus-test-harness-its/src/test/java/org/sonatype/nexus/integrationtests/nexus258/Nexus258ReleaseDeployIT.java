@@ -13,18 +13,19 @@
  */
 package org.sonatype.nexus.integrationtests.nexus258;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.commons.httpclient.HttpStatus;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 
 /**
@@ -40,8 +41,11 @@ public class Nexus258ReleaseDeployIT
     {
         super( TEST_RELEASE_REPO );
     }
-
-  
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void deploywithGavUsingRest()
@@ -85,7 +89,7 @@ public class Nexus258ReleaseDeployIT
     {
 
         Gav gav =
-            new Gav( this.getTestId(), "uploadWithGav", "1.0.0", null, "xml", 0,
+            new Gav( this.getTestId(), "uploadWithPom", "1.0.0", null, "xml", 0,
                      new Date().getTime(), "Simple Test Artifact", false, false, null, false, null );
 
         // file to deploy

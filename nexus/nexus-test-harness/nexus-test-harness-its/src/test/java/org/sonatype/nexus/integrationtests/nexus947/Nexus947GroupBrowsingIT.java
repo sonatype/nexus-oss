@@ -17,20 +17,26 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus947GroupBrowsingIT
     extends AbstractNexusIntegrationTest
 {
+	
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
     @Test
     public void groupTest() throws IOException
@@ -40,7 +46,7 @@ public class Nexus947GroupBrowsingIT
         List<ContentListResource> items = contentUtil.getContentListResource( "public", "/", true );
 
         // make sure we have a few items
-        Assert.assertTrue( "Expected more then 1 item. ", items.size() > 1 );
+        Assert.assertTrue( items.size() > 1, "Expected more then 1 item. " );
 
         // now for a bit more control
         items = contentUtil.getContentListResource( "public", "/nexus947/nexus947/3.2.1/", true );

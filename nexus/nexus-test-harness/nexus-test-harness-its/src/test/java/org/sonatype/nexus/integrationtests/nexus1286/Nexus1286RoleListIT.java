@@ -18,9 +18,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -28,6 +25,8 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.security.rest.model.ExternalRoleMappingResource;
 import org.sonatype.security.rest.model.PlexusRoleResource;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1286RoleListIT
     extends AbstractNexusIntegrationTest

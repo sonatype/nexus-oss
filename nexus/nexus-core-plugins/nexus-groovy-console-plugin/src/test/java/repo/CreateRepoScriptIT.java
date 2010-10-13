@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.List;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import util.GroovyConsoleMessageUtil;
 

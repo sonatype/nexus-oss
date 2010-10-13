@@ -1,12 +1,11 @@
 package org.sonatype.nexus.integrationtests.nexus3162;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryTemplateMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * @author juven

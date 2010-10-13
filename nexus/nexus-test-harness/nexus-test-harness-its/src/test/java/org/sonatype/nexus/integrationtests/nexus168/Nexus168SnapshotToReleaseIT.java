@@ -17,16 +17,16 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.maven.wagon.TransferFailedException;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.test.utils.DeployUtils;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 
 /**
@@ -41,6 +41,10 @@ public class Nexus168SnapshotToReleaseIT
     public Nexus168SnapshotToReleaseIT()
     {
         super( TEST_RELEASE_REPO );
+    }
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -111,7 +115,7 @@ public class Nexus168SnapshotToReleaseIT
             fileWasUploaded = false;
         }
         
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
     }
     
     
@@ -154,7 +158,7 @@ public class Nexus168SnapshotToReleaseIT
             fileWasUploaded = false;
         }
         
-        Assert.assertFalse( "The file was uploaded and it should not have been.", fileWasUploaded );
+        Assert.assertFalse( fileWasUploaded, "The file was uploaded and it should not have been." );
 
     }
     

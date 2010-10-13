@@ -4,15 +4,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1581RemoteMetadataIT
     extends AbstractNexusProxyIntegrationTest

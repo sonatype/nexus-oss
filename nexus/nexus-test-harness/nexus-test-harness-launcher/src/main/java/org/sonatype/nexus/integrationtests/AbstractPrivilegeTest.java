@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.junit.After;
@@ -37,6 +35,10 @@ import org.sonatype.security.model.CPrivilege;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -88,13 +90,17 @@ public abstract class AbstractPrivilegeTest
             Assert.fail( e.getMessage() );
         }
     }
+    
+    @BeforeClass(alwaysRun = true)
+    @org.junit.BeforeClass
+    public static void enableSecurity(){
+        // turn on security for the test
+        TestContainer.getInstance().getTestContext().setSecureTest( true );    	
+    }
 
     private void init()
         throws ComponentLookupException
     {
-        // turn on security for the test
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-
         XStream xstream = this.getXMLXStream();
 
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
@@ -107,6 +113,7 @@ public abstract class AbstractPrivilegeTest
         this.groupUtil = new GroupMessageUtil( this,xstream, MediaType.APPLICATION_XML );
     }
 
+    @BeforeMethod(alwaysRun = true)
     @Before
     public void resetTestUserPrivs()
         throws Exception
@@ -305,7 +312,7 @@ public abstract class AbstractPrivilegeTest
 
         if ( role == null )
         {
-            org.junit.Assert.fail( "Role not found: " + roleId );
+            Assert.fail( "Role not found: " + roleId );
         }
 
         // add it
@@ -316,6 +323,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @Override
+    @AfterMethod(alwaysRun = true)
     @After
     public void afterTest()
         throws Exception

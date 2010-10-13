@@ -13,16 +13,19 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus177;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Create three repositories, deploys a different artifact with the same name in each repo. Add each repo to a group
@@ -38,8 +41,13 @@ public class Nexus177OutOfServiceIT
     {
         super( TEST_RELEASE_REPO );
     }
+    
+    @BeforeClass(alwaysRun = true)
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-    @Test
+    @Test(groups = PROXY)
     public void outOfServiceTest()
         throws Exception
     {

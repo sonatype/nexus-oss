@@ -1,14 +1,13 @@
 package org.sonatype.nexus.integrationtests.nexus3626;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
+
 import java.io.File;
 import java.io.IOException;
-
-import junit.framework.Assert;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -23,11 +22,13 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3626SimpleSearchIT
     extends AbstractNexusIntegrationTest
 {
-    @Test
+    @Test(groups = INDEX)
     public void wagonDeploy()
         throws Exception
     {
@@ -43,28 +44,29 @@ public class Nexus3626SimpleSearchIT
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void mavenDeploy()
         throws Exception
     {
         final File pom = getTestFile( "maven.pom" );
         MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3626", "maven", "1.0.0", "pom" ),
-                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null, "-DgeneratePom=false" ).verifyErrorFreeLog();
+                                            getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null,
+                                            "-DgeneratePom=false" ).verifyErrorFreeLog();
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void restDeploy()
         throws Exception
     {
         final File pom = getTestFile( "rest.pom" );
         HttpMethod r = getDeployUtils().deployPomWithRest( REPO_TEST_HARNESS_REPO, pom );
-        Assert.assertTrue( "Unable to deploy artifact " + r.getStatusCode() + ": " + r.getStatusText(),
-                           Status.isSuccess( r.getStatusCode() ) );
+        Assert.assertTrue( Status.isSuccess( r.getStatusCode() ), "Unable to deploy artifact " + r.getStatusCode()
+            + ": " + r.getStatusText() );
         searchFor( pom );
     }
 
-    @Test
+    @Test(groups = INDEX)
     public void manualStorage()
         throws Exception
     {
@@ -114,7 +116,7 @@ public class Nexus3626SimpleSearchIT
         getEventInspectorsUtil().waitForCalmPeriod();
         
         SearchNGResponse result = getSearchMessageUtil().searchSha1NGFor( sha1 );
-        Assert.assertEquals( "Pom with " + sha1 + " not found " + msg, 1, result.getTotalCount() );
-        Assert.assertEquals( "Pom with " + sha1 + " not found " + msg, 1, result.getData().size() );
+        Assert.assertEquals( result.getTotalCount(), 1, "Pom with " + sha1 + " not found " + msg );
+        Assert.assertEquals( result.getData().size(), 1, "Pom with " + sha1 + " not found " + msg );
     }
 }

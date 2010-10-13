@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.repository.metadata.model.RepositoryMetadata;
@@ -16,6 +13,8 @@ import org.sonatype.nexus.rest.model.MirrorResource;
 import org.sonatype.nexus.rest.model.MirrorResourceListRequest;
 import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.test.utils.MirrorMessageUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1633HostedMirrorMetadataIT
     extends AbstractNexusIntegrationTest

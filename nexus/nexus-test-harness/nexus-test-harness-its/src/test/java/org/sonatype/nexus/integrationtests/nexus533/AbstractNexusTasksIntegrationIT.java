@@ -18,10 +18,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang.time.DateUtils;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.configuration.model.CScheduledTask;
 import org.sonatype.nexus.configuration.model.Configuration;
@@ -30,13 +27,15 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledServiceBaseResource>
     extends AbstractNexusIntegrationTest
 {
 
     public abstract E getTaskScheduled();
-    
+
     @Test
     public void doTest()
         throws Exception
@@ -93,7 +92,8 @@ public abstract class AbstractNexusTasksIntegrationIT<E extends ScheduledService
         E scheduledTask = getTaskScheduled();
         ScheduledServiceListResource task = TaskScheduleUtil.getTask( scheduledTask.getName() );
 
-        // if we have a manual task we can't change the schedule to be manual again
+        // if we have a manual task we can't change the schedule to be manual
+        // again
         if ( !task.getSchedule().equals( "manual" ) )
         {
 

@@ -15,25 +15,30 @@ package org.sonatype.nexus.integrationtests.nexus810;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Checks to make sure the tasks don't have packages in the type field.
  */
 public class Nexus810PackageNamesInRestMessagesIT extends AbstractNexusIntegrationTest
 {
-
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
+    
     @Test
     public void checkForPackageNamesInResponse() throws IOException
     {
         // I like simple tests
         Response response = RequestFacade.doGetRequest( "service/local/schedule_types" );
         String responseText = response.getEntity().getText();
-        Assert.assertFalse( "Found package names in response.", responseText.contains( "org.sonatype." ) );
+        Assert.assertFalse( responseText.contains( "org.sonatype." ), "Found package names in response." );
     }
 }

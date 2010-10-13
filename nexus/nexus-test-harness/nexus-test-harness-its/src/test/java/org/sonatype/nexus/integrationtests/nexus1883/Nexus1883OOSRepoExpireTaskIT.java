@@ -1,21 +1,20 @@
 package org.sonatype.nexus.integrationtests.nexus1883;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus1883OOSRepoExpireTaskIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Before
+    @BeforeMethod
     public void putOutOfService()
         throws Exception
     {

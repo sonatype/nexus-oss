@@ -33,6 +33,7 @@ import org.sonatype.nexus.proxy.maven.maven2.M2GroupRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2LayoutedM1ShadowRepositoryConfiguration;
 import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.security.SecuritySystem;
+import org.testng.Assert;
 
 public class NexusConfigUtil
     extends ITUtil

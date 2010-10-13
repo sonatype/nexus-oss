@@ -6,9 +6,8 @@ import java.util.List;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.IsCollectionContaining;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsCollectionContaining;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -21,6 +20,8 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3045GroupRemovalIT
     extends AbstractNexusIntegrationTest
@@ -72,8 +73,8 @@ public class Nexus3045GroupRemovalIT
 
         RepositoryRouteResource route = routesUtil.getRoute( REPO_ROUTE_ID );
         Assert.assertNotNull( route );
-        Assert.assertThat( getRepoIds( route.getRepositories() ), IsCollectionContaining.hasItem( "thirdparty" ) );
-        Assert.assertThat( getRepoIds( route.getRepositories() ),
+        MatcherAssert.assertThat( getRepoIds( route.getRepositories() ), IsCollectionContaining.hasItem( "thirdparty" ) );
+        MatcherAssert.assertThat( getRepoIds( route.getRepositories() ),
                            CoreMatchers.not( IsCollectionContaining.hasItem( "releases" ) ) );
     }
 

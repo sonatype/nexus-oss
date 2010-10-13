@@ -2,7 +2,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -11,6 +10,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 public class RepositoryTemplateMessageUtil
 {

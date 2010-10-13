@@ -13,9 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.proxy.nexus1111;
 
-import junit.framework.Assert;
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
 
-import org.junit.Test;
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -26,6 +25,8 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * @author Juven Xu
@@ -39,7 +40,7 @@ public class Nexus1111ProxyRemote500ErrorIT
         super( "release-proxy-repo-1" );
     }
 
-    @Test
+    @Test(groups = PROXY)
     public void remote500Error()
         throws Exception
     {
@@ -109,11 +110,11 @@ public class Nexus1111ProxyRemote500ErrorIT
         // not using it and switched back to XML as it is wired in it this util class.
         RepositoryMessageUtil util =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
-                getRepositoryTypeRegistry() );
+                                       getRepositoryTypeRegistry() );
 
         RepositoryStatusResource status = util.getStatus( this.testRepositoryId );
 
-        Assert.assertEquals( "Repository should be auto-blocked", ProxyMode.BLOCKED_AUTO.name(), status.getProxyMode() );
+        Assert.assertEquals( status.getProxyMode(), ProxyMode.BLOCKED_AUTO.name(), "Repository should be auto-blocked" );
 
         // stop the error server, start the healthy server
         return500Server.stop();

@@ -2,8 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus3546;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
@@ -13,6 +11,8 @@ import org.sonatype.nexus.rest.model.RepositoryGroupMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryGroupResource;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3546ValidateTransitivePrivsOnGroupsIT
     extends AbstractPrivilegeTest
@@ -54,7 +54,7 @@ public class Nexus3546ValidateTransitivePrivsOnGroupsIT
         File artifact = getTestFile( "artifact.jar" );
 
         int code = getDeployUtils().deployUsingGavWithRest( REPO_TEST_HARNESS_RELEASE_REPO, gav, artifact );
-        Assert.assertTrue( "Unable to deploy artifact " + code, Status.isSuccess( code ) );
+        Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
         
         //create group 1
         RepositoryGroupResource group = new RepositoryGroupResource();

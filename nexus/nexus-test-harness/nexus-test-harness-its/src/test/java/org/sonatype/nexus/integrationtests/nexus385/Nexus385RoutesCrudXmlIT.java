@@ -15,18 +15,18 @@ package org.sonatype.nexus.integrationtests.nexus385;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -39,12 +39,13 @@ public class Nexus385RoutesCrudXmlIT
 
     protected RoutesMessageUtil messageUtil;
 
-    public Nexus385RoutesCrudXmlIT()
-    {
-        this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil = new RoutesMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Before
+    @BeforeMethod
     public void cleanRoutes()
         throws IOException
     {
@@ -191,7 +192,7 @@ public class Nexus385RoutesCrudXmlIT
             Assert.fail( "Could not create privilege: " + response.getStatus() + "\nresponse:\n" + responseText );
         }
 
-        Assert.assertTrue( "Route was not deleted.", getNexusConfigUtil().getRoute( resource.getId() ) == null );
+        Assert.assertTrue( getNexusConfigUtil().getRoute( resource.getId() ) == null, "Route was not deleted." );
 
     }
 

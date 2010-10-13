@@ -1,9 +1,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-import java.util.List;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -16,6 +15,7 @@ import org.sonatype.nexus.rest.model.MirrorResourceListResponse;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -33,7 +33,7 @@ public class MirrorMessageUtils
         this.xstream = xstream;
         this.mediaType = mediaType;
     }
-    
+
     public MirrorResourceListResponse getMirrors( String repositoryId )
         throws IOException
     {
@@ -55,16 +55,16 @@ public class MirrorMessageUtils
         representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        MirrorResourceListResponse resourceResponse = (MirrorResourceListResponse) representation
-            .getPayload( new MirrorResourceListResponse() );
+        MirrorResourceListResponse resourceResponse =
+            (MirrorResourceListResponse) representation.getPayload( new MirrorResourceListResponse() );
 
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-        
-        for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
+        Assert.assertNotNull( resourceResponse, "Resource Response shouldn't be null" );
+
+        for ( MirrorResource resource : (List<MirrorResource>) resourceResponse.getData() )
         {
             Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
         }
-        
+
         return resourceResponse;
     }
 
@@ -92,24 +92,25 @@ public class MirrorMessageUtils
         representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        MirrorResourceListResponse resourceResponse = (MirrorResourceListResponse) representation
-            .getPayload( new MirrorResourceListResponse() );
+        MirrorResourceListResponse resourceResponse =
+            (MirrorResourceListResponse) representation.getPayload( new MirrorResourceListResponse() );
 
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-        
-        for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
+        Assert.assertNotNull( resourceResponse, "Resource Response shouldn't be null" );
+
+        for ( MirrorResource resource : (List<MirrorResource>) resourceResponse.getData() )
         {
             Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
         }
-        
-        for ( int i = 0 ; i < resourceResponse.getData().size() ; i++ )
+
+        for ( int i = 0; i < resourceResponse.getData().size(); i++ )
         {
-            Assert.assertEquals( ( ( MirrorResource ) resourceResponse.getData().get( i ) ).getUrl(), ( ( MirrorResource ) resourceRequest.getData().get( i ) ).getUrl() ); 
+            Assert.assertEquals( ( (MirrorResource) resourceResponse.getData().get( i ) ).getUrl(),
+                                 ( (MirrorResource) resourceRequest.getData().get( i ) ).getUrl() );
         }
-        
+
         return resourceResponse;
     }
-    
+
     public MirrorStatusResourceListResponse getMirrorsStatus( String repositoryId )
         throws IOException
     {
@@ -131,19 +132,19 @@ public class MirrorMessageUtils
         representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        MirrorStatusResourceListResponse resourceResponse = (MirrorStatusResourceListResponse) representation
-            .getPayload( new MirrorStatusResourceListResponse() );
+        MirrorStatusResourceListResponse resourceResponse =
+            (MirrorStatusResourceListResponse) representation.getPayload( new MirrorStatusResourceListResponse() );
 
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-        
-        for ( MirrorStatusResource resource : ( List<MirrorStatusResource> ) resourceResponse.getData() )
+        Assert.assertNotNull( resourceResponse, "Resource Response shouldn't be null" );
+
+        for ( MirrorStatusResource resource : (List<MirrorStatusResource>) resourceResponse.getData() )
         {
             Assert.assertNotNull( "Id shouldn't be null", resource.getId() );
         }
-        
+
         return resourceResponse;
     }
-    
+
     public MirrorResourceListResponse getPredefinedMirrors( String repositoryId )
         throws IOException
     {
@@ -165,16 +166,16 @@ public class MirrorMessageUtils
         representation = new XStreamRepresentation( xstream, responseString, mediaType );
 
         // this
-        MirrorResourceListResponse resourceResponse = (MirrorResourceListResponse) representation
-            .getPayload( new MirrorResourceListResponse() );
+        MirrorResourceListResponse resourceResponse =
+            (MirrorResourceListResponse) representation.getPayload( new MirrorResourceListResponse() );
 
-        Assert.assertNotNull( "Resource Response shouldn't be null", resourceResponse );
-        
-        for ( MirrorResource resource : ( List<MirrorResource> ) resourceResponse.getData() )
+        Assert.assertNotNull( resourceResponse, "Resource Response shouldn't be null" );
+
+        for ( MirrorResource resource : (List<MirrorResource>) resourceResponse.getData() )
         {
             Assert.assertNotNull( "URL shouldn't be null", resource.getUrl() );
         }
-        
+
         return resourceResponse;
     }
 }

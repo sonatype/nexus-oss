@@ -14,7 +14,7 @@
  */
 package org.sonatype.nexus.integrationtests;
 
-import static org.junit.Assert.fail;
+import static org.testng.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,8 +30,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -49,15 +47,14 @@ import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.restlet.data.Method;
 import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.artifact.Gav;
+import org.sonatype.nexus.log4j.ConcisePatternLayout;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
 import org.sonatype.nexus.rt.boot.ITAppBooterCustomizer;
 import org.sonatype.nexus.rt.prefs.FilePreferencesFactory;
@@ -74,6 +71,11 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.nexus.util.EnhancedProperties;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -275,7 +277,8 @@ public abstract class AbstractNexusIntegrationTest
 
     // == Test "lifecycle" (@Before/@After...)
 
-    @BeforeClass
+    @BeforeClass(alwaysRun = true)
+    @org.junit.BeforeClass
     public static void staticOncePerClassSetUp()
         throws Exception
     {
@@ -294,9 +297,10 @@ public abstract class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     * 
+     *
      * @throws Exception
      */
+    @BeforeMethod(alwaysRun = true)
     @Before
     public void oncePerClassSetUp()
         throws Exception
@@ -360,6 +364,7 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
+    @AfterMethod(alwaysRun = true)
     @After
     public void afterTest()
         throws Exception
@@ -368,7 +373,8 @@ public abstract class AbstractNexusIntegrationTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
-    @AfterClass
+    @AfterClass(alwaysRun = true)
+    @org.junit.AfterClass
     public static void oncePerClassTearDown()
         throws Exception
     {
@@ -463,7 +469,7 @@ public abstract class AbstractNexusIntegrationTest
         properties.putIfNew( "log4j.appender.logfile.Append", "true" );
         properties.putIfNew( "log4j.appender.logfile.MaxBackupIndex", "30" );
         properties.putIfNew( "log4j.appender.logfile.MaxFileSize", "10MB" );
-        properties.putIfNew( "log4j.appender.logfile.layout", "org.sonatype.nexus.log4j.ConcisePatternLayout" );
+        properties.putIfNew( "log4j.appender.logfile.layout", ConcisePatternLayout.class.getName() );
         properties.putIfNew( "log4j.appender.logfile.layout.ConversionPattern",
             "%4d{yyyy-MM-dd HH:mm:ss} %-5p [%-15.15t] - %c - %m%n" );
 
@@ -559,7 +565,7 @@ public abstract class AbstractNexusIntegrationTest
      * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
      * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
      * hint.
-     * 
+     *
      * @throws Exception
      */
     protected void deployArtifacts()
@@ -617,7 +623,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
      * override this.
-     * 
+     *
      * @param deployProtocol
      * @return
      */
@@ -629,7 +635,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie. deployUrl
      * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-     * 
+     *
      * @param wagonHint
      * @param deployUrl
      * @param model
@@ -722,7 +728,7 @@ public abstract class AbstractNexusIntegrationTest
     protected void startNexus()
         throws Exception
     {
-
+        System.out.println("######## Running Test: " + getTestId() + " - Class: " + this.getClass());
         log.info( "starting nexus" );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -816,7 +822,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     * 
+     *
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -835,7 +841,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     * 
+     *
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -982,13 +988,13 @@ public abstract class AbstractNexusIntegrationTest
         {
             throw new FileNotFoundException( status + ": (" + status.getCode() + ")" );
         }
-        Assert.assertEquals( "Snapshot download should redirect to a new file\n "
-            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription(), 301,
-            status.getCode() );
+
+        Assert.assertEquals( 301, status.getCode(), "Snapshot download should redirect to a new file\n "
+            + response.getRequest().getResourceRef().toString() + " \n Error: " + status.getDescription() );
 
         Reference redirectRef = response.getRedirectRef();
-        Assert.assertNotNull( "Snapshot download should redirect to a new file "
-            + response.getRequest().getResourceRef().toString(), redirectRef );
+        Assert.assertNotNull( redirectRef, "Snapshot download should redirect to a new file "
+            + response.getRequest().getResourceRef().toString() );
 
         serviceURI = redirectRef.toString();
 
@@ -1274,6 +1280,7 @@ public abstract class AbstractNexusIntegrationTest
         ContainerConfiguration containerConfiguration =
             new DefaultContainerConfiguration().setName( "test" ).setContext( context ).setContainerConfiguration(
                 baseClass.getName().replace( '.', '/' ) + ".xml" );
+
         containerConfiguration.setClassPathScanning( true );
 
         customizeContainerConfiguration( containerConfiguration );

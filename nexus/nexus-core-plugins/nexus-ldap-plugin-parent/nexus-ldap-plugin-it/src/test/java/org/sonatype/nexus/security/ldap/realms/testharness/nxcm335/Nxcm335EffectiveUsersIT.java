@@ -1,35 +1,29 @@
 /**
  * Sonatype NexusTM Professional.
- * Copyright © 2008 Sonatype, Inc. All rights reserved.
+ * Copyright ï¿½ 2008 Sonatype, Inc. All rights reserved.
  * Includes the third-party code listed at ${thirdpartyurl}.
  */
 package org.sonatype.nexus.security.ldap.realms.testharness.nxcm335;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.security.ldap.realms.testharness.AbstractLdapIntegrationIT;
 import org.sonatype.nexus.security.ldap.realms.testharness.LdapUsersMessageUtil;
-import org.sonatype.nexus.test.utils.NexusConfigUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.sonatype.security.rest.model.PlexusUserListResourceResponse;
 import org.sonatype.security.rest.model.PlexusUserResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResource;
 import org.sonatype.security.rest.model.PlexusUserSearchCriteriaResourceRequest;
 import org.sonatype.security.rest.model.UserToRoleResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -43,7 +37,12 @@ public class Nxcm335EffectiveUsersIT
     public Nxcm335EffectiveUsersIT()
     {
         super();
-        this.xstream = this.getJsonXStream();
+    }
+    
+    @BeforeClass
+    public void init()
+    {
+                this.xstream = this.getJsonXStream();
         this.mediaType = MediaType.APPLICATION_JSON;
     }
 
@@ -55,10 +54,10 @@ public class Nxcm335EffectiveUsersIT
 
         // by default we should have 2 effective users ( using the developer role )
         List<PlexusUserResource> users = this.doSearch( "", true, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2 + defaultUserCount, users.size() );
+        Assert.assertEquals( users.size(), 2 + defaultUserCount, "Users found: " + this.toUserIds( users ) );
         
         users = this.doSearch( "", true, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2, users.size() );
+        Assert.assertEquals( users.size(), 2, "Users found: " + this.toUserIds( users ) );
 
         // map user to nexus role
         LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this, this.xstream, this.mediaType );
@@ -68,15 +67,15 @@ public class Nxcm335EffectiveUsersIT
         ldapUser.addRole( "admin" );
         Response response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
         Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+            response.getStatus().isSuccess(),
+            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText() );
 
         // search effective users should find user
         users = this.doSearch( "", true, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2 + defaultUserCount, users.size() );
+        Assert.assertEquals( users.size(), 2 + defaultUserCount, "Users found: " + this.toUserIds( users ) );
         
         users = this.doSearch( "", true, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2, users.size() );
+        Assert.assertEquals( users.size(), 2, "Users found: " + this.toUserIds( users ) );
 
         ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "brianf" );
@@ -84,15 +83,15 @@ public class Nxcm335EffectiveUsersIT
         ldapUser.addRole( "admin" );
         response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
         Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+            response.getStatus().isSuccess(),
+            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText() );
 
         // search effective users should find user
         users = this.doSearch( "", true, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 2, users.size() );
+        Assert.assertEquals( users.size(), 2, "Users found: " + this.toUserIds( users ) );
 
         users = this.doSearch( "", true, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 3 + defaultUserCount, users.size() );
+        Assert.assertEquals( users.size(), 3 + defaultUserCount, "Users found: " + this.toUserIds( users ) );
 
     }
 
@@ -109,10 +108,10 @@ public class Nxcm335EffectiveUsersIT
 
         // by default we should have 2 effective users ( using the developer role )
         List<PlexusUserResource> users = this.doSearch( "", false, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 4, users.size() );
+        Assert.assertEquals( users.size(), 4, "Users found: " + this.toUserIds( users ) );
         
         users = this.doSearch( "", false, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), defaultUserCount + 4, users.size() );
+        Assert.assertEquals( users.size(), defaultUserCount + 4, "Users found: " + this.toUserIds( users ) );
 
         // map user to nexus role
         LdapUsersMessageUtil userUtil = new LdapUsersMessageUtil( this, this.xstream, this.mediaType );
@@ -122,15 +121,15 @@ public class Nxcm335EffectiveUsersIT
         ldapUser.addRole( "admin" );
         Response response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
         Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+            response.getStatus().isSuccess(),
+            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText() );
 
         // search effective users should find user
         users = this.doSearch( "", false, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 4, users.size() );
+        Assert.assertEquals( users.size(), 4, "Users found: " + this.toUserIds( users ) );
         
         users = this.doSearch( "", false, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), defaultUserCount + 4, users.size() );
+        Assert.assertEquals( users.size(), defaultUserCount + 4, "Users found: " + this.toUserIds( users ) );
 
         ldapUser = new UserToRoleResource();
         ldapUser.setUserId( "brianf" );
@@ -138,15 +137,15 @@ public class Nxcm335EffectiveUsersIT
         ldapUser.addRole( "admin" );
         response = userUtil.sendMessage( Method.PUT, ldapUser, "LDAP" );
         Assert.assertTrue(
-            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText(),
-            response.getStatus().isSuccess() );
+            response.getStatus().isSuccess(),
+            "Status: " + response.getStatus() + "\nresponse: " + response.getEntity().getText() );
 
         // search effective users should find user
         users = this.doSearch( "", false, "LDAP" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), 4, users.size() );
+        Assert.assertEquals( users.size(), 4, "Users found: " + this.toUserIds( users ) );
         
         users = this.doSearch( "", false, "all" );
-        Assert.assertEquals( "Users found: " + this.toUserIds( users ), defaultUserCount + 4, users.size() );
+        Assert.assertEquals( users.size(), defaultUserCount + 4, "Users found: " + this.toUserIds( users ) );
 
     }
 
@@ -171,7 +170,7 @@ public class Nxcm335EffectiveUsersIT
 
         Response response = RequestFacade.sendMessage( serviceURI, Method.PUT, representation );
 
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
 
         PlexusUserListResourceResponse userList = (PlexusUserListResourceResponse) this.parseResponse(
             response,

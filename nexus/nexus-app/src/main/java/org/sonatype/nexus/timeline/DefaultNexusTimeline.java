@@ -131,7 +131,7 @@ public class DefaultNexusTimeline
         }
         catch ( Exception e )
         {
-            getLogger().warn( "Failed to add a timeline record", e );
+            getLogger().info( "Failed to add a timeline record", e );
         }
     }
 

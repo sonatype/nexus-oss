@@ -15,7 +15,6 @@ package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
 
-import org.junit.Assert;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -26,6 +25,7 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.sonatype.nexus.rest.model.SmtpSettingsResource;
 import org.sonatype.nexus.rest.model.SmtpSettingsResourceRequest;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -50,8 +50,8 @@ public class SettingsMessageUtil
         XStreamRepresentation representation =
             new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
 
-        Assert.assertTrue( "Error getting Settings: " + response.getStatus() + "\n" + responseText,
-                           response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Error getting Settings: " + response.getStatus() + "\n"
+            + responseText );
 
         GlobalConfigurationResourceResponse configResponse =
             (GlobalConfigurationResourceResponse) representation.getPayload( new GlobalConfigurationResourceResponse() );

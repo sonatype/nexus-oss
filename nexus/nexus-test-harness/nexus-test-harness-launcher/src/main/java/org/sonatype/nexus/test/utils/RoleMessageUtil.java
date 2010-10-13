@@ -14,9 +14,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-import java.util.List;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -34,6 +33,7 @@ import org.sonatype.security.rest.model.PlexusRoleResource;
 import org.sonatype.security.rest.model.RoleListResourceResponse;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.RoleResourceRequest;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -68,7 +68,7 @@ public class RoleMessageUtil
         RoleResource responseResource = this.getResourceFromResponse( responseString );
 
         // make sure the id != null
-        Assert.assertNotNull( "Result:\n" + this.xStream.toXML( responseResource ), responseResource.getId() );
+        Assert.assertNotNull( responseResource.getId(), "Result:\n" + this.xStream.toXML( responseResource ) );
 
         if ( role.getId() != null )
         {
@@ -143,8 +143,8 @@ public class RoleMessageUtil
 
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Request failed: " + response.getStatus() + "\n" + responseText,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Request failed: " + response.getStatus() + "\n" + responseText );
 
         XStreamRepresentation representation =
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
@@ -223,12 +223,12 @@ public class RoleMessageUtil
         Response response =
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
         ExternalRoleMappingResourceResponse result =
             (ExternalRoleMappingResourceResponse) this.parseResponseText( responseString,
-                new ExternalRoleMappingResourceResponse() );
+                                                                          new ExternalRoleMappingResourceResponse() );
 
         return result.getData();
     }
@@ -243,14 +243,14 @@ public class RoleMessageUtil
         Response response =
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
         LOG.debug( "response: " + responseString );
 
         PlexusRoleListResourceResponse result =
             (PlexusRoleListResourceResponse) this.parseResponseText( responseString,
-                new PlexusRoleListResourceResponse() );
+                                                                     new PlexusRoleListResourceResponse() );
 
         return result.getData();
     }

@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.integrationtests.webproxy.nexus1101;
 
+import static org.sonatype.nexus.integrationtests.ITGroups.PROXY;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.SocketAddress;
@@ -20,16 +22,15 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.webproxy.AbstractNexusWebProxyIntegrationTest;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class ProxyTest
     extends AbstractNexusWebProxyIntegrationTest
 {
-    @Test
+    @Test(groups = PROXY)
     public void checkWebProxy()
         throws Exception
     {

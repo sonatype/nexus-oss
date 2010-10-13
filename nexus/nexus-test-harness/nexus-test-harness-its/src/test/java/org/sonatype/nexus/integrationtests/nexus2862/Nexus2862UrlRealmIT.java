@@ -2,11 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus2862;
 
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
@@ -14,6 +9,11 @@ import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
+import org.testng.Assert;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus2862UrlRealmIT
     extends AbstractNexusIntegrationTest
@@ -22,6 +22,7 @@ public class Nexus2862UrlRealmIT
     private static Integer proxyPort;
 
     private static AuthenticationServer server;
+
 
     static
     {
@@ -45,6 +46,11 @@ public class Nexus2862UrlRealmIT
     public static void startServer()
         throws Exception
     {
+        proxyPort = TestProperties.getInteger( "proxy.server.port" );
+        // System.setProperty( "plexus.authentication-url", "http://localhost:" + proxyPort );
+        // System.setProperty( "plexus.url-authentication-default-role", "admin" );
+        // System.setProperty( "plexus.url-authentication-email-domain", "sonatype.com" );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
         server = new AuthenticationServer( proxyPort );
         server.addUser( "juka", "juk@", "admin" );
         server.start();
@@ -71,7 +77,7 @@ public class Nexus2862UrlRealmIT
         Assert.assertTrue( status.isSuccess() );
     }
 
-    @After
+    @AfterMethod
     public void cleanAccessedUris()
     {
         server.getAccessedUri().clear();
@@ -93,7 +99,7 @@ public class Nexus2862UrlRealmIT
         throws IOException
     {
         Status status = UserCreationUtil.login( "juka", "juka" );
-        Assert.assertFalse( status + "", status.isSuccess() );
+        Assert.assertFalse( status.isSuccess(), status + "" );
 
         Assert.assertTrue( UserCreationUtil.logout().isSuccess() );
     }
@@ -103,7 +109,7 @@ public class Nexus2862UrlRealmIT
         throws IOException
     {
         Status status = UserCreationUtil.login( "anuser", "juka" );
-        Assert.assertFalse( status + "", status.isSuccess() );
+        Assert.assertFalse( status.isSuccess(), status + "" );
 
         Assert.assertTrue( UserCreationUtil.logout().isSuccess() );
     }

@@ -21,14 +21,15 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Adds metadata in a snapshot repo, then checks to see if it was not changed ( future version of nexus may clean metadata on the fly.)
@@ -44,6 +45,11 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoIT
     public Nexus169ReleaseMetaDataInSnapshotRepoIT()
     {
         super( TEST_SNAPSHOT_REPO );
+    }
+    
+    @BeforeClass
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -67,7 +73,7 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoIT
             fileWasDownloaded = false;
         }
 
-        Assert.assertFalse( "The file was downloaded and it should not have been.", fileWasDownloaded );
+        Assert.assertFalse( fileWasDownloaded, "The file was downloaded and it should not have been." );
 
         fileWasDownloaded = true;
         try
@@ -80,7 +86,7 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoIT
             fileWasDownloaded = false;
         }
 
-        Assert.assertFalse( "The file was downloaded and it should not have been.", fileWasDownloaded );
+        Assert.assertFalse( fileWasDownloaded, "The file was downloaded and it should not have been." );
     }
 
     @Test
@@ -123,11 +129,11 @@ public class Nexus169ReleaseMetaDataInSnapshotRepoIT
         is.close();
 
         Assert.assertTrue(
-                           "Metadata from snapshot repo does not have 2 versions, maybe you just fixed up the metadata merge code, in that case, change this test.",
-                           snapshotRepoMetaData.getVersioning().getVersions().size() == 2 );
+                           snapshotRepoMetaData.getVersioning().getVersions().size() == 2,
+                           "Metadata from snapshot repo does not have 2 versions, maybe you just fixed up the metadata merge code, in that case, change this test." );
         Assert.assertTrue(
-                           "Metadata from group does not have 2 versions, maybe you just fixed up the metadata merge code, in that case, change this test.",
-                           groupMetaData.getVersioning().getVersions().size() == 2 );
+                           groupMetaData.getVersioning().getVersions().size() == 2,
+                           "Metadata from group does not have 2 versions, maybe you just fixed up the metadata merge code, in that case, change this test." );
 
     }
 

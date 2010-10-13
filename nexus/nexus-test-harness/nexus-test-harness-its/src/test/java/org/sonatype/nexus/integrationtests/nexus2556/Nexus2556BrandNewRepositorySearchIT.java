@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -20,6 +18,9 @@ import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus2556BrandNewRepositorySearchIT
     extends AbstractNexusIntegrationTest
@@ -28,6 +29,12 @@ public class Nexus2556BrandNewRepositorySearchIT
     private RepositoryMessageUtil repoUtil;
 
     public Nexus2556BrandNewRepositorySearchIT()
+    {
+
+    }
+
+    @BeforeClass
+    public void init()
         throws ComponentLookupException
     {
         this.repoUtil =
@@ -71,10 +78,10 @@ public class Nexus2556BrandNewRepositorySearchIT
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> result = getSearchMessageUtil().searchForGav( gav, repoId );
-        Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );
+        Assert.assertEquals( result.size(), 1, "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ) );
 
         result = getSearchMessageUtil().searchFor( Collections.singletonMap( "q", "nexus2556" ), repoId );
-        Assert.assertEquals( "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ), 1, result.size() );
+        Assert.assertEquals( result.size(), 1, "Results: \n" + XStreamFactory.getXmlXStream().toXML( result ) );
     }
 
 }

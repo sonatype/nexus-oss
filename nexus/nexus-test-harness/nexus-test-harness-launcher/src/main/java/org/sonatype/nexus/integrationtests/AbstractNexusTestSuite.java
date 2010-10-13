@@ -15,11 +15,12 @@ package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 
 /**
  * What is this?
@@ -30,6 +31,7 @@ public abstract class AbstractNexusTestSuite
 {
 
     @BeforeClass
+    @org.junit.BeforeClass
     public static void beforeSuite()
         throws Exception
     {
@@ -50,6 +52,7 @@ public abstract class AbstractNexusTestSuite
     }
 
     @AfterClass
+    @org.junit.AfterClass
     public static void afterSuite()
         throws Exception
     {

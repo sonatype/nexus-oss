@@ -14,16 +14,16 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
 
 public class AbstractMavenNexusIT
     extends AbstractNexusIntegrationTest

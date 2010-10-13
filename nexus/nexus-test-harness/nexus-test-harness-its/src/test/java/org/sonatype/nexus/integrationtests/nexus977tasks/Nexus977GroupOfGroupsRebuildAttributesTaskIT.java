@@ -4,13 +4,13 @@ import java.io.File;
 
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
     extends AbstractNexusProxyIntegrationTest
@@ -38,7 +38,7 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task = TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
@@ -52,7 +52,7 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         scan.scan();
         String[] attributesContent = scan.getIncludedFiles();
 
-        Assert.assertArrayEquals( storageContent, attributesContent );
+        Assert.assertEquals( attributesContent, storageContent );
     }
 
 }

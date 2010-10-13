@@ -16,16 +16,18 @@ package org.sonatype.nexus.integrationtests.nexus379;
 import java.io.IOException;
 
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryShadowResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test to make sure a Virtual repo cannot have the same Id as an real repository.
@@ -36,13 +38,13 @@ public class Nexus379VirtualRepoSameIdIT
 
     protected RepositoryMessageUtil messageUtil;
 
-    public Nexus379VirtualRepoSameIdIT()
-        throws ComponentLookupException
-    {
-        this.messageUtil = new RepositoryMessageUtil(
+    @BeforeClass
+    public void setSecureTest() throws ComponentLookupException{
+    	this.messageUtil = new RepositoryMessageUtil(
             this, this.getXMLXStream(),
             MediaType.APPLICATION_XML,
             getRepositoryTypeRegistry() );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     @Test
@@ -76,7 +78,7 @@ public class Nexus379VirtualRepoSameIdIT
         virtualRepo.setShadowOf( "testVirtualRepoWithSameId" );
         Response response = this.messageUtil.sendMessage( Method.POST, virtualRepo );
 
-        Assert.assertEquals( "Status:" + "\n" + response.getEntity().getText(), 400, response.getStatus().getCode() );
+        Assert.assertEquals( response.getStatus().getCode(), 400, "Status:" + "\n" + response.getEntity().getText() );
 
     }
 

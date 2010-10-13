@@ -2,10 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus2213;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -14,11 +10,14 @@ import org.sonatype.nexus.rest.model.ErrorReportingSettings;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
 import org.sonatype.nexus.test.utils.ErrorReportUtil;
 import org.sonatype.nexus.test.utils.SettingsMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class Nexus2213ErrorReportBundleIT
     extends AbstractNexusIntegrationTest
 {
-    @Before
+    @BeforeMethod
     public void cleanDirs()
         throws Exception
     {

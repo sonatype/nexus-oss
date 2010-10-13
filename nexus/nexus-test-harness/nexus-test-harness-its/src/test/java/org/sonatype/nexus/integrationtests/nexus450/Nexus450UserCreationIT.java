@@ -15,11 +15,6 @@ package org.sonatype.nexus.integrationtests.nexus450;
 
 import javax.mail.internet.MimeMessage;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractEmailServerNexusIT;
@@ -29,6 +24,11 @@ import org.sonatype.nexus.test.utils.ChangePasswordUtils;
 import org.sonatype.nexus.test.utils.UserCreationUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.UserResource;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.icegreen.greenmail.util.GreenMailUtil;
 
@@ -50,7 +50,7 @@ public class Nexus450UserCreationIT
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
-    @Before
+    @BeforeMethod
     public void init()
     {
         userUtil =
@@ -83,7 +83,7 @@ public class Nexus450UserCreationIT
         StringBuilder emailsContent = new StringBuilder();
         
         /// make sure we have at least 1 message
-        Assert.assertTrue( "No emails recieved.", msgs.length > 0 );
+        Assert.assertTrue( msgs.length > 0, "No emails recieved." );
         
         for ( MimeMessage mimeMessage : msgs )
         {
@@ -128,7 +128,7 @@ public class Nexus450UserCreationIT
         Assert.assertTrue( status.isSuccess() );
     }
 
-    @After
+    @AfterMethod
     public void removeUser()
         throws Exception
     {

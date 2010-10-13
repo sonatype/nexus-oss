@@ -5,10 +5,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public abstract class Nexus1329AbstractCheckOnlyOneMirror
     extends AbstractMirrorIT
@@ -38,8 +38,8 @@ public abstract class Nexus1329AbstractCheckOnlyOneMirror
         File originalFile = this.getTestFile( "basic/nexus1329/sample/1.0.0/sample-1.0.0.xml" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
-        Assert.assertTrue( "Nexus should access first mirror " + mirror1Urls, mirror1Urls.size() > 0 );
-        Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
+        Assert.assertTrue( mirror1Urls.size() > 0, "Nexus should access first mirror " + mirror1Urls );
+        Assert.assertTrue( mirror2Urls.isEmpty(), "Nexus should not access second mirror " + mirror2Urls );
     }
     
     protected void beforeCheck()

@@ -2,9 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus3709;
 
 import java.net.URL;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -13,6 +10,8 @@ import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus3709FileTypeValidationIT
     extends AbstractNexusProxyIntegrationTest
@@ -34,7 +33,7 @@ public class Nexus3709FileTypeValidationIT
         
         RepositoryProxyResource resource = (RepositoryProxyResource) repoUtil.getRepository( this.getTestRepositoryId() );
         // this should be false to start with
-        Assert.assertFalse( "Expected fileTypeValidation to be false after startup.", resource.isFileTypeValidation() );
+        Assert.assertFalse( resource.isFileTypeValidation(), "Expected fileTypeValidation to be false after startup." );
         resource.setFileTypeValidation( true );
         
         // update it

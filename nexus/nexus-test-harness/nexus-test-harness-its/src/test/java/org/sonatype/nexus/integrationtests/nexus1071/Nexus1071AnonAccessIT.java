@@ -13,18 +13,20 @@
  */
 package org.sonatype.nexus.integrationtests.nexus1071;
 
-import static org.junit.Assert.assertTrue;
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * @author Juven Xu
@@ -32,8 +34,13 @@ import org.sonatype.nexus.test.utils.FileTestingUtils;
 public class Nexus1071AnonAccessIT
     extends AbstractPrivilegeTest
 {
+	
+    @BeforeClass(alwaysRun = true)
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-    @Test
+    @Test(groups = SECURITY)
     public void downloadArtifactFromPublicGroup()
         throws Exception
     {
@@ -53,7 +60,7 @@ public class Nexus1071AnonAccessIT
 
     }
 
-    @Test
+    @Test(groups = SECURITY)
     public void downloadArtifactFromInternalRepo()
         throws Exception
     {

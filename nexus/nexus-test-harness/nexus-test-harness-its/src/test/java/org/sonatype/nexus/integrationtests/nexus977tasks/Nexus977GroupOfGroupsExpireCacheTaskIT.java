@@ -5,9 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.StringContains;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
@@ -15,6 +14,8 @@ import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsExpireCacheTaskIT
     extends AbstractNexusProxyIntegrationTest
@@ -38,7 +39,7 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         ScheduledServiceListResource task =
             TaskScheduleUtil.runTask( "ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( "The ScheduledServicePropertyResource task didn't run", task );
+        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
         downloadArtifactFromRepository( "g4", gav, "target/downloads/nexus977tasks" );
     }
@@ -53,7 +54,7 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         }
         catch ( FileNotFoundException e )
         {
-            Assert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
+            MatcherAssert.assertThat( e.getMessage(), StringContains.containsString( "404" ) );
         }
     }
 }

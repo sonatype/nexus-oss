@@ -15,9 +15,11 @@ package org.sonatype.nexus.integrationtests.nexus156;
 
 import java.io.IOException;
 
-import org.junit.Test;
 import org.restlet.data.MediaType;
+import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.RoleMessageUtil;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * CRUD tests for XML request/response.
@@ -26,9 +28,10 @@ public class Nexus156RolesCrudXmlIT
     extends Nexus156RolesCrudJsonIT
 {
 
-    public Nexus156RolesCrudXmlIT()
-    {
-        this.messageUtil = new RoleMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+    @BeforeClass
+    public void setSecureTest(){
+    	this.messageUtil = new RoleMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
     
     @Test

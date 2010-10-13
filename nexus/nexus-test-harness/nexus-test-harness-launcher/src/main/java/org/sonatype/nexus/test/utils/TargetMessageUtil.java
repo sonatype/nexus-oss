@@ -14,12 +14,12 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
-import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.StringUtils;
@@ -36,6 +36,7 @@ import org.sonatype.nexus.rest.model.RepositoryTargetListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.rest.model.RepositoryTargetResourceResponse;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -67,8 +68,8 @@ public class TargetMessageUtil
         Response response = this.sendMessage( update ? Method.PUT : Method.POST, target );
         String responseText = response.getEntity().getText();
 
-        Assert.assertTrue( "Could not save Repository Target: " + response.getStatus() + "\nResponse Text:\n"
-            + responseText + "\n" + xstream.toXML( target ), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Could not save Repository Target: " + response.getStatus() + "\nResponse Text:\n"
+                + responseText + "\n" + xstream.toXML( target ) );
 
         // get the Resource object
         RepositoryTargetResource responseResource = this.getResourceFromResponse( responseText );
@@ -212,8 +213,8 @@ public class TargetMessageUtil
 
         List<CRepositoryTarget> repoTargets = config.getRepositoryTargets();
         // check to see if the size matches
-        Assert.assertTrue( "Configuration had a different number: (" + repoTargets.size()
-            + ") of targets then expected: (" + targets.size() + ")", repoTargets.size() == targets.size() );
+        Assert.assertTrue( repoTargets.size() == targets.size(), "Configuration had a different number: (" + repoTargets.size()
+                + ") of targets then expected: (" + targets.size() + ")" );
 
         // look for the target by id
 
@@ -255,7 +256,7 @@ public class TargetMessageUtil
         {
             Status status =
                 RequestFacade.sendMessage( "service/local/repo_targets/" + target.getId(), Method.DELETE ).getStatus();
-            Assert.assertTrue( "Failt to delete: " + status.getDescription(), status.isSuccess() );
+            Assert.assertTrue( status.isSuccess(), "Failt to delete: " + status.getDescription() );
         }
     }
 

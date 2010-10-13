@@ -1,14 +1,15 @@
 package org.sonatype.nexus.integrationtests.nexus2996;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.internal.matchers.IsCollectionContaining;
+import org.hamcrest.MatcherAssert;
+import org.hamcrest.collection.IsCollectionContaining;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.RepositoryTargetResource;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.XStreamFactory;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2996DeleteRepoTargetIT
     extends AbstractNexusIntegrationTest
@@ -32,7 +33,7 @@ public class Nexus2996DeleteRepoTargetIT
         throws Exception
     {
         RepositoryTargetResource target = TargetMessageUtil.get( TARGET_ID );
-        Assert.assertThat( target.getPatterns(), IsCollectionContaining.hasItem( ".*" ) );
+        MatcherAssert.assertThat( target.getPatterns(), IsCollectionContaining.hasItem( ".*" ) );
 
         privUtil.assertExists( READ_PRIV_ID, CREATE_PRIV_ID, UPDATE_PRIV_ID, DELETE_PRIV_ID );
 

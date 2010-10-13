@@ -18,12 +18,8 @@ import java.io.FileReader;
 import java.util.Date;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.junit.After;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.SearchType;
@@ -32,6 +28,9 @@ import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.Test;
 
 /**
  * Test Search operations.
@@ -65,7 +64,7 @@ public class Nexus383SearchIT
         super.deployArtifacts();
     }
 
-    @After
+    @AfterMethod
     public void resetRepo()
         throws Exception
     {
@@ -88,7 +87,7 @@ public class Nexus383SearchIT
 
         // groupId
         List<NexusArtifact> results = getSearchMessageUtil().searchFor( "nexus383" );
-        Assert.assertEquals( 2, results.size() );
+        Assert.assertEquals( results.size(), 2  );
 
         // 3. negative test
         results = getSearchMessageUtil().searchFor( "nexus-383" );
@@ -221,7 +220,8 @@ public class Nexus383SearchIT
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
-    @Test
+    @Test( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
+        "disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
     public void crossRepositorySearch()
         throws Exception
@@ -279,11 +279,11 @@ public class Nexus383SearchIT
         // Keyword search does collapse results, so we need _1_
         // Not since NEXUS-3595, because we have only 3 hits, collapse will be overridden
         List<NexusArtifact> results = getSearchMessageUtil().searchFor( "crossArtifact" );
-        Assert.assertEquals( 3, results.size() );
+        Assert.assertEquals( results.size(), 3  );
 
         // GAV search does not
         results = getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), null );
-        Assert.assertEquals( 3, results.size() );
+        Assert.assertEquals( results.size(), 3  );
 
     }
 

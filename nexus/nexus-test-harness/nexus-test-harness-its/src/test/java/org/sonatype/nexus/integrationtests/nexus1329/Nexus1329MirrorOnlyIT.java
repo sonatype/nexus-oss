@@ -18,10 +18,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1329MirrorOnlyIT
     extends AbstractMirrorIT
@@ -50,8 +50,8 @@ public class Nexus1329MirrorOnlyIT
         File originalFile = this.getTestFile( "basic/nexus1329/sample/1.0.0/sample-1.0.0.xml" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( originalFile, artifactFile ) );
 
-        Assert.assertTrue( "Nexus should not access repository canonical url " + repoUrls, repoUrls.isEmpty() );
-        Assert.assertTrue( "Nexus should not access second mirror " + mirror2Urls, mirror2Urls.isEmpty() );
+        Assert.assertTrue( repoUrls.isEmpty(), "Nexus should not access repository canonical url " + repoUrls );
+        Assert.assertTrue( mirror2Urls.isEmpty(), "Nexus should not access second mirror " + mirror2Urls );
     }
 
 }

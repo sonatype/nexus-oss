@@ -2,9 +2,8 @@ package org.sonatype.nexus.integrationtests.nexus2692;
 
 import java.util.SortedSet;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2692EvictAllTaskIT extends AbstractEvictTaskIt
 {
@@ -26,26 +25,26 @@ public class Nexus2692EvictAllTaskIT extends AbstractEvictTaskIt
         // calc the diff ( files that were deleted and should not have been )
         expectedResults.removeAll( resultStorageFiles );
         Assert.assertTrue(
-            "The following files where deleted and should not have been: " + expectedResults,
-            expectedResults.isEmpty() );
+            expectedResults.isEmpty(),
+            "The following files where deleted and should not have been: " + expectedResults );
 
         expectedResults = this.buildListOfExpectedFilesForAllRepos( days );
         expectedResults.removeAll( resultAttributeFiles );
         Assert.assertTrue(
-            "The following attribute files where deleted and should not have been: " + expectedResults,
-            expectedResults.isEmpty() );
+            expectedResults.isEmpty(),
+            "The following attribute files where deleted and should not have been: " + expectedResults );
 
         // now the other way
         expectedResults = this.buildListOfExpectedFilesForAllRepos( days );
         resultStorageFiles.removeAll( expectedResults );
-        Assert.assertTrue( "The following files should have been deleted: " + resultStorageFiles, resultStorageFiles
-            .isEmpty() );
+        Assert.assertTrue( resultStorageFiles
+            .isEmpty(), "The following files should have been deleted: " + resultStorageFiles );
 
         expectedResults = this.buildListOfExpectedFilesForAllRepos( days );
         resultAttributeFiles.removeAll( expectedResults );
         Assert.assertTrue(
-            "The following files should have been deleted: " + resultAttributeFiles,
-            resultAttributeFiles.isEmpty() );
+            resultAttributeFiles.isEmpty(),
+            "The following files should have been deleted: " + resultAttributeFiles );
 
         // make sure we don't have any empty directories
         this.checkForEmptyDirectories();

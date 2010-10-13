@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -22,6 +20,9 @@ import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.security.rest.model.PrivilegeStatusResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class Nexus1730DeleteRepoIT
     extends AbstractNexusIntegrationTest
@@ -30,10 +31,9 @@ public class Nexus1730DeleteRepoIT
     protected RepositoryMessageUtil repoUtil;
     protected GroupMessageUtil groupUtil;
     
-    public Nexus1730DeleteRepoIT()
-        throws Exception
-    {
-        privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+    @BeforeClass
+    public void prepare() throws ComponentLookupException{
+    	privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         repoUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
         groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }

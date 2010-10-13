@@ -3,10 +3,6 @@ package org.sonatype.nexus.integrationtests.nexus2120;
 import java.io.File;
 import java.util.List;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ControlledServer;
@@ -21,6 +17,10 @@ import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
 import org.sonatype.nexus.test.utils.XStreamFactory;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -41,7 +41,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
     private RepositoryMessageUtil repoUtil;
 
-    @Before
+    @BeforeMethod
     public void start()
         throws Exception
     {
@@ -51,7 +51,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
                                        getRepositoryTypeRegistry() );
     }
 
-    @After
+    @AfterMethod
     public void stop()
         throws Exception
     {
@@ -81,11 +81,11 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         // first try, download remote index set to false
-        Assert.assertTrue( "nexus should not download remote indexes!!! " + repoUrls, repoUrls.isEmpty() );
+        Assert.assertTrue( repoUrls.isEmpty(), "nexus should not download remote indexes!!! " + repoUrls );
         // server changed here, a 404 is no longer returned if index_context is empty, 404 will only be returned
         // if index_context does not exist (or repo does not exist)
         Response response = RequestFacade.doGetRequest( URI );
-        Assert.assertTrue( "Error downloading index content\n" + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Error downloading index content\n" + response.getStatus() );
        
         XStream xstream = XStreamFactory.getXmlXStream();
         
@@ -97,7 +97,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
         
-        Assert.assertTrue( "index response should have 0 entries", resourceResponse.getData().getChildren().isEmpty() );
+        Assert.assertTrue( resourceResponse.getData().getChildren().isEmpty(), "index response should have 0 entries" );
 
         // I changed my mind, I do wanna remote index
         basic.setDownloadRemoteIndexes( true );
@@ -108,9 +108,9 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
 
         // did nexus downloaded indexes?
-        Assert.assertTrue( "nexus should download remote indexes!!! " + repoUrls,
-                           repoUrls.contains( "/repository/.index/nexus-maven-repository-index.gz" ) );
+        Assert.assertTrue( repoUrls.contains( "/repository/.index/nexus-maven-repository-index.gz" ),
+                           "nexus should download remote indexes!!! " + repoUrls );
         response = RequestFacade.doGetRequest( URI );
-        Assert.assertTrue( "Error downloading index content\n" + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Error downloading index content\n" + response.getStatus() );
     }
 }

@@ -17,12 +17,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
 
-import junit.framework.Assert;
-
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.junit.After;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.index.SearchType;
@@ -31,6 +27,10 @@ import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test Search operations.
@@ -49,6 +49,12 @@ public class Nexus383SearchNGIT
 
     public Nexus383SearchNGIT()
     {
+
+    }
+
+    @BeforeClass
+    public void prepare()
+    {
         this.groupMessageUtil = new GroupMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
@@ -57,14 +63,14 @@ public class Nexus383SearchNGIT
         throws Exception
     {
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_RELEASE_REPO, NEXUS_TEST_HARNESS_REPO2,
-            NEXUS_TEST_HARNESS_REPO );
+                                             NEXUS_TEST_HARNESS_REPO );
 
         TaskScheduleUtil.waitForAllTasksToStop();
 
         super.deployArtifacts();
     }
 
-    @After
+    @AfterMethod
     public void resetRepo()
         throws Exception
     {
@@ -87,7 +93,7 @@ public class Nexus383SearchNGIT
 
         // groupId
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "nexus383" );
-        Assert.assertEquals( 2, results.getData().size() );
+        Assert.assertEquals( results.getData().size(), 2 );
 
         // 3. negative test
         results = getSearchMessageUtil().searchNGFor( "nexus-383" );
@@ -126,15 +132,15 @@ public class Nexus383SearchNGIT
     {
         // know-artifact-1
         SearchNGResponse result = getSearchMessageUtil().searchSha1NGFor( "4ce1d96bd11b8959b32a75c1fa5b738d7b87d408" );
-        Assert.assertEquals( "know-artifact-1 should be found", 1, result.getData().size() );
+        Assert.assertEquals( result.getData().size(), 1, "know-artifact-1 should be found" );
 
         // know-artifact-2
         result = getSearchMessageUtil().searchSha1NGFor( "230377663ac3b19ad83c99b0afdb056dd580c5c8" );
-        Assert.assertEquals( "know-artifact-2 should be found", 1, result.getData().size() );
+        Assert.assertEquals( result.getData().size(), 1, "know-artifact-2 should be found" );
 
         // velo's picture
         result = getSearchMessageUtil().searchSha1NGFor( "612c17de73fdc8b9e3f6a063154d89946eb7c6f2" );
-        Assert.assertEquals( "velo's picture should not be found", 0, result.getData().size() );
+        Assert.assertEquals( result.getData().size(), 0, "velo's picture should not be found" );
     }
 
     @Test
@@ -222,7 +228,8 @@ public class Nexus383SearchNGIT
         getSearchMessageUtil().allowDeploying( NEXUS_TEST_HARNESS_REPO, true );
     }
 
-    @Test
+    @Test( dependsOnMethods = { "searchFor", "searchForSHA1", "disableSearching", "disableEnableSearching",
+        "disableBrowsing", "disableEnableBrowsing", "disableDeploying" } )
     // 4. deploy same artifact to multiple repos, and search
     public void crossRepositorySearch()
         throws Exception
@@ -238,40 +245,40 @@ public class Nexus383SearchNGIT
 
         Gav gav =
             new Gav( model.getGroupId(), model.getArtifactId(), model.getVersion(), null, model.getPackaging(), 0,
-                new Date().getTime(), model.getName(), false, false, null, false, null );
+                     new Date().getTime(), model.getName(), false, false, null, false, null );
 
         // Multi repository deploy
         getDeployUtils().deployWithWagon( "http", deployUrl, fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http", deployUrl, pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2 ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
 
         // if you deploy the same item multiple times to the same repo, that is only a single item
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), fileToDeploy,
-            this.getRelitiveArtifactPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          fileToDeploy, this.getRelitiveArtifactPath( gav ) );
         getDeployUtils().deployWithWagon( "http",
-            deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ), pomFile,
-            this.getRelitivePomPath( gav ) );
+                                          deployUrl.replace( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_RELEASE_REPO ),
+                                          pomFile, this.getRelitivePomPath( gav ) );
 
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
-            NEXUS_TEST_HARNESS_RELEASE_REPO );
+                                             NEXUS_TEST_HARNESS_RELEASE_REPO );
 
         TaskScheduleUtil.waitForTasks();
         
@@ -280,11 +287,11 @@ public class Nexus383SearchNGIT
         // Keyword search does collapse results, so we need _1_
         // Since the top level is GAV now only
         SearchNGResponse results = getSearchMessageUtil().searchNGFor( "crossArtifact" );
-        Assert.assertEquals( "We need 1 cross artifacts with Quick search!", 1, results.getData().size() );
+        Assert.assertEquals( results.getData().size(), 1, "We need 1 cross artifacts with Quick search!" );
 
         // GAV search does not
         results = getSearchMessageUtil().searchNGForGav( gav );
-        Assert.assertEquals( "We need 1 cross artifacts with GAV search!", 1, results.getData().size() );
+        Assert.assertEquals( results.getData().size(), 1, "We need 1 cross artifacts with GAV search!" );
     }
 
 }

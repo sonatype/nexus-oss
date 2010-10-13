@@ -17,17 +17,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test task Reindex Repositories.
@@ -61,7 +60,7 @@ public class Nexus641ReindexTaskIT
 
         // try to seach and fail
         List<NexusArtifact> search = getSearchMessageUtil().searchFor( "nexus641" );
-        Assert.assertEquals( "The artifact was already indexed", 1, search.size() );
+        Assert.assertEquals( search.size(), 1, "The artifact was already indexed" );
 
         // reindex
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
@@ -75,7 +74,7 @@ public class Nexus641ReindexTaskIT
 
         // try to download again and success
         search = getSearchMessageUtil().searchFor( "nexus641" );
-        Assert.assertEquals( "The artifact should be indexed", 2, search.size() );
+        Assert.assertEquals( search.size(), 2, "The artifact should be indexed" );
     }
 
 }

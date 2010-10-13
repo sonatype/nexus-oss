@@ -13,20 +13,23 @@
  */
 package org.sonatype.nexus.integrationtests.nexus429;
 
+
+import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
+
 import java.io.File;
 import java.util.Date;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
-import org.sonatype.nexus.test.utils.DeployUtils;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Test the privilege for manual artifact upload.
  */
+@Test(groups = SECURITY)
 public class Nexus429UploadArtifactPrivilegeIT
     extends AbstractPrivilegeTest
 {
@@ -36,9 +39,12 @@ public class Nexus429UploadArtifactPrivilegeIT
     {
         super( TEST_RELEASE_REPO );
     }
+    
+    @BeforeClass(alwaysRun = true)
+    public void setSecureTest(){
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+    }
 
-
-    @Test
     public void deployPrivWithPom()
         throws Exception
     {
@@ -51,7 +57,7 @@ public class Nexus429UploadArtifactPrivilegeIT
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
 
         File pomFile = this.getTestFile( "pom.xml" );
-         
+
         // deploy
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -60,24 +66,24 @@ public class Nexus429UploadArtifactPrivilegeIT
         String uploadURL = this.getBaseNexusUrl() + "service/local/artifact/maven/content";
 
         // with pom should fail
-        int status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        Assert.assertEquals( "Status should have been 403", 403, status );
-                
+        int status =
+            getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        Assert.assertEquals( status, 403, "Status should have been 403" );
+
         // give deployment role
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "65" );
         this.giveUserRole( "test-user", "repo-all-full" );
-        
+
         // try again
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
-        status = getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
-        Assert.assertEquals( "Status should have been 201", 201, status );
+
+        status =
+            getDeployUtils().deployUsingPomWithRest( uploadURL, TEST_RELEASE_REPO, fileToDeploy, pomFile, null, null );
+        Assert.assertEquals( status, 201, "Status should have been 201" );
     }
-    
-    
-    @Test
+
     public void deployPrivWithGav()
         throws Exception
     {
@@ -88,7 +94,7 @@ public class Nexus429UploadArtifactPrivilegeIT
 
         // file to deploy
         File fileToDeploy = this.getTestFile( gav.getArtifactId() + "." + gav.getExtension() );
-         
+
         // deploy
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
@@ -98,19 +104,19 @@ public class Nexus429UploadArtifactPrivilegeIT
 
         // with gav should fail
         int status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-        Assert.assertEquals( "Status should have been 403", 403, status );
-        
+        Assert.assertEquals( status, 403, "Status should have been 403" );
+
         // give deployment role
         TestContainer.getInstance().getTestContext().useAdminForRequests();
         this.giveUserPrivilege( "test-user", "65" );
         this.giveUserRole( "test-user", "repo-all-full" );
-        
+
         // try again
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
+
         status = getDeployUtils().deployUsingGavWithRest( uploadURL, TEST_RELEASE_REPO, gav, fileToDeploy );
-        Assert.assertEquals( "Status should have been 201", 201, status );
+        Assert.assertEquals( status, 201, "Status should have been 201" );
 
     }
 

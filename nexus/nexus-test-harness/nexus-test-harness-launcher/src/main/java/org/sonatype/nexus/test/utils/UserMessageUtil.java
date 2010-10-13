@@ -14,9 +14,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-import java.util.List;
 
-import junit.framework.Assert;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
@@ -33,6 +32,7 @@ import org.sonatype.security.rest.model.PlexusUserResourceResponse;
 import org.sonatype.security.rest.model.UserListResourceResponse;
 import org.sonatype.security.rest.model.UserResource;
 import org.sonatype.security.rest.model.UserResourceRequest;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -68,8 +68,8 @@ public class UserMessageUtil
         UserResource responseResource = this.getResourceFromResponse( response );
 
         // make sure the id != null
-        Assert.assertNotNull( "User ID shouldn't be null: " + response.getEntity().getText(),
-            responseResource.getUserId() );
+        Assert.assertNotNull( responseResource.getUserId(), "User ID shouldn't be null: "
+            + response.getEntity().getText() );
         user.setUserId( responseResource.getUserId() );
 
         Assert.assertEquals( user.getFirstName(), responseResource.getFirstName() );
@@ -170,7 +170,7 @@ public class UserMessageUtil
             new XStreamRepresentation( XStreamFactory.getXmlXStream(), responseText, MediaType.APPLICATION_XML );
 
         // make sure we have a success
-        Assert.assertTrue( "Status: " + response.getStatus() + "\n" + responseText, response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() + "\n" + responseText );
 
         UserListResourceResponse resourceResponse =
             (UserListResourceResponse) representation.getPayload( new UserListResourceResponse() );
@@ -212,12 +212,12 @@ public class UserMessageUtil
         Response response =
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
         PlexusUserListResourceResponse result =
             (PlexusUserListResourceResponse) this.parseResponseText( responseString,
-                new PlexusUserListResourceResponse() );
+                                                                     new PlexusUserListResourceResponse() );
 
         return result.getData();
     }
@@ -233,8 +233,8 @@ public class UserMessageUtil
         Response response =
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
         PlexusUserResourceResponse result =
             (PlexusUserResourceResponse) this.parseResponseText( responseString, new PlexusUserResourceResponse() );
@@ -258,12 +258,12 @@ public class UserMessageUtil
         Response response =
             RequestFacade.sendMessage( uriPart, Method.GET, new StringRepresentation( "", this.mediaType ) );
         String responseString = response.getEntity().getText();
-        Assert.assertTrue( "Status: " + response.getStatus() + "\nResponse:\n" + responseString,
-            response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(),
+                           "Status: " + response.getStatus() + "\nResponse:\n" + responseString );
 
         PlexusUserListResourceResponse result =
             (PlexusUserListResourceResponse) this.parseResponseText( responseString,
-                new PlexusUserListResourceResponse() );
+                                                                     new PlexusUserListResourceResponse() );
 
         return result.getData();
     }

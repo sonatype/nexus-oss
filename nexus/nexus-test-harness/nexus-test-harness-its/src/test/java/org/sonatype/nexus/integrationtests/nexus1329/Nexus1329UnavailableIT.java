@@ -16,11 +16,11 @@ package org.sonatype.nexus.integrationtests.nexus1329;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus1329UnavailableIT
     extends AbstractMirrorIT
@@ -52,8 +52,8 @@ public class Nexus1329UnavailableIT
             // expected
         }
 
-        Assert.assertFalse( "Nexus should try repository canonical url " + repoUrls, repoUrls.isEmpty() );
-        Assert.assertFalse( "Nexus should try mirror 1 " + mirror1Urls, mirror1Urls.isEmpty() );
+        Assert.assertFalse( repoUrls.isEmpty(), "Nexus should try repository canonical url " + repoUrls );
+        Assert.assertFalse( mirror1Urls.isEmpty(), "Nexus should try mirror 1 " + mirror1Urls );
 
         MirrorStatusResourceListResponse response = this.messageUtil.getMirrorsStatus( REPO );
 

@@ -15,15 +15,14 @@ package org.sonatype.nexus.integrationtests.nexus641;
 
 import java.io.IOException;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
-import org.junit.Test;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 /**
  * Test task OptimizeIndex Repositories.

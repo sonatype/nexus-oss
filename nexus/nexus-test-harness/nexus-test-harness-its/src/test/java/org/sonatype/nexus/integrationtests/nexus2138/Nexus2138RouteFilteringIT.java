@@ -2,9 +2,6 @@ package org.sonatype.nexus.integrationtests.nexus2138;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
-import org.junit.Test;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -15,6 +12,8 @@ import org.sonatype.nexus.rest.model.RepositoryRouteListResource;
 import org.sonatype.nexus.rest.model.RepositoryRouteMemberRepository;
 import org.sonatype.nexus.rest.model.RepositoryRouteResource;
 import org.sonatype.nexus.test.utils.RoutesMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus2138RouteFilteringIT
     extends AbstractPrivilegeTest
@@ -26,10 +25,10 @@ public class Nexus2138RouteFilteringIT
     {
         // create some test routes
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
 
         response = this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
 
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
@@ -48,7 +47,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
 
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + "public" );
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
@@ -69,7 +68,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
         TestContainer.getInstance().getTestContext().setPassword( TEST_USER_PASSWORD );
@@ -84,7 +83,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserRole( TEST_USER_NAME, "ui-routing-admin" );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
         RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -103,7 +102,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + "public" );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
         RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -121,7 +120,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId() );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
         RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
@@ -140,7 +139,7 @@ public class Nexus2138RouteFilteringIT
         this.giveUserPrivilege( TEST_USER_NAME, "repository-" + this.getTestRepositoryId() );
 
         Response response = this.createRouteTest( "public", this.getTestRepositoryId(), "nexus-test-harness-release-repo" );
-        Assert.assertTrue( "Status: " + response.getStatus(), response.getStatus().isSuccess() );
+        Assert.assertTrue( response.getStatus().isSuccess(), "Status: " + response.getStatus() );
         RepositoryRouteResource routeResource = this.routeUtil.getResourceFromResponse( response );
 
         TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );

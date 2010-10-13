@@ -16,15 +16,14 @@ package org.sonatype.nexus.integrationtests.nexus748;
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
-import org.junit.Test;
 import org.sonatype.nexus.client.NexusClient;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.integrationtests.TestContext;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 public class Nexus748MultipleStart
     extends AbstractNexusIntegrationTest

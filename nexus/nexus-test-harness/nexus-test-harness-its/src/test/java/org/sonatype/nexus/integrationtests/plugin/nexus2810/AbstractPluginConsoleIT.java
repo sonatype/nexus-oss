@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.it.util.StringUtils;
-import org.junit.Assert;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.plugins.plugin.console.api.dto.PluginInfoDTO;
+import org.testng.Assert;
 
 public abstract class AbstractPluginConsoleIT
     extends AbstractNexusIntegrationTest

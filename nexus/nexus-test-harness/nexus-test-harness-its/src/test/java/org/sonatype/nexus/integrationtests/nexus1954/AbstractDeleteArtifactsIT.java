@@ -9,16 +9,16 @@ import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.TimeZone;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public abstract class AbstractDeleteArtifactsIT
     extends AbstractNexusIntegrationTest
@@ -51,7 +51,8 @@ public abstract class AbstractDeleteArtifactsIT
         super( testRepositoryId );
     }
 
-    @Before
+    //@BeforeClass
+    @BeforeMethod
     public void init()
         throws IllegalArtifactCoordinateException
     {

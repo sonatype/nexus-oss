@@ -16,10 +16,7 @@ package org.sonatype.nexus.integrationtests.nexus874;
 import java.io.IOException;
 import java.net.ConnectException;
 
-import junit.framework.Assert;
-
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -31,6 +28,9 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.TargetMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Validate the MemoryRealm that replaces default nexus security
@@ -46,13 +46,15 @@ public class Nexus874SecurityRealmReplacementIT
 
     private UserMessageUtil userUtil;
 
-    public Nexus874SecurityRealmReplacementIT()
+    @BeforeClass
+    public void setSecureTest()
         throws ComponentLookupException
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         groupUtil = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         repoUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
+                                       getRepositoryTypeRegistry() );
         // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         roleUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
@@ -169,10 +171,10 @@ public class Nexus874SecurityRealmReplacementIT
         TestContainer.getInstance().getTestContext().setPassword( "deployment123" );
 
         String serviceURI = "service/local/schedules";
-        
+
         Response response = RequestFacade.doGetRequest( "service/local/repo_targets" );
         Assert.assertEquals( 403, response.getStatus().getCode() );
-        
+
         response = RequestFacade.doGetRequest( serviceURI );
         Assert.assertEquals( 403, response.getStatus().getCode() );
 

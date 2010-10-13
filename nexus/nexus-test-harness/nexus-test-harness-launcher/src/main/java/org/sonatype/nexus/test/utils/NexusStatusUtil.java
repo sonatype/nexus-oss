@@ -19,14 +19,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.StatusResourceResponse;
 import org.sonatype.nexus.test.launcher.ThreadedPlexusAppBooterService;
+import org.testng.Assert;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -129,7 +128,7 @@ public class NexusStatusUtil
         }
 
         final ThreadedPlexusAppBooterService appBooterService = APP_BOOTER_SERVICE;
-        
+
         try
         {
             try
@@ -190,7 +189,7 @@ public class NexusStatusUtil
                 }
             }
         }
-        
+
         try
         {
             getNexusStatus();
@@ -202,6 +201,7 @@ public class NexusStatusUtil
             log.debug( "nexus application port is open, but not yet responding to requests." );
             return false;
         }
+
     }
 
     public boolean isNexusStopped()
