@@ -61,7 +61,7 @@ public final class NexusTypeVisitor
 
     private ClassSpace space;
 
-    private NexusType nexusType;
+    private NexusType nexusType = MarkedNexusTypes.UNKNOWN;
 
     // ----------------------------------------------------------------------
     // Constructors
