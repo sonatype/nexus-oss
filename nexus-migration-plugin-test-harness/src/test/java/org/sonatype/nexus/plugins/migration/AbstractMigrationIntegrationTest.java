@@ -265,5 +265,6 @@ public abstract class AbstractMigrationIntegrationTest
     {
         TaskScheduleUtil.waitForAllTasksToStop();
         new EventInspectorsUtil( this ).waitForCalmPeriod();
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 }
