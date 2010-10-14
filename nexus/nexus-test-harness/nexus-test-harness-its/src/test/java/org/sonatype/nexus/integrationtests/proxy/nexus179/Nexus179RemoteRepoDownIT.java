@@ -113,7 +113,7 @@ public class Nexus179RemoteRepoDownIT
             Assert.fail( "Could not clear the cache for repo: " + REPO_RELEASE_PROXY_REPO1 );
         }
 
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
 }

@@ -36,18 +36,13 @@ public class EventInspectorsUtil
     public void waitForCalmPeriod()
         throws IOException, InterruptedException
     {
-        final int RETRIES = 10;
+        final Response response =
+            RequestFacade.doGetRequest( "service/local/eventInspectors/isCalmPeriod?waitForCalm=true" );
 
-        for ( int i = 0; i < RETRIES; i++ )
+        if ( response.getStatus().getCode() != Status.SUCCESS_OK.getCode() )
         {
-            Thread.sleep( 800 );
-            
-            if ( isCalmPeriod() )
-            {
-                return;
-            }
+            throw new IOException( "The isCalmPeriod REST resource reported an error ("
+                + response.getStatus().toString() + "), bailing out!" );
         }
-
-        throw new IOException( "Was not able to get to calm period even afer " + RETRIES + " retries!" );
     }
 }

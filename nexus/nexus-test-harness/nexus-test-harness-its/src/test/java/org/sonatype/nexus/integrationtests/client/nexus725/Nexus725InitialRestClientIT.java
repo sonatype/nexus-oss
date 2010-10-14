@@ -92,7 +92,6 @@ public class Nexus725InitialRestClientIT
     public void isValidRepositoryTest()
         throws Exception
     {
-    	Thread.sleep(30000);
         NexusClient client = this.getConnectedNexusClient();
 
         Assert.assertTrue( client.isValidRepository( "nexus-test-harness-repo" ),

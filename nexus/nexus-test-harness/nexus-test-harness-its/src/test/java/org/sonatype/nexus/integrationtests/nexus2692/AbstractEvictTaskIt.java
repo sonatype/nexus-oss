@@ -142,8 +142,7 @@ public class AbstractEvictTaskIt
         age.setValue( String.valueOf( days ) );
 
         ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, 100, prop,
-                                      age );
+            TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
 
         Assert.assertNotNull( task, "Task did not finish." );
         Assert.assertEquals( "SUBMITTED", task.getStatus() );

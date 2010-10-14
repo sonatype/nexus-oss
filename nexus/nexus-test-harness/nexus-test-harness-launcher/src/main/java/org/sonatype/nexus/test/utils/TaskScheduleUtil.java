@@ -14,7 +14,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -129,28 +128,28 @@ public class TaskScheduleUtil
         }
     }
 
-    public static void waitForTasks()
-        throws Exception
-    {
-        waitForTasks( 100 );
-    }
-
     public static void waitForAllTasksToStop()
         throws Exception
     {
-        waitForAllTasksToStop( 100 );
+        waitForAllTasksToStop( 300 );
     }
 
     public static void waitForAllTasksToStop( String taskType )
         throws Exception
     {
-        waitForAllTasksToStop( 100, taskType );
+        waitForAllTasksToStop( 300, taskType );
     }
 
     public static void waitForAllTasksToStop( int maxAttempts )
         throws Exception
     {
         waitForAllTasksToStop( maxAttempts, null );
+    }
+
+    public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
+        throws Exception
+    {
+        waitForAllTasksToStop( taskClass.getSimpleName() );
     }
 
     public static void waitForAllTasksToStop( int maxAttempts, String taskType )
@@ -160,79 +159,48 @@ public class TaskScheduleUtil
 
         Thread.sleep( 500 ); // give an time to task start
 
+        List<String> runningTasks = new ArrayList<String>();
+
         for ( int attempt = 0; attempt < maxAttempts; attempt++ )
         {
             List<ScheduledServiceListResource> tasks = getAllTasks();
-
-            boolean running = false;
-            String runninTaskId = null;
+            runningTasks.clear();
 
             for ( ScheduledServiceListResource task : tasks )
             {
-                if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals( TaskState.SLEEPING.name() ) )
+                // if a task is running or sleeping or the task is an internal one
+                // then we should assume something is still (or will be shortly) running
+                if ( ( task.getStatus().equals( TaskState.RUNNING.name() )
+                    || task.getStatus().equals( TaskState.SLEEPING.name() ) || ( task.getSchedule().equals( "internal" ) && !task.getStatus().equals(
+                    TaskState.BROKEN.name() ) ) )
                     && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
                 {
-                    runninTaskId = task.getId();
-                    running = true;
-                    break;
+                    runningTasks.add( task.getId() );
                 }
             }
 
-            if ( !running )
+            if ( runningTasks.isEmpty() )
             {
                 return;
-            }
-            else
-            {
-                LOG.debug( "Still running " + runninTaskId );
             }
 
             Thread.sleep( sleep );
         }
+        
+        Assert.fail( "Some tasks still running after w8 period " + runningTasks );
 
-        List<String> runningTasks = new ArrayList<String>();
-        List<ScheduledServiceListResource> tasks = getAllTasks();
-
-        for ( ScheduledServiceListResource task : tasks )
-        {
-            if ( ( task.getStatus().equals( TaskState.RUNNING.name() ) || task.getStatus().equals( TaskState.SLEEPING.name() ) )
-                && ( taskType == null || taskType.equals( task.getTypeId() ) ) )
-            {
-                runningTasks.add( task.getId() );
-            }
-        }
-
-        Assert.assertTrue( runningTasks.isEmpty(), "Some tasks still running after w8 period " + runningTasks );
+        /*
+         * uncomment this after resource working String uri = "service/local/taskhelper"; if ( taskType != null ) { uri
+         * += "?taskType=" + taskType; } final Response response = RequestFacade.doGetRequest( uri ); if (
+         * response.getStatus().getCode() != Status.SUCCESS_OK.getCode() ) { throw new IOException(
+         * "The taskhelper REST resource reported an error (" + response.getStatus().toString() + "), bailing out!" ); }
+         */
     }
 
-    public static void waitForTasks( int maxAttempts )
+    public static ScheduledServiceListResource waitForTask( String name )
         throws Exception
     {
-        long sleep = 1000;
-
-        Thread.sleep( 500 ); // give an time to task start
-
-        for ( int attempt = 0; attempt < maxAttempts; attempt++ )
-        {
-            Thread.sleep( sleep );
-
-            List<ScheduledServiceListResource> tasks = getTasks();
-
-            int brokenCount = 0;
-
-            for ( ScheduledServiceListResource task : tasks )
-            {
-                if ( "BROKEN".equals( task.getStatus() ) )
-                {
-                    brokenCount++;
-                }
-            }
-
-            if ( tasks.size() - brokenCount == 0 )
-            {
-                return;
-            }
-        }
+        return waitForTask( name, 300 );
     }
 
     /**
@@ -256,15 +224,22 @@ public class TaskScheduleUtil
 
             ScheduledServiceListResource task = getTask( name );
 
-            LOG.info( "Task: " + task.getName() + ", Attempt: " + attempt + ", LastRunResult: "
-                + task.getLastRunResult() + ", Status: " + task.getStatus() );
             if ( !StringUtils.equals( task.getLastRunResult(), "n/a" )
                 && ( task.getStatus().equals( "SUBMITTED" ) || task.getStatus().equals( "WAITING" ) ) )
             {
                 return task;
             }
         }
+
+        LOG.info( "Task still running after w8 period: " + name );
         return null;
+        /*
+         * uncomment this after the resource is working String uri = "service/local/taskhelper"; if ( name != null ) {
+         * uri += "?name=" + name; } final Response response = RequestFacade.doGetRequest( uri ); if (
+         * response.getStatus().getCode() != Status.SUCCESS_OK.getCode() ) { throw new IOException(
+         * "The taskhelper REST resource reported an error (" + response.getStatus().toString() + "), bailing out!" ); }
+         * return getTask( name );
+         */
     }
 
     public static Status update( ScheduledServiceBaseResource task )
@@ -306,6 +281,13 @@ public class TaskScheduleUtil
         return runTask( typeId, typeId, properties );
     }
 
+    public static ScheduledServiceListResource runTask( String taskName, String typeId,
+                                                        ScheduledServicePropertyResource... properties )
+        throws Exception
+    {
+        return runTask( taskName, typeId, 300, properties );
+    }
+
     public static ScheduledServiceListResource runTask( String taskName, String typeId, int maxAttempts,
                                                         ScheduledServicePropertyResource... properties )
         throws Exception
@@ -331,18 +313,4 @@ public class TaskScheduleUtil
 
         return waitForTask( taskName, maxAttempts );
     }
-
-    public static ScheduledServiceListResource runTask( String taskName, String typeId,
-                                                        ScheduledServicePropertyResource... properties )
-        throws Exception
-    {
-        return runTask( taskName, typeId, 200, properties );
-    }
-
-    public static void waitForAllTasksToStop( Class<? extends NexusTask<?>> taskClass )
-        throws Exception
-    {
-        waitForAllTasksToStop( taskClass.getSimpleName() );
-    }
-
 }

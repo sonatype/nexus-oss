@@ -108,7 +108,7 @@ public class TaskHelperPlexusResource
 
     private boolean isTaskRunning( ScheduledTask<?> task, String taskType, String name )
     {
-        return ( ( TaskState.RUNNING.equals( task.getTaskState() ) || TaskState.SLEEPING.equals( task.getTaskState() ) || RunNowSchedule.class.isAssignableFrom( task.getClass() ) )
+        return ( ( TaskState.RUNNING.equals( task.getTaskState() ) || TaskState.SLEEPING.equals( task.getTaskState() ) || ( RunNowSchedule.class.isAssignableFrom( task.getClass() ) && !TaskState.BROKEN.equals( task.getTaskState() ) ) )
             && ( taskType == null || taskType.equals( task.getType() ) ) && ( name == null || name.equals( task.getName() ) ) );
     }
 }

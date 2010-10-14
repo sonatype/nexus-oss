@@ -95,7 +95,7 @@ public class Nexus1650MultipleManualTaskIT
     public void testMultipleManualInstances()
         throws Exception
     {
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         createSnapshotTask( "Nexus1650Task1" );
         createSnapshotTask( "Nexus1650Task2" );

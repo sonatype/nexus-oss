@@ -280,7 +280,7 @@ public class Nexus383SearchNGIT
         RepositoryMessageUtil.updateIndexes( NEXUS_TEST_HARNESS_REPO, NEXUS_TEST_HARNESS_REPO2,
                                              NEXUS_TEST_HARNESS_RELEASE_REPO );
 
-        TaskScheduleUtil.waitForTasks();
+        TaskScheduleUtil.waitForAllTasksToStop();
         
         getEventInspectorsUtil().waitForCalmPeriod();
 

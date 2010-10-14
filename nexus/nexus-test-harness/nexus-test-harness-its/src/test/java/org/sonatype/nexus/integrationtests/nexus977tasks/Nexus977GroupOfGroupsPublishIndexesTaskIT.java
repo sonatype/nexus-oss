@@ -53,8 +53,7 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, 200,
-                                      repo );
+            TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, repo );
         TaskScheduleUtil.waitForAllTasksToStop();
         Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
 
