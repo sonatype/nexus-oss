@@ -3,6 +3,7 @@ package org.sonatype.nexus.plugins.events.api;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
@@ -43,15 +44,43 @@ public class EventInspectorsPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        if ( eventInspectorHost.isCalmPeriod() )
+        Form form = request.getResourceRef().getQueryAsForm();
+        boolean waitForCalm = Boolean.parseBoolean( form.getFirstValue( "waitForCalm" ) );
+
+        if ( waitForCalm )
         {
-            response.setStatus( Status.SUCCESS_OK );
-            return "Ok";
+            for ( int i = 0; i < 100; i++ )
+            {
+                try
+                {
+                    Thread.sleep( 500 );
+                }
+                catch ( InterruptedException e )
+                {
+                }
+                
+                if ( eventInspectorHost.isCalmPeriod() )
+                {
+                    response.setStatus( Status.SUCCESS_OK );
+                    return "Ok";
+                }
+            }
+            
+            response.setStatus( Status.SUCCESS_ACCEPTED );
+            return "Still munching on them...";
         }
         else
         {
-            response.setStatus( Status.SUCCESS_ACCEPTED );
-            return "Still munching on them...";
+            if ( eventInspectorHost.isCalmPeriod() )
+            {
+                response.setStatus( Status.SUCCESS_OK );
+                return "Ok";
+            }
+            else
+            {
+                response.setStatus( Status.SUCCESS_ACCEPTED );
+                return "Still munching on them...";
+            }
         }
     }
 
