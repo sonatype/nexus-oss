@@ -21,7 +21,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -65,12 +64,10 @@ public class Nexus641ReindexTaskIT
         // reindex
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "nexus-test-harness-repo" );
+        prop.setValue( "repo_" + this.getTestRepositoryId() );
 
         // reindex
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
-        Assert.assertNotNull( task );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
 
         // try to download again and success
         search = getSearchMessageUtil().searchFor( "nexus641" );

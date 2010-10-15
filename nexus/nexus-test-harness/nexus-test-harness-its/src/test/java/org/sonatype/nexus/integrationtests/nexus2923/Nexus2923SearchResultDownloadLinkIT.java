@@ -11,7 +11,6 @@ import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -41,11 +40,9 @@ public class Nexus2923SearchResultDownloadLinkIT
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( this.getTestRepositoryId() );
+        prop.setValue( "repo_" + this.getTestRepositoryId() );
 
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
-        Assert.assertNotNull( task );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
     }
 
     @Test

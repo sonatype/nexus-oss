@@ -20,7 +20,6 @@ import java.io.File;
 
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.MavenDeployer;
@@ -75,16 +74,15 @@ public class Nexus635ExpireCacheTaskIT
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "tasks-snapshot-repo" );
+        prop.setValue( "repo_tasks-snapshot-repo" );
 
         // prop = new ScheduledServicePropertyResource();
         // prop.setId( "resourceStorePath" );
         // prop.setValue( "/" );
 
         // This is THE important part
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
-        Assert.assertNotNull( task );
-
+        TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, prop );
+        
         File thirdDownload = downloadSnapshotArtifact( "tasks-snapshot-repo", GAV, new File( "target/download" ) );
         Assert.assertTrue( compareFileSHA1s( thirdDownload, artifact2 ), //
                            "After ExpireCache should download artifact 2" );

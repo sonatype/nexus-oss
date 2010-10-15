@@ -20,7 +20,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.mortbay.jetty.Server;
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
@@ -115,16 +114,11 @@ public class Nexus634CheckDoesNotGoRemoteIT
         // expire caches
         ScheduledServicePropertyResource repoOrGroupProp = new ScheduledServicePropertyResource();
         repoOrGroupProp.setKey( "repositoryOrGroupId" );
-        repoOrGroupProp.setValue( REPO_RELEASE_PROXY_REPO1 );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, repoOrGroupProp );
-        Assert.assertNotNull( task );
-
-        TaskScheduleUtil.waitForAllTasksToStop();
-
+        repoOrGroupProp.setValue( "repo_" + REPO_RELEASE_PROXY_REPO1 );
+        TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, repoOrGroupProp );
+        
         // run snapshot remover
-        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 0, 0, true );
-
-        TaskScheduleUtil.waitForAllTasksToStop();
+        runSnapshotRemover( "repo_nexus-test-harness-snapshot-repo", 0, 0, true );
 
         // check is proxy touched
         Assert.assertEquals(

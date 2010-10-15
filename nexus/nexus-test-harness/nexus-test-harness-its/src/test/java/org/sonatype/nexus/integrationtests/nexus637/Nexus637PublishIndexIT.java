@@ -72,7 +72,7 @@ public class Nexus637PublishIndexIT
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "nexus-test-harness-repo" );
+        prop.setValue( "repo_nexus-test-harness-repo" );
 
         TaskScheduleUtil.runTask( PublishIndexesTaskDescriptor.ID, prop );
 

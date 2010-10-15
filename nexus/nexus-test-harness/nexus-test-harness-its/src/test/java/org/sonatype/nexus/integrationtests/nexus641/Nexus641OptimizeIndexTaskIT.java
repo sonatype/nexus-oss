@@ -17,11 +17,9 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 /**
@@ -47,12 +45,10 @@ public class Nexus641OptimizeIndexTaskIT
         // reindex
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
-        prop.setValue( "nexus-test-harness-repo" );
+        prop.setValue( "repo_nexus-test-harness-repo" );
 
         // reindex
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( OptimizeIndexTaskDescriptor.ID, prop );
-        Assert.assertNotNull( task );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( OptimizeIndexTaskDescriptor.ID, prop );
 
     }
 

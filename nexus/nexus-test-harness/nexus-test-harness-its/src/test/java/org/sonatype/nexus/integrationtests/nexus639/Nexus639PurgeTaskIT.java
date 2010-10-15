@@ -16,7 +16,6 @@ package org.sonatype.nexus.integrationtests.nexus639;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.PurgeTimelineTaskDescriptor;
 import org.sonatype.nexus.test.utils.FeedUtil;
@@ -49,10 +48,7 @@ public class Nexus639PurgeTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "purgeOlderThan" );
         repo.setValue( "0" );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
-
-        Assert.assertNotNull( task );
-        Assert.assertEquals( task.getStatus(), "SUBMITTED"  );
+        TaskScheduleUtil.runTask( "purge", PurgeTimelineTaskDescriptor.ID, repo );
 
         // validate the feeds contain nothing.
 

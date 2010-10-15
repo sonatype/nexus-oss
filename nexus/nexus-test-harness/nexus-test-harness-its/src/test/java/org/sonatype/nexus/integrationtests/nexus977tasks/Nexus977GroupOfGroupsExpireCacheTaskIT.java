@@ -9,7 +9,6 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;
 import org.sonatype.nexus.test.utils.GavUtil;
@@ -36,11 +35,8 @@ public class Nexus977GroupOfGroupsExpireCacheTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
-
+        TaskScheduleUtil.runTask( "ExpireCacheTaskDescriptor-snapshot", ExpireCacheTaskDescriptor.ID, repo );
+        
         downloadArtifactFromRepository( "g4", gav, "target/downloads/nexus977tasks" );
     }
 

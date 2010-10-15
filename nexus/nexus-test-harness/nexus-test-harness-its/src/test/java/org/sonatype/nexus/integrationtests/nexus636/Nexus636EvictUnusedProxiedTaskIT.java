@@ -26,7 +26,6 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
@@ -72,9 +71,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "repo_" + this.getTestRepositoryId() );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
-        Assert.assertNotNull( task );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, prop );
 
     }
 
@@ -154,10 +151,7 @@ public class Nexus636EvictUnusedProxiedTaskIT
         age.setValue( String.valueOf( cacheAge ) );
 
         // clean unused
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, repo, age );
-        Assert.assertNotNull( task, "Task '" + taskName + "' didn't execute!" );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( taskName, EvictUnusedItemsTaskDescriptor.ID, repo, age );
     }
 
     private XStream getXStream()

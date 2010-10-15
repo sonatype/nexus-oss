@@ -1,7 +1,9 @@
 package org.sonatype.nexus.plugins.tasks.api;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -36,7 +38,7 @@ public class TaskHelperPlexusResource
     @Override
     public PathProtectionDescriptor getResourceProtection()
     {
-        return null;
+        return new PathProtectionDescriptor( getResourceUri(), "anon" );
     }
 
     @Override
@@ -52,12 +54,36 @@ public class TaskHelperPlexusResource
         Form form = request.getResourceRef().getQueryAsForm();
         String name = form.getFirstValue( "name" );
         String taskType = form.getFirstValue( "taskType" );
+        String attemptsParam = form.getFirstValue( "attempts" );
+        int attempts = 300;
 
-        response.setStatus( Status.SUCCESS_NO_CONTENT );
+        if ( attemptsParam != null )
+        {
+            try
+            {
+                attempts = Integer.parseInt( attemptsParam );
+            }
+            catch ( NumberFormatException e )
+            {
+                // ignore, will use default of 300
+            }
+        }
 
         ScheduledTask<?> namedTask = null;
 
-        for ( int i = 0; i < 100; i++ )
+        if ( name != null )
+        {
+            namedTask = getTaskByName( name );
+
+            if ( namedTask == null )
+            {
+                // task wasn't found, so bounce on outta here
+                response.setStatus( Status.SUCCESS_OK );
+                return "OK";
+            }
+        }
+
+        for ( int i = 0; i < attempts; i++ )
         {
             try
             {
@@ -67,48 +93,93 @@ public class TaskHelperPlexusResource
             {
             }
 
-            Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
-
-            boolean running = false;
-
             if ( namedTask != null )
             {
-                running = isTaskRunning( namedTask, taskType, name );
+                if ( isTaskCompleted( namedTask ) )
+                {
+                    response.setStatus( Status.SUCCESS_OK );
+                    return "OK";
+                }
             }
             else
             {
-                for ( List<ScheduledTask<?>> taskList : taskMap.values() )
+                Set<ScheduledTask<?>> tasks = getTasks( taskType );
+
+                boolean running = false;
+
+                for ( ScheduledTask<?> task : tasks )
                 {
-                    for ( ScheduledTask<?> task : taskList )
+                    if ( !isTaskCompleted( task ) )
                     {
-                        if ( isTaskRunning( task, taskType, name ) )
-                        {
-                            running = true;
-
-                            if ( name != null )
-                            {
-                                namedTask = task;
-                            }
-
-                            break;
-                        }
+                        running = true;
+                        break;
                     }
                 }
-            }
 
-            if ( !running )
+                if ( !running )
+                {
+                    response.setStatus( Status.SUCCESS_OK );
+                    return "OK";
+                }
+            }
+        }
+
+        response.setStatus( Status.SUCCESS_NO_CONTENT );
+        return "Tasks Not Finished";
+    }
+
+    private boolean isTaskCompleted( ScheduledTask<?> task )
+    {
+        // always have to wait for internal tasks
+        if ( RunNowSchedule.class.isAssignableFrom( task.getClass() ) )
+        {
+            return false;
+        }
+
+        // otherwise, just check the status
+        if ( TaskState.RUNNING.equals( task.getTaskState() ) || TaskState.SLEEPING.equals( task.getTaskState() ) )
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private ScheduledTask<?> getTaskByName( String name )
+    {
+        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
+
+        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
+        {
+            for ( ScheduledTask<?> task : taskList )
             {
-                response.setStatus( Status.SUCCESS_OK );
-                break;
+                if ( task.getName().equals( name ) )
+                {
+                    return task;
+                }
             }
         }
 
         return null;
     }
 
-    private boolean isTaskRunning( ScheduledTask<?> task, String taskType, String name )
+    private Set<ScheduledTask<?>> getTasks( String taskType )
     {
-        return ( ( TaskState.RUNNING.equals( task.getTaskState() ) || TaskState.SLEEPING.equals( task.getTaskState() ) || ( RunNowSchedule.class.isAssignableFrom( task.getClass() ) && !TaskState.BROKEN.equals( task.getTaskState() ) ) )
-            && ( taskType == null || taskType.equals( task.getType() ) ) && ( name == null || name.equals( task.getName() ) ) );
+        Set<ScheduledTask<?>> tasks = new HashSet<ScheduledTask<?>>();
+
+        Map<String, List<ScheduledTask<?>>> taskMap = nexusScheduler.getAllTasks();
+
+        for ( List<ScheduledTask<?>> taskList : taskMap.values() )
+        {
+            for ( ScheduledTask<?> task : taskList )
+            {
+                if ( taskType == null || task.getType().equals( taskType ) )
+                {
+                    tasks.add( task );
+                }
+            }
+        }
+
+        return tasks;
     }
 }

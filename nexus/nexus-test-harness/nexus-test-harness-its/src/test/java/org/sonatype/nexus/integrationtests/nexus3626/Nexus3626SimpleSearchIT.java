@@ -6,14 +6,11 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpMethod;
-import org.apache.velocity.runtime.parser.node.GetExecutor;
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.tasks.ReindexTask;
@@ -84,13 +81,10 @@ public class Nexus3626SimpleSearchIT
 
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
 
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task );
-        TaskScheduleUtil.waitForAllTasksToStop( RebuildMavenMetadataTask.class );
-
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-nexus3626", RebuildMavenMetadataTaskDescriptor.ID, repo );
+        
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
         doSearch( sha1, "after reindexing!" );
     }
 

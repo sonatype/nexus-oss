@@ -5,7 +5,6 @@ import java.io.File;
 import org.codehaus.plexus.util.DirectoryScanner;
 import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.RebuildAttributesTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -36,10 +35,8 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
-
+        TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
+        
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
         scan.addDefaultExcludes();

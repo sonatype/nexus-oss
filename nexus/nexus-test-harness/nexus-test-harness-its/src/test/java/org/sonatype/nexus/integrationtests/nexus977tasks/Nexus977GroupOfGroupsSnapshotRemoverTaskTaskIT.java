@@ -10,7 +10,6 @@ import org.hamcrest.text.StringContains;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.SnapshotRemovalTaskDescriptor;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
@@ -57,7 +56,7 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
     {
         String path = "nexus977tasks/project/1.0-SNAPSHOT/project-1.0-20100520.154534-88.jar";
         downloadFile( new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
-                      "target/downloads/nexus977tasks/project-1.0-20100520.154534-88.jar" );
+            "target/downloads/nexus977tasks/project-1.0-20100520.154534-88.jar" );
 
         ScheduledServicePropertyResource keepSnapshotsProp = new ScheduledServicePropertyResource();
         keepSnapshotsProp.setKey( "minSnapshotsToKeep" );
@@ -70,16 +69,14 @@ public class Nexus977GroupOfGroupsSnapshotRemoverTaskTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,
-                                      keepSnapshotsProp, ageProp );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "SnapshotRemovalTask-snapshot", SnapshotRemovalTaskDescriptor.ID, repo,
+            keepSnapshotsProp, ageProp );
 
         try
         {
-            downloadFile( new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
-                          "target/downloads/nexus977tasks/project-1.0-20100520.154534-88-2.jar" );
+            downloadFile(
+                new URL( AbstractNexusIntegrationTest.nexusBaseUrl + REPOSITORY_RELATIVE_URL + "g4/" + path ),
+                "target/downloads/nexus977tasks/project-1.0-20100520.154534-88-2.jar" );
             Assert.fail( "snapshot removal should have deleted this" );
         }
         catch ( FileNotFoundException e )

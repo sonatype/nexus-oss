@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EvictUnusedItemsTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -141,11 +140,7 @@ public class AbstractEvictTaskIt
         age.setKey( "evictOlderCacheItemsThen" );
         age.setValue( String.valueOf( days ) );
 
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
-
-        Assert.assertNotNull( task, "Task did not finish." );
-        Assert.assertEquals( "SUBMITTED", task.getStatus() );
+        TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
     }
 
     protected SortedSet<String> buildListOfExpectedFilesForAllRepos( int days )

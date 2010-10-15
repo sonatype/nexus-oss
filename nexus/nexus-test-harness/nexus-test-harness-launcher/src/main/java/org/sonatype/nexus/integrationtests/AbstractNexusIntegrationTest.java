@@ -378,14 +378,14 @@ public abstract class AbstractNexusIntegrationTest
     public static void oncePerClassTearDown()
         throws Exception
     {
-        TaskScheduleUtil.waitForAllTasksToStop();
         try
         {
+            TaskScheduleUtil.waitForAllTasksToStop();
             new EventInspectorsUtil( null ).waitForCalmPeriod();
         }
         catch ( IOException e )
         {
-            // throw if server is already stopped, not a problem for me
+            //throw if server is already stopped, not a problem for me
         }
 
         // turn off security, of the current IT with security on won't affect the next IT

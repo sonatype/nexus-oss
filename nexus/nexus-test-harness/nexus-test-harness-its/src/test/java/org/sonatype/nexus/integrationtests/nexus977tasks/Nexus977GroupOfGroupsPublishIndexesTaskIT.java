@@ -3,7 +3,6 @@ package org.sonatype.nexus.integrationtests.nexus977tasks;
 import java.io.File;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.DownloadIndexesTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.PublishIndexesTaskDescriptor;
@@ -28,16 +27,12 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repository_r4" );
-        ScheduledServiceListResource task = TaskScheduleUtil.runTask( "r4", DownloadIndexesTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
-
+        TaskScheduleUtil.runTask( "r4", DownloadIndexesTaskDescriptor.ID, repo );
+        
         repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repository_r5" );
-        task = TaskScheduleUtil.runTask( "r5", DownloadIndexesTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "r5", DownloadIndexesTaskDescriptor.ID, repo );
     }
 
     @Test
@@ -52,11 +47,8 @@ public class Nexus977GroupOfGroupsPublishIndexesTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
-
+        TaskScheduleUtil.runTask( "PublishIndexesTaskDescriptor-snapshot", PublishIndexesTaskDescriptor.ID, repo );
+        
         Assert.assertTrue( new File( nexusWorkDir, "storage/r1/.index" ).exists() );
         Assert.assertTrue( new File( nexusWorkDir, "storage/r2/.index" ).exists() );
         Assert.assertTrue( new File( nexusWorkDir, "storage/r3/.index" ).exists() );

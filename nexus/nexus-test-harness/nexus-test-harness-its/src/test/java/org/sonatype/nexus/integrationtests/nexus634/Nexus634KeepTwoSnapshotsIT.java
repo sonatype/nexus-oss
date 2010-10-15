@@ -33,7 +33,7 @@ public class Nexus634KeepTwoSnapshotsIT
     {
 
         // This is THE important part
-        runSnapshotRemover( "nexus-test-harness-snapshot-repo", 2, 0, true );
+        runSnapshotRemover( "repo_nexus-test-harness-snapshot-repo", 2, 0, true );
 
         Collection<File> jars = listFiles( artifactFolder, new String[] { "jar" }, false );
         Assert.assertEquals( jars.size(), 2, "SnapshotRemoverTask should remove only old artifacts" );

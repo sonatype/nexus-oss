@@ -10,10 +10,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
 import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.maven.tasks.RebuildMavenMetadataTask;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
@@ -82,13 +80,10 @@ public class Nexus3233IndexPomSha1IT
 
         repo.setValue( "repo_" + REPO_TEST_HARNESS_REPO );
 
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task );
-        TaskScheduleUtil.waitForAllTasksToStop( RebuildMavenMetadataTask.class );
-
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus3233", RebuildMavenMetadataTaskDescriptor.ID, repo );
+        
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
         doSearch( sha1, "after reindexing!" );
     }
 

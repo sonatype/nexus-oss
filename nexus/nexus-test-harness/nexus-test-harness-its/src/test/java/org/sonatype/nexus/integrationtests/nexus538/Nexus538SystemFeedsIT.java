@@ -20,6 +20,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.rest.model.RepositoryBaseResource;
 import org.sonatype.nexus.rest.model.RepositoryStatusResource;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FeedUtil;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
@@ -60,6 +61,7 @@ public class Nexus538SystemFeedsIT
         repoUtil.updateRepo( repo );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        new EventInspectorsUtil( this ).waitForCalmPeriod();
 
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
@@ -80,6 +82,7 @@ public class Nexus538SystemFeedsIT
         repoUtil.updateStatus( repo );
 
         TaskScheduleUtil.waitForAllTasksToStop();
+        new EventInspectorsUtil( this ).waitForCalmPeriod();
         
         SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( systemFeed );

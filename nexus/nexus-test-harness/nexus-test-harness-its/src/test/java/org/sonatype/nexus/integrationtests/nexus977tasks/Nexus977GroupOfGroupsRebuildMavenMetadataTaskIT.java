@@ -12,10 +12,8 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionContaining;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
@@ -30,9 +28,7 @@ public class Nexus977GroupOfGroupsRebuildMavenMetadataTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         File metadataFile =
             downloadFile( new URL( nexusBaseUrl + "content/repositories/g4/"

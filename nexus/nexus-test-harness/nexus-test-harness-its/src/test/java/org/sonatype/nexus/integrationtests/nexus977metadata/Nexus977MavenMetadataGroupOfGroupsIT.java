@@ -12,10 +12,8 @@ import org.hamcrest.MatcherAssert;
 import org.hamcrest.collection.IsCollectionContaining;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
-import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class Nexus977MavenMetadataGroupOfGroupsIT
@@ -31,21 +29,17 @@ public class Nexus977MavenMetadataGroupOfGroupsIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_release" );
-        ScheduledServiceListResource task =
-            TaskScheduleUtil.runTask( "RebuildMavenMetadata-release", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-release", RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_release2" );
-        task = TaskScheduleUtil.runTask( "RebuildMavenMetadata-release2", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-release2", RebuildMavenMetadataTaskDescriptor.ID, repo );
 
         repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "repo_snapshot" );
-        task = TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        Assert.assertNotNull( task, "The ScheduledServicePropertyResource task didn't run" );
+        TaskScheduleUtil.runTask( "RebuildMavenMetadata-snapshot", RebuildMavenMetadataTaskDescriptor.ID, repo );
     }
 
     @SuppressWarnings( "unchecked" )
