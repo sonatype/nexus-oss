@@ -39,7 +39,6 @@ public class NXCM1008SiteDeployIT
         repo.setValue( "repo_fake-central" );
 
         TaskScheduleUtil.runTask( "RebuildMavenMetadata-Nexus1022", RebuildMavenMetadataTaskDescriptor.ID, repo );
-        TaskScheduleUtil.waitForAllTasksToStop();
     }
 
     @Test
