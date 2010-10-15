@@ -390,6 +390,11 @@ public abstract class AbstractRepository
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
+
         request.setRequestLocalOnly( true );
 
         getLogger().info(
