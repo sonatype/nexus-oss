@@ -16,7 +16,7 @@
 		<privilege>
 			<id>browse-remote-repo</id>
 			<type>method</type>
-			<name>Repository Browse Remote - (read)</name>
+			<name>Browse Remote Repository - (read)</name>
 			<description>Give permission to browse remote repositories</description>
 			<properties>
 				<property>
