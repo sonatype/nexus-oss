@@ -50,6 +50,7 @@
         <version>2.5</version>
         <configuration>
           <forkMode>always</forkMode>
+          <testNGArtifactName>none:none</testNGArtifactName>
         </configuration>
       </plugin>
 
