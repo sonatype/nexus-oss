@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
+
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Statistics;
@@ -29,33 +31,42 @@ import net.sf.ehcache.Statistics;
 public class EhCachePathCache
     extends AbstractPathCache
 {
-    private String repositoryId;
-    
+    private final String _repositoryId;
+
     /** The ec. */
-    private Ehcache ec;
+    private final Ehcache _ec;
 
     /**
      * Instantiates a new eh cache cache.
      * 
      * @param cache the cache
      */
-    public EhCachePathCache( String repositoryId, Ehcache cache )
+    public EhCachePathCache( final String repositoryId, final Ehcache cache )
     {
-        super();
-        this.repositoryId = repositoryId;
-        this.ec = cache;
+        this._repositoryId = repositoryId;
+        this._ec = cache;
+    }
+
+    protected String getRepositoryId()
+    {
+        return _repositoryId;
+    }
+
+    protected Ehcache getEHCache()
+    {
+        return _ec;
     }
 
     public boolean doContains( String key )
     {
-        return ec.get( key ) != null;
+        return getEHCache().get( key ) != null;
     }
 
     public boolean doIsExpired( String key )
     {
-        if ( ec.isKeyInCache( key ) )
+        if ( getEHCache().isKeyInCache( key ) )
         {
-            Element el = ec.get( key );
+            Element el = getEHCache().get( key );
             if ( el != null )
             {
                 return el.isExpired();
@@ -78,18 +89,18 @@ public class EhCachePathCache
         {
             el.setTimeToLive( expiration );
         }
-        ec.put( el );
+        getEHCache().put( el );
     }
 
     public boolean doRemove( String key )
     {
-        return ec.remove( key );
+        return getEHCache().remove( key );
     }
 
     public boolean removeWithChildren( String path )
     {
-        @SuppressWarnings("unchecked")
-        List<String> keys = ec.getKeys();
+        @SuppressWarnings( "unchecked" )
+        List<String> keys = getEHCache().getKeys();
 
         String keyToRemove = makeKeyFromPath( path );
 
@@ -97,7 +108,7 @@ public class EhCachePathCache
         {
             if ( key.startsWith( keyToRemove ) )
             {
-                ec.remove( key );
+                getEHCache().remove( key );
             }
         }
         return true;
@@ -105,47 +116,55 @@ public class EhCachePathCache
 
     public void doPurge()
     {
-        ec.removeAll();
-        ec.flush();
+        // getEHCache().removeAll();
+        // getEHCache().flush();
+
+        // this above is not true anymore, since the "shared-cache" implementor forgot about the fact that using purge()
+        // will purge _all_ caches (it purges the one shared!), not just this repo's cache 
+        removeWithChildren( RepositoryItemUid.PATH_ROOT );
     }
 
     public CacheStatistics getStatistics()
     {
-        Statistics stats = ec.getStatistics();
+        Statistics stats = getEHCache().getStatistics();
 
         return new CacheStatistics( stats.getObjectCount(), stats.getCacheMisses(), stats.getCacheHits() );
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     public Collection<String> listKeysInCache()
     {
-        ec.evictExpiredElements();
+        getEHCache().evictExpiredElements();
 
-        
         List<String> keys = new ArrayList<String>();
-        
+
         // this is going to be slow (if we have lots of items) but if you are concerned about speed you shouldn't call
         // this method anyway, this should only be used for information purposes
 
-        String startsWithString = this.repositoryId + ":";
-        
-        for ( String key : (List<String>) ec.getKeys() )
+        String startsWithString = getKeyPrefix();
+
+        for ( String key : (List<String>) getEHCache().getKeys() )
         {
-            if( key.startsWith( startsWithString ))
+            if ( key.startsWith( startsWithString ) )
             {
-                keys.add( key.replaceFirst( startsWithString, "" ) );
+                keys.add( key.substring( startsWithString.length() ) );
             }
         }
-        
+
         return keys;
     }
-    
+
     @Override
     protected String makeKeyFromPath( String path )
     {
         path = super.makeKeyFromPath( path );
-        
-        return this.repositoryId +":"+ path;
+
+        return getKeyPrefix() + path;
+    }
+
+    protected String getKeyPrefix()
+    {
+        return getRepositoryId() + ":";
     }
 
 }

@@ -19,7 +19,6 @@ package org.sonatype.nexus.proxy.cache;
 public abstract class AbstractPathCache
     implements PathCache
 {
-
     public final boolean contains( String path )
     {
         return doContains( makeKeyFromPath( path ) );
@@ -73,6 +72,8 @@ public abstract class AbstractPathCache
         doPurge();
     }
 
+    // ==
+
     protected String makeKeyFromPath( String path )
     {
         while ( path.startsWith( "/" ) )
@@ -97,5 +98,4 @@ public abstract class AbstractPathCache
     protected abstract boolean doRemove( String key );
 
     protected abstract void doPurge();
-
 }
