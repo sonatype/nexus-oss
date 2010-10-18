@@ -16,7 +16,7 @@ package org.sonatype.nexus.tasks;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.scheduling.AbstractNexusTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
@@ -26,20 +26,16 @@ import org.sonatype.scheduling.SchedulerTask;
  */
 @Component( role = SchedulerTask.class, hint = "DeleteRepositoryFoldersTask", instantiationStrategy = "per-lookup" )
 public class DeleteRepositoryFoldersTask
-    extends AbstractNexusTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
-    private Repository repository;
-
     private boolean deleteForever = false;
 
-    public Repository getRepository()
-    {
-        return repository;
-    }
+    private Repository repository = null;
 
     public void setRepository( Repository repository )
     {
         this.repository = repository;
+        setRepositoryId( repository.getId() );
     }
 
     public boolean isDeleteForever()
@@ -78,11 +74,17 @@ public class DeleteRepositoryFoldersTask
     @Override
     protected String getMessage()
     {
-        if ( repository != null )
+        if ( getRepositoryId() != null )
         {
-            return "Deleting folders with repository ID: " + repository.getId();
+            return "Deleting folders with repository ID: " + getRepositoryId();
         }
         return null;
+    }
+    
+    @Override
+    public String getRepositoryName()
+    {
+        return repository.getName();
     }
 
 }
