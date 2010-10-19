@@ -17,7 +17,7 @@
     <assembly.directory>${project.build.directory}/assembly</assembly.directory>
     <itar-plexus-jsw-app-booter.version>2.1.1-v0001</itar-plexus-jsw-app-booter.version>
     <itar-plexus-app-booter.version>2.1.1-v0001</itar-plexus-app-booter.version>
-    <bar-jsw.version>3.2.3-v0004-SNAPSHOT</bar-jsw.version>
+    <bar-jsw.version>3.2.3-v0004</bar-jsw.version>
   </properties>
 
   <dependencies>
