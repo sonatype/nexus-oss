@@ -46,13 +46,6 @@
       <outputDirectory>metadata</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/assembly/bundle</directory>
-      <outputDirectory>data/${applicationDir}</outputDirectory>
-      <includes>
-        <include>*.txt</include>
-      </includes>
-    </fileSet>
-    <fileSet>
       <directory>src/main/assembly/base-bundle</directory>
       <outputDirectory>data/${runtimeDir}</outputDirectory>
       <includes>
