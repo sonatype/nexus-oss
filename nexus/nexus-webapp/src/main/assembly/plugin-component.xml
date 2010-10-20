@@ -1,8 +1,0 @@
-<component>
-  <fileSets>
-    <fileSet>
-      <directory>target/${plugin-repository.directory}</directory>
-      <outputDirectory>${plugin-repository.directory}/</outputDirectory>
-    </fileSet>
-  </fileSets>
-</component>

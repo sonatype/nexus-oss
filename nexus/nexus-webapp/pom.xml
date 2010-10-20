@@ -18,9 +18,6 @@
   <name>Nexus : Web Application frontend (WAR and ITAR)</name>
 
   <properties>
-    <!-- NOTE: MNG-3355 will fix this so we can use ${project.build.directory} instead of the hard-coded target directory. -->
-    <jsw-input>target/jsw-template</jsw-input>
-    <jsw-output>jsw-filtered</jsw-output>
     <nexus-tools-input>target/nexus-tools</nexus-tools-input>
     <compressed-dir>${project.build.directory}/ui-compressed</compressed-dir>
 
@@ -127,21 +124,6 @@
 
     <!-- The bundle -->
     <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-app-booter</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
-      <artifactId>plexus-jsw-app-booter</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>tanukisoft</groupId>
-      <artifactId>wrapper</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>javax.xml.bind</groupId>
       <artifactId>jaxb-api</artifactId>
       <version>2.1</version>
@@ -191,12 +173,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.jsw-binaries</groupId>
-      <artifactId>jsw-binaries</artifactId>
-      <type>tar.gz</type>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
@@ -231,72 +207,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-
   </dependencies>
   <build>
-    <filters>
-      <filter>src/main/filters/assemble.properties</filter>
-    </filters>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>false</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/filtered-resources</directory>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
-        <directory>src/main/assembly/bundle</directory>
-        <filtering>false</filtering>
-        <targetPath>../plexus-home</targetPath>
-      </resource>
-      <resource>
-        <directory>${jsw-input}</directory>
-        <filtering>true</filtering>
-        <excludes>
-          <exclude>**/*.so</exclude>
-          <exclude>**/*.dll</exclude>
-          <exclude>**/*.jnilib</exclude>
-          <exclude>**/*.exe</exclude>
-          <exclude>**/*.a</exclude>
-          <exclude>**/*.sl</exclude>
-          <exclude>**/wrapper</exclude>
-        </excludes>
-        <targetPath>../${jsw-output}</targetPath>
-      </resource>
-      <resource>
-        <directory>${jsw-input}</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*.so</include>
-          <include>**/*.dll</include>
-          <include>**/*.jnilib</include>
-          <include>**/*.exe</include>
-          <include>**/*.a</include>
-          <include>**/*.sl</include>
-          <include>**/wrapper</include>
-        </includes>
-        <targetPath>../${jsw-output}</targetPath>
-      </resource>
-    </resources>
     <plugins>
       <plugin>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.0</version>
         <executions>
-          <execution>
-            <id>unpack-jsw</id>
-            <phase>generate-resources</phase>
-            <goals>
-              <goal>unpack-dependencies</goal>
-            </goals>
-            <configuration>
-              <includeArtifactIds>jsw-binaries</includeArtifactIds>
-              <outputDirectory>${jsw-input}</outputDirectory>
-            </configuration>
-          </execution>
-
           <execution>
             <id>unpack-plugins</id>
             <phase>prepare-package</phase>
@@ -372,7 +289,6 @@
               </artifactItems>
             </configuration>
           </execution>
-
         </executions>
       </plugin>
       <plugin>
@@ -479,13 +395,6 @@
           <jswarn>false</jswarn>
           <excludes>
             <exclude>**/ext-2.3/**/*.js</exclude>
-            <exclude>**/*.so</exclude>
-            <exclude>**/*.dll</exclude>
-            <exclude>**/*.jnilib</exclude>
-            <exclude>**/*.exe</exclude>
-            <exclude>**/*.a</exclude>
-            <exclude>**/*.sl</exclude>
-            <exclude>**/wrapper</exclude>
           </excludes>
           <aggregations>
             <aggregation>
@@ -592,6 +501,7 @@
         <version>1.4</version>
         <executions>
           <execution>
+            <phase>process-resources</phase>
             <goals>
               <goal>generate</goal>
             </goals>

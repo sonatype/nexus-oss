@@ -12,16 +12,9 @@
       <fileMode>0644</fileMode>
       <scope>runtime</scope>
       <excludes>
-        <exclude>org.sonatype.appbooter.plexus-platforms:plexus-platform-*</exclude>
         <exclude>org.sonatype.appbooter.plexus-booters:plexus-app-booter</exclude>
-        <exclude>org.codehaus.plexus:plexus-container-default</exclude>
         <exclude>org.sonatype.appbooter.plexus-booters:plexus-jsw-app-booter</exclude>
-        <exclude>com.google.code.atinject:atinject</exclude>
         <exclude>org.sonatype.nexus:nexus-plugin-api</exclude>
-        <exclude>org.sonatype.nexus:nexus-plugin-manager</exclude>
-        <exclude>org.sonatype.reflect:reflect-class-descriptor</exclude>
-        <exclude>org.sonatype.plugin:plugin-gleaner</exclude>
-        <exclude>org.apache.xbean:xbean-reflect</exclude>
         <exclude>org.sonatype.nexus:nexus-oss-edition</exclude> <!-- why exclude? -->
       </excludes>
     </dependencySet>
@@ -46,15 +39,8 @@
       <outputDirectory>metadata</outputDirectory>
     </fileSet>
     <fileSet>
-      <directory>src/main/assembly/base-bundle</directory>
-      <outputDirectory>data/${runtimeDir}</outputDirectory>
-      <includes>
-        <include>*.txt</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <directory>src/main/assembly/bundle/conf</directory>
-      <outputDirectory>data/${appConfDir}</outputDirectory>
+      <directory>src/main/assembly/data</directory>
+      <outputDirectory>data</outputDirectory>
     </fileSet>
     <fileSet>
       <directory>src/main/webapp</directory>
