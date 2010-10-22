@@ -156,7 +156,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>sisu-inject-nexus</artifactId>
+      <artifactId>nexus-plugin-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

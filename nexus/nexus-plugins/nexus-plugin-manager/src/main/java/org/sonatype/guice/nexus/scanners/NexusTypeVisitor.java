@@ -18,10 +18,10 @@ import java.net.URL;
 import javax.inject.Named;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.objectweb.asm.AnnotationVisitor;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
+import org.sonatype.guice.asm.AnnotationVisitor;
+import org.sonatype.guice.asm.ClassVisitor;
+import org.sonatype.guice.asm.Opcodes;
+import org.sonatype.guice.asm.Type;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.scanners.ClassSpaceVisitor;
 import org.sonatype.guice.bean.scanners.EmptyAnnotationVisitor;

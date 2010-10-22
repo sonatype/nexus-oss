@@ -9,68 +9,57 @@
     <version>1.9-SNAPSHOT</version>
   </parent>
 
-  <packaging>pom</packaging>
-
-  <artifactId>guice-nexus</artifactId>
+  <artifactId>nexus-plugin-manager</artifactId>
 
   <name>Nexus : Plugins : Manager</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <modules>
-    <module>guice-nexus-scanners</module>
-    <module>guice-nexus-binders</module>
-    <module>guice-nexus-shim</module>
-    <module>sisu-inject-nexus</module>
-  </modules>
-
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <version>2.1.0</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-
-  <dependencyManagement>
-    <dependencies>
-
-      <dependency>
-        <groupId>org.sonatype.sisu.inject</groupId>
-        <artifactId>guice-plexus</artifactId>
-        <version>${sisu-inject-plexus.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
-      <dependency>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-plugin-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-host-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plugin</groupId>
+      <artifactId>plugin-model-api</artifactId>
+    </dependency>
+    <dependency>
         <groupId>org.sonatype.nexus</groupId>
-        <artifactId>guice-nexus-scanners</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>guice-nexus-binders</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>guice-nexus-shim</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>sisu-inject-nexus</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-    </dependencies>
-  </dependencyManagement>
+        <artifactId>nexus-indexer-artifact</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.appbooter.plexus-booters</groupId>
+      <artifactId>plexus-app-booter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-configuration</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.codehaus.plexus</groupId>
+          <artifactId>plexus-container-default</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- Testing -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>

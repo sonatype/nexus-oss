@@ -27,7 +27,7 @@
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
-      <artifactId>sisu-inject-nexus</artifactId>
+      <artifactId>nexus-plugin-manager</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
