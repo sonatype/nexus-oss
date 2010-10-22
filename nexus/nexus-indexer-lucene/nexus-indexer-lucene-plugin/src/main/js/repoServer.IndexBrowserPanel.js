@@ -133,6 +133,8 @@ Ext.extend(Sonatype.repoServer.IndexBrowserPanel, Sonatype.panels.TreePanel, {
         if (this.payload)
         {
           this.loader.url = this.payload.data.resourceURI + '/index_content';
+          this.loader.timeout = 1000;
+
           if (this.payload.data.useHints)
           {
             this.loader.baseParams = {

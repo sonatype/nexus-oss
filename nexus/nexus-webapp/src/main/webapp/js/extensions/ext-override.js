@@ -1223,3 +1223,33 @@ Ext.History = (function() {
   };
 })();
 Ext.apply(Ext.History, new Ext.util.Observable());
+
+Ext.tree.TreeLoader.override({
+      requestData : function(node, callback) {
+        if (this.fireEvent("beforeload", this, node, callback) !== false)
+        {
+          this.transId = Ext.Ajax.request({
+                method : this.requestMethod,
+                url : this.dataUrl || this.url,
+                success : this.handleResponse,
+                failure : this.handleFailure,
+                timeout : this.timeout || 1000,
+                scope : this,
+                argument : {
+                  callback : callback,
+                  node : node
+                },
+                params : this.getParams(node)
+              });
+        }
+        else
+        {
+          // if the load is cancelled, make sure we notify
+          // the node that we are done
+          if (typeof callback == "function")
+          {
+            callback();
+          }
+        }
+      }
+    });
