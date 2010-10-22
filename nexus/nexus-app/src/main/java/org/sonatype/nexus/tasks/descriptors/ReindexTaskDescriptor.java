@@ -19,8 +19,8 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
 public class ReindexTaskDescriptor
@@ -41,7 +41,7 @@ public class ReindexTaskDescriptor
         "If selected will generate a new full index, otherwise just generate the incremental index.",
         FormField.OPTIONAL );
 
-    private final NumberTextFormField resourceStorePathField = new NumberTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
+    private final StringTextFormField resourceStorePathField = new StringTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
         "Repository path",
         "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
         FormField.OPTIONAL );

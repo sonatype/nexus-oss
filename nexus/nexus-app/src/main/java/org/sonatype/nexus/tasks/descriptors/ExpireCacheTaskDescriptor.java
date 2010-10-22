@@ -18,8 +18,8 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
+import org.sonatype.nexus.formfields.StringTextFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "ExpireCache", description = "Expire Repository Caches" )
 public class ExpireCacheTaskDescriptor
@@ -38,8 +38,8 @@ public class ExpireCacheTaskDescriptor
                                        "Type in the repository path from which to expire caches recursively (ie. \"/\" for root or \"/org/apache\")",
                                        FormField.MANDATORY );
 
-    private final NumberTextFormField resourceStorePathField =
-        new NumberTextFormField(
+    private final StringTextFormField resourceStorePathField =
+        new StringTextFormField(
                                  RESOURCE_STORE_PATH_FIELD_ID,
                                  "Repository path",
                                  "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
