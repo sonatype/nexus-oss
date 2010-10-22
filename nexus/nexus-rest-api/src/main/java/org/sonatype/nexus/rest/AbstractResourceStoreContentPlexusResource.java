@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.shiro.subject.Subject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -69,6 +70,7 @@ import org.sonatype.nexus.rest.model.ContentListResourceResponse;
 import org.sonatype.nexus.rest.repositories.AbstractRepositoryPlexusResource;
 import org.sonatype.nexus.security.filter.authc.NexusHttpAuthenticationFilter;
 import org.sonatype.plexus.rest.representation.VelocityRepresentation;
+import org.sonatype.security.SecuritySystem;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
 import com.noelios.restlet.http.HttpConstants;
@@ -87,6 +89,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
     public static final String REQUEST_RECEIVED_KEY = "request.received.timestamp";
 
     public static final String OVERRIDE_FILENAME_KEY = "override-filename";
+
+    @Requirement
+    private SecuritySystem securitySystem;
 
     @Requirement( role = ArtifactViewProvider.class )
     public Map<String, ArtifactViewProvider> viewProviders;
@@ -283,9 +288,10 @@ public abstract class AbstractResourceStoreContentPlexusResource
         result.getRequestContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, getValidRemoteIPAddress( request ) );
 
         // stuff in the user id if we have it in request
-        if ( request.getChallengeResponse() != null && request.getChallengeResponse().getIdentifier() != null )
+        Subject subject = securitySystem.getSubject();
+        if ( subject != null && subject.getPrincipal() != null )
         {
-            result.getRequestContext().put( AccessManager.REQUEST_USER, request.getChallengeResponse().getIdentifier() );
+            result.getRequestContext().put( AccessManager.REQUEST_USER, subject.getPrincipal().toString() );
         }
 
         // this is HTTPS, get the cert and stuff it too for later
