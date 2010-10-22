@@ -1,339 +1,340 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.sonatype.nexus</groupId>
-		<artifactId>nexus-test-harness</artifactId>
-		<version>1.9-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>nexus-test-harness</artifactId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
 
-	<artifactId>nexus-test-harness-its</artifactId>
-	<name>Nexus : Test Harness : Core ITs</name>
+  <artifactId>nexus-test-harness-its</artifactId>
+  <name>Nexus : Test Harness : Core ITs</name>
 
-	<properties>
-		<!-- Below is the "product", the subject of the ITs -->
-		<product-groupId>org.sonatype.nexus</product-groupId>
-		<product-artifactId>nexus-oss-webapp</product-artifactId>
-		<product-version>${project.version}</product-version>
-		<product-classifier>bundle</product-classifier>
-		<product-type>zip</product-type>
-	</properties>
+  <properties>
+    <!-- Below is the "product", the subject of the ITs -->
+    <product-groupId>org.sonatype.nexus</product-groupId>
+    <product-artifactId>nexus-oss-webapp</product-artifactId>
+    <product-version>${project.version}</product-version>
+    <product-classifier>bundle</product-classifier>
+    <product-type>zip</product-type>
+  </properties>
 
-	<build>
+  <build>
 
-		<testResources>
-			<testResource>
-				<targetPath>${project.build.testOutputDirectory}</targetPath>
-				<filtering>true</filtering>
-				<directory>${basedir}/src/test/resources</directory>
-			</testResource>
-		</testResources>
+    <testResources>
+      <testResource>
+        <targetPath>${project.build.testOutputDirectory}</targetPath>
+        <filtering>true</filtering>
+        <directory>${basedir}/src/test/resources</directory>
+      </testResource>
+    </testResources>
 
-		<plugins>
-			<plugin>
-				<artifactId>maven-invoker-plugin</artifactId>
-				<version>1.6-SONATYPE-r940877</version>
-				<configuration>
-					<localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
-					<extraArtifacts>
-						<xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
-						<xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
-					</extraArtifacts>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>initialize</phase>
-						<goals>
-							<goal>install</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+    <plugins>
+      <plugin>
+        <artifactId>maven-invoker-plugin</artifactId>
+        <version>1.6-SONATYPE-r940877</version>
+        <configuration>
+          <localRepositoryPath>${project.build.directory}/maven/fake-repo</localRepositoryPath>
+          <extraArtifacts>
+            <xml>org.apache.maven.plugins:maven-clean-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-compiler-plugin:2.0.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-dependency-plugin:2.0:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.4:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-deploy-plugin:2.5:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-install-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-jar-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-resources-plugin:2.4:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.2:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.4.3:maven-plugin</xml>
+            <xml>org.apache.maven.plugins:maven-surefire-plugin:2.5:maven-plugin</xml>
+          </extraArtifacts>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>initialize</phase>
+            <goals>
+              <goal>install</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
 
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-test-environment-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>env</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>setup-environment</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>package</id>
-						<goals>
-							<goal>package</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<nexusBundleArtifact>
-						<groupId>${product-groupId}</groupId>
-						<artifactId>${product-artifactId}</artifactId>
-						<version>${product-version}</version>
-						<classifier>${product-classifier}</classifier>
-						<type>${product-type}</type>
-					</nexusBundleArtifact>
-					<nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
-					<nexusPluginsArtifacts>
-						<plugin>
-							<groupId>org.sonatype.nexus</groupId>
-							<artifactId>nexus-it-helper-plugin</artifactId>
-							<classifier>cp</classifier>
-							<type>jar</type>
-						</plugin>
-						<plugin>
-							<groupId>org.sonatype.nexus</groupId>
-							<artifactId>nexus-it-helper-plugin</artifactId>
-							<classifier>bundle</classifier>
-							<type>zip</type>
-						</plugin>
-						<jar>
-							<groupId>org.sonatype.security.realms</groupId>
-							<artifactId>security-url-realm</artifactId>
-						</jar>
-					</nexusPluginsArtifacts>
-				</configuration>
-			</plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-test-environment-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>env</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>setup-environment</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>package</id>
+            <goals>
+              <goal>package</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <nexusBundleArtifact>
+            <groupId>${product-groupId}</groupId>
+            <artifactId>${product-artifactId}</artifactId>
+            <version>${product-version}</version>
+            <classifier>${product-classifier}</classifier>
+            <type>${product-type}</type>
+          </nexusBundleArtifact>
+          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+          <nexusPluginsArtifacts>
+            <plugin>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>cp</classifier>
+              <type>jar</type>
+            </plugin>
+            <plugin>
+              <groupId>org.sonatype.nexus</groupId>
+              <artifactId>nexus-it-helper-plugin</artifactId>
+              <classifier>bundle</classifier>
+              <type>zip</type>
+            </plugin>
+            <jar>
+              <groupId>org.sonatype.security.realms</groupId>
+              <artifactId>security-url-realm</artifactId>
+            </jar>
+          </nexusPluginsArtifacts>
+        </configuration>
+      </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<skipTests>true</skipTests>
-				</configuration>
-			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<argLine>-Xmx512M</argLine>
-					<excludes>
-						<exclude>**Suite*</exclude>
-						<!-- START This are start/stop tests, shouldn't be runned -->
-						<exclude>**/Nexus758ServiceStabilityTest.*</exclude>
-						<exclude>**/Nexus758StatusService.*</exclude>
-						<exclude>**/Nexus748MultipleStartTest.*</exclude>
-						<!-- END This are start/stop tests, shouldn't be runned -->
-						<!-- inner classes -->
-						<exclude>**/*$*.*</exclude>
-					</excludes>
-					<properties>
-						<property>
-							<name>usedefaultlisteners</name>
-							<value>true</value>
-						</property>
-						<property>
-							<name>reporter</name>
-							<value>org.uncommons.reportng.HTMLReporter</value>
-						</property>
-					</properties>
-				</configuration>
-			</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <argLine>-Xmx512M</argLine>
+          <excludes>
+            <exclude>**Suite*</exclude>
+            <!-- START This are start/stop tests, shouldn't be runned -->
+            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
+            <exclude>**/Nexus758StatusService.*</exclude>
+            <exclude>**/Nexus748MultipleStartTest.*</exclude>
+            <!-- END This are start/stop tests, shouldn't be runned -->
+            <!-- inner classes -->
+            <exclude>**/*$*.*</exclude>
+          </excludes>
+          <properties>
+            <property>
+              <name>usedefaultlisteners</name>
+              <value>true</value>
+            </property>
+            <property>
+              <name>reporter</name>
+              <value>org.uncommons.reportng.HTMLReporter</value>
+            </property>
+            <property>
+              <name>listener</name>
+              <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
+            </property>
+          </properties>
+        </configuration>
+      </plugin>
 
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+        <version>1.1</version>
+        <extensions>true</extensions>
+        <dependencies>
+          <dependency>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>app-lifecycle-nexus</artifactId>
+            <version>1.1</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+    </plugins>
+  </build>
 
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>app-lifecycle-maven-plugin</artifactId>
-				<version>1.1</version>
-				<extensions>true</extensions>
-				<dependencies>
-					<dependency>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>app-lifecycle-nexus</artifactId>
-						<version>1.1</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
-	</build>
+  <dependencies>
+    <!-- The IT Launcher -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-test-harness-launcher</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-	<dependencies>
-		<!-- The IT Launcher -->
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-test-harness-launcher</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <!-- NEXUS-2490 -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-lvo-plugin</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<!-- NEXUS-2490 -->
-		<dependency>
-			<groupId>org.sonatype.nexus.plugins</groupId>
-			<artifactId>nexus-lvo-plugin</artifactId>
-			<version>${project.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <!-- NEXUS-2810 references this -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-plugin-console-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<!-- NEXUS-2810 references this -->
-		<dependency>
-			<groupId>org.sonatype.nexus.plugins</groupId>
-			<artifactId>nexus-plugin-console-plugin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <!-- NEXUS-156 -->
+    <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<!-- NEXUS-156 -->
-		<dependency>
-			<groupId>org.sonatype.nexus</groupId>
-			<artifactId>nexus-indexer-lucene-plugin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <!-- NEXUS-3699 -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-capabilities-plugin</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<!-- NEXUS-3699 -->
-		<dependency>
-			<groupId>org.sonatype.nexus.plugins</groupId>
-			<artifactId>nexus-capabilities-plugin</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>5.11</version>
+      <classifier>jdk15</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+        <!-- <exclusion> -->
+        <!-- <groupId>com.google.inject</groupId> -->
+        <!-- <artifactId>guice</artifactId> -->
+        <!-- </exclusion> -->
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.testng</groupId>
-			<artifactId>testng</artifactId>
-			<version>5.11</version>
-			<classifier>jdk15</classifier>
-			<exclusions>
-				<exclusion>
-					<groupId>junit</groupId>
-					<artifactId>junit</artifactId>
-				</exclusion>
-				<!-- <exclusion> -->
-				<!-- <groupId>com.google.inject</groupId> -->
-				<!-- <artifactId>guice</artifactId> -->
-				<!-- </exclusion> -->
-			</exclusions>
-		</dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-core</artifactId>
+      <version>1.1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-core</artifactId>
-			<version>1.1</version>
-		</dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-library</artifactId>
+      <version>1.1</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<version>1.1</version>
-		</dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-integration</artifactId>
+      <version>1.0</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-integration</artifactId>
-			<version>1.0</version>
-		</dependency>
+    <dependency>
+      <groupId>org.uncommons</groupId>
+      <artifactId>reportng</artifactId>
+      <version>1.1.2</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>velocity</artifactId>
+          <groupId>velocity</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 
-		<dependency>
-			<groupId>org.uncommons</groupId>
-			<artifactId>reportng</artifactId>
-			<version>1.1.2</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>velocity</artifactId>
-					<groupId>velocity</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+    <dependency>
+      <groupId>org.sonatype.security.realms</groupId>
+      <artifactId>security-url-realm</artifactId>
+      <version>${plexus-security.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.sonatype.security.realms</groupId>
-			<artifactId>security-url-realm</artifactId>
-			<version>${plexus-security.version}</version>
-		</dependency>
+  </dependencies>
 
-	</dependencies>
+  <profiles>
+    <profile>
+      <id>m2e</id>
+      <activation>
+        <property>
+          <name>m2e.version</name>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.sonatype.nexus</groupId>
+          <artifactId>nexus-it-helper-plugin</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>skip-test-harness-tests</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
-	<profiles>
-		<profile>
-			<id>m2e</id>
-			<activation>
-				<property>
-					<name>m2e.version</name>
-				</property>
-			</activation>
-			<dependencies>
-				<dependency>
-					<groupId>org.sonatype.nexus</groupId>
-					<artifactId>nexus-it-helper-plugin</artifactId>
-					<version>${project.version}</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>skip-test-harness-tests</id>
-			<build>
-				<plugins>
-					<plugin>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<configuration>
-							<skip>true</skip>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
+    <profile>
+      <!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
+      <id>yourkit-profile</id>
 
-		<profile>
-			<!-- http://www.yourkit.com/docs/80/help/agent.jsp -->
-			<id>yourkit-profile</id>
+      <activation>
+        <property>
+          <name>yourkit.home</name>
+        </property>
+      </activation>
 
-			<activation>
-				<property>
-					<name>yourkit.home</name>
-				</property>
-			</activation>
+      <!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos de programas\YourKit Java Profiler 8.0.13</yourkit.home> </properties -->
 
-			<!-- This is the path on Velo's machine ;) <properties> <yourkit.home>C:\Arquivos 
-				de programas\YourKit Java Profiler 8.0.13</yourkit.home> </properties -->
+      <dependencies>
+        <dependency>
+          <groupId>com.yourkit</groupId>
+          <artifactId>yjp</artifactId>
+          <version>8.0.13</version>
+          <scope>system</scope>
+          <systemPath>${yourkit.home}\lib\yjp.jar</systemPath>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <argLine>-agentpath:"${yourkit.home}\bin\win32\yjpagent.dll"</argLine>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
 
-			<dependencies>
-				<dependency>
-					<groupId>com.yourkit</groupId>
-					<artifactId>yjp</artifactId>
-					<version>8.0.13</version>
-					<scope>system</scope>
-					<systemPath>${yourkit.home}\lib\yjp.jar</systemPath>
-				</dependency>
-			</dependencies>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-surefire-plugin</artifactId>
-						<configuration>
-							<argLine>-agentpath:"${yourkit.home}\bin\win32\yjpagent.dll"</argLine>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-	</profiles>
+  </profiles>
 </project>
