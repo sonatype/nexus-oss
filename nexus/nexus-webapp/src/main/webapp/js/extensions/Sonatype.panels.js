@@ -762,7 +762,8 @@ Sonatype.panels.TreePanel = function(config) {
     appendPathToRoot : true,
     leafClickEvent : null,
     resetRootNodeText : true,
-    autoExpandRoot : true
+    autoExpandRoot : true,
+    appendAttributeToId : null
   };
   Ext.apply(this, config, defaultConfig);
 
@@ -795,6 +796,7 @@ Sonatype.panels.TreePanel = function(config) {
               useNodeIconClassParam : this.useNodeIconClassParam,
               nodeClass : this.nodeClass,
               useNodeClassParam : this.useNodeClassParam,
+              appendAttributeToId : this.appendAttributeToId,
               requestMethod : 'GET',
               url : this.url,
               listeners : {
@@ -848,7 +850,11 @@ Sonatype.panels.TreePanel = function(config) {
                 }
                 if (!attr.id)
                 {
-                  attr.id = (this.url + attr.path).replace(/\//g, '_');
+                	attr.id = (this.url + attr.path).replace(/\//g, '_');
+                	if ( this.appendAttributeToId )
+                	{
+                		attr.id += attr[this.appendAttributeToId];
+                	}
                 }
 
                 if (!attr.singleClickExpand)
