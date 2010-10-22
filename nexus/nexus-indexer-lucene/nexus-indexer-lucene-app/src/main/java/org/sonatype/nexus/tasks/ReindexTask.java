@@ -19,7 +19,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
-import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -39,13 +38,13 @@ public class ReindexTask
     @Override
     protected String getRepositoryFieldId()
     {
-        return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
+        return ReindexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
     }
 
     @Override
     protected String getRepositoryPathFieldId()
     {
-        return null;
+        return ReindexTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
     public boolean getFullReindex()

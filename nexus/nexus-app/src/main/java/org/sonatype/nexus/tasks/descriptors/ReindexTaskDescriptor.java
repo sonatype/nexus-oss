@@ -19,6 +19,7 @@ import java.util.List;
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
@@ -31,15 +32,19 @@ public class ReindexTaskDescriptor
 
     public static final String FULL_REINDEX_FIELD_ID = "forceFullReindex";
 
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
-                                                                                       FormField.MANDATORY );
+    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
-    private final CheckboxFormField fullReindexField =
-        new CheckboxFormField(
-                               FULL_REINDEX_FIELD_ID,
-                               "Do full reindex",
-                               "If selected will generate a new full index, otherwise just generate the incremental index.",
-                               FormField.OPTIONAL );
+    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
+        FormField.MANDATORY );
+
+    private final CheckboxFormField fullReindexField = new CheckboxFormField( FULL_REINDEX_FIELD_ID, "Do full reindex",
+        "If selected will generate a new full index, otherwise just generate the incremental index.",
+        FormField.OPTIONAL );
+
+    private final NumberTextFormField resourceStorePathField = new NumberTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
+        "Repository path",
+        "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
+        FormField.OPTIONAL );
 
     public String getId()
     {
@@ -57,6 +62,7 @@ public class ReindexTaskDescriptor
 
         fields.add( repoField );
         fields.add( fullReindexField );
+        fields.add( resourceStorePathField );
 
         return fields;
     }

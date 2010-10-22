@@ -385,14 +385,14 @@ public abstract class AbstractRepository
 
     public void expireCaches( ResourceStoreRequest request )
     {
-        if ( StringUtils.isEmpty( request.getRequestPath() ) )
-        {
-            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
-        }
-
         if ( !getLocalStatus().shouldServiceRequest() )
         {
             return;
+        }
+
+        if ( StringUtils.isEmpty( request.getRequestPath() ) )
+        {
+            request.setRequestPath( RepositoryItemUid.PATH_ROOT );
         }
 
         request.setRequestLocalOnly( true );
@@ -425,6 +425,11 @@ public abstract class AbstractRepository
 
     public void expireNotFoundCaches( ResourceStoreRequest request )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
+        
         if ( StringUtils.isBlank( request.getRequestPath() ) )
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
@@ -466,6 +471,11 @@ public abstract class AbstractRepository
 
     public boolean recreateAttributes( ResourceStoreRequest request, final Map<String, String> initialData )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return false;
+        }
+        
         if ( StringUtils.isEmpty( request.getRequestPath() ) )
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );

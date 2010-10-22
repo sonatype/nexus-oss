@@ -2,6 +2,7 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -90,6 +91,11 @@ public abstract class AbstractMavenGroupRepository
 
     public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return false;
+        }
+        
         boolean result = false;
 
         for ( Repository repository : getMemberRepositories() )

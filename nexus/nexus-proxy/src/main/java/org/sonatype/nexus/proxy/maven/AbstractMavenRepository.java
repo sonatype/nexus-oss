@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -147,6 +148,11 @@ public abstract class AbstractMavenRepository
     @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return Collections.emptyList();
+        }
+
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             Collection<String> result =
@@ -165,6 +171,11 @@ public abstract class AbstractMavenRepository
 
     public boolean recreateMavenMetadata( ResourceStoreRequest request )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return false;
+        }
+
         if ( !getRepositoryKind().isFacetAvailable( HostedRepository.class ) )
         {
             return false;
@@ -264,7 +275,7 @@ public abstract class AbstractMavenRepository
     {
         getExternalConfiguration( true ).setCleanseRepositoryMetadata( cleanseRepositoryMetadata );
     }
-    
+
     public ChecksumPolicy getChecksumPolicy()
     {
         return getExternalConfiguration( false ).getChecksumPolicy();

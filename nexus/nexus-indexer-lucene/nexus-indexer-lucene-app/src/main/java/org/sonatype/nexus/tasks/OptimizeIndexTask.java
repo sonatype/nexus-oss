@@ -17,7 +17,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.nexus.tasks.descriptors.OptimizeIndexTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -28,7 +28,7 @@ import org.sonatype.scheduling.SchedulerTask;
  */
 @Component( role = SchedulerTask.class, hint = OptimizeIndexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class OptimizeIndexTask
-    extends AbstractNexusRepositoriesPathAwareTask<Object>
+    extends AbstractNexusRepositoriesTask<Object>
 {
 
     @Requirement
@@ -38,12 +38,6 @@ public class OptimizeIndexTask
     protected String getRepositoryFieldId()
     {
         return OptimizeIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-    }
-    
-    @Override
-    protected String getRepositoryPathFieldId()
-    {
-        return null;
     }
 
     @Override
@@ -77,13 +71,11 @@ public class OptimizeIndexTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Optimizing repository group " + getRepositoryGroupName() + " index from path "
-                + getResourceStorePath() + " and below.";
+            return "Optimizing repository group " + getRepositoryGroupName() + " index.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Optimizing repository " + getRepositoryName() + " index from path " + getResourceStorePath()
-                + " and below.";
+            return "Optimizing repository " + getRepositoryName() + " index.";
         }
         else
         {

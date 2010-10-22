@@ -15,6 +15,7 @@ package org.sonatype.nexus.proxy.repository;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -160,6 +161,11 @@ public abstract class AbstractProxyRepository
     @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return Collections.emptyList();
+        }
+
         if ( getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
         {
             Collection<String> result =

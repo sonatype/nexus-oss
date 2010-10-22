@@ -40,7 +40,7 @@ public class RebuildMavenMetadataTask
     @Override
     protected String getRepositoryPathFieldId()
     {
-        return null;
+        return RebuildMavenMetadataTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
     public Object doRun()

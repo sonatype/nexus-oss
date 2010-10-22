@@ -43,7 +43,7 @@ public class RebuildAttributesTask
     @Override
     protected String getRepositoryPathFieldId()
     {
-        return null;
+        return RebuildAttributesTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
     }
 
     public Object doRun()
@@ -55,13 +55,13 @@ public class RebuildAttributesTask
 
         if ( getRepositoryGroupId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes( req,
-                                                                                                                                initialData );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryGroupId(), GroupRepository.class ).recreateAttributes(
+                req, initialData );
         }
         else if ( getRepositoryId() != null )
         {
-            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes( req,
-                                                                                                                      initialData );
+            getRepositoryRegistry().getRepositoryWithFacet( getRepositoryId(), Repository.class ).recreateAttributes(
+                req, initialData );
         }
         else
         {
@@ -80,15 +80,18 @@ public class RebuildAttributesTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return "Rebuilding attributes of repository group " + getRepositoryGroupName();
+            return "Rebuilding attributes of repository group " + getRepositoryGroupName() + " from path "
+                + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return "Rebuilding attributes of repository " + getRepositoryName();
+            return "Rebuilding attributes of repository " + getRepositoryName() + " from path "
+                + getResourceStorePath() + " and below.";
         }
         else
         {
-            return "Rebuilding attributes of all registered repositories";
+            return "Rebuilding attributes of all registered repositories from path " + getResourceStorePath()
+                + " and below.";
         }
     }
 

@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
+import java.util.Collections;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -75,8 +77,8 @@ public abstract class AbstractShadowRepository
             // erm?
 
             getLogger().warn(
-                              "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
-                                  + getMasterRepositoryId() + "'!", e );
+                "ShadowRepository ID='" + getId() + "' cannot fetch it's master repository with ID='"
+                    + getMasterRepositoryId() + "'!", e );
 
             return null;
         }
@@ -113,7 +115,7 @@ public abstract class AbstractShadowRepository
     {
         return super.getLocalStatus().shouldServiceRequest()
             && getMasterRepository().getLocalStatus().shouldServiceRequest() ? LocalStatus.IN_SERVICE
-                        : LocalStatus.OUT_OF_SERVICE;
+            : LocalStatus.OUT_OF_SERVICE;
     }
 
     @Override
@@ -164,6 +166,11 @@ public abstract class AbstractShadowRepository
      */
     public void synchronizeWithMaster()
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return;
+        }
+
         getLogger().info( "Syncing shadow " + getId() + " with master repository " + getMasterRepository().getId() );
 
         ResourceStoreRequest root = new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true );

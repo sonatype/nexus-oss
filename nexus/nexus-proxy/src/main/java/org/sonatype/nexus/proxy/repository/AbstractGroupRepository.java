@@ -92,6 +92,11 @@ public abstract class AbstractGroupRepository
     @Override
     public Collection<String> evictUnusedItems( ResourceStoreRequest request, final long timestamp )
     {
+        if ( !getLocalStatus().shouldServiceRequest() )
+        {
+            return Collections.emptyList();
+        }
+        
         getLogger().info(
             "Evicting unused items from group repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
                 + request.getRequestPath() );

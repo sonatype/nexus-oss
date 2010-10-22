@@ -17,22 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.ThreadContext;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.error.reporting.ErrorReportRequest;
 import org.sonatype.nexus.error.reporting.ErrorReportingManager;
 import org.sonatype.nexus.feeds.SystemProcess;
+import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 import org.sonatype.scheduling.ScheduledTask;
 import org.sonatype.scheduling.TaskExecutionException;
 import org.sonatype.scheduling.TaskState;
-import org.sonatype.security.SecuritySystem;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
 public abstract class AbstractNexusTask<T>
     extends AbstractLogEnabled
@@ -49,10 +47,7 @@ public abstract class AbstractNexusTask<T>
     @Requirement
     private ApplicationEventMulticaster applicationEventMulticaster;
 
-    @Requirement
-    private SecuritySystem securitySystem;
-    
-    // DO NOT, EVER AGAIN ADD @REQ here, since you will introduce a cycle
+    // DO NOT ADD @REQ here, since you will introduce a cycle
     // Look below, nexus is looked up "lazily"
     private Nexus nexus = null;
 

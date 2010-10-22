@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.formfields.FormField;
+import org.sonatype.nexus.formfields.NumberTextFormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "RebuildAttributes", description = "Rebuild Repository Attributes" )
@@ -28,8 +29,17 @@ public class RebuildAttributesTaskDescriptor
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
 
+    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
+
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
                                                                                        FormField.MANDATORY );
+
+    private final NumberTextFormField resourceStorePathField =
+        new NumberTextFormField(
+                                 RESOURCE_STORE_PATH_FIELD_ID,
+                                 "Repository path",
+                                 "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
+                                 FormField.OPTIONAL );
 
     public String getId()
     {
@@ -46,6 +56,8 @@ public class RebuildAttributesTaskDescriptor
         List<FormField> fields = new ArrayList<FormField>();
 
         fields.add( repoField );
+        
+        fields.add( resourceStorePathField );
 
         return fields;
     }
