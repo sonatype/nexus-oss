@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nexusConfiguration>
-  <version>1.4.2</version>
+  <version>1.4.3</version>
   <globalConnectionSettings>
     <connectionTimeout>20000</connectionTimeout>
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-  <restApi />
+  <restApi>
+    <uiTimeout>30000</uiTimeout>
+  </restApi>
   <httpProxy>
     <enabled>true</enabled>
     <port>8082</port>

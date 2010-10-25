@@ -1,14 +1,8 @@
 
-  <!--
-    Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free
-    software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
-    published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
-    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more
-    details. You should have received a copy of the GNU Lesser General Public License along with this program; if not,
-    write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-  -->
+<!-- Nexus: Maven Repository Manager Copyright (C) 2008 Sonatype, Inc. This file is part of Nexus. This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software 
+  Foundation; either version 3 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+  See the GNU Lesser General Public License for more details. You should have received a copy of the GNU Lesser General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, 
+  USA. -->
 
 <model>
 
@@ -120,7 +114,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>SystemNotificationSettings</name>
       <version>1.0.0+</version>
@@ -275,7 +269,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "global-settings-list" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "global-settings-list" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>      
+      </annotations>
       <description>REST Response object for a global configuration list request, contains the typical 'data' parameter, which is a list of the global configuration items requested.</description>
       <fields>
         <field>
@@ -290,7 +284,7 @@
           <annotations>
             <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "data" )</annotation>
             <annotation>@javax.xml.bind.annotation.XmlElement( name = "global-settings-list-item" )</annotation>
-          </annotations>      
+          </annotations>
         </field>
       </fields>
     </class>
@@ -435,7 +429,7 @@
           <name>globalRestApiSettings</name>
           <version>1.0.0+</version>
           <association>
-          	<type>RestApiSettings</type>
+            <type>RestApiSettings</type>
           </association>
           <required>false</required>
           <description>Rest API configuration parameters.</description>
@@ -502,7 +496,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository-status-list" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository-status-list" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations> 
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1019,7 +1013,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "repository-status" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "repository-status" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations> 
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -1513,7 +1507,7 @@
             <multiplicity>*</multiplicity>
           </association>
           <required>true</required>
-          <description>The list of repositories in the associated group, that will be applied to route (or excluded based upon ruleType).</description>        
+          <description>The list of repositories in the associated group, that will be applied to route (or excluded based upon ruleType).</description>
           <annotations>
             <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "repositories" )</annotation>
             <annotation>@javax.xml.bind.annotation.XmlElement( name = "repo-routes-member" )</annotation>
@@ -2162,19 +2156,19 @@
           <description>The name of the service type.</description>
         </field>
         <field>
-			<name>formFields</name>
-			<version>1.0.0+</version>
-			<association>
-				<type>FormFieldResource</type>
-				<multiplicity>*</multiplicity>
-			</association>
-			<required>true</required>
-			<description>List of task form fields that configure the task.</description>
-			<annotations>
-				<annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "form-fields" )</annotation>
-				<annotation>@javax.xml.bind.annotation.XmlElement( name = "form-field" )</annotation>
-			</annotations>
-		</field>
+          <name>formFields</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>FormFieldResource</type>
+            <multiplicity>*</multiplicity>
+          </association>
+          <required>true</required>
+          <description>List of task form fields that configure the task.</description>
+          <annotations>
+            <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "form-fields" )</annotation>
+            <annotation>@javax.xml.bind.annotation.XmlElement( name = "form-field" )</annotation>
+          </annotations>
+        </field>
       </fields>
     </class>
 
@@ -2622,7 +2616,7 @@
         </field>
       </fields>
     </class>
-    
+
     <!-- Feeds -->
     <class>
       <name>FeedListResourceResponse</name>
@@ -3530,7 +3524,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "mirror-list-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "mirror-list-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>      
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3710,137 +3704,167 @@
       </fields>
     </class>
 
-	<class>
-		<name>RestApiSettings</name>
-		<version>1.0.0+</version>
-        <description>The rest api configuration settings.</description>
-        <annotations>
-          <annotation>@javax.xml.bind.annotation.XmlType( name = "rest-api-settings" )</annotation>
-          <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-        </annotations>
-		<fields>
-			<field>
-				<name>forceBaseUrl</name>
-				<version>1.0.0+</version>
-				<type>boolean</type>
-				<required>false</required>
-                <description>Flag that states whether to forcefully set the baseUrl defined in rest responses.</description>
-			</field>
-			<field>
-				<name>baseUrl</name>
-				<version>1.0.0+</version>
-				<type>String</type>
-				<required>false</required>
-                <description>The baseUrl of the nexus server.</description>
-			</field>
-		</fields>
-	</class>
-	
-	<class>
-	  <name>ErrorReportRequestDTO</name>
-	  <version>1.0.0+</version>
+    <class>
+      <name>RestApiResourceResponse</name>
+      <version>1.0.0+</version>
+      <superClass>NexusResponse</superClass>
+      <description>REST Response object for a rest api settings request, contains the typical 'data' parameter, which is the rest settings requested.</description>
+      <annotations>
+        <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "rest-api-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "rest-api-response" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
+            <type>RestApiSettings</type>
+          </association>
+          <required>true</required>
+          <description>The rest api configuration settings.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>RestApiSettings</name>
+      <version>1.0.0+</version>
+      <description>The rest api configuration settings.</description>
+      <annotations>
+        <annotation>@javax.xml.bind.annotation.XmlType( name = "rest-api-settings" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
+      </annotations>
+      <fields>
+        <field>
+          <name>forceBaseUrl</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+          <description>Flag that states whether to forcefully set the baseUrl defined in rest responses.</description>
+        </field>
+        <field>
+          <name>baseUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
+          <description>The baseUrl of the nexus server.</description>
+        </field>
+        <field>
+          <name>uiTimeout</name>
+          <version>1.0.0+</version>
+          <type>int</type>
+          <required>true</required>
+          <description>UI timeout in milliseconds.</description>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ErrorReportRequestDTO</name>
+      <version>1.0.0+</version>
       <description>Details required to generate an error report.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "error-report-request-dto" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
-	  <fields>
-	    <field>
-	      <name>title</name>
-	      <version>1.0.0+</version>
-	      <type>String</type>
-	      <required>true</required>
+      <fields>
+        <field>
+          <name>title</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
           <description>The title of the error report.</description>
-	    </field>
-	    <field>
-	      <name>description</name>
-	      <version>1.0.0+</version>
-	      <type>String</type>
-	      <required>false</required>
+        </field>
+        <field>
+          <name>description</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>false</required>
           <description>A detailed explanation of the error report.</description>
-	    </field>
-	    <field>
-	      <name>saveErrorReportingSettings</name>
-	      <version>1.0.0+</version>
-	      <type>boolean</type>
-	      <required>false</required>
-	      <defaultValue>false</defaultValue>
+        </field>
+        <field>
+          <name>saveErrorReportingSettings</name>
+          <version>1.0.0+</version>
+          <type>boolean</type>
+          <required>false</required>
+          <defaultValue>false</defaultValue>
           <description>If true will overwrite currect error report settings with the credentials provided.</description>
-	    </field>
-	    <field>
-	      <name>errorReportingSettings</name>
-	      <version>1.0.0+</version>
+        </field>
+        <field>
+          <name>errorReportingSettings</name>
+          <version>1.0.0+</version>
           <association>
             <type>ErrorReportingSettings</type>
           </association>
-	      <required>false</required>
+          <required>false</required>
           <description>The error report settings.</description>
-	    </field>
-	  </fields>
-	</class>
-	
-	<class>
-	  <name>ErrorReportRequest</name>
-	  <version>1.0.0+</version>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ErrorReportRequest</name>
+      <version>1.0.0+</version>
       <description>REST Request object for generating an error report, contains the typical 'data' parameter, which is an error report item.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "error-report-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "error-report-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
-	  <fields>
-	    <field>
-	      <name>data</name>
-	      <version>1.0.0+</version>
-	      <association>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
             <type>ErrorReportRequestDTO</type>
           </association>
           <required>true</required>
           <description>The error report object.</description>
-	    </field>
-	  </fields>
-	</class>
-	
-	<class>
-	  <name>ErrorReportResponseDTO</name>
-	  <version>1.0.0+</version>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ErrorReportResponseDTO</name>
+      <version>1.0.0+</version>
       <description>The response data that is returned after generating an error report.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "error-report-response-dto" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
-	  <fields>
-	    <field>
-	      <name>jiraUrl</name>
-	      <version>1.0.0+</version>
-	      <type>String</type>
-	      <required>true</required>
+      <fields>
+        <field>
+          <name>jiraUrl</name>
+          <version>1.0.0+</version>
+          <type>String</type>
+          <required>true</required>
           <description>The JIRA server URL for the error report that was created.</description>
-	    </field>
-	  </fields>
-	</class>
-	
-	<class>
-	  <name>ErrorReportResponse</name>
+        </field>
+      </fields>
+    </class>
+
+    <class>
+      <name>ErrorReportResponse</name>
       <description>REST Response object received after generating an error report, contains the typical 'data' parameter, which is the error report response item.</description>
-	  <version>1.0.0+</version>
+      <version>1.0.0+</version>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "error-report-response" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "error-report-response" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>      
-	  <fields>
-	    <field>
-	      <name>data</name>
-	      <version>1.0.0+</version>
-	      <association>
+      </annotations>
+      <fields>
+        <field>
+          <name>data</name>
+          <version>1.0.0+</version>
+          <association>
             <type>ErrorReportResponseDTO</type>
           </association>
           <required>true</required>
           <description>The error report response object.</description>
-	    </field>
-	  </fields>
-	</class>
+        </field>
+      </fields>
+    </class>
 
     <!-- /artifact/maven/resolve -->
     <class>
@@ -3954,7 +3978,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "artifact-resolution" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "artifact-resolution" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>   
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -3967,11 +3991,11 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>ArtifactCoordinate</name>
       <version>1.0.0+</version>
-      <description>Uniquely identifies a maven artifact.  This is returned by the artifact upload request.</description>
+      <description>Uniquely identifies a maven artifact. This is returned by the artifact upload request.</description>
       <annotations>
         <annotation>@javax.xml.bind.annotation.XmlType( name = "artifact-coordinate" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
@@ -4007,7 +4031,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>PrivilegeResourceRequest</name>
       <version>1.0.0+</version>
@@ -4016,7 +4040,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "privilege-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "privilege" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>   
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -4098,7 +4122,7 @@
       </fields>
     </class>
     <!-- Purposefully no PrivilegeApplicationResource as that type of resource cannot be created -->
-    
+
     <class>
       <name>Maven2ArtifactInfoResourceRespose</name>
       <version>1.0.0+</version>
@@ -4107,7 +4131,7 @@
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "maven2-info" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "maven2-info" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
-      </annotations>   
+      </annotations>
       <fields>
         <field>
           <name>data</name>
@@ -4120,7 +4144,7 @@
         </field>
       </fields>
     </class>
-    
+
     <class>
       <name>Maven2ArtifactInfoResource</name>
       <version>1.0.0+</version>

@@ -210,6 +210,12 @@
     public static final String MODEL_VERSION = "1.4.2";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>1.4.3</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.4.3";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
@@ -387,6 +393,13 @@
             request.
           </description>
           <required>true</required>
+        </field>
+        <field>
+          <name>uiTimeout</name>
+          <version>1.4.3+</version>
+          <type>int</type>
+          <description>HTTP connection timeout in miliseconds.</description>
+          <required>false</required>
         </field>
       </fields>
     </class>

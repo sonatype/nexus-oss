@@ -14,20 +14,20 @@
  */
 Sonatype.view = {
   FIELD_OFFSET_WITH_SCROLL : (3 + 16 + 3 + 30) * (-1) + '', // (help icon
-                                                            // margin) + (help
-                                                            // icon) + margin +
-                                                            // (scrollbar)
+  // margin) + (help
+  // icon) + margin +
+  // (scrollbar)
   FIELD_OFFSET : (3 + 16) * (-1) + '', // extra padding on right of icon not
-                                        // needed
+  // needed
   FIELDSET_OFFSET : (3 + 18) * (-1) + '', // (extra room between border and
-                                          // scrollbar) + (scrollbar)
+  // scrollbar) + (scrollbar)
   FIELDSET_OFFSET_WITH_SCROLL : (3 + 18 + 3 + 30) * (-1) + '', // (extra room
-                                                                // between
-                                                                // border and
-                                                                // scrollbar) +
-                                                                // (scrollbar) +
-                                                                // margin +
-                                                                // (scrollbar)
+  // between
+  // border and
+  // scrollbar) +
+  // (scrollbar) +
+  // margin +
+  // (scrollbar)
   HISTORY_DELIMITER : ';',
 
   headLinks : new Sonatype.headLinks(),
@@ -202,3 +202,5 @@ Sonatype.view.MainTabPanel = Ext.extend(Ext.TabPanel, {
 Sonatype.Events.addListener('nexusNavigationInit', function(panel) {
       Sonatype.view.viewport.doLayout();
     });
+
+Sonatype.utils.updateGlobalTimeout();

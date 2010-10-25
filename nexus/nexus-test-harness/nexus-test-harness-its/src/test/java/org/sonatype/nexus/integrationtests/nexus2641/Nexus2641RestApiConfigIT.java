@@ -1,5 +1,7 @@
 package org.sonatype.nexus.integrationtests.nexus2641;
 
+import static org.testng.Assert.assertEquals;
+
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;
@@ -16,6 +18,10 @@ public class Nexus2641RestApiConfigIT
         throws Exception
     {
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
+
+        // *NEXUS-3840
+        assertEquals( settings.getGlobalRestApiSettings().getUiTimeout(), 30 );
+        // *
 
         Assert.assertNotNull( settings.getGlobalRestApiSettings() );
 

@@ -254,6 +254,8 @@ public abstract class AbstractGlobalConfigurationPlexusResource
 
         result.setForceBaseUrl( settings.isForceBaseUrl() );
 
+        result.setUiTimeout( settings.getUITimeout() / 1000 );
+
         return result;
     }
 
@@ -364,6 +366,8 @@ public abstract class AbstractGlobalConfigurationPlexusResource
         result.setBaseUrl( settings.getBaseUrl() );
 
         result.setForceBaseUrl( settings.isForceBaseUrl() );
+
+        result.setUiTimeout( settings.getUiTimeout() / 1000 );
 
         return result;
     }

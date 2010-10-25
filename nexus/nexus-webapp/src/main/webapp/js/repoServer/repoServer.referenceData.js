@@ -60,7 +60,8 @@
       },
       globalRestApiSettings : {
         baseUrl : "",
-        forceBaseUrl : false
+        forceBaseUrl : false,
+        uiTimeout : 30000
       },
       systemNotificationSettings : {
         enabled : false,

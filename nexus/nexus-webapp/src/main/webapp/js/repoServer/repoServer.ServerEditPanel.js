@@ -446,6 +446,18 @@ Sonatype.repoServer.ServerEditPanel = function(config) {
                       var baseUrlField = checkbox.ownerCt.find('name', 'globalRestApiSettings.baseUrl')[0];
                       baseUrlField.validate();
                     }
+                  }, {
+                    xtype : 'numberfield',
+                    fieldLabel : 'UI Timeout',
+                    helpText : ht.uiTimeout,
+                    afterText : 'seconds',
+                    name : 'globalRestApiSettings.uiTimeout',
+                    width : 50,
+                    allowBlank : false,
+                    itemCls : 'required-field',
+                    allowDecimals : false,
+                    allowNegative : false,
+                    maxValue : 36000
                   }]
             }, {
               xtype : 'fieldset',
@@ -728,7 +740,8 @@ Ext.extend(Sonatype.repoServer.ServerEditPanel, Ext.Panel, {
                   return fpanel.find('name', 'nonProxyHosts')[0].getEntries();
                 }
               },
-              serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState
+              serviceDataObj : Sonatype.repoServer.referenceData.globalSettingsState,
+              success : Sonatype.utils.updateGlobalTimeout
             });
       },
 

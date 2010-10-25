@@ -112,4 +112,14 @@ public class DefaultGlobalRestApiSettings
         return "Global Rest Api Settings";
     }
 
+    public void setUITimeout( int uiTimeout )
+    {
+        getCurrentConfiguration( true ).setUiTimeout( uiTimeout );
+    }
+
+    public int getUITimeout()
+    {
+        return getCurrentConfiguration( false ).getUiTimeout();
+    }
+
 }

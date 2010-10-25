@@ -155,6 +155,25 @@
       }
     },
 
+    updateGlobalTimeout : function() {
+      Ext.Ajax.request({
+            method : 'GET',
+            scope : this,
+            url : Sonatype.config.repos.urls.restApiSettings,
+            callback : function(options, success, response) {
+              if (success)
+              {
+                var dec = Ext.decode(response.responseText);
+                Ext.Ajax.timeout = dec.data.uiTimeout * 1000;
+              }
+              else
+              {
+                Ext.Ajax.timeout = 30000;
+                Sonatype.utils.connectionError(response, 'Error retrieving rest timeout');
+              }
+            }
+          });
+    },
     connectionError : function(response, message, offerRestart, options, showResponseText) {
       var serverMessage = '';
       var r = response.responseText;

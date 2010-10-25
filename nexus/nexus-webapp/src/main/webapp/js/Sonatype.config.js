@@ -75,6 +75,7 @@
           logout : servicePath + '/authentication/logout',
           globalSettings : servicePath + '/global_settings',
           globalSettingsState : servicePath + '/global_settings/current',
+          restApiSettings: servicePath + '/rest_api_settings',
           repositories : servicePath + '/repositories',
           allRepositories : servicePath + '/all_repositories',
           repositoryStatuses : servicePath + '/repository_statuses',

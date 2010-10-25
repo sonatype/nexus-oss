@@ -25,11 +25,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.codehaus.enunciate.contract.jaxrs.ResourceMethodSignature;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.restlet.Context;
 import org.restlet.data.Reference;
 import org.restlet.data.Request;
@@ -463,6 +463,8 @@ public class GlobalConfigurationPlexusResource
                             getGlobalRestApiSettings().setBaseUrl(
                                                                    new Reference( restApiSettings.getBaseUrl() ).getTargetRef().toString() );
                         }
+
+                        getGlobalRestApiSettings().setUITimeout( restApiSettings.getUiTimeout() * 1000 );
                     }
                     else
                     {
