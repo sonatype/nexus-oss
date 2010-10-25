@@ -113,7 +113,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
     protected String getResourceStorePath( Request request )
     {
-        return parsePathFromUri( request.getResourceRef().getRemainingPart() );
+        return parsePathFromUri( request.getResourceRef().getRemainingPart( true ) );
     }
 
     protected boolean isDescribe( Request request )
