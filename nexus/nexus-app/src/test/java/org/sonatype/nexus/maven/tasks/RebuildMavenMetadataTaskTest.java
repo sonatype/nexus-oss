@@ -43,7 +43,8 @@ public class RebuildMavenMetadataTaskTest
         super.tearDown();
     }
 
-    protected int countFiles( final MavenRepository repository, final String[] includepattern )
+    protected int countFiles( final MavenRepository repository, final String[] includepattern,
+                              final String[] excludepattern )
         throws Exception
     {
         // get the root
@@ -53,6 +54,7 @@ public class RebuildMavenMetadataTaskTest
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repoStorageRoot );
         scanner.setIncludes( includepattern );
+        scanner.setExcludes( excludepattern );
 
         // count
         scanner.scan();
@@ -65,7 +67,7 @@ public class RebuildMavenMetadataTaskTest
     {
         fillInRepo();
 
-        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
 
         RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
         RebuildMavenMetadataTask.class );
@@ -78,7 +80,7 @@ public class RebuildMavenMetadataTaskTest
         handle.get();
 
         // count it again
-        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
 
         // assert
         assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
@@ -90,12 +92,15 @@ public class RebuildMavenMetadataTaskTest
     {
         fillInRepo();
 
-        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        // we will initiate a task with "subpath" of /org/sonatype, so we count the files of total and the processed and
+        // non-processed set
+        // to be able to perform checks at the end
+        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
         final int countNonProcessedSubBefore =
-            countFiles( snapshots, new String[] { "org/myorg/**/maven-metadata.xml",
-                "org/nonuniquesnapgroup/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" },
+                new String[] { "org/sonatype/**/maven-metadata.xml" } );
         final int countProcessedSubBefore =
-            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, null );
 
         RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
         RebuildMavenMetadataTask.class );
@@ -109,12 +114,12 @@ public class RebuildMavenMetadataTaskTest
         handle.get();
 
         // count it again
-        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
         final int countNonProcessedSubAfter =
-            countFiles( snapshots, new String[] { "org/myorg/**/maven-metadata.xml",
-                "org/nonuniquesnapgroup/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" },
+                new String[] { "org/sonatype/**/maven-metadata.xml" } );
         final int countProcessedSubAfter =
-            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, null );
 
         // assert
         assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
