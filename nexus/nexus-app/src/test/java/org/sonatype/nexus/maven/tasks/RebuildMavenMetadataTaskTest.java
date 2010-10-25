@@ -13,7 +13,12 @@
  */
 package org.sonatype.nexus.maven.tasks;
 
+import java.io.File;
+
+import org.codehaus.plexus.util.DirectoryScanner;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
+import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -21,6 +26,8 @@ public class RebuildMavenMetadataTaskTest
     extends AbstractMavenRepoContentTests
 {
     protected NexusScheduler nexusScheduler;
+
+    protected ApplicationConfiguration applicationConfiguration;
 
     protected void setUp()
         throws Exception
@@ -36,19 +43,91 @@ public class RebuildMavenMetadataTaskTest
         super.tearDown();
     }
 
+    protected int countFiles( final MavenRepository repository, final String[] includepattern )
+        throws Exception
+    {
+        // get the root
+        final File repoStorageRoot = retrieveFile( repository, "" );
+
+        // use scanner
+        DirectoryScanner scanner = new DirectoryScanner();
+        scanner.setBasedir( repoStorageRoot );
+        scanner.setIncludes( includepattern );
+
+        // count
+        scanner.scan();
+
+        return scanner.getIncludedFiles().length;
+    }
+
     public void testOneRun()
         throws Exception
     {
         fillInRepo();
 
+        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+
         RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
-            RebuildMavenMetadataTask.class);
+        RebuildMavenMetadataTask.class );
 
         task.setRepositoryId( snapshots.getId() );
 
         ScheduledTask<Object> handle = nexusScheduler.submit( "task", task );
 
         // block until it finishes
-        handle.getIfDone();
+        handle.get();
+
+        // count it again
+        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+
+        // assert
+        assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
+            countTotalBefore < countTotalAfter );
+    }
+
+    public void testOneRunWithSubpath()
+        throws Exception
+    {
+        fillInRepo();
+
+        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        final int countNonProcessedSubBefore =
+            countFiles( snapshots, new String[] { "org/myorg/**/maven-metadata.xml",
+                "org/nonuniquesnapgroup/**/maven-metadata.xml" } );
+        final int countProcessedSubBefore =
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" } );
+
+        RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
+        RebuildMavenMetadataTask.class );
+
+        task.setRepositoryId( snapshots.getId() );
+        task.setResourceStorePath( "/org/sonatype" );
+
+        ScheduledTask<Object> handle = nexusScheduler.submit( "task", task );
+
+        // block until it finishes
+        handle.get();
+
+        // count it again
+        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" } );
+        final int countNonProcessedSubAfter =
+            countFiles( snapshots, new String[] { "org/myorg/**/maven-metadata.xml",
+                "org/nonuniquesnapgroup/**/maven-metadata.xml" } );
+        final int countProcessedSubAfter =
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" } );
+
+        // assert
+        assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
+            countTotalBefore < countTotalAfter );
+        assertTrue( "We should have same count of md's after rebuilding them for non-processed ones!",
+            countNonProcessedSubBefore == countNonProcessedSubAfter );
+        assertTrue(
+            "We should have more md's after rebuilding them for processed ones, since we have some of them missing!",
+            countProcessedSubBefore < countProcessedSubAfter );
+
+        // the total change has to equals to processed change
+        assertTrue(
+            "We should have same change on total level as we have on processed ones, since we have some of them missing!",
+            ( countTotalAfter - countTotalBefore ) == ( countProcessedSubAfter - countProcessedSubBefore ) );
     }
 }
