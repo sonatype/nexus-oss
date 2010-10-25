@@ -156,6 +156,13 @@ public class DefaultSnapshotRemover
     protected SnapshotRemovalRepositoryResult removeSnapshotsFromMavenRepository( MavenRepository repository,
                                                                                   SnapshotRemovalRequest request )
     {
+        SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0, true );
+
+        if ( !repository.getLocalStatus().shouldServiceRequest() )
+        {
+            return result;
+        }
+        
         // we are already processed here, so skip repo
         if ( request.isProcessedRepo( repository.getId() ) )
         {
@@ -164,8 +171,6 @@ public class DefaultSnapshotRemover
         
         request.addProcessedRepo( repository.getId() );
         
-        SnapshotRemovalRepositoryResult result = new SnapshotRemovalRepositoryResult( repository.getId(), 0, 0, true );
-
         // if this is not snap repo, do nothing
         if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
         {
