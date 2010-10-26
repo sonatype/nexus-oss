@@ -168,7 +168,7 @@
               }
               else
               {
-                Ext.Ajax.timeout = 30000;
+                Ext.Ajax.timeout = 60000;
                 Sonatype.utils.connectionError(response, 'Error retrieving rest timeout');
               }
             }

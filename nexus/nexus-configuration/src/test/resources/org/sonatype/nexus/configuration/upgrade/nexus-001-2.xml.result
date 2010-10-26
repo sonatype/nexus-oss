@@ -15,7 +15,7 @@
     </authentication>
   </globalHttpProxySettings>
   <restApi>
-    <uiTimeout>30000</uiTimeout>
+    <uiTimeout>60000</uiTimeout>
   </restApi>
   <httpProxy>
     <port>8082</port>

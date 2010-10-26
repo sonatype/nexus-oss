@@ -20,7 +20,7 @@ public class Nexus2641RestApiConfigIT
         GlobalConfigurationResource settings = SettingsMessageUtil.getCurrentSettings();
 
         // *NEXUS-3840
-        assertEquals( settings.getGlobalRestApiSettings().getUiTimeout(), 30 );
+        assertEquals( settings.getGlobalRestApiSettings().getUiTimeout(), 60 );
         // *
 
         Assert.assertNotNull( settings.getGlobalRestApiSettings() );
