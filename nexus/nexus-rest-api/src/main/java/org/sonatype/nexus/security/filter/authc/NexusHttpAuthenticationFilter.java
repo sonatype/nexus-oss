@@ -204,7 +204,7 @@ public class NexusHttpAuthenticationFilter
 
         UsernamePasswordToken usernamePasswordToken =
             new UsernamePasswordToken( getNexusConfiguration().getAnonymousUsername(),
-                                       getNexusConfiguration().getAnonymousPassword() );
+                getNexusConfiguration().getAnonymousPassword() );
 
         try
         {
@@ -223,8 +223,9 @@ public class NexusHttpAuthenticationFilter
         }
         catch ( AuthenticationException ae )
         {
-            getLogger().info( "Unable to authenticate user [anonymous] from IP Address "
-                                  + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
+            getLogger().info(
+                "Unable to authenticate user [anonymous] from IP Address "
+                    + RemoteIPFinder.findIP( (HttpServletRequest) request ) );
 
             if ( getLogger().isDebugEnabled() )
             {
@@ -258,12 +259,8 @@ public class NexusHttpAuthenticationFilter
         {
             ApplicationEventMulticaster multicaster = getPlexusContainer().lookup( ApplicationEventMulticaster.class );
 
-            multicaster.notifyEventListeners( new NexusAuthenticationEvent(
-                                                                            this,
-                                                                            new AuthenticationItem(
-                                                                                                    username,
-                                                                                                    RemoteIPFinder.findIP( (HttpServletRequest) request ),
-                                                                                                    success ) ) );
+            multicaster.notifyEventListeners( new NexusAuthenticationEvent( this, new AuthenticationItem( username,
+                RemoteIPFinder.findIP( (HttpServletRequest) request ), success ) ) );
         }
         catch ( ComponentLookupException e )
         {
@@ -290,7 +287,19 @@ public class NexusHttpAuthenticationFilter
             evt.getEventContext().put( AccessManager.REQUEST_REMOTE_ADDRESS, ip );
         }
 
-        getNexus().addAuthcAuthzEvent( evt );
+        Nexus nexus = getNexus();
+
+        if ( nexus != null )
+        {
+            try
+            {
+                getNexus().addAuthcAuthzEvent( evt );
+            }
+            catch ( Exception e )
+            {
+                // just neglect it, it should not disturb actual authc operation
+            }
+        }
 
         currentAuthcEvt = evt;
     }
@@ -431,17 +440,17 @@ public class NexusHttpAuthenticationFilter
         {
             return null;
         }
-        
+
         String decoded = Base64.decodeToString( encoded );
-        
+
         // no credentials, no auth
         if ( StringUtils.isEmpty( encoded ) )
         {
-           return null;
+            return null;
         }
 
         String[] parts = decoded.split( ":" );
-        
+
         // invalid credentials, no auth
         if ( parts == null || parts.length < 2 )
         {

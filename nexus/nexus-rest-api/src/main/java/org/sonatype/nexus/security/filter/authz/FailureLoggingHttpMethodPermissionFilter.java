@@ -99,9 +99,17 @@ public class FailureLoggingHttpMethodPermissionFilter
         }
 
         Nexus nexus = getNexus( request );
+
         if ( nexus != null )
         {
-            nexus.addAuthcAuthzEvent( authzEvt );
+            try
+            {
+                nexus.addAuthcAuthzEvent( authzEvt );
+            }
+            catch ( Exception e )
+            {
+                // just neglect it, it should not disturb actual authz operation
+            }
         }
 
         currentAuthzEvt = authzEvt;
