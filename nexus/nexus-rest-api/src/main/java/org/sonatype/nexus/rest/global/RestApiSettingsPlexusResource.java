@@ -62,7 +62,7 @@ public class RestApiSettingsPlexusResource
     public PathProtectionDescriptor getResourceProtection()
     {
         // everybody needs to know the UI timeout
-        return null;
+        return new PathProtectionDescriptor( getResourceUri(), "anon" );
     }
 
     /**
