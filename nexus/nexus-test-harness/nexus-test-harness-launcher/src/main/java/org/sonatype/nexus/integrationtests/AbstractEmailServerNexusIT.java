@@ -27,13 +27,7 @@ public abstract class AbstractEmailServerNexusIT
 
     private static final Logger LOG = Logger.getLogger( AbstractEmailServerNexusIT.class );
 
-    private static final int emailServerPort;
-
-    static
-    {
-        String port = TestProperties.getString( "email.server.port" );
-        emailServerPort = new Integer( port );
-    }
+    private static int emailServerPort;
 
     protected static GreenMail server;
 
@@ -41,6 +35,8 @@ public abstract class AbstractEmailServerNexusIT
     @org.junit.BeforeClass
     public static void startEmailServer()
     {
+        String port = TestProperties.getString( "email.server.port" );
+        emailServerPort = new Integer( port );
         // ServerSetup smtp = new ServerSetup( 1234, null, ServerSetup.PROTOCOL_SMTP );
         ServerSetup smtp = new ServerSetup( emailServerPort, null, ServerSetup.PROTOCOL_SMTP );
 
