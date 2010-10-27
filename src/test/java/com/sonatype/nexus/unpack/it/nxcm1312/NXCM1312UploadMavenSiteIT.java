@@ -9,9 +9,9 @@ package com.sonatype.nexus.unpack.it.nxcm1312;
 import java.io.File;
 
 import org.apache.maven.it.Verifier;
-import org.junit.Assert;
-import org.junit.Test;
 import org.sonatype.nexus.test.utils.TestProperties;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 

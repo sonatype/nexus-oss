@@ -8,14 +8,14 @@ package com.sonatype.nexus.unpack.it.nxcm1312;
 
 import java.io.File;
 
-import org.junit.Assert;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.resource.FileRepresentation;
 import org.restlet.resource.Representation;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 
@@ -27,28 +27,31 @@ public class NXCM1312UploadCompressedBundleIT
     public void upload()
         throws Exception
     {
-        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-            + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
-
-        Assert.assertEquals( 1, getSearchMessageUtil().searchForGav( "nxcm1312", "artifact", "2.0" ).size() );
-        Assert.assertEquals(
-                             1,
-                             getSearchMessageUtil().searchForGav( "org.nxcm1312", "maven-deploy-released", "1.0" ).size() );
+        getDeployUtils().deployWithWagon( "http",
+                                          nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+                                              + "/content-compressed", getTestFile( "bundle.zip" ), "" );
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
+        
+        Assert.assertEquals( getSearchMessageUtil().searchForGav( "nxcm1312", "artifact", "2.0" ).size(), 1 );
+        Assert.assertEquals( getSearchMessageUtil().searchForGav( "org.nxcm1312", "maven-deploy-released", "1.0" ).size(),
+                             1 );
     }
 
-    @Test
+    @Test( dependsOnMethods = "upload" )
     public void uploadWithPath()
         throws Exception
     {
-        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-            + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "some/path" );
+        getDeployUtils().deployWithWagon( "http",
+                                          nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+                                              + "/content-compressed", getTestFile( "bundle.zip" ), "some/path" );
 
         // Check for the parent folder, it should been created
         File root = new File( nexusWorkDir, "storage/nexus-test-harness-repo/some/path" );
         Assert.assertTrue( root.isDirectory() );
     }
 
-    @Test
+    @Test( dependsOnMethods = "uploadWithPath" )
     public void uploadWithDelete()
         throws Exception
     {
@@ -109,13 +112,13 @@ public class NXCM1312UploadCompressedBundleIT
         {
             if ( checkForPresence )
             {
-                Assert.assertTrue( "Directory should exists with name: " + presentRootDirectory,
-                                   new File( repositoryRootDirectory, presentRootDirectory ).isDirectory() );
+                Assert.assertTrue( new File( repositoryRootDirectory, presentRootDirectory ).isDirectory(),
+                                   "Directory should exists with name: " + presentRootDirectory );
             }
             else
             {
-                Assert.assertFalse( "File should not exists: " + presentRootDirectory,
-                                    new File( repositoryRootDirectory, presentRootDirectory ).exists() );
+                Assert.assertFalse( new File( repositoryRootDirectory, presentRootDirectory ).exists(),
+                                    "File should not exists: " + presentRootDirectory );
             }
         }
     }

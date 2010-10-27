@@ -8,8 +8,8 @@ package com.sonatype.nexus.unpack.it;
 
 import java.util.prefs.Preferences;
 
-import org.junit.Before;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
+import org.testng.annotations.BeforeMethod;
 
 import com.sonatype.nexus.licensing.NexusLicenseBuilder;
 import com.sonatype.nexus.licensing.NexusLicensingManager;
@@ -21,7 +21,7 @@ public abstract class AbstractUnpackIT
     protected NexusLicensingManager licenseManager;
 
     @Override
-    @Before
+    @BeforeMethod
     public void oncePerClassSetUp()
         throws Exception
     {

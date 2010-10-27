@@ -9,8 +9,8 @@ package com.sonatype.nexus.unpack.it.nxcm1312;
 import java.io.File;
 import java.util.prefs.Preferences;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.Test;
 
 import com.sonatype.nexus.licensing.NexusLicenseBuilder;
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;

@@ -5,11 +5,9 @@
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
 package com.sonatype.nexus.unpack.it.nxcm1326;
-import java.io.IOException;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import java.io.IOException;
+
 import org.restlet.data.MediaType;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -17,35 +15,36 @@ import org.sonatype.nexus.test.utils.RoleMessageUtil;
 import org.sonatype.nexus.test.utils.UserMessageUtil;
 import org.sonatype.security.rest.model.RoleResource;
 import org.sonatype.security.rest.model.UserResource;
+import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import com.sonatype.nexus.unpack.it.AbstractUnpackIT;
 import com.thoughtworks.xstream.XStream;
 
-
 public class NXCM1326AuthenticationIT
     extends AbstractUnpackIT
 {
-    static
+    @BeforeClass
+    public void setSecurity()
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
-    }
-
-    public NXCM1326AuthenticationIT()
-    {
         XStream xstream = this.getXMLXStream();
 
         this.userUtil = new UserMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         this.roleUtil = new RoleMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         this.privUtil = new PrivilegesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
-    
-    @Before
-    public void setupUserPrivs() throws IOException
+
+    @BeforeMethod
+    public void setupUserPrivs()
+        throws IOException
     {
         UserResource user = this.userUtil.getUser( "test-user" );
         user.addRole( "repo-all-full" );
         this.userUtil.updateUser( user );
-        
+
     }
 
     @Test
@@ -57,8 +56,9 @@ public class NXCM1326AuthenticationIT
 
         try
         {
-            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-                + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
+            getDeployUtils().deployWithWagon( "http",
+                                              nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+                                                  + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
         catch ( org.apache.maven.wagon.TransferFailedException e )
@@ -67,17 +67,18 @@ public class NXCM1326AuthenticationIT
         }
     }
 
-    @Test
+    @Test( dependsOnMethods = "invalidUser" )
     public void withoutPrivsUser()
         throws Exception
     {
         TestContainer.getInstance().getTestContext().setUsername( "test-user" );
         TestContainer.getInstance().getTestContext().setPassword( "admin123" );
-        
+
         try
         {
-            getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-                + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
+            getDeployUtils().deployWithWagon( "http",
+                                              nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+                                                  + "/content-compressed", getTestFile( "bundle.zip" ), "" );
             Assert.fail( "Authentication should fail!!!" );
         }
         catch ( org.apache.maven.wagon.authorization.AuthorizationException e )
@@ -85,7 +86,7 @@ public class NXCM1326AuthenticationIT
         }
     }
 
-    @Test
+    @Test( dependsOnMethods = { "withoutPrivsUser" } )
     public void okUser()
         throws Exception
     {
@@ -94,8 +95,9 @@ public class NXCM1326AuthenticationIT
 
         addPrivilege( "test-user", "repository-" + REPO_TEST_HARNESS_REPO, "content-compressed" );
 
-        getDeployUtils().deployWithWagon( "http", nexusBaseUrl + "service/local/repositories/"
-            + REPO_TEST_HARNESS_REPO + "/content-compressed", getTestFile( "bundle.zip" ), "" );
+        getDeployUtils().deployWithWagon( "http",
+                                          nexusBaseUrl + "service/local/repositories/" + REPO_TEST_HARNESS_REPO
+                                              + "/content-compressed", getTestFile( "bundle.zip" ), "" );
     }
 
     protected void addPrivilege( String userId, String privilege, String... privs )
