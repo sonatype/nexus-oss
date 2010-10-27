@@ -4,8 +4,6 @@ import java.util.List;
 
 import junit.framework.Assert;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
@@ -17,6 +15,8 @@ import org.sonatype.nexus.rest.model.NexusRepositoryTypeListResourceResponse;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 public class NXCM1008SiteRepoIT
     extends AbstractNexusIntegrationTest
