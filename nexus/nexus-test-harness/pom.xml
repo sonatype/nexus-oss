@@ -13,9 +13,12 @@
   <name>Nexus : Test Harness</name>
 
   <profiles>
-    <!-- until nexus-mock is again working, we cant have this module -->
-    <!--profile> <id>selenium-tests</id> <modules> <module>nexus-test-harness-selenium</module> </modules> </profile -->
-
+    <profile>
+      <id>selenium-tests</id>
+      <modules>
+        <module>nexus-test-harness-selenium</module>
+      </modules>
+    </profile>
     <profile>
       <id>its</id>
       <activation>

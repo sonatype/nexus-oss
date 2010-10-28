@@ -1183,7 +1183,7 @@
   <modules>
     <module>nexus-indexer-lucene</module>
     <module>nexus-plugins</module>
-    <!-- New Guice based IoC cannot cope with it currently <module>nexus-mock</module> -->
+    <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
     <module>nexus-logging-extras</module>
