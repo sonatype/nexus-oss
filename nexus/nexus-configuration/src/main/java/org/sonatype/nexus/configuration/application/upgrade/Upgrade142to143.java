@@ -41,15 +41,15 @@ public class Upgrade142to143
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v1_4_2.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader reader =
-                new org.sonatype.nexus.configuration.model.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v1_4_2.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v1_4_2.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
