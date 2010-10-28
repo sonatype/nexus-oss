@@ -141,6 +141,8 @@ public class AbstractEvictTaskIt
         age.setValue( String.valueOf( days ) );
 
         TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
+        
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     protected SortedSet<String> buildListOfExpectedFilesForAllRepos( int days )
