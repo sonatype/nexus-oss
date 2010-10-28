@@ -99,6 +99,9 @@ public class SimpleTest
     {
         System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
 
+        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
+            + MockAppBooterCustomizer.class.getName() );
+
         File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
 
         if ( !classworldsConf.isFile() )
