@@ -47,11 +47,21 @@ public class Nexus408ChangePasswordPermissionIT
         // Should be able to change my own password
         Status status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
         Assert.assertTrue( status.isSuccess() );
-
-        // NOT Should be able to change my own password
-        status = ChangePasswordUtils.changePassword( "admin", "admin123", "123admin" );
+        
+        // password changed ! should fail
+        status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
         Assert.assertEquals( 401, status.getCode() );
-
+        status = ChangePasswordUtils.changePassword( "test-user", "123admin", "admin123" );
+        Assert.assertEquals( 401, status.getCode() );
+        
+        TestContainer.getInstance().getTestContext().setUsername( TEST_USER_NAME );
+        TestContainer.getInstance().getTestContext().setPassword( "123admin" );
+        
+        // should pass
+        status = ChangePasswordUtils.changePassword( "test-user", "123admin", "admin123" );
+        Assert.assertTrue( status.isSuccess() );
+        
+        // should NOT be able to change another users password
     }
 
     @Test(groups = SECURITY)
@@ -66,11 +76,7 @@ public class Nexus408ChangePasswordPermissionIT
 
         // NOT Should be able to forgot my own username
         Status status = ChangePasswordUtils.changePassword( "test-user", "admin123", "123admin" );
-        Assert.assertEquals( 401, status.getCode() );
-
-        // NOT Should be able to forgot anyone username
-        status = ChangePasswordUtils.changePassword( "admin", "admin123", "123admin" );
-        Assert.assertEquals( 401, status.getCode() );
+        Assert.assertEquals( 403, status.getCode() );
     }
 
 }
