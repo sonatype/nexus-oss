@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
   <!-- a unique name for this project -->
   <artifactId>nexus-mock</artifactId>
@@ -38,11 +38,21 @@
             <id>unpack-bundle</id>
             <phase>generate-resources</phase>
             <goals>
-              <goal>unpack-dependencies</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
               <includeArtifactIds>nexus-oss-webapp</includeArtifactIds>
               <outputDirectory>target/nexus-ui</outputDirectory>
+              <!-- The bundle we test -->
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.sonatype.nexus</groupId>
+                  <artifactId>nexus-oss-webapp</artifactId>
+                  <version>${project.version}</version>
+                  <type>zip</type>
+                  <classifier>bundle</classifier>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
@@ -52,6 +62,12 @@
 
   <dependencies>
 
+    <dependency>
+      <!-- TEMP! force use of AOP build -->
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-guice</artifactId>
+      <version>2.1.7</version>
+    </dependency>
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
@@ -88,15 +104,6 @@
           <artifactId>servlet-api-2.5</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <!-- The bundle we test -->
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
-      <type>zip</type>
-      <classifier>bundle</classifier>
     </dependency>
 
   </dependencies>

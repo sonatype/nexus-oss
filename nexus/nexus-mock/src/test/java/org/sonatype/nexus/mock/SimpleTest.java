@@ -99,9 +99,6 @@ public class SimpleTest
     {
         System.setProperty( "basedir", bundleRoot.getAbsolutePath() );
 
-        System.setProperty( "plexus.appbooter.customizers", "org.sonatype.nexus.NexusBooterCustomizer,"
-            + MockAppBooterCustomizer.class.getName() );
-
         File classworldsConf = new File( bundleRoot, "conf/classworlds.conf" );
 
         if ( !classworldsConf.isFile() )
@@ -124,6 +121,9 @@ public class SimpleTest
         launcher.setSystemClassLoader( Thread.currentThread().getContextClassLoader() );
         launcher.configure( new FileInputStream( classworldsConf ) ); // launcher closes stream upon configuration
         // Launcher trick -- end
+
+        // TEMP! get container to scan our code in order to install resource interceptors
+        launcher.getMainRealm().addURL( new File( "target/classes" ).toURI().toURL() );
 
         PlexusAppBooter plexusAppBooter = new PlexusAppBooter(); // set the preconfigured world
 
