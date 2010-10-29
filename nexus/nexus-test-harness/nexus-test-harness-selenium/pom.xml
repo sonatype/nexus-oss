@@ -105,7 +105,7 @@ not sure where this went - is it still needed?
       <plugin>
         <groupId>org.sonatype.maven.plugin</groupId>
         <artifactId>selenium-grid-maven-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.1-SNAPSHOT</version>
       </plugin>
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -294,24 +294,14 @@ not sure where this went - is it still needed?
     <dependency>
       <groupId>org.openqa.selenium.grid</groupId>
       <artifactId>selenium-grid-tools</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.8.grid</version>
+      <classifier>standalone</classifier>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium.client-drivers</groupId>
       <artifactId>selenium-java-client-driver</artifactId>
-      <version>1.0.1</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.seleniumhq.selenium.server</groupId>
-          <artifactId>selenium-server</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.seleniumhq.selenium.core</groupId>
-          <artifactId>selenium-core</artifactId>
-        </exclusion>
-      </exclusions>
+      <version>1.0.3.grid</version>
     </dependency>
-
 
     <dependency>
       <groupId>javax.servlet</groupId>
