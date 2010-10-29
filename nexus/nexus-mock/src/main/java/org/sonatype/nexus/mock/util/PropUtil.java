@@ -5,7 +5,7 @@ public class PropUtil
     public static String get( String name, String def )
     {
         String val = System.getProperty( name, def );
-        if ( val != null && ( val.startsWith( "${" ) && val.endsWith( "}" ) ) )
+        if ( val == null || "".endsWith( val ) || ( val.startsWith( "${" ) && val.endsWith( "}" ) ) )
         {
             val = def;
         }
