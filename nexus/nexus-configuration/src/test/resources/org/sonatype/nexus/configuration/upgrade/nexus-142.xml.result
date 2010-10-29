@@ -6,7 +6,6 @@
     <retrievalRetryCount>3</retrievalRetryCount>
     <queryString></queryString>
   </globalConnectionSettings>
-
   <restApi>
     <baseUrl>https://grid.sonatype.org/nexus-snap-oss</baseUrl>
     <forceBaseUrl>true</forceBaseUrl>
@@ -15,7 +14,6 @@
   <httpProxy>
     <enabled>true</enabled>
     <port>8082</port>
-
     <proxyPolicy>strict</proxyPolicy>
   </httpProxy>
   <routing>
@@ -24,21 +22,18 @@
   <repositories>
     <repository>
       <id>central</id>
-
       <name>Maven Central</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
-
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
-
       <localStorage>
         <provider>file</provider>
       </localStorage>
@@ -46,14 +41,12 @@
         <provider>apacheHttpClient3x</provider>
         <url>http://repo1.maven.org/maven2/</url>
       </remoteStorage>
-
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>-1</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
-
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
@@ -61,21 +54,18 @@
     <repository>
       <id>google</id>
       <name>Google Code</name>
-
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
-
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
       <localStorage>
-
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
@@ -83,14 +73,12 @@
         <url>http://google-maven-repository.googlecode.com/svn/repository/</url>
       </remoteStorage>
       <externalConfiguration>
-
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>-1</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
-
         <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
     </repository>
@@ -98,21 +86,18 @@
       <id>java.net-m2</id>
       <name>java.net - Maven 2</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
-
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
-
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
       <localStorage>
         <provider>file</provider>
-
       </localStorage>
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
@@ -120,14 +105,12 @@
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
-
         <artifactMaxAge>-1</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
-
       </externalConfiguration>
     </repository>
     <repository>
@@ -135,14 +118,12 @@
       <name>java.net-m1</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven1</providerHint>
-
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-
       <writePolicy>READ_ONLY</writePolicy>
       <localStorage>
         <provider>file</provider>
@@ -150,7 +131,6 @@
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://download.java.net/maven/1/</url>
-
       </remoteStorage>
       <externalConfiguration>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -158,7 +138,6 @@
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <artifactMaxAge>-1</artifactMaxAge>
         <metadataMaxAge>1440</metadataMaxAge>
-
       </externalConfiguration>
     </repository>
     <repository>
@@ -166,14 +145,12 @@
       <name>Apache Snapshots</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
-
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
@@ -181,7 +158,6 @@
         <provider>file</provider>
       </localStorage>
       <remoteStorage>
-
         <provider>apacheHttpClient3x</provider>
         <url>http://repository.apache.org/snapshots/</url>
       </remoteStorage>
@@ -189,7 +165,6 @@
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>1440</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
-
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
@@ -197,21 +172,18 @@
       </externalConfiguration>
     </repository>
     <repository>
-
       <id>codehaus-snapshots</id>
       <name>Codehaus Snapshots</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
-
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
-
       <searchable>true</searchable>
       <localStorage>
         <provider>file</provider>
@@ -219,7 +191,6 @@
       <remoteStorage>
         <provider>apacheHttpClient3x</provider>
         <url>http://nexus.codehaus.org/snapshots/</url>
-
       </remoteStorage>
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
@@ -227,7 +198,6 @@
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
-
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>SNAPSHOT</repositoryPolicy>
       </externalConfiguration>
@@ -235,21 +205,18 @@
     <repository>
       <id>releases</id>
       <name>Releases</name>
-
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
-
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
       <localStorage>
-
         <provider>file</provider>
       </localStorage>
       <externalConfiguration>
@@ -257,7 +224,6 @@
         <artifactMaxAge>-1</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
-
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
@@ -265,21 +231,18 @@
     </repository>
     <repository>
       <id>snapshots</id>
-
       <name>Snapshots</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>1440</notFoundCacheTTL>
-
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE</writePolicy>
       <indexable>true</indexable>
       <searchable>true</searchable>
-
       <localStorage>
         <provider>file</provider>
       </localStorage>
@@ -287,7 +250,6 @@
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>1440</artifactMaxAge>
         <itemMaxAge>1440</itemMaxAge>
-
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
@@ -295,21 +257,18 @@
       </externalConfiguration>
     </repository>
     <repository>
-
       <id>thirdparty</id>
       <name>3rd party</name>
       <providerRole>org.sonatype.nexus.proxy.repository.Repository</providerRole>
       <providerHint>maven2</providerHint>
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
-
       <notFoundCacheTTL>1440</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>ALLOW_WRITE_ONCE</writePolicy>
       <indexable>true</indexable>
-
       <searchable>true</searchable>
       <localStorage>
         <provider>file</provider>
@@ -317,14 +276,12 @@
       <externalConfiguration>
         <proxyMode>ALLOW</proxyMode>
         <artifactMaxAge>-1</artifactMaxAge>
-
         <itemMaxAge>1440</itemMaxAge>
         <cleanseRepositoryMetadata>false</cleanseRepositoryMetadata>
         <downloadRemoteIndex>false</downloadRemoteIndex>
         <checksumPolicy>WARN</checksumPolicy>
         <repositoryPolicy>RELEASE</repositoryPolicy>
       </externalConfiguration>
-
     </repository>
     <repository>
       <id>central-m1</id>
@@ -332,14 +289,12 @@
       <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
       <providerHint>m2-m1-shadow</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
       <localStorage>
-
         <provider>file</provider>
       </localStorage>
       <externalConfiguration>
@@ -347,21 +302,18 @@
         <syncAtStartup>false</syncAtStartup>
       </externalConfiguration>
     </repository>
-
     <repository>
       <id>java.net-m1-m2</id>
       <name>java.net-m1 M2 shadow</name>
       <providerRole>org.sonatype.nexus.proxy.repository.ShadowRepository</providerRole>
       <providerHint>m1-m2-shadow</providerHint>
       <localStatus>IN_SERVICE</localStatus>
-
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
       <writePolicy>READ_ONLY</writePolicy>
-
       <searchable>true</searchable>
       <localStorage>
         <provider>file</provider>
@@ -369,7 +321,6 @@
       <externalConfiguration>
         <masterRepositoryId>java.net-m1</masterRepositoryId>
         <synchronizeAtStartup>false</synchronizeAtStartup>
-
       </externalConfiguration>
     </repository>
     <repository>
@@ -377,14 +328,12 @@
       <name>Public Repositories</name>
       <providerRole>org.sonatype.nexus.proxy.repository.GroupRepository</providerRole>
       <providerHint>maven2</providerHint>
-
       <localStatus>IN_SERVICE</localStatus>
       <notFoundCacheActive>true</notFoundCacheActive>
       <notFoundCacheTTL>15</notFoundCacheTTL>
       <userManaged>true</userManaged>
       <exposed>true</exposed>
       <browseable>true</browseable>
-
       <writePolicy>READ_ONLY</writePolicy>
       <indexable>true</indexable>
       <localStorage>
@@ -392,14 +341,12 @@
       </localStorage>
       <externalConfiguration>
         <mergeMetadata>true</mergeMetadata>
-
         <memberRepositories>
           <memberRepository>releases</memberRepository>
           <memberRepository>snapshots</memberRepository>
           <memberRepository>thirdparty</memberRepository>
           <memberRepository>central</memberRepository>
           <memberRepository>java.net-m2</memberRepository>
-
           <memberRepository>java.net-m1-m2</memberRepository>
           <memberRepository>google</memberRepository>
           <memberRepository>apache-snapshots</memberRepository>
@@ -407,7 +354,6 @@
         </memberRepositories>
       </externalConfiguration>
     </repository>
-
   </repositories>
   <repositoryGrouping>
     <pathMappings>
@@ -415,7 +361,6 @@
         <id>inhouse-stuff</id>
         <groupId>*</groupId>
         <routeType>inclusive</routeType>
-
         <routePatterns>
           <routePattern>.*/(com|org)/somecompany/.*</routePattern>
         </routePatterns>
@@ -423,7 +368,6 @@
           <repository>snapshots</repository>
           <repository>releases</repository>
         </repositories>
-
       </pathMapping>
       <pathMapping>
         <id>apache-stuff</id>
@@ -431,7 +375,6 @@
         <routeType>exclusive</routeType>
         <routePatterns>
           <routePattern>.*/org/some-oss/.*</routePattern>
-
         </routePatterns>
         <repositories>
           <repository>releases</repository>
@@ -440,7 +383,6 @@
       </pathMapping>
     </pathMappings>
   </repositoryGrouping>
-
   <repositoryTargets>
     <repositoryTarget>
       <id>1</id>
@@ -448,7 +390,6 @@
       <contentClass>maven2</contentClass>
       <patterns>
         <pattern>.*</pattern>
-
       </patterns>
     </repositoryTarget>
     <repositoryTarget>
@@ -456,7 +397,6 @@
       <name>All (Maven1)</name>
       <contentClass>maven1</contentClass>
       <patterns>
-
         <pattern>.*</pattern>
       </patterns>
     </repositoryTarget>
@@ -464,7 +404,6 @@
       <id>3</id>
       <name>All but sources (Maven2)</name>
       <contentClass>maven2</contentClass>
-
       <patterns>
         <pattern>(?!.*-sources.*).*</pattern>
       </patterns>
@@ -472,7 +411,6 @@
     <repositoryTarget>
       <id>4</id>
       <name>All Metadata (Maven2)</name>
-
       <contentClass>maven2</contentClass>
       <patterns>
         <pattern>.*maven-metadata\.xml.*</pattern>
@@ -480,7 +418,6 @@
     </repositoryTarget>
     <repositoryTarget>
       <id>any</id>
-
       <name>All (Any Repository)</name>
       <contentClass>any</contentClass>
       <patterns>
@@ -488,14 +425,12 @@
       </patterns>
     </repositoryTarget>
   </repositoryTargets>
-
   <smtpConfiguration>
     <hostname>smtp-host</hostname>
     <port>25</port>
     <username>smtp-username</username>
     <password>{8hkbmlobf8kHgG50f+NASyv6vKMIhRMW4HW1K+eNFkE=}</password>
     <systemEmailAddress>system@nexus.org</systemEmailAddress>
-
   </smtpConfiguration>
   <errorReporting>
     <jiraUrl>https://issues.sonatype.org</jiraUrl>
@@ -503,7 +438,6 @@
     <useGlobalProxy>true</useGlobalProxy>
   </errorReporting>
   <notification>
-
     <notificationTargets>
       <notificationTarget>
         <targetId>autoBlockTarget</targetId>

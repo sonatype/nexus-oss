@@ -361,8 +361,6 @@ public class DefaultApplicationConfigurationUpgraderTest
         assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
 
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-142.xml", configuration );
-        securityResultIsFine( "/org/sonatype/nexus/configuration/upgrade/security-configuration-142.xml" );
-
     }
 
 }
