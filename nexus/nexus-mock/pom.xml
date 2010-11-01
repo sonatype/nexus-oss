@@ -106,6 +106,20 @@
       </exclusions>
     </dependency>
 
+   <dependency>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-oss-webapp</artifactId>
+      <version>${project.version}</version>
+      <type>zip</type>
+      <classifier>bundle</classifier>
+      <exclusions>
+        <exclusion>
+          <groupId>org.sonatype.nexus.plugins.ldap</groupId>
+          <artifactId>nexus-ldap-realm-plugin</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
   </dependencies>
 
 </project>
