@@ -34,8 +34,13 @@ public class CapabilityTypesPlexusResource
 
     public static final String RESOURCE_URI = "/capabilityTypes";
 
-    private final CapabilityDescriptorRegistry capabilityDescriptorRegistry;
+    private CapabilityDescriptorRegistry capabilityDescriptorRegistry;
 
+    // TODO get rid of this constructor as it is here because enunciate plugin fails without a default constructor
+    public CapabilityTypesPlexusResource()
+    {
+    }
+    
     @Inject
     public CapabilityTypesPlexusResource( final CapabilityDescriptorRegistry capabilityDescriptorRegistry )
     {
