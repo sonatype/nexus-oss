@@ -8,9 +8,6 @@ package org.sonatype.nexus.index.updater;
 
 import java.io.File;
 
-import org.apache.maven.wagon.authentication.AuthenticationInfo;
-import org.apache.maven.wagon.events.TransferListener;
-import org.apache.maven.wagon.proxy.ProxyInfo;
 import org.sonatype.nexus.index.context.DocumentFilter;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.fs.Locker;
@@ -25,12 +22,6 @@ public class IndexUpdateRequest
     private ResourceFetcher resourceFetcher;
 
     private DocumentFilter documentFilter;
-    
-    private AuthenticationInfo authenticationInfo;
-    
-    private ProxyInfo proxyInfo;
-    
-    private TransferListener transferListener;
     
     private boolean forceFullUpdate;
 
@@ -89,48 +80,6 @@ public class IndexUpdateRequest
         return forceFullUpdate;
     }
     
-    public ProxyInfo getProxyInfo()
-    {
-        return proxyInfo;
-    }
-    
-    /**
-     * ProxyInfo object that will be used by the default wagon manager
-     * if no other fetcher is set
-     * 
-     * @param proxyInfo
-     */
-    public void setProxyInfo( ProxyInfo proxyInfo )
-    {
-        this.proxyInfo = proxyInfo;
-    }
-    
-    public TransferListener getTransferListener()
-    {
-        return transferListener;
-    }
-    
-    /**
-     * TransferListener that will be used by the default wagon manager
-     * if no other fetcher is set
-     * 
-     * @param transferListener
-     */
-    public void setTransferListener( TransferListener transferListener )
-    {
-        this.transferListener = transferListener;
-    }
-
-    public AuthenticationInfo getAuthenticationInfo()
-    {
-        return authenticationInfo;
-    }
-
-    public void setAuthenticationInfo( AuthenticationInfo authenticationInfo )
-    {
-        this.authenticationInfo = authenticationInfo;
-    }
-
     public File getLocalIndexCacheDir()
     {
         return localIndexCacheDir;

@@ -219,7 +219,14 @@ public class DefaultNexusIndexer
      * @see DefaultScannerListener
      * @see #artifactDiscovered(ArtifactContext, IndexingContext)
      */
-    public void scan( IndexingContext context, final ArtifactScanningListener listener, boolean update )
+    public void scan( final IndexingContext context, final ArtifactScanningListener listener, final boolean update )
+        throws IOException
+    {
+        scan( context, null, listener, update );
+    }
+
+    public void scan( final IndexingContext context, final String fromPath, final ArtifactScanningListener listener,
+                      final boolean update )
         throws IOException
     {
         File repositoryDirectory = context.getRepository();
@@ -264,7 +271,7 @@ public class DefaultNexusIndexer
                 true );
 
             scanner.scan( new ScanningRequest( tmpContext, //
-                new DefaultScannerListener( tmpContext, indexerEngine, update, listener ) ) );
+                new DefaultScannerListener( tmpContext, indexerEngine, update, listener ), fromPath ) );
 
             tmpContext.updateTimestamp( true );
             context.replace( tmpContext.getIndexDirectory() );

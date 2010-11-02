@@ -193,27 +193,53 @@ public interface NexusIndexer
     // ----------------------------------------------------------------------------
 
     /**
-     * Performs full scan (reindex) for the local repository
+     * Performs full scan (reindex) for the local repository belonging to supplied context.
+     * 
+     * @param context
      */
     void scan( IndexingContext context )
         throws IOException;
 
     /**
-     * Performs full scan (reindex) for the local repository
+     * Performs full scan (reindex) for the local repository belonging to supplied context. ArtifactListener is used
+     * during that process.
+     * 
+     * @param context
+     * @param listener
      */
     void scan( IndexingContext context, ArtifactScanningListener listener )
         throws IOException;
 
     /**
-     * Performs optionally incremental scan (reindex) for the local repository
+     * Performs optionally incremental scan (reindex/full reindex) for the local repository belonging to the supplied
+     * context.
+     * 
+     * @param context
+     * @param update if incremental reindex wanted, set true, otherwise false and full reindex will happenF
      */
     void scan( IndexingContext context, boolean update )
         throws IOException;
 
     /**
-     * Performs optionally incremental scan (reindex) for the local repository
+     * Performs optionally incremental scan (reindex) for the local repository, with listener.
+     * 
+     * @param context
+     * @param listener
+     * @param update if incremental reindex wanted, set true, otherwise false and full reindex will happenF
      */
     void scan( IndexingContext context, ArtifactScanningListener listener, boolean update )
+        throws IOException;
+
+    /**
+     * Performs optionally incremental scan (reindex) for the local repository.
+     * 
+     * @param context
+     * @param fromPath a path segment if you want "sub-path" reindexing (ie. reindex just a given subfolder of a
+     *            repository, ot whole repository from root.
+     * @param listener
+     * @param update if incremental reindex wanted, set true, otherwise false and full reindex will happenF
+     */
+    void scan( IndexingContext context, String fromPath, ArtifactScanningListener listener, boolean update )
         throws IOException;
 
     void artifactDiscovered( ArtifactContext ac, IndexingContext context )

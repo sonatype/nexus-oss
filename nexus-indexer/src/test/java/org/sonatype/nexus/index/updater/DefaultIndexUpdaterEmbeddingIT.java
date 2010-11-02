@@ -1,5 +1,12 @@
 package org.sonatype.nexus.index.updater;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import junit.framework.TestCase;
+
 import org.apache.maven.wagon.authentication.AuthenticationInfo;
 import org.apache.maven.wagon.events.TransferEvent;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -10,16 +17,9 @@ import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.updater.WagonHelper.WagonFetcher;
 import org.sonatype.nexus.index.updater.fixtures.ServerTestFixture;
 import org.sonatype.nexus.index.updater.fixtures.TransferListenerFixture;
-import org.sonatype.nexus.index.updater.jetty.JettyResourceFetcher;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import junit.framework.TestCase;
 
 public class DefaultIndexUpdaterEmbeddingIT
     extends TestCase
@@ -31,6 +31,8 @@ public class DefaultIndexUpdaterEmbeddingIT
     private ServerTestFixture server;
 
     private IndexUpdater updater;
+
+    private WagonHelper wagonHelper;
 
     public void testBasicIndexRetrieval()
         throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
@@ -44,7 +46,9 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setTransferListener( new TransferListenerFixture() );
+
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(), null,
+                null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -72,16 +76,17 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "protected/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
 
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                new AuthenticationInfo()
                 {
-                    setUserName( "user" );
-                    setPassword( "password" );
-                }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture() );
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setUserName( "user" );
+                        setPassword( "password" );
+                    }
+                }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -109,16 +114,17 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "protected/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
 
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                new AuthenticationInfo()
                 {
-                    setUserName( "longuser" );
-                    setPassword( ServerTestFixture.LONG_PASSWORD );
-                }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture() );
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setUserName( "longuser" );
+                        setPassword( ServerTestFixture.LONG_PASSWORD );
+                    }
+                }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -146,16 +152,17 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
 
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                new AuthenticationInfo()
                 {
-                    setUserName( "user" );
-                    setPassword( "password" );
-                }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture() );
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setUserName( "user" );
+                        setPassword( "password" );
+                    }
+                }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -171,7 +178,8 @@ public class DefaultIndexUpdaterEmbeddingIT
         }
     }
 
-    public void testHighLatencyIndexRetrieval_LowConnectionTimeout()
+    // Disabled, since with Wagon you cannot set timeout as it was possible with Jetty client
+    public void OFFtestHighLatencyIndexRetrieval_LowConnectionTimeout()
         throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
     {
         File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
@@ -183,7 +191,14 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
+
+            WagonFetcher wf = wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
+            {
+                @Override
+                public void transferError( final TransferEvent transferEvent )
+                {
+                }
+            }, new AuthenticationInfo()
             {
                 private static final long serialVersionUID = 1L;
 
@@ -191,21 +206,13 @@ public class DefaultIndexUpdaterEmbeddingIT
                     setUserName( "user" );
                     setPassword( "password" );
                 }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
-                {
-                }
-            } );
+            }, null );
 
-            ResourceFetcher fetcher =
-                new JettyResourceFetcher().setConnectionTimeoutMillis( 100 )
-                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                                          .addTransferListener( updateRequest.getTransferListener() );
+            updateRequest.setResourceFetcher( wf );
 
-            updateRequest.setResourceFetcher( fetcher );
+            // ResourceFetcher fetcher =
+            // new JettyResourceFetcher().setConnectionTimeoutMillis( 100 ).setAuthenticationInfo(
+            // updateRequest.getAuthenticationInfo() ).addTransferListener( updateRequest.getTransferListener() );
 
             try
             {
@@ -229,7 +236,8 @@ public class DefaultIndexUpdaterEmbeddingIT
         }
     }
 
-    public void testHighLatencyIndexRetrieval_LowTransactionTimeout()
+    // Disabled, since with Wagon you cannot set timeout as it was possible with Jetty client
+    public void OFFtestHighLatencyIndexRetrieval_LowTransactionTimeout()
         throws IOException, UnsupportedExistingLuceneIndexException, ComponentLookupException
     {
         File basedir = File.createTempFile( "nexus-indexer.", ".dir" );
@@ -241,7 +249,14 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
+
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
+            {
+                @Override
+                public void transferError( final TransferEvent transferEvent )
+                {
+                }
+            }, new AuthenticationInfo()
             {
                 private static final long serialVersionUID = 1L;
 
@@ -249,21 +264,11 @@ public class DefaultIndexUpdaterEmbeddingIT
                     setUserName( "user" );
                     setPassword( "password" );
                 }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
-                {
-                }
-            } );
+            }, null ) );
 
-            ResourceFetcher fetcher =
-                new JettyResourceFetcher().setTransactionTimeoutMillis( 100 )
-                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                                          .addTransferListener( updateRequest.getTransferListener() );
-
-            updateRequest.setResourceFetcher( fetcher );
+            // ResourceFetcher fetcher =
+            // new JettyResourceFetcher().setTransactionTimeoutMillis( 100 ).setAuthenticationInfo(
+            // updateRequest.getAuthenticationInfo() ).addTransferListener( updateRequest.getTransferListener() );
 
             try
             {
@@ -299,18 +304,14 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, baseUrl + "redirect-trap/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setTransferListener( new TransferListenerFixture()
+
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
             {
                 @Override
                 public void transferError( final TransferEvent transferEvent )
                 {
                 }
-            } );
-
-            ResourceFetcher fetcher =
-                new JettyResourceFetcher().addTransferListener( updateRequest.getTransferListener() );
-
-            updateRequest.setResourceFetcher( fetcher );
+            }, null, null ) );
 
             try
             {
@@ -346,7 +347,14 @@ public class DefaultIndexUpdaterEmbeddingIT
             IndexingContext ctx = newTestContext( basedir, "http://dummy/" );
 
             IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-            updateRequest.setAuthenticationInfo( new AuthenticationInfo()
+
+            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
+            {
+                @Override
+                public void transferError( final TransferEvent transferEvent )
+                {
+                }
+            }, new AuthenticationInfo()
             {
                 private static final long serialVersionUID = 1L;
 
@@ -354,21 +362,7 @@ public class DefaultIndexUpdaterEmbeddingIT
                     setUserName( "user" );
                     setPassword( "password" );
                 }
-            } );
-            updateRequest.setTransferListener( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
-                {
-                }
-            } );
-
-            ResourceFetcher fetcher =
-                new JettyResourceFetcher().setConnectionTimeoutMillis( 100 )
-                                          .setAuthenticationInfo( updateRequest.getAuthenticationInfo() )
-                                          .addTransferListener( updateRequest.getTransferListener() );
-
-            updateRequest.setResourceFetcher( fetcher );
+            }, null ) );
 
             try
             {
@@ -405,7 +399,7 @@ public class DefaultIndexUpdaterEmbeddingIT
         String repositoryId = "test";
 
         return new DefaultIndexingContext( repositoryId, repositoryId, basedir, basedir, baseUrl, baseUrl, creators,
-                                           true );
+            true );
     }
 
     @Override
@@ -432,6 +426,8 @@ public class DefaultIndexUpdaterEmbeddingIT
         container = new DefaultPlexusContainer();
 
         updater = container.lookup( IndexUpdater.class, "default" );
+
+        wagonHelper = new WagonHelper( container );
     }
 
     @Override

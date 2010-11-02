@@ -11,6 +11,7 @@ import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
+import org.sonatype.nexus.index.updater.WagonHelper.WagonFetcher;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,11 +100,11 @@ public class FullBootProofOfConcept
 
         IndexingContext ctx =
             new DefaultIndexingContext( repositoryId, repositoryId, basedir, basedir, repositoryUrl, indexUrl,
-                                        creators, true );
+                creators, true );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
+        // craft the Wagon based Resource
 
-        updateRequest.setTransferListener( new TransferListener()
+        TransferListener tl = new TransferListener()
         {
 
             private int col = 0;
@@ -160,7 +161,15 @@ public class FullBootProofOfConcept
             {
                 System.out.println( "[DEBUG]: " + message );
             }
-        } );
+        };
+
+        WagonHelper wh = new WagonHelper( container );
+
+        WagonFetcher wf = wh.getWagonResourceFetcher( tl, null, null );
+
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
+
+        updateRequest.setResourceFetcher( wf );
 
         container.lookup( IndexUpdater.class ).fetchAndUpdateIndex( updateRequest );
     }
