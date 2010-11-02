@@ -311,14 +311,7 @@ public class DefaultFeedRecorder
     {
         if ( result != null )
         {
-            try
-            {
-                result.release();
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Unable to release result set", e );
-            }
+            result.release();
         }
     }
 
