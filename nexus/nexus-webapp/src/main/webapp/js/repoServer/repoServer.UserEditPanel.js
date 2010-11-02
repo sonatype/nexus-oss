@@ -164,6 +164,9 @@ Sonatype.repoServer.UserEditPanel = function(config) {
         },
         tbar : [' ', this.displaySelector, this.searchField]
       });
+   
+  this.titleColumn = 'userId';
+      
 };
 
 Ext.extend(Sonatype.repoServer.UserEditPanel, Sonatype.panels.GridViewer, {
