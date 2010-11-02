@@ -1749,7 +1749,7 @@
       <id>0</id>
       <name>Refresh Plexus-Releases Index for Promoted Releases</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>RUNNING</status>
       <nextRun>1235772900000</nextRun>
       <schedule>

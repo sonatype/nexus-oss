@@ -836,10 +836,7 @@ public class BasicVersionConverter
         // Convert field forceBaseUrl
         value.setForceBaseUrl( cRestApiSettings.isForceBaseUrl() );
 
-        // set the default value!
-        value.setUiTimeout( 60000 );
-
-      return value;
+        return value;
     } // -- org.sonatype.nexus.configuration.model.CRestApiSettings convertCRestApiSettings(
       // org.sonatype.nexus.configuration.model.v1_4_2.CRestApiSettings,
       // org.sonatype.nexus.configuration.model.CRestApiSettings )

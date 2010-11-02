@@ -45,9 +45,11 @@ import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.rest.AbstractIndexerNexusPlexusResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.SearchResponse;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.scheduling.NexusTask;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.RepairIndexTask;
+import org.sonatype.nexus.tasks.UpdateIndexTask;
 
 public abstract class AbstractIndexPlexusResource
     extends AbstractIndexerNexusPlexusResource
@@ -328,15 +330,19 @@ public abstract class AbstractIndexPlexusResource
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {
-        ReindexTask task = getNexusScheduler().createTaskInstance( ReindexTask.class );
+        AbstractNexusRepositoriesPathAwareTask<Object> task;
+        if ( getIsFullReindex() )
+        {
+            task = getNexusScheduler().createTaskInstance( RepairIndexTask.class );
+        }
+        else
+        {
+            task = getNexusScheduler().createTaskInstance( UpdateIndexTask.class );
+        }
 
         task.setRepositoryId( getRepositoryId( request ) );
-
         task.setRepositoryGroupId( getRepositoryGroupId( request ) );
-
         task.setResourceStorePath( getResourceStorePath( request ) );
-
-        task.setFullReindex( getIsFullReindex() );
 
         handleDelete( task, request );
     }

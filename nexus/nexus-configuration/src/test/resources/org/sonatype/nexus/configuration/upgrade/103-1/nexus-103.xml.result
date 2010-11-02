@@ -330,7 +330,7 @@
       <id>1</id>
       <name>Refresh Plexus-Releases Index for Promoted Releases</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>
@@ -349,7 +349,7 @@
       <id>2</id>
       <name>A manual task</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>RUNNING</status>
       <lastRun>1216242900941</lastRun>
       <nextRun>1216257300000</nextRun>

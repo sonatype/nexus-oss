@@ -12,7 +12,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -42,7 +42,7 @@ public class Nexus2923SearchResultDownloadLinkIT
         prop.setKey( "repositoryOrGroupId" );
         prop.setValue( "repo_" + this.getTestRepositoryId() );
 
-        TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
+        TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );
     }
 
     @Test

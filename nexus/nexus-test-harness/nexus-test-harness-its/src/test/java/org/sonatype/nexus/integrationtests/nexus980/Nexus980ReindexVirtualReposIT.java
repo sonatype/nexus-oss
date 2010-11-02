@@ -23,7 +23,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -66,7 +66,7 @@ public class Nexus980ReindexVirtualReposIT
         scheduledTask.setEnabled( true );
         scheduledTask.setId( null );
         scheduledTask.setName( "reindex_shadow" );
-        scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+        scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
         scheduledTask.setSchedule( "manual" );
         scheduledTask.addProperty( prop );
         Status status = TaskScheduleUtil.create( scheduledTask );

@@ -2,7 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus836;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.RepositoryStatusMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.annotations.BeforeMethod;
@@ -29,6 +29,6 @@ public class Nexus836OOSRepoReindexTaskIT
 
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
+        TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );
     }
 }

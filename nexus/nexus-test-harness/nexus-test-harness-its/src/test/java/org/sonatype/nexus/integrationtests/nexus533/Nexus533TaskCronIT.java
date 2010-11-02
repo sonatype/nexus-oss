@@ -19,7 +19,7 @@ import java.util.Date;
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 
 public class Nexus533TaskCronIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceAdvancedResource>
@@ -42,7 +42,7 @@ public class Nexus533TaskCronIT
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
             scheduledTask.setCronCommand( "0 0 12 ? * WED" );
 
-            scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( "repositoryOrGroupId" );

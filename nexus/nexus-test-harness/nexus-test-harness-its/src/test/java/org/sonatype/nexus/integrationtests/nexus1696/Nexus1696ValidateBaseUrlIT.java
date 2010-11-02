@@ -20,7 +20,7 @@ import org.sonatype.nexus.rest.model.RestApiSettings;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceListResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;
 import org.sonatype.nexus.test.utils.PrivilegesMessageUtil;
@@ -196,7 +196,7 @@ public class Nexus1696ValidateBaseUrlIT
         scheduledTask.setId( null );
         scheduledTask.setName( "taskManual" );
         scheduledTask.setSchedule( "manual" );
-        scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+        scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );

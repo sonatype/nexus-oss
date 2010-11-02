@@ -27,7 +27,6 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.rest.model.RepositoryProxyResource;
 import org.sonatype.nexus.rest.model.RepositoryResource;
 import org.sonatype.nexus.rest.model.RepositoryResourceRemoteStorage;
-import org.sonatype.nexus.tasks.ReindexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
@@ -46,8 +45,10 @@ public class Nexus688ReindexOnRepoAddIT
     private static final String INDEX_PROPERTIES = ".index/nexus-maven-repository-index.properties";
 
     @BeforeClass
-    public void setSecureTest() throws ComponentLookupException{ 
-    	messageUtil =
+    public void setSecureTest()
+        throws ComponentLookupException
+    {
+        messageUtil =
             new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
                 getRepositoryTypeRegistry() );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
@@ -77,7 +78,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -106,7 +107,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         this.downloadIndexFromRepository( resource.getId(), false );
     }
@@ -139,7 +140,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -172,7 +173,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         this.downloadIndexFromRepository( resource.getId(), true );
     }
@@ -205,7 +206,7 @@ public class Nexus688ReindexOnRepoAddIT
         // this also validates
         this.messageUtil.createRepository( resource );
 
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop();
 
         this.downloadIndexFromRepository( resource.getId(), false );
     }
@@ -214,7 +215,7 @@ public class Nexus688ReindexOnRepoAddIT
         throws Exception
     {
         String repositoryUrl = this.getRepositoryUrl( repoId );
-        
+
         URL url = null;
 
         // nexus does not publish old indexes anymore

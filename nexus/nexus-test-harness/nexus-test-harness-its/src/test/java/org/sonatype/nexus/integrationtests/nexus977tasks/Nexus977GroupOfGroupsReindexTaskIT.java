@@ -7,7 +7,8 @@ import org.codehaus.plexus.util.FileUtils;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -40,7 +41,7 @@ public class Nexus977GroupOfGroupsReindexTaskIT
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
-        TaskScheduleUtil.runTask( "ReindexTaskDescriptor-snapshot", ReindexTaskDescriptor.ID, repo );
+        TaskScheduleUtil.runTask( "ReindexTaskDescriptor-snapshot", RepairIndexTaskDescriptor.ID, repo );
         
         result = getSearchMessageUtil().searchForGav( getTestId(), "project", null, "g4" );
         Assert.assertEquals( 8, result.size() );

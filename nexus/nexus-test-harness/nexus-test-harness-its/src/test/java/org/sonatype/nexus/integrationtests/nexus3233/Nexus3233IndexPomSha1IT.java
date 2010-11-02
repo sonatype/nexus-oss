@@ -13,7 +13,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.MavenDeployer;
@@ -98,7 +98,7 @@ public class Nexus3233IndexPomSha1IT
         doSearch( sha1, "" );
 
         RepositoryMessageUtil.updateIndexes( REPO_TEST_HARNESS_REPO );
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop( UpdateIndexTask.class );
         doSearch( sha1, "after reindexing!" );
     }
 

@@ -17,29 +17,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.formfields.CheckboxFormField;
 import org.sonatype.nexus.formfields.FormField;
 import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
 import org.sonatype.nexus.formfields.StringTextFormField;
 
-@Component( role = ScheduledTaskDescriptor.class, hint = "Reindex", description = "Reindex Repositories" )
-public class ReindexTaskDescriptor
+@Component( role = ScheduledTaskDescriptor.class, hint = "RepairIndex", description = "Repair Repositories Index" )
+public class RepairIndexTaskDescriptor
     extends AbstractScheduledTaskDescriptor
 {
-    public static final String ID = "ReindexTask";
+    public static final String ID = "RepairIndexTask";
 
     public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
-
-    public static final String FULL_REINDEX_FIELD_ID = "forceFullReindex";
 
     public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
 
     private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
         FormField.MANDATORY );
-
-    private final CheckboxFormField fullReindexField = new CheckboxFormField( FULL_REINDEX_FIELD_ID, "Do full reindex",
-        "If selected will generate a new full index, otherwise just generate the incremental index.",
-        FormField.OPTIONAL );
 
     private final StringTextFormField resourceStorePathField = new StringTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
         "Repository path",
@@ -53,15 +46,15 @@ public class ReindexTaskDescriptor
 
     public String getName()
     {
-        return "Reindex Repositories";
+        return "Repair Repositories Index";
     }
 
+    @Override
     public List<FormField> formFields()
     {
         List<FormField> fields = new ArrayList<FormField>();
 
         fields.add( repoField );
-        fields.add( fullReindexField );
         fields.add( resourceStorePathField );
 
         return fields;

@@ -42,7 +42,8 @@ import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.rest.model.SearchResponse;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.plexus.rest.representation.XStreamRepresentation;
 import org.testng.Assert;
 
@@ -370,13 +371,18 @@ public class SearchMessageUtil
         scheduledTask.setEnabled( true );
         scheduledTask.setId( null );
         scheduledTask.setName( taskName );
-        scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+        if ( force )
+        {
+        scheduledTask.setTypeId( RepairIndexTaskDescriptor.ID );
+        } else {
+            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
+        }
         scheduledTask.setSchedule( "manual" );
 
         if ( repoId != null )
         {
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( ReindexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
+            prop.setKey( UpdateIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID );
             if ( group )
             {
                 prop.setValue( "group_" + repoId );
@@ -388,14 +394,6 @@ public class SearchMessageUtil
             scheduledTask.addProperty( prop );
         }
 
-        if ( force )
-        {
-            ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-            prop.setKey( ReindexTaskDescriptor.FULL_REINDEX_FIELD_ID );
-            prop.setValue( "true" );
-
-            scheduledTask.addProperty( prop );
-        }
 
         Status status = TaskScheduleUtil.create( scheduledTask );
         Assert.assertTrue( status.isSuccess() );

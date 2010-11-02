@@ -1749,7 +1749,7 @@ public class TestMarshalUnmarchal
         scheduledTask.addRecurringDay( "wednesday" );
         scheduledTask.addRecurringDay( "friday" );
 
-        scheduledTask.setTypeId( "org.sonatype.nexus.tasks.ReindexTask" );
+        scheduledTask.setTypeId( "org.sonatype.nexus.tasks.RepairIndexTask" );
         scheduledTask.setAlertEmail( "foo@bar.org" );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();

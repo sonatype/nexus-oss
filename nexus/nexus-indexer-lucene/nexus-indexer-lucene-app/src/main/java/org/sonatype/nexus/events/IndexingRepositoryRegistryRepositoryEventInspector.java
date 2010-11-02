@@ -28,8 +28,10 @@ import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.scheduling.NexusScheduler;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.RepairIndexTask;
+import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.plexus.appevents.Event;
 
 /**
@@ -185,11 +187,17 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
 
     private void reindexRepo( Repository repository, boolean full, String taskName )
     {
-        ReindexTask rt = nexusScheduler.createTaskInstance( ReindexTask.class );
+        AbstractNexusRepositoriesPathAwareTask<Object> rt;
+        if ( full )
+        {
+            rt = nexusScheduler.createTaskInstance( RepairIndexTask.class );
+        }
+        else
+        {
+            rt = nexusScheduler.createTaskInstance( UpdateIndexTask.class );
+        }
 
         rt.setRepositoryId( repository.getId() );
-
-        rt.setFullReindex( full );
 
         nexusScheduler.submit( taskName, rt );
     }

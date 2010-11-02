@@ -23,7 +23,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.ScheduledServiceAdvancedResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -54,7 +54,7 @@ public class Nexus810PackageNamesInNexusConfIT
         startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
         scheduledTask.setCronCommand( "0 0 12 ? * WED" );
 
-        scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+        scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
         ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
         prop.setKey( "repositoryOrGroupId" );

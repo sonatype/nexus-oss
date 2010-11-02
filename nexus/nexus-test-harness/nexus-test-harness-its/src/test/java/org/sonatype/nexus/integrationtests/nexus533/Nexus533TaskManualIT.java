@@ -19,7 +19,7 @@ import java.util.Date;
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceBaseResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 
 public class Nexus533TaskManualIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceBaseResource>
@@ -41,7 +41,7 @@ public class Nexus533TaskManualIT
             Date startDate = DateUtils.addDays( new Date(), 10 );
             startDate = DateUtils.round( startDate, Calendar.DAY_OF_MONTH );
 
-            scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( "repositoryOrGroupId" );

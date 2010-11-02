@@ -661,7 +661,7 @@
       <id>1</id>
       <name>weekly_task</name>
       <enabled>true</enabled>
-      <type>ReindexTask</type>
+      <type>UpdateIndexTask</type>
       <status>SUBMITTED</status>
       <nextRun>1229291340000</nextRun>
       <schedule>

@@ -19,7 +19,7 @@ import java.util.Date;
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceOnceResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 
 public class Nexus533TaskOnceIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceOnceResource>
@@ -43,7 +43,7 @@ public class Nexus533TaskOnceIT
             scheduledTask.setStartDate( String.valueOf( startDate.getTime() ) );
             scheduledTask.setStartTime( "03:30" );
 
-            scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( "repositoryOrGroupId" );

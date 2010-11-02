@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -67,7 +67,7 @@ public class Nexus641ReindexTaskIT
         prop.setValue( "repo_" + this.getTestRepositoryId() );
 
         // reindex
-        TaskScheduleUtil.runTask( ReindexTaskDescriptor.ID, prop );
+        TaskScheduleUtil.runTask( UpdateIndexTaskDescriptor.ID, prop );
 
         // try to download again and success
         search = getSearchMessageUtil().searchFor( "nexus641" );

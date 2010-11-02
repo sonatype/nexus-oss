@@ -382,6 +382,36 @@
       </pathMapping>
     </pathMappings>
   </repositoryGrouping>
+  <tasks>
+    <task>
+      <id>1</id>
+      <name>index</name>
+      <enabled>true</enabled>
+      <type>ReindexTask</type>
+      <status>SUBMITTED</status>
+      <schedule>
+        <type>manual</type>
+      </schedule>
+      <properties>
+        <property>
+          <key>forceFullReindex</key>
+          <value>false</value>
+        </property>
+        <property>
+          <key>resourceStorePath</key>
+          <value></value>
+        </property>
+        <property>
+          <key>.name</key>
+          <value>index</value>
+        </property>
+        <property>
+          <key>repositoryOrGroupId</key>
+          <value>all_repo</value>
+        </property>
+      </properties>
+    </task>
+  </tasks>
   <repositoryTargets>
     <repositoryTarget>
       <id>1</id>

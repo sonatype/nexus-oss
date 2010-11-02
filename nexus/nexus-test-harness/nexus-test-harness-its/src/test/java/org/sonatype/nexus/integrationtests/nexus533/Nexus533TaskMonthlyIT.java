@@ -19,7 +19,7 @@ import java.util.Date;
 import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServiceMonthlyResource;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
-import org.sonatype.nexus.tasks.descriptors.ReindexTaskDescriptor;
+import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -46,7 +46,7 @@ public class Nexus533TaskMonthlyIT
             scheduledTask.setRecurringTime( "03:30" );
             scheduledTask.setRecurringDay( Arrays.asList( new String[] { "1", "9", "17", "25" } ) );
 
-            scheduledTask.setTypeId( ReindexTaskDescriptor.ID );
+            scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
 
             ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
             prop.setKey( "repositoryOrGroupId" );

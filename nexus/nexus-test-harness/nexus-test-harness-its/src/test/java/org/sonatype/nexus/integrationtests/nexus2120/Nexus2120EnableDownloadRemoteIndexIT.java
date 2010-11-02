@@ -11,7 +11,7 @@ import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;
 import org.sonatype.nexus.rest.model.RepositoryResource;
-import org.sonatype.nexus.tasks.ReindexTask;
+import org.sonatype.nexus.tasks.UpdateIndexTask;
 import org.sonatype.nexus.test.utils.RepositoryMessageUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -78,7 +78,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
         // reindex once
         RepositoryMessageUtil.updateIndexes( "basic" );
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop( UpdateIndexTask.class );
 
         // first try, download remote index set to false
         Assert.assertTrue( repoUrls.isEmpty(), "nexus should not download remote indexes!!! " + repoUrls );
@@ -105,7 +105,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
         // reindex again
         RepositoryMessageUtil.updateIndexes( "basic" );
-        TaskScheduleUtil.waitForAllTasksToStop( ReindexTask.class );
+        TaskScheduleUtil.waitForAllTasksToStop( UpdateIndexTask.class );
 
         // did nexus downloaded indexes?
         Assert.assertTrue( repoUrls.contains( "/repository/.index/nexus-maven-repository-index.gz" ),
