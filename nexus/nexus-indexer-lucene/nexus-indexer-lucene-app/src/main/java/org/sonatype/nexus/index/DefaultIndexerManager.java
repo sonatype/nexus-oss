@@ -846,7 +846,7 @@ public class DefaultIndexerManager
     // Reindexing related
     // ----------------------------------------------------------------------------
 
-    public void reindexAllRepositories( String path, boolean fullReindex )
+    public void reindexAllRepositories( final String path, final boolean fullReindex )
         throws IOException
     {
         List<Repository> reposes = repositoryRegistry.getRepositories();
@@ -855,36 +855,36 @@ public class DefaultIndexerManager
         {
             if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
             {
-                reindexRepository( repository, fullReindex );
+                reindexRepository( repository, path, fullReindex );
             }
         }
 
         publishAllIndex();
     }
 
-    public void reindexRepository( String path, String repositoryId, boolean fullReindex )
+    public void reindexRepository( final String path, final String repositoryId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
         if ( repository.isIndexable() )
         {
-            reindexRepository( repository, fullReindex );
+            reindexRepository( repository, path, fullReindex );
 
             publishRepositoryIndex( repositoryId );
         }
     }
 
-    public void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
+    public void reindexRepositoryGroup( final String path, final String repositoryGroupId, final boolean fullReindex )
         throws NoSuchRepositoryException, IOException
     {
         GroupRepository groupRepo =
             repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
 
-        reindexRepositoryGroup( groupRepo, fullReindex );
+        reindexRepositoryGroup( groupRepo, path, fullReindex );
     }
 
-    private void reindexRepositoryGroup( GroupRepository groupRepo, boolean fullReindex )
+    private void reindexRepositoryGroup( final GroupRepository groupRepo, final String path, final boolean fullReindex )
         throws IOException, NoSuchRepositoryException
     {
         if ( groupRepo.isIndexable() )
@@ -900,12 +900,12 @@ public class DefaultIndexerManager
             {
                 if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
                 {
-                    reindexRepositoryGroup( repository.adaptToFacet( GroupRepository.class ), fullReindex );
+                    reindexRepositoryGroup( repository.adaptToFacet( GroupRepository.class ), path, fullReindex );
                     mergeRepositoryGroupIndexWithMember( repository );
                 }
                 else
                 {
-                    reindexRepository( repository, fullReindex );
+                    reindexRepository( repository, path, fullReindex );
                 }
             }
 
@@ -969,7 +969,7 @@ public class DefaultIndexerManager
         }
     }
 
-    protected void reindexRepository( Repository repository, boolean fullReindex )
+    protected void reindexRepository( final Repository repository, final String fromPath, final boolean fullReindex )
         throws IOException
     {
         if ( !isIndexingSupported( repository )
@@ -1000,14 +1000,7 @@ public class DefaultIndexerManager
                 purgeCurrentIndex( context );
             }
 
-            if ( fullReindex )
-            {
-                nexusIndexer.scan( context, false );
-            }
-            else
-            {
-                nexusIndexer.scan( context, true );
-            }
+            nexusIndexer.scan( context, fromPath, null, !fullReindex );
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
