@@ -31,31 +31,6 @@
           </dependency>
         </dependencies>
       </plugin>
-      <!-- This is duplicated plugin configuration! See below, this is ILLEGAL (in Maven3.x)! -->
-      <!-- FIX THIS -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-        <executions>
-          <execution>
-            <id>maven-version</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <skip>false</skip>
-              <rules>
-                <requireMavenVersion>
-                  <version>2.2.1</version>
-                </requireMavenVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
