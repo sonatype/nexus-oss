@@ -146,8 +146,16 @@ Sonatype.Events.addListener('indexNodeClickedEvent', function(node, passthru) {
                         });
                   }
                 },
-                url : Sonatype.config.servicePath + '/artifact/maven/resolve?r=' + node.attributes.repositoryId + '&g=' + node.attributes.groupId + '&a=' + node.attributes.artifactId + '&v=' + node.attributes.version
-                    + (Ext.isEmpty(node.attributes.classifier) ? '' : ('&c=' + node.attributes.classifier)) + '&e=' + node.attributes.extension + '&isLocal=true'
+                url : Sonatype.config.servicePath + '/artifact/maven/resolve',
+                params : {
+                  r : node.attributes.repositoryId,
+                  g : node.attributes.groupId,
+                  a : node.attributes.artifactId,
+                  v : node.attributes.version,
+                  c : node.attributes.classifier,
+                  e : node.attributes.extension,
+                  isLocal : 'true'
+                }
               });
           // var resourceURI = node.ownerTree.loader.url.substring(0,
           // node.ownerTree.loader.url.length - 'index_content'.length) +

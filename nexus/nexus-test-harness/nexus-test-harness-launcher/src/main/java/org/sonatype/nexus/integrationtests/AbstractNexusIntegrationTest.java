@@ -277,7 +277,7 @@ public abstract class AbstractNexusIntegrationTest
 
     // == Test "lifecycle" (@Before/@After...)
 
-    @BeforeClass(alwaysRun = true)
+    @BeforeClass( alwaysRun = true )
     @org.junit.BeforeClass
     public static void staticOncePerClassSetUp()
         throws Exception
@@ -297,10 +297,10 @@ public abstract class AbstractNexusIntegrationTest
      * static, so we don't have access to the package name of the running tests. We are going to use the package name to
      * find resources for additional setup. NOTE: With this setup running multiple Test at the same time is not
      * possible.
-     *
+     * 
      * @throws Exception
      */
-    @BeforeMethod(alwaysRun = true)
+    @BeforeMethod( alwaysRun = true )
     @Before
     public void oncePerClassSetUp()
         throws Exception
@@ -364,7 +364,7 @@ public abstract class AbstractNexusIntegrationTest
         }
     }
 
-    @AfterMethod(alwaysRun = true)
+    @AfterMethod( alwaysRun = true )
     @After
     public void afterTest()
         throws Exception
@@ -373,7 +373,7 @@ public abstract class AbstractNexusIntegrationTest
         TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
-    @AfterClass(alwaysRun = true)
+    @AfterClass( alwaysRun = true )
     @org.junit.AfterClass
     public static void oncePerClassTearDown()
         throws Exception
@@ -385,7 +385,7 @@ public abstract class AbstractNexusIntegrationTest
         }
         catch ( IOException e )
         {
-            //throw if server is already stopped, not a problem for me
+            // throw if server is already stopped, not a problem for me
         }
 
         // turn off security, of the current IT with security on won't affect the next IT
@@ -565,7 +565,7 @@ public abstract class AbstractNexusIntegrationTest
      * This is a "switchboard" to detech HOW to deploy. For now, just using the protocol from POM's
      * DistributionManagement section and invoking the getWagonHintForDeployProtocol(String protocol) to get the wagon
      * hint.
-     *
+     * 
      * @throws Exception
      */
     protected void deployArtifacts()
@@ -623,7 +623,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Does "protocol to wagon hint" converion: the default is just return the same, but maybe some test wants to
      * override this.
-     *
+     * 
      * @param deployProtocol
      * @return
      */
@@ -635,7 +635,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Deploys with given Wagon (hint is provided), to deployUrl. It is caller matter to adjust those two (ie. deployUrl
      * with file: protocol to be deployed with file wagon would be error). Model is supplied since it is read before.
-     *
+     * 
      * @param wagonHint
      * @param deployUrl
      * @param model
@@ -728,7 +728,7 @@ public abstract class AbstractNexusIntegrationTest
     protected void startNexus()
         throws Exception
     {
-        System.out.println("######## Running Test: " + getTestId() + " - Class: " + this.getClass());
+        System.out.println( "######## Running Test: " + getTestId() + " - Class: " + this.getClass() );
         log.info( "starting nexus" );
 
         TestContainer.getInstance().getTestContext().useAdminForRequests();
@@ -822,7 +822,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/" folder.
-     *
+     * 
      * @param relativePath path relative to the nexusXXX directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -841,7 +841,7 @@ public abstract class AbstractNexusIntegrationTest
     /**
      * Returns a File if it exists, null otherwise. Files returned by this method must be located in the
      * "src/test/resourcs/nexusXXX/files/" folder.
-     *
+     * 
      * @param relativePath path relative to the files directory.
      * @return A file specified by the relativePath. or null if it does not exist.
      */
@@ -979,9 +979,10 @@ public abstract class AbstractNexusIntegrationTest
         // p=<packaging> -- optional, jar is taken as default
         // http://localhost:8087/nexus/service/local/artifact/maven/redirect?r=tasks-snapshot-repo&g=nexus&a=artifact&
         // v=1.0-SNAPSHOT
+        String c = gav.getClassifier() == null ? "" : "&c=" + Reference.encode( gav.getClassifier() );
         String serviceURI =
             "service/local/artifact/maven/redirect?r=" + repository + "&g=" + gav.getGroupId() + "&a="
-                + gav.getArtifactId() + "&v=" + gav.getVersion();
+                + gav.getArtifactId() + "&v=" + gav.getVersion() + c;
         Response response = RequestFacade.doGetRequest( serviceURI );
         Status status = response.getStatus();
         if ( status.isError() )

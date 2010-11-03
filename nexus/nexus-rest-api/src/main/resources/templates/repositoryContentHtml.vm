@@ -25,11 +25,11 @@
                 #set( $uriLength = $listItem.resourceURI.length() - 2 )
                 #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/', $uriLength ) + 1 )
                 #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
-                <a href="$linkName">$linkName</a>
+                <a href="$listItem.resourceURI">$linkName</a>
               #else
                 #set( $startIndex = $listItem.resourceURI.lastIndexOf( '/' ) + 1 )
                 #set( $linkName = $listItem.resourceURI.substring( $startIndex ) )
-                <a href="$linkName">$linkName</a>
+                <a href="$listItem.resourceURI">$linkName</a>
               #end
             </td>
             <td>

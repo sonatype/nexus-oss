@@ -27,7 +27,12 @@ public class Nexus2302DeployEncodedFileIT
     extends AbstractNexusIntegrationTest
 {
 
-    @Test( enabled = false )
+    public Nexus2302DeployEncodedFileIT()
+    {
+        super.setTestRepositoryId( REPO_TEST_HARNESS_REPO );
+    }
+
+    @Test
     public void deployUsingMaven()
         throws Exception
     {
@@ -37,6 +42,12 @@ public class Nexus2302DeployEncodedFileIT
             MavenDeployer.deployAndGetVerifier( gav, getRepositoryUrl( REPO_TEST_HARNESS_REPO ),
                 getTestFile( "artifact.jar" ), getOverridableFile( "settings.xml" ) );
         v.verifyErrorFreeLog();
+
+        // direct download
+        downloadArtifact( gav, "target/nexus2302/direct.jar" );
+
+        // redirect download
+        downloadSnapshotArtifact( REPO_TEST_HARNESS_REPO, gav, new File( "target/nexus2302" ) );
 
         checkFileSystem( gav );
         checkIndex( gav );
