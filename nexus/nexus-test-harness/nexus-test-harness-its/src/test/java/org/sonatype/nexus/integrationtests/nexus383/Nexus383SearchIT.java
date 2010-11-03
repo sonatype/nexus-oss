@@ -282,7 +282,7 @@ public class Nexus383SearchIT
         Assert.assertEquals( results.size(), 3  );
 
         // GAV search does not
-        results = getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), null );
+        results = getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(), null, null );
         Assert.assertEquals( results.size(), 3  );
 
     }

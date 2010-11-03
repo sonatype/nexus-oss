@@ -14,10 +14,8 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
@@ -31,13 +29,10 @@ import com.thoughtworks.xstream.XStream;
 
 public class ContentListMessageUtil
 {
-    private static final String SERVICE_PART = "service/local/repo_groups";
 
     private XStream xstream;
 
     private MediaType mediaType;
-
-    private static final Logger LOG = Logger.getLogger( GroupMessageUtil.class );
 
     public ContentListMessageUtil( XStream xstream, MediaType mediaType )
     {
@@ -54,7 +49,6 @@ public class ContentListMessageUtil
         return RequestFacade.sendMessage( uriPart, Method.GET );
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContentListResource> getContentListResource( String repoId, String path, boolean isGroup )
         throws IOException
     {

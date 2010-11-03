@@ -14,7 +14,6 @@
 package org.sonatype.nexus.test.utils;
 
 import java.io.IOException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +22,7 @@ import java.util.Map.Entry;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
+import org.restlet.data.Reference;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.slf4j.Logger;
@@ -88,7 +88,8 @@ public class SearchMessageUtil
 
         for ( Entry<String, String> entry : queryArgs.entrySet() )
         {
-            serviceURI.append( entry.getKey() ).append( "=" ).append( entry.getValue() ).append( "&" );
+            serviceURI.append( entry.getKey() ).append( "=" ).append( Reference.encode( entry.getValue() ) ).append(
+                "&" );
         }
 
         if ( searchType != null )
@@ -217,6 +218,13 @@ public class SearchMessageUtil
                                              String repositoryId )
         throws IOException
     {
+        return searchForGav( groupId, artifactId, version, packaging, null, repositoryId );
+    }
+
+    public List<NexusArtifact> searchForGav( String groupId, String artifactId, String version, String packaging,
+                                             String classifier, String repositoryId )
+        throws IOException
+    {
         Map<String, String> args = new HashMap<String, String>();
 
         if ( StringUtils.isNotBlank( groupId ) )
@@ -235,6 +243,10 @@ public class SearchMessageUtil
         {
             args.put( "p", packaging );
         }
+        if ( StringUtils.isNotBlank( classifier ) )
+        {
+            args.put( "c", classifier );
+        }
 
         return doSearchFor( args, repositoryId, null );
     }
@@ -242,7 +254,8 @@ public class SearchMessageUtil
     public List<NexusArtifact> searchForGav( Gav gav, String repositoryId )
         throws IOException
     {
-        return searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), repositoryId );
+        return searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getExtension(),
+            gav.getClassifier(), repositoryId );
     }
 
     // CLASSNAME
@@ -328,8 +341,8 @@ public class SearchMessageUtil
 
         if ( response.getStatus().isError() )
         {
-            Assert.assertFalse( response.getStatus().isError(),
-                                "Unable do retrieve repository: " + repositoryName + "\n" + response.getStatus() );
+            Assert.assertFalse( response.getStatus().isError(), "Unable do retrieve repository: " + repositoryName
+                + "\n" + response.getStatus() );
         }
         String responseText = response.getEntity().getText();
 
@@ -373,8 +386,10 @@ public class SearchMessageUtil
         scheduledTask.setName( taskName );
         if ( force )
         {
-        scheduledTask.setTypeId( RepairIndexTaskDescriptor.ID );
-        } else {
+            scheduledTask.setTypeId( RepairIndexTaskDescriptor.ID );
+        }
+        else
+        {
             scheduledTask.setTypeId( UpdateIndexTaskDescriptor.ID );
         }
         scheduledTask.setSchedule( "manual" );
@@ -394,7 +409,6 @@ public class SearchMessageUtil
             scheduledTask.addProperty( prop );
         }
 
-
         Status status = TaskScheduleUtil.create( scheduledTask );
         Assert.assertTrue( status.isSuccess() );
 
@@ -407,7 +421,7 @@ public class SearchMessageUtil
     {
         Response res =
             RequestFacade.sendMessage( "content/repositories/" + repositoryId + "/" + itemPath + "?describe=info",
-                                       Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
+                Method.GET, new XStreamRepresentation( xstream, "", MediaType.APPLICATION_XML ) );
 
         String responseText = res.getEntity().getText();
         if ( !res.getStatus().isSuccess() )
@@ -562,7 +576,7 @@ public class SearchMessageUtil
         throws IOException
     {
         return searchNGForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), gav.getClassifier(),
-                               gav.getExtension(), repositoryId, type );
+            gav.getExtension(), repositoryId, type );
     }
 
     public SearchNGResponse searchSha1NGFor( String sha1 )
