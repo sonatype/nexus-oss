@@ -625,6 +625,11 @@
                 <stringProp name="Argument.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
+              <elementProp name="uaChrome" elementType="Argument">
+                <stringProp name="Argument.name">uaChrome</stringProp>
+                <stringProp name="Argument.value"></stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
               <elementProp name="uaMaven3x" elementType="Argument">
                 <stringProp name="Argument.name">uaMaven3x</stringProp>
                 <stringProp name="Argument.value">Apache-Maven/3.0 (Java 1.6.0_20; Mac OS X 10.5.8)</stringProp>
@@ -636,10 +641,10 @@
                 <stringProp name="Argument.metadata">=</stringProp>
               </elementProp>
             </collectionProp>
-            <stringProp name="TestPlan.comments">Common user agent strings for reference only - in other words, explicitly add your user agent string to your headers config</stringProp>
+            <stringProp name="TestPlan.comments">Common user agent strings for reference only - in other words, explicitly add your user agent string to your headers config don&apos;t try to reference these as variables</stringProp>
           </Arguments>
           <hashTree/>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers Basic" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="Accept" elementType="Header">
                 <stringProp name="Header.name">Accept</stringProp>
@@ -665,6 +670,12 @@
                 <stringProp name="Header.name">X-Requested-With</stringProp>
                 <stringProp name="Header.value">XMLHttpRequest</stringProp>
               </elementProp>
+            </collectionProp>
+            <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+          </HeaderManager>
+          <hashTree/>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers POST/PUT" enabled="true">
+            <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
@@ -681,7 +692,7 @@
               </elementProp>
               <elementProp name="User-Agent" elementType="Header">
                 <stringProp name="Header.name">User-Agent</stringProp>
-                <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                <stringProp name="Header.value">${uaFirefox}</stringProp>
               </elementProp>
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Accept-Language</stringProp>
@@ -715,7 +726,7 @@
               </elementProp>
               <elementProp name="User-Agent" elementType="Header">
                 <stringProp name="Header.name">User-Agent</stringProp>
-                <stringProp name="Header.value">Apache-Maven/3.0 (Java 1.6.0_20; Mac OS X 10.5.8)</stringProp>
+                <stringProp name="Header.value">${uaMaven3x}</stringProp>
               </elementProp>
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">threadNum</stringProp>
@@ -1253,227 +1264,6 @@
               <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
                 <collectionProp name="Asserion.test_strings">
                   <stringProp name="49586">200</stringProp>
-                </collectionProp>
-                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-                <boolProp name="Assertion.assume_success">false</boolProp>
-                <intProp name="Assertion.test_type">8</intProp>
-              </ResponseAssertion>
-              <hashTree/>
-            </hashTree>
-          </hashTree>
-        </hashTree>
-        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Users" enabled="true">
-          <stringProp name="TestPlan.comments">/nexus/service/local/users</stringProp>
-        </GenericController>
-        <hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Delete" enabled="true">
-            <stringProp name="TestPlan.comments">Uses a counter reference to dynamically delete users</stringProp>
-          </GenericController>
-          <hashTree>
-            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Delete" enabled="true">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                <collectionProp name="Arguments.arguments"/>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain"></stringProp>
-              <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">${context}/service/local/users/user${__threadNum}-${deleteUserCount}</stringProp>
-              <stringProp name="HTTPSampler.method">DELETE</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            </HTTPSampler2>
-            <hashTree>
-              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
-                <collectionProp name="HeaderManager.headers">
-                  <elementProp name="Accept" elementType="Header">
-                    <stringProp name="Header.name">Accept</stringProp>
-                    <stringProp name="Header.value">application/json</stringProp>
-                  </elementProp>
-                  <elementProp name="User-Agent" elementType="Header">
-                    <stringProp name="Header.name">User-Agent</stringProp>
-                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Language</stringProp>
-                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Encoding</stringProp>
-                    <stringProp name="Header.value">gzip,deflate</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Charset</stringProp>
-                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">X-Requested-With</stringProp>
-                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Content-Type</stringProp>
-                    <stringProp name="Header.value">application/json</stringProp>
-                  </elementProp>
-                </collectionProp>
-                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
-              </HeaderManager>
-              <hashTree/>
-              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 204 404" enabled="true">
-                <collectionProp name="Asserion.test_strings">
-                  <stringProp name="-1443488270">204|404</stringProp>
-                </collectionProp>
-                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-                <boolProp name="Assertion.assume_success">false</boolProp>
-                <intProp name="Assertion.test_type">1</intProp>
-                <stringProp name="TestPlan.comments">204 if user exists, 404 if we have not created user yet</stringProp>
-              </ResponseAssertion>
-              <hashTree/>
-            </hashTree>
-          </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Create  &lt; 1.9" enabled="true">
-            <stringProp name="TestPlan.comments">use a counter reference to dynamically create users for versions of Nexus &lt; 1.9</stringProp>
-          </GenericController>
-          <hashTree>
-            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Create &lt; 1.9" enabled="true">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                <collectionProp name="Arguments.arguments">
-                  <elementProp name="" elementType="HTTPArgument">
-                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">{&quot;data&quot;:{&quot;userId&quot;:&quot;user${__threadNum}-${createUserCount}&quot;,&quot;name&quot;:&quot;name${createUserCount}&quot;,&quot;email&quot;:&quot;fake@sonatype.org&quot;,&quot;status&quot;:&quot;active&quot;,&quot;password&quot;:&quot;123&quot;,&quot;roles&quot;:[&quot;admin&quot;]}}</stringProp>
-                    <stringProp name="Argument.metadata">=</stringProp>
-                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  </elementProp>
-                </collectionProp>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain"></stringProp>
-              <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">${context}/service/local/users</stringProp>
-              <stringProp name="HTTPSampler.method">POST</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              <stringProp name="TestPlan.comments">using counter function to create a dynamic set of users per global counter</stringProp>
-            </HTTPSampler2>
-            <hashTree>
-              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
-                <collectionProp name="HeaderManager.headers">
-                  <elementProp name="Accept" elementType="Header">
-                    <stringProp name="Header.name">Accept</stringProp>
-                    <stringProp name="Header.value">application/json</stringProp>
-                  </elementProp>
-                  <elementProp name="User-Agent" elementType="Header">
-                    <stringProp name="Header.name">User-Agent</stringProp>
-                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Language</stringProp>
-                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Encoding</stringProp>
-                    <stringProp name="Header.value">gzip,deflate</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Charset</stringProp>
-                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">X-Requested-With</stringProp>
-                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
-                  </elementProp>
-                </collectionProp>
-                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
-              </HeaderManager>
-              <hashTree/>
-              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 201" enabled="true">
-                <collectionProp name="Asserion.test_strings">
-                  <stringProp name="49587">201</stringProp>
-                </collectionProp>
-                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-                <boolProp name="Assertion.assume_success">false</boolProp>
-                <intProp name="Assertion.test_type">8</intProp>
-              </ResponseAssertion>
-              <hashTree/>
-            </hashTree>
-          </hashTree>
-          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Create  &gt;= 1.9" enabled="true">
-            <stringProp name="TestPlan.comments">use a counter reference to dynamically create users for versions of Nexus &gt;= 1.9</stringProp>
-          </GenericController>
-          <hashTree>
-            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Create &gt;= 1.9" enabled="true">
-              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                <collectionProp name="Arguments.arguments">
-                  <elementProp name="" elementType="HTTPArgument">
-                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                    <stringProp name="Argument.value">{&quot;data&quot;:{&quot;userId&quot;:&quot;user${__threadNum}-${createUserCount}&quot;,&quot;firstName&quot;:&quot;first${createUserCount}&quot;,&quot;lastName&quot;:&quot;last${createUserCount}&quot;,&quot;email&quot;:&quot;fake@sonatype.org&quot;,&quot;status&quot;:&quot;active&quot;,&quot;password&quot;:&quot;123&quot;,&quot;roles&quot;:[&quot;admin&quot;]}}</stringProp>
-                    <stringProp name="Argument.metadata">=</stringProp>
-                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
-                  </elementProp>
-                </collectionProp>
-              </elementProp>
-              <stringProp name="HTTPSampler.domain"></stringProp>
-              <stringProp name="HTTPSampler.port"></stringProp>
-              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-              <stringProp name="HTTPSampler.response_timeout"></stringProp>
-              <stringProp name="HTTPSampler.protocol"></stringProp>
-              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-              <stringProp name="HTTPSampler.path">${context}/service/local/users</stringProp>
-              <stringProp name="HTTPSampler.method">POST</stringProp>
-              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-              <boolProp name="HTTPSampler.monitor">false</boolProp>
-              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              <stringProp name="TestPlan.comments">using counter function to create a dynamic set of users per global counter</stringProp>
-            </HTTPSampler2>
-            <hashTree>
-              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
-                <collectionProp name="HeaderManager.headers">
-                  <elementProp name="Accept" elementType="Header">
-                    <stringProp name="Header.name">Accept</stringProp>
-                    <stringProp name="Header.value">application/json</stringProp>
-                  </elementProp>
-                  <elementProp name="User-Agent" elementType="Header">
-                    <stringProp name="Header.name">User-Agent</stringProp>
-                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Language</stringProp>
-                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Encoding</stringProp>
-                    <stringProp name="Header.value">gzip,deflate</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">Accept-Charset</stringProp>
-                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
-                  </elementProp>
-                  <elementProp name="" elementType="Header">
-                    <stringProp name="Header.name">X-Requested-With</stringProp>
-                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
-                  </elementProp>
-                </collectionProp>
-                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
-              </HeaderManager>
-              <hashTree/>
-              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 201" enabled="true">
-                <collectionProp name="Asserion.test_strings">
-                  <stringProp name="49587">201</stringProp>
                 </collectionProp>
                 <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
                 <boolProp name="Assertion.assume_success">false</boolProp>
@@ -2352,6 +2142,1095 @@
           <stringProp name="TestPlan.comments">/nexus/service/local/lucene</stringProp>
         </GenericController>
         <hashTree/>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Repositories" enabled="true">
+          <stringProp name="TestPlan.comments">nexus/service/local/repositories</stringProp>
+        </GenericController>
+        <hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Content" enabled="true">
+            <stringProp name="TestPlan.comments">/nexus/service/local/repositories/*reponame*/content/ lists the content of a repository, data consumable in the browse storage view</stringProp>
+          </GenericController>
+          <hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Walk Local Storage Tree" enabled="true">
+              <stringProp name="TestPlan.comments">Walk the local storage tree until all nodes have been retrieved</stringProp>
+            </GenericController>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="Accept" elementType="Header">
+                    <stringProp name="Header.name">Accept</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                  <elementProp name="User-Agent" elementType="Header">
+                    <stringProp name="Header.name">User-Agent</stringProp>
+                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Language</stringProp>
+                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Encoding</stringProp>
+                    <stringProp name="Header.value">gzip,deflate</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Charset</stringProp>
+                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">X-Requested-With</stringProp>
+                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                  </elementProp>
+                </collectionProp>
+                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+              </HeaderManager>
+              <hashTree/>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="root" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="isLocal" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.metadata"></stringProp>
+                      <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                      <stringProp name="Argument.name">isLocal</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths A" enabled="true">
+                  <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                  <stringProp name="RegexExtractor.refname">pathA</stringProp>
+                  <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                  <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                  <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                </RegexExtractor>
+                <hashTree/>
+              </hashTree>
+              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level A" enabled="true">
+                <stringProp name="ForeachController.inputVal">pathA</stringProp>
+                <stringProp name="ForeachController.returnVal">pathA</stringProp>
+                <boolProp name="ForeachController.useSeparator">true</boolProp>
+              </ForeachController>
+              <hashTree>
+                <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level A" enabled="true">
+                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                    <collectionProp name="Arguments.arguments">
+                      <elementProp name="isLocal" elementType="HTTPArgument">
+                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                        <stringProp name="Argument.value"></stringProp>
+                        <stringProp name="Argument.metadata"></stringProp>
+                        <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                        <stringProp name="Argument.name">isLocal</stringProp>
+                      </elementProp>
+                    </collectionProp>
+                  </elementProp>
+                  <stringProp name="HTTPSampler.domain"></stringProp>
+                  <stringProp name="HTTPSampler.port"></stringProp>
+                  <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                  <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                  <stringProp name="HTTPSampler.protocol"></stringProp>
+                  <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                  <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathA}/</stringProp>
+                  <stringProp name="HTTPSampler.method">GET</stringProp>
+                  <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                  <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                  <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                  <boolProp name="HTTPSampler.monitor">false</boolProp>
+                  <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                </HTTPSampler2>
+                <hashTree>
+                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                    <collectionProp name="Asserion.test_strings">
+                      <stringProp name="49586">200</stringProp>
+                    </collectionProp>
+                    <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                    <boolProp name="Assertion.assume_success">false</boolProp>
+                    <intProp name="Assertion.test_type">8</intProp>
+                  </ResponseAssertion>
+                  <hashTree/>
+                  <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths B" enabled="true">
+                    <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                    <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                    <stringProp name="RegexExtractor.refname">pathB</stringProp>
+                    <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                    <stringProp name="RegexExtractor.template">$1$</stringProp>
+                    <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                    <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                  </RegexExtractor>
+                  <hashTree/>
+                </hashTree>
+                <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level B" enabled="true">
+                  <stringProp name="ForeachController.inputVal">pathB</stringProp>
+                  <stringProp name="ForeachController.returnVal">pathB</stringProp>
+                  <boolProp name="ForeachController.useSeparator">true</boolProp>
+                </ForeachController>
+                <hashTree>
+                  <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level B" enabled="true">
+                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                      <collectionProp name="Arguments.arguments">
+                        <elementProp name="isLocal" elementType="HTTPArgument">
+                          <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                          <stringProp name="Argument.value"></stringProp>
+                          <stringProp name="Argument.metadata"></stringProp>
+                          <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                          <stringProp name="Argument.name">isLocal</stringProp>
+                        </elementProp>
+                      </collectionProp>
+                    </elementProp>
+                    <stringProp name="HTTPSampler.domain"></stringProp>
+                    <stringProp name="HTTPSampler.port"></stringProp>
+                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                    <stringProp name="HTTPSampler.protocol"></stringProp>
+                    <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                    <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathB}/</stringProp>
+                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                    <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                    <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                    <boolProp name="HTTPSampler.monitor">false</boolProp>
+                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                  </HTTPSampler2>
+                  <hashTree>
+                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                      <collectionProp name="Asserion.test_strings">
+                        <stringProp name="49586">200</stringProp>
+                      </collectionProp>
+                      <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                      <boolProp name="Assertion.assume_success">false</boolProp>
+                      <intProp name="Assertion.test_type">8</intProp>
+                    </ResponseAssertion>
+                    <hashTree/>
+                    <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths C" enabled="true">
+                      <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                      <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                      <stringProp name="RegexExtractor.refname">pathC</stringProp>
+                      <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                      <stringProp name="RegexExtractor.template">$1$</stringProp>
+                      <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                      <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                    </RegexExtractor>
+                    <hashTree/>
+                  </hashTree>
+                  <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level C" enabled="true">
+                    <stringProp name="ForeachController.inputVal">pathC</stringProp>
+                    <stringProp name="ForeachController.returnVal">pathC</stringProp>
+                    <boolProp name="ForeachController.useSeparator">true</boolProp>
+                  </ForeachController>
+                  <hashTree>
+                    <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level C" enabled="true">
+                      <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                        <collectionProp name="Arguments.arguments">
+                          <elementProp name="isLocal" elementType="HTTPArgument">
+                            <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                            <stringProp name="Argument.value"></stringProp>
+                            <stringProp name="Argument.metadata"></stringProp>
+                            <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                            <stringProp name="Argument.name">isLocal</stringProp>
+                          </elementProp>
+                        </collectionProp>
+                      </elementProp>
+                      <stringProp name="HTTPSampler.domain"></stringProp>
+                      <stringProp name="HTTPSampler.port"></stringProp>
+                      <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                      <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                      <stringProp name="HTTPSampler.protocol"></stringProp>
+                      <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                      <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathC}/</stringProp>
+                      <stringProp name="HTTPSampler.method">GET</stringProp>
+                      <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                      <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                      <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                      <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                      <boolProp name="HTTPSampler.monitor">false</boolProp>
+                      <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                    </HTTPSampler2>
+                    <hashTree>
+                      <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                        <collectionProp name="Asserion.test_strings">
+                          <stringProp name="49586">200</stringProp>
+                        </collectionProp>
+                        <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                        <boolProp name="Assertion.assume_success">false</boolProp>
+                        <intProp name="Assertion.test_type">8</intProp>
+                      </ResponseAssertion>
+                      <hashTree/>
+                      <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths D" enabled="true">
+                        <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                        <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                        <stringProp name="RegexExtractor.refname">pathD</stringProp>
+                        <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                        <stringProp name="RegexExtractor.template">$1$</stringProp>
+                        <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                        <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                      </RegexExtractor>
+                      <hashTree/>
+                    </hashTree>
+                    <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level D" enabled="true">
+                      <stringProp name="ForeachController.inputVal">pathD</stringProp>
+                      <stringProp name="ForeachController.returnVal">pathD</stringProp>
+                      <boolProp name="ForeachController.useSeparator">true</boolProp>
+                    </ForeachController>
+                    <hashTree>
+                      <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level D" enabled="true">
+                        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                          <collectionProp name="Arguments.arguments">
+                            <elementProp name="isLocal" elementType="HTTPArgument">
+                              <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                              <stringProp name="Argument.value"></stringProp>
+                              <stringProp name="Argument.metadata"></stringProp>
+                              <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                              <stringProp name="Argument.name">isLocal</stringProp>
+                            </elementProp>
+                          </collectionProp>
+                        </elementProp>
+                        <stringProp name="HTTPSampler.domain"></stringProp>
+                        <stringProp name="HTTPSampler.port"></stringProp>
+                        <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                        <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                        <stringProp name="HTTPSampler.protocol"></stringProp>
+                        <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                        <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathD}/</stringProp>
+                        <stringProp name="HTTPSampler.method">GET</stringProp>
+                        <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                        <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                        <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                        <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                        <boolProp name="HTTPSampler.monitor">false</boolProp>
+                        <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                      </HTTPSampler2>
+                      <hashTree>
+                        <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                          <collectionProp name="Asserion.test_strings">
+                            <stringProp name="49586">200</stringProp>
+                          </collectionProp>
+                          <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                          <boolProp name="Assertion.assume_success">false</boolProp>
+                          <intProp name="Assertion.test_type">8</intProp>
+                        </ResponseAssertion>
+                        <hashTree/>
+                        <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths E" enabled="true">
+                          <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                          <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                          <stringProp name="RegexExtractor.refname">pathE</stringProp>
+                          <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                          <stringProp name="RegexExtractor.template">$1$</stringProp>
+                          <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                          <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                        </RegexExtractor>
+                        <hashTree/>
+                      </hashTree>
+                      <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level E" enabled="true">
+                        <stringProp name="ForeachController.inputVal">pathE</stringProp>
+                        <stringProp name="ForeachController.returnVal">pathE</stringProp>
+                        <boolProp name="ForeachController.useSeparator">true</boolProp>
+                      </ForeachController>
+                      <hashTree>
+                        <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level E" enabled="true">
+                          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                            <collectionProp name="Arguments.arguments">
+                              <elementProp name="isLocal" elementType="HTTPArgument">
+                                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                <stringProp name="Argument.value"></stringProp>
+                                <stringProp name="Argument.metadata"></stringProp>
+                                <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                <stringProp name="Argument.name">isLocal</stringProp>
+                              </elementProp>
+                            </collectionProp>
+                          </elementProp>
+                          <stringProp name="HTTPSampler.domain"></stringProp>
+                          <stringProp name="HTTPSampler.port"></stringProp>
+                          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                          <stringProp name="HTTPSampler.protocol"></stringProp>
+                          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                          <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathE}/</stringProp>
+                          <stringProp name="HTTPSampler.method">GET</stringProp>
+                          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                          <boolProp name="HTTPSampler.monitor">false</boolProp>
+                          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                        </HTTPSampler2>
+                        <hashTree>
+                          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                            <collectionProp name="Asserion.test_strings">
+                              <stringProp name="49586">200</stringProp>
+                            </collectionProp>
+                            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                            <boolProp name="Assertion.assume_success">false</boolProp>
+                            <intProp name="Assertion.test_type">8</intProp>
+                          </ResponseAssertion>
+                          <hashTree/>
+                          <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths F" enabled="true">
+                            <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                            <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                            <stringProp name="RegexExtractor.refname">pathF</stringProp>
+                            <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                            <stringProp name="RegexExtractor.template">$1$</stringProp>
+                            <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                            <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                          </RegexExtractor>
+                          <hashTree/>
+                        </hashTree>
+                        <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level F" enabled="true">
+                          <stringProp name="ForeachController.inputVal">pathF</stringProp>
+                          <stringProp name="ForeachController.returnVal">pathF</stringProp>
+                          <boolProp name="ForeachController.useSeparator">true</boolProp>
+                        </ForeachController>
+                        <hashTree>
+                          <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level F" enabled="true">
+                            <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                              <collectionProp name="Arguments.arguments">
+                                <elementProp name="isLocal" elementType="HTTPArgument">
+                                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                  <stringProp name="Argument.value"></stringProp>
+                                  <stringProp name="Argument.metadata"></stringProp>
+                                  <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                  <stringProp name="Argument.name">isLocal</stringProp>
+                                </elementProp>
+                              </collectionProp>
+                            </elementProp>
+                            <stringProp name="HTTPSampler.domain"></stringProp>
+                            <stringProp name="HTTPSampler.port"></stringProp>
+                            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                            <stringProp name="HTTPSampler.protocol"></stringProp>
+                            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                            <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathF}/</stringProp>
+                            <stringProp name="HTTPSampler.method">GET</stringProp>
+                            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                            <boolProp name="HTTPSampler.monitor">false</boolProp>
+                            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                          </HTTPSampler2>
+                          <hashTree>
+                            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                              <collectionProp name="Asserion.test_strings">
+                                <stringProp name="49586">200</stringProp>
+                              </collectionProp>
+                              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                              <boolProp name="Assertion.assume_success">false</boolProp>
+                              <intProp name="Assertion.test_type">8</intProp>
+                            </ResponseAssertion>
+                            <hashTree/>
+                            <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths G" enabled="true">
+                              <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                              <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                              <stringProp name="RegexExtractor.refname">pathG</stringProp>
+                              <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                              <stringProp name="RegexExtractor.template">$1$</stringProp>
+                              <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                              <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                            </RegexExtractor>
+                            <hashTree/>
+                          </hashTree>
+                          <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level G" enabled="true">
+                            <stringProp name="ForeachController.inputVal">pathG</stringProp>
+                            <stringProp name="ForeachController.returnVal">pathG</stringProp>
+                            <boolProp name="ForeachController.useSeparator">true</boolProp>
+                          </ForeachController>
+                          <hashTree>
+                            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level G" enabled="true">
+                              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                                <collectionProp name="Arguments.arguments">
+                                  <elementProp name="isLocal" elementType="HTTPArgument">
+                                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                    <stringProp name="Argument.value"></stringProp>
+                                    <stringProp name="Argument.metadata"></stringProp>
+                                    <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                    <stringProp name="Argument.name">isLocal</stringProp>
+                                  </elementProp>
+                                </collectionProp>
+                              </elementProp>
+                              <stringProp name="HTTPSampler.domain"></stringProp>
+                              <stringProp name="HTTPSampler.port"></stringProp>
+                              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                              <stringProp name="HTTPSampler.protocol"></stringProp>
+                              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                              <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathG}/</stringProp>
+                              <stringProp name="HTTPSampler.method">GET</stringProp>
+                              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                              <boolProp name="HTTPSampler.monitor">false</boolProp>
+                              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                            </HTTPSampler2>
+                            <hashTree>
+                              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                                <collectionProp name="Asserion.test_strings">
+                                  <stringProp name="49586">200</stringProp>
+                                </collectionProp>
+                                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                                <boolProp name="Assertion.assume_success">false</boolProp>
+                                <intProp name="Assertion.test_type">8</intProp>
+                              </ResponseAssertion>
+                              <hashTree/>
+                              <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths H" enabled="true">
+                                <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                                <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                                <stringProp name="RegexExtractor.refname">pathH</stringProp>
+                                <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                                <stringProp name="RegexExtractor.template">$1$</stringProp>
+                                <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                                <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                              </RegexExtractor>
+                              <hashTree/>
+                            </hashTree>
+                            <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level H" enabled="true">
+                              <stringProp name="ForeachController.inputVal">pathH</stringProp>
+                              <stringProp name="ForeachController.returnVal">pathH</stringProp>
+                              <boolProp name="ForeachController.useSeparator">true</boolProp>
+                            </ForeachController>
+                            <hashTree>
+                              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level H" enabled="true">
+                                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                                  <collectionProp name="Arguments.arguments">
+                                    <elementProp name="isLocal" elementType="HTTPArgument">
+                                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                      <stringProp name="Argument.value"></stringProp>
+                                      <stringProp name="Argument.metadata"></stringProp>
+                                      <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                      <stringProp name="Argument.name">isLocal</stringProp>
+                                    </elementProp>
+                                  </collectionProp>
+                                </elementProp>
+                                <stringProp name="HTTPSampler.domain"></stringProp>
+                                <stringProp name="HTTPSampler.port"></stringProp>
+                                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                                <stringProp name="HTTPSampler.protocol"></stringProp>
+                                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                                <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathH}/</stringProp>
+                                <stringProp name="HTTPSampler.method">GET</stringProp>
+                                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                              </HTTPSampler2>
+                              <hashTree>
+                                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                                  <collectionProp name="Asserion.test_strings">
+                                    <stringProp name="49586">200</stringProp>
+                                  </collectionProp>
+                                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                                  <boolProp name="Assertion.assume_success">false</boolProp>
+                                  <intProp name="Assertion.test_type">8</intProp>
+                                </ResponseAssertion>
+                                <hashTree/>
+                                <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths I" enabled="true">
+                                  <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                                  <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                                  <stringProp name="RegexExtractor.refname">pathI</stringProp>
+                                  <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                                  <stringProp name="RegexExtractor.template">$1$</stringProp>
+                                  <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                                  <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                                </RegexExtractor>
+                                <hashTree/>
+                              </hashTree>
+                              <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level I" enabled="true">
+                                <stringProp name="ForeachController.inputVal">pathI</stringProp>
+                                <stringProp name="ForeachController.returnVal">pathI</stringProp>
+                                <boolProp name="ForeachController.useSeparator">true</boolProp>
+                              </ForeachController>
+                              <hashTree>
+                                <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level I" enabled="true">
+                                  <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                                    <collectionProp name="Arguments.arguments">
+                                      <elementProp name="isLocal" elementType="HTTPArgument">
+                                        <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                        <stringProp name="Argument.value"></stringProp>
+                                        <stringProp name="Argument.metadata"></stringProp>
+                                        <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                        <stringProp name="Argument.name">isLocal</stringProp>
+                                      </elementProp>
+                                    </collectionProp>
+                                  </elementProp>
+                                  <stringProp name="HTTPSampler.domain"></stringProp>
+                                  <stringProp name="HTTPSampler.port"></stringProp>
+                                  <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                                  <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                                  <stringProp name="HTTPSampler.protocol"></stringProp>
+                                  <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                                  <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathI}/</stringProp>
+                                  <stringProp name="HTTPSampler.method">GET</stringProp>
+                                  <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                                  <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                                  <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                                  <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                                  <boolProp name="HTTPSampler.monitor">false</boolProp>
+                                  <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                                </HTTPSampler2>
+                                <hashTree>
+                                  <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                                    <collectionProp name="Asserion.test_strings">
+                                      <stringProp name="49586">200</stringProp>
+                                    </collectionProp>
+                                    <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                                    <boolProp name="Assertion.assume_success">false</boolProp>
+                                    <intProp name="Assertion.test_type">8</intProp>
+                                  </ResponseAssertion>
+                                  <hashTree/>
+                                  <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths J" enabled="true">
+                                    <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                                    <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                                    <stringProp name="RegexExtractor.refname">pathJ</stringProp>
+                                    <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                                    <stringProp name="RegexExtractor.template">$1$</stringProp>
+                                    <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                                    <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                                  </RegexExtractor>
+                                  <hashTree/>
+                                </hashTree>
+                                <ForeachController guiclass="ForeachControlPanel" testclass="ForeachController" testname="Level J" enabled="true">
+                                  <stringProp name="ForeachController.inputVal">pathJ</stringProp>
+                                  <stringProp name="ForeachController.returnVal">pathJ</stringProp>
+                                  <boolProp name="ForeachController.useSeparator">true</boolProp>
+                                </ForeachController>
+                                <hashTree>
+                                  <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Level J" enabled="true">
+                                    <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                                      <collectionProp name="Arguments.arguments">
+                                        <elementProp name="isLocal" elementType="HTTPArgument">
+                                          <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                                          <stringProp name="Argument.value"></stringProp>
+                                          <stringProp name="Argument.metadata"></stringProp>
+                                          <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                                          <stringProp name="Argument.name">isLocal</stringProp>
+                                        </elementProp>
+                                      </collectionProp>
+                                    </elementProp>
+                                    <stringProp name="HTTPSampler.domain"></stringProp>
+                                    <stringProp name="HTTPSampler.port"></stringProp>
+                                    <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                                    <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                                    <stringProp name="HTTPSampler.protocol"></stringProp>
+                                    <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                                    <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content/${pathJ}/</stringProp>
+                                    <stringProp name="HTTPSampler.method">GET</stringProp>
+                                    <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                                    <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                                    <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                                    <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                                    <boolProp name="HTTPSampler.monitor">false</boolProp>
+                                    <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                                  </HTTPSampler2>
+                                  <hashTree>
+                                    <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                                      <collectionProp name="Asserion.test_strings">
+                                        <stringProp name="49586">200</stringProp>
+                                      </collectionProp>
+                                      <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                                      <boolProp name="Assertion.assume_success">false</boolProp>
+                                      <intProp name="Assertion.test_type">8</intProp>
+                                    </ResponseAssertion>
+                                    <hashTree/>
+                                    <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Extract Paths J" enabled="true">
+                                      <stringProp name="TestPlan.comments">extract the relativePath values from the JSON so that that they can be looped over</stringProp>
+                                      <stringProp name="RegexExtractor.useHeaders">false</stringProp>
+                                      <stringProp name="RegexExtractor.refname">pathJ</stringProp>
+                                      <stringProp name="RegexExtractor.regex">&quot;relativePath&quot;:&quot;/([\w|/|.|-]+?)/&quot;,</stringProp>
+                                      <stringProp name="RegexExtractor.template">$1$</stringProp>
+                                      <stringProp name="RegexExtractor.default">NO_RELATIVE_PATH_MATCH</stringProp>
+                                      <stringProp name="RegexExtractor.match_number">-1</stringProp>
+                                    </RegexExtractor>
+                                    <hashTree/>
+                                  </hashTree>
+                                </hashTree>
+                              </hashTree>
+                            </hashTree>
+                          </hashTree>
+                        </hashTree>
+                      </hashTree>
+                    </hashTree>
+                  </hashTree>
+                </hashTree>
+              </hashTree>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="isLocal" enabled="true"/>
+            <hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="isLocal" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="isLocal" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.metadata"></stringProp>
+                      <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                      <stringProp name="Argument.name">isLocal</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content${path}</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                <stringProp name="TestPlan.comments">content path must be surrounded by / or be a single /</stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="Accept" elementType="Header">
+                      <stringProp name="Header.name">Accept</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                    <elementProp name="User-Agent" elementType="Header">
+                      <stringProp name="Header.name">User-Agent</stringProp>
+                      <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Language</stringProp>
+                      <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Encoding</stringProp>
+                      <stringProp name="Header.value">gzip,deflate</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Charset</stringProp>
+                      <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">X-Requested-With</stringProp>
+                      <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                  <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+                </HeaderManager>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="isRemote" enabled="true"/>
+            <hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="isRemote" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="isRemote" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.metadata"></stringProp>
+                      <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                      <stringProp name="Argument.name">isRemote</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">${context}/service/local/repositories/${repoName}/content{$path}</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+                <stringProp name="TestPlan.comments">content path must be surrounded by / or be a single /</stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="Accept" elementType="Header">
+                      <stringProp name="Header.name">Accept</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                    <elementProp name="User-Agent" elementType="Header">
+                      <stringProp name="Header.name">User-Agent</stringProp>
+                      <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Language</stringProp>
+                      <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Encoding</stringProp>
+                      <stringProp name="Header.value">gzip,deflate</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Charset</stringProp>
+                      <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">X-Requested-With</stringProp>
+                      <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                  <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+                </HeaderManager>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Repo Groups" enabled="true">
+          <stringProp name="TestPlan.comments">nexus/service/local/repo_groups</stringProp>
+        </GenericController>
+        <hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Content" enabled="true">
+            <stringProp name="TestPlan.comments">/nexus/service/local/repo_groups/*reponame*/content/ lists the content of a repository group</stringProp>
+          </GenericController>
+          <hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="isLocal" enabled="true"/>
+            <hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="isLocal" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments">
+                    <elementProp name="isLocal" elementType="HTTPArgument">
+                      <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                      <stringProp name="Argument.value"></stringProp>
+                      <stringProp name="Argument.metadata"></stringProp>
+                      <boolProp name="HTTPArgument.use_equals">false</boolProp>
+                      <stringProp name="Argument.name">isLocal</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">${context}/service/local/repo_groups/${groupName}/content${path}</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                  <collectionProp name="HeaderManager.headers">
+                    <elementProp name="Accept" elementType="Header">
+                      <stringProp name="Header.name">Accept</stringProp>
+                      <stringProp name="Header.value">application/json</stringProp>
+                    </elementProp>
+                    <elementProp name="User-Agent" elementType="Header">
+                      <stringProp name="Header.name">User-Agent</stringProp>
+                      <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Language</stringProp>
+                      <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Encoding</stringProp>
+                      <stringProp name="Header.value">gzip,deflate</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">Accept-Charset</stringProp>
+                      <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                    </elementProp>
+                    <elementProp name="" elementType="Header">
+                      <stringProp name="Header.name">X-Requested-With</stringProp>
+                      <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                    </elementProp>
+                  </collectionProp>
+                  <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+                </HeaderManager>
+                <hashTree/>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+          </hashTree>
+        </hashTree>
+        <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Users" enabled="true">
+          <stringProp name="TestPlan.comments">/nexus/service/local/users</stringProp>
+        </GenericController>
+        <hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Delete" enabled="true">
+            <stringProp name="TestPlan.comments">Uses a counter reference to dynamically delete users</stringProp>
+          </GenericController>
+          <hashTree>
+            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Delete" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                <collectionProp name="Arguments.arguments"/>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain"></stringProp>
+              <stringProp name="HTTPSampler.port"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.protocol"></stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">${context}/service/local/users/user${__threadNum}-${deleteUserCount}</stringProp>
+              <stringProp name="HTTPSampler.method">DELETE</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <boolProp name="HTTPSampler.monitor">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            </HTTPSampler2>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="Accept" elementType="Header">
+                    <stringProp name="Header.name">Accept</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                  <elementProp name="User-Agent" elementType="Header">
+                    <stringProp name="Header.name">User-Agent</stringProp>
+                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Language</stringProp>
+                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Encoding</stringProp>
+                    <stringProp name="Header.value">gzip,deflate</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Charset</stringProp>
+                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">X-Requested-With</stringProp>
+                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Content-Type</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                </collectionProp>
+                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+              </HeaderManager>
+              <hashTree/>
+              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 204 404" enabled="true">
+                <collectionProp name="Asserion.test_strings">
+                  <stringProp name="-1443488270">204|404</stringProp>
+                </collectionProp>
+                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                <boolProp name="Assertion.assume_success">false</boolProp>
+                <intProp name="Assertion.test_type">1</intProp>
+                <stringProp name="TestPlan.comments">204 if user exists, 404 if we have not created user yet</stringProp>
+              </ResponseAssertion>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Create  &lt; 1.9" enabled="true">
+            <stringProp name="TestPlan.comments">use a counter reference to dynamically create users for versions of Nexus &lt; 1.9</stringProp>
+          </GenericController>
+          <hashTree>
+            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Create &lt; 1.9" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{&quot;data&quot;:{&quot;userId&quot;:&quot;user${__threadNum}-${createUserCount}&quot;,&quot;name&quot;:&quot;name${createUserCount}&quot;,&quot;email&quot;:&quot;fake@sonatype.org&quot;,&quot;status&quot;:&quot;active&quot;,&quot;password&quot;:&quot;123&quot;,&quot;roles&quot;:[&quot;admin&quot;]}}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain"></stringProp>
+              <stringProp name="HTTPSampler.port"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.protocol"></stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">${context}/service/local/users</stringProp>
+              <stringProp name="HTTPSampler.method">POST</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <boolProp name="HTTPSampler.monitor">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="TestPlan.comments">using counter function to create a dynamic set of users per global counter</stringProp>
+            </HTTPSampler2>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="Accept" elementType="Header">
+                    <stringProp name="Header.name">Accept</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                  <elementProp name="User-Agent" elementType="Header">
+                    <stringProp name="Header.name">User-Agent</stringProp>
+                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Language</stringProp>
+                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Encoding</stringProp>
+                    <stringProp name="Header.value">gzip,deflate</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Charset</stringProp>
+                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">X-Requested-With</stringProp>
+                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                  </elementProp>
+                </collectionProp>
+                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+              </HeaderManager>
+              <hashTree/>
+              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 201" enabled="true">
+                <collectionProp name="Asserion.test_strings">
+                  <stringProp name="49587">201</stringProp>
+                </collectionProp>
+                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                <boolProp name="Assertion.assume_success">false</boolProp>
+                <intProp name="Assertion.test_type">8</intProp>
+              </ResponseAssertion>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Dynamic Create  &gt;= 1.9" enabled="true">
+            <stringProp name="TestPlan.comments">use a counter reference to dynamically create users for versions of Nexus &gt;= 1.9</stringProp>
+          </GenericController>
+          <hashTree>
+            <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="Create &gt;= 1.9" enabled="true">
+              <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                <collectionProp name="Arguments.arguments">
+                  <elementProp name="" elementType="HTTPArgument">
+                    <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                    <stringProp name="Argument.value">{&quot;data&quot;:{&quot;userId&quot;:&quot;user${__threadNum}-${createUserCount}&quot;,&quot;firstName&quot;:&quot;first${createUserCount}&quot;,&quot;lastName&quot;:&quot;last${createUserCount}&quot;,&quot;email&quot;:&quot;fake@sonatype.org&quot;,&quot;status&quot;:&quot;active&quot;,&quot;password&quot;:&quot;123&quot;,&quot;roles&quot;:[&quot;admin&quot;]}}</stringProp>
+                    <stringProp name="Argument.metadata">=</stringProp>
+                    <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                  </elementProp>
+                </collectionProp>
+              </elementProp>
+              <stringProp name="HTTPSampler.domain"></stringProp>
+              <stringProp name="HTTPSampler.port"></stringProp>
+              <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+              <stringProp name="HTTPSampler.response_timeout"></stringProp>
+              <stringProp name="HTTPSampler.protocol"></stringProp>
+              <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+              <stringProp name="HTTPSampler.path">${context}/service/local/users</stringProp>
+              <stringProp name="HTTPSampler.method">POST</stringProp>
+              <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+              <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+              <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+              <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+              <boolProp name="HTTPSampler.monitor">false</boolProp>
+              <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              <stringProp name="TestPlan.comments">using counter function to create a dynamic set of users per global counter</stringProp>
+            </HTTPSampler2>
+            <hashTree>
+              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="AJAX JSON Headers" enabled="true">
+                <collectionProp name="HeaderManager.headers">
+                  <elementProp name="Accept" elementType="Header">
+                    <stringProp name="Header.name">Accept</stringProp>
+                    <stringProp name="Header.value">application/json</stringProp>
+                  </elementProp>
+                  <elementProp name="User-Agent" elementType="Header">
+                    <stringProp name="Header.name">User-Agent</stringProp>
+                    <stringProp name="Header.value">Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.11) Gecko/20101012 Firefox/3.6.11</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Language</stringProp>
+                    <stringProp name="Header.value">en-us,en;q=0.5</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Encoding</stringProp>
+                    <stringProp name="Header.value">gzip,deflate</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">Accept-Charset</stringProp>
+                    <stringProp name="Header.value">ISO-8859-1,utf-8;q=0.7,*;q=0.7</stringProp>
+                  </elementProp>
+                  <elementProp name="" elementType="Header">
+                    <stringProp name="Header.name">X-Requested-With</stringProp>
+                    <stringProp name="Header.value">XMLHttpRequest</stringProp>
+                  </elementProp>
+                </collectionProp>
+                <stringProp name="TestPlan.comments">Headers that are typically sent from a user&apos;s web browser to Nexus backend</stringProp>
+              </HeaderManager>
+              <hashTree/>
+              <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 201" enabled="true">
+                <collectionProp name="Asserion.test_strings">
+                  <stringProp name="49587">201</stringProp>
+                </collectionProp>
+                <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                <boolProp name="Assertion.assume_success">false</boolProp>
+                <intProp name="Assertion.test_type">8</intProp>
+              </ResponseAssertion>
+              <hashTree/>
+            </hashTree>
+          </hashTree>
+        </hashTree>
       </hashTree>
     </hashTree>
   </hashTree>
