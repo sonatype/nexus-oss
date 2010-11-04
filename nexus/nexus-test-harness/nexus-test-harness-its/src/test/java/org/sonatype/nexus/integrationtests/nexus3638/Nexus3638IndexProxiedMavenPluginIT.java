@@ -84,10 +84,11 @@ public class Nexus3638IndexProxiedMavenPluginIT
             }
         }
 
-        // make sure it does have enought time to index the artifact!
+        // make sure it does have enough time to index the artifact!
         TaskScheduleUtil.waitForAllTasksToStop();
 
-        List<NexusArtifact> items = getSearchMessageUtil().searchForGav( gav, "nexus3638" );
+        List<NexusArtifact> items =
+            getSearchMessageUtil().searchForGav( gav.getGroupId(), gav.getArtifactId(), gav.getVersion(), "nexus3638" );
         Assert.assertFalse( items.isEmpty() );
         Assert.assertEquals( "maven-plugin", items.get( 0 ).getPackaging() );
 
