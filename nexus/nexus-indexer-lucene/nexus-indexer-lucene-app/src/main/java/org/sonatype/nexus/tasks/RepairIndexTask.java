@@ -13,88 +13,23 @@
  */
 package org.sonatype.nexus.tasks;
 
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.feeds.FeedRecorder;
-import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.RepairIndexTaskDescriptor;
 import org.sonatype.scheduling.SchedulerTask;
 
 /**
  * Repair index task.
  * 
- * @author cstamas
  * @author velo
  */
 @Component( role = SchedulerTask.class, hint = RepairIndexTaskDescriptor.ID, instantiationStrategy = "per-lookup" )
 public class RepairIndexTask
-    extends AbstractNexusRepositoriesPathAwareTask<Object>
+    extends AbstractIndexerTask
 {
 
-    @Requirement( role = ReindexTaskHandler.class )
-    private List<ReindexTaskHandler> handlers;
-
-    @Override
-    protected String getRepositoryFieldId()
+    public RepairIndexTask()
     {
-        return RepairIndexTaskDescriptor.REPO_OR_GROUP_FIELD_ID;
-    }
-
-    @Override
-    protected String getRepositoryPathFieldId()
-    {
-        return RepairIndexTaskDescriptor.RESOURCE_STORE_PATH_FIELD_ID;
-    }
-
-    @Override
-    public Object doRun()
-        throws Exception
-    {
-        for ( ReindexTaskHandler handler : handlers )
-        {
-            if ( getRepositoryId() != null )
-            {
-                handler.reindexRepository( getRepositoryId(), getResourceStorePath(), true );
-            }
-            else if ( getRepositoryGroupId() != null )
-            {
-                handler.reindexRepositoryGroup( getRepositoryGroupId(), getResourceStorePath(), true );
-            }
-            else
-            {
-                handler.reindexAllRepositories( getResourceStorePath(), true );
-            }
-        }
-
-        return null;
-    }
-
-    @Override
-    protected String getAction()
-    {
-        return FeedRecorder.SYSTEM_REINDEX_ACTION;
-    }
-
-    @Override
-    protected String getMessage()
-    {
-        if ( getRepositoryGroupId() != null )
-        {
-            return "Reparing repository group index " + getRepositoryGroupName() + " from path "
-                + getResourceStorePath()
-                + " and below.";
-        }
-        else if ( getRepositoryId() != null )
-        {
-            return "Reparing repository index " + getRepositoryName() + " from path " + getResourceStorePath()
-                + " and below.";
-        }
-        else
-        {
-            return "Reparing all registered repositories index";
-        }
+        super( "Reparing", true );
     }
 
 }

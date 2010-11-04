@@ -13,50 +13,16 @@
  */
 package org.sonatype.nexus.tasks.descriptors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codehaus.plexus.component.annotations.Component;
-import org.sonatype.nexus.formfields.FormField;
-import org.sonatype.nexus.formfields.RepoOrGroupComboFormField;
-import org.sonatype.nexus.formfields.StringTextFormField;
 
 @Component( role = ScheduledTaskDescriptor.class, hint = "RepairIndex", description = "Repair Repositories Index" )
 public class RepairIndexTaskDescriptor
-    extends AbstractScheduledTaskDescriptor
+    extends AbstractIndexTaskDescriptor
 {
     public static final String ID = "RepairIndexTask";
 
-    public static final String REPO_OR_GROUP_FIELD_ID = "repositoryOrGroupId";
-
-    public static final String RESOURCE_STORE_PATH_FIELD_ID = "resourceStorePath";
-
-    private final RepoOrGroupComboFormField repoField = new RepoOrGroupComboFormField( REPO_OR_GROUP_FIELD_ID,
-        FormField.MANDATORY );
-
-    private final StringTextFormField resourceStorePathField = new StringTextFormField( RESOURCE_STORE_PATH_FIELD_ID,
-        "Repository path",
-        "Enter a repository path to run the task in recursively (ie. \"/\" for root or \"/org/apache\")",
-        FormField.OPTIONAL );
-
-    public String getId()
+    public RepairIndexTaskDescriptor()
     {
-        return ID;
-    }
-
-    public String getName()
-    {
-        return "Repair Repositories Index";
-    }
-
-    @Override
-    public List<FormField> formFields()
-    {
-        List<FormField> fields = new ArrayList<FormField>();
-
-        fields.add( repoField );
-        fields.add( resourceStorePathField );
-
-        return fields;
+        super( ID, "Repair" );
     }
 }
