@@ -131,8 +131,7 @@
       <type>zip</type>
     </dependency>
 
-    <!-- <dependency> <groupId>org.sonatype.nexus</groupId> <artifactId>itar-nexus-plugin-manager-guice</artifactId> <version>${project.version}</version> 
-      <type>zip</type> </dependency> -->
+    <!-- <dependency> <groupId>org.sonatype.nexus</groupId> <artifactId>itar-nexus-plugin-manager-guice</artifactId> <version>${project.version}</version> <type>zip</type> </dependency> -->
   </dependencies>
 
 
@@ -203,5 +202,61 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>tattletale</id>
+
+      <properties>
+        <tattletale-source-directory>${project.build.directory}/tattletale-source</tattletale-source-directory>
+        <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
+      </properties>
+
+      <build>
+        <plugins>
+          <!-- tattletale expects all jars on the same folder -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>2.1</version>
+            <executions>
+              <execution>
+                <id>tattletale-jars</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${tattletale-source-directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- do it! -->
+          <plugin>
+            <groupId>org.jboss.tattletale</groupId>
+            <artifactId>tattletale-maven</artifactId>
+            <version>1.1.0.Final</version>
+            <executions>
+              <execution>
+                <id>run-tattletale-report</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>report</goal>
+                </goals>
+                <configuration>
+                  <source>${tattletale-source-directory}</source>
+                  <destination>${tattletale-destination-directory}</destination>
+                  <profiles>
+                    <profile>java5</profile>
+                  </profiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
