@@ -213,12 +213,13 @@
                   <include>org.apache.maven:maven-model</include>
                   <include>org.apache.maven:maven-plugin-api</include>
                   <include>org.codehaus.plexus:plexus-cli</include>
-                  <include>org.sonatype.sisu:sisu-inject-plexus</include>
+                  <include>aopalliance:aopalliance</include>
+                  <include>javax.inject:*</include>
+                  <include>org.sonatype.sisu.inject:*</include>
+                  <include>org.sonatype.sisu:*</include>
                   <include>org.codehaus.plexus:plexus-component-annotations</include>
                   <include>org.codehaus.plexus:plexus-classworlds</include>
                   <include>org.codehaus.plexus:plexus-utils</include>
-                  <include>org.sonatype.sisu:sisu-inject-bean</include>
-                  <include>org.sonatype.sisu:sisu-guice:jar:noaop</include>
                 </includes>
               </artifactSet>
             </configuration>
