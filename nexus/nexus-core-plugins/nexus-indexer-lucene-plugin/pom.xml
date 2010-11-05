@@ -93,8 +93,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
       <scope>provided</scope>
     </dependency>
 

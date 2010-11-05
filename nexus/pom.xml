@@ -157,7 +157,7 @@
     <plexus-interpolation.version>1.6</plexus-interpolation.version>
     <plexus-slf4j-logging.version>1.1</plexus-slf4j-logging.version>
     <plexus-velocity.version>1.1.7</plexus-velocity.version>
-    <commons-beanutils.version>1.7.0</commons-beanutils.version>
+    <commons-beanutils.version>1.7.0-SONATYPE</commons-beanutils.version>
     <log4j.version>1.2.14</log4j.version>
     <plexus-ehcache.version>1.3</plexus-ehcache.version>
     <plexus-jetty-testsuite.version>1.7</plexus-jetty-testsuite.version>
@@ -165,6 +165,7 @@
     <spice-timeline.version>1.1.4-SNAPSHOT</spice-timeline.version>
     <plexus-swizzle.version>1.2</plexus-swizzle.version>
     <spice-utils.version>1.0.0</spice-utils.version>
+    <enunciate.version>1.20</enunciate.version>
   </properties>
 
   <dependencyManagement>
@@ -411,6 +412,17 @@
 
       <!-- shiro -->
       <dependency>
+        <groupId>org.sonatype.security</groupId>
+        <artifactId>security-system</artifactId>
+        <version>${plexus-security.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
         <version>${plexus-security.version}</version>
@@ -418,6 +430,10 @@
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -430,6 +446,10 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -441,6 +461,10 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -458,6 +482,10 @@
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -468,6 +496,10 @@
           <exclusion>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-container-default</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.sonatype.sisu</groupId>
+            <artifactId>sisu-inject-plexus</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
@@ -484,7 +516,7 @@
       </dependency>
       <dependency>
         <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils</artifactId>
+        <artifactId>commons-beanutils-core</artifactId>
         <version>${commons-beanutils.version}</version>
         <exclusions>
           <exclusion>
@@ -994,6 +1026,35 @@
         <groupId>javax.xml.bind</groupId>
         <artifactId>jaxb-api</artifactId>
         <version>2.1</version>
+        <exclusions>
+          <exclusion>
+            <groupId>javax.xml.stream</groupId>
+            <artifactId>stax-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.enunciate</groupId>
+        <artifactId>enunciate-core</artifactId>
+        <version>${enunciate.version}</version>
+        <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
+        <!-- But nothing is using that annotation after build happened, and doco is generated -->
+        <scope>provided</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun</groupId>
+            <artifactId>tools</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1051,6 +1112,13 @@
                     <exclude>*:jsecurity</exclude>
                   </excludes>
                   <message>Nexus has being updated to use apache shiro instead, please remove jsecurity dependency</message>
+                </bannedDependencies>
+                <bannedDependencies>
+                  <excludes>
+                    <exclude>commons-beanutils:commons-beanutils</exclude>
+                  </excludes>
+                  <message>commons-beanutils includes commons-collections. use commons-beanutils-core instead
+                  </message>
                 </bannedDependencies>
                 <!-- <requirePluginVersions> <banSnapshots>false</banSnapshots> </requirePluginVersions> -->
               </rules>
@@ -1226,7 +1294,6 @@
         </file>
       </activation>
       <properties>
-        <enunciate.version>1.20</enunciate.version>
         <enunciate.plugin.version>1.20-SONATYPE-r919</enunciate.plugin.version>
       </properties>
       <dependencies>
@@ -1234,20 +1301,12 @@
         <dependency>
           <groupId>org.codehaus.enunciate</groupId>
           <artifactId>enunciate-core</artifactId>
-          <version>${enunciate.version}</version>
           <!-- This dependency is needed during build only, it contains a special annotation used on classes -->
           <!-- But nothing is using that annotation after build happened, and doco is generated -->
-          <scope>provided</scope>
-          <exclusions>
-            <exclusion>
-              <groupId>commons-logging</groupId>
-              <artifactId>commons-logging</artifactId>
-            </exclusion>
-            <exclusion>
-              <groupId>com.sun</groupId>
-              <artifactId>tools</artifactId>
-            </exclusion>
-          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils-core</artifactId>
         </dependency>
         <dependency>
           <groupId>org.codehaus.jackson</groupId>
@@ -1259,6 +1318,11 @@
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
           <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>stax</groupId>
+          <artifactId>stax-api</artifactId>
+          <version>1.0.1</version>
         </dependency>
         <dependency>
           <groupId>javax.ws.rs</groupId>

@@ -27,8 +27,8 @@
     </dependency>
     <!-- For App basic -->
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -83,7 +83,7 @@
     </dependency>
     <dependency>
       <groupId>commons-beanutils</groupId>
-      <artifactId>commons-beanutils</artifactId>
+      <artifactId>commons-beanutils-core</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

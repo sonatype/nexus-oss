@@ -91,8 +91,8 @@
 
     <!-- Plexus -->
     <dependency>
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu.inject</groupId>
+      <artifactId>guice-plexus-shim</artifactId>
     </dependency>
 
     <!-- Needed for CLI assembly only, to make it work in "standalone" CLI mode -->

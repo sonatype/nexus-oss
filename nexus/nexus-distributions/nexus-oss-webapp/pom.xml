@@ -206,50 +206,38 @@
   <profiles>
     <profile>
       <id>tattletale</id>
-
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
-        <tattletale-source-directory>${project.build.directory}/tattletale-source</tattletale-source-directory>
+        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus/lib</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
 
       <build>
-        <plugins>
-          <!-- tattletale expects all jars on the same folder -->
+        <plugins><!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-resources-plugin</artifactId> <version>2.4.2</version> <executions> <execution> <id>copy-rt-jar</id> <phase>verify</phase> <goals> <goal>copy-resources</goal> </goals> 
+            <configuration> <outputDirectory>${tattletale-source}</outputDirectory> <resources> <resource> <directory>${java.home}/lib</directory> <filtering>false</filtering> <includes> <include>rt.jar</include> </includes> </resource> </resources> </configuration> </execution> 
+            </executions> </plugin> --><!-- do it! -->
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.1</version>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>tattletale-maven-plugin</artifactId>
+            <version>1.0-SNAPSHOT</version>
             <executions>
               <execution>
-                <id>tattletale-jars</id>
-                <phase>verify</phase>
                 <goals>
-                  <goal>copy-dependencies</goal>
+                  <goal>tattletale</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${tattletale-source-directory}</outputDirectory>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <!-- do it! -->
-          <plugin>
-            <groupId>org.jboss.tattletale</groupId>
-            <artifactId>tattletale-maven</artifactId>
-            <version>1.1.0.Final</version>
-            <executions>
-              <execution>
-                <id>run-tattletale-report</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-                <configuration>
-                  <source>${tattletale-source-directory}</source>
+                  <source>${tattletale-source}</source>
                   <destination>${tattletale-destination-directory}</destination>
                   <profiles>
                     <profile>java5</profile>
                   </profiles>
+                  <reports>
+                    <report>multiplejars</report>
+                  </reports>
+                  <failOnError>true</failOnError>
+                  <failOnWarn>true</failOnWarn>
                 </configuration>
               </execution>
             </executions>

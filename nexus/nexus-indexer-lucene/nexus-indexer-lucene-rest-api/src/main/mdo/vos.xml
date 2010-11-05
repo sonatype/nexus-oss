@@ -30,16 +30,17 @@
 
     <!-- Root class for all responses -->
     <class>
-      <name>NexusResponse</name>
+      <name>NexusIndexerResponse</name>
       <version>1.0.0+</version>
       <fields></fields>
+      <superClass>org.sonatype.nexus.rest.model.NexusResponse</superClass>
     </class>
     <!-- Search -->
     <class>
       <!-- Search response -->
       <name>SearchResponse</name>
       <version>1.0.0+</version>
-      <superClass>NexusResponse</superClass>
+      <superClass>NexusIndexerResponse</superClass>
       <description>REST Response object for a list of search results, contains the typical 'data' parameter, which is a
         list of search results.</description>
       <annotations>
@@ -195,7 +196,7 @@
     <class>
       <name>ArtifactInfoResourceResponse</name>
       <version>1.0.0+</version>
-      <superClass>NexusResponse</superClass>
+      <superClass>NexusIndexerResponse</superClass>
       <description>REST Response object for a artifact-info resource request, contains the typical 'data' parameter,
         which is the content items requested.</description>
       <annotations>
@@ -385,7 +386,7 @@
       <!-- Search response -->
       <name>SearchNGResponse</name>
       <version>1.0.0+</version>
-      <superClass>NexusResponse</superClass>
+      <superClass>NexusIndexerResponse</superClass>
       <description>REST Response object for a list of search results, contains the typical 'data' parameter, which is a
         list of search results.</description>
       <annotations>

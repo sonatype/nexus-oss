@@ -37,8 +37,8 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.sonatype.sisu</groupId>
-        <artifactId>sisu-inject-plexus</artifactId>
+        <groupId>org.sonatype.sisu.inject</groupId>
+        <artifactId>guice-plexus-shim</artifactId>
         <version>${sisu-inject-plexus.version}</version>
       </dependency>
       <!-- This below is actually tied to this above, but some modules like modello only modules does need p-u only as dependency -->

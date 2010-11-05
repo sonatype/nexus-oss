@@ -17,9 +17,9 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import org.sonatype.guice.asm.AnnotationVisitor;
-import org.sonatype.guice.asm.ClassVisitor;
-import org.sonatype.guice.asm.Type;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Type;
 import org.sonatype.guice.bean.reflect.ClassSpace;
 import org.sonatype.guice.bean.scanners.ClassSpaceScanner;
 import org.sonatype.guice.bean.scanners.EmptyAnnotationVisitor;

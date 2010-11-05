@@ -51,8 +51,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-  <!-- Need to manage some transite deps to force them into provided, as they are set to compile through parent inheritance. 
-    This is kind of a workaround due to NEXUS-3189. -->
+  <!-- Need to manage some transite deps to force them into provided, as they are set to compile through parent inheritance. This is kind of a workaround due to NEXUS-3189. -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -131,18 +130,6 @@
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-core</artifactId>
-      <version>1.20</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-logging</artifactId>
-          <groupId>commons-logging</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <artifactId>jsr311-api</artifactId>
