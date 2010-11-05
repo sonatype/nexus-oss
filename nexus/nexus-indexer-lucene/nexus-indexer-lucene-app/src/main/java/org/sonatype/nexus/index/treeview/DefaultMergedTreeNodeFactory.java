@@ -15,7 +15,6 @@ package org.sonatype.nexus.index.treeview;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -37,9 +36,9 @@ public class DefaultMergedTreeNodeFactory
 {
     private Repository repository;
 
-    public DefaultMergedTreeNodeFactory( IndexingContext ctx, Repository repository )
+    public DefaultMergedTreeNodeFactory( Repository repository )
     {
-        super( ctx );
+        super( repository.getId() );
 
         this.repository = repository;
     }
@@ -48,38 +47,43 @@ public class DefaultMergedTreeNodeFactory
     {
         return repository;
     }
-    
+
     @Override
-    protected TreeNode decorateGNode( IndexTreeView tview, String path, String groupName, TreeNode node )
+    protected TreeNode decorateGNode( IndexTreeView tview, TreeViewRequest req, String path, String groupName,
+                                      TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateGNode( tview, path, groupName, node );
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateGNode( tview, req, path, groupName, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-        
+
         return mnode;
     }
-    
+
     @Override
-    protected TreeNode decorateANode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateANode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                      TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, ai, path, node );
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateANode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-        
+
         return mnode;
     }
-    
+
     @Override
-    protected TreeNode decorateVNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateVNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                      TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, ai, path, node );
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateVNode( tview, req, ai, path, node );
         mnode.setLocallyAvailable( isPathAvailable( path ) );
-        
+
         return mnode;
     }
-    
-    protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+
+    @Override
+    protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                             TreeNode node )
     {
-        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateArtifactNode( tview, ai, path, node );
-        
+        DefaultMergedTreeNode mnode = (DefaultMergedTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+
         ResourceStoreRequest request = getResourceStoreRequest( path );
 
         // default it to not available
@@ -127,29 +131,33 @@ public class DefaultMergedTreeNodeFactory
         return node;
     }
 
-    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName, Type type )
+    @Override
+    protected TreeNode createNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                   String nodeName, Type type )
     {
-        TreeNode result = super.createNode( tview, path, leaf, nodeName, type );
+        TreeNode result = super.createNode( tview, req, path, leaf, nodeName, type );
 
         result.setRepositoryId( getRepository().getId() );
 
         return result;
     }
 
-    protected TreeNode instantiateNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
+    @Override
+    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                        String nodeName )
     {
-        return new DefaultMergedTreeNode( tview, this );
+        return new DefaultMergedTreeNode( tview, req );
     }
 
     protected ResourceStoreRequest getResourceStoreRequest( String path )
     {
         return new ResourceStoreRequest( path, true );
     }
-    
+
     protected boolean isPathAvailable( String path )
     {
         ResourceStoreRequest request = getResourceStoreRequest( path );
-        
+
         try
         {
             return getRepository().getLocalStorage().containsItem( getRepository(), request );
@@ -158,7 +166,7 @@ public class DefaultMergedTreeNodeFactory
         {
             // for whatever reason, couldn't see item, so it's not cached locally we shall say
         }
-        
+
         return false;
     }
 

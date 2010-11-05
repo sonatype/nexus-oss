@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.rest.indextreeview;
 
+import java.io.IOException;
+import java.util.HashMap;
+
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
@@ -22,11 +25,11 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.index.Field;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
-import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -107,28 +110,26 @@ public abstract class AbstractIndexContentPlexusResource
             if ( GroupRepository.class.isInstance( repository ) || repository.isSearchable() )
             {
                 TreeNodeFactory factory =
-                    new IndexBrowserTreeNodeFactory(
-                        indexerManager.getRepositoryBestIndexContext( repository.getId() ), repository,
-                        createRedirectBaseRef( request ).toString() );
+                    new IndexBrowserTreeNodeFactory( repository, createRedirectBaseRef( request ).toString() );
 
-                TreeViewRequest tvReq = new TreeViewRequest( factory, path );
+                HashMap<Field, String> hints = new HashMap<Field, String>();
 
                 if ( StringUtils.isNotBlank( groupIdHint ) )
                 {
-                    tvReq.addFieldHint( MAVEN.GROUP_ID, groupIdHint );
+                    hints.put( MAVEN.GROUP_ID, groupIdHint );
                 }
 
                 if ( StringUtils.isNotBlank( artifactIdHint ) )
                 {
-                    tvReq.addFieldHint( MAVEN.ARTIFACT_ID, artifactIdHint );
+                    hints.put( MAVEN.ARTIFACT_ID, artifactIdHint );
                 }
 
                 if ( StringUtils.isNotBlank( versionHint ) )
                 {
-                    tvReq.addFieldHint( MAVEN.VERSION, versionHint );
+                    hints.put( MAVEN.VERSION, versionHint );
                 }
 
-                TreeNode node = indexerManager.listNodes( tvReq );
+                TreeNode node = indexerManager.listNodes( factory, path, hints, null, repository.getId() );
 
                 if ( node == null )
                 {
@@ -153,6 +154,11 @@ public abstract class AbstractIndexContentPlexusResource
         {
             getLogger().error( "Repository Not Found, id=" + repositoryId, e );
             throw new PlexusResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Repository Not Found", e );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got IO exception while executing treeView, id=" + repositoryId, e );
+            throw new PlexusResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
         }
     }
 

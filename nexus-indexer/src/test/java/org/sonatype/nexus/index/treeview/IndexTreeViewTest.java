@@ -33,14 +33,7 @@ public class IndexTreeViewTest
     protected void prepareNexusIndexer( NexusIndexer nexusIndexer )
         throws Exception
     {
-        context = nexusIndexer.addIndexingContext(
-            "test-minimal",
-            "test",
-            repo,
-            indexDir,
-            null,
-            null,
-            MIN_CREATORS );
+        context = nexusIndexer.addIndexingContext( "test-minimal", "test", repo, indexDir, null, null, MIN_CREATORS );
         nexusIndexer.scan( context );
     }
 
@@ -75,7 +68,9 @@ public class IndexTreeViewTest
     public void testRoot()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/" );
+        TreeViewRequest req =
+            new TreeViewRequest( new DefaultTreeNodeFactory( context.getRepositoryId() ), "/", context );
+        TreeNode root = indexTreeView.listNodes( req );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -87,7 +82,9 @@ public class IndexTreeViewTest
     public void testPathIsAboveRealGroup()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/" );
+        TreeViewRequest req =
+            new TreeViewRequest( new DefaultTreeNodeFactory( context.getRepositoryId() ), "/org/", context );
+        TreeNode root = indexTreeView.listNodes( req );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -99,7 +96,9 @@ public class IndexTreeViewTest
     public void testPathIsRealGroup()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/slf4j/" );
+        TreeViewRequest req =
+            new TreeViewRequest( new DefaultTreeNodeFactory( context.getRepositoryId() ), "/org/slf4j/", context );
+        TreeNode root = indexTreeView.listNodes( req );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -111,7 +110,10 @@ public class IndexTreeViewTest
     public void testPathIsRealGroupArtifact()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes( new DefaultTreeNodeFactory( context ), "/org/slf4j/slf4j-log4j12/" );
+        TreeViewRequest req =
+            new TreeViewRequest( new DefaultTreeNodeFactory( context.getRepositoryId() ), "/org/slf4j/slf4j-log4j12/",
+                context );
+        TreeNode root = indexTreeView.listNodes( req );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 
@@ -123,9 +125,10 @@ public class IndexTreeViewTest
     public void testPathIsRealGroupArtifactVersion()
         throws Exception
     {
-        TreeNode root = indexTreeView.listNodes(
-            new DefaultTreeNodeFactory( context ),
-            "/org/slf4j/slf4j-log4j12/1.4.1/" );
+        TreeViewRequest req =
+            new TreeViewRequest( new DefaultTreeNodeFactory( context.getRepositoryId() ),
+                "/org/slf4j/slf4j-log4j12/1.4.1/", context );
+        TreeNode root = indexTreeView.listNodes( req );
 
         int leafsFound = prettyPrint( debug, root, 0 );
 

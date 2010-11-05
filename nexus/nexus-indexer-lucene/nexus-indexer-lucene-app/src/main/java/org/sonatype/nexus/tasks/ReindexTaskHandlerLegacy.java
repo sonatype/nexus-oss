@@ -27,7 +27,6 @@ import org.sonatype.nexus.index.IndexerManager;
 public class ReindexTaskHandlerLegacy
     implements ReindexTaskHandler
 {
-
     @Requirement
     private IndexerManager indexerManager;
 
@@ -55,18 +54,4 @@ public class ReindexTaskHandlerLegacy
     {
         indexerManager.reindexRepository( path, repositoryId, fullReindex );
     }
-
-    /**
-     * Delegates to indexer manager.
-     *
-     * {@inheritDoc}
-     */
-    public void reindexRepositoryGroup( final String repositoryId,
-                                        final String path,
-                                        final boolean fullReindex )
-        throws Exception
-    {
-        indexerManager.reindexRepositoryGroup( path, repositoryId, fullReindex );
-    }
-
 }

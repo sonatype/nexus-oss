@@ -7,7 +7,6 @@
 package org.sonatype.nexus.index.treeview;
 
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode.Type;
 
 /**
@@ -18,49 +17,51 @@ import org.sonatype.nexus.index.treeview.TreeNode.Type;
 public class DefaultTreeNodeFactory
     implements TreeNodeFactory
 {
-    private IndexingContext context;
+    private final String repositoryId;
 
-    public DefaultTreeNodeFactory( IndexingContext ctx )
+    public DefaultTreeNodeFactory( String id )
     {
-        this.context = ctx;
+        this.repositoryId = id;
     }
 
-    public IndexingContext getIndexingContext()
+    public String getRepositoryId()
     {
-        return context;
+        return repositoryId;
     }
 
-    public TreeNode createGNode( IndexTreeView tview, String path, String groupName )
+    public TreeNode createGNode( IndexTreeView tview, TreeViewRequest req, String path, String groupName )
     {
-        TreeNode result = createNode( tview, path, false, groupName, Type.G );
+        TreeNode result = createNode( tview, req, path, false, groupName, Type.G );
 
-        return decorateGNode( tview, path, groupName, result );
+        return decorateGNode( tview, req, path, groupName, result );
     }
 
-    protected TreeNode decorateGNode( IndexTreeView tview, String path, String groupName, TreeNode node )
+    protected TreeNode decorateGNode( IndexTreeView tview, TreeViewRequest req, String path, String groupName,
+                                      TreeNode node )
     {
         return node;
     }
 
-    public TreeNode createANode( IndexTreeView tview, ArtifactInfo ai, String path )
+    public TreeNode createANode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path )
     {
-        TreeNode result = createNode( tview, path, false, ai.artifactId, Type.A );
+        TreeNode result = createNode( tview, req, path, false, ai.artifactId, Type.A );
 
         result.setGroupId( ai.groupId );
 
         result.setArtifactId( ai.artifactId );
 
-        return decorateANode( tview, ai, path, result );
+        return decorateANode( tview, req, ai, path, result );
     }
 
-    protected TreeNode decorateANode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateANode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                      TreeNode node )
     {
         return node;
     }
 
-    public TreeNode createVNode( IndexTreeView tview, ArtifactInfo ai, String path )
+    public TreeNode createVNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path )
     {
-        TreeNode result = createNode( tview, path, false, ai.version, Type.V );
+        TreeNode result = createNode( tview, req, path, false, ai.version, Type.V );
 
         result.setGroupId( ai.groupId );
 
@@ -68,15 +69,16 @@ public class DefaultTreeNodeFactory
 
         result.setVersion( ai.version );
 
-        return decorateVNode( tview, ai, path, result );
+        return decorateVNode( tview, req, ai, path, result );
     }
 
-    protected TreeNode decorateVNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateVNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                      TreeNode node )
     {
         return node;
     }
 
-    public TreeNode createArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path )
+    public TreeNode createArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path )
     {
         StringBuffer sb = new StringBuffer( ai.artifactId ).append( "-" ).append( ai.version );
 
@@ -87,7 +89,7 @@ public class DefaultTreeNodeFactory
 
         sb.append( "." ).append( ai.fextension == null ? "jar" : ai.fextension );
 
-        TreeNode result = createNode( tview, path, true, sb.toString(), Type.artifact );
+        TreeNode result = createNode( tview, req, path, true, sb.toString(), Type.artifact );
 
         result.setGroupId( ai.groupId );
 
@@ -95,17 +97,19 @@ public class DefaultTreeNodeFactory
 
         result.setVersion( ai.version );
 
-        return decorateArtifactNode( tview, ai, path, result );
+        return decorateArtifactNode( tview, req, ai, path, result );
     }
 
-    protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                             TreeNode node )
     {
         return node;
     }
 
-    protected TreeNode createNode( IndexTreeView tview, String path, boolean leaf, String nodeName, Type type )
+    protected TreeNode createNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                   String nodeName, Type type )
     {
-        TreeNode result = instantiateNode( tview, path, leaf, nodeName );
+        TreeNode result = instantiateNode( tview, req, path, leaf, nodeName );
 
         result.setPath( path );
 
@@ -115,14 +119,15 @@ public class DefaultTreeNodeFactory
 
         result.setNodeName( nodeName );
 
-        result.setRepositoryId( getIndexingContext().getRepositoryId() );
+        result.setRepositoryId( getRepositoryId() );
 
         return result;
     }
 
-    protected TreeNode instantiateNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
+    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                        String nodeName )
     {
-        return new DefaultTreeNode( tview, this );
+        return new DefaultTreeNode( tview, req );
     }
 
 }

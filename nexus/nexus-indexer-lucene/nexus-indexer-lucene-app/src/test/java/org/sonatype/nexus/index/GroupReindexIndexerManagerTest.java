@@ -25,7 +25,7 @@ public class GroupReindexIndexerManagerTest
         assertFalse( "No index .gz file should exist.", indexFile.exists() );
         assertFalse( "No incremental chunk should exists.", incrementalIndexFile.exists() );
 
-        indexerManager.reindexRepositoryGroup( null, group.getId(), true );
+        indexerManager.reindexRepository( null, group.getId(), true );
 
         assertTrue( "Index .gz file should exist.", indexFile.exists() );
         assertFalse( "No incremental chunk should exists.", incrementalIndexFile.exists() );
@@ -34,7 +34,7 @@ public class GroupReindexIndexerManagerTest
         File sourceApacheSnapshotsRoot = new File( getBasedir(), "src/test/resources/reposes/apache-snapshots-2" );
         File snapshotsRoot = new File( new URL( snapshots.getLocalUrl() ).toURI() );
         copyDirectory( sourceApacheSnapshotsRoot, snapshotsRoot );
-        indexerManager.reindexRepositoryGroup( null, group.getId(), false );
+        indexerManager.reindexRepository( null, group.getId(), false );
 
         assertTrue( "Index .gz file should exist.", indexFile.exists() );
         assertTrue( "Incremental chunk should exists.", incrementalIndexFile.exists() );

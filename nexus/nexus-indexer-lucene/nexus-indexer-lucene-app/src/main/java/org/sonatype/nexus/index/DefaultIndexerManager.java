@@ -459,9 +459,14 @@ public class DefaultIndexerManager
     public IndexingContext getRepositoryBestIndexContext( String repositoryId )
         throws NoSuchRepositoryException
     {
-        IndexingContext bestContext = getRepositoryLocalIndexContext( repositoryId );
+        return getRepositoryBestIndexContext( repositoryRegistry.getRepository( repositoryId ) );
+    }
 
-        IndexingContext remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+    public IndexingContext getRepositoryBestIndexContext( Repository repository )
+    {
+        IndexingContext bestContext = getRepositoryLocalIndexContext( repository );
+
+        IndexingContext remoteContext = getRepositoryRemoteIndexContext( repository );
 
         if ( remoteContext != null )
         {
@@ -867,21 +872,21 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( repository.isIndexable() )
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
-            reindexRepository( repository, path, fullReindex );
+            GroupRepository groupRepo = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
-            publishRepositoryIndex( repositoryId );
+            reindexRepositoryGroup( groupRepo, path, fullReindex );
         }
-    }
+        else
+        {
+            if ( repository.isIndexable() )
+            {
+                reindexRepository( repository, path, fullReindex );
 
-    public void reindexRepositoryGroup( final String path, final String repositoryGroupId, final boolean fullReindex )
-        throws NoSuchRepositoryException, IOException
-    {
-        GroupRepository groupRepo =
-            repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-
-        reindexRepositoryGroup( groupRepo, path, fullReindex );
+                publishRepositoryIndex( repositoryId );
+            }
+        }
     }
 
     private void reindexRepositoryGroup( final GroupRepository groupRepo, final String path, final boolean fullReindex )
@@ -909,7 +914,7 @@ public class DefaultIndexerManager
                 }
             }
 
-            publishRepositoryGroupIndex( groupRepo.getId() );
+            publishRepositoryGroupIndex( groupRepo );
         }
     }
 
@@ -960,7 +965,7 @@ public class DefaultIndexerManager
                     getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
                     mergeRepositoryGroupIndexWithMember( repository );
                 }
-                publishRepositoryGroupIndex( groupId );
+                publishRepositoryGroupIndex( group );
             }
         }
         finally
@@ -1064,17 +1069,19 @@ public class DefaultIndexerManager
     {
         ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
 
-        if ( repository.isIndexable() && downloadRepositoryIndex( repository ) )
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
-            mergeRepositoryGroupIndexWithMember( repository );
-        }
-    }
+            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
-    public void downloadRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException, NoSuchRepositoryException
-    {
-        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
-        downloadRepositoryGroupIndex( group );
+            downloadRepositoryGroupIndex( group );
+        }
+        else
+        {
+            if ( repository.isIndexable() && downloadRepositoryIndex( repository ) )
+            {
+                mergeRepositoryGroupIndexWithMember( repository );
+            }
+        }
     }
 
     protected void downloadRepositoryGroupIndex( GroupRepository group )
@@ -1425,15 +1432,18 @@ public class DefaultIndexerManager
     public void publishRepositoryIndex( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        publishRepositoryIndex( repositoryRegistry.getRepository( repositoryId ) );
-    }
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-    public void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException, NoSuchRepositoryException
-    {
-        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryGroupId, GroupRepository.class );
+        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
 
-        publishRepositoryGroupIndex( group );
+            publishRepositoryGroupIndex( group );
+        }
+        else
+        {
+            publishRepositoryIndex( repositoryRegistry.getRepository( repositoryId ) );
+        }
     }
 
     protected void publishRepositoryGroupIndex( GroupRepository group )
@@ -1691,15 +1701,60 @@ public class DefaultIndexerManager
     }
 
     // ----------------------------------------------------------------------------
-    // Identify
+    // Optimize
     // ----------------------------------------------------------------------------
 
-    @Deprecated
-    public ArtifactInfo identifyArtifact( String type, String checksum )
+    public void optimizeAllRepositoriesIndex()
         throws IOException
     {
-        return nexusIndexer.identify( type, checksum );
+        List<Repository> repos = repositoryRegistry.getRepositories();
+
+        for ( Repository repository : repos )
+        {
+            optimizeIndex( repository );
+        }
     }
+
+    public void optimizeRepositoryIndex( String repositoryId )
+        throws NoSuchRepositoryException, IOException
+    {
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
+
+        optimizeIndex( repository );
+    }
+
+    protected void optimizeIndex( Repository repo )
+        throws CorruptIndexException, IOException
+    {
+        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        {
+            GroupRepository group = repo.adaptToFacet( GroupRepository.class );
+            for ( Repository member : group.getMemberRepositories() )
+            {
+                optimizeIndex( member );
+            }
+        }
+
+        // local
+        IndexingContext context = getRepositoryLocalIndexContext( repo );
+        if ( context != null )
+        {
+            getLogger().debug( "Optimizing local index context for repository: " + repo.getId() );
+            context.optimize();
+        }
+
+        // remote
+        context = getRepositoryRemoteIndexContext( repo );
+        if ( context != null )
+        {
+            getLogger().debug( "Optimizing remote index context for repository: " + repo.getId() );
+            context.optimize();
+        }
+    }
+
+    // ----------------------------------------------------------------------------
+    // Identify
+    // ----------------------------------------------------------------------------
 
     public ArtifactInfo identifyArtifact( Field field, String data )
         throws IOException
@@ -2164,6 +2219,53 @@ public class DefaultIndexerManager
         return req;
     }
 
+    public IteratorSearchResponse searchQueryIterator( Query query, String repositoryId, Integer from, Integer count,
+                                                       Integer hitLimit, boolean uniqueRGA,
+                                                       List<ArtifactInfoFilter> filters )
+        throws NoSuchRepositoryException
+    {
+        IteratorSearchRequest req = createRequest( query, from, count, hitLimit, uniqueRGA, filters );
+
+        if ( repositoryId != null )
+        {
+            IndexingContext localContext = getRepositoryLocalIndexContext( repositoryId );
+            IndexingContext remoteContext = getRepositoryRemoteIndexContext( repositoryId );
+
+            if ( localContext != null )
+            {
+                req.getContexts().add( localContext );
+            }
+
+            if ( remoteContext != null )
+            {
+                req.getContexts().add( remoteContext );
+            }
+        }
+
+        try
+        {
+            IteratorSearchResponse result = nexusIndexer.searchIterator( req );
+
+            return result;
+        }
+        catch ( BooleanQuery.TooManyClauses e )
+        {
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug( "Too many clauses exception caught:", e );
+            }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + query.toString() + "\"", e );
+
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
+        }
+    }
+
     public IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from,
                                                           Integer count, Integer hitLimit, boolean uniqueRGA,
                                                           SearchType searchType, List<ArtifactInfoFilter> filters )
@@ -2526,44 +2628,30 @@ public class DefaultIndexerManager
     // Query construction
     // ----------------------------------------------------------------------------
 
-    public Query constructQuery( String field, String query )
+    public Query constructQuery( Field field, String query, SearchType type )
     {
-        return nexusIndexer.constructQuery( field, query );
+        return nexusIndexer.constructQuery( field, query, type );
     }
 
     // ----------------------------------------------------------------------------
     // Tree nodes
     // ----------------------------------------------------------------------------
 
-    @Deprecated
-    public TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path )
+    public TreeNode listNodes( final TreeNodeFactory factory, final String path, final String repositoryId )
+        throws NoSuchRepositoryException, IOException
     {
-        try
-        {
-            return indexTreeView.listNodes( factory, path );
-        }
-        catch ( IOException e )
-        {
-            // TODO Auto-generated catch block
-            getLogger().warn( "Error retrieving index nodes", e );
-        }
-
-        return null;
+        return listNodes( factory, path, null, null, repositoryId );
     }
 
-    public TreeNode listNodes( TreeViewRequest request )
+    public TreeNode listNodes( final TreeNodeFactory factory, final String path, final Map<Field, String> hints,
+                               final ArtifactInfoFilter artifactInfoFilter, final String repositoryId )
+        throws NoSuchRepositoryException, IOException
     {
-        try
-        {
-            return indexTreeView.listNodes( request );
-        }
-        catch ( IOException e )
-        {
-            // TODO Auto-generated catch block
-            getLogger().warn( "Error retrieving index nodes", e );
-        }
+        IndexingContext ctx = getRepositoryBestIndexContext( repositoryId );
 
-        return null;
+        TreeViewRequest request = new TreeViewRequest( factory, path, hints, artifactInfoFilter, ctx );
+
+        return indexTreeView.listNodes( request );
     }
 
     // ----------------------------------------------------------------------------
@@ -2678,73 +2766,5 @@ public class DefaultIndexerManager
     private boolean isAlreadyBeingIndexed( Repository repository )
     {
         return isAlreadyBeingIndexed( repository.getId() );
-    }
-
-    public void optimizeRepositoryIndex( String repositoryId )
-        throws IOException
-    {
-        try
-        {
-            optimizeIndex( repositoryRegistry.getRepository( repositoryId ) );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // should never happen
-            getLogger().error( e.getMessage(), e );
-        }
-    }
-
-    public void optimizeGroupIndex( String groupId )
-        throws IOException
-    {
-        try
-        {
-            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
-            optimizeIndex( group );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // should never happen
-            getLogger().error( e.getMessage(), e );
-        }
-    }
-
-    public void optimizeAllRepositoriesIndex()
-        throws IOException
-    {
-        List<Repository> repos = repositoryRegistry.getRepositories();
-        for ( Repository repository : repos )
-        {
-            optimizeIndex( repository );
-        }
-    }
-
-    protected void optimizeIndex( Repository repo )
-        throws CorruptIndexException, IOException
-    {
-        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            GroupRepository group = repo.adaptToFacet( GroupRepository.class );
-            for ( Repository member : group.getMemberRepositories() )
-            {
-                optimizeIndex( member );
-            }
-        }
-
-        // local
-        IndexingContext context = getRepositoryLocalIndexContext( repo );
-        if ( context != null )
-        {
-            getLogger().debug( "Optimizing local index context for repository: " + repo.getId() );
-            context.optimize();
-        }
-
-        // remote
-        context = getRepositoryRemoteIndexContext( repo );
-        if ( context != null )
-        {
-            getLogger().debug( "Optimizing remote index context for repository: " + repo.getId() );
-            context.optimize();
-        }
     }
 }

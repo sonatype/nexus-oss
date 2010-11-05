@@ -16,18 +16,6 @@ import java.io.IOException;
 public interface IndexTreeView
 {
     /**
-     * Returns the TreeNode, as calculated by passed in parameters using index data.
-     * 
-     * @param factory
-     * @param path
-     * @return
-     * @throws IOException
-     * @deprecated Use {{@link #listNodes(TreeViewRequest)}
-     */
-    TreeNode listNodes( TreeNodeFactory factory, String path )
-        throws IOException;
-
-    /**
      * Returns the TreeNode, as calculated by passed in request, using index data.
      * 
      * @param request

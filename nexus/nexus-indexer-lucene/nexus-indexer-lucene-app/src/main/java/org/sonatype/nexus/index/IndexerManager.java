@@ -15,67 +15,73 @@ package org.sonatype.nexus.index;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.lucene.search.Query;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.index.treeview.TreeNodeFactory;
-import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * Nexus facade for NexusIndexer operations.
+ * 
+ * @author cstamas
+ */
 public interface IndexerManager
 {
+    // ----------------------------------------------------------------------------
+    // Config management et al
+    // ----------------------------------------------------------------------------
+
+    /**
+     * Shutdown of Indexer, with cleanup. It remove index files if needed.
+     * 
+     * @param deleteFile set to true if you want to completely remove index files.
+     */
+    void shutdown( boolean deleteFiles )
+        throws IOException;
+
+    /**
+     * Resets the configuration of Indexer, forcing it to renew it's values.
+     */
+    void resetConfiguration();
+
     // ----------------------------------------------------------------------------
     // Context management et al
     // ----------------------------------------------------------------------------
 
-    void shutdown( boolean deleteFiles )
-        throws IOException;
-
-    void resetConfiguration();
-
+    /**
+     * Adds a new IndexContext for repository.
+     * 
+     * @param repositoryId
+     * @throws IOException
+     * @throws NoSuchRepositoryException
+     */
     void addRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException;
 
+    /**
+     * Removes an IndexContext for repository.
+     * 
+     * @param repositoryId
+     * @param deleteFiles
+     * @throws IOException
+     * @throws NoSuchRepositoryException
+     */
     void removeRepositoryIndexContext( String repositoryId, boolean deleteFiles )
         throws IOException, NoSuchRepositoryException;
 
+    /**
+     * Updates an IndexContext for repository.
+     * 
+     * @param repositoryId
+     * @throws IOException
+     * @throws NoSuchRepositoryException
+     */
     void updateRepositoryIndexContext( String repositoryId )
         throws IOException, NoSuchRepositoryException;
-
-    /**
-     * Returns the local index (the true index for hosted ones, and the true cacheds index for proxy reposes). Every
-     * repo has local index.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryLocalIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
-
-    /**
-     * Returns the remote index. Only proxy repositories have remote index, otherwise null is returnded.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryRemoteIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
-
-    /**
-     * Returns the "best" indexing context. If it has remoteIndex, and it is bigger then local, remote is considered
-     * "best", otherwise local.
-     * 
-     * @param repositoryId
-     * @return
-     * @throws NoSuchRepositoryException
-     */
-    IndexingContext getRepositoryBestIndexContext( String repositoryId )
-        throws NoSuchRepositoryException;
 
     /**
      * Flags an indexing context should be searched in global searches or not.
@@ -89,19 +95,26 @@ public interface IndexerManager
         throws IOException, NoSuchRepositoryException;
 
     // ----------------------------------------------------------------------------
-    // Publish the used NexusIndexer
-    // ----------------------------------------------------------------------------
-
-    @Deprecated
-    NexusIndexer getNexusIndexer();
-
-    // ----------------------------------------------------------------------------
     // adding/removing on the fly
     // ----------------------------------------------------------------------------
 
+    /**
+     * Adds an item to index.
+     * 
+     * @param repository
+     * @param item
+     * @throws IOException
+     */
     void addItemToIndex( Repository repository, StorageItem item )
         throws IOException;
 
+    /**
+     * Removes single item from index.
+     * 
+     * @param repository
+     * @param item
+     * @throws IOException
+     */
     void removeItemFromIndex( Repository repository, StorageItem item )
         throws IOException;
 
@@ -113,9 +126,6 @@ public interface IndexerManager
         throws IOException;
 
     void reindexRepository( String path, String repositoryId, boolean fullReindex )
-        throws NoSuchRepositoryException, IOException;
-
-    void reindexRepositoryGroup( String path, String repositoryGroupId, boolean fullReindex )
         throws NoSuchRepositoryException, IOException;
 
     void resetGroupIndex( String groupId, boolean purgeOnly )
@@ -131,9 +141,6 @@ public interface IndexerManager
     void downloadRepositoryIndex( String repositoryId )
         throws IOException, NoSuchRepositoryException;
 
-    void downloadRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException, NoSuchRepositoryException;
-
     // ----------------------------------------------------------------------------
     // Publishing index (will do publish only)
     // ----------------------------------------------------------------------------
@@ -144,16 +151,19 @@ public interface IndexerManager
     void publishRepositoryIndex( String repositoryId )
         throws IOException, NoSuchRepositoryException;
 
-    void publishRepositoryGroupIndex( String repositoryGroupId )
-        throws IOException, NoSuchRepositoryException;
+    // ----------------------------------------------------------------------------
+    // Optimizing index
+    // ----------------------------------------------------------------------------
+
+    void optimizeAllRepositoriesIndex()
+        throws IOException;
+
+    void optimizeRepositoryIndex( String repositoryId )
+        throws NoSuchRepositoryException, IOException;
 
     // ----------------------------------------------------------------------------
     // Identify
     // ----------------------------------------------------------------------------
-
-    @Deprecated
-    ArtifactInfo identifyArtifact( String type, String checksum )
-        throws IOException;
 
     ArtifactInfo identifyArtifact( Field field, String data )
         throws IOException;
@@ -175,6 +185,10 @@ public interface IndexerManager
     @Deprecated
     FlatSearchResponse searchArtifactFlat( String gTerm, String aTerm, String vTerm, String pTerm, String cTerm,
                                            String repositoryId, Integer from, Integer count, Integer hitLimit )
+        throws NoSuchRepositoryException;
+
+    IteratorSearchResponse searchQueryIterator( Query query, String repositoryId, Integer from, Integer count,
+                                                Integer hitLimit, boolean uniqueRGA, List<ArtifactInfoFilter> filters )
         throws NoSuchRepositoryException;
 
     IteratorSearchResponse searchArtifactIterator( String term, String repositoryId, Integer from, Integer count,
@@ -202,26 +216,16 @@ public interface IndexerManager
     // Query construction
     // ----------------------------------------------------------------------------
 
-    Query constructQuery( String field, String query );
+    Query constructQuery( Field field, String query, SearchType type );
 
     // ----------------------------------------------------------------------------
     // Tree nodes
     // ----------------------------------------------------------------------------
 
-    /**
-     * @deprecated Use {@link #listNodes(TreeViewRequest) instead.
-     */
-    TreeNode listNodes( TreeNodeFactory factory, Repository repository, String path );
+    TreeNode listNodes( final TreeNodeFactory factory, final String path, final String repositoryId )
+        throws NoSuchRepositoryException, IOException;
 
-    TreeNode listNodes( TreeViewRequest request );
-
-    void optimizeRepositoryIndex( String repositoryId )
-        throws IOException;;
-
-    void optimizeGroupIndex( String groupId )
-        throws IOException;
-
-    void optimizeAllRepositoriesIndex()
-        throws IOException;;
-
+    TreeNode listNodes( final TreeNodeFactory factory, final String path, final Map<Field, String> hints,
+                        final ArtifactInfoFilter artifactInfoFilter, final String repositoryId )
+        throws NoSuchRepositoryException, IOException;
 }

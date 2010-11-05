@@ -3,11 +3,13 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;
 import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 
@@ -36,14 +38,28 @@ public abstract class AbstractIndexerManagerTest
     protected void searchFor( String groupId, int expected )
         throws IOException
     {
-        Query query = indexerManager.getNexusIndexer().constructQuery( ArtifactInfo.GROUP_ID, groupId );
-        FlatSearchRequest request = new FlatSearchRequest( query );
+        Query query = indexerManager.constructQuery( MAVEN.GROUP_ID, groupId, SearchType.EXACT );
 
-        FlatSearchResponse response = indexerManager.getNexusIndexer().searchFlat( request );
+        IteratorSearchResponse response;
 
-        Collection<ArtifactInfo> result = response.getResults();
+        try
+        {
+            response = indexerManager.searchQueryIterator( query, null, null, null, null, false, null );
+        }
+        catch ( NoSuchRepositoryException e )
+        {
+            // will not happen since we are not selecting a repo to search
+            throw new IOException( "Huh?" );
+        }
 
-        assertEquals( result.toString(), expected, result.size() );
+        ArrayList<ArtifactInfo> results = new ArrayList<ArtifactInfo>( response.getTotalHits() );
+
+        for ( ArtifactInfo hit : response )
+        {
+            results.add( hit );
+        }
+
+        assertEquals( "Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size() );
     }
 
     protected IteratorSearchResponse searchForKeywordNG( String term, int expected )
@@ -83,7 +99,8 @@ public abstract class AbstractIndexerManagerTest
     protected void assertTemporatyContexts( final Repository repo )
         throws Exception
     {
-        IndexingContext context = indexerManager.getRepositoryLocalIndexContext( repo.getId() );
+        IndexingContext context =
+            ( (DefaultIndexerManager) indexerManager ).getRepositoryLocalIndexContext( repo.getId() );
         File dir = context.getIndexDirectoryFile().getParentFile();
 
         File[] contextDirs = dir.listFiles( new FilenameFilter()

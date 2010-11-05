@@ -66,9 +66,9 @@ public class DefaultMergedTreeNode
      * @param tview
      * @param factory
      */
-    public DefaultMergedTreeNode( IndexTreeView tview, TreeNodeFactory factory )
+    public DefaultMergedTreeNode( IndexTreeView tview, TreeViewRequest request )
     {
-        super( tview, factory );
+        super( tview, request );
     }
 
     /**

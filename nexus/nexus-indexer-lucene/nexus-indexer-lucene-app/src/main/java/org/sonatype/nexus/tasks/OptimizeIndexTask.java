@@ -50,7 +50,7 @@ public class OptimizeIndexTask
         }
         else if ( getRepositoryGroupId() != null )
         {
-            indexManager.optimizeGroupIndex( getRepositoryGroupId() );
+            indexManager.optimizeRepositoryIndex( getRepositoryGroupId() );
         }
         else
         {

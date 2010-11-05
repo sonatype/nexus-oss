@@ -52,7 +52,7 @@ public abstract class AbstractIndexerTask
             }
             else if ( getRepositoryGroupId() != null )
             {
-                handler.reindexRepositoryGroup( getRepositoryGroupId(), getResourceStorePath(), fullReindex );
+                handler.reindexRepository( getRepositoryGroupId(), getResourceStorePath(), fullReindex );
             }
             else
             {

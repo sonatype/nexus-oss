@@ -53,7 +53,7 @@ public class PublishIndexesTask
             }
             else if ( getRepositoryGroupId() != null )
             {
-                indexerManager.publishRepositoryGroupIndex( getRepositoryGroupId() );
+                indexerManager.publishRepositoryIndex( getRepositoryGroupId() );
             }
             else
             {

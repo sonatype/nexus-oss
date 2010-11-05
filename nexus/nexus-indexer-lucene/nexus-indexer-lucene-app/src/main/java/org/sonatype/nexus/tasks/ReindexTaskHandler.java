@@ -17,20 +17,15 @@ import org.sonatype.plugin.ExtensionPoint;
 
 /**
  * Performs the actual reindexing.
- *
+ * 
  * @author Alin Dreghiciu
  */
 @ExtensionPoint
 public interface ReindexTaskHandler
 {
-
     public void reindexAllRepositories( String path, boolean fullReindex )
-        throws Exception;
-
-    public void reindexRepositoryGroup( String repositoryId, String path, boolean fullReindex )
         throws Exception;
 
     public void reindexRepository( String repositoryId, String path, boolean fullReindex )
         throws Exception;
-
 }

@@ -2,7 +2,7 @@ package org.sonatype.nexus.rest.indextreeview;
 
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNode;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
-import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.sonatype.nexus.index.treeview.TreeViewRequest;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -44,9 +44,9 @@ public class IndexBrowserTreeNode
      * @param tview
      * @param factory
      */
-    public IndexBrowserTreeNode( IndexTreeView tview, TreeNodeFactory factory )
+    public IndexBrowserTreeNode( IndexTreeView tview, TreeViewRequest request )
     {
-        super( tview, factory );
+        super( tview, request );
     }
     
     /**

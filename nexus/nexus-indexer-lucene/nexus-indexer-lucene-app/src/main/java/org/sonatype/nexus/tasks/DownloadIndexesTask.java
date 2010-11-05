@@ -53,7 +53,7 @@ public class DownloadIndexesTask
             }
             else if ( getRepositoryGroupId() != null )
             {
-                indexerManager.downloadRepositoryGroupIndex( getRepositoryGroupId() );
+                indexerManager.downloadRepositoryIndex( getRepositoryGroupId() );
             }
             else
             {

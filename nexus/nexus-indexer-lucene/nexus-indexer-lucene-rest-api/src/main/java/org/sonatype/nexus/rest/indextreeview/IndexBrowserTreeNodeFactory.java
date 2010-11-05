@@ -2,28 +2,29 @@ package org.sonatype.nexus.rest.indextreeview;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory;
 import org.sonatype.nexus.index.treeview.IndexTreeView;
 import org.sonatype.nexus.index.treeview.TreeNode;
+import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class IndexBrowserTreeNodeFactory
     extends DefaultMergedTreeNodeFactory
 {
     private String baseLinkUrl;
-    
-    public IndexBrowserTreeNodeFactory( IndexingContext ctx, Repository repository, String baseLinkUrl )
+
+    public IndexBrowserTreeNodeFactory( Repository repository, String baseLinkUrl )
     {
-        super( ctx, repository );
+        super( repository );
         this.baseLinkUrl = baseLinkUrl;
     }
 
     @Override
-    protected TreeNode decorateArtifactNode( IndexTreeView tview, ArtifactInfo ai, String path, TreeNode node )
+    protected TreeNode decorateArtifactNode( IndexTreeView tview, TreeViewRequest req, ArtifactInfo ai, String path,
+                                             TreeNode node )
     {
-        IndexBrowserTreeNode iNode = ( IndexBrowserTreeNode ) super.decorateArtifactNode( tview, ai, path, node );
-        
+        IndexBrowserTreeNode iNode = (IndexBrowserTreeNode) super.decorateArtifactNode( tview, req, ai, path, node );
+
         iNode.setClassifier( ai.classifier );
         iNode.setExtension( ai.fextension );
         iNode.setPackaging( ai.packaging );
@@ -34,19 +35,19 @@ public class IndexBrowserTreeNodeFactory
     }
 
     @Override
-    protected TreeNode instantiateNode( IndexTreeView tview, String path, boolean leaf, String nodeName )
+    protected TreeNode instantiateNode( IndexTreeView tview, TreeViewRequest req, String path, boolean leaf,
+                                        String nodeName )
     {
-        return new IndexBrowserTreeNode( tview, this );
+        return new IndexBrowserTreeNode( tview, req );
     }
-    
+
     protected String buildArtifactUri( IndexBrowserTreeNode node )
     {
-        if ( StringUtils.isEmpty( node.getPackaging() ) 
-            || "pom".equals( node.getPackaging() ) )
+        if ( StringUtils.isEmpty( node.getPackaging() ) || "pom".equals( node.getPackaging() ) )
         {
             return "";
         }
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append( "?r=" );
         sb.append( node.getRepositoryId() );
@@ -57,18 +58,18 @@ public class IndexBrowserTreeNodeFactory
         sb.append( "&v=" );
         sb.append( node.getVersion() );
         sb.append( "&p=" );
-        sb.append(  node.getPackaging() );
+        sb.append( node.getPackaging() );
 
         return this.baseLinkUrl + sb.toString();
     }
-    
+
     protected String buildPomUri( IndexBrowserTreeNode node )
     {
         if ( StringUtils.isNotEmpty( node.getClassifier() ) )
         {
             return "";
         }
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append( "?r=" );
         sb.append( node.getRepositoryId() );

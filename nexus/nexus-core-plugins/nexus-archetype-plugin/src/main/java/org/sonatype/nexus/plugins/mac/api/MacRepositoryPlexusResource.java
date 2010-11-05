@@ -17,6 +17,7 @@ import org.restlet.resource.StringRepresentation;
 import org.restlet.resource.Variant;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexArtifactFilter;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
@@ -131,9 +132,10 @@ public class MacRepositoryPlexusResource
             } );
 
             // get the catalog
+            // TODO: This is wrong, see the cast below! This has to change (cstamas) to not expose ctx directly!
             ArchetypeCatalog catalog =
                 getMacPlugin().listArcherypesAsCatalog( req,
-                    indexerManager.getRepositoryBestIndexContext( req.getRepositoryId() ) );
+                    ( (DefaultIndexerManager) indexerManager ).getRepositoryBestIndexContext( repository ) );
 
             // serialize it to XML
             ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
@@ -146,7 +148,7 @@ public class MacRepositoryPlexusResource
         }
         catch ( NoSuchRepositoryException e )
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, e.getMessage(), e );
         }
         catch ( IOException e )
         {

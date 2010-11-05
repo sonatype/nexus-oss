@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
 import org.sonatype.nexus.index.Field;
 import org.sonatype.nexus.index.MAVEN;
+import org.sonatype.nexus.index.context.IndexingContext;
 
 public class TreeViewRequest
 {
@@ -17,12 +18,15 @@ public class TreeViewRequest
 
     private final Map<Field, String> fieldHints;
 
-    public TreeViewRequest( TreeNodeFactory factory, String path )
+    private final IndexingContext indexingContext;
+
+    public TreeViewRequest( final TreeNodeFactory factory, final String path, final IndexingContext ctx )
     {
-        this( factory, path, null, null );
+        this( factory, path, null, null, ctx );
     }
 
-    public TreeViewRequest( TreeNodeFactory factory, String path, Map<Field, String> hints, ArtifactInfoFilter artifactInfoFilter )
+    public TreeViewRequest( final TreeNodeFactory factory, final String path, final Map<Field, String> hints,
+                            final ArtifactInfoFilter artifactInfoFilter, final IndexingContext ctx )
     {
         this.factory = factory;
 
@@ -34,8 +38,10 @@ public class TreeViewRequest
         {
             this.fieldHints.putAll( hints );
         }
-        
+
         this.artifactInfoFilter = artifactInfoFilter;
+
+        this.indexingContext = ctx;
     }
 
     public TreeNodeFactory getFactory()
@@ -84,5 +90,15 @@ public class TreeViewRequest
     public String getFieldHint( Field field )
     {
         return fieldHints.get( field );
+    }
+    
+    public Map<Field, String> getFieldHints()
+    {
+        return fieldHints;
+    }
+
+    public IndexingContext getIndexingContext()
+    {
+        return indexingContext;
     }
 }

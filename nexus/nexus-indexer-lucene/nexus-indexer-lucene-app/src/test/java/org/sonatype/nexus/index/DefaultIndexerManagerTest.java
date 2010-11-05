@@ -46,9 +46,9 @@ public class DefaultIndexerManagerTest
     {
         fillInRepo();
 
-        indexerManager.reindexAllRepositories( "/", false );
+        indexerManager.reindexAllRepositories( "/", true );
 
-        searchFor( "org.sonatype.nexus", 9 );
+        searchFor( "org.sonatype.nexus", 10 );
 
         assertTemporatyContexts( releases );
     }
@@ -58,7 +58,7 @@ public class DefaultIndexerManagerTest
     {
         fillInRepo();
 
-        indexerManager.reindexAllRepositories( "/", false );
+        indexerManager.reindexAllRepositories( "/", true );
 
         searchForKeywordNG( "org.sonatype.nexus", 10 );
 
@@ -70,7 +70,7 @@ public class DefaultIndexerManagerTest
     {
         fillInRepo();
 
-        indexerManager.reindexAllRepositories( "/", false );
+        indexerManager.reindexAllRepositories( "/", true );
 
         // org.sonatype.nexus : nexus-indexer : 1.0-beta-4
         // sha1: 86e12071021fa0be4ec809d4d2e08f07b80d4877

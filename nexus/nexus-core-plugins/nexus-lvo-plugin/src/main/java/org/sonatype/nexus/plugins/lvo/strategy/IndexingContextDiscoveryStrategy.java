@@ -1,16 +1,17 @@
 package org.sonatype.nexus.plugins.lvo.strategy;
 
 import java.io.IOException;
+import java.util.TreeSet;
 
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.FlatSearchRequest;
-import org.sonatype.nexus.index.FlatSearchResponse;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.sonatype.nexus.index.IteratorSearchResponse;
+import org.sonatype.nexus.index.MAVEN;
+import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;
@@ -35,28 +36,26 @@ public class IndexingContextDiscoveryStrategy
     {
         CLvoKey info = req.getLvoKey();
 
-        IndexingContext localContext = indexerManager.getRepositoryLocalIndexContext( info.getRepositoryId() );
-        IndexingContext remoteContext = indexerManager.getRepositoryRemoteIndexContext( info.getRepositoryId() );
-
         BooleanQuery bq = new BooleanQuery();
-        bq.add( indexerManager.constructQuery( ArtifactInfo.GROUP_ID, info.getGroupId() ), Occur.MUST );
-        bq.add( indexerManager.constructQuery( ArtifactInfo.ARTIFACT_ID, info.getArtifactId() ), Occur.MUST );
+        bq.add( indexerManager.constructQuery( MAVEN.GROUP_ID, info.getGroupId(), SearchType.EXACT ), Occur.MUST );
+        bq.add( indexerManager.constructQuery( MAVEN.ARTIFACT_ID, info.getArtifactId(), SearchType.EXACT ), Occur.MUST );
 
-        // to have sorted results by version in descending order
-        FlatSearchRequest sreq = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        IteratorSearchResponse hits =
+            indexerManager.searchQueryIterator( bq, info.getRepositoryId(), null, null, null, false, null );
 
-        sreq.getContexts().add( localContext );
+        TreeSet<ArtifactInfo> sortedResults = new TreeSet<ArtifactInfo>( ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
 
-        sreq.getContexts().add( remoteContext );
-
-        FlatSearchResponse hits = indexerManager.getNexusIndexer().searchFlat( sreq );
+        for ( ArtifactInfo hit : hits )
+        {
+            sortedResults.add( hit );
+        }
 
         DiscoveryResponse response = new DiscoveryResponse( req );
 
         if ( hits.getTotalHits() > 0 )
         {
-            // found it, they are sorted in descending order, so the 1st one is the newest
-            response.setVersion( hits.getResults().iterator().next().version );
+            // found it, they are sorted in ascending order, so the last one is the newest
+            response.setVersion( sortedResults.last().version );
 
             response.setSuccessful( true );
         }

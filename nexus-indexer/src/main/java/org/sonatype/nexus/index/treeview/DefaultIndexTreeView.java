@@ -41,13 +41,6 @@ public class DefaultIndexTreeView
         return nexusIndexer;
     }
 
-    @Deprecated
-    public TreeNode listNodes( TreeNodeFactory factory, String path )
-        throws IOException
-    {
-        return listNodes( new TreeViewRequest( factory, path ) );
-    }
-
     public TreeNode listNodes( TreeViewRequest request )
         throws IOException
     {
@@ -81,7 +74,7 @@ public class DefaultIndexTreeView
         }
 
         // the root node depends on request we have, so let's see
-        TreeNode result = request.getFactory().createGNode( this, request.getPath(), name );
+        TreeNode result = request.getFactory().createGNode( this, request, request.getPath(), name );
 
         if ( request.hasFieldHints() )
         {
@@ -93,20 +86,20 @@ public class DefaultIndexTreeView
             if ( "/".equals( request.getPath() ) )
             {
                 // get root groups and finish
-                Set<String> rootGroups = request.getFactory().getIndexingContext().getRootGroups();
+                Set<String> rootGroups = request.getIndexingContext().getRootGroups();
 
                 for ( String group : rootGroups )
                 {
                     if ( group.length() > 0 )
                     {
                         result.getChildren().add(
-                            request.getFactory().createGNode( this, request.getPath() + group + "/", group ) );
+                            request.getFactory().createGNode( this, request, request.getPath() + group + "/", group ) );
                     }
                 }
             }
             else
             {
-                Set<String> allGroups = request.getFactory().getIndexingContext().getAllGroups();
+                Set<String> allGroups = request.getIndexingContext().getAllGroups();
 
                 listChildren( result, request, allGroups );
             }
@@ -181,7 +174,7 @@ public class DefaultIndexTreeView
                                     partialGroupId.lastIndexOf( '.' ) + 1, partialGroupId.length() ) : partialGroupId;
 
                             groupResource =
-                                request.getFactory().createGNode( this,
+                                request.getFactory().createGNode( this, request,
                                     "/" + partialGroupId.replaceAll( "\\.", "/" ) + "/", gNodeName );
 
                             groupParentResource.getChildren().add( groupResource );
@@ -203,14 +196,15 @@ public class DefaultIndexTreeView
                     }
 
                     artifactResource =
-                        request.getFactory().createANode( this, ai, getPathForAi( ai, MAVEN.ARTIFACT_ID ) );
+                        request.getFactory().createANode( this, request, ai, getPathForAi( ai, MAVEN.ARTIFACT_ID ) );
 
                     groupParentResource.getChildren().add( artifactResource );
 
                     folders.put( artifactKey, artifactResource );
                 }
 
-                versionResource = request.getFactory().createVNode( this, ai, getPathForAi( ai, MAVEN.VERSION ) );
+                versionResource =
+                    request.getFactory().createVNode( this, request, ai, getPathForAi( ai, MAVEN.VERSION ) );
 
                 artifactResource.getChildren().add( versionResource );
 
@@ -219,7 +213,7 @@ public class DefaultIndexTreeView
 
             String nodePath = getPathForAi( ai, null );
 
-            versionResource.getChildren().add( request.getFactory().createArtifactNode( this, ai, nodePath ) );
+            versionResource.getChildren().add( request.getFactory().createArtifactNode( this, request, ai, nodePath ) );
         }
 
         if ( !request.hasFieldHints() )
@@ -232,7 +226,7 @@ public class DefaultIndexTreeView
 
                 if ( groupResource == null )
                 {
-                    groupResource = request.getFactory().createGNode( this, path + group + "/", group );
+                    groupResource = request.getFactory().createGNode( this, request, path + group + "/", group );
 
                     root.getChildren().add( groupResource );
                 }
@@ -498,7 +492,7 @@ public class DefaultIndexTreeView
 
         IteratorSearchRequest searchRequest = new IteratorSearchRequest( q, request.getArtifactInfoFilter() );
 
-        searchRequest.getContexts().add( request.getFactory().getIndexingContext() );
+        searchRequest.getContexts().add( request.getIndexingContext() );
 
         IteratorSearchResponse result = getNexusIndexer().searchIterator( searchRequest );
 

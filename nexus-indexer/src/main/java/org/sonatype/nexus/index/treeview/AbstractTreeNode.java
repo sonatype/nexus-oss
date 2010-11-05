@@ -65,7 +65,7 @@ public abstract class AbstractTreeNode
 
     private transient final IndexTreeView treeView;
 
-    private transient final TreeNodeFactory factory;
+    private transient final TreeViewRequest request;
 
     /**
      * Constructor that takes an IndexTreeView implmentation and a TreeNodeFactory implementation;
@@ -73,11 +73,11 @@ public abstract class AbstractTreeNode
      * @param tview
      * @param factory
      */
-    public AbstractTreeNode( IndexTreeView tview, TreeNodeFactory factory )
+    public AbstractTreeNode( IndexTreeView tview, TreeViewRequest request )
     {
         this.treeView = tview;
 
-        this.factory = factory;
+        this.request = request;
     }
 
     /**
@@ -268,7 +268,10 @@ public abstract class AbstractTreeNode
     {
         if ( !isLeaf() && getChildren().isEmpty() && !isLeaf() )
         {
-            children = treeView.listNodes( new TreeViewRequest( factory, getPath() ) ).getChildren();
+            children =
+                treeView.listNodes(
+                    new TreeViewRequest( request.getFactory(), getPath(), request.getFieldHints(),
+                        request.getArtifactInfoFilter(), request.getIndexingContext() ) ).getChildren();
         }
 
         return children;

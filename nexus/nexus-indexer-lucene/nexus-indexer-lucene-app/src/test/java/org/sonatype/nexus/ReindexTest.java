@@ -26,7 +26,9 @@ import org.apache.lucene.store.FSDirectory;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.index.ArtifactInfo;
+import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexerManager;
+import org.sonatype.nexus.index.MAVEN;
 import org.sonatype.nexus.index.NexusIndexer;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.packer.IndexPacker;
@@ -85,7 +87,7 @@ public class ReindexTest
         central.setDownloadRemoteIndexes( true );
 
         nexusConfiguration.saveConfiguration();
-        
+
         waitForTasksToStop();
     }
 
@@ -129,7 +131,7 @@ public class ReindexTest
                         doc.removeFields( ArtifactInfo.LAST_MODIFIED );
 
                         doc.add( new Field( ArtifactInfo.LAST_MODIFIED, Long.toString( lm ), Field.Store.YES,
-                                            Field.Index.NO ) );
+                            Field.Index.NO ) );
 
                         iw.updateDocument( new Term( ArtifactInfo.UINFO, doc.get( ArtifactInfo.UINFO ) ), doc );
                     }
@@ -154,7 +156,7 @@ public class ReindexTest
 
     /**
      * Will reindex, shift if needed and publish indexes for a "remote" repository (published over jetty component).
-     *
+     * 
      * @param repositoryRoot
      * @param repositoryId
      * @param deleteIndexFiles
@@ -169,10 +171,9 @@ public class ReindexTest
 
         Directory directory = FSDirectory.getDirectory( indexDirectory );
 
-
         IndexingContext ctx =
             nexusIndexer.addIndexingContextForced( repositoryId + "-temp", repositoryId, repositoryRoot, directory,
-                                                   null, null, new IndexCreatorHelper( getContainer() ).getFullCreators() );
+                null, null, new IndexCreatorHelper( getContainer() ).getFullCreators() );
 
         // shifting if needed (very crude way to do it, but heh)
         shiftContextInTime( ctx, shiftDays );
@@ -200,7 +201,7 @@ public class ReindexTest
                                               String version )
         throws Exception
     {
-        ArtifactInfo ai = indexerManager.identifyArtifact( ArtifactInfo.SHA1, sha1Hash );
+        ArtifactInfo ai = indexerManager.identifyArtifact( MAVEN.SHA1, sha1Hash );
 
         if ( shouldBePresent )
         {
@@ -224,7 +225,7 @@ public class ReindexTest
         indexerManager.reindexRepository( null, "releases", true );
 
         validateIndexWithIdentify( true, "86e12071021fa0be4ec809d4d2e08f07b80d4877", "org.sonatype.nexus",
-                                   "nexus-indexer", "1.0-beta-4" );
+            "nexus-indexer", "1.0-beta-4" );
     }
 
     public void testProxyRepositoryReindex()
@@ -253,7 +254,7 @@ public class ReindexTest
             + "/central/" );
 
         // central is member of public group
-        indexerManager.reindexRepositoryGroup( null, "public", true );
+        indexerManager.reindexRepository( null, "public", true );
 
         validateIndexWithIdentify( true, "057b8740427ee6d7b0b60792751356cad17dc0d9", "log4j", "log4j", "1.2.12" );
     }
@@ -279,7 +280,7 @@ public class ReindexTest
 
         // day 2 (1 day passed), so shift both ctxes "in time"
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc2" ), "central", false, -1 );
-        shiftContextInTime( indexerManager.getRepositoryRemoteIndexContext( "central" ), -1 );
+        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryRemoteIndexContext( "central" ), -1 );
 
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc2/" );
@@ -296,7 +297,7 @@ public class ReindexTest
 
         // day 3
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc3" ), "central", false, -1 );
-        shiftContextInTime( indexerManager.getRepositoryRemoteIndexContext( "central" ), -1 );
+        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryRemoteIndexContext( "central" ), -1 );
 
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc3/" );

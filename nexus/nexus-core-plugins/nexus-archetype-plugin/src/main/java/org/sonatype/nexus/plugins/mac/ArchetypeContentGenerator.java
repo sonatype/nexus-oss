@@ -10,13 +10,13 @@ import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
 import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexArtifactFilter;
 import org.sonatype.nexus.index.IndexerManager;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -64,9 +64,10 @@ public class ArchetypeContentGenerator
             } );
 
             // get the catalog
+            // TODO: This is wrong, see the cast below! This has to change (cstamas) to not expose ctx directly!
             ArchetypeCatalog catalog =
                 macPlugin.listArcherypesAsCatalog( req,
-                    indexerManager.getRepositoryBestIndexContext( repository.getId() ) );
+                   ((DefaultIndexerManager) indexerManager).getRepositoryBestIndexContext( repository ) );
 
             // serialize it to XML
             StringWriter sw = new StringWriter();
@@ -81,12 +82,6 @@ public class ArchetypeContentGenerator
         }
         catch ( IOException e )
         {
-            throw new LocalStorageException( "Could not generate the catalog for repository ID='" + repository.getId()
-                + "'!", e );
-        }
-        catch ( NoSuchRepositoryException e )
-        {
-            // wtf?
             throw new LocalStorageException( "Could not generate the catalog for repository ID='" + repository.getId()
                 + "'!", e );
         }
