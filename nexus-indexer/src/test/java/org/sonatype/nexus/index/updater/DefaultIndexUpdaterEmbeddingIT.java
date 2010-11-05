@@ -17,7 +17,6 @@ import org.sonatype.nexus.index.context.DefaultIndexingContext;
 import org.sonatype.nexus.index.context.IndexCreator;
 import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
-import org.sonatype.nexus.index.updater.WagonHelper.WagonFetcher;
 import org.sonatype.nexus.index.updater.fixtures.ServerTestFixture;
 import org.sonatype.nexus.index.updater.fixtures.TransferListenerFixture;
 
@@ -45,10 +44,9 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(), null,
-                null ) );
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(), null,
+                    null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -75,18 +73,17 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "protected/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
-                new AuthenticationInfo()
-                {
-                    private static final long serialVersionUID = 1L;
-
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                    new AuthenticationInfo()
                     {
-                        setUserName( "user" );
-                        setPassword( "password" );
-                    }
-                }, null ) );
+                        private static final long serialVersionUID = 1L;
+
+                        {
+                            setUserName( "user" );
+                            setPassword( "password" );
+                        }
+                    }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -113,18 +110,17 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "protected/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
-                new AuthenticationInfo()
-                {
-                    private static final long serialVersionUID = 1L;
-
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                    new AuthenticationInfo()
                     {
-                        setUserName( "longuser" );
-                        setPassword( ServerTestFixture.LONG_PASSWORD );
-                    }
-                }, null ) );
+                        private static final long serialVersionUID = 1L;
+
+                        {
+                            setUserName( "longuser" );
+                            setPassword( ServerTestFixture.LONG_PASSWORD );
+                        }
+                    }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -151,18 +147,17 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
-                new AuthenticationInfo()
-                {
-                    private static final long serialVersionUID = 1L;
-
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture(),
+                    new AuthenticationInfo()
                     {
-                        setUserName( "user" );
-                        setPassword( "password" );
-                    }
-                }, null ) );
+                        private static final long serialVersionUID = 1L;
+
+                        {
+                            setUserName( "user" );
+                            setPassword( "password" );
+                        }
+                    }, null ) );
 
             updater.fetchAndUpdateIndex( updateRequest );
         }
@@ -190,25 +185,22 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            WagonFetcher wf = wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
                 {
-                }
-            }, new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
-
+                    @Override
+                    public void transferError( final TransferEvent transferEvent )
+                    {
+                    }
+                }, new AuthenticationInfo()
                 {
-                    setUserName( "user" );
-                    setPassword( "password" );
-                }
-            }, null );
+                    private static final long serialVersionUID = 1L;
 
-            updateRequest.setResourceFetcher( wf );
+                    {
+                        setUserName( "user" );
+                        setPassword( "password" );
+                    }
+                }, null ) );
 
             // ResourceFetcher fetcher =
             // new JettyResourceFetcher().setConnectionTimeoutMillis( 100 ).setAuthenticationInfo(
@@ -248,23 +240,22 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "slow/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
                 {
-                }
-            }, new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
-
+                    @Override
+                    public void transferError( final TransferEvent transferEvent )
+                    {
+                    }
+                }, new AuthenticationInfo()
                 {
-                    setUserName( "user" );
-                    setPassword( "password" );
-                }
-            }, null ) );
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setUserName( "user" );
+                        setPassword( "password" );
+                    }
+                }, null ) );
 
             // ResourceFetcher fetcher =
             // new JettyResourceFetcher().setTransactionTimeoutMillis( 100 ).setAuthenticationInfo(
@@ -303,15 +294,14 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, baseUrl + "redirect-trap/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
                 {
-                }
-            }, null, null ) );
+                    @Override
+                    public void transferError( final TransferEvent transferEvent )
+                    {
+                    }
+                }, null, null ) );
 
             try
             {
@@ -346,23 +336,22 @@ public class DefaultIndexUpdaterEmbeddingIT
         {
             IndexingContext ctx = newTestContext( basedir, "http://dummy/" );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-            updateRequest.setResourceFetcher( wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
-            {
-                @Override
-                public void transferError( final TransferEvent transferEvent )
+            IndexUpdateRequest updateRequest =
+                new IndexUpdateRequest( ctx, wagonHelper.getWagonResourceFetcher( new TransferListenerFixture()
                 {
-                }
-            }, new AuthenticationInfo()
-            {
-                private static final long serialVersionUID = 1L;
-
+                    @Override
+                    public void transferError( final TransferEvent transferEvent )
+                    {
+                    }
+                }, new AuthenticationInfo()
                 {
-                    setUserName( "user" );
-                    setPassword( "password" );
-                }
-            }, null ) );
+                    private static final long serialVersionUID = 1L;
+
+                    {
+                        setUserName( "user" );
+                        setPassword( "password" );
+                    }
+                }, null ) );
 
             try
             {

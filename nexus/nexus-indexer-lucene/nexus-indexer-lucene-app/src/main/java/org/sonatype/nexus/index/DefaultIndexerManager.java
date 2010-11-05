@@ -1196,16 +1196,8 @@ public class DefaultIndexerManager
         repository.expireCaches( new ResourceStoreRequest( "/.index" ) );
 
         IndexingContext context = getRepositoryRemoteIndexContext( repository );
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
 
-        if ( repository instanceof MavenRepository )
-        {
-            MavenRepository mrepository = (MavenRepository) repository;
-
-            updateRequest.setDocumentFilter( getFilterFor( mrepository.getRepositoryPolicy() ) );
-        }
-
-        updateRequest.setResourceFetcher( new AbstractResourceFetcher()
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( context, new AbstractResourceFetcher()
         {
             public void connect( String id, String url )
                 throws IOException
@@ -1269,6 +1261,13 @@ public class DefaultIndexerManager
                 }
             }
         } );
+
+        if ( repository instanceof MavenRepository )
+        {
+            MavenRepository mrepository = (MavenRepository) repository;
+
+            updateRequest.setDocumentFilter( getFilterFor( mrepository.getRepositoryPolicy() ) );
+        }
 
         IndexUpdateResult result = indexUpdater.fetchAndUpdateIndex( updateRequest );
 

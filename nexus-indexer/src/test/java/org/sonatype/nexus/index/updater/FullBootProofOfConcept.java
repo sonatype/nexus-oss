@@ -167,9 +167,7 @@ public class FullBootProofOfConcept
 
         WagonFetcher wf = wh.getWagonResourceFetcher( tl, null, null );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx );
-
-        updateRequest.setResourceFetcher( wf );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( ctx, wf );
 
         container.lookup( IndexUpdater.class ).fetchAndUpdateIndex( updateRequest );
     }

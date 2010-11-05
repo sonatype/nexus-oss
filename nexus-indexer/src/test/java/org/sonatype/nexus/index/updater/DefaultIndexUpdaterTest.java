@@ -395,9 +395,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext, mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
 
@@ -462,9 +460,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext, mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
 
@@ -543,9 +539,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext, mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
 
@@ -619,9 +613,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext ,mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
 
@@ -705,9 +697,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext ,mockFetcher );
 
         updater.fetchAndUpdateIndex( updateRequest );
 
@@ -791,9 +781,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext,mockFetcher );
 
         updateRequest.setForceFullUpdate( true );
 
@@ -870,9 +858,7 @@ public class DefaultIndexUpdaterTest
 
         // tempContext.updateTimestamp( true, contextTimestamp );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext );
-
-        updateRequest.setResourceFetcher( mockFetcher );
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( tempContext,mockFetcher );
 
         updateRequest.setForceFullUpdate( true );
 
