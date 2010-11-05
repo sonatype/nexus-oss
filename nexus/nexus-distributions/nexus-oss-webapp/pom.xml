@@ -215,9 +215,35 @@
       </properties>
 
       <build>
-        <plugins><!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-resources-plugin</artifactId> <version>2.4.2</version> <executions> <execution> <id>copy-rt-jar</id> <phase>verify</phase> <goals> <goal>copy-resources</goal> </goals> 
-            <configuration> <outputDirectory>${tattletale-source}</outputDirectory> <resources> <resource> <directory>${java.home}/lib</directory> <filtering>false</filtering> <includes> <include>rt.jar</include> </includes> </resource> </resources> </configuration> </execution> 
-            </executions> </plugin> --><!-- do it! -->
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>2.4.2</version>
+            <executions>
+              <execution>
+                <id>copy-rt-jar</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${tattletale-source}</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>${java.home}/lib</directory>
+                      <filtering>false</filtering>
+                      <includes>
+                        <include>rt.jar</include>
+                      </includes>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- do it! -->
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>tattletale-maven-plugin</artifactId>
