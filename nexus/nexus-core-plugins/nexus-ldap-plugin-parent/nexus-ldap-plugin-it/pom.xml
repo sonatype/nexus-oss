@@ -131,7 +131,6 @@
       <classifier>bundle</classifier>
       <scope>test</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -189,8 +188,7 @@
       <plugin>
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
-          <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap
-            during each restart -->
+          <!-- workaround for a bug in apache LDAP server which leaks ~1M of heap during each restart -->
           <argLine>-Xmx256M</argLine>
         </configuration>
       </plugin>
