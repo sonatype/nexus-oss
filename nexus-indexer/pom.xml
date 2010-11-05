@@ -2,6 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- 
+  **********************************************************
+  * IMPORTANT!                                             *
+  * WHEN YOU CHANGE DEPS MAKE SURE TO UPDATE SHADE CONFIG! *
+  * DON'T FORGET!                                          *
+  **********************************************************
+  -->
+  
   <parent>
     <groupId>org.sonatype.nexus</groupId>
     <artifactId>nexus-parent</artifactId>
