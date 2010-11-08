@@ -1067,7 +1067,7 @@ public class DefaultIndexerManager
     public void downloadRepositoryIndex( String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
-        ProxyRepository repository = repositoryRegistry.getRepositoryWithFacet( repositoryId, ProxyRepository.class );
+        Repository repository = repositoryRegistry.getRepository( repositoryId );
 
         if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
@@ -1075,12 +1075,10 @@ public class DefaultIndexerManager
 
             downloadRepositoryGroupIndex( group );
         }
-        else
+        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) && repository.isIndexable()
+            && downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
         {
-            if ( repository.isIndexable() && downloadRepositoryIndex( repository ) )
-            {
-                mergeRepositoryGroupIndexWithMember( repository );
-            }
+            mergeRepositoryGroupIndexWithMember( repository );
         }
     }
 
