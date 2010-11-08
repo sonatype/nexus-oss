@@ -31,14 +31,14 @@ Sonatype.Events.addListener( 'repositoryMenuInit',
     if ( Sonatype.lib.Permissions.checkPermission( 'nexus:index', Sonatype.lib.Permissions.DELETE ) 
         && repoRecord.get( 'repoType' ) != 'virtual' ) {
       menu.add({
-        text: 'ReIndex',
+        text: 'Repair Index',
         handler: function( rec ) {
           REINDEX_ACTION( rec, true );
         },
         scope: this
       });
       menu.add( {
-        text: 'Incremental ReIndex',
+        text: 'Update Index',
         handler: function( rec ) {
           REINDEX_ACTION( rec, false );
         },
@@ -52,15 +52,8 @@ Sonatype.Events.addListener( 'repositoryContentMenuInit',
   function( menu, repoRecord, contentRecord ) {
     if ( Sonatype.lib.Permissions.checkPermission( 'nexus:index', Sonatype.lib.Permissions.DELETE ) 
         && repoRecord.data['repoType'] != 'virtual' ) {
-      menu.add({
-        text: 'ReIndex',
-        handler: function( rec ) {
-          REINDEX_ACTION( rec, true );
-        },
-        scope: this
-      });
       menu.add( {
-        text: 'Incremental ReIndex',
+        text: 'Update Index',
         handler: function( rec ) {
           REINDEX_ACTION( rec, false );
         },
