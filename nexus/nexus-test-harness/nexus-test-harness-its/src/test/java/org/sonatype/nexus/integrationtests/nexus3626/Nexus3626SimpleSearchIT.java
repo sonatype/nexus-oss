@@ -49,6 +49,10 @@ public class Nexus3626SimpleSearchIT
         MavenDeployer.deployAndGetVerifier( GavUtil.newGav( "nexus3626", "maven", "1.0.0", "pom" ),
                                             getRepositoryUrl( REPO_TEST_HARNESS_REPO ), pom, null,
                                             "-DgeneratePom=false" ).verifyErrorFreeLog();
+
+        // indexing is now asynchronous, let's wait then
+        getEventInspectorsUtil().waitForCalmPeriod();
+
         searchFor( pom );
     }
 
