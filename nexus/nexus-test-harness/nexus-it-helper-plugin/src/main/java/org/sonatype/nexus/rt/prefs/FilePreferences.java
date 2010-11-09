@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import java.util.prefs.AbstractPreferences;
 import java.util.prefs.BackingStoreException;
 
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,7 +143,15 @@ public class FilePreferences
             Properties p = new Properties();
             try
             {
-                p.load( new FileInputStream( file ) );
+                final FileInputStream in = new FileInputStream( file );
+                try
+                {
+                    p.load( in );
+                }
+                finally
+                {
+                    IOUtils.closeQuietly( in );
+                }
 
                 StringBuilder sb = new StringBuilder();
                 getPath( sb );
@@ -200,7 +209,15 @@ public class FilePreferences
 
                 if ( file.exists() )
                 {
-                    p.load( new FileInputStream( file ) );
+                    final FileInputStream in = new FileInputStream( file );
+                    try
+                    {
+                        p.load( in );
+                    }
+                    finally
+                    {
+                        IOUtils.closeQuietly( in );
+                    }
 
                     List<String> toRemove = new ArrayList<String>();
 
@@ -236,7 +253,15 @@ public class FilePreferences
                     }
                 }
 
-                p.store( new FileOutputStream( file ), "FilePreferences" );
+                final FileOutputStream out = new FileOutputStream( file );
+                try
+                {
+                    p.store( out, "FilePreferences" );
+                }
+                finally
+                {
+                    IOUtils.closeQuietly( out );
+                }
             }
             catch ( IOException e )
             {

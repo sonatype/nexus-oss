@@ -571,6 +571,8 @@ public abstract class AbstractNexusIntegrationTest
     protected void deployArtifacts()
         throws Exception
     {
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+
         // test the test directory
         File projectsDir = this.getTestResourceAsFile( "projects" );
         log.debug( "projectsDir: " + projectsDir );
