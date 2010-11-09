@@ -117,8 +117,9 @@ public class Nexus1806ValidateSmtpConfigurationIT
         smtpSettings.setPassword( EmailUtil.USER_PASSWORD );
         smtpSettings.setSystemEmailAddress( EmailUtil.USER_EMAIL );
         smtpSettings.setTestEmail( "test_user@sonatype.org" );
-        Status status = SettingsMessageUtil.validateSmtp( smtpSettings );
-        Assert.assertTrue( status.isSuccess(), "Unable to validate e-mail " + status );
+        Response res = SettingsMessageUtil.validateSmtpResponse( smtpSettings );
+        Assert.assertTrue( res.getStatus().isSuccess(), "Unable to validate e-mail " + res.getStatus() + "\n"
+            + res.getEntity().getText() );
 
         server.waitForIncomingEmail( 5000, 1 );
 
