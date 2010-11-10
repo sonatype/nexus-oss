@@ -22,6 +22,7 @@ import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepositoryTarget;
 import org.sonatype.nexus.configuration.model.CRepositoryTargetCoreConfiguration;
 import org.sonatype.nexus.configuration.validator.ApplicationConfigurationValidator;
+import org.sonatype.nexus.proxy.events.TargetRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.TargetRegistryEventRemove;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.registry.RepositoryTypeRegistry;
@@ -214,6 +215,8 @@ public class DefaultTargetRegistry
         removeRepositoryTarget( cnf.getId(), true );
 
         getCurrentConfiguration( true ).add( cnf );
+        
+        getApplicationEventMulticaster().notifyEventListeners( new TargetRegistryEventAdd( this, target ) );
 
         return true;
     }
