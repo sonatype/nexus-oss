@@ -78,7 +78,7 @@ public class Nexus782UploadWithClassifierIT
 
     @Test
     public void withSamePomExtention()
-        throws HttpException, IOException
+        throws Exception
     {
 
         File artifactFile = this.getTestFile( "same-pom/same-pom.jar" );
@@ -90,6 +90,7 @@ public class Nexus782UploadWithClassifierIT
             getDeployUtils().deployUsingPomWithRest( this.getTestRepositoryId(), artifactFile, pomFile, null,
                                                      this.artifactGav.getExtension() );
         assertTrue( Status.isSuccess( result ), "Got error from server: " + result );
+        getEventInspectorsUtil().waitForCalmPeriod();
 
         // make sure everything is cool so far
         this.checkUpload( this.artifactGav, artifactFile );
