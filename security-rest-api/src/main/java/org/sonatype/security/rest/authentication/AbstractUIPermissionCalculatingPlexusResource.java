@@ -155,7 +155,7 @@ public abstract class AbstractUIPermissionCalculatingPlexusResource
             permissionNameList.add( priv.getKey() + ":delete" );
         }
 
-        if ( subject != null )
+        if ( subject != null && getSecuritySystem().isSecurityEnabled() )
         {
 
             // get the privileges for this subject
