@@ -101,7 +101,7 @@ public abstract class AbstractNexusIntegrationTest
 
     public static final String REPO_TEST_HARNESS_SHADOW = "nexus-test-harness-shadow";
 
-    private static boolean NEEDS_INIT = false;
+    protected static boolean NEEDS_INIT = false;
 
     public static final String REPOSITORY_RELATIVE_URL = "content/repositories/";
 
