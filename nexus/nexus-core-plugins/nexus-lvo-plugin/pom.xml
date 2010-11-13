@@ -35,9 +35,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer-lucene-app</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <scope>provided</scope>
+      <type>nexus-plugin</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>

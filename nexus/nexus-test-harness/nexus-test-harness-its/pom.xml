@@ -205,7 +205,7 @@
 
     <!-- NEXUS-156 -->
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
+      <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
       <version>${project.version}</version>
     </dependency>

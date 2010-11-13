@@ -974,14 +974,11 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-indexer-lucene-app</artifactId>
+        <groupId>org.sonatype.nexus.plugins</groupId>
+        <artifactId>nexus-indexer-lucene-plugin</artifactId>
         <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-indexer-lucene-rest-api</artifactId>
-        <version>${project.version}</version>
+        <type>nexus-plugin</type>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
@@ -1070,6 +1067,11 @@
             <artifactId>tools</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>3.2.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -1288,7 +1290,6 @@
   </scm>
 
   <modules>
-    <module>nexus-indexer-lucene</module>
     <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
