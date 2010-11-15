@@ -16,7 +16,6 @@
   <version>1-SNAPSHOT</version>
 
   <packaging>pom</packaging>
-
   <name>Sonatype Nexus Aggregator</name>
 
   <modules>
