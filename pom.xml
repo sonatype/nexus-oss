@@ -5,17 +5,13 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.9-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-maven-site-plugin</artifactId>
-
-  <version>1.4.5-SNAPSHOT</version>
-
   <packaging>nexus-plugin</packaging>
 
   <name>Nexus Enterprise Plugin :: Maven Site Plugin</name>
-
   <description>Adds a repository type for deploying maven sites.</description>
 
   <dependencyManagement>
@@ -23,7 +19,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.version}</version>
+        <version>${this.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
