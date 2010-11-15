@@ -14,14 +14,13 @@
 package org.sonatype.nexus.integrationtests;
 
 import java.io.File;
-
 import java.io.IOException;
 
+import org.apache.maven.index.artifact.Gav;
 import org.junit.After;
 import org.junit.Before;
 import org.restlet.data.Response;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.ProxyMode;
 import org.sonatype.nexus.proxy.repository.RemoteStatus;

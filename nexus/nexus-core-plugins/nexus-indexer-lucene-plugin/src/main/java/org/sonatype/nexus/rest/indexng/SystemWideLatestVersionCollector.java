@@ -1,7 +1,7 @@
 package org.sonatype.nexus.rest.indexng;
 
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.context.IndexingContext;
 
 /**
  * A special filter that actually does not filter, but collects the latest and release version for every GA. After

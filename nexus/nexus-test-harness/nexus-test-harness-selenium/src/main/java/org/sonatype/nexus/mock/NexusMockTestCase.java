@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.wagon.ConnectionException;
@@ -22,7 +23,6 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
 import org.sonatype.appbooter.PlexusAppBooter;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

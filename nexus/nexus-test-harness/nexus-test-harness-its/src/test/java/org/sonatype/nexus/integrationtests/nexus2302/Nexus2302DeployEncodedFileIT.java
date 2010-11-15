@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;

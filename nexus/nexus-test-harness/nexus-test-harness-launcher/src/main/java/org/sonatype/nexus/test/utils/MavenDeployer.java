@@ -22,9 +22,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
-import org.sonatype.nexus.artifact.Gav;
 
 public class MavenDeployer
 {

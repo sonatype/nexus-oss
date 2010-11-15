@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResource;

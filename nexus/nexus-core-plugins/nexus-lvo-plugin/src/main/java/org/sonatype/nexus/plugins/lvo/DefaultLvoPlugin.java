@@ -3,11 +3,11 @@ package org.sonatype.nexus.plugins.lvo;
 import java.io.IOException;
 import java.util.Map;
 
+import org.apache.maven.index.ArtifactInfo;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.plugins.lvo.config.LvoPluginConfiguration;
 import org.sonatype.nexus.plugins.lvo.config.model.CLvoKey;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;

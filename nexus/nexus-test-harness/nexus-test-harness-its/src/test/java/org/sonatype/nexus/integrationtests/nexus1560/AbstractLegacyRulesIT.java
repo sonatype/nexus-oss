@@ -2,9 +2,9 @@ package org.sonatype.nexus.integrationtests.nexus1560;
 
 import java.io.IOException;
 
+import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;

@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Date;
 
+import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

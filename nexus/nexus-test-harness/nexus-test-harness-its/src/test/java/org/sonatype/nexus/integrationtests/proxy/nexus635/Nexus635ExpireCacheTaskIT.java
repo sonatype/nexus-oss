@@ -18,7 +18,7 @@ import static org.sonatype.nexus.test.utils.FileTestingUtils.compareFileSHA1s;
 
 import java.io.File;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusProxyIntegrationTest;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.ExpireCacheTaskDescriptor;

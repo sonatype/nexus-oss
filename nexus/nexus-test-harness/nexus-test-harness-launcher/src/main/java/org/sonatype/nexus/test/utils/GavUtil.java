@@ -4,9 +4,9 @@ import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 public class GavUtil
 {

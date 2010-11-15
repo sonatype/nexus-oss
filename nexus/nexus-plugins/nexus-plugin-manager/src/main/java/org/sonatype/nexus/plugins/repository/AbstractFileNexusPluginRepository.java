@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.index.artifact.ArtifactPackagingMapper;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
 import org.sonatype.plugin.metadata.GAVCoordinate;
 import org.sonatype.plugins.model.PluginMetadata;
 

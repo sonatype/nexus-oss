@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 
 public interface MetadataManager
 {

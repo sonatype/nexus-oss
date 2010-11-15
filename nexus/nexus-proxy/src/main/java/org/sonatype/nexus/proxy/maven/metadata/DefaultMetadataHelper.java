@@ -15,8 +15,8 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
 
+import org.apache.maven.index.artifact.GavCalculator;
 import org.codehaus.plexus.logging.Logger;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;

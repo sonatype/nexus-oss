@@ -16,7 +16,7 @@ package org.sonatype.nexus.integrationtests.nexus1329;
 import java.io.File;
 import java.util.List;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;

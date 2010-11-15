@@ -19,7 +19,7 @@ import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import java.io.File;
 import java.util.Date;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;

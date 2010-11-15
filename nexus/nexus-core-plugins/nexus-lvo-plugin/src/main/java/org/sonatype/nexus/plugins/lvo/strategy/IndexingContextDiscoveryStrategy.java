@@ -5,13 +5,13 @@ import java.util.TreeSet;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.MAVEN;
+import org.apache.maven.index.SearchType;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.IteratorSearchResponse;
-import org.sonatype.nexus.index.MAVEN;
-import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.plugins.lvo.DiscoveryRequest;
 import org.sonatype.nexus.plugins.lvo.DiscoveryResponse;
 import org.sonatype.nexus.plugins.lvo.DiscoveryStrategy;

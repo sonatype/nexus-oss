@@ -20,15 +20,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.GavCalculator;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 /**
  * a Maven metadata helper containing all the logic for creating maven-metadata.xml <br/>

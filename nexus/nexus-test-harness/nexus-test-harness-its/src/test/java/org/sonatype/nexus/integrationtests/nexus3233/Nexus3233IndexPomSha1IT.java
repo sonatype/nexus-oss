@@ -6,9 +6,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.maven.index.artifact.Gav;
 import org.codehaus.plexus.util.FileUtils;
 import org.restlet.data.Status;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.maven.tasks.descriptors.RebuildMavenMetadataTaskDescriptor;
 import org.sonatype.nexus.rest.model.NexusArtifact;

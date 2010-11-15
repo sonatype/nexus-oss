@@ -13,6 +13,9 @@
  */
 package org.sonatype.nexus.index;
 
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.MAVEN;
 import org.sonatype.nexus.Nexus;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 import org.sonatype.nexus.templates.repository.maven.Maven2ProxyRepositoryTemplate;

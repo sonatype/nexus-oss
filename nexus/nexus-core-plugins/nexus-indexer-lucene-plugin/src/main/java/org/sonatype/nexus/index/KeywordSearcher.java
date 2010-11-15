@@ -17,6 +17,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.SearchType;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;

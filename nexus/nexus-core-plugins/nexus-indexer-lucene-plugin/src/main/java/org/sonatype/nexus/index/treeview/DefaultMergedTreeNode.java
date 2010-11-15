@@ -13,6 +13,10 @@
  */
 package org.sonatype.nexus.index.treeview;
 
+import org.apache.maven.index.treeview.DefaultTreeNode;
+import org.apache.maven.index.treeview.IndexTreeView;
+import org.apache.maven.index.treeview.TreeViewRequest;
+
 /**
  * Enhances the DefaultTreeNode (which is built from index information) to add information that
  * Nexus has stored about the item.

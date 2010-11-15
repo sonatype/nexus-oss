@@ -18,8 +18,8 @@ import static org.sonatype.nexus.integrationtests.ITGroups.SECURITY;
 import java.io.File;
 import java.util.Date;
 
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.MavenDeployer;

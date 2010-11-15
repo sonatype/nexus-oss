@@ -18,8 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.lucene.search.Query;
-import org.sonatype.nexus.index.treeview.TreeNode;
-import org.sonatype.nexus.index.treeview.TreeNodeFactory;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.Field;
+import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.SearchType;
+import org.apache.maven.index.treeview.TreeNode;
+import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;

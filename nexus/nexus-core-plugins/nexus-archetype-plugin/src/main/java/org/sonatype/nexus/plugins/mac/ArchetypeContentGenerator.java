@@ -8,12 +8,12 @@ import javax.inject.Named;
 
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.context.IndexingContext;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexArtifactFilter;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;

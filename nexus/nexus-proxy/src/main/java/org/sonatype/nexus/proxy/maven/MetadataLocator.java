@@ -15,11 +15,11 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 
 /**
  * An adapter in charge for doing the IO against the storage, hiding the fact where it runs.

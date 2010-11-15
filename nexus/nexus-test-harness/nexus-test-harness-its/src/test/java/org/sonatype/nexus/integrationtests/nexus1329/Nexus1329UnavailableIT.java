@@ -16,7 +16,7 @@ package org.sonatype.nexus.integrationtests.nexus1329;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.testng.Assert;

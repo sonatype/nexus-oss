@@ -18,12 +18,12 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.apache.maven.index.artifact.ArtifactPackagingMapper;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.GavCalculator;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.GavCalculator;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

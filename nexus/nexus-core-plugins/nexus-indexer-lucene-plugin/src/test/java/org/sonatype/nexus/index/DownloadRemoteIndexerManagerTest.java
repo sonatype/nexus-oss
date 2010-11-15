@@ -30,12 +30,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.index.context.IndexingContext;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
 import org.mortbay.jetty.handler.ResourceHandler;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 
 public class DownloadRemoteIndexerManagerTest

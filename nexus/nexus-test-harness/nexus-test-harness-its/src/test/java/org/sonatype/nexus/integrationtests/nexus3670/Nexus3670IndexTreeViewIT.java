@@ -18,8 +18,8 @@ import static org.sonatype.nexus.integrationtests.ITGroups.INDEX;
 import java.util.Collections;
 import java.util.Set;
 
-import org.sonatype.nexus.index.treeview.TreeNode;
-import org.sonatype.nexus.index.treeview.TreeNode.Type;
+import org.apache.maven.index.treeview.TreeNode;
+import org.apache.maven.index.treeview.TreeNode.Type;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeViewResponseDTO;

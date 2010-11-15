@@ -1,8 +1,8 @@
 package org.sonatype.nexus.rest.indextreeview;
 
+import org.apache.maven.index.treeview.IndexTreeView;
+import org.apache.maven.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNode;
-import org.sonatype.nexus.index.treeview.IndexTreeView;
-import org.sonatype.nexus.index.treeview.TreeViewRequest;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

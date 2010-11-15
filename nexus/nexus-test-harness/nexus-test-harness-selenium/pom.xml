@@ -276,7 +276,7 @@ not sure where this went - is it still needed?
       <!-- TEMP! force use of AOP build -->
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
-      <version>${sisu-guice.version}</version>
+      <version>2.9.1</version>
     </dependency>
 
     <dependency>

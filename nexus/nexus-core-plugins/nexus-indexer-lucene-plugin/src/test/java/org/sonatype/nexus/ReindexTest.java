@@ -23,16 +23,16 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.MAVEN;
+import org.apache.maven.index.NexusIndexer;
+import org.apache.maven.index.context.IndexingContext;
+import org.apache.maven.index.packer.IndexPacker;
+import org.apache.maven.index.packer.IndexPackingRequest;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.DefaultIndexerManager;
 import org.sonatype.nexus.index.IndexerManager;
-import org.sonatype.nexus.index.MAVEN;
-import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.packer.IndexPacker;
-import org.sonatype.nexus.index.packer.IndexPackingRequest;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 
 public class ReindexTest

@@ -19,11 +19,11 @@ import java.net.URL;
 import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;

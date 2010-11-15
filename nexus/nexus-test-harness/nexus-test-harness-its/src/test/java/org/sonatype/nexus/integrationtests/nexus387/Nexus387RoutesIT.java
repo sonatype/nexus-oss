@@ -19,7 +19,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.testng.Assert;

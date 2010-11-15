@@ -2,8 +2,8 @@ package org.sonatype.nexus.integrationtests.nexus3546;
 
 import java.io.File;
 
+import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.Status;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.jsecurity.realms.TargetPrivilegeDescriptor;

@@ -17,11 +17,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.Date;
 
+import org.apache.maven.index.SearchType;
+import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.restlet.data.MediaType;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.index.SearchType;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.SearchNGResponse;
 import org.sonatype.nexus.test.utils.GroupMessageUtil;

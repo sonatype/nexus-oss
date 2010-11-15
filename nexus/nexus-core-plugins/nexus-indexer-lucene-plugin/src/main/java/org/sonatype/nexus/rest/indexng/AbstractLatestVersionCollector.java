@@ -2,9 +2,9 @@ package org.sonatype.nexus.rest.indexng;
 
 import java.util.HashMap;
 
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoFilter;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.context.IndexingContext;
 
 public abstract class AbstractLatestVersionCollector
     implements ArtifactInfoFilter

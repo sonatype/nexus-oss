@@ -15,9 +15,10 @@ package org.sonatype.nexus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.index.context.IndexCreator;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.sonatype.nexus.index.context.IndexCreator;
 
 /**
  *  Creators that can be used in tests.

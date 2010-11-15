@@ -4,11 +4,11 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.index.artifact.Gav;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.text.StringContains;
 import org.sonatype.jettytestsuite.ControlledServer;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.GavUtil;

@@ -15,6 +15,11 @@ package org.sonatype.nexus.index;
 
 import java.util.List;
 import java.util.Map;
+
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.SearchType;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 
 /**

@@ -15,7 +15,7 @@ package org.sonatype.nexus.util;
 
 import java.util.Comparator;
 
-import org.sonatype.nexus.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfo;
 
 public class ArtifactInfoComparator
     implements Comparator<ArtifactInfo>

@@ -2,12 +2,11 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Map;
 
+import org.apache.maven.index.artifact.ArtifactPackagingMapper;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.artifact.ArtifactPackagingMapper;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

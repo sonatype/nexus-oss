@@ -2,6 +2,8 @@ package org.sonatype.nexus.index;
 
 import java.util.Collection;
 
+import org.apache.maven.index.ArtifactInfo;
+
 /**
  * Filters the search result by various conditions.
  * 

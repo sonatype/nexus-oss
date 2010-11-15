@@ -3,8 +3,8 @@ package org.sonatype.nexus.rest.indexng;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.artifact.VersionUtils;
 
 /**
  * Extended version of latest version holder, that collects Extension+Classifier combinations too.

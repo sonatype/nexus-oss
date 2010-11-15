@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.treeview.TreeNode;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.proxy.maven.ChecksumPolicy;

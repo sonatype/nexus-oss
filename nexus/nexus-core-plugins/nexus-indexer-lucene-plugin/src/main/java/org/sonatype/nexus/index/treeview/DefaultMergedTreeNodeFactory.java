@@ -13,9 +13,13 @@
  */
 package org.sonatype.nexus.index.treeview;
 
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.treeview.DefaultTreeNodeFactory;
+import org.apache.maven.index.treeview.IndexTreeView;
+import org.apache.maven.index.treeview.TreeNode;
+import org.apache.maven.index.treeview.TreeNode.Type;
+import org.apache.maven.index.treeview.TreeViewRequest;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.treeview.TreeNode.Type;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.AccessManager;

@@ -16,7 +16,7 @@ package org.sonatype.nexus.proxy.maven;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 
 /**

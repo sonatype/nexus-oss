@@ -19,7 +19,7 @@ import java.io.File;
 import java.util.Date;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.TestContainer;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

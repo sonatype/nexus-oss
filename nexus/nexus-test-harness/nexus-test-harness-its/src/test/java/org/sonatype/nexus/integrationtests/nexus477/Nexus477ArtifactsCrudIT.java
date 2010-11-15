@@ -19,9 +19,9 @@ import java.net.URISyntaxException;
 import java.util.Date;
 
 import org.apache.http.HttpException;
+import org.apache.maven.index.artifact.Gav;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;

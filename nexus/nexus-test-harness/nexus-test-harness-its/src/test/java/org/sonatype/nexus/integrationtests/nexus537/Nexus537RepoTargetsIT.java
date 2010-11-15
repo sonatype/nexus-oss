@@ -21,12 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpException;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.restlet.data.Method;
 import org.restlet.data.Response;
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.integrationtests.AbstractPrivilegeTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.integrationtests.TestContainer;

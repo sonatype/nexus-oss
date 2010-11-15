@@ -142,8 +142,7 @@
     <plexus-security.version>2.0.0-SNAPSHOT</plexus-security.version>
     <shiro.version>1.0.0-incubating</shiro.version>
     <slf4j.version>1.5.6</slf4j.version>
-    <nexus.indexer.version>3.1-SNAPSHOT</nexus.indexer.version>
-    <nexus.indexer.artifact.version>1.1-SNAPSHOT</nexus.indexer.artifact.version>
+    <maven.indexer.version>3.1.0-SNAPSHOT</maven.indexer.version>
     <nexus.repository.metadata.version>1.1-SNAPSHOT</nexus.repository.metadata.version>
     <!-- Shared with nexus-client, hence it is properties'ed -->
     <plexus.restlet.bridge.version>1.16</plexus.restlet.bridge.version>
@@ -229,11 +228,6 @@
       </dependency>
 
       <!-- Plexus et al -->
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-annotations</artifactId>
-        <version>1.5.4</version>
-      </dependency>
       <dependency>
         <groupId>org.sonatype.plexus.appevents</groupId>
         <artifactId>plexus-app-events-api</artifactId>
@@ -423,42 +417,16 @@
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-system</artifactId>
         <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-xml-realm</artifactId>
         <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-web</artifactId>
         <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
@@ -495,31 +463,11 @@
         <groupId>org.sonatype.security</groupId>
         <artifactId>security-configuration</artifactId>
         <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.sonatype.security.realms</groupId>
         <artifactId>security-url-realm</artifactId>
         <version>${plexus-security.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.codehaus.plexus</groupId>
-            <artifactId>plexus-container-default</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.sonatype.sisu</groupId>
-            <artifactId>sisu-inject-plexus</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.shiro</groupId>
@@ -898,14 +846,9 @@
 
       <!-- The modules -->
       <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-indexer</artifactId>
-        <version>${nexus.indexer.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.sonatype.nexus</groupId>
-        <artifactId>nexus-indexer-artifact</artifactId>
-        <version>${nexus.indexer.artifact.version}</version>
+        <groupId>org.apache.maven.indexer</groupId>
+        <artifactId>indexer-artifact</artifactId>
+        <version>${maven.indexer.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>

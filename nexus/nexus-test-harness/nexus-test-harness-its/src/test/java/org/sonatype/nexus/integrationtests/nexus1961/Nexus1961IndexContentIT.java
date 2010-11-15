@@ -2,10 +2,10 @@ package org.sonatype.nexus.integrationtests.nexus1961;
 
 import java.util.List;
 
+import org.apache.maven.index.treeview.TreeNode;
 import org.restlet.data.MediaType;
 import org.restlet.data.Response;
 import org.restlet.data.Status;
-import org.sonatype.nexus.index.treeview.TreeNode;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
 import org.sonatype.nexus.rest.indextreeview.IndexBrowserTreeNode;

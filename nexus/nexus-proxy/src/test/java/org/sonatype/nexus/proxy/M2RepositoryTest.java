@@ -21,8 +21,8 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.apache.maven.index.artifact.VersionUtils;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.artifact.VersionUtils;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventCache;

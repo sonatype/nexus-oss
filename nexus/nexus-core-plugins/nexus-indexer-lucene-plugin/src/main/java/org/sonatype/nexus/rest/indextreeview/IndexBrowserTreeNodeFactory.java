@@ -1,11 +1,11 @@
 package org.sonatype.nexus.rest.indextreeview;
 
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.treeview.IndexTreeView;
+import org.apache.maven.index.treeview.TreeNode;
+import org.apache.maven.index.treeview.TreeViewRequest;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
 import org.sonatype.nexus.index.treeview.DefaultMergedTreeNodeFactory;
-import org.sonatype.nexus.index.treeview.IndexTreeView;
-import org.sonatype.nexus.index.treeview.TreeNode;
-import org.sonatype.nexus.index.treeview.TreeViewRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 public class IndexBrowserTreeNodeFactory

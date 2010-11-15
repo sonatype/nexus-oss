@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -25,27 +26,33 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <jetty.version>6.1.19</jetty.version>
-    <sisu-guice.version>2.9.1</sisu-guice.version>
     <sisu-inject.version>1.4.3</sisu-inject.version>
     <sisu-inject-plexus.version>${sisu-inject.version}</sisu-inject-plexus.version>
-    <plexus-component-metadata.version>1.5.4</plexus-component-metadata.version>
+    <plexus-component-metadata.version>1.5.5</plexus-component-metadata.version>
+    <plexus-utils.version>2.0.5</plexus-utils.version>
 
+    <jetty.version>6.1.19</jetty.version>
     <maven.version>2.2.1</maven.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <!-- SISU and Plexus support (the version should be tied to SISU used ones!) -->
       <dependency>
-        <groupId>org.sonatype.sisu.inject</groupId>
-        <artifactId>guice-plexus-shim</artifactId>
+        <groupId>org.sonatype.sisu</groupId>
+        <artifactId>sisu-inject-plexus</artifactId>
         <version>${sisu-inject-plexus.version}</version>
       </dependency>
-      <!-- This below is actually tied to this above, but some modules like modello only modules does need p-u only as dependency -->
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-annotations</artifactId>
+        <version>${plexus-component-metadata.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>2.0.5</version>
+        <version>${plexus-utils.version}</version>
       </dependency>
 
       <dependency>

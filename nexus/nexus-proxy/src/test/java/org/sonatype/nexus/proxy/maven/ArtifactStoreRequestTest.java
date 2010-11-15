@@ -2,8 +2,8 @@ package org.sonatype.nexus.proxy.maven;
 
 import junit.framework.Assert;
 
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.jettytestsuite.ServletServer;
-import org.sonatype.nexus.artifact.Gav;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
 import org.sonatype.nexus.proxy.EnvironmentBuilder;
 import org.sonatype.nexus.proxy.M2TestsuiteEnvironmentBuilder;

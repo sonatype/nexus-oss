@@ -1,8 +1,8 @@
 package org.sonatype.nexus.rest.indexng;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
-import org.sonatype.nexus.artifact.VersionUtils;
-import org.sonatype.nexus.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.artifact.VersionUtils;
 
 /**
  * A holder for the latest version (both release and snapshot).

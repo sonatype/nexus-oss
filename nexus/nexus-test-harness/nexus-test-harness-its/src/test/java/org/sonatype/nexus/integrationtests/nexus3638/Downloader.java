@@ -2,7 +2,7 @@ package org.sonatype.nexus.integrationtests.nexus3638;
 
 import java.net.URL;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 
 public class Downloader

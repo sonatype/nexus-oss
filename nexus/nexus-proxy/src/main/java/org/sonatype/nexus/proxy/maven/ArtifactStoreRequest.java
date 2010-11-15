@@ -13,8 +13,8 @@
  */
 package org.sonatype.nexus.proxy.maven;
 
-import org.sonatype.nexus.artifact.Gav;
-import org.sonatype.nexus.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 
 public class ArtifactStoreRequest

@@ -19,11 +19,11 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.maven.index.artifact.GavCalculator;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.artifact.GavCalculator;
 import org.sonatype.nexus.proxy.maven.metadata.AbstractMetadataHelper;
 
 @Component( role = FSMetadataHelper.class )

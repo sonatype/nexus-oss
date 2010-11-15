@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.sonatype.nexus.artifact.Gav;
+import org.apache.maven.index.artifact.Gav;
 import org.sonatype.nexus.rest.model.MirrorStatusResource;
 import org.sonatype.nexus.rest.model.MirrorStatusResourceListResponse;
 import org.sonatype.nexus.test.utils.FileTestingUtils;

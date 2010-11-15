@@ -51,13 +51,7 @@
       <scope>compile</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.sonatype.sisu.inject</groupId>
-      <artifactId>guice-plexus-shim</artifactId>
-      <scope>compile</scope>
-    </dependency>
-
-<!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
+    <!-- TEMPORARY: remove once AbstractPluginTestCase is fixed -->
     <dependency>
       <groupId>org.sonatype.plugin</groupId>
       <artifactId>plugin-gleaner</artifactId>
