@@ -5,12 +5,12 @@
   <parent>
     <groupId>com.sonatype.nexus.plugin</groupId>
     <artifactId>nexus-enterprise-plugins</artifactId>
-    <version>1.4.9-SNAPSHOT</version>
+    <version>1.9-SNAPSHOT</version>
   </parent>
 
   <artifactId>nexus-unpack-plugin</artifactId>
-  <version>1.4.5-SNAPSHOT</version>
   <packaging>nexus-plugin</packaging>
+
   <name>Nexus Enterprise Plugin :: Unpack</name>
   <description>A plugin that will automatically unpack deployed bundles</description>
 
@@ -19,7 +19,7 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp-dependencies</artifactId>
-        <version>${nexus.version}</version>
+        <version>${this.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -68,7 +68,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${nexus.version}</version>
+      <version>${this.version}</version>
       <scope>test</scope>
     </dependency>
 

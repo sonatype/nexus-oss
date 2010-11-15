@@ -21,7 +21,7 @@
             <configuration>
               <serverId>nexus</serverId>
               <repositoryUrl>${nexus-base-url}service/local/repositories/nexus-test-harness-repo2/content-compressed</repositoryUrl>
-              <file>target/${project.artifactId}-${project.version}.jar</file>
+              <file>target/${project.artifactId}-${this.version}.jar</file>
               <repositoryPath>some/path</repositoryPath>
             </configuration>
           </execution>
