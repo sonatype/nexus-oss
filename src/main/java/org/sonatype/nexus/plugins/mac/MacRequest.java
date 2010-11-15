@@ -1,6 +1,6 @@
 package org.sonatype.nexus.plugins.mac;
 
-import org.sonatype.nexus.index.ArtifactInfoFilter;
+import org.apache.maven.index.ArtifactInfoFilter;
 
 public class MacRequest
 {

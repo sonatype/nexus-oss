@@ -2,7 +2,7 @@ package org.sonatype.nexus.plugins.mac.cli;
 
 import java.io.File;
 
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.apache.maven.index.context.IndexingContext;
 
 public interface CliIndexInitializer
 {

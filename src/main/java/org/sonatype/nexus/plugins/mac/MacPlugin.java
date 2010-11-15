@@ -3,7 +3,7 @@ package org.sonatype.nexus.plugins.mac;
 import java.io.IOException;
 
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
-import org.sonatype.nexus.index.context.IndexingContext;
+import org.apache.maven.index.context.IndexingContext;
 
 /**
  * The MavenArchetypePlugin's main component.

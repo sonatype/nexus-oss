@@ -6,10 +6,10 @@ import java.io.FileWriter;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.maven.index.context.IndexingContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.tools.cli.AbstractCli;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.index.context.IndexingContext;
 import org.sonatype.nexus.plugins.mac.MacPlugin;
 import org.sonatype.nexus.plugins.mac.MacRequest;
 

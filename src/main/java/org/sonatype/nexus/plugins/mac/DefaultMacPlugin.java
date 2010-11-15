@@ -8,18 +8,18 @@ import org.apache.lucene.search.Query;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
 import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
+import org.apache.maven.index.AndMultiArtifactInfoFilter;
+import org.apache.maven.index.ArtifactInfo;
+import org.apache.maven.index.ArtifactInfoFilter;
+import org.apache.maven.index.IteratorSearchRequest;
+import org.apache.maven.index.IteratorSearchResponse;
+import org.apache.maven.index.MAVEN;
+import org.apache.maven.index.NexusIndexer;
+import org.apache.maven.index.SearchType;
+import org.apache.maven.index.context.IndexingContext;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.index.AndMultiArtifactInfoFilter;
-import org.sonatype.nexus.index.ArtifactInfo;
-import org.sonatype.nexus.index.ArtifactInfoFilter;
-import org.sonatype.nexus.index.IteratorSearchRequest;
-import org.sonatype.nexus.index.IteratorSearchResponse;
-import org.sonatype.nexus.index.MAVEN;
-import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.SearchType;
-import org.sonatype.nexus.index.context.IndexingContext;
 
 @Component( role = MacPlugin.class )
 public class DefaultMacPlugin

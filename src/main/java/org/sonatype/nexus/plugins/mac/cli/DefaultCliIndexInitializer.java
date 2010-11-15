@@ -7,16 +7,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.apache.maven.index.NexusIndexer;
+import org.apache.maven.index.context.IndexCreator;
+import org.apache.maven.index.context.IndexingContext;
+import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
+import org.apache.maven.index.updater.IndexUpdateRequest;
+import org.apache.maven.index.updater.IndexUpdater;
+import org.apache.maven.index.updater.ResourceFetcher;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.FileUtils;
-import org.sonatype.nexus.index.NexusIndexer;
-import org.sonatype.nexus.index.context.IndexCreator;
-import org.sonatype.nexus.index.context.IndexingContext;
-import org.sonatype.nexus.index.context.UnsupportedExistingLuceneIndexException;
-import org.sonatype.nexus.index.updater.IndexUpdateRequest;
-import org.sonatype.nexus.index.updater.IndexUpdater;
-import org.sonatype.nexus.index.updater.ResourceFetcher;
 
 @Component( role = CliIndexInitializer.class )
 public class DefaultCliIndexInitializer
@@ -58,9 +58,7 @@ public class DefaultCliIndexInitializer
 
             indexer.scan( context );
 
-            IndexUpdateRequest updateRequest = new IndexUpdateRequest( context );
-
-            updateRequest.setResourceFetcher( new FileFetcher( indexDir ) );
+            IndexUpdateRequest updateRequest = new IndexUpdateRequest( context, new FileFetcher( indexDir ) );
 
             updateRequest.setForceFullUpdate( true );
 

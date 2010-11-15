@@ -7,6 +7,7 @@
     <groupId>org.sonatype.spice</groupId>
     <artifactId>spice-parent</artifactId>
     <version>16</version>
+    <relativePath>../spice-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>nexus-archetype-common</artifactId>
@@ -15,16 +16,17 @@
   <name>Nexus Maven Archetype Catalog Plugin Common</name>
 
   <properties>
-    <spice-inject-plexus.version>1.3.2</spice-inject-plexus.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spice-inject-plexus.version>1.4.3</spice-inject-plexus.version>
     <plexus.version>1.5.4</plexus.version>
-    <nexus-indexer.version>3.0.4</nexus-indexer.version>
+    <maven-indexer.version>3.1.0-SNAPSHOT</maven-indexer.version>
   </properties>
 
   <dependencies>
     <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-indexer</artifactId>
-      <version>${nexus-indexer.version}</version>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-core</artifactId>
+      <version>${maven-indexer.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -34,8 +36,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.spice</groupId>
-      <artifactId>spice-inject-plexus</artifactId>
+      <groupId>org.sonatype.sisu</groupId>
+      <artifactId>sisu-inject-plexus</artifactId>
       <version>${spice-inject-plexus.version}</version>
       <optional>true</optional>
     </dependency>
@@ -84,7 +86,7 @@
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
-        <version>1.0.2</version>
+        <version>1.4.1</version>
         <executions>
           <execution>
             <id>archetype-catalog.xml</id>
