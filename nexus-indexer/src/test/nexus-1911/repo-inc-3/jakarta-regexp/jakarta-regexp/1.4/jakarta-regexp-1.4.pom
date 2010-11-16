@@ -1,6 +1,0 @@
-<project>
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>jakarta-regexp</groupId>
-  <artifactId>jakarta-regexp</artifactId>
-  <version>1.4</version>
-</project>
