@@ -53,6 +53,7 @@ public class Nexus2302DeployEncodedFileIT
         checkIndex( gav );
         checkRepoBrowse( gav );
         checkBrowse( gav );
+        delete( gav );
     }
 
     private void checkBrowse( Gav gav )
@@ -149,6 +150,12 @@ public class Nexus2302DeployEncodedFileIT
             new File( nexusWorkDir, "storage/" + REPO_TEST_HARNESS_REPO + "/" + getRelitiveArtifactPath( gav ) );
 
         assertTrue( artifact.exists(), "File not found: " + artifact.getAbsolutePath() );
+    }
+
+    private void delete( Gav gav )
+        throws IOException
+    {
+        assertTrue( deleteFromRepository( REPO_TEST_HARNESS_REPO, getRelitiveArtifactPath( gav ) ) );
     }
 
 }
