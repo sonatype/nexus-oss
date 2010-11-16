@@ -13,6 +13,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.it.VerificationException;
 import org.apache.maven.it.Verifier;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.MediaType;
@@ -20,6 +21,7 @@ import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.rest.model.ContentListResource;
 import org.sonatype.nexus.rest.model.NexusArtifact;
 import org.sonatype.nexus.test.utils.ContentListMessageUtil;
+import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.MavenDeployer;
 import org.testng.annotations.Test;
 
@@ -33,21 +35,40 @@ public class Nexus2302DeployEncodedFileIT
     }
 
     @Test
-    public void deployUsingMaven()
+    public void plusSign()
         throws Exception
     {
         Gav gav =
             new Gav( "nexus2302", "artifact", "1.0", "c++", "jar", null, null, null, false, false, null, false, null );
+        testIt( gav );
+    }
+
+    @Test
+    public void dolarSign()
+        throws Exception
+    {
+        Gav gav =
+            new Gav( "nexus2302", "artifact", "$dolar", "void", "jar", null, null, null, false, false, null, false,
+                null );
+        testIt( gav );
+    }
+
+    public void testIt( Gav gav )
+        throws VerificationException, IOException, Exception
+    {
+        final File file = getTestFile( "artifact.jar" );
         Verifier v =
-            MavenDeployer.deployAndGetVerifier( gav, getRepositoryUrl( REPO_TEST_HARNESS_REPO ),
-                getTestFile( "artifact.jar" ), getOverridableFile( "settings.xml" ) );
+            MavenDeployer.deployAndGetVerifier( gav, getRepositoryUrl( REPO_TEST_HARNESS_REPO ), file,
+                getOverridableFile( "settings.xml" ) );
         v.verifyErrorFreeLog();
 
         // direct download
-        downloadArtifact( gav, "target/nexus2302/direct.jar" );
+        assertTrue( FileTestingUtils.compareFileSHA1s( file,
+            downloadArtifact( gav, "target/nexus2302/" + gav.getArtifactId() + ".jar" ) ) );
 
         // redirect download
-        downloadSnapshotArtifact( REPO_TEST_HARNESS_REPO, gav, new File( "target/nexus2302" ) );
+        assertTrue( FileTestingUtils.compareFileSHA1s( file,
+            downloadSnapshotArtifact( REPO_TEST_HARNESS_REPO, gav, new File( "target/nexus2302" ) ) ) );
 
         checkFileSystem( gav );
         checkIndex( gav );
