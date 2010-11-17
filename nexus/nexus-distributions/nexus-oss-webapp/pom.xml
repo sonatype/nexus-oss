@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -131,7 +133,6 @@
       <type>zip</type>
     </dependency>
 
-    <!-- <dependency> <groupId>org.sonatype.nexus</groupId> <artifactId>itar-nexus-plugin-manager-guice</artifactId> <version>${project.version}</version> <type>zip</type> </dependency> -->
   </dependencies>
 
 
@@ -210,6 +211,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
+        <!--tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus</tattletale-source -->
         <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus/lib</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
