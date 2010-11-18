@@ -8,7 +8,7 @@
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>nexus-ldap-realm-plugin</artifactId>
-  <name>Nexus : Core Plugins : OSS LDAP : LDAP Realm Plugin</name>
+  <name>Nexus : Core Plugins : OSS LDAP : LDAP Plugin</name>
   <description>Nexus OSS LDAP Realm Plugin</description>
   <packaging>nexus-plugin</packaging>
 
@@ -157,28 +157,16 @@
   <build>
     <plugins>
 
-      <plugin>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-metadata</artifactId>
-        <version>1.2.1.3</version>
-      </plugin>
-
+      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.0</version>
-
         <extensions>true</extensions>
-
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.0</version>
-          </dependency>
-        </dependencies>
       </plugin>
-
+      <plugin>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-component-metadata</artifactId>
+      </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

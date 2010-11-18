@@ -11,18 +11,7 @@
 
   <artifactId>nexus-indexer-lucene-plugin</artifactId>
   <packaging>nexus-plugin</packaging>
-  <name>Nexus : Indexer Lucene : Plugin</name>
-
-  <developers>
-    <developer>
-      <id>dbradicich</id>
-      <name>Damian Bradicich</name>
-      <email>dbradicich@sonatype.com</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
+  <name>Nexus : Core Plugins : Indexer Lucene</name>
 
   <dependencies>
 
@@ -120,18 +109,14 @@
 
   <build>
     <plugins>
+      <!-- We must exclude indexer-core from bundling as classpath dependency, since we are shading it to make it shared -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.3-SNAPSHOT</version>
         <extensions>true</extensions>
-        <dependencies>
-          <dependency>
-            <groupId>org.sonatype.plugins</groupId>
-            <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.3-SNAPSHOT</version>
-          </dependency>
-        </dependencies>
+        <configuration>
+          <excludeClasspathDependency>org.apache.maven.indexer:indexer-core</excludeClasspathDependency>
+        </configuration>
       </plugin>
 
       <!-- We must shade 1st, to make it "shared", then create the bundle -->

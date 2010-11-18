@@ -17,17 +17,6 @@
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</developerConnection>
   </scm>
 
-  <developers>
-    <developer>
-      <id>cstamas</id>
-      <name>Tamas Cservenak</name>
-      <email>cstamas@sonatype.com</email>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -47,7 +36,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.2</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

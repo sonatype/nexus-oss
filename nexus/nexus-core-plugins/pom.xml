@@ -32,13 +32,13 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <version>1.1</version>
+        <version>1.3-SNAPSHOT</version>
         <extensions>true</extensions>
         <dependencies>
           <dependency>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>app-lifecycle-nexus</artifactId>
-            <version>1.1</version>
+            <version>1.3-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>
