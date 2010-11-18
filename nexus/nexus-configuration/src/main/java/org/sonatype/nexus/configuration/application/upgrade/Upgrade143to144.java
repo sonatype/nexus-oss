@@ -23,16 +23,16 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.sonatype.configuration.upgrade.ConfigurationIsCorruptedException;
 import org.sonatype.configuration.upgrade.SingleVersionUpgrader;
 import org.sonatype.configuration.upgrade.UpgradeMessage;
-import org.sonatype.nexus.configuration.model.v1_4_3.CRestApiSettings;
-import org.sonatype.nexus.configuration.model.v1_4_3.upgrade.BasicVersionConverter;
+import org.sonatype.nexus.configuration.model.CScheduledTask;
+import org.sonatype.nexus.configuration.model.v1_4_4.upgrade.BasicVersionConverter;
 
 /**
- * Upgrades configuration model from version 1.4.2 to 1.4.3.
+ * Upgrades configuration model from version 1.4.3 to 1.4.4.
  * 
  * @author bdemers
  */
-@Component( role = SingleVersionUpgrader.class, hint = "1.4.2" )
-public class Upgrade142to143
+@Component( role = SingleVersionUpgrader.class, hint = "1.4.3" )
+public class Upgrade143to144
     extends AbstractLogEnabled
     implements SingleVersionUpgrader
 {
@@ -42,15 +42,15 @@ public class Upgrade142to143
     {
         FileReader fr = null;
 
-        org.sonatype.nexus.configuration.model.v1_4_2.Configuration conf = null;
+        org.sonatype.nexus.configuration.model.v1_4_3.Configuration conf = null;
 
         try
         {
             // reading without interpolation to preserve user settings as variables
             fr = new FileReader( file );
 
-            org.sonatype.nexus.configuration.model.v1_4_2.io.xpp3.NexusConfigurationXpp3Reader reader =
-                new org.sonatype.nexus.configuration.model.v1_4_2.io.xpp3.NexusConfigurationXpp3Reader();
+            org.sonatype.nexus.configuration.model.v1_4_3.io.xpp3.NexusConfigurationXpp3Reader reader =
+                new org.sonatype.nexus.configuration.model.v1_4_3.io.xpp3.NexusConfigurationXpp3Reader();
 
             conf = reader.read( fr );
         }
@@ -72,21 +72,23 @@ public class Upgrade142to143
     public void upgrade( UpgradeMessage message )
         throws ConfigurationIsCorruptedException
     {
-        org.sonatype.nexus.configuration.model.v1_4_2.Configuration oldc =
-            (org.sonatype.nexus.configuration.model.v1_4_2.Configuration) message.getConfiguration();
+        org.sonatype.nexus.configuration.model.v1_4_3.Configuration oldc =
+            (org.sonatype.nexus.configuration.model.v1_4_3.Configuration) message.getConfiguration();
 
-        org.sonatype.nexus.configuration.model.v1_4_3.Configuration newc =
+        org.sonatype.nexus.configuration.model.Configuration newc =
             new BasicVersionConverter().convertConfiguration( oldc );
 
-        // NEXUS-3840
-        if ( newc.getRestApi() == null )
+        // NEXUS-3833
+        for ( CScheduledTask task : newc.getTasks() )
         {
-            newc.setRestApi( new CRestApiSettings() );
+            if ( "ReindexTask".equals( task.getType() ) )
+            {
+                task.setType( "UpdateIndexTask" );
+            }
         }
-        newc.getRestApi().setUiTimeout( 60000 );
 
-        newc.setVersion( org.sonatype.nexus.configuration.model.v1_4_3.Configuration.MODEL_VERSION );
-        message.setModelVersion( org.sonatype.nexus.configuration.model.v1_4_3.Configuration.MODEL_VERSION );
+        newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
+        message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
     }
 

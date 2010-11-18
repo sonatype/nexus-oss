@@ -363,4 +363,16 @@ public class DefaultApplicationConfigurationUpgraderTest
         resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-142.xml", configuration );
     }
 
+    public void testFrom143()
+        throws Exception
+    {
+        copyFromClasspathToFile( "/org/sonatype/nexus/configuration/upgrade/nexus-143.xml", getNexusConfiguration() );
+
+        Configuration configuration = configurationUpgrader.loadOldConfiguration( new File( getNexusConfiguration() ) );
+
+        assertEquals( Configuration.MODEL_VERSION, configuration.getVersion() );
+
+        resultIsFine( "/org/sonatype/nexus/configuration/upgrade/nexus-143.xml", configuration );
+    }
+
 }

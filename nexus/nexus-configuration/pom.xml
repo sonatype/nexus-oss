@@ -90,11 +90,12 @@
             </goals>
             <configuration>
               <useJava5>true</useJava5>
-              <version>1.4.3</version>
+              <version>1.4.4</version>
               <packagedVersions>
                 <packagedVersion>1.4.0</packagedVersion>
                 <packagedVersion>1.4.1</packagedVersion>
                 <packagedVersion>1.4.2</packagedVersion>
+                <packagedVersion>1.4.3</packagedVersion>
               </packagedVersions>
               <models>
                 <model>src/main/mdo/nexus.xml</model>

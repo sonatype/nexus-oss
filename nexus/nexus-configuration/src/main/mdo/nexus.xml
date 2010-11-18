@@ -216,6 +216,12 @@
     public static final String MODEL_VERSION = "1.4.3";
 ]]></code>
         </codeSegment>
+        <codeSegment>
+          <version>1.4.4</version>
+          <code><![CDATA[
+    public static final String MODEL_VERSION = "1.4.4";
+]]></code>
+        </codeSegment>
       </codeSegments>
     </class>
 
