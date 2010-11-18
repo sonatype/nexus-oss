@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
@@ -67,6 +68,9 @@ public abstract class AbstractCargoIT
     public void startContainer()
         throws Exception
     {
+        fixPlexusProperties();
+        fixLog4jProperties();
+
         WAR war = new WAR( getWarFile().getAbsolutePath() );
         war.setContext( "nexus" );
 
@@ -84,6 +88,42 @@ public abstract class AbstractCargoIT
 
         container.start();
 
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
+        TestContainer.getInstance().getTestContext().useAdminForRequests();
+    }
+
+    private void fixLog4jProperties()
+        throws IOException
+    {
+        File plexusProps = new File( getWarFile(), "WEB-INF/log4j.properties" );
+        Properties p = new Properties();
+        FileReader r = new FileReader( plexusProps );
+        try
+        {
+            p.load( r );
+        }
+        finally
+        {
+            r.close();
+        }
+
+        p.clear();
+        p.setProperty( "log4j.rootLogger", "INFO, logfile" );
+
+        Writer w = new FileWriter( plexusProps );
+        try
+        {
+            p.store( w, null );
+        }
+        finally
+        {
+            w.close();
+        }
+    }
+
+    private void fixPlexusProperties()
+        throws Exception
+    {
         File plexusProps = new File( getWarFile(), "WEB-INF/plexus.properties" );
         Properties p = new Properties();
         FileReader r = new FileReader( plexusProps );
@@ -95,7 +135,7 @@ public abstract class AbstractCargoIT
         {
             r.close();
         }
-        p.setProperty( "nexus-work", TestProperties.getString( "nexus-work-dir" ) + getClass().getName() );
+        p.setProperty( "nexus-work", TestProperties.getString( "nexus-work-dir" ) + "-" + getClass().getSimpleName() );
         Writer w = new FileWriter( plexusProps );
         try
         {
@@ -105,9 +145,6 @@ public abstract class AbstractCargoIT
         {
             w.close();
         }
-
-        TestContainer.getInstance().getTestContext().setSecureTest( true );
-        TestContainer.getInstance().getTestContext().useAdminForRequests();
     }
 
     @AfterClass( alwaysRun = true )

@@ -304,8 +304,6 @@
       <artifactId>cargo-core-container-tomcat</artifactId>
       <version>1.0.4</version>
     </dependency>
-
-
     <dependency>
       <groupId>org.codehaus.cargo</groupId>
       <artifactId>cargo-core-container-jetty</artifactId>
