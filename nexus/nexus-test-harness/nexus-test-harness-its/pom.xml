@@ -353,6 +353,7 @@
                       <groupId>org.apache.tomcat</groupId>
                       <artifactId>apache-tomcat</artifactId>
                       <version>6.0.29</version>
+                      <classifier>bundle</classifier>
                       <type>tar.gz</type>
                     </artifactItem>
                     <artifactItem>
