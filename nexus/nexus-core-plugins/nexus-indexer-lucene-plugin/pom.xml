@@ -114,9 +114,16 @@
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
         <extensions>true</extensions>
-        <configuration>
-          <excludeClasspathDependency>org.apache.maven.indexer:indexer-core</excludeClasspathDependency>
-        </configuration>
+        <executions>
+          <execution>
+            <id>default-create-bundle</id>
+            <configuration>
+              <classpathDependencyExcludes>
+                <classpathDependencyExclude>org.apache.maven.indexer:indexer-core</classpathDependencyExclude>
+              </classpathDependencyExcludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <!-- We must shade 1st, to make it "shared", then create the bundle -->
