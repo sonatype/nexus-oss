@@ -211,8 +211,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <!--tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus</tattletale-source -->
-        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus/lib</tattletale-source>
+        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
 
