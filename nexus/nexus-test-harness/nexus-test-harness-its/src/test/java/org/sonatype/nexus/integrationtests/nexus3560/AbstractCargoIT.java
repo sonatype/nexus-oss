@@ -9,11 +9,15 @@ import static org.testng.Assert.assertNotNull;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.codehaus.cargo.container.ContainerType;
 import org.codehaus.cargo.container.InstalledLocalContainer;
@@ -61,6 +65,7 @@ public abstract class AbstractCargoIT
 
     @BeforeClass
     public void startContainer()
+        throws Exception
     {
         WAR war = new WAR( getWarFile().getAbsolutePath() );
         war.setContext( "nexus" );
@@ -78,6 +83,28 @@ public abstract class AbstractCargoIT
         container.setHome( getContainerLocation().getAbsolutePath() );
 
         container.start();
+
+        File plexusProps = new File( getWarFile(), "WEB-INF/plexus.properties" );
+        Properties p = new Properties();
+        FileReader r = new FileReader( plexusProps );
+        try
+        {
+            p.load( r );
+        }
+        finally
+        {
+            r.close();
+        }
+        p.setProperty( "nexus-work", TestProperties.getString( "nexus-work-dir" ) + getClass().getName() );
+        Writer w = new FileWriter( plexusProps );
+        try
+        {
+            p.store( w, null );
+        }
+        finally
+        {
+            w.close();
+        }
 
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         TestContainer.getInstance().getTestContext().useAdminForRequests();
