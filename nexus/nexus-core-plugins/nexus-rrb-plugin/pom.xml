@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -47,52 +48,6 @@
     </developer>
   </developers>
 
-  <!-- Need to manage some transite deps to force them into provided, as they are set to compile through parent inheritance. This is kind of a workaround due to NEXUS-3189. -->
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.lucene</groupId>
-        <artifactId>lucene-core</artifactId>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>backport-util-concurrent</groupId>
-        <artifactId>backport-util-concurrent</artifactId>
-        <scope>provided</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
@@ -120,23 +75,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <artifactId>jsr311-api</artifactId>
-      <groupId>javax.ws.rs</groupId>
-      <version>1.1.1</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.7</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-proxy</artifactId>
       <scope>provided</scope>
@@ -150,6 +88,24 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.sonatype.plexus</groupId>
@@ -174,11 +130,6 @@
       <artifactId>mockito-all</artifactId>
       <version>1.8.2</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.thoughtworks.xstream</groupId>
-      <artifactId>xstream</artifactId>
-      <scope>provided</scope>
     </dependency>
   </dependencies>
 
