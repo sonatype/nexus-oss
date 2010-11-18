@@ -340,10 +340,10 @@
                 <id>copy-war</id>
                 <phase>pre-integration-test</phase>
                 <goals>
-                  <goal>copy-dependencies</goal>
+                  <goal>unpack-dependencies</goal>
                 </goals>
                 <configuration>
-                  <outputDirectory>${project.build.directory}/nexus</outputDirectory>
+                  <outputDirectory>${project.build.directory}/nexus/war</outputDirectory>
                   <includeTypes>war</includeTypes>
                 </configuration>
               </execution>

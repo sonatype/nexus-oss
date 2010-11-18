@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 //FIXME http://jira.codehaus.org/browse/CARGO-494
 @Test( enabled = false )
-public class Nexus3560Resin3WarCargoIT
+public class Nexus3560Resin3WarCargoNotest
     extends AbstractCargoIT
 {
     @Override
