@@ -108,7 +108,7 @@ public abstract class AbstractCargoIT
         }
 
         p.clear();
-        p.setProperty( "log4j.rootLogger", "INFO, logfile" );
+        p.setProperty( "log4j.rootLogger", "DEBUG, logfile" );
 
         Writer w = new FileWriter( plexusProps );
         try
