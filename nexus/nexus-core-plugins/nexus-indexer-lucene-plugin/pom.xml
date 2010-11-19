@@ -116,7 +116,7 @@
         <extensions>true</extensions>
         <executions>
           <execution>
-            <id>default-create-bundle</id>
+            <id>default-generate-metadata</id>
             <configuration>
               <classpathDependencyExcludes>
                 <classpathDependencyExclude>org.apache.maven.indexer:indexer-core</classpathDependencyExclude>
