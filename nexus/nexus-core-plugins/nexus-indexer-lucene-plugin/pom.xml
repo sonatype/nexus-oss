@@ -113,7 +113,6 @@
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
         <executions>
           <execution>
             <id>default-generate-metadata</id>

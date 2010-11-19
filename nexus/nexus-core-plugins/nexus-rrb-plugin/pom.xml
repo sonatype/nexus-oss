@@ -135,11 +135,10 @@
 
   <build>
     <plugins>
-      <!-- Remove this plugin (it's already in parent!) when fixed MNGECLIPSE-2574 -->
+      <!-- Needed to make Maven "know" nexus-plugin packaging -->
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>app-lifecycle-maven-plugin</artifactId>
-        <extensions>true</extensions>
       </plugin>
       <plugin>
         <groupId>net.sf.alchim</groupId>
