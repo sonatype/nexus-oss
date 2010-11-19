@@ -129,9 +129,10 @@
           <excludes>
             <exclude>**Suite*</exclude>
             <!-- START This are start/stop tests, shouldn't be runned -->
-            <exclude>**/Nexus758ServiceStabilityTest.*</exclude>
+            <exclude>**/Nexus758ServiceStability.*</exclude>
             <exclude>**/Nexus758StatusService.*</exclude>
-            <exclude>**/Nexus748MultipleStartTest.*</exclude>
+            <exclude>**/Nexus748MultipleStart.*</exclude>
+            <exclude>**/Nexus3560*</exclude>
             <!-- END This are start/stop tests, shouldn't be runned -->
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
@@ -151,6 +152,26 @@
             </property>
           </properties>
         </configuration>
+        <executions>
+          <execution>
+            <id>cargo</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <forkMode>always</forkMode>
+              <reportsDirectory>${project.build.directory}/forked-failsafe-reports</reportsDirectory>
+              <includes>
+                <include>**/Nexus3560*IT.*</include>
+              </includes>
+              <excludes>
+                <exclude>void</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
 
       <plugin>
