@@ -86,6 +86,7 @@ public abstract class AbstractCargoIT
                 ContainerType.INSTALLED, configuration );
         container.setHome( getContainerLocation().getAbsolutePath() );
 
+        container.setTimeout( 5 * 60 * 1000 );// 5 minutes
         container.start();
 
         TestContainer.getInstance().getTestContext().setSecureTest( true );
