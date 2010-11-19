@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -9,7 +10,7 @@
 
   <artifactId>nexus-lvo-plugin</artifactId>
   <name>Nexus : Core Plugins : LVO Plugin</name>
-  <description>Nexus LVO Plugin (Extras).</description>
+  <description>Nexus LVO Plugin (Extension).</description>
 
   <scm>
     <url>http://svn.sonatype.org/nexus-plugins/trunk/nexus-lvo-plugin</url>
@@ -24,14 +25,22 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.sonatype.nexus.plugins</groupId>
-      <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <scope>provided</scope>
-      <type>nexus-plugin</type>
+      <groupId>org.apache.maven.indexer</groupId>
+      <artifactId>indexer-artifact</artifactId>
     </dependency>
     <dependency>
       <groupId>org.sonatype.spice</groupId>
       <artifactId>spice-utils</artifactId>
+    </dependency>
+    <!-- Note: this extension lives in Nexus Core, while one of it's strategies
+    (IndexingContextDiscoveryStrategy) depends on IndxerManager to be found in nexus-indexer-lucene-plugin.
+    Hence, we are providing the dependency as "provided" scope, but this means that this strategy will be workable ONLY
+    if you have that plugin installed -->
+    <dependency>
+      <groupId>org.sonatype.nexus.plugins</groupId>
+      <artifactId>nexus-indexer-lucene-plugin</artifactId>
+      <scope>provided</scope>
+      <type>nexus-plugin</type>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -42,6 +51,11 @@
 
   <build>
     <plugins>
+      <!-- Needed to make Maven "know" nexus-plugin packaging -->
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>app-lifecycle-maven-plugin</artifactId>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-component-metadata</artifactId>
