@@ -64,13 +64,7 @@ public class GroupMessageUtil
             Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
         }
 
-        // // get the Resource object
-        // RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
-
-        // currently create doesn't return anything, it should see NEXUS-540
-        // the work around is to call get at this point
-        RepositoryGroupResource responseResource = this.getGroup( group.getId() ); // GET always uses XML, due to a
-        // problem in the RESTlet client
+        RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
 
         this.validateResourceResponse( group, responseResource );
 
@@ -175,12 +169,7 @@ public class GroupMessageUtil
             Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
         }
 
-        // this doesn't return any objects, it should....
-        // // get the Resource object
-        // RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
-
-        // for now call GET
-        RepositoryGroupResource responseResource = this.getGroup( group.getId() );
+        RepositoryGroupResource responseResource = this.getResourceFromResponse( response );
 
         this.validateResourceResponse( group, responseResource );
 
@@ -215,7 +204,7 @@ public class GroupMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -248,7 +237,6 @@ public class GroupMessageUtil
         return resourceResponse.getData();
     }
 
-    @SuppressWarnings( "unchecked" )
     private void validateRepoInNexusConfig( RepositoryGroupResource group )
         throws IOException
     {
@@ -257,7 +245,7 @@ public class GroupMessageUtil
         Assert.assertEquals( group.getId(), cGroup.getId() );
         Assert.assertEquals( group.getName(), cGroup.getName() );
 
-        List expectedRepos = group.getRepositories();
+        List<RepositoryGroupMemberRepository> expectedRepos = group.getRepositories();
         List<String> actualRepos = getTest().getNexusConfigUtil().getGroup( group.getId() ).getMemberRepositoryIds();
 
         this.validateRepoLists( expectedRepos, actualRepos );

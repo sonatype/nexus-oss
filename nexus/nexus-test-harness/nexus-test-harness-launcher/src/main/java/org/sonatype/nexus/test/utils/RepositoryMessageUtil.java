@@ -86,13 +86,7 @@ public class RepositoryMessageUtil
             Assert.fail( "Could not create Repository: " + response.getStatus() + ":\n" + responseText );
         }
 
-        // // get the Resource object
-        // RepositoryResource responseResource = this.getResourceFromResponse( response );
-
-        // currently create doesn't return anything, it should see NEXUS-540
-        // the work around is to call get at this point
-        RepositoryBaseResource responseResource = this.getRepository( repo.getId() ); // GET always uses XML, due to a
-        // problem in the RESTlet client
+        RepositoryBaseResource responseResource = this.getRepositoryBaseResourceFromResponse( response );
 
         if ( validate )
         {
@@ -204,12 +198,7 @@ public class RepositoryMessageUtil
             Assert.fail( "Could not update user: " + response.getStatus() + "\n" + responseText );
         }
 
-        // this doesn't return any objects, it should....
-        // // get the Resource object
-        // RepositoryResource responseResource = this.getResourceFromResponse( response );
-
-        // for now call GET
-        RepositoryBaseResource responseResource = this.getRepository( repo.getId() );
+        RepositoryBaseResource responseResource = this.getRepositoryBaseResourceFromResponse( response );
 
         if ( validate )
         {
@@ -259,7 +248,7 @@ public class RepositoryMessageUtil
 
     /**
      * This should be replaced with a REST Call, but the REST client does not set the Accept correctly on GET's/
-     * 
+     *
      * @return
      * @throws IOException
      */
@@ -294,17 +283,23 @@ public class RepositoryMessageUtil
         return resourceResponse.getData();
     }
 
-    public RepositoryResource getResourceFromResponse( Response response )
+    public RepositoryBaseResource getRepositoryBaseResourceFromResponse( Response response )
         throws IOException
     {
         String responseString = response.getEntity().getText();
-        LOG.debug( " getResourceFromResponse: " + responseString );
+        LOG.debug( " getRepositoryBaseResourceFromResponse: " + responseString );
 
         XStreamRepresentation representation = new XStreamRepresentation( xstream, responseString, mediaType );
         RepositoryResourceResponse resourceResponse =
             (RepositoryResourceResponse) representation.getPayload( new RepositoryResourceResponse() );
 
-        return (RepositoryResource) resourceResponse.getData();
+        return resourceResponse.getData();
+    }
+
+    public RepositoryResource getResourceFromResponse( Response response )
+        throws IOException
+    {
+        return (RepositoryResource) getRepositoryBaseResourceFromResponse( response );
     }
 
     private void validateRepoInNexusConfig( RepositoryBaseResource repo )
