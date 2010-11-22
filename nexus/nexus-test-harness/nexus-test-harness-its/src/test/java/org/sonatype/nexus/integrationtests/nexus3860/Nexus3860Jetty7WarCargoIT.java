@@ -1,8 +1,8 @@
-package org.sonatype.nexus.integrationtests.nexus3560;
+package org.sonatype.nexus.integrationtests.nexus3860;
 
 import java.io.File;
 
-public class Nexus3560Jetty7WarCargoIT
+public class Nexus3860Jetty7WarCargoIT
     extends AbstractCargoIT
 {
     @Override

@@ -132,7 +132,7 @@
             <exclude>**/Nexus758ServiceStability.*</exclude>
             <exclude>**/Nexus758StatusService.*</exclude>
             <exclude>**/Nexus748MultipleStart.*</exclude>
-            <exclude>**/Nexus3560*</exclude>
+            <exclude>**/Nexus3860*</exclude>
             <!-- END This are start/stop tests, shouldn't be runned -->
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
@@ -164,7 +164,7 @@
               <forkMode>always</forkMode>
               <reportsDirectory>${project.build.directory}/forked-failsafe-reports</reportsDirectory>
               <includes>
-                <include>**/Nexus3560*IT.*</include>
+                <include>**/Nexus3860*IT.*</include>
               </includes>
               <excludes>
                 <exclude>void</exclude>

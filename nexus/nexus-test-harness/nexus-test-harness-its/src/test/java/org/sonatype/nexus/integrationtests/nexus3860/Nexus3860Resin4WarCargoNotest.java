@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus3560;
+package org.sonatype.nexus.integrationtests.nexus3860;
 
 import java.io.File;
 
@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 //FIXME http://jira.codehaus.org/browse/CARGO-760
 @Test( enabled = false )
-public class Nexus3560Resin4WarCargoNotest
+public class Nexus3860Resin4WarCargoNotest
     extends AbstractCargoIT
 {
     @Override

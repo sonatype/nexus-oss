@@ -1,4 +1,4 @@
-package org.sonatype.nexus.integrationtests.nexus3560;
+package org.sonatype.nexus.integrationtests.nexus3860;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
