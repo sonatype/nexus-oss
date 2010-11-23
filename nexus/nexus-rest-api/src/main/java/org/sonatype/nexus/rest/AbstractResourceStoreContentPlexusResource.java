@@ -832,7 +832,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else
             {
                 // if not in DEBUG mode, we obey the flag to decide whether we need to log or not the stack trace
-                if ( t instanceof ItemNotFoundException && !shouldLogInfoStackTrace )
+                if ( (t instanceof ItemNotFoundException || t instanceof IllegalRequestException) && !shouldLogInfoStackTrace )
                 {
                     // mute it
                 }
