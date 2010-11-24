@@ -53,6 +53,7 @@ public class DynamicGroupsTest
 //        configuration.setGroupMemberAttribute( "uniqueMember" );
         configuration.setUserRealNameAttribute( "cn" );
         configuration.setUserMemberOfAttribute( "businesscategory" );
+        configuration.setLdapGroupsAsRoles( true );
 
         LdapUserDAO lum = (LdapUserDAO) lookup( LdapUserDAO.class.getName() );
 
@@ -117,6 +118,7 @@ public class DynamicGroupsTest
     //    configuration.setGroupMemberAttribute( "uniqueMember" );
         configuration.setUserRealNameAttribute( "cn" );
         configuration.setUserMemberOfAttribute( "businesscategory" );
+        configuration.setLdapGroupsAsRoles( true );
     
         LdapGroupDAO lgm = (LdapGroupDAO) lookup( LdapGroupDAO.class.getName() );
     

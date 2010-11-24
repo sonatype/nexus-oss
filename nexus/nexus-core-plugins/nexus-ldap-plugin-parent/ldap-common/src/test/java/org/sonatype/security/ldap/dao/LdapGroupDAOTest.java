@@ -53,6 +53,7 @@ public class LdapGroupDAOTest
         configuration.setGroupObjectClass( "groupOfUniqueNames" );
         configuration.setGroupMemberAttribute( "uniqueMember" );
         configuration.setGroupMemberFormat( groupMemberFormat );
+        configuration.setLdapGroupsAsRoles( true );
         configuration.setUserMemberOfAttribute( "" );
 
         LdapGroupDAO lgm = (LdapGroupDAO) lookup( LdapGroupDAO.class.getName() );
