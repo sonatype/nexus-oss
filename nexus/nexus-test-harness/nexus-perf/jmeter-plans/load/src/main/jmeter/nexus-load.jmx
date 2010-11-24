@@ -708,11 +708,129 @@
         </ModuleController>
         <hashTree/>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="MSE Install" enabled="true">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Eclipse MSE artifacts.xml" enabled="true">
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">${mseinstall.loop}</stringProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${mseinstall.threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${mseinstall.rampup}</stringProp>
+        <longProp name="ThreadGroup.start_time">1288061702000</longProp>
+        <longProp name="ThreadGroup.end_time">1288061702000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration">${mseinstall.duration}</stringProp>
+        <stringProp name="ThreadGroup.delay">${mseinstall.delay}</stringProp>
+        <stringProp name="TestPlan.comments">Exercise the P2 Plugin artifacts.xml metadata</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Eclipse Headers" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="Cache-Control" elementType="Header">
+              <stringProp name="Header.name">Cache-Control</stringProp>
+              <stringProp name="Header.value">max-age=0</stringProp>
+            </elementProp>
+            <elementProp name="User-Agent" elementType="Header">
+              <stringProp name="Header.name">User-Agent</stringProp>
+              <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
+            </elementProp>
+            <elementProp name="Accept-encoding" elementType="Header">
+              <stringProp name="Header.name">Accept-encoding</stringProp>
+              <stringProp name="Header.value">gzip</stringProp>
+            </elementProp>
+          </collectionProp>
+          <stringProp name="TestPlan.comments">Eclipse IDE headers when requesting bits from a P2 Repository, gzip is only suitable for xml files but shouldn&apos;t hurt otherwise</stringProp>
+        </HeaderManager>
+        <hashTree/>
+        <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
+          <collectionProp name="UserParameters.names">
+            <stringProp name="3496818">repo</stringProp>
+          </collectionProp>
+          <collectionProp name="UserParameters.thread_values">
+            <collectionProp name="-1214092943">
+              <stringProp name="-1033489156">nx-mse</stringProp>
+            </collectionProp>
+          </collectionProp>
+          <boolProp name="UserParameters.per_iteration">false</boolProp>
+          <stringProp name="TestPlan.comments">thread variables</stringProp>
+        </UserParameters>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE artifacts.xml" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="-1227702913">WorkBench</stringProp>
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="2108044882">Common Modules</stringProp>
+            <stringProp name="-1678783399">Content</stringProp>
+            <stringProp name="-2016914040">Repositories</stringProp>
+            <stringProp name="12427913">MSE artifacts.xml</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Eclipse MSE content.xml" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${mseinstall.threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">${mseinstall.rampup}</stringProp>
+        <longProp name="ThreadGroup.start_time">1288061702000</longProp>
+        <longProp name="ThreadGroup.end_time">1288061702000</longProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration">${mseinstall.duration}</stringProp>
+        <stringProp name="ThreadGroup.delay">${mseinstall.delay}</stringProp>
+        <stringProp name="TestPlan.comments">Exercise the P2 Plugin content.xml metadata</stringProp>
+      </ThreadGroup>
+      <hashTree>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Eclipse Headers" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="Cache-Control" elementType="Header">
+              <stringProp name="Header.name">Cache-Control</stringProp>
+              <stringProp name="Header.value">max-age=0</stringProp>
+            </elementProp>
+            <elementProp name="User-Agent" elementType="Header">
+              <stringProp name="Header.name">User-Agent</stringProp>
+              <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
+            </elementProp>
+            <elementProp name="Accept-encoding" elementType="Header">
+              <stringProp name="Header.name">Accept-encoding</stringProp>
+              <stringProp name="Header.value">gzip</stringProp>
+            </elementProp>
+          </collectionProp>
+          <stringProp name="TestPlan.comments">Eclipse IDE headers when requesting bits from a P2 Repository, gzip is only suitable for xml files but shouldn&apos;t hurt otherwise</stringProp>
+        </HeaderManager>
+        <hashTree/>
+        <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
+          <collectionProp name="UserParameters.names">
+            <stringProp name="3496818">repo</stringProp>
+          </collectionProp>
+          <collectionProp name="UserParameters.thread_values">
+            <collectionProp name="-1214092943">
+              <stringProp name="-1033489156">nx-mse</stringProp>
+            </collectionProp>
+          </collectionProp>
+          <boolProp name="UserParameters.per_iteration">false</boolProp>
+          <stringProp name="TestPlan.comments">thread variables</stringProp>
+        </UserParameters>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE content.xml" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="-1227702913">WorkBench</stringProp>
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="2108044882">Common Modules</stringProp>
+            <stringProp name="-1678783399">Content</stringProp>
+            <stringProp name="-2016914040">Repositories</stringProp>
+            <stringProp name="1781123553">MSE content.xml</stringProp>
+          </collectionProp>
+        </ModuleController>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Eclipse MSE Install" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <intProp name="LoopController.loops">-1</intProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${mseinstall.threads}</stringProp>
         <stringProp name="ThreadGroup.ramp_time">${mseinstall.rampup}</stringProp>
@@ -739,7 +857,7 @@
               <stringProp name="Header.value">gzip</stringProp>
             </elementProp>
           </collectionProp>
-          <stringProp name="TestPlan.comments">Useful to simulate requests from Eclipse IDE when requesting bits from a P2 Repository</stringProp>
+          <stringProp name="TestPlan.comments">Eclipse IDE headers when requesting bits from a P2 Repository, gzip is only suitable for xml files but shouldn&apos;t hurt otherwise</stringProp>
         </HeaderManager>
         <hashTree/>
         <UserParameters guiclass="UserParametersGui" testclass="UserParameters" testname="User Parameters" enabled="true">
@@ -754,6 +872,17 @@
           <boolProp name="UserParameters.per_iteration">false</boolProp>
           <stringProp name="TestPlan.comments">thread variables</stringProp>
         </UserParameters>
+        <hashTree/>
+        <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE Metadata" enabled="true">
+          <collectionProp name="ModuleController.node_path">
+            <stringProp name="-1227702913">WorkBench</stringProp>
+            <stringProp name="764597751">Test Plan</stringProp>
+            <stringProp name="2108044882">Common Modules</stringProp>
+            <stringProp name="-1678783399">Content</stringProp>
+            <stringProp name="-2016914040">Repositories</stringProp>
+            <stringProp name="-537530640">MSE Metadata</stringProp>
+          </collectionProp>
+        </ModuleController>
         <hashTree/>
         <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE Install" enabled="true">
           <collectionProp name="ModuleController.node_path">
@@ -891,7 +1020,7 @@
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="true">
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -1533,6 +1662,27 @@
             </ResultCollector>
             <hashTree/>
           </hashTree>
+          <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="Assertions" enabled="true"/>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="51512">404</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">8</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
         </hashTree>
         <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="HTTP" enabled="true"/>
         <hashTree>
@@ -1919,40 +2069,134 @@
               </HTTPSampler2>
               <hashTree/>
             </hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="GET Resource as Eclipse" enabled="true"/>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="MSE artifacts.xml" enabled="true"/>
             <hashTree>
-              <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="Eclipse Headers" enabled="true">
-                <collectionProp name="HeaderManager.headers">
-                  <elementProp name="Cache-Control" elementType="Header">
-                    <stringProp name="Header.name">Cache-Control</stringProp>
-                    <stringProp name="Header.value">max-age=0</stringProp>
-                  </elementProp>
-                  <elementProp name="User-Agent" elementType="Header">
-                    <stringProp name="Header.name">User-Agent</stringProp>
-                    <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                  </elementProp>
-                  <elementProp name="Accept-encoding" elementType="Header">
-                    <stringProp name="Header.name">Accept-encoding</stringProp>
-                    <stringProp name="Header.value">gzip</stringProp>
-                  </elementProp>
-                </collectionProp>
-                <stringProp name="TestPlan.comments">Useful to simulate requests from Eclipse IDE when requesting bits from a P2 Repository</stringProp>
-              </HeaderManager>
-              <hashTree/>
-              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="GET Resource" enabled="true">
-                <collectionProp name="ModuleController.node_path">
-                  <stringProp name="-1227702913">WorkBench</stringProp>
-                  <stringProp name="764597751">Test Plan</stringProp>
-                  <stringProp name="2108044882">Common Modules</stringProp>
-                  <stringProp name="-1678783399">Content</stringProp>
-                  <stringProp name="-2016914040">Repositories</stringProp>
-                  <stringProp name="-468307496">GET Resource</stringProp>
-                </collectionProp>
-              </ModuleController>
-              <hashTree/>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/artifacts.xml HEAD" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/artifacts.xml</stringProp>
+                <stringProp name="HTTPSampler.method">HEAD</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/artifacts.xml GET" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/artifacts.xml</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
             </hashTree>
-            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="MSE Install 1.8.0.1" enabled="true">
-              <stringProp name="TestPlan.comments">Install into existingEclipse</stringProp>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="MSE content.xml" enabled="true"/>
+            <hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/content.xml HEAD" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/content.xml</stringProp>
+                <stringProp name="HTTPSampler.method">HEAD</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/content.xml GET" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/content.xml</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="MSE Metadata" enabled="true">
+              <stringProp name="TestPlan.comments">Simulated Fetch of content metadata that Eclipse requests when determining the features available in a P2 Repo</stringProp>
             </GenericController>
             <hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/p2.index" enabled="true">
@@ -1975,22 +2219,90 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="51512">404</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/content.jar HEAD" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/content.jar</stringProp>
+                <stringProp name="HTTPSampler.method">HEAD</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="51512">404</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
+                <hashTree/>
+              </hashTree>
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE content.xml" enabled="true">
+                <collectionProp name="ModuleController.node_path">
+                  <stringProp name="-1227702913">WorkBench</stringProp>
+                  <stringProp name="764597751">Test Plan</stringProp>
+                  <stringProp name="2108044882">Common Modules</stringProp>
+                  <stringProp name="-1678783399">Content</stringProp>
+                  <stringProp name="-2016914040">Repositories</stringProp>
+                  <stringProp name="1781123553">MSE content.xml</stringProp>
+                </collectionProp>
+              </ModuleController>
+              <hashTree/>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="MSE Install 1.8.0.1" enabled="true">
+              <stringProp name="TestPlan.comments">Simulated Install of MSE into Eclipse</stringProp>
+            </GenericController>
+            <hashTree>
+              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/p2.index" enabled="true">
+                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
+                  <collectionProp name="Arguments.arguments"/>
+                </elementProp>
+                <stringProp name="HTTPSampler.domain"></stringProp>
+                <stringProp name="HTTPSampler.port"></stringProp>
+                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+                <stringProp name="HTTPSampler.response_timeout"></stringProp>
+                <stringProp name="HTTPSampler.protocol"></stringProp>
+                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/p2.index</stringProp>
+                <stringProp name="HTTPSampler.method">GET</stringProp>
+                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+                <boolProp name="HTTPSampler.monitor">false</boolProp>
+                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+              </HTTPSampler2>
+              <hashTree>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="51512">404</stringProp>
+                  </collectionProp>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/artifacts.jar" enabled="true">
@@ -2013,92 +2325,27 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 404" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="51512">404</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
-              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/artifacts.xml" enabled="true">
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                  <collectionProp name="Arguments.arguments"/>
-                </elementProp>
-                <stringProp name="HTTPSampler.domain"></stringProp>
-                <stringProp name="HTTPSampler.port"></stringProp>
-                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                <stringProp name="HTTPSampler.protocol"></stringProp>
-                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/artifacts.xml</stringProp>
-                <stringProp name="HTTPSampler.method">GET</stringProp>
-                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                <boolProp name="HTTPSampler.monitor">false</boolProp>
-                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              </HTTPSampler2>
-              <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
-                  </collectionProp>
-                </HeaderManager>
-                <hashTree/>
-              </hashTree>
-              <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/artifacts.xml" enabled="true">
-                <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
-                  <collectionProp name="Arguments.arguments"/>
-                </elementProp>
-                <stringProp name="HTTPSampler.domain"></stringProp>
-                <stringProp name="HTTPSampler.port"></stringProp>
-                <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-                <stringProp name="HTTPSampler.response_timeout"></stringProp>
-                <stringProp name="HTTPSampler.protocol"></stringProp>
-                <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-                <stringProp name="HTTPSampler.path">/nexus/content/repositories/nx-mse/artifacts.xml</stringProp>
-                <stringProp name="HTTPSampler.method">HEAD</stringProp>
-                <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
-                <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-                <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
-                <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-                <boolProp name="HTTPSampler.monitor">false</boolProp>
-                <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-              </HTTPSampler2>
-              <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                  </collectionProp>
-                </HeaderManager>
-                <hashTree/>
-              </hashTree>
+              <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="MSE artifacts.xml" enabled="true">
+                <collectionProp name="ModuleController.node_path">
+                  <stringProp name="-1227702913">WorkBench</stringProp>
+                  <stringProp name="764597751">Test Plan</stringProp>
+                  <stringProp name="2108044882">Common Modules</stringProp>
+                  <stringProp name="-1678783399">Content</stringProp>
+                  <stringProp name="-2016914040">Repositories</stringProp>
+                  <stringProp name="12427913">MSE artifacts.xml</stringProp>
+                </collectionProp>
+              </ModuleController>
+              <hashTree/>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.buildserver.eclipse.feature_1.0.2.20101115.jar" enabled="true">
                 <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" enabled="true">
                   <collectionProp name="Arguments.arguments"/>
@@ -2119,22 +2366,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.s2.project.feature_1.0.7.20101115-1145.jar" enabled="true">
@@ -2157,22 +2396,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.buildserver.bridge.feature_1.0.2.20101115.jar" enabled="true">
@@ -2195,22 +2426,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.s2.project.cvs.feature_1.0.7.20101115-1145.jar" enabled="true">
@@ -2233,22 +2456,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.s2.project.git.feature_1.0.7.20101115-1145.jar" enabled="true">
@@ -2271,22 +2486,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/com.sonatype.s2.project.svn.feature_1.0.7.20101115-1145.jar" enabled="true">
@@ -2309,22 +2516,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.eclipse.egit_0.9.3.jar" enabled="true">
@@ -2347,22 +2546,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.eclipse.team.svn_0.7.9.I20100917-1700.jar" enabled="true">
@@ -2385,22 +2576,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.maven.ide.eclipse.feature_0.12.20101114.jar" enabled="true">
@@ -2423,22 +2606,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.maven.ide.eclipse.temporary.mojos.feature_0.12.0.20101103-1500.jar" enabled="true">
@@ -2461,22 +2636,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.eclipse.jgit_0.9.3.jar" enabled="true">
@@ -2499,22 +2666,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.polarion.eclipse.team.svn.connector_2.2.2.I20101001-1700.jar" enabled="true">
@@ -2537,22 +2696,14 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
               </hashTree>
               <HTTPSampler2 guiclass="HttpTestSampleGui2" testclass="HTTPSampler2" testname="/nexus/content/repositories/nx-mse/features/org.polarion.eclipse.team.svn.connector.svnkit16_2.2.2.I20100917-1700.jar" enabled="true">
@@ -2575,23 +2726,77 @@
                 <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
               </HTTPSampler2>
               <hashTree>
-                <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
-                  <collectionProp name="HeaderManager.headers">
-                    <elementProp name="Cache-Control" elementType="Header">
-                      <stringProp name="Header.name">Cache-Control</stringProp>
-                      <stringProp name="Header.value">max-age=0</stringProp>
-                    </elementProp>
-                    <elementProp name="User-Agent" elementType="Header">
-                      <stringProp name="Header.name">User-Agent</stringProp>
-                      <stringProp name="Header.value">Jakarta Commons-HttpClient/3.1</stringProp>
-                    </elementProp>
-                    <elementProp name="Accept-encoding" elementType="Header">
-                      <stringProp name="Header.name">Accept-encoding</stringProp>
-                      <stringProp name="Header.value">gzip</stringProp>
-                    </elementProp>
+                <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Response Code 200" enabled="true">
+                  <collectionProp name="Asserion.test_strings">
+                    <stringProp name="49586">200</stringProp>
                   </collectionProp>
-                </HeaderManager>
+                  <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+                  <boolProp name="Assertion.assume_success">false</boolProp>
+                  <intProp name="Assertion.test_type">8</intProp>
+                </ResponseAssertion>
                 <hashTree/>
+              </hashTree>
+            </hashTree>
+            <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="EXAMPLES" enabled="true"/>
+            <hashTree>
+              <GenericController guiclass="LogicControllerGui" testclass="GenericController" testname="mse install loop" enabled="true"/>
+              <hashTree>
+                <LoopController guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="false">
+                  <boolProp name="LoopController.continue_forever">true</boolProp>
+                  <intProp name="LoopController.loops">-1</intProp>
+                </LoopController>
+                <hashTree>
+                  <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="mse.csv" enabled="true">
+                    <stringProp name="delimiter">,</stringProp>
+                    <stringProp name="fileEncoding">${fileEncoding}</stringProp>
+                    <stringProp name="filename">${data.dir}/mse.csv</stringProp>
+                    <stringProp name="quotedData">${csvAllowQuotedData}</stringProp>
+                    <stringProp name="recycle">${csvRecycleOnEOF}</stringProp>
+                    <stringProp name="shareMode">Current thread</stringProp>
+                    <stringProp name="stopThread">${csvStopOnEOF}</stringProp>
+                    <stringProp name="variableNames">resourcePath,httpMethod</stringProp>
+                    <stringProp name="TestPlan.comments">resourcePaths for the resources to get to simulate a complete Eclipse MSE installation</stringProp>
+                  </CSVDataSet>
+                  <hashTree/>
+                  <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If HEAD" enabled="true">
+                    <stringProp name="IfController.condition">${__jexl(&quot;HEAD&quot; == &quot;${__log(${httpMethod},,,)}&quot;)}</stringProp>
+                    <boolProp name="IfController.evaluateAll">false</boolProp>
+                    <boolProp name="IfController.useExpression">true</boolProp>
+                  </IfController>
+                  <hashTree>
+                    <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="HEAD Resource" enabled="true">
+                      <stringProp name="TestPlan.comments">Use module controllers to reference common modules</stringProp>
+                      <collectionProp name="ModuleController.node_path">
+                        <stringProp name="-1227702913">WorkBench</stringProp>
+                        <stringProp name="764597751">Test Plan</stringProp>
+                        <stringProp name="2108044882">Common Modules</stringProp>
+                        <stringProp name="-1678783399">Content</stringProp>
+                        <stringProp name="-2016914040">Repositories</stringProp>
+                        <stringProp name="1365433966">HEAD Resource</stringProp>
+                      </collectionProp>
+                    </ModuleController>
+                    <hashTree/>
+                  </hashTree>
+                  <IfController guiclass="IfControllerPanel" testclass="IfController" testname="If GET" enabled="true">
+                    <stringProp name="IfController.condition"> ${__jexl(&quot;GET&quot; == &quot;${__log(${httpMethod},,,)}&quot;)}</stringProp>
+                    <boolProp name="IfController.evaluateAll">false</boolProp>
+                    <boolProp name="IfController.useExpression">true</boolProp>
+                  </IfController>
+                  <hashTree>
+                    <ModuleController guiclass="ModuleControllerGui" testclass="ModuleController" testname="GET Resource" enabled="true">
+                      <stringProp name="TestPlan.comments">Use module controllers to reference common modules</stringProp>
+                      <collectionProp name="ModuleController.node_path">
+                        <stringProp name="-1227702913">WorkBench</stringProp>
+                        <stringProp name="764597751">Test Plan</stringProp>
+                        <stringProp name="2108044882">Common Modules</stringProp>
+                        <stringProp name="-1678783399">Content</stringProp>
+                        <stringProp name="-2016914040">Repositories</stringProp>
+                        <stringProp name="-468307496">GET Resource</stringProp>
+                      </collectionProp>
+                    </ModuleController>
+                    <hashTree/>
+                  </hashTree>
+                </hashTree>
               </hashTree>
             </hashTree>
           </hashTree>
