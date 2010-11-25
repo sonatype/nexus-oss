@@ -83,7 +83,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.sonatype.security.realms.ldap</groupId>
+      <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>ldap-common</artifactId>
       <version>${project.version}</version>
     </dependency>
