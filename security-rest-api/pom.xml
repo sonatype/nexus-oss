@@ -42,7 +42,7 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-model</artifactId>
-      <version>${base-security.version}</version>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
