@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>nexus-test-environment-maven-plugin</artifactId>
-  <version>1.6</version>
+  <version>1.7-SNAPSHOT</version>
 
   <packaging>maven-plugin</packaging>
 
@@ -90,10 +90,4 @@
       <version>r06</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.sonatype.org/plugins/tags/nexus-test-environment-maven-plugin-1.6</connection>
-    <developerConnection>scm:svn:https://svn.sonatype.org/plugins/tags/nexus-test-environment-maven-plugin-1.6</developerConnection>
-    <url>http://svn.sonatype.org/plugins/tags/nexus-test-environment-maven-plugin-1.6</url>
-  </scm>
 </project>
