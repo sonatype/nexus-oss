@@ -13,9 +13,9 @@
   <name>Plexus Security Aggregator</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
+    <connection>scm:git:git@github.com/sonatype/security.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/security.git</developerConnection>
+    <url>http://github.com/sonatype/security</url>
   </scm>
 
   <distributionManagement>
