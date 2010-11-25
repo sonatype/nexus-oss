@@ -18,14 +18,6 @@
     <url>http://github.com/sonatype/security</url>
   </scm>
 
-  <distributionManagement>
-    <repository>
-      <id>localhost</id>
-      <name>dumping to target</name>
-      <url>file://${basedir}/target/repo/</url>
-    </repository>
-  </distributionManagement>
-
   <properties>
     <plexus.version>1.2.1</plexus.version>
     <plexus-maven-plugin.version>1.3.8</plexus-maven-plugin.version>
