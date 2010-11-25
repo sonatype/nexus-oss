@@ -11,6 +11,7 @@
 
   <properties>
     <plexus-restlet-bridge.version>1.9</plexus-restlet-bridge.version>
+    <base-security.version>2.0.0</base-security.version>
   </properties>
 
   <dependencies>
@@ -29,25 +30,25 @@
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-system</artifactId>
-      <version>${project.version}</version>
+      <version>${base-security.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
-      <version>${project.version}</version>
+      <version>${base-security.version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.sonatype.security</groupId>
       <artifactId>security-rest-model</artifactId>
-      <version>${project.version}</version>
+      <version>${base-security.version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.sonatype.security.realms</groupId>
       <artifactId>security-xml-realm</artifactId>
-      <version>${project.version}</version>
+      <version>${base-security.version}</version>
       <scope>test</scope>
       <classifier>tests</classifier>
     </dependency>
