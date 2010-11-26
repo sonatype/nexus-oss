@@ -41,7 +41,7 @@ public class Nexus2209PrivilegesTest
         NxAssert.requiredField( privs.getDescription(), "selpriv" );
 
         privs.save();
-        NxAssert.hasErrorText( privs.getRepositoryOrGroup(), "Repository Target is required." );
+        NxAssert.hasErrorText( privs.getRepositoryOrGroup(), "This field is required" );
         privs.getRepositoryOrGroup().select( 0 );
 
         privs.save();
