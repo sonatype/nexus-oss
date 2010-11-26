@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -58,14 +57,7 @@
 
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
           <nexusPluginsArtifacts>
-<!--
-not sure where this went - is it still needed?
--?-
-            <plugin>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>nexus-simple-memory-realm</artifactId>
-            </plugin>
--->
+            <!-- not sure where this went - is it still needed? -?- <plugin> <groupId>${project.groupId}</groupId> <artifactId>nexus-simple-memory-realm</artifactId> </plugin> -->
             <jar>
               <!-- TEMP! activate resource interception -->
               <groupId>org.sonatype.nexus</groupId>
@@ -327,6 +319,10 @@ not sure where this went - is it still needed?
         <exclusion>
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-beanutils</groupId>
+          <artifactId>commons-beanutils</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
