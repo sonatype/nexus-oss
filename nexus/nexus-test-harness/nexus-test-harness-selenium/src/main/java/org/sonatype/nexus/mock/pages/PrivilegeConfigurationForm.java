@@ -105,10 +105,14 @@ public class PrivilegeConfigurationForm
         return type;
     }
 
-    public PrivilegeConfigurationForm populate( String name, String description, int target )
+    public PrivilegeConfigurationForm populate( String name, String description, int repository, int target )
     {
         this.name.type( name );
         this.description.type( description );
+        if ( repository != -1 )
+        {
+            this.repositoryOrGroup.select( repository );
+        }
         if ( target != -1 )
         {
             this.repoTarget.select( target );
@@ -119,7 +123,7 @@ public class PrivilegeConfigurationForm
 
     public PrivilegeConfigurationForm populate( String name, String description, String repoId, String targetId )
     {
-        populate( name, description, -1 );
+        populate( name, description, -1, -1 );
         this.repoTarget.setValue( targetId );
         this.repositoryOrGroup.setValue( String.valueOf( repoId ) );
 

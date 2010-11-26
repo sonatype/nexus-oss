@@ -41,6 +41,10 @@ public class Nexus2209PrivilegesTest
         NxAssert.requiredField( privs.getDescription(), "selpriv" );
 
         privs.save();
+        NxAssert.hasErrorText( privs.getRepositoryOrGroup(), "Repository Target is required." );
+        privs.getRepositoryOrGroup().select( 0 );
+
+        privs.save();
         NxAssert.hasErrorText( privs.getRepoTarget(), "Repository Target is required." );
 
         privs.getRepoTarget().select( 0 );
@@ -70,7 +74,7 @@ public class Nexus2209PrivilegesTest
         // create
         String name = "privName";
         String description = "privDescription";
-        privs.addPrivilege().populate( name, description, 0 ).save();
+        privs.addPrivilege().populate( name, description, 0, 0 ).save();
 
         PrivilegeListResourceResponse result = (PrivilegeListResourceResponse) ml.getResult();
         assertNotNull( result );
@@ -197,7 +201,7 @@ public class Nexus2209PrivilegesTest
         PrivilegeConfigurationForm priv = privs.addPrivilege();
 
         priv.getRepositoryOrGroup().select( 0 );
-        Assert.assertEquals( new Integer( 4 ), priv.getRepoTarget().getCount() );
+        Assert.assertEquals( new Integer( 5 ), priv.getRepoTarget().getCount() );
         priv.getRepositoryOrGroup().setValue( "repo_central" );
         Assert.assertEquals( new Integer( 3 ), priv.getRepoTarget().getCount() );
         priv.getRepositoryOrGroup().setValue( "repo_central-m1" );
