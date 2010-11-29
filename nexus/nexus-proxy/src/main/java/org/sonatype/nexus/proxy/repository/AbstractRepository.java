@@ -39,6 +39,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.cache.CacheManager;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
@@ -61,6 +62,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
@@ -107,6 +109,9 @@ public abstract class AbstractRepository
 
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
+    
+    @Requirement
+    private RepositoryItemUidAttributeManager repositoryItemUidAttributeManager;
 
     @Requirement
     private AccessManager accessManager;
@@ -122,6 +127,9 @@ public abstract class AbstractRepository
 
     @Requirement( role = ContentGenerator.class )
     private Map<String, ContentGenerator> contentGenerators;
+
+    @Requirement
+    private AttributesHandler attributesHandler;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -209,8 +217,8 @@ public abstract class AbstractRepository
 
     protected AbstractRepositoryConfiguration getExternalConfiguration( boolean forModification )
     {
-        return (AbstractRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration()
-            .getConfiguration( forModification );
+        return (AbstractRepositoryConfiguration) getCurrentCoreConfiguration().getExternalConfiguration().getConfiguration(
+            forModification );
     }
 
     // ==
@@ -218,10 +226,9 @@ public abstract class AbstractRepository
     public RepositoryTaskFilter getRepositoryTaskFilter()
     {
         // we are allowing all, and subclasses will filter as they want
-        return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true )
-            .setAllowsUserInitiatedTasks( true ).setContentOperators(
-                DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS ).setAttributeOperators(
-                DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
+        return new DefaultRepositoryTaskFilter().setAllowsRepositoryScanning( true ).setAllowsScheduledTasks( true ).setAllowsUserInitiatedTasks(
+            true ).setContentOperators( DefaultRepositoryTaskActivityDescriptor.ALL_CONTENT_OPERATIONS ).setAttributeOperators(
+            DefaultRepositoryTaskActivityDescriptor.ALL_ATTRIBUTES_OPERATIONS );
     }
 
     public Map<String, RequestProcessor> getRequestProcessors()
@@ -510,6 +517,16 @@ public abstract class AbstractRepository
         return true;
     }
 
+    public AttributesHandler getAttributesHandler()
+    {
+        return attributesHandler;
+    }
+
+    public void setAttributesHandler( AttributesHandler attributesHandler )
+    {
+        this.attributesHandler = attributesHandler;
+    }
+
     public LocalRepositoryStorage getLocalStorage()
     {
         return localStorage;
@@ -604,8 +621,8 @@ public abstract class AbstractRepository
         }
 
         DefaultStorageFileItem fItem =
-            new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is, getMimeUtil()
-                .getMimeType( request.getRequestPath() ) ) );
+            new DefaultStorageFileItem( this, request, true, true, new PreparedContentLocator( is,
+                getMimeUtil().getMimeType( request.getRequestPath() ) ) );
 
         if ( userAttributes != null )
         {
@@ -1031,6 +1048,11 @@ public abstract class AbstractRepository
     {
         return getRepositoryItemUidFactory().createUid( this, path );
     }
+    
+    public RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager()
+    {
+        return repositoryItemUidAttributeManager;
+    }
 
     // ===================================================================================
     // Inner stuff
@@ -1225,7 +1247,7 @@ public abstract class AbstractRepository
             // this "self correction" is needed to nexus build for himself the needed metadata
             if ( localItem.getRemoteChecked() == 0 )
             {
-                getLocalStorage().touchItemRemoteChecked( this, request );
+                getAttributesHandler().touchItemRemoteChecked( this, request );
 
                 localItem = getLocalStorage().retrieveItem( this, request );
             }

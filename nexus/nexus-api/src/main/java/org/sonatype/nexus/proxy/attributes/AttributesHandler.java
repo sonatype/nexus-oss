@@ -15,11 +15,17 @@ package org.sonatype.nexus.proxy.attributes;
 
 import java.io.InputStream;
 
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
- * The Interface AttributesHandler. Used by LocalStorage to decorate the items.
+ * The Interface AttributesHandler. Used to decorate the items.
+ * 
+ * @author cstamas
  */
 public interface AttributesHandler
 {
@@ -50,4 +56,67 @@ public interface AttributesHandler
      * @return true if attributes are found and deleted, false otherwise.
      */
     boolean deleteAttributes( RepositoryItemUid uid );
+
+    // ==
+
+    /**
+     * Touch item and sets on it the current time.
+     * 
+     * @param uid the uid
+     * @throws LocalStorageException the storage exception
+     */
+    void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException;
+
+    /**
+     * Touch item and sets on it the given timestamp.
+     * 
+     * @param uid the uid
+     * @param timestamp the ts to set on file, 0 to "expire" it
+     * @throws LocalStorageException the storage exception
+     */
+    void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException;
+
+    /**
+     * Touch item last requested and sets on it the current time.
+     * 
+     * @param uid the uid
+     * @throws LocalStorageException the storage exception
+     */
+    void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException;
+
+    /**
+     * Touch item last requested and sets on it the given timestamp.
+     * 
+     * @param uid the uid
+     * @param timestamp the ts to set on file, 0 to "expire" it
+     * @throws LocalStorageException the storage exception
+     */
+    void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException;
+
+    /**
+     * Touch only if request is user-request (coming from outside of nexus).
+     * 
+     * @param timestamp
+     * @param repository
+     * @param request
+     * @param storageItem
+     * @throws ItemNotFoundException
+     * @throws LocalStorageException
+     */
+    void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
+                                 StorageItem storageItem )
+        throws ItemNotFoundException, LocalStorageException;
+
+    /**
+     * Update item attributes, does not modify the content of it.
+     * 
+     * @param item the item
+     * @throws LocalStorageException the storage exception
+     */
+    void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
+        throws ItemNotFoundException, LocalStorageException;
 }

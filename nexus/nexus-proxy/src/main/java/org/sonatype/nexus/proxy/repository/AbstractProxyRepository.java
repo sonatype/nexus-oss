@@ -1176,7 +1176,7 @@ public abstract class AbstractProxyRepository
         throws StorageException, ItemNotFoundException
     {
         // remote file unchanged, touch the local one to renew it's Age
-        getLocalStorage().touchItemRemoteChecked( this, request );
+        getAttributesHandler().touchItemRemoteChecked( this, request );
     }
 
     /**

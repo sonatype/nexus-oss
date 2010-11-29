@@ -439,7 +439,7 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
-            repository.getLocalStorage().getAttributesHandler().getAttributeStorage()
+            repository.getAttributesHandler().getAttributeStorage()
                       .getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
@@ -478,7 +478,7 @@ public class M2RepositoryTest
 
         // check the shadow attributes
         AbstractStorageItem shadowStorageItem =
-            repository.getLocalStorage().getAttributesHandler().getAttributeStorage()
+            repository.getAttributesHandler().getAttributeStorage()
                       .getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }

@@ -24,10 +24,12 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.cache.PathCache;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -148,6 +150,13 @@ public interface Repository
     RepositoryItemUid createUid( String path );
 
     /**
+     * Returns the repository ItemUidAttributeManager.
+     * 
+     * @return
+     */
+    RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager();
+
+    /**
      * Will return the proper Action that will occur on "write" operation: create (if nothing exists on the given path)
      * or update (if overwrite will happen since the path already exists).
      * 
@@ -261,6 +270,18 @@ public interface Repository
 
     // ==================================================
     // LocalStorage et al
+
+    /**
+     * Returns the attribute handler used by repository.
+     */
+    AttributesHandler getAttributesHandler();
+
+    /**
+     * Sets attribute handler used by repository.
+     * 
+     * @param attributesHandler
+     */
+    void setAttributesHandler( AttributesHandler attributesHandler );
 
     /**
      * Returns the local URL of this repository, if any.

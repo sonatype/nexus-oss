@@ -27,17 +27,15 @@ import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.LoggerManager;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.proxy.attributes.AttributesHandler;
-import org.sonatype.nexus.proxy.attributes.DefaultAttributeStorage;
+import org.sonatype.nexus.proxy.attributes.DefaultFSAttributeStorage;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryItemEvent;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.StorageLinkItem;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -208,8 +206,11 @@ public abstract class AbstractProxyTestEnvironment
 
         attributesHandler = lookup( AttributesHandler.class );
 
-        ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory( "proxy/attributes" ) );
+        if ( attributesHandler.getAttributeStorage() instanceof DefaultFSAttributeStorage )
+        {
+            ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage() ).setWorkingDirectory( getApplicationConfiguration().getWorkingDirectory(
+                "proxy/attributes" ) );
+        }
 
         localRepositoryStorage = lookup( LocalRepositoryStorage.class, "file" );
 

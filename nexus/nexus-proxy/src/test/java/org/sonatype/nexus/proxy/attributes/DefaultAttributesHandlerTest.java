@@ -51,13 +51,9 @@ public class DefaultAttributesHandlerTest
         super.setUp();
 
         FileUtils.copyDirectoryStructure( new File( getBasedir(), "target/test-classes/repo1" ), new File(
-            getBasedir(),
-            "target/test-reposes/repo1" ) );
+            getBasedir(), "target/test-reposes/repo1" ) );
 
         attributesHandler = (DefaultAttributesHandler) lookup( AttributesHandler.class );
-
-        FileUtils.deleteDirectory( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getWorkingDirectory() );
 
         repository = lookup( Repository.class, "maven2" );
 
@@ -69,8 +65,8 @@ public class DefaultAttributesHandlerTest
 
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
-        repoConf.getLocalStorage().setUrl(
-            new File( getBasedir(), "target/test-reposes/repo1" ).toURI().toURL().toString() );
+        File localStorageDirectory = new File( getBasedir(), "target/test-reposes/repo1" );
+        repoConf.getLocalStorage().setUrl( localStorageDirectory.toURI().toURL().toString() );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
         repoConf.setExternalConfiguration( exRepo );
@@ -78,34 +74,44 @@ public class DefaultAttributesHandlerTest
         exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
         exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
+        if ( attributesHandler.getAttributeStorage() instanceof DefaultFSAttributeStorage )
+        {
+            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributesHandler.getAttributeStorage() ).getWorkingDirectory() );
+        }
+        else
+        {
+            FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
+        }
+
         repository.configure( repoConf );
     }
 
     public void testRecreateAttrs()
         throws Exception
     {
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+        RepositoryItemUid uid =
+            getRepositoryItemUidFactory().createUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
-        assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid ).exists() );
+        assertNull( attributesHandler.getAttributeStorage().getAttributes( uid ) );
+        // assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() ).getFileFromBase( uid
+        // ).exists() );
 
         repository.recreateAttributes( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ), null );
 
-        assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid ).exists() );
+        assertNotNull( attributesHandler.getAttributeStorage().getAttributes( uid ) );
+        // assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() ).getFileFromBase( uid
+        // ).exists() );
     }
 
     public void testRecreateAttrsWithCustomAttrs()
         throws Exception
     {
-        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid(
-            repository,
-            "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
+        RepositoryItemUid uid =
+            getRepositoryItemUidFactory().createUid( repository, "/activemq/activemq-core/1.2/activemq-core-1.2.jar" );
 
-        assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid ).exists() );
+        assertNull( attributesHandler.getAttributeStorage().getAttributes( uid ) );
+        // assertFalse( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() ).getFileFromBase( uid
+        // ).exists() );
 
         Map<String, String> customAttrs = new HashMap<String, String>();
         customAttrs.put( "one", "1" );
@@ -113,8 +119,9 @@ public class DefaultAttributesHandlerTest
 
         repository.recreateAttributes( new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ), customAttrs );
 
-        assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() )
-            .getFileFromBase( uid ).exists() );
+        assertNotNull( attributesHandler.getAttributeStorage().getAttributes( uid ) );
+        // assertTrue( ( (DefaultAttributeStorage) attributesHandler.getAttributeStorage() ).getFileFromBase( uid
+        // ).exists() );
 
         AbstractStorageItem item = attributesHandler.getAttributeStorage().getAttributes( uid );
 

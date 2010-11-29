@@ -43,7 +43,7 @@ public class ExpireCacheWalker
             // expire it
             item.setExpired( true );
 
-            getRepository().getLocalStorage().updateItemAttributes( getRepository(), null, item );
+            getRepository().getAttributesHandler().updateItemAttributes( getRepository(), null, item );
         }
         catch ( ItemNotFoundException e )
         {

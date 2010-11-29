@@ -22,6 +22,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -163,6 +164,11 @@ public class DefaultRepositoryItemUid
     public void unlockAttributes()
     {
         doUnlock( null, getAttributeLockKey(), attributesLock );
+    }
+
+    public <T extends Attribute<?>> T getAttribute( Class<T> attrClass )
+    {
+        return getRepository().getRepositoryItemUidAttributeManager().getAttribute( attrClass, this );
     }
 
     /**
@@ -349,22 +355,6 @@ public class DefaultRepositoryItemUid
     private String getAttributeLockKey()
     {
         return toString() + " : attrlock";
-    }
-
-    public boolean isHidden()
-    {
-        // paths that start with a . in any directory (or filename)
-        // are considered hidden.
-        // This check will catch (for example):
-        // .metadata
-        // /.meta/something.jar
-        // /something/else/.hidden/something.jar
-        if ( getPath() != null && ( getPath().indexOf( "/." ) > -1 || getPath().startsWith( "." ) ) )
-        {
-            return true;
-        }
-
-        return false;
     }
 
     // for Debug/tests vvv

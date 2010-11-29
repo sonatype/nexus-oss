@@ -13,7 +13,9 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.attributes.AttributesHandler;
 import org.sonatype.nexus.proxy.cache.PathCache;
+import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
@@ -491,6 +493,24 @@ public class DummyRepository
 
     public Collection<StorageItem> list( boolean fromTask, StorageCollectionItem item )
         throws IllegalOperationException, ItemNotFoundException, StorageException
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public AttributesHandler getAttributesHandler()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setAttributesHandler( AttributesHandler attributesHandler )
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    public RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager()
     {
         // TODO Auto-generated method stub
         return null;

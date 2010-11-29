@@ -55,8 +55,8 @@ public abstract class AbstractShadowRepositoryTest
         long lastRequest = System.currentTimeMillis() - 10 * A_DAY;
 
         // now set the lastRequest stamp programatically to both items to this "old" timestamp
-        shadowRepository.getLocalStorage().touchItemLastRequested( lastRequest, shadowRepository, shadowRequest );
-        masterRepository.getLocalStorage().touchItemLastRequested( lastRequest, masterRepository, masterRequest );
+        shadowRepository.getAttributesHandler().touchItemLastRequested( lastRequest, shadowRepository, shadowRequest );
+        masterRepository.getAttributesHandler().touchItemLastRequested( lastRequest, masterRepository, masterRequest );
 
         // now request the object, the lastRequested timestamp should be updated
         shadowItem = shadowRepository.retrieveItem( shadowRequest );
@@ -65,7 +65,7 @@ public abstract class AbstractShadowRepositoryTest
         // verify that shadow item lastRequested is updated, but master is still untouched
         // the attribute load will give us items without UIDs!
         StorageItem shadowItem1 =
-            shadowRepository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
+            shadowRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 shadowRepository.createUid( shadowPath ) );
         Assert.assertTrue( "Shadow must have updated lastRequested field!",
             shadowItem1.getLastRequested() > lastRequest );
@@ -73,7 +73,7 @@ public abstract class AbstractShadowRepositoryTest
         // verify that shadow item lastRequested is updated, but master is still untouched
         // the attribute load will give us items without UIDs!
         StorageItem masterItem1 =
-            masterRepository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
+            masterRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 masterRepository.createUid( masterPath ) );
         Assert.assertTrue( "Master must have untouched lastRequested field!",
             masterItem1.getLastRequested() == lastRequest );
@@ -97,13 +97,13 @@ public abstract class AbstractShadowRepositoryTest
 
         // check the shadow attributes programatically
         shadowItem =
-            shadowRepository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
+            shadowRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 shadowRepository.createUid( shadowPath ) );
         Assert.assertEquals( "The attributes differ", shadowLastRequested, shadowItem.getLastRequested() );
 
         // check the master attributes programatically
         masterItem =
-            masterRepository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes(
+            masterRepository.getAttributesHandler().getAttributeStorage().getAttributes(
                 masterRepository.createUid( masterPath ) );
         Assert.assertEquals( "The attributes differ", masterLastRequested, masterItem.getLastRequested() );
     }

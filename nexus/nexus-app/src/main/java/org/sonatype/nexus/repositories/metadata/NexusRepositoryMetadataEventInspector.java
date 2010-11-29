@@ -189,7 +189,7 @@ public class NexusRepositoryMetadataEventInspector
                 file.getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID,
                     "NexusRepositoryMetadataContentGenerator" );
 
-                repository.getLocalStorage().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
+                repository.getAttributesHandler().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
             }
             catch ( MetadataHandlerException e )
             {

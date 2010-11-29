@@ -101,7 +101,7 @@ public class SimplePullTest
         item = getRootRouter().retrieveItem( new ResourceStoreRequest( "/groups/test/", false ) );
         Collection<StorageItem> dir = ( (StorageCollectionItem) item ).list();
         // we should have listed in root only those things/dirs we pulled, se above!
-        assertEquals( 4, dir.size() );
+        assertEquals( 5, dir.size() );
     }
 
     public void testSimplePullWithRegardingToPathEnding()

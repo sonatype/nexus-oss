@@ -14,6 +14,7 @@
 package org.sonatype.nexus.proxy.item;
 
 import org.sonatype.nexus.proxy.access.Action;
+import org.sonatype.nexus.proxy.item.uid.Attribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -71,11 +72,13 @@ public interface RepositoryItemUid
      * Unlocks attributes of item belonging to this UID.
      */
     void unlockAttributes();
-    
+
     /**
-     * Checks if this item is a hidden item
+     * Gets an "attribute" from this UID.
      * 
+     * @param <T>
+     * @param attr
      * @return
      */
-    boolean isHidden();
+    <T extends Attribute<?>> T getAttribute( Class<T> attr );
 }

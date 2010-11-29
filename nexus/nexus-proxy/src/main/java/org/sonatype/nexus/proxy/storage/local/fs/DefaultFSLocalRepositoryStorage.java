@@ -13,7 +13,6 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,8 +37,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
+import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
@@ -61,8 +60,6 @@ public class DefaultFSLocalRepositoryStorage
 {
     public static final String PROVIDER_STRING = "file";
 
-    private static final String LINK_PREFIX = "LINK to ";
-
     @Configuration( value = "${rename.retry.count}" )
     private String renameRetryCountString;
 
@@ -78,11 +75,8 @@ public class DefaultFSLocalRepositoryStorage
 
     private int copyStreamBufferSize = -1;
 
-    /**
-     * The UID factory.
-     */
     @Requirement
-    private RepositoryItemUidFactory repositoryItemUidFactory;
+    private LinkPersister linkPersister;
 
     protected int getRenameRetryCount()
     {
@@ -296,7 +290,7 @@ public class DefaultFSLocalRepositoryStorage
                 new DefaultStorageCollectionItem( repository, request, target.canRead(), target.canWrite() );
             coll.setModified( target.lastModified() );
             coll.setCreated( target.lastModified() );
-            getAttributesHandler().fetchAttributes( coll );
+            repository.getAttributesHandler().fetchAttributes( coll );
             result = coll;
 
         }
@@ -304,41 +298,52 @@ public class DefaultFSLocalRepositoryStorage
         {
             request.setRequestPath( path );
 
-            if ( checkBeginOfFile( LINK_PREFIX, target ) )
+            FileContentLocator linkContent = new FileContentLocator( target, "text/plain" );
+
+            try
             {
-                try
+                if ( linkPersister.isLinkContent( linkContent ) )
                 {
-                    DefaultStorageLinkItem link =
-                        new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
-                            getLinkTarget( target ) );
-                    getAttributesHandler().fetchAttributes( link );
-                    link.setModified( target.lastModified() );
-                    link.setCreated( target.lastModified() );
-                    result = link;
+                    try
+                    {
+                        DefaultStorageLinkItem link =
+                            new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
+                                linkPersister.readLinkContent( linkContent ) );
+                        repository.getAttributesHandler().fetchAttributes( link );
+                        link.setModified( target.lastModified() );
+                        link.setCreated( target.lastModified() );
+                        result = link;
 
-                    touchItemLastRequested( System.currentTimeMillis(), repository, request, link );
+                        repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(),
+                            repository, request, link );
+                    }
+                    catch ( NoSuchRepositoryException e )
+                    {
+                        getLogger().warn( "Stale link object found on UID: " + uid.toString() + ", deleting it." );
+
+                        target.delete();
+
+                        throw new ItemNotFoundException( request, repository );
+                    }
                 }
-                catch ( NoSuchRepositoryException e )
+                else
                 {
-                    getLogger().warn( "Stale link object found on UID: " + uid.toString() + ", deleting it." );
+                    DefaultStorageFileItem file =
+                        new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
+                            new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
+                    repository.getAttributesHandler().fetchAttributes( file );
+                    file.setModified( target.lastModified() );
+                    file.setCreated( target.lastModified() );
+                    file.setLength( target.length() );
+                    result = file;
 
-                    target.delete();
-
-                    throw new ItemNotFoundException( request, repository );
+                    repository.getAttributesHandler().touchItemLastRequested( System.currentTimeMillis(), repository,
+                        request, file );
                 }
             }
-            else
+            catch ( IOException e )
             {
-                DefaultStorageFileItem file =
-                    new DefaultStorageFileItem( repository, request, target.canRead(), target.canWrite(),
-                        new FileContentLocator( target, getMimeUtil().getMimeType( target ) ) );
-                getAttributesHandler().fetchAttributes( file );
-                file.setModified( target.lastModified() );
-                file.setCreated( target.lastModified() );
-                file.setLength( target.length() );
-                result = file;
-
-                touchItemLastRequested( System.currentTimeMillis(), repository, request, file );
+                throw new LocalStorageException( "Exception during reading up an item from FS storage!", e );
             }
         }
         else
@@ -453,7 +458,7 @@ public class DefaultFSLocalRepositoryStorage
 
                 try
                 {
-                    getAttributesHandler().storeAttributes( item, mdis );
+                    repository.getAttributesHandler().storeAttributes( item, mdis );
                 }
                 finally
                 {
@@ -484,7 +489,7 @@ public class DefaultFSLocalRepositoryStorage
 
             target.mkdir();
             target.setLastModified( item.getModified() );
-            getAttributesHandler().storeAttributes( item, null );
+            repository.getAttributesHandler().storeAttributes( item, null );
         }
         else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
         {
@@ -496,13 +501,11 @@ public class DefaultFSLocalRepositoryStorage
 
                 FileOutputStream os = new FileOutputStream( target );
 
-                IOUtil.copy(
-                    new ByteArrayInputStream( ( LINK_PREFIX + ( (StorageLinkItem) item ).getTarget() ).getBytes() ), os );
+                linkPersister.writeLinkContent( (StorageLinkItem) item, os );
 
-                os.flush();
-                os.close();
                 target.setLastModified( item.getModified() );
-                getAttributesHandler().storeAttributes( item, null );
+
+                repository.getAttributesHandler().storeAttributes( item, null );
             }
             catch ( IOException ex )
             {
@@ -584,7 +587,7 @@ public class DefaultFSLocalRepositoryStorage
     {
         RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
 
-        getAttributesHandler().deleteAttributes( uid );
+        repository.getAttributesHandler().deleteAttributes( uid );
 
         File target = getFileFromBase( repository, request );
 
@@ -666,80 +669,5 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         return result;
-    }
-
-    protected boolean checkBeginOfFile( final String magic, File file )
-    {
-        if ( file != null && file.length() > magic.length() )
-        {
-            FileInputStream fis = null;
-
-            try
-            {
-                byte[] buf = new byte[magic.length()];
-
-                byte[] link = magic.getBytes();
-
-                fis = new FileInputStream( file );
-
-                boolean result = fis.read( buf ) == magic.length();
-
-                if ( result )
-                {
-                    for ( int i = 0; i < magic.length() && result; i++ )
-                    {
-                        result = result && buf[i] == link[i];
-                    }
-                }
-
-                return result;
-            }
-            catch ( IOException e )
-            {
-                return false;
-            }
-            finally
-            {
-                IOUtil.close( fis );
-            }
-
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    protected RepositoryItemUid getLinkTarget( File file )
-        throws NoSuchRepositoryException
-    {
-        if ( file != null && file.length() > LINK_PREFIX.length() )
-        {
-            FileInputStream fis = null;
-
-            try
-            {
-                fis = new FileInputStream( file );
-
-                String link = IOUtil.toString( fis );
-
-                String uidStr = link.substring( LINK_PREFIX.length(), link.length() );
-
-                return repositoryItemUidFactory.createUid( uidStr );
-            }
-            catch ( IOException e )
-            {
-                return null;
-            }
-            finally
-            {
-                IOUtil.close( fis );
-            }
-
-        }
-        else
-        {
-            return null;
-        }
     }
 }

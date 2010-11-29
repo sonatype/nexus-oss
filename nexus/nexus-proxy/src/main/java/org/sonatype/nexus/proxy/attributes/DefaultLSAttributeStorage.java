@@ -13,63 +13,55 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
-import org.apache.commons.io.FilenameUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
-import org.sonatype.nexus.configuration.ConfigurationChangeEvent;
-import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ByteArrayContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageCompositeFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
-import org.sonatype.plexus.appevents.Event;
-import org.sonatype.plexus.appevents.EventListener;
+import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
 
 /**
- * AttributeStorage implementation driven by XStream.
+ * AttributeStorage implementation driven by XStream, and uses LocalRepositoryStorage of repositories to store
+ * attributes "along" the artifacts (well, not along but in same storage but hidden).
  * 
  * @author cstamas
  */
 @Component( role = AttributeStorage.class )
-public class DefaultAttributeStorage
-    extends AbstractLogEnabled
-    implements AttributeStorage, EventListener, Initializable
+public class DefaultLSAttributeStorage
+    implements AttributeStorage
 {
-    @Requirement
-    private ApplicationEventMulticaster applicationEventMulticaster;
+    private static final String ATTRIBUTE_PATH_PREFIX = "/.nexus/attributes";
 
     @Requirement
-    private ApplicationConfiguration applicationConfiguration;
+    private Logger logger;
 
-    /**
-     * The base dir.
-     */
-    private File workingDirectory;
-
-    /** The xstream. */
+    /** The XStream. */
     private XStream xstream;
 
     /**
      * Instantiates a new FSX stream attribute storage.
      */
-    public DefaultAttributeStorage()
+    public DefaultLSAttributeStorage()
     {
         super();
         this.xstream = new XStream();
@@ -79,61 +71,24 @@ public class DefaultAttributeStorage
         this.xstream.alias( "link", DefaultStorageLinkItem.class );
     }
 
-    public void initialize()
+    protected Logger getLogger()
     {
-        applicationEventMulticaster.addEventListener( this );
+        return logger;
     }
 
-    public void onEvent( Event<?> evt )
+    protected boolean isAttribute( RepositoryItemUid uid )
     {
-        if ( ConfigurationChangeEvent.class.isAssignableFrom( evt.getClass() ) )
-        {
-            this.workingDirectory = null;
-        }
-    }
-
-    /**
-     * Gets the base dir.
-     * 
-     * @return the base dir
-     */
-    public File getWorkingDirectory()
-        throws IOException
-    {
-        if ( workingDirectory == null )
-        {
-            workingDirectory = applicationConfiguration.getWorkingDirectory( "proxy/attributes" );
-
-            if ( workingDirectory.exists() )
-            {
-                if ( workingDirectory.isFile() )
-                {
-                    throw new IllegalArgumentException( "The attribute storage exists and is not a directory: "
-                        + workingDirectory.getAbsolutePath() );
-                }
-            }
-            else
-            {
-                getLogger().info( "Attribute storage directory does not exists, creating it here: " + workingDirectory );
-
-                if ( !workingDirectory.mkdirs() )
-                {
-                    throw new IllegalArgumentException( "Could not create the attribute storage directory on path "
-                        + workingDirectory.getAbsolutePath() );
-                }
-            }
-        }
-
-        return workingDirectory;
-    }
-
-    public void setWorkingDirectory( File baseDir )
-    {
-        this.workingDirectory = baseDir;
+        return uid.getPath().startsWith( ATTRIBUTE_PATH_PREFIX );
     }
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
+        if ( isAttribute( uid ) )
+        {
+            // do nothing
+            return false;
+        }
+
         uid.lockAttributes( Action.delete );
 
         try
@@ -143,20 +98,31 @@ public class DefaultAttributeStorage
                 getLogger().debug( "Deleting attributes on UID=" + uid.toString() );
             }
 
-            boolean result = false;
-
             try
             {
-                File ftarget = getFileFromBase( uid );
+                final Repository repository = uid.getRepository();
 
-                result = ftarget.exists() && ftarget.isFile() && ftarget.delete();
+                final ResourceStoreRequest request =
+                    new ResourceStoreRequest( getAttributePath( repository, uid.getPath() ) );
+
+                repository.getLocalStorage().deleteItem( repository, request );
+
+                return true;
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // ignore it
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                // ignore it
             }
             catch ( IOException e )
             {
                 getLogger().warn( "Got IOException during delete of UID=" + uid.toString(), e );
             }
 
-            return result;
+            return false;
         }
         finally
         {
@@ -166,6 +132,12 @@ public class DefaultAttributeStorage
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
+        if ( isAttribute( uid ) )
+        {
+            // do nothing
+            return null;
+        }
+
         uid.lockAttributes( Action.read );
 
         try
@@ -197,6 +169,12 @@ public class DefaultAttributeStorage
 
     public void putAttribute( StorageItem item )
     {
+        if ( isAttribute( item.getRepositoryItemUid() ) )
+        {
+            // do nothing
+            return;
+        }
+
         RepositoryItemUid origUid = item.getRepositoryItemUid();
 
         origUid.lockAttributes( Action.create );
@@ -233,35 +211,25 @@ public class DefaultAttributeStorage
                     item = onDisk;
                 }
 
-                File target = getFileFromBase( item.getRepositoryItemUid() );
+                item.incrementGeneration();
 
-                target.getParentFile().mkdirs();
+                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-                if ( target.getParentFile().exists() && target.getParentFile().isDirectory() )
-                {
-                    FileOutputStream fos = null;
+                xstream.toXML( item, bos );
 
-                    try
-                    {
-                        fos = new FileOutputStream( target );
+                final Repository repository = origUid.getRepository();
 
-                        item.incrementGeneration();
+                final DefaultStorageFileItem attributeItem =
+                    new DefaultStorageFileItem( repository, new ResourceStoreRequest( getAttributePath( repository,
+                        origUid.getPath() ) ), true, true, new ByteArrayContentLocator( bos.toByteArray(), "text/xml" ) );
 
-                        xstream.toXML( item, fos );
-
-                        fos.flush();
-                    }
-                    finally
-                    {
-                        IOUtil.close( fos );
-                    }
-                }
-                else
-                {
-                    getLogger().error(
-                        "Could not store attributes on UID=" + item.getRepositoryItemUid()
-                            + ", parent exists but is not a directory!" );
-                }
+                repository.getLocalStorage().storeItem( repository, attributeItem );
+            }
+            catch ( UnsupportedStorageOperationException ex )
+            {
+                // TODO: what here? Is local storage unsuitable for storing attributes?
+                getLogger().error(
+                    "Got UnsupportedStorageOperationException during store of UID=" + item.getRepositoryItemUid(), ex );
             }
             catch ( IOException ex )
             {
@@ -271,6 +239,20 @@ public class DefaultAttributeStorage
         finally
         {
             origUid.unlockAttributes();
+        }
+    }
+
+    // ==
+
+    protected String getAttributePath( final Repository repository, final String path )
+    {
+        if ( path.startsWith( RepositoryItemUid.PATH_SEPARATOR ) )
+        {
+            return ATTRIBUTE_PATH_PREFIX + path;
+        }
+        else
+        {
+            return ATTRIBUTE_PATH_PREFIX + RepositoryItemUid.PATH_SEPARATOR + path;
         }
     }
 
@@ -287,19 +269,27 @@ public class DefaultAttributeStorage
     protected AbstractStorageItem doGetAttributes( RepositoryItemUid uid )
         throws IOException
     {
-        File target = getFileFromBase( uid );
-
         AbstractStorageItem result = null;
 
-        if ( target.exists() && target.isFile() )
+        InputStream attributeStream = null;
+
+        boolean corrupt = false;
+
+        try
         {
-            FileInputStream fis = null;
+            final Repository repository = uid.getRepository();
 
-            try
+            AbstractStorageItem attributeItemCandidate =
+                repository.getLocalStorage().retrieveItem( repository,
+                    new ResourceStoreRequest( getAttributePath( repository, uid.getPath() ) ) );
+
+            if ( attributeItemCandidate instanceof StorageFileItem )
             {
-                fis = new FileInputStream( target );
+                StorageFileItem attributeItem = (StorageFileItem) attributeItemCandidate;
 
-                result = (AbstractStorageItem) xstream.fromXML( fis );
+                attributeStream = attributeItem.getContentLocator().getContent();
+
+                result = (AbstractStorageItem) xstream.fromXML( attributeStream );
 
                 result.setRepositoryItemUid( uid );
 
@@ -317,62 +307,37 @@ public class DefaultAttributeStorage
                     result.setLastRequested( System.currentTimeMillis() );
                 }
             }
-            catch ( XStreamException e )
+        }
+        catch ( XStreamException e )
+        {
+            // it is corrupt
+            if ( getLogger().isDebugEnabled() )
             {
-                // it is corrupt
-                if ( getLogger().isDebugEnabled() )
-                {
-                    // we log the stacktrace
-                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
-                }
-                else
-                {
-                    // just remark about this
-                    getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
-                }
+                // we log the stacktrace
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+            }
+            else
+            {
+                // just remark about this
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+            }
 
-                deleteAttributes( uid );
-            }
-            finally
-            {
-                IOUtil.close( fis );
-            }
+            corrupt = true;
+        }
+        catch ( ItemNotFoundException e )
+        {
+            return null;
+        }
+        finally
+        {
+            IOUtil.close( attributeStream );
+        }
+
+        if ( corrupt )
+        {
+            deleteAttributes( uid );
         }
 
         return result;
-    }
-
-    /**
-     * Gets the file from base.
-     * 
-     * @param uid the uid
-     * @param isCollection the is collection
-     * @return the file from base
-     */
-    protected File getFileFromBase( RepositoryItemUid uid )
-        throws IOException
-    {
-        File repoBase = new File( getWorkingDirectory(), uid.getRepository().getId() );
-
-        File result = null;
-
-        String path = FilenameUtils.getPath( uid.getPath() );
-
-        String name = FilenameUtils.getName( uid.getPath() );
-
-        result = new File( repoBase, path + "/" + name );
-
-        // to be foolproof
-        // 2007.11.09. - Believe or not, Nexus deleted my whole USB rack! (cstamas)
-        // ok, now you may laugh :)
-        if ( !result.getAbsolutePath().startsWith( getWorkingDirectory().getAbsolutePath() ) )
-        {
-            throw new IOException( "FileFromBase evaluated directory wrongly! baseDir="
-                + getWorkingDirectory().getAbsolutePath() + ", target=" + result.getAbsolutePath() );
-        }
-        else
-        {
-            return result;
-        }
     }
 }

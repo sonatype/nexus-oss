@@ -105,7 +105,7 @@ public class DefaultWalker
             {
                 WalkerFilter filter = context.getFilter() != null
                     ? context.getFilter()
-                    : new AffirmativeStoreWalkerFilter();
+                    : new DefaultStoreWalkerFilter();
 
                 collCount = walkRecursive( 0, context, filter, (StorageCollectionItem) item );
 

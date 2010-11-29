@@ -23,12 +23,18 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
+import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
+import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.AccessManager;
+import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
  * The Class DefaultAttributesHandler.
@@ -37,9 +43,10 @@ import org.sonatype.nexus.proxy.item.StorageItem;
  */
 @Component( role = AttributesHandler.class )
 public class DefaultAttributesHandler
-    extends AbstractLogEnabled
     implements AttributesHandler
 {
+    @Requirement
+    private Logger logger;
 
     /**
      * The application configuration.
@@ -64,6 +71,13 @@ public class DefaultAttributesHandler
      */
     @Requirement( role = StorageFileItemInspector.class )
     protected List<StorageFileItemInspector> fileItemInspectorList;
+    
+    // ==
+    
+    protected Logger getLogger()
+    {
+        return logger;
+    }
 
     /**
      * Gets the attribute storage.
@@ -190,6 +204,79 @@ public class DefaultAttributesHandler
         getAttributeStorage().putAttribute( item );
     }
 
+    // ==
+
+    public void touchItemRemoteChecked( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        touchItemRemoteChecked( System.currentTimeMillis(), repository, request );
+    }
+
+    public void touchItemRemoteChecked( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
+
+        AbstractStorageItem item = getAttributeStorage().getAttributes( uid );
+
+        if ( item != null )
+        {
+            item.setResourceStoreRequest( request );
+
+            item.setRepositoryItemUid( uid );
+
+            item.setRemoteChecked( timestamp );
+
+            item.setExpired( false );
+
+            getAttributeStorage().putAttribute( item );
+        }
+    }
+
+    public void touchItemLastRequested( Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        touchItemLastRequested( System.currentTimeMillis(), repository, request );
+    }
+
+    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        RepositoryItemUid uid = repository.createUid( request.getRequestPath() );
+
+        AbstractStorageItem item = getAttributeStorage().getAttributes( uid );
+
+        if ( item != null )
+        {
+            item.setResourceStoreRequest( request );
+
+            item.setRepositoryItemUid( uid );
+
+            touchItemLastRequested( timestamp, repository, request, item );
+        }
+    }
+
+    public void touchItemLastRequested( long timestamp, Repository repository, ResourceStoreRequest request,
+                                           StorageItem storageItem )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        // TODO: touch it only if this is user-originated request
+        // Currently, we test for IP address presence, since that makes sure it is user request (from REST API) and not
+        // a request from "internals" (ie. a running task).
+        if ( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
+        {
+            storageItem.setLastRequested( timestamp );
+
+            getAttributeStorage().putAttribute( storageItem );
+        }
+    }
+
+    public void updateItemAttributes( Repository repository, ResourceStoreRequest request, StorageItem item )
+        throws ItemNotFoundException, LocalStorageException
+    {
+        getAttributeStorage().putAttribute( item );
+    }
+
     // ======================================================================
     // Internal
 
@@ -213,8 +300,8 @@ public class DefaultAttributesHandler
                 {
                     // unpack the file
                     tmpFile =
-                        File.createTempFile( "px-" + item.getName(), ".tmp", applicationConfiguration
-                            .getTemporaryDirectory() );
+                        File.createTempFile( "px-" + item.getName(), ".tmp",
+                            applicationConfiguration.getTemporaryDirectory() );
 
                     tmpFileStream = new FileOutputStream( tmpFile );
 
@@ -271,7 +358,7 @@ public class DefaultAttributesHandler
                     {
                         tmpFile.delete();
                     }
-                    
+
                     tmpFile = null;
                 }
             }

@@ -13,17 +13,22 @@
  */
 package org.sonatype.nexus.proxy.attributes;
 
-import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.replay;
+import java.io.File;
 
 import org.codehaus.plexus.util.FileUtils;
-import org.easymock.EasyMock;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.sonatype.nexus.configuration.model.CLocalStorage;
+import org.sonatype.nexus.configuration.model.CRepository;
+import org.sonatype.nexus.configuration.model.DefaultCRepository;
 import org.sonatype.nexus.proxy.AbstractNexusTestEnvironment;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.RepositoryItemUidFactory;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
+import org.sonatype.nexus.proxy.maven.ChecksumPolicy;
+import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
+import org.sonatype.nexus.proxy.maven.maven2.M2RepositoryConfiguration;
 import org.sonatype.nexus.proxy.repository.Repository;
 
 /**
@@ -35,7 +40,7 @@ public class DefaultAttributeStorageTest
     extends AbstractNexusTestEnvironment
 {
 
-    protected DefaultAttributeStorage attributeStorage;
+    protected AttributeStorage attributeStorage;
 
     protected RepositoryItemUidFactory repositoryItemUidFactory;
 
@@ -46,34 +51,39 @@ public class DefaultAttributeStorageTest
     {
         super.setUp();
 
-        attributeStorage = (DefaultAttributeStorage) lookup( AttributeStorage.class );
+        attributeStorage = lookup( AttributeStorage.class );
 
         repositoryItemUidFactory = lookup( RepositoryItemUidFactory.class );
 
-        FileUtils.deleteDirectory( attributeStorage.getWorkingDirectory() );
+        repository = lookup( Repository.class, "maven2" );
 
-        repository = EasyMock.createNiceMock( Repository.class );
+        CRepository repoConf = new DefaultCRepository();
 
-        RepositoryItemUid uidA = EasyMock.createNiceMock( RepositoryItemUid.class );
-        RepositoryItemUid uidB = EasyMock.createNiceMock( RepositoryItemUid.class );
+        repoConf.setProviderRole( Repository.class.getName() );
+        repoConf.setProviderHint( "maven2" );
+        repoConf.setId( "dummy" );
 
-        expect( uidA.getRepository() ).andReturn( repository ).anyTimes();
-        expect( uidA.getPath() ).andReturn( "/a.txt" ).anyTimes();
-        expect( uidB.getRepository() ).andReturn( repository ).anyTimes();
-        expect( uidB.getPath() ).andReturn( "/b.txt" ).anyTimes();
+        repoConf.setLocalStorage( new CLocalStorage() );
+        repoConf.getLocalStorage().setProvider( "file" );
+        File localStorageDirectory = new File( getBasedir(), "target/test-reposes/repo1" );
+        repoConf.getLocalStorage().setUrl( localStorageDirectory.toURI().toURL().toString() );
 
-        expect( repository.getId() ).andReturn( "dummy" ).anyTimes();
+        Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
+        repoConf.setExternalConfiguration( exRepo );
+        M2RepositoryConfiguration exRepoConf = new M2RepositoryConfiguration( exRepo );
+        exRepoConf.setRepositoryPolicy( RepositoryPolicy.RELEASE );
+        exRepoConf.setChecksumPolicy( ChecksumPolicy.STRICT_IF_EXISTS );
 
-        expect( repository.createUid( "/a.txt" ) ).andReturn( uidA );
-        expect( repository.createUid( "/b.txt" ) ).andReturn( uidB );
+        if ( attributeStorage instanceof DefaultFSAttributeStorage )
+        {
+            FileUtils.deleteDirectory( ( (DefaultFSAttributeStorage) attributeStorage ).getWorkingDirectory() );
+        }
+        else
+        {
+            FileUtils.deleteDirectory( new File( localStorageDirectory, ".nexus/attributes" ) );
+        }
 
-        replay( repository );
-
-        getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
-        getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
-
-        replay( uidA );
-        replay( uidB );
+        repository.configure( repoConf );
     }
 
     public void testSimplePutGet()
@@ -107,10 +117,10 @@ public class DefaultAttributeStorageTest
 
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
-        assertTrue( attributeStorage.getFileFromBase( uid ).exists() );
+        assertNotNull(attributeStorage.getAttributes( uid ));
 
         assertTrue( attributeStorage.deleteAttributes( uid ) );
 
-        assertFalse( attributeStorage.getFileFromBase( uid ).exists() );
+        assertNull(attributeStorage.getAttributes( uid ));
     }
 }

@@ -30,7 +30,6 @@ import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
 import org.sonatype.nexus.proxy.maven.maven1.M1Repository;
-import org.sonatype.nexus.proxy.maven.maven2.M2Repository;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
@@ -193,7 +192,7 @@ public class M1RepositoryTest
         Assert.assertTrue( resultItem.getLastRequested() + " > " + lastRequest, resultItem.getLastRequested() > lastRequest );
         
         // check the shadow attributes
-        AbstractStorageItem shadowStorageItem = repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
     
@@ -221,7 +220,7 @@ public class M1RepositoryTest
         Assert.assertTrue( resultItem.getLastRequested() > lastRequest );
         
         // check the shadow attributes
-        AbstractStorageItem shadowStorageItem = repository.getLocalStorage().getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
+        AbstractStorageItem shadowStorageItem = repository.getAttributesHandler().getAttributeStorage().getAttributes( repository.createUid( request.getRequestPath() ) );
         Assert.assertEquals( resultItem.getLastRequested(), shadowStorageItem.getLastRequested() );
     }
     
