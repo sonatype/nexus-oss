@@ -57,6 +57,8 @@ public interface ApplicationConfiguration
      * Returns the wastebasket directory.
      * 
      * @return
+     * @deprecated Wastebasket is not separately anymore, it is within local storage to make sure no cross-volume (hence
+     *             expensive) file operations are done while "trashing" things.
      */
     File getWastebasketDirectory();
 

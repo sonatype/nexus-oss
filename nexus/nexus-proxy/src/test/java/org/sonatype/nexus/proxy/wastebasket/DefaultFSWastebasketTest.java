@@ -14,9 +14,7 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 import java.io.File;
-import java.io.IOException;
 
-import org.apache.commons.io.FileUtils;
 import org.sonatype.nexus.proxy.AbstractNexusTestCase;
 
 /**
@@ -63,7 +61,7 @@ public class DefaultFSWastebasketTest
         new File( wastebasketDir, "folderA/folderAA/fileA.txt" ).createNewFile();
         new File( wastebasketDir, "folderB/fileB.txt" ).createNewFile();
 
-        wastebasket.delete( wastebasketDir );
+        wastebasket.delete( wastebasketDir, false );
 
         File fileA = new File( trashDir, "wastebasket/folderA/folderAA/fileA.txt" );
         File fileB = new File( trashDir, "wastebasket/folderB/fileB.txt" );
@@ -84,12 +82,6 @@ public class DefaultFSWastebasketTest
         public File getWastebasketDirectory()
         {
             return trashDir;
-        }
-
-        public void delete( File file )
-            throws IOException
-        {
-            super.delete( file, false );
         }
     }
 }

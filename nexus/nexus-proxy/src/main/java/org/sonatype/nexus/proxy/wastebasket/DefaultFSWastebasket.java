@@ -33,7 +33,8 @@ import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.repository.Repository;
-import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.statistics.DeferredLong;
+import org.sonatype.nexus.proxy.statistics.impl.DefaultDeferredLong;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage;
@@ -42,7 +43,7 @@ import org.sonatype.plexus.appevents.Event;
 import org.sonatype.plexus.appevents.EventListener;
 
 /**
- * A default FS based implementation.
+ * A default Wastebasket implementation.
  * 
  * @author cstamas
  */
@@ -116,29 +117,51 @@ public class DefaultFSWastebasket
         this.deleteOperation = deleteOperation;
     }
 
-    public long getItemCount()
-        throws IOException
+    public DeferredLong getTotalSize()
     {
-        return org.sonatype.nexus.util.FileUtils.filesInDirectory( getWastebasketDirectory() );
+        return new DefaultDeferredLong( FileUtils.sizeOfDirectory( getWastebasketDirectory() ) );
     }
 
-    public long getSize()
-        throws IOException
-    {
-        return FileUtils.sizeOfDirectory( getWastebasketDirectory() );
-    }
-
-    public void purge()
+    public void purgeAll()
         throws IOException
     {
         FileUtils.cleanDirectory( getWastebasketDirectory() );
     }
 
-    public void purge( long age )
+    public void purgeAll( long age )
         throws IOException
     {
         removeForever( getWastebasketDirectory(), age );
     }
+
+    public DeferredLong getSize( Repository repository )
+    {
+        return new DefaultDeferredLong( FileUtils.sizeOfDirectory( new File( getWastebasketDirectory(),
+            repository.getId() ) ) );
+    }
+
+    public void purge( Repository repository )
+        throws IOException
+    {
+        FileUtils.cleanDirectory( new File( getWastebasketDirectory(), repository.getId() ) );
+    }
+
+    public void purge( Repository repository, long age )
+        throws IOException
+    {
+        removeForever( new File( getWastebasketDirectory(), repository.getId() ), age );
+    }
+
+    // ==============================
+    // SmartWastebasket iface
+
+    public void setMaximumSizeConstraint( MaximumSizeConstraint constraint )
+    {
+        // TODO: implement this
+    }
+
+    // ==============================
+    // The rest
 
     public void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
@@ -222,66 +245,33 @@ public class DefaultFSWastebasket
         }
     }
 
-    // ==============================
-    // SmartWastebasket iface
-    public void setMaxSizeInBytes( long bytes )
+    public boolean undelete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
+        throws LocalStorageException
     {
-        // TODO Auto-generated method stub
+        throw new LocalStorageException( "Undelete not supported!" );
     }
 
-    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
+    protected void removeForever( File file, long age )
         throws IOException
     {
-        deleteStorage( repository, deleteForever );
-
-        deleteProxyAttributes( repository, true );
-
-        deleteIndexer( repository, true );
-    }
-
-    private void deleteStorage( Repository repository, boolean deleteForever )
-        throws IOException
-    {
-        File defaultStorageFolder =
-            new File( new File( applicationConfiguration.getWorkingDirectory(), "storage" ), repository.getId() );
-
-        String defaultStorageURI = defaultStorageFolder.toURI().toURL().toString();
-        defaultStorageURI = defaultStorageURI.endsWith( "/" ) ? defaultStorageURI : defaultStorageURI + "/";
-
-        String localURI = repository.getLocalUrl();
-        localURI = localURI.endsWith( "/" ) ? localURI : localURI + "/";
-
-        boolean sameLocation = defaultStorageURI.equals( localURI );
-
-        if ( sameLocation )
+        if ( file.isFile() )
         {
-            delete( defaultStorageFolder, deleteForever );
+            if ( isOlderThan( file, age ) )
+            {
+                FileUtils.forceDelete( file );
+            }
         }
-    }
-
-    private void deleteProxyAttributes( Repository repository, boolean deleteForever )
-        throws IOException
-    {
-        File proxyAttributesFolder =
-            new File( new File( new File( applicationConfiguration.getWorkingDirectory(), "proxy" ), "attributes" ),
-                repository.getId() );
-
-        delete( proxyAttributesFolder, true );
-    }
-
-    private void deleteIndexer( Repository repository, boolean deleteForever )
-        throws IOException
-    {
-        if ( repository.getRepositoryKind().isFacetAvailable( ShadowRepository.class ) )
+        else
         {
-            return;
+            for ( File subFile : file.listFiles() )
+            {
+                removeForever( subFile, age );
+            }
+            if ( file.list().length == 0 )
+            {
+                FileUtils.forceDelete( file );
+            }
         }
-
-        File indexerFolder = new File( applicationConfiguration.getWorkingDirectory(), "indexer" );
-
-        delete( new File( indexerFolder, repository.getId() + "-local" ), deleteForever );
-
-        delete( new File( indexerFolder, repository.getId() + "-remote" ), deleteForever );
     }
 
     /**
@@ -311,29 +301,6 @@ public class DefaultFSWastebasket
         }
 
         FileUtils.forceDelete( file );
-    }
-
-    protected void removeForever( File file, long age )
-        throws IOException
-    {
-        if ( file.isFile() )
-        {
-            if ( isOlderThan( file, age ) )
-            {
-                FileUtils.forceDelete( file );
-            }
-        }
-        else
-        {
-            for ( File subFile : file.listFiles() )
-            {
-                removeForever( subFile, age );
-            }
-            if ( file.list().length == 0 )
-            {
-                FileUtils.forceDelete( file );
-            }
-        }
     }
 
     private boolean isOlderThan( File file, long age )

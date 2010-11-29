@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.rest.wastebasket;
 
-import java.io.IOException;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -29,6 +27,7 @@ import org.restlet.data.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
+import org.sonatype.nexus.proxy.statistics.DeferredLong;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.rest.AbstractNexusPlexusResource;
 import org.sonatype.nexus.rest.model.WastebasketResource;
@@ -51,13 +50,13 @@ public class WastebasketPlexusResource
     extends AbstractNexusPlexusResource
 {
     public static final String RESOURCE_URI = "/wastebasket";
-    
+
     @Requirement
     private Wastebasket wastebasket;
-    
+
     @Requirement
     private NexusScheduler nexusScheduler;
-    
+
     @Override
     public Object getPayloadInstance()
     {
@@ -85,25 +84,26 @@ public class WastebasketPlexusResource
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
-        try
+        WastebasketResourceResponse result = new WastebasketResourceResponse();
+
+        WastebasketResource resource = new WastebasketResource();
+
+        resource.setItemCount( -1 );
+
+        DeferredLong totalSize = wastebasket.getTotalSize();
+
+        if ( totalSize.isDone() )
         {
-            WastebasketResourceResponse result = new WastebasketResourceResponse();
-
-            WastebasketResource resource = new WastebasketResource();
-
-            resource.setItemCount( wastebasket.getItemCount() );
-
-            resource.setSize( wastebasket.getSize() );
-
-            result.setData( resource );
-
-            return result;
-
+            resource.setSize( wastebasket.getTotalSize().getValue() );
         }
-        catch ( IOException e )
+        else
         {
-            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, "IOException during configuration retrieval!", e );
+            resource.setSize( -1 );
         }
+
+        result.setData( resource );
+
+        return result;
     }
 
     /**
@@ -111,7 +111,7 @@ public class WastebasketPlexusResource
      */
     @Override
     @DELETE
-    @ResourceMethodSignature()
+    @ResourceMethodSignature( )
     public void delete( Context context, Request request, Response response )
         throws ResourceException
     {

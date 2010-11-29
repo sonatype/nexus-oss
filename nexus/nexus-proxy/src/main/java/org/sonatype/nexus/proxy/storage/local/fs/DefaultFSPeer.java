@@ -115,32 +115,61 @@ public class DefaultFSPeer
     public void shredItem( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
-        if ( target.exists() )
+        if ( target.isDirectory() )
         {
-            if ( target.isDirectory() )
+            try
             {
-                try
-                {
-                    FileUtils.deleteDirectory( target );
-                }
-                catch ( IOException ex )
-                {
-                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                        + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath(), ex );
-                }
+                FileUtils.deleteDirectory( target );
             }
-            else if ( target.isFile() )
+            catch ( IOException ex )
             {
-                if ( !target.delete() )
-                {
-                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                        + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath() );
-                }
+                throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
+                    + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath(), ex );
+            }
+        }
+        else if ( target.isFile() )
+        {
+            if ( !target.delete() )
+            {
+                throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
+                    + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath() );
             }
         }
         else
         {
             throw new ItemNotFoundException( request, repository );
+        }
+    }
+
+    public void moveItem( Repository repository, ResourceStoreRequest request1, File target1,
+                          ResourceStoreRequest request2, File target2 )
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
+    {
+        // create parents down to the file itself (this will make those if needed, otherwise return silently)
+        mkParentDirs( repository, target2 );
+
+        if ( target1.isDirectory() )
+        {
+            // we have no content, we talk about directory
+            target2.mkdir();
+
+            // update timestamp
+            target2.setLastModified( target1.lastModified() );
+        }
+        else if ( target1.isFile() )
+        {
+            try
+            {
+                FileUtils.rename( target1, target2 );
+            }
+            catch ( IOException e )
+            {
+                throw new LocalStorageException( "Error during moveItem", e );
+            }
+        }
+        else
+        {
+            throw new ItemNotFoundException( request1, repository );
         }
     }
 
@@ -317,5 +346,4 @@ public class DefaultFSPeer
             }
         }
     }
-
 }

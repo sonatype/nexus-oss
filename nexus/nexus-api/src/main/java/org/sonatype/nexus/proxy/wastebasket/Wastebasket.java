@@ -18,22 +18,24 @@ import java.io.IOException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.statistics.DeferredLong;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
 
 public interface Wastebasket
 {
-    DeleteOperation getDeleteOperation();
-
-    void setDeleteOperation( DeleteOperation deleteOperation );
-
     /**
-     * Returns the count of items in wastebasket.
+     * Returns the delete operation that this Wastebasket operates upon.
      * 
      * @return
-     * @throws IOException
      */
-    long getItemCount()
-        throws IOException;
+    DeleteOperation getDeleteOperation();
+
+    /**
+     * Sets the delete operation to have this Wastebasket operate.
+     * 
+     * @param deleteOperation
+     */
+    void setDeleteOperation( DeleteOperation deleteOperation );
 
     /**
      * Returns the sum of sizes of items in the wastebasket.
@@ -41,15 +43,14 @@ public interface Wastebasket
      * @return
      * @throws IOException
      */
-    long getSize()
-        throws IOException;
+    DeferredLong getTotalSize();
 
     /**
      * Empties the wastebasket.
      * 
      * @throws IOException
      */
-    void purge()
+    void purgeAll()
         throws IOException;
 
     /**
@@ -58,7 +59,32 @@ public interface Wastebasket
      * @param age age of the items to be deleted, in milliseconds
      * @throws IOException
      */
-    void purge( long age )
+    void purgeAll( long age )
+        throws IOException;
+
+    /**
+     * Returns the sum of sizes of items in the wastebasket.
+     * 
+     * @return
+     * @throws IOException
+     */
+    DeferredLong getSize( Repository repository );
+
+    /**
+     * Empties the wastebasket.
+     * 
+     * @throws IOException
+     */
+    void purge( Repository repository )
+        throws IOException;
+
+    /**
+     * Purge the items older than the age
+     * 
+     * @param age age of the items to be deleted, in milliseconds
+     * @throws IOException
+     */
+    void purge( Repository repository, long age )
         throws IOException;
 
     /**
@@ -72,12 +98,13 @@ public interface Wastebasket
         throws LocalStorageException;
 
     /**
-     * Trash or 'rm -fr' the storage folder,'rm -fr' proxy attributes folder and index folder
+     * Performs an un-delete operation. If target (where undeleted item should be returned) exists, false is returned,
+     * true otherwise. It undeletes at once if item is file or link. If it is a collection, it will undelete it and all
+     * it's sub-items (recursively).
      * 
-     * @param repository
-     * @param deleteForever 'rm -fr' the storage folder if it's true, else move the storage folder into trash
+     * @param path
      * @throws IOException
      */
-    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
-        throws IOException;
+    boolean undelete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )
+        throws LocalStorageException;
 }

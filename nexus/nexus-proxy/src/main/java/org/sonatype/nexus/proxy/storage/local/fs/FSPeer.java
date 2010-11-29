@@ -33,6 +33,10 @@ public interface FSPeer
     public void shredItem( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
+    public void moveItem( Repository repository, ResourceStoreRequest request1, File target1,
+                         ResourceStoreRequest request2, File target2 )
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
+
     public Collection<File> listItems( Repository repository, ResourceStoreRequest request, File target )
         throws ItemNotFoundException, LocalStorageException;
 }

@@ -70,6 +70,7 @@ import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
+import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 import org.sonatype.nexus.proxy.wastebasket.Wastebasket;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.SynchronizeShadowsTask;
@@ -135,6 +136,9 @@ public class DefaultNexus
      */
     @Requirement
     private Wastebasket wastebasket;
+    
+    @Requirement
+    private RepositoryFolderRemover repositoryFolderRemover;
 
     /**
      * The SecurityConfiguration component.
@@ -454,7 +458,7 @@ public class DefaultNexus
 
         try
         {
-            wastebasket.deleteRepositoryFolders( repository, deleteForever );
+            repositoryFolderRemover.deleteRepositoryFolders( repository, deleteForever );
         }
         catch ( IOException e )
         {

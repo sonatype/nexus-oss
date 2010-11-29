@@ -44,11 +44,11 @@ public class EmptyTrashTask
     {
         if ( getEmptyOlderCacheItemsThan() == DEFAULT_OLDER_THAN_DAYS )
         {
-            wastebasket.purge();
+            wastebasket.purgeAll();
         }
         else
         {
-            wastebasket.purge( getEmptyOlderCacheItemsThan() * A_DAY );
+            wastebasket.purgeAll( getEmptyOlderCacheItemsThan() * A_DAY );
         }
 
         return null;

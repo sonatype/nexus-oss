@@ -14,7 +14,7 @@
 package org.sonatype.nexus.proxy.wastebasket;
 
 /**
- * A Smart Wastebasket, that is able to do some housecleaning if some limits are reached.
+ * A Smart Wastebasket, that is able to do some house-cleaning if some limits are reached.
  * 
  * @author cstamas
  */
@@ -22,9 +22,9 @@ public interface SmartWastebasket
     extends Wastebasket
 {
     /**
-     * Set treshold for Wastebasket, from where it delete it's items.
+     * Set size constraint for Wastebasket, from where it delete it's items using FIFO (first-in-first-out).
      * 
-     * @param bytes
+     * @param constraint
      */
-    void setMaxSizeInBytes( long bytes );
+    void setMaximumSizeConstraint( MaximumSizeConstraint constraint );
 }

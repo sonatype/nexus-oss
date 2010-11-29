@@ -353,7 +353,7 @@ public class DefaultFSLocalRepositoryStorage
         }
 
         InputStream mdis;
-        
+
         try
         {
             mdis = item instanceof StorageFileItem ? ( (StorageFileItem) item ).getContentLocator().getContent() : null;
@@ -385,6 +385,28 @@ public class DefaultFSLocalRepositoryStorage
         fsPeer.shredItem( repository, request, target );
     }
 
+    public void moveItem( Repository repository, ResourceStoreRequest from, ResourceStoreRequest to )
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
+    {
+        RepositoryItemUid fromUid = repository.createUid( from.getRequestPath() );
+        
+        AbstractStorageItem fromAttr = repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
+        
+        RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
+
+        fromAttr.setRepositoryItemUid( toUid );
+        
+        repository.getAttributesHandler().getAttributeStorage().putAttribute( fromAttr );
+        
+        File fromTarget = getFileFromBase( repository, from );
+        
+        File toTarget = getFileFromBase( repository, to );
+        
+        fsPeer.moveItem( repository, from, fromTarget, to, toTarget );
+        
+        repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
+    }
+
     public Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException
     {
@@ -414,4 +436,5 @@ public class DefaultFSLocalRepositoryStorage
 
         return result;
     }
+
 }

@@ -128,6 +128,19 @@ public interface LocalRepositoryStorage
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
 
     /**
+     * Move item from path to path.
+     * 
+     * @param repository
+     * @param from
+     * @param to
+     * @throws ItemNotFoundException
+     * @throws UnsupportedStorageOperationException
+     * @throws LocalStorageException
+     */
+    void moveItem( Repository repository, ResourceStoreRequest from, ResourceStoreRequest to )
+        throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException;
+
+    /**
      * List items.
      * 
      * @param uid the uid
