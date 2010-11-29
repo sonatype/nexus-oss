@@ -475,6 +475,25 @@
                 </execution>
               </executions>
             </plugin>
+            <plugin>
+              <artifactId>maven-antrun-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>ntemp-hacks</id>
+                  <phase>initialize</phase>
+                  <goals>
+                    <goal>run</goal>
+                  </goals>
+                  <configuration>
+                    <target>
+                <!-- hack because test environment plugin copyies a bad log4j.properties
+                  file to nexus work/conf preventing default logging -->
+                      <delete verbose="true" file="${nexus-work-dir}/conf/log4j.properties" />
+                    </target>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
           </plugins>
         </pluginManagement>
       </build>
