@@ -54,6 +54,7 @@ public class RebuildMavenMetadataTaskTest
         DirectoryScanner scanner = new DirectoryScanner();
         scanner.setBasedir( repoStorageRoot );
         scanner.setIncludes( includepattern );
+
         scanner.setExcludes( excludepattern );
 
         // count
@@ -67,7 +68,8 @@ public class RebuildMavenMetadataTaskTest
     {
         fillInRepo();
 
-        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
+        final int countTotalBefore =
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
 
         RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
         RebuildMavenMetadataTask.class );
@@ -80,7 +82,8 @@ public class RebuildMavenMetadataTaskTest
         handle.get();
 
         // count it again
-        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
+        final int countTotalAfter =
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
 
         // assert
         assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
@@ -90,21 +93,18 @@ public class RebuildMavenMetadataTaskTest
     public void testOneRunWithSubpath()
         throws Exception
     {
-        if (true)
-        {
-            return;
-        }
         fillInRepo();
 
         // we will initiate a task with "subpath" of /org/sonatype, so we count the files of total and the processed and
         // non-processed set
         // to be able to perform checks at the end
-        final int countTotalBefore = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
+        final int countTotalBefore =
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
         final int countNonProcessedSubBefore =
-            countFiles( snapshots, new String[] { "**/maven-metadata.xml" },
-                new String[] { "org/sonatype/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**",
+                "org/sonatype/**/maven-metadata.xml" } );
         final int countProcessedSubBefore =
-            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, null );
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
 
         RebuildMavenMetadataTask task = nexusScheduler.createTaskInstance( //
         RebuildMavenMetadataTask.class );
@@ -118,20 +118,26 @@ public class RebuildMavenMetadataTaskTest
         handle.get();
 
         // count it again
-        final int countTotalAfter = countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, null );
+        final int countTotalAfter =
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
         final int countNonProcessedSubAfter =
-            countFiles( snapshots, new String[] { "**/maven-metadata.xml" },
-                new String[] { "org/sonatype/**/maven-metadata.xml" } );
+            countFiles( snapshots, new String[] { "**/maven-metadata.xml" }, new String[] { ".nexus/**",
+                "org/sonatype/**/maven-metadata.xml" } );
         final int countProcessedSubAfter =
-            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, null );
+            countFiles( snapshots, new String[] { "org/sonatype/**/maven-metadata.xml" }, new String[] { ".nexus/**" } );
 
         // assert
-        assertTrue( "We should have more md's after rebuilding them, since we have some of them missing!",
-            countTotalBefore < countTotalAfter );
-        assertTrue( "We should have same count of md's after rebuilding them for non-processed ones!",
+        assertTrue( String.format(
+            "We should have more md's after rebuilding them, since we have some of them missing! (%s, %s)",
+            new Object[] { countTotalBefore, countTotalAfter } ), countTotalBefore < countTotalAfter );
+        assertTrue( String.format(
+            "We should have same count of md's after rebuilding them for non-processed ones! (%s, %s)", new Object[] {
+                countNonProcessedSubBefore, countNonProcessedSubAfter } ),
             countNonProcessedSubBefore == countNonProcessedSubAfter );
         assertTrue(
-            "We should have more md's after rebuilding them for processed ones, since we have some of them missing!",
+            String.format(
+                "We should have more md's after rebuilding them for processed ones, since we have some of them missing! (%s, %s)",
+                new Object[] { countProcessedSubBefore, countProcessedSubAfter } ),
             countProcessedSubBefore < countProcessedSubAfter );
 
         // the total change has to equals to processed change

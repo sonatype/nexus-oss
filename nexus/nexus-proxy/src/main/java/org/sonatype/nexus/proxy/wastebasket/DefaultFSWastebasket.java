@@ -84,7 +84,7 @@ public class DefaultFSWastebasket
         {
             if ( wastebasketDirectory == null )
             {
-                wastebasketDirectory = applicationConfiguration.getWastebasketDirectory();
+                // wastebasketDirectory = applicationConfiguration.getWastebasketDirectory();
 
                 wastebasketDirectory.mkdirs();
             }
