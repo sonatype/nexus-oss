@@ -56,10 +56,28 @@
           </nexusBundleArtifact>
 
           <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+
+          <!--
+           | Remove the non-AOP Guice JAR from the unpacked Nexus distro
+           -->
+          <nexusBundleExcludes>
+            **/sisu-guice-*.jar
+          </nexusBundleExcludes>
+
           <nexusPluginsArtifacts>
             <!-- not sure where this went - is it still needed? -?- <plugin> <groupId>${project.groupId}</groupId> <artifactId>nexus-simple-memory-realm</artifactId> </plugin> -->
+
+            <!--
+             | Add the AOP enabled Guice JAR to the unpacked Nexus distro
+             -->
             <jar>
-              <!-- TEMP! activate resource interception -->
+              <groupId>org.sonatype.sisu</groupId>
+              <artifactId>sisu-guice</artifactId>
+            </jar>
+            <!--
+             | Activate PlexusResource interception via Guice AOP
+             -->
+            <jar>
               <groupId>org.sonatype.nexus</groupId>
               <artifactId>nexus-mock</artifactId>
             </jar>
@@ -264,11 +282,14 @@
   </build>
 
   <dependencies>
+
+    <!--
+     | Make sure Nexus Mock and its dependencies appear first
+     -->
     <dependency>
-      <!-- TEMP! force use of AOP build -->
-      <groupId>org.sonatype.sisu</groupId>
-      <artifactId>sisu-guice</artifactId>
-      <version>2.9.1</version>
+      <groupId>org.sonatype.nexus</groupId>
+      <artifactId>nexus-mock</artifactId>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -303,12 +324,6 @@
           <artifactId>junit</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.nexus</groupId>
-      <artifactId>nexus-mock</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>

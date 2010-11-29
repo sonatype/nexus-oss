@@ -26,6 +26,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+    <sisu-guice.version>2.9.1</sisu-guice.version>
     <sisu-inject.version>1.4.3</sisu-inject.version>
     <sisu-inject-plexus.version>${sisu-inject.version}</sisu-inject-plexus.version>
     <plexus-component-metadata.version>1.5.5</plexus-component-metadata.version>

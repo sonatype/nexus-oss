@@ -63,12 +63,15 @@
 
   <dependencies>
 
+    <!--
+     | Make sure the AOP enabled Guice JAR appears first
+     -->
     <dependency>
-      <!-- TEMP! force use of AOP build -->
       <groupId>org.sonatype.sisu</groupId>
       <artifactId>sisu-guice</artifactId>
-      <version>2.9.1</version>
+      <version>${sisu-guice.version}</version>
     </dependency>
+
     <dependency>
       <groupId>org.sonatype.appbooter.plexus-booters</groupId>
       <artifactId>plexus-app-booter</artifactId>
