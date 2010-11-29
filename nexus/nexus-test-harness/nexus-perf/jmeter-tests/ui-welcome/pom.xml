@@ -25,7 +25,17 @@
     <profile>
       <id>example-1</id>
       <properties>
+        <perf.testplan>ui-welcome.jmx</perf.testplan>
         <perf.data.id>example-1</perf.data.id>
+        <perf.testplan.desc>Example performance test that just loads the welcome page</perf.testplan.desc>
+      </properties>
+    </profile>
+    <profile>
+      <id>example-2</id>
+      <properties>
+        <perf.testplan>ui-welcome.jmx</perf.testplan>
+        <perf.data.id>example-2</perf.data.id>
+        <perf.testplan.desc>Example performance test that just loads the welcome page</perf.testplan.desc>
       </properties>
     </profile>
   </profiles>
