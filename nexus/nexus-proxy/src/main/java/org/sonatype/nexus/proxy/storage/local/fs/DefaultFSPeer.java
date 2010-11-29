@@ -141,26 +141,26 @@ public class DefaultFSPeer
         }
     }
 
-    public void moveItem( Repository repository, ResourceStoreRequest request1, File target1,
-                          ResourceStoreRequest request2, File target2 )
+    public void moveItem( Repository repository, ResourceStoreRequest from, File fromTarget,
+                          ResourceStoreRequest to, File toTarget )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         // create parents down to the file itself (this will make those if needed, otherwise return silently)
-        mkParentDirs( repository, target2 );
+        mkParentDirs( repository, toTarget );
 
-        if ( target1.isDirectory() )
+        if ( fromTarget.isDirectory() )
         {
             // we have no content, we talk about directory
-            target2.mkdir();
+            toTarget.mkdir();
 
             // update timestamp
-            target2.setLastModified( target1.lastModified() );
+            toTarget.setLastModified( fromTarget.lastModified() );
         }
-        else if ( target1.isFile() )
+        else if ( fromTarget.isFile() )
         {
             try
             {
-                FileUtils.rename( target1, target2 );
+                FileUtils.rename( fromTarget, toTarget );
             }
             catch ( IOException e )
             {
@@ -169,7 +169,7 @@ public class DefaultFSPeer
         }
         else
         {
-            throw new ItemNotFoundException( request1, repository );
+            throw new ItemNotFoundException( from, repository );
         }
     }
 
