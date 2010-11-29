@@ -11,42 +11,17 @@
  * Sonatype Nexus (TM) Professional Version is available from Sonatype, Inc.
  * "Sonatype" and "Sonatype Nexus" are trademarks of Sonatype, Inc.
  */
-package org.sonatype.nexus.proxy.storage.remote;
+package org.sonatype.nexus.proxy.storage.local;
 
-import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
-import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
-import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
 import org.sonatype.nexus.proxy.storage.StorageContext;
 
 /**
- * The remote storage settings and context.
+ * The local storage settings and context.
  * 
  * @author cstamas
  */
-public interface RemoteStorageContext
+public interface LocalStorageContext
     extends StorageContext
 {
-    boolean hasRemoteConnectionSettings();
 
-    RemoteConnectionSettings getRemoteConnectionSettings();
-
-    void setRemoteConnectionSettings( RemoteConnectionSettings settings );
-
-    void removeRemoteConnectionSettings();
-
-    boolean hasRemoteAuthenticationSettings();
-
-    RemoteAuthenticationSettings getRemoteAuthenticationSettings();
-
-    void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings );
-
-    void removeRemoteAuthenticationSettings();
-
-    boolean hasRemoteProxySettings();
-
-    RemoteProxySettings getRemoteProxySettings();
-
-    void setRemoteProxySettings( RemoteProxySettings settings );
-
-    void removeRemoteProxySettings();
 }

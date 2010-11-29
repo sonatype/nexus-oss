@@ -16,7 +16,9 @@ package org.sonatype.nexus.proxy.storage.local;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -62,6 +64,11 @@ public abstract class AbstractLocalRepositoryStorage
     @Requirement
     private MimeUtil mimeUtil;
 
+    /**
+     * Since storages are shared, we are tracking the last changes from each of them.
+     */
+    private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
+
     protected Logger getLogger()
     {
         return logger;
@@ -71,7 +78,7 @@ public abstract class AbstractLocalRepositoryStorage
     {
         return wastebasket;
     }
-    
+
     protected LinkPersister getLinkPersister()
     {
         return linkPersister;
@@ -81,6 +88,41 @@ public abstract class AbstractLocalRepositoryStorage
     {
         return mimeUtil;
     }
+
+    // ==
+
+    /**
+     * Remote storage specific, when the remote connection settings are actually applied.
+     * 
+     * @param context
+     */
+    protected void updateContext( Repository repository, LocalStorageContext context )
+        throws LocalStorageException
+    {
+        // empty, override if needed
+    }
+
+    protected synchronized LocalStorageContext getLocalStorageContext( Repository repository )
+        throws LocalStorageException
+    {
+        if ( repository.getLocalStorageContext() != null )
+        {
+            // we have repo specific settings
+            // if contextContains key and is newer, or does not contain yet
+            if ( ( repositoryContexts.containsKey( repository.getId() ) && repository.getLocalStorageContext().getLastChanged() > ( repositoryContexts.get( repository.getId() ).longValue() ) )
+                || !repositoryContexts.containsKey( repository.getId() ) )
+            {
+                updateContext( repository, repository.getLocalStorageContext() );
+
+                repositoryContexts.put( repository.getId(),
+                    Long.valueOf( repository.getLocalStorageContext().getLastChanged() ) );
+            }
+        }
+
+        return repository.getLocalStorageContext();
+    }
+
+    // ==
 
     /**
      * Gets the absolute url from base.

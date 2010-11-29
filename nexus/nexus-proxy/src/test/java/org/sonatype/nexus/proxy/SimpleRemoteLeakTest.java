@@ -83,7 +83,7 @@ public class SimpleRemoteLeakTest
 
         CustomMultiThreadedHttpConnectionManager cm1 =
             (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
-                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
         assertEquals( 1, cm1.getConnectionsInPool() );
@@ -92,7 +92,7 @@ public class SimpleRemoteLeakTest
 
         CustomMultiThreadedHttpConnectionManager cm2 =
             (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
-                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
         assertEquals( 1, cm2.getConnectionsInPool() );
@@ -130,7 +130,7 @@ public class SimpleRemoteLeakTest
 
         CustomMultiThreadedHttpConnectionManager cm1 =
             (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx1
-                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
         assertEquals( 1, cm1.getConnectionsInPool() );
@@ -139,7 +139,7 @@ public class SimpleRemoteLeakTest
 
         CustomMultiThreadedHttpConnectionManager cm2 =
             (CustomMultiThreadedHttpConnectionManager) ( (HttpClient) ctx2
-                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
 
         assertEquals( 1, cm2.getConnectionsInPool() );

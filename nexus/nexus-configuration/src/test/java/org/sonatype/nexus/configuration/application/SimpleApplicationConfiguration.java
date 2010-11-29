@@ -26,6 +26,7 @@ import org.sonatype.nexus.configuration.model.CRemoteConnectionSettings;
 import org.sonatype.nexus.configuration.model.CRepositoryGrouping;
 import org.sonatype.nexus.configuration.model.CRouting;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.plexus.appevents.ApplicationEventMulticaster;
 
@@ -38,6 +39,8 @@ public class SimpleApplicationConfiguration
     
     private Configuration configuration;
 
+    private LocalStorageContext localStorageContext = new SimpleLocalStorageContext();
+    
     private RemoteStorageContext remoteStorageContext = new SimpleRemoteStorageContext();
 
     public SimpleApplicationConfiguration()
@@ -52,6 +55,11 @@ public class SimpleApplicationConfiguration
         configuration.setRepositoryGrouping( new CRepositoryGrouping() );
     }
 
+    public LocalStorageContext getGlobalLocalStorageContext()
+    {
+        return localStorageContext;
+    }
+    
     public RemoteStorageContext getGlobalRemoteStorageContext()
     {
         return remoteStorageContext;

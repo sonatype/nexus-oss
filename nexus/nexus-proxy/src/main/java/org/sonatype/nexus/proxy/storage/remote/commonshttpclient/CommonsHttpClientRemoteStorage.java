@@ -37,9 +37,7 @@ import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.util.DateParseException;
 import org.apache.commons.httpclient.util.DateUtil;
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.StringUtils;
-import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.RemoteAccessDeniedException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
@@ -343,12 +341,12 @@ public class CommonsHttpClientRemoteStorage
 
         HttpClientProxyUtil.applyProxyToHttpClient( httpClient, ctx, getLogger() );
 
-        ctx.putRemoteConnectionContextObject( CTX_KEY_CLIENT, httpClient );
+        ctx.putContextObject( CTX_KEY_CLIENT, httpClient );
 
-        ctx.putRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION, httpClient.getHostConfiguration() );
+        ctx.putContextObject( CTX_KEY_HTTP_CONFIGURATION, httpClient.getHostConfiguration() );
 
         // NEXUS-3338: we don't know afer config change is remote S3 (url changed maybe)
-        ctx.putRemoteConnectionContextObject( CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
+        ctx.putContextObject( CTX_KEY_S3_FLAG, new BooleanFlagHolder() );
     }
 
     /**
@@ -380,10 +378,10 @@ public class CommonsHttpClientRemoteStorage
 
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
-        HttpClient httpClient = (HttpClient) ctx.getRemoteConnectionContextObject( CTX_KEY_CLIENT );
+        HttpClient httpClient = (HttpClient) ctx.getContextObject( CTX_KEY_CLIENT );
 
         HostConfiguration httpConfiguration =
-            (HostConfiguration) ctx.getRemoteConnectionContextObject( CTX_KEY_HTTP_CONFIGURATION );
+            (HostConfiguration) ctx.getContextObject( CTX_KEY_HTTP_CONFIGURATION );
 
         method.setRequestHeader( new Header( "user-agent", formatUserAgentString( ctx, repository ) ) );
         method.setRequestHeader( new Header( "accept", "*/*" ) );
@@ -609,10 +607,10 @@ public class CommonsHttpClientRemoteStorage
         // it is S3 if we have CTX_KEY_S3_FLAG set, the flag value is not null, and flag value is true
         // if flag is False, we know it is not S3
         // if flag is null, we still did not contact remote, so we were not able to tell yet
-        return ctx.hasRemoteConnectionContextObject( CTX_KEY_S3_FLAG )
-               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getRemoteConnectionContextObject(
+        return ctx.hasContextObject( CTX_KEY_S3_FLAG )
+               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
                    CTX_KEY_S3_FLAG ) ).isFlag() != null
-               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getRemoteConnectionContextObject(
+               && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
                    CTX_KEY_S3_FLAG ) ).isFlag();
     }
 
@@ -622,8 +620,8 @@ public class CommonsHttpClientRemoteStorage
         RemoteStorageContext ctx = getRemoteStorageContext( repository );
 
         // we already know the result, do nothing
-        if ( ctx.hasRemoteConnectionContextObject( CTX_KEY_S3_FLAG )
-             && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getRemoteConnectionContextObject(
+        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG )
+             && ( (BooleanFlagHolder) getRemoteStorageContext( repository ).getContextObject(
                  CTX_KEY_S3_FLAG ) ).isFlag() != null )
         {
             return;
@@ -634,9 +632,9 @@ public class CommonsHttpClientRemoteStorage
 
         boolean isAmazonS3 = ( hdr != null ) && ( hdr.getValue().toLowerCase().contains( "amazons3" ) );
 
-        if ( ctx.hasRemoteConnectionContextObject( CTX_KEY_S3_FLAG ) )
+        if ( ctx.hasContextObject( CTX_KEY_S3_FLAG ) )
         {
-            ( (BooleanFlagHolder) ctx.getRemoteConnectionContextObject( CTX_KEY_S3_FLAG ) ).setFlag( isAmazonS3 );
+            ( (BooleanFlagHolder) ctx.getContextObject( CTX_KEY_S3_FLAG ) ).setFlag( isAmazonS3 );
         }
 
         if ( isAmazonS3 )

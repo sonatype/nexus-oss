@@ -19,6 +19,7 @@ import java.io.IOException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
@@ -73,6 +74,11 @@ public class ApplicationConfigurationAdapter
     public boolean isSecurityEnabled()
     {
         return nexusConfiguration.isSecurityEnabled();
+    }
+
+    public LocalStorageContext getGlobalLocalStorageContext()
+    {
+        return nexusConfiguration.getGlobalLocalStorageContext();
     }
 
     public RemoteStorageContext getGlobalRemoteStorageContext()

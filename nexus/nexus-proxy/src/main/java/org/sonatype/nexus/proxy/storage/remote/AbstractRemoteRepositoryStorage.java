@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.logging.AbstractLogEnabled;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.ApplicationStatusSource;
 import org.sonatype.nexus.SystemStatus;
@@ -40,9 +40,11 @@ import org.sonatype.nexus.proxy.repository.Repository;
  * @author cstamas
  */
 public abstract class AbstractRemoteRepositoryStorage
-    extends AbstractLogEnabled
     implements RemoteRepositoryStorage
 {
+    @Requirement
+    private Logger logger;
+    
     @Requirement
     private ApplicationStatusSource applicationStatusSource;
 
@@ -64,6 +66,11 @@ public abstract class AbstractRemoteRepositoryStorage
      */
     private Map<String, Long> repositoryContexts = new HashMap<String, Long>();
 
+    protected Logger getLogger()
+    {
+        return logger;
+    }
+    
     protected MimeUtil getMimeUtil()
     {
         return mimeUtil;

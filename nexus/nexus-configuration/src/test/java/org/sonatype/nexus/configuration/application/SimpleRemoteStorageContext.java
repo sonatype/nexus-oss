@@ -6,6 +6,7 @@ import java.util.Map;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.storage.StorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 public class SimpleRemoteStorageContext
@@ -18,27 +19,27 @@ public class SimpleRemoteStorageContext
         return 0;
     }
 
-    public RemoteStorageContext getParentRemoteStorageContext()
+    public RemoteStorageContext getParentStorageContext()
     {
         return null;
     }
 
-    public Map<String, Object> getRemoteConnectionContext()
+    public Map<String, Object> getContext()
     {
         return ctx;
     }
 
-    public Object getRemoteConnectionContextObject( String key )
+    public Object getContextObject( String key )
     {
         return ctx.get( key );
     }
 
-    public void putRemoteConnectionContextObject( String key, Object value )
+    public void putContextObject( String key, Object value )
     {
         ctx.put( key, value );
     }
 
-    public void removeRemoteConnectionContextObject( String key )
+    public void removeContextObject( String key )
     {
         ctx.remove( key );
     }
@@ -89,7 +90,7 @@ public class SimpleRemoteStorageContext
         return false;
     }
 
-    public boolean hasRemoteConnectionContextObject( String key )
+    public boolean hasContextObject( String key )
     {
         // TODO Auto-generated method stub
         return false;
@@ -125,7 +126,7 @@ public class SimpleRemoteStorageContext
         
     }
 
-    public void setParentRemoteStorageContext( RemoteStorageContext parent )
+    public void setParentStorageContext( StorageContext parent )
     {
         // TODO Auto-generated method stub
         

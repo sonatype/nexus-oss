@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.sonatype.nexus.configuration.model.Configuration;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 
 /**
@@ -69,6 +70,13 @@ public interface ApplicationConfiguration
      */
     boolean isSecurityEnabled();
 
+    /**
+     * Gets the top level local storage context.
+     * 
+     * @return
+     */
+    LocalStorageContext getGlobalLocalStorageContext();
+    
     /**
      * Gets the top level remote storage context.
      * 

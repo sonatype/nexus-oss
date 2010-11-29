@@ -60,6 +60,8 @@ import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.LocalStatus;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.repository.ShadowRepository;
+import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.DefaultRemoteStorageContext;
 import org.sonatype.nexus.proxy.storage.remote.RemoteStorageContext;
 import org.sonatype.nexus.tasks.descriptors.ScheduledTaskDescriptor;
@@ -85,6 +87,9 @@ public class DefaultNexusConfiguration
 
     @Requirement( hint = "file" )
     private ApplicationConfigurationSource configurationSource;
+
+    /** The global local storage context. */
+    private LocalStorageContext globalLocalStorageContext;
 
     /** The global remote storage context. */
     private RemoteStorageContext globalRemoteStorageContext;
@@ -173,6 +178,8 @@ public class DefaultNexusConfiguration
 
             wastebasketDirectory = null;
 
+            globalLocalStorageContext = new DefaultLocalStorageContext( null );
+            
             // create global remote ctx
             // this one has no parent
             globalRemoteStorageContext = new DefaultRemoteStorageContext( null );
@@ -303,6 +310,11 @@ public class DefaultNexusConfiguration
     public boolean isConfigurationDefaulted()
     {
         return configurationSource.isConfigurationDefaulted();
+    }
+    
+    public LocalStorageContext getGlobalLocalStorageContext()
+    {
+        return globalLocalStorageContext;
     }
 
     public RemoteStorageContext getGlobalRemoteStorageContext()

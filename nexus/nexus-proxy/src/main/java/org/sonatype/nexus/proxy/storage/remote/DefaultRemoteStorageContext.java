@@ -13,12 +13,12 @@
  */
 package org.sonatype.nexus.proxy.storage.remote;
 
-import java.util.HashMap;
-
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.repository.RemoteAuthenticationSettings;
 import org.sonatype.nexus.proxy.repository.RemoteConnectionSettings;
 import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
+import org.sonatype.nexus.proxy.storage.AbstractStorageContext;
+import org.sonatype.nexus.proxy.storage.StorageContext;
 
 /**
  * The default remote storage context.
@@ -26,153 +26,85 @@ import org.sonatype.nexus.proxy.repository.RemoteProxySettings;
  * @author cstamas
  */
 public class DefaultRemoteStorageContext
+    extends AbstractStorageContext
     implements RemoteStorageContext
 {
-    private final HashMap<String, Object> context = new HashMap<String, Object>();
-
-    private long lastChanged = System.currentTimeMillis();
-
-    private RemoteStorageContext parent;
-
-    public DefaultRemoteStorageContext( RemoteStorageContext parent )
+    public DefaultRemoteStorageContext( StorageContext parent )
     {
-        this.parent = parent;
-    }
-
-    public long getLastChanged()
-    {
-        if ( parent != null )
-        {
-            return parent.getLastChanged() > lastChanged ? parent.getLastChanged() : lastChanged;
-        }
-        else
-        {
-            return lastChanged;
-        }
-    }
-
-    protected void setLastChanged( long ts )
-    {
-        lastChanged = ts;
-    }
-
-    public RemoteStorageContext getParentRemoteStorageContext()
-    {
-        return parent;
-    }
-
-    public void setParentRemoteStorageContext( RemoteStorageContext parent )
-    {
-        this.parent = parent;
-    }
-
-    public Object getRemoteConnectionContextObject( String key )
-    {
-        if ( context.containsKey( key ) )
-        {
-            return context.get( key );
-        }
-        else if ( parent != null )
-        {
-            return parent.getRemoteConnectionContextObject( key );
-        }
-        else
-        {
-            return null;
-        }
-    }
-
-    public void putRemoteConnectionContextObject( String key, Object value )
-    {
-        context.put( key, value );
-
-        setLastChanged( System.currentTimeMillis() );
-    }
-
-    public void removeRemoteConnectionContextObject( String key )
-    {
-        context.remove( key );
-
-        setLastChanged( System.currentTimeMillis() );
-    }
-
-    public boolean hasRemoteConnectionContextObject( String key )
-    {
-        return context.containsKey( key );
+        super( parent );
     }
 
     public boolean hasRemoteAuthenticationSettings()
     {
-        return hasRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName() );
+        return hasContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
     public RemoteAuthenticationSettings getRemoteAuthenticationSettings()
     {
-        return (RemoteAuthenticationSettings) getRemoteConnectionContextObject( RemoteAuthenticationSettings.class
-            .getName() );
+        return (RemoteAuthenticationSettings) getContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
     public void setRemoteAuthenticationSettings( RemoteAuthenticationSettings settings )
     {
-        putRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName(), settings );
+        putContextObject( RemoteAuthenticationSettings.class.getName(), settings );
     }
 
     public void removeRemoteAuthenticationSettings()
     {
-        removeRemoteConnectionContextObject( RemoteAuthenticationSettings.class.getName() );
+        removeContextObject( RemoteAuthenticationSettings.class.getName() );
     }
 
     public boolean hasRemoteConnectionSettings()
     {
-        return hasRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+        return hasContextObject( RemoteConnectionSettings.class.getName() );
     }
 
     public RemoteConnectionSettings getRemoteConnectionSettings()
     {
-        return (RemoteConnectionSettings) getRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+        return (RemoteConnectionSettings) getContextObject( RemoteConnectionSettings.class.getName() );
     }
 
     public void setRemoteConnectionSettings( RemoteConnectionSettings settings )
     {
-        putRemoteConnectionContextObject( RemoteConnectionSettings.class.getName(), settings );
+        putContextObject( RemoteConnectionSettings.class.getName(), settings );
     }
 
     public void removeRemoteConnectionSettings()
     {
-        removeRemoteConnectionContextObject( RemoteConnectionSettings.class.getName() );
+        removeContextObject( RemoteConnectionSettings.class.getName() );
     }
 
     public boolean hasRemoteProxySettings()
     {
-        return hasRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
+        return hasContextObject( RemoteProxySettings.class.getName() );
     }
 
     public RemoteProxySettings getRemoteProxySettings()
     {
         // we have a special case here, need to track blockInheritance flag
         // so, a little code duplication happens
-        // thre cases:
+        // three cases:
         // 1. we have _no_ proxy settings in this context, fallback to original code
         // 2. we have proxy settings with no proxyHost set, then obey the blockInheritance
         // 3. we have proxy settings with set proxyHost, then return it
 
-        String key = RemoteProxySettings.class.getName();
+        final String key = RemoteProxySettings.class.getName();
 
-        if ( !context.containsKey( key ) )
+        if ( !hasContextObject( key ) )
         {
             // case 1
-            return (RemoteProxySettings) getRemoteConnectionContextObject( key );
+            return (RemoteProxySettings) getContextObject( key );
         }
         else
         {
-            RemoteProxySettings remoteProxySettings = (RemoteProxySettings) context.get( key );
+            RemoteProxySettings remoteProxySettings = (RemoteProxySettings) getContextObject( key, false );
 
             if ( StringUtils.isBlank( remoteProxySettings.getHostname() ) )
             {
                 // case 2
                 if ( !remoteProxySettings.isBlockInheritance() )
                 {
-                    return (RemoteProxySettings) getRemoteConnectionContextObject( key );
+                    return (RemoteProxySettings) getContextObject( key );
                 }
                 else
                 {
@@ -190,11 +122,11 @@ public class DefaultRemoteStorageContext
 
     public void setRemoteProxySettings( RemoteProxySettings settings )
     {
-        putRemoteConnectionContextObject( RemoteProxySettings.class.getName(), settings );
+        putContextObject( RemoteProxySettings.class.getName(), settings );
     }
 
     public void removeRemoteProxySettings()
     {
-        removeRemoteConnectionContextObject( RemoteProxySettings.class.getName() );
+        removeContextObject( RemoteProxySettings.class.getName() );
     }
 }

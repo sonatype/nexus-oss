@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.repository.RepositoryWritePolicy;
 import org.sonatype.nexus.proxy.repository.RequestProcessor;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 
@@ -511,6 +512,12 @@ public class DummyRepository
     }
 
     public RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public LocalStorageContext getLocalStorageContext()
     {
         // TODO Auto-generated method stub
         return null;

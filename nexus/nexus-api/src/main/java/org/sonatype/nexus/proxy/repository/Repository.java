@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
 import org.sonatype.nexus.proxy.registry.ContentClass;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.scheduling.RepositoryTaskFilter;
 import org.sonatype.plugin.ExtensionPoint;
@@ -309,6 +310,13 @@ public interface Repository
      * @param val the val
      */
     void setLocalStatus( LocalStatus val );
+    
+    /**
+     * Returns repository specific local storage context.
+     * 
+     * @return null if none
+     */
+    LocalStorageContext getLocalStorageContext();
 
     /**
      * Returns the local storage of the repository. Per repository instance may exists.

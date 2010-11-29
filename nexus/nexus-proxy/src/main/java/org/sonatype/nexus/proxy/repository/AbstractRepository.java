@@ -64,7 +64,9 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.RepositoryItemUidAttributeManager;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
+import org.sonatype.nexus.proxy.storage.local.DefaultLocalStorageContext;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.storage.local.LocalStorageContext;
 import org.sonatype.nexus.proxy.target.TargetRegistry;
 import org.sonatype.nexus.proxy.target.TargetSet;
 import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
@@ -130,6 +132,9 @@ public abstract class AbstractRepository
 
     @Requirement
     private AttributesHandler attributesHandler;
+
+    /** Local storage context to store storage-wide configs. */
+    private LocalStorageContext localStorageContext;
 
     /** The local storage. */
     private LocalRepositoryStorage localStorage;
@@ -525,6 +530,17 @@ public abstract class AbstractRepository
     public void setAttributesHandler( AttributesHandler attributesHandler )
     {
         this.attributesHandler = attributesHandler;
+    }
+
+    public LocalStorageContext getLocalStorageContext()
+    {
+        if ( localStorageContext == null )
+        {
+            localStorageContext =
+                new DefaultLocalStorageContext( getApplicationConfiguration().getGlobalLocalStorageContext() );
+        }
+
+        return localStorageContext;
     }
 
     public LocalRepositoryStorage getLocalStorage()

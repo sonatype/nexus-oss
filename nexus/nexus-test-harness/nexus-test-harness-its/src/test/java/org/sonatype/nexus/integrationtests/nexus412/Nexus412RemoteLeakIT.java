@@ -74,7 +74,7 @@ public class Nexus412RemoteLeakIT
 
         MultiThreadedHttpConnectionManager cm =
             (MultiThreadedHttpConnectionManager) ( (HttpClient) ctx
-                .getRemoteConnectionContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
+                .getContextObject( CommonsHttpClientRemoteStorage.CTX_KEY_CLIENT ) )
                 .getHttpConnectionManager();
         Assert.assertEquals( 2, cm.getConnectionsInPool() );
 
