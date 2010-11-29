@@ -358,7 +358,7 @@
         <plugin>
           <groupId>org.sonatype.plugins</groupId>
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
-          <version>1.6-SNAPSHOT</version>
+          <version>1.6</version>
         </plugin>
       </plugins>
     </pluginManagement>
