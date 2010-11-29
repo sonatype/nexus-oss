@@ -47,8 +47,6 @@ public class AbstractEvictTaskIt
 
     private File storageWorkDir;
 
-    private File attributesWorkDir;
-
     @BeforeMethod
     public void setupStorageAndAttributes()
         throws Exception
@@ -56,10 +54,9 @@ public class AbstractEvictTaskIt
         File workDir = new File( AbstractNexusIntegrationTest.nexusWorkDir );
 
         this.storageWorkDir = new File( workDir, "storage" );
-        this.attributesWorkDir = new File( workDir, "proxy/attributes" );
 
         FileUtils.copyDirectoryStructure( this.getTestResourceAsFile( "storage/" ), storageWorkDir );
-        FileUtils.copyDirectoryStructure( this.getTestResourceAsFile( "attributes/" ), attributesWorkDir );
+        FileUtils.copyDirectoryStructure( this.getTestResourceAsFile( "attributes/" ), storageWorkDir );
 
         // now setup all the attributes
         File attributesInfo = this.getTestResourceAsFile( "attributes.info" );
@@ -86,7 +83,7 @@ public class AbstractEvictTaskIt
                 long offset = (long) ( Double.parseDouble( parts[1] ) * A_DAY );
 
                 // get the file
-                File attributeFile = new File( attributesWorkDir, filePart );
+                File attributeFile = new File( storageWorkDir, filePart );
                 if ( attributeFile.isFile() )
                 {
                     this.pathMap.put( filePart, Double.parseDouble( parts[1] ) );
@@ -101,7 +98,7 @@ public class AbstractEvictTaskIt
                                                              * see: NEXUS-3026
                                                              */|| filePart.startsWith( "snapshots/" )
                         || filePart.startsWith( "thirdparty/" ) || filePart.contains( ".meta" )
-                        || filePart.contains( ".index" ) )
+                        || filePart.contains( ".index" ) || filePart.contains( ".nexus" ) )
                     {
                         neverDeleteFiles.add( filePart );
                     }
@@ -231,12 +228,31 @@ public class AbstractEvictTaskIt
         return buffer.toString();
     }
 
+    protected SortedSet<String> getAttributeFilePaths()
+        throws IOException
+    {
+        SortedSet<String> result = new TreeSet<String>();
+
+        SortedSet<String> attributes = getFilePaths( getStorageWorkDir() );
+
+        for ( String attribute : attributes )
+        {
+            if ( attribute.contains( "/.nexus/attributes" ) )
+            {
+                // "tweak" the path
+                result.add( attribute.replace( "/.nexus/attributes", "" ) );
+            }
+        }
+
+        return result;
+    }
+
     @SuppressWarnings( "unchecked" )
     protected SortedSet<String> getFilePaths( File basedir )
         throws IOException
     {
         SortedSet<String> result = new TreeSet<String>();
-        List<String> paths = FileUtils.getFileNames( this.getStorageWorkDir(), null, null, false, true );
+        List<String> paths = FileUtils.getFileNames( basedir, null, null, false, true );
         for ( String path : paths )
         {
             result.add( path.replaceAll( Pattern.quote( "\\" ), "/" ) );
@@ -249,7 +265,7 @@ public class AbstractEvictTaskIt
         throws IOException
     {
         SortedSet<String> result = new TreeSet<String>();
-        List<String> paths = FileUtils.getDirectoryNames( this.getStorageWorkDir(), null, null, false, true );
+        List<String> paths = FileUtils.getDirectoryNames( basedir, null, null, false, true );
         for ( String path : paths )
         {
             result.add( path.replaceAll( Pattern.quote( "\\" ), "/" ) );
@@ -262,11 +278,6 @@ public class AbstractEvictTaskIt
         return storageWorkDir;
     }
 
-    public File getAttributesWorkDir()
-    {
-        return attributesWorkDir;
-    }
-
     public Map<String, Double> getPathMap()
     {
         return pathMap;
@@ -276,7 +287,7 @@ public class AbstractEvictTaskIt
     {
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
-        scan.setIncludes( new String[] { "**/.index/*", "**/.meta/*" } );
+        scan.setIncludes( new String[] { "**/.index/", "**/.meta/", "**/.nexus/" } );
         scan.addDefaultExcludes();
 
         scan.scan();

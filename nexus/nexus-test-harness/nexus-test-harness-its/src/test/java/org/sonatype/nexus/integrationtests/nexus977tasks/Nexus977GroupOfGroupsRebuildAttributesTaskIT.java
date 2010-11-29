@@ -36,20 +36,23 @@ public class Nexus977GroupOfGroupsRebuildAttributesTaskIT
         repo.setKey( "repositoryOrGroupId" );
         repo.setValue( "group_g4" );
         TaskScheduleUtil.runTask( RebuildAttributesTaskDescriptor.ID, repo );
-        
+
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
         scan.addDefaultExcludes();
+        scan.setExcludes( new String[] { "**/.nexus/attributes/" } );
         scan.scan();
         String[] storageContent = scan.getIncludedFiles();
 
         scan = new DirectoryScanner();
-        scan.setBasedir( new File( nexusWorkDir, "proxy/attributes" ) );
+        scan.setBasedir( new File( nexusWorkDir, "storage" ) );
         scan.addDefaultExcludes();
+        scan.setIncludes( new String[] { "**/.nexus/attributes/" } );
         scan.scan();
         String[] attributesContent = scan.getIncludedFiles();
 
-        Assert.assertEquals( attributesContent, storageContent );
+        // the paths will differ, but length should be equal
+        Assert.assertEquals( attributesContent.length, storageContent.length );
     }
 
 }

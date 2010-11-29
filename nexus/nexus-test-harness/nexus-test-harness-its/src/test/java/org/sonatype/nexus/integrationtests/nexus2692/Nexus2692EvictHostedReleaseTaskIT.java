@@ -9,30 +9,28 @@ import org.testng.annotations.Test;
 public class Nexus2692EvictHostedReleaseTaskIT
     extends AbstractEvictTaskIt
 {
-
-    @SuppressWarnings( "unchecked" )
     @Test
     public void testEvictReleaseRepo()
         throws Exception
     {
         int days = 1;
         // run Task
-        this.runTask( days, "repo_releases" );
+        runTask( days, "repo_releases" );
 
         // check files
-        SortedSet<String> resultStorageFiles = this.getFilePaths( this.getStorageWorkDir() );
-        SortedSet<String> resultAttributeFiles = this.getFilePaths( this.getAttributesWorkDir() );
+        SortedSet<String> resultStorageFiles = getFilePaths( getStorageWorkDir() );
+        SortedSet<String> resultAttributeFiles = getAttributeFilePaths();
 
         // unexpected deleted files
-        SortedSet<String> storageDiff = new TreeSet( this.getPathMap().keySet() );
+        SortedSet<String> storageDiff = new TreeSet<String>( getPathMap().keySet() );
         storageDiff.removeAll( resultStorageFiles );
 
-        SortedSet<String> attributeDiff = new TreeSet( this.getPathMap().keySet() );
+        SortedSet<String> attributeDiff = new TreeSet<String>( getPathMap().keySet() );
         attributeDiff.removeAll( resultAttributeFiles );
 
         Assert.assertTrue( storageDiff.isEmpty(),
-                           "Files deleted that should not have been: " + this.prettyList( storageDiff ) );
+                           "Files deleted that should not have been: " + prettyList( storageDiff ) );
         Assert.assertTrue( attributeDiff.isEmpty(),
-                           "Files deleted that should not have been: " + this.prettyList( attributeDiff ) );
+                           "Files deleted that should not have been: " + prettyList( attributeDiff ) );
     }
 }
