@@ -182,9 +182,9 @@ public class Component
         return success;
     }
 
-
     public void waitToLoad()
     {
-        waitForEvalTrue(".disabled != true");
+        waitForEvalTrue( ".disabled != true" );
     }
+
 }

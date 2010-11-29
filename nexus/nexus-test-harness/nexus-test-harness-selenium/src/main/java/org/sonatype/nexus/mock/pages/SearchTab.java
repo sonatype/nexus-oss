@@ -42,13 +42,13 @@ public class SearchTab
 
         searchSelector = new Button( selenium, expression + ".searchToolbar.items.first()" );
         keywordButton = new Button( selenium, searchSelector.getExpression() + ".menu.items.items[0].el" );
-        keywordButton.idFunction = ".id";
+        keywordButton.idFunction = ".dom.id";
         classnameButton = new Button( selenium, searchSelector.getExpression() + ".menu.items.items[1].el" );
-        classnameButton.idFunction = ".id";
+        classnameButton.idFunction = ".dom.id";
         gavButton = new Button( selenium, searchSelector.getExpression() + ".menu.items.items[2].el" );
-        gavButton.idFunction = ".id";
+        gavButton.idFunction = ".dom.id";
         checksumButton = new Button( selenium, searchSelector.getExpression() + ".menu.items.items[3].el" );
-        checksumButton.idFunction = ".id";
+        checksumButton.idFunction = ".dom.id";
 
         allSearch = new SearchField( selenium, expression + ".searchField" );
 

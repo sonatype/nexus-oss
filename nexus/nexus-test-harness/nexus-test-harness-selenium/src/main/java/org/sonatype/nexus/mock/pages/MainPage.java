@@ -15,6 +15,21 @@ public class MainPage
     {
         this.selenium = selenium;
         selenium.open( "/nexus" );
+
+        for ( int i = 1; i < 50; i++ )
+        {
+            if ( i % 20 == 0 )
+            {
+                selenium.refresh();
+            }
+
+            if ( loginLinkAvailable() )
+            {
+                return;
+            }
+
+            selenium.waitForPageToLoad( "1000" );
+        }
     }
 
     public boolean loginLinkAvailable()

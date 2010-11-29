@@ -14,8 +14,9 @@ import org.sonatype.nexus.mock.pages.ArtifactInformationPanel;
 import org.sonatype.nexus.mock.pages.SearchTab;
 import org.testng.annotations.Test;
 
-@Component( role = Nexus2181SearchTest.class )
-public class Nexus2181SearchTest
+@Component( role = Nexus2181SearchNotest.class )
+public class Nexus2181SearchNotest
+    // can't test plugins using selenium
     extends SeleniumTest
 {
 
@@ -28,8 +29,7 @@ public class Nexus2181SearchTest
     {
         FlatSearchResponse result =
             plexus.lookup( Searcher.class, "mavenCoordinates" ).flatSearch(
-                                                                            Collections.singletonMap( "g", "nexus2181" ),
-                                                                            "thirdparty", 0, Integer.MAX_VALUE, null );
+                Collections.singletonMap( "g", "nexus2181" ), "thirdparty", 0, Integer.MAX_VALUE, null );
         assertEquals( 2, result.getTotalHits() );
 
         SearchTab search = main.searchPanel().search( "nexus2181" );
@@ -67,9 +67,8 @@ public class Nexus2181SearchTest
     {
         SearchTab search = main.searchPanel().clickAdvancedSearch();
         assertEquals( 1, search.classnameSearch( "org.apache.tools.ant.launch.AntMain" ).getGrid().getStoreDataLength() );
-        assertEquals(
-                      0,
-                      search.classnameSearch( "my.custom.unknow.class.to.not.be.found.AntMain" ).getGrid().getStoreDataLength() );
+        assertEquals( 0,
+            search.classnameSearch( "my.custom.unknow.class.to.not.be.found.AntMain" ).getGrid().getStoreDataLength() );
     }
 
     @Test

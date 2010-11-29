@@ -25,6 +25,7 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationExce
 import org.sonatype.appbooter.PlexusAppBooter;
 import org.sonatype.nexus.mock.rest.MockHelper;
 import org.sonatype.nexus.mock.util.PropUtil;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.FileTestingUtils;
 import org.sonatype.nexus.test.utils.GavUtil;
 import org.sonatype.nexus.test.utils.TestProperties;
@@ -234,6 +235,8 @@ public abstract class NexusMockTestCase
                 }
             }
         }
+
+        getEventInspectorsUtil().waitForCalmPeriod();
     }
 
     private void deployWithWagon( PlexusContainer container, String wagonHint, String deployUrl, File fileToDeploy,
@@ -306,5 +309,17 @@ public abstract class NexusMockTestCase
     protected File getFile( String relativePath )
     {
         return getTestResourceAsFile( "files/" + relativePath );
+    }
+
+    private EventInspectorsUtil eventInspectorsUtil;
+
+    public EventInspectorsUtil getEventInspectorsUtil()
+    {
+        if ( eventInspectorsUtil == null )
+        {
+            eventInspectorsUtil = new EventInspectorsUtil( null );
+        }
+
+        return eventInspectorsUtil;
     }
 }
