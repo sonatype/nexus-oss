@@ -14,7 +14,7 @@ public class DefaultRepositoryItemUidAttributeManager
     implements RepositoryItemUidAttributeManager
 {
     @SuppressWarnings( "unchecked" )
-    public <T extends Attribute<?>> T getAttribute( Class<T> attribute, RepositoryItemUid subject )
+    public <T extends Attribute<?>> T getAttribute( final Class<T> attribute, final RepositoryItemUid subject )
     {
         if ( attribute.equals( HiddenUid.class ) )
         {

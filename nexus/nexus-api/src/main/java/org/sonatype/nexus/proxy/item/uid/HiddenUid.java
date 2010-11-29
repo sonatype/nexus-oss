@@ -7,7 +7,7 @@ public class HiddenUid
 {
     private final RepositoryItemUid uid;
 
-    public HiddenUid( RepositoryItemUid uid )
+    public HiddenUid( final RepositoryItemUid uid )
     {
         this.uid = uid;
     }
@@ -24,7 +24,9 @@ public class HiddenUid
         {
             return Boolean.TRUE;
         }
-
-        return Boolean.FALSE;
+        else
+        {
+            return Boolean.FALSE;
+        }
     }
 }
