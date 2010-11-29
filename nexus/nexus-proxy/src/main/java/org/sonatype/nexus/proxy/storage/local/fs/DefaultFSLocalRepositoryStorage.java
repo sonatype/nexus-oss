@@ -312,9 +312,7 @@ public class DefaultFSLocalRepositoryStorage
         item.setRemoteChecked( item.getStoredLocally() );
         item.setExpired( false );
 
-        ResourceStoreRequest request = new ResourceStoreRequest( item );
-
-        File target = getFileFromBase( repository, request );
+        File target = getFileFromBase( repository, item.getResourceStoreRequest() );
 
         ContentLocator cl = null;
 
