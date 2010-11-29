@@ -1,8 +1,10 @@
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.1 http://maven.apache.org/xsd/assembly-1.1.1.xsd">
-  <id>test-plan</id>
+  <id>jmeter-plan-dist</id>
   <formats>
     <format>zip</format>
     <format>tar.gz</format>
+    <!-- to aid inplace development -->
+    <format>dir</format>
   </formats>
   <includeBaseDirectory>true</includeBaseDirectory>
   <baseDirectory>test-plan</baseDirectory>
@@ -15,6 +17,7 @@
       <outputDirectory>.</outputDirectory>
       <includes>
         <include>*.jmx</include>
+        <include>*.properties</include>
       </includes>
     </fileSet>
     <fileSet>
