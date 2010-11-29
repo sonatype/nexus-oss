@@ -61,6 +61,11 @@ public class DefaultFSLocalRepositoryStorage
     @Requirement
     private FSPeer fsPeer;
 
+    protected FSPeer getFSPeer()
+    {
+        return fsPeer;
+    }
+
     public String getProviderId()
     {
         return PROVIDER_STRING;
@@ -284,13 +289,13 @@ public class DefaultFSLocalRepositoryStorage
     {
         File target = getBaseDir( repository, request );
 
-        return fsPeer.isReachable( repository, request, target );
+        return getFSPeer().isReachable( repository, request, target );
     }
 
     public boolean containsItem( Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
     {
-        return fsPeer.containsItem( repository, request, getFileFromBase( repository, request ) );
+        return getFSPeer().containsItem( repository, request, getFileFromBase( repository, request ) );
     }
 
     public AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
@@ -335,7 +340,7 @@ public class DefaultFSLocalRepositoryStorage
             cl = new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/xml" );
         }
 
-        fsPeer.storeItem( repository, item, target, cl );
+        getFSPeer().storeItem( repository, item, target, cl );
 
         if ( item instanceof StorageFileItem )
         {
@@ -378,7 +383,7 @@ public class DefaultFSLocalRepositoryStorage
 
         File target = getFileFromBase( repository, request );
 
-        fsPeer.shredItem( repository, request, target );
+        getFSPeer().shredItem( repository, request, target );
     }
 
     public void moveItem( Repository repository, ResourceStoreRequest from, ResourceStoreRequest to )
@@ -402,7 +407,7 @@ public class DefaultFSLocalRepositoryStorage
 
         File toTarget = getFileFromBase( repository, to );
 
-        fsPeer.moveItem( repository, from, fromTarget, to, toTarget );
+        getFSPeer().moveItem( repository, from, fromTarget, to, toTarget );
 
         repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
     }
@@ -414,7 +419,7 @@ public class DefaultFSLocalRepositoryStorage
 
         File target = getFileFromBase( repository, request );
 
-        Collection<File> files = fsPeer.listItems( repository, request, target );
+        Collection<File> files = getFSPeer().listItems( repository, request, target );
 
         if ( files != null )
         {
