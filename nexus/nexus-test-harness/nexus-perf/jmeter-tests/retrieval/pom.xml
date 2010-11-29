@@ -1,0 +1,66 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.sonatype.nexus</groupId>
+    <artifactId>jmeter-tests</artifactId>
+    <version>1.9-SNAPSHOT</version>
+  </parent>
+  <groupId>org.sonatype.nexus.jmeter</groupId>
+  <artifactId>retrieval-runner</artifactId>
+  <version>1.9-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>jmeter-tests :: retrieval-runner</name>
+  <dependencies>
+    <dependency>
+      <groupId>org.sonatype.nexus.jmeter</groupId>
+      <artifactId>retrieval</artifactId>
+      <type>zip</type>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <properties>
+    <jmeter.jvmprops>-Dmseinstall.duration=10</jmeter.jvmprops>
+    <product-groupId>com.sonatype.nexus</product-groupId>
+    <product-artifactId>nexus-onboarding-webapp</product-artifactId>
+  </properties>
+  <profiles>
+    <profile>
+      <id>p2-plugin-1</id>
+      <properties>
+        <perf.testplan>p2-plugin.jmx</perf.testplan>
+        <perf.data.id>p2-plugin-1</perf.data.id>
+        <perf.testplan.desc>Configure a p2 proxy repo with ArtifactMaxAge = MetadataMaxAge > 1 day (or long enough). Prime the metadata in the repo. Concurrently request metadata and artifacts from the p2 proxy repo.</perf.testplan.desc>
+        <nexus.repo>p2-plugin-1</nexus.repo>
+      </properties>
+    </profile>
+    <profile>
+      <id>p2-plugin-2</id>
+      <properties>
+        <perf.testplan>p2-plugin.jmx</perf.testplan>
+        <perf.data.id>p2-plugin-2</perf.data.id>
+        <perf.testplan.desc>Configure a p2 proxy repo with ArtifactMaxAge = 1 min (or less), MetadataMaxAge > 1 day (or long enough). Prime the metadata in the repo. Concurrently request metadata and artifacts from the p2 proxy repo for more than 10 x ArtifactMaxAge time.</perf.testplan.desc>
+        <nexus.repo>p2-plugin-2</nexus.repo>
+      </properties>
+    </profile>
+    <profile>
+      <id>p2-plugin-3</id>
+      <properties>
+        <perf.testplan>p2-plugin.jmx</perf.testplan>
+        <perf.data.id>p2-plugin-3</perf.data.id>
+        <perf.testplan.desc> Configure a p2 proxy repo with MetadataMaxAge = 1 min (or less). Prime the metadata in the repo. Concurrently request metadata and artifacts from the p2 proxy repo for more than 10 x MetadataMaxAge time.</perf.testplan.desc>
+        <nexus.repo>p2-plugin-3</nexus.repo>
+      </properties>
+    </profile>
+    <profile>
+      <id>p2-plugin-4</id>
+      <properties>
+        <perf.testplan>p2-plugin.jmx</perf.testplan>
+        <perf.data.id>p2-plugin-4</perf.data.id>
+        <perf.testplan.desc>Configure a p2 proxy repo with ArtifactMaxAge = MetadataMaxAge = 1 min (or less). Prime the metadata in the repo. Concurrently request metadata and artifacts from the p2 proxy repo for more than 10 x MetadataMaxAge time.</perf.testplan.desc>
+        <nexus.repo>p2-plugin-4</nexus.repo>
+      </properties>
+    </profile>
+  </profiles>
+</project>
