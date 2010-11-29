@@ -13,9 +13,9 @@
  */
 package org.sonatype.nexus.proxy.storage.local.fs;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -24,9 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Configuration;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
@@ -34,12 +32,13 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
+import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
 import org.sonatype.nexus.proxy.item.LinkPersister;
+import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
@@ -60,81 +59,11 @@ public class DefaultFSLocalRepositoryStorage
 {
     public static final String PROVIDER_STRING = "file";
 
-    @Configuration( value = "${rename.retry.count}" )
-    private String renameRetryCountString;
-
-    @Configuration( value = "${rename.retry.delay}" )
-    private String renameRetryDelayString;
-
-    @Configuration( value = "${upload.stream.bufferSize}" )
-    private String copyStreamBufferSizeString;
-
-    private int renameRetryCount = -1;
-
-    private int renameRetryDelay = -1;
-
-    private int copyStreamBufferSize = -1;
-
     @Requirement
     private LinkPersister linkPersister;
 
-    protected int getRenameRetryCount()
-    {
-        if ( renameRetryCount == -1 )
-        {
-            initializeRenameRetryParams();
-        }
-
-        return renameRetryCount;
-    }
-
-    protected int getRenameRetryDelay()
-    {
-        if ( renameRetryDelay == -1 )
-        {
-            initializeRenameRetryParams();
-        }
-
-        return renameRetryDelay;
-    }
-
-    protected int getCopyStreamBufferSize()
-    {
-        if ( this.copyStreamBufferSize == -1 )
-        {
-            try
-            {
-                // keeping this separate from initializeRenameRetryParams, parsing because hopefully that change will
-                // get backed out.
-                this.copyStreamBufferSize = Integer.parseInt( copyStreamBufferSizeString );
-            }
-            catch ( NumberFormatException e )
-            {
-                this.getLogger().debug( "Property upload.stream.bufferSize is not a valid integer, defaulting to 4096" );
-                this.copyStreamBufferSize = 4096;
-            }
-        }
-        return this.copyStreamBufferSize;
-    }
-
-    protected void initializeRenameRetryParams()
-    {
-        try
-        {
-            renameRetryCount = Integer.parseInt( renameRetryCountString );
-            renameRetryDelay = Integer.parseInt( renameRetryDelayString );
-        }
-        catch ( NumberFormatException e )
-        {
-        }
-
-        // initialize values, 0 isn't valid in either case
-        if ( renameRetryCount == 0 || renameRetryDelay == 0 )
-        {
-            renameRetryCount = 0;
-            renameRetryDelay = 0;
-        }
-    }
+    @Requirement
+    private FSPeer fsPeer;
 
     public String getProviderId()
     {
@@ -359,34 +288,19 @@ public class DefaultFSLocalRepositoryStorage
     {
         File target = getBaseDir( repository, request );
 
-        return target.exists() && target.canWrite();
+        return fsPeer.isReachable( repository, request, target );
     }
 
     public boolean containsItem( Repository repository, ResourceStoreRequest request )
         throws LocalStorageException
     {
-        return getFileFromBase( repository, request ).exists();
+        return fsPeer.containsItem( repository, request, getFileFromBase( repository, request ) );
     }
 
     public AbstractStorageItem retrieveItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException
     {
         return retrieveItemFromFile( repository, request, getFileFromBase( repository, request ) );
-    }
-
-    private synchronized void mkParentDirs( Repository repository, File target )
-        throws LocalStorageException
-    {
-        if ( !target.getParentFile().exists() && !target.getParentFile().mkdirs() )
-        {
-            // recheck is it really a "good" parent?
-            if ( !target.getParentFile().isDirectory() )
-            {
-                throw new LocalStorageException( "Could not create the directory hiearchy in repository \""
-                    + repository.getName() + "\" (id=\"" + repository.getId() + "\") to write "
-                    + target.getAbsolutePath() );
-            }
-        }
     }
 
     public void storeItem( Repository repository, StorageItem item )
@@ -399,186 +313,63 @@ public class DefaultFSLocalRepositoryStorage
 
         ResourceStoreRequest request = new ResourceStoreRequest( item );
 
-        File target = null;
+        File target = getFileFromBase( repository, request );
 
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        ContentLocator cl = null;
+
+        if ( item instanceof StorageFileItem )
         {
-            target = getFileFromBase( repository, request );
-
-            // NXCM-966, to be replaced with Tx!
-            File hiddenTarget = new File( target.getParentFile(), target.getName() + ".tmp" );
+            cl = ( (StorageFileItem) item ).getContentLocator();
+        }
+        else if ( item instanceof StorageLinkItem )
+        {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
             try
             {
-                mkParentDirs( repository, target );
-
-                InputStream is = null;
-
-                FileOutputStream os = null;
-
-                try
-                {
-                    is = ( (StorageFileItem) item ).getInputStream();
-
-                    os = new FileOutputStream( hiddenTarget );
-
-                    int bufferSize = this.getCopyStreamBufferSize();
-                    // log what the buffer size is so we can make sure we set it correctly.
-                    if ( this.getLogger().isDebugEnabled() )
-                    {
-                        this.getLogger().debug( "Copying stream with buffer size of: " + bufferSize );
-                    }
-                    IOUtil.copy( is, os, bufferSize );
-
-                    os.flush();
-                }
-                finally
-                {
-                    IOUtil.close( is );
-
-                    IOUtil.close( os );
-                }
-
-                handleRenameOperation( hiddenTarget, target );
-
-                target.setLastModified( item.getModified() );
-
-                ( (StorageFileItem) item ).setLength( target.length() );
-
-                // replace content locator transparently, if we just consumed a non-reusable one
-                // Hint: in general, those items coming from user uploads or remote proxy caching requests are non
-                // reusable ones
-                if ( !( (StorageFileItem) item ).getContentLocator().isReusable() )
-                {
-                    ( (StorageFileItem) item ).setContentLocator( new FileContentLocator( target,
-                        ( (StorageFileItem) item ).getMimeType() ) );
-                }
-
-                InputStream mdis = new FileInputStream( target );
-
-                try
-                {
-                    repository.getAttributesHandler().storeAttributes( item, mdis );
-                }
-                finally
-                {
-                    IOUtil.close( mdis );
-                }
+                linkPersister.writeLinkContent( (StorageLinkItem) item, bos );
             }
             catch ( IOException e )
             {
-                if ( target != null )
-                {
-                    target.delete();
-                }
-
-                if ( hiddenTarget != null )
-                {
-                    hiddenTarget.delete();
-                }
-
-                throw new LocalStorageException( "Got exception during storing on path "
-                    + item.getRepositoryItemUid().toString(), e );
+                // should not happen, look at implementation
+                // we will handle here two byte array backed streams!
+                throw new LocalStorageException( "Problem ", e );
             }
-        }
-        else if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            target = getFileFromBase( repository, request );
 
-            mkParentDirs( repository, target );
-
-            target.mkdir();
-            target.setLastModified( item.getModified() );
-            repository.getAttributesHandler().storeAttributes( item, null );
-        }
-        else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
-        {
-            try
-            {
-                target = getFileFromBase( repository, request );
-
-                mkParentDirs( repository, target );
-
-                FileOutputStream os = new FileOutputStream( target );
-
-                linkPersister.writeLinkContent( (StorageLinkItem) item, os );
-
-                target.setLastModified( item.getModified() );
-
-                repository.getAttributesHandler().storeAttributes( item, null );
-            }
-            catch ( IOException ex )
-            {
-                if ( target != null )
-                {
-                    target.delete();
-                }
-
-                throw new LocalStorageException( "Got exception during storing on path "
-                    + item.getRepositoryItemUid().toString(), ex );
-            }
-        }
-    }
-
-    protected void handleRenameOperation( File hiddenTarget, File target )
-        throws IOException
-    {
-        // delete the target, this is required on windows
-        if ( target.exists() )
-        {
-            target.delete();
+            cl = new PreparedContentLocator( new ByteArrayInputStream( bos.toByteArray() ), "text/xml" );
         }
 
-        // first try
-        boolean success = hiddenTarget.renameTo( target );
+        fsPeer.storeItem( repository, item, target, cl );
 
-        // if retries enabled go ahead and start the retry process
-        for ( int i = 1; success == false && i <= getRenameRetryCount(); i++ )
+        if ( item instanceof StorageFileItem )
         {
-            getLogger().debug(
-                "Rename operation attempt " + i + "failed on " + hiddenTarget.getAbsolutePath() + " --> "
-                    + target.getAbsolutePath() + " will wait " + getRenameRetryDelay() + " milliseconds and try again" );
+            ( (StorageFileItem) item ).setLength( target.length() );
 
-            try
-            {
-                Thread.sleep( getRenameRetryDelay() );
-            }
-            catch ( InterruptedException e )
-            {
-            }
-
-            // try to delete again...
-            if ( target.exists() )
-            {
-                target.delete();
-            }
-
-            // and rename again...
-            success = hiddenTarget.renameTo( target );
-
-            if ( success )
-            {
-                getLogger().info(
-                    "Rename operation succeeded after " + i + " retries on " + hiddenTarget.getAbsolutePath() + " --> "
-                        + target.getAbsolutePath() );
-            }
+            // replace content locator transparently, if we just consumed a non-reusable one
+            // Hint: in general, those items coming from user uploads or remote proxy caching requests are non
+            // reusable ones
+            ( (StorageFileItem) item ).setContentLocator( new FileContentLocator( target,
+                ( (StorageFileItem) item ).getMimeType() ) );
         }
 
-        if ( !success )
+        InputStream mdis;
+        
+        try
         {
-            try
-            {
-                FileUtils.rename( hiddenTarget, target );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error(
-                    "Rename operation failed after " + getRenameRetryCount() + " retries in " + getRenameRetryDelay()
-                        + " ms intervals " + hiddenTarget.getAbsolutePath() + " --> " + target.getAbsolutePath() );
+            mdis = item instanceof StorageFileItem ? ( (StorageFileItem) item ).getContentLocator().getContent() : null;
+        }
+        catch ( IOException e )
+        {
+            throw new LocalStorageException( "Was not able to open content locator just added!", e );
+        }
 
-                throw new IOException( "Cannot rename file \"" + hiddenTarget.getAbsolutePath() + "\" to \""
-                    + target.getAbsolutePath() + "\"! " + e.getMessage() );
-            }
+        try
+        {
+            repository.getAttributesHandler().storeAttributes( item, mdis );
+        }
+        finally
+        {
+            IOUtil.close( mdis );
         }
     }
 
@@ -591,81 +382,34 @@ public class DefaultFSLocalRepositoryStorage
 
         File target = getFileFromBase( repository, request );
 
-        if ( target.exists() )
-        {
-            if ( target.isDirectory() )
-            {
-                try
-                {
-                    FileUtils.deleteDirectory( target );
-                }
-                catch ( IOException ex )
-                {
-                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                        + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath(), ex );
-                }
-            }
-            else if ( target.isFile() )
-            {
-                if ( !target.delete() )
-                {
-                    throw new LocalStorageException( "Could not delete File in repository \"" + repository.getName()
-                        + "\" (id=\"" + repository.getId() + "\") from path " + target.getAbsolutePath() );
-                }
-            }
-        }
-        else
-        {
-            throw new ItemNotFoundException( request, repository );
-        }
+        fsPeer.shredItem( repository, request, target );
     }
 
     public Collection<StorageItem> listItems( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, LocalStorageException
     {
-        File target = getFileFromBase( repository, request );
-
         List<StorageItem> result = new ArrayList<StorageItem>();
 
-        if ( target.exists() )
+        File target = getFileFromBase( repository, request );
+
+        Collection<File> files = fsPeer.listItems( repository, request, target );
+
+        if ( files != null )
         {
-            if ( target.isDirectory() )
+            for ( File file : files )
             {
-                File[] files = target.listFiles();
+                String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), file.getName() );
 
-                if ( files != null )
-                {
-                    for ( int i = 0; i < files.length; i++ )
-                    {
-                        if ( files[i].isFile() || files[i].isDirectory() )
-                        {
-                            String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), files[i].getName() );
+                request.pushRequestPath( newPath );
 
-                            request.pushRequestPath( newPath );
+                result.add( retrieveItemFromFile( repository, request, file ) );
 
-                            result.add( retrieveItemFromFile( repository, request, files[i] ) );
-
-                            request.popRequestPath();
-                        }
-                    }
-                }
-                else
-                {
-                    getLogger().warn( "Cannot list directory " + target.getAbsolutePath() );
-                }
-            }
-            else if ( target.isFile() )
-            {
-                result.add( retrieveItemFromFile( repository, request, target ) );
-            }
-            else
-            {
-                throw new ItemNotFoundException( request, repository );
+                request.popRequestPath();
             }
         }
         else
         {
-            throw new ItemNotFoundException( request, repository );
+            result.add( retrieveItemFromFile( repository, request, target ) );
         }
 
         return result;
