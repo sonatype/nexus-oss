@@ -41,7 +41,8 @@ public class SSHAPasswordEncoderTest
 
         try
         {
-            encoder.encodePassword( "password", ":нсп" );
+            // salt must be byte[], this salt below is string and should throw IAE
+            encoder.encodePassword( "password", ":abc" );
             Assert.fail( "Expected IllegalArgumentException" );
         }
         catch ( IllegalArgumentException e )
