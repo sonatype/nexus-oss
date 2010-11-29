@@ -39,7 +39,7 @@ public class Nexus643EmptyTrashTaskIT
 
         delete( "nexus643" );
 
-        File trashContent = new File( nexusWorkDir, "trash/nexus-test-harness-repo/nexus643" );
+        File trashContent = new File( nexusWorkDir, "storage/nexus-test-harness-repo/.nexus/trash/nexus643" );
         Assert.assertTrue( trashContent.exists(), "Something should be at trash!" );
 
         // Empty trash content older than 1 days

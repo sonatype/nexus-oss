@@ -33,7 +33,7 @@ public class Nexus640RebuildRepositoryAttributesTaskIT
     public void rebuildAttributes()
         throws Exception
     {
-        String attributePath = "proxy/attributes/nexus-test-harness-repo/nexus640/artifact/1.0.0/";
+        String attributePath = "storage/"+REPO_TEST_HARNESS_REPO+"/.nexus/attributes/nexus640/artifact/1.0.0/";
 
         ScheduledServicePropertyResource repo = new ScheduledServicePropertyResource();
         repo.setKey( "repositoryOrGroupId" );
