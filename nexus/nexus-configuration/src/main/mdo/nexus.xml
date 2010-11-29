@@ -14,9 +14,9 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
   -->
 
-<model xmlns="http://modello.codehaus.org/MODELLO/1.0.0"
+<model xmlns="http://modello.codehaus.org/MODELLO/1.4.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.0.0 http://modello.codehaus.org/xsd/modello-1.0.0.xsd">
+  xsi:schemaLocation="http://modello.codehaus.org/MODELLO/1.4.0 http://modello.codehaus.org/xsd/modello-1.4.0.xsd">
 
   <id>nexus</id>
   <name>NexusConfiguration</name>
