@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.item.uid;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
@@ -13,16 +15,37 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class DefaultRepositoryItemUidAttributeManager
     implements RepositoryItemUidAttributeManager
 {
+    private final ConcurrentHashMap<Class<?>, Object> attributes;
+
+    public DefaultRepositoryItemUidAttributeManager()
+    {
+        super();
+
+        attributes = new ConcurrentHashMap<Class<?>, Object>();
+
+        fillInDefaults();
+    }
+
+    protected void fillInDefaults()
+    {
+        registerAttribute( new IsHiddenUidAttribute() );
+
+        registerAttribute( new IsMetadataMaintainedAttribute() );
+    }
+
     @SuppressWarnings( "unchecked" )
     public <T extends Attribute<?>> T getAttribute( final Class<T> attribute, final RepositoryItemUid subject )
     {
-        if ( attribute.equals( HiddenUid.class ) )
-        {
-            return (T) new HiddenUid( subject );
-        }
-        else
-        {
-            return null;
-        }
+        return (T) attributes.get( attribute );
+    }
+
+    public <T extends Attribute<?>> void registerAttribute( T attr )
+    {
+        attributes.put( attr.getClass(), attr );
+    }
+
+    public <T extends Attribute<?>> void deregisterAttribute( Class<T> attr )
+    {
+        attributes.remove( attr );
     }
 }

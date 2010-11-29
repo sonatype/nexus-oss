@@ -159,13 +159,6 @@ public class DefaultWastebasket
         return false;
     }
 
-    public void deleteRepositoryFolders( Repository repository, boolean deleteForever )
-        throws IOException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
     // ==============================
     // SmartWastebasket iface
 

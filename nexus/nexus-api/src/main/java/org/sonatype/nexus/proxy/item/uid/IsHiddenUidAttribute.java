@@ -2,17 +2,10 @@ package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
-public class HiddenUid
+public class IsHiddenUidAttribute
     implements Attribute<Boolean>
 {
-    private final RepositoryItemUid uid;
-
-    public HiddenUid( final RepositoryItemUid uid )
-    {
-        this.uid = uid;
-    }
-
-    public Boolean getValue()
+    public Boolean getValueFor( final RepositoryItemUid subject )
     {
         // paths that start with a . in any directory (or filename)
         // are considered hidden.
@@ -20,7 +13,8 @@ public class HiddenUid
         // .metadata
         // /.meta/something.jar
         // /something/else/.hidden/something.jar
-        if ( uid.getPath() != null && ( uid.getPath().indexOf( "/." ) > -1 || uid.getPath().startsWith( "." ) ) )
+        if ( subject.getPath() != null
+            && ( subject.getPath().indexOf( "/." ) > -1 || subject.getPath().startsWith( "." ) ) )
         {
             return Boolean.TRUE;
         }

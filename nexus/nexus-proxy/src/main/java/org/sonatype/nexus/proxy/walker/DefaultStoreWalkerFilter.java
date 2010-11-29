@@ -2,7 +2,7 @@ package org.sonatype.nexus.proxy.walker;
 
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.uid.HiddenUid;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenUidAttribute;
 
 public class DefaultStoreWalkerFilter
     implements WalkerFilter
@@ -21,11 +21,11 @@ public class DefaultStoreWalkerFilter
 
     protected boolean isHidden( WalkerContext context, StorageItem item )
     {
-        HiddenUid hiddenUid = item.getRepositoryItemUid().getAttribute( HiddenUid.class );
+        Boolean isHidden = item.getRepositoryItemUid().getAttributeValue( IsHiddenUidAttribute.class );
 
-        if ( hiddenUid != null )
+        if ( isHidden != null )
         {
-            return hiddenUid.getValue();
+            return isHidden.booleanValue();
         }
         else
         {

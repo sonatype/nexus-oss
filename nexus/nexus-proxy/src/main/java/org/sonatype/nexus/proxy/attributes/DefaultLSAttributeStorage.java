@@ -34,6 +34,7 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.item.uid.IsMetadataMaintainedAttribute;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 
@@ -76,14 +77,24 @@ public class DefaultLSAttributeStorage
         return logger;
     }
 
-    protected boolean isAttribute( RepositoryItemUid uid )
+    protected boolean IsMetadataMaintained( RepositoryItemUid uid )
     {
-        return uid.getPath().startsWith( ATTRIBUTE_PATH_PREFIX );
+        Boolean isMetadataMaintained = uid.getAttributeValue( IsMetadataMaintainedAttribute.class );
+
+        if ( isMetadataMaintained != null )
+        {
+            return isMetadataMaintained.booleanValue();
+        }
+        else
+        {
+            // safest
+            return true;
+        }
     }
 
     public boolean deleteAttributes( RepositoryItemUid uid )
     {
-        if ( isAttribute( uid ) )
+        if ( !IsMetadataMaintained( uid ) )
         {
             // do nothing
             return false;
@@ -132,7 +143,7 @@ public class DefaultLSAttributeStorage
 
     public AbstractStorageItem getAttributes( RepositoryItemUid uid )
     {
-        if ( isAttribute( uid ) )
+        if ( !IsMetadataMaintained( uid ) )
         {
             // do nothing
             return null;
@@ -169,7 +180,7 @@ public class DefaultLSAttributeStorage
 
     public void putAttribute( StorageItem item )
     {
-        if ( isAttribute( item.getRepositoryItemUid() ) )
+        if ( !IsMetadataMaintained( item.getRepositoryItemUid() ) )
         {
             // do nothing
             return;

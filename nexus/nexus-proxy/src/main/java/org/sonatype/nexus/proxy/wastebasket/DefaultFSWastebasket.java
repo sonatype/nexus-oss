@@ -47,7 +47,7 @@ import org.sonatype.plexus.appevents.EventListener;
  * 
  * @author cstamas
  */
-@Component( role = Wastebasket.class )
+// @Component( role = Wastebasket.class )
 public class DefaultFSWastebasket
     implements SmartWastebasket, EventListener, Initializable
 {

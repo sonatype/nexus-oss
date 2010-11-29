@@ -389,21 +389,25 @@ public class DefaultFSLocalRepositoryStorage
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
         RepositoryItemUid fromUid = repository.createUid( from.getRequestPath() );
-        
-        AbstractStorageItem fromAttr = repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
-        
-        RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
 
-        fromAttr.setRepositoryItemUid( toUid );
-        
-        repository.getAttributesHandler().getAttributeStorage().putAttribute( fromAttr );
-        
+        AbstractStorageItem fromAttr = repository.getAttributesHandler().getAttributeStorage().getAttributes( fromUid );
+
+        // check does it have attrs at all
+        if ( fromAttr != null )
+        {
+            RepositoryItemUid toUid = repository.createUid( to.getRequestPath() );
+
+            fromAttr.setRepositoryItemUid( toUid );
+
+            repository.getAttributesHandler().getAttributeStorage().putAttribute( fromAttr );
+        }
+
         File fromTarget = getFileFromBase( repository, from );
-        
+
         File toTarget = getFileFromBase( repository, to );
-        
+
         fsPeer.moveItem( repository, from, fromTarget, to, toTarget );
-        
+
         repository.getAttributesHandler().getAttributeStorage().deleteAttributes( fromUid );
     }
 

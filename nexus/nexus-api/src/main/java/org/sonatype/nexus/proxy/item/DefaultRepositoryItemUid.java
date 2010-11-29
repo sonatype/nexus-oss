@@ -166,9 +166,23 @@ public class DefaultRepositoryItemUid
         doUnlock( null, getAttributeLockKey(), attributesLock );
     }
 
-    public <T extends Attribute<?>> T getAttribute( Class<T> attrClass )
+    public <A extends Attribute<?>> A getAttribute( Class<A> attrClass )
     {
         return getRepository().getRepositoryItemUidAttributeManager().getAttribute( attrClass, this );
+    }
+
+    public <A extends Attribute<V>, V> V getAttributeValue( Class<A> attrClass )
+    {
+        A attr = getAttribute( attrClass );
+
+        if ( attr != null )
+        {
+            return attr.getValueFor( this );
+        }
+        else
+        {
+            return null;
+        }
     }
 
     /**
