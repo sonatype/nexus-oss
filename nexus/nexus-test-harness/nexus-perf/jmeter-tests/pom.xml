@@ -1,6 +1,5 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.nexus</groupId>
@@ -12,13 +11,6 @@
   <packaging>pom</packaging>
   <name>jmeter-tests</name>
   <description></description>
-
-  <!-- ci should run test modules as performance is specific to machine -->
-  <!--
-  <modules>
-    <module>ui-welcome</module>
-  </modules>
-  -->
 
   <properties>
     <!-- Below is the "product", the subject of the tests -->
@@ -41,9 +33,8 @@
      -->
     <!-- don't change these -->
     <perf.history.dir>${project.build.directory}/test-plan-history/nexus/${project.version}</perf.history.dir>
-    <perf.result.dir>${project.build.directory}/test-plan-result</perf.result.dir>
-    <perf.data.dir>${project.build.directory}/test-plan-resources/${perf.data.id}</perf.data.dir>
-    <perf.plan.dir>${project.build.directory}/test-plan</perf.plan.dir>
+    <perf.result.dir>${project.build.directory}/test-result</perf.result.dir>
+    <perf.data.dir>${project.build.directory}/test-resources</perf.data.dir>
 
     <!--  customize these -->
     <perf.data.id>EXAMPLE_DATA_ID</perf.data.id>
@@ -54,10 +45,13 @@
 
     <!-- jmeter runtime cruft -->
     <jmeter.loggc>${perf.result.dir}/gclog-${perf.data.id}.log</jmeter.loggc>
-    <jmeter.test.file>${project.build.directory}/test-plan/${perf.testplan}</jmeter.test.file>
+    <jmeter.test.dir>${perf.data.dir}</jmeter.test.dir>
+    <jmeter.test.file>${jmeter.test.dir}/${perf.testplan}</jmeter.test.file>
     <jmeter.log.file>${perf.result.dir}/performance-${perf.data.id}.jtl</jmeter.log.file>
     <jmeter.stdout.file>${perf.result.dir}/jmeter-stdout-${perf.data.id}.txt</jmeter.stdout.file>
     <jmeter.runlog.file>${perf.result.dir}/jmeter-runlog-${perf.data.id}.log</jmeter.runlog.file>
+    <jmeter.resultproperty.file>${perf.result.dir}/jmeter-result-${perf.data.id}.txt</jmeter.resultproperty.file>
+
     <!-- standard JVM tweaks for running each test. These seem to work pretty well in most cases -->
     <jmeter.jvmargs>-server -Djava.awt.headless=true -Xms756m -Xmx756m
       -XX:NewSize=256m
@@ -113,33 +107,88 @@
             <!--  ntemp plugin hijacks target/test-classes so copy test plan resources to another directory -->
             <execution>
               <id>copy-test-plan-resources</id>
-              <phase>pre-integration-test</phase>
+              <phase>generate-test-resources</phase>
               <goals>
                 <goal>copy-resources</goal>
               </goals>
               <configuration>
-                <outputDirectory>${project.build.directory}/test-plan-resources/${perf.data.id}</outputDirectory>
+                <outputDirectory>${perf.data.dir}</outputDirectory>
                 <resources>
                   <resource>
-                    <directory>src/test/test-plan-resources/${perf.data.id}</directory>
+                    <directory>src/perf/test-plan</directory>
                     <filtering>false</filtering>
                   </resource>
                 </resources>
               </configuration>
             </execution>
-
+            <execution>
+              <id>filter-test-plan-resources</id>
+              <phase>process-test-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${perf.data.dir}</outputDirectory>
+                <includeEmptyDirs>true</includeEmptyDirs>
+                <resources>
+                  <resource>
+                    <directory>${project.build.directory}/dependency/test-plan</directory>
+                    <filtering>true</filtering>
+                    <includes>
+                      <include>**/*.properties</include>
+                    </includes>
+                  </resource>
+                  <resource>
+                    <directory>${project.build.directory}/dependency/test-plan</directory>
+                    <filtering>false</filtering>
+                    <excludes>
+                      <exclude>**/*.properties</exclude>
+                    </excludes>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+            <execution>
+              <id>copy-nexus-work-resources</id>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${nexus-work-dir}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/perf/nexus-work-dir</directory>
+                    <filtering>false</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
+            <execution>
+              <id>copy-nexus-base-resources</id>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>copy-resources</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${nexus-base-dir}</outputDirectory>
+                <resources>
+                  <resource>
+                    <directory>src/perf/nexus-base-dir</directory>
+                    <filtering>false</filtering>
+                  </resource>
+                </resources>
+              </configuration>
+            </execution>
           </executions>
         </plugin>
         <!-- by default output to the target directory  -->
         <plugin>
           <artifactId>maven-dependency-plugin</artifactId>
-          <configuration>
-            <outputDirectory>${project.build.directory}</outputDirectory>
-          </configuration>
           <executions>
             <execution>
               <id>extract-test-plans</id>
-              <phase>pre-integration-test</phase>
+              <phase>generate-test-resources</phase>
               <goals>
                 <goal>unpack-dependencies</goal>
               </goals>
@@ -152,6 +201,17 @@
         <plugin>
           <artifactId>maven-antrun-plugin</artifactId>
           <executions>
+            <!-- gives oportunity to delete or otherwise modify a default nexus installation -->
+            <execution>
+              <id>nexus-modify-installation</id>
+              <phase>generate-test-resources</phase>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <target></target>
+              </configuration>
+            </execution>
             <execution>
               <id>jmeter-exec</id>
               <phase>integration-test</phase>
@@ -162,8 +222,7 @@
                 <target>
                   <echo>RUNNING TEST: ${perf.data.id}</echo>
                   <mkdir dir="${perf.result.dir}" />
-                  <java fork="true" jar="${jmeter.home}/bin/ApacheJMeter.jar"
-                    outputProperty="jmeter.stdout">
+                  <java fork="true" jar="${jmeter.home}/bin/ApacheJMeter.jar" outputProperty="jmeter.stdout" dir="${jmeter.test.dir}" resultproperty="jmeter.resultproperty">
                     <jvmarg value="-Duser.dir=${jmeter.home}/bin" />
                     <jvmarg line="${jmeter.jvmargs}" />
                     <jvmarg value="-verbose:gc" />
@@ -176,6 +235,7 @@
                     <jvmarg value="-Dnexus.host=${nexus.host}" />
                     <jvmarg value="-Dnexus.protocol=${nexus.protocol}" />
                     <jvmarg value="-Dnexus.context=${nexus.context}" />
+                    <jvmarg value="-Dnexus.repo=${nexus.repo}" />
                     <!-- give runner profiles the opportunity to specify additional user defined variables -->
                     <jvmarg line="${jmeter.jvmprops}" />
                     <!-- nongui -->
@@ -191,8 +251,8 @@
                     <arg path="${jmeter.runlog.file}" />
                   </java>
                   <echo message="${jmeter.stdout}" />
-                  <echo file="${jmeter.stdout.file}" encoding="UTF-8"
-                    message="${jmeter.stdout}" />
+                  <echo file="${jmeter.stdout.file}" encoding="UTF-8" message="${jmeter.stdout}" />
+                  <echo file="${jmeter.resultproperty.file}" encoding="UTF-8" message="${jmeter.resultproperty}" />
                 </target>
               </configuration>
             </execution>
@@ -208,27 +268,23 @@
                 <target>
                   <condition property="nexus.jsw.dir" value="macosx-universal-64">
                     <and>
-                      <contains string="${os.name}" substring="mac os x"
-                        casesensitive="false" />
+                      <contains string="${os.name}" substring="mac os x" casesensitive="false" />
                       <contains string="${os.arch}" substring="64" />
                     </and>
                   </condition>
                   <condition property="nexus.jsw.dir" value="linux-x86-64">
                     <and>
-                      <contains string="${os.name}" substring="linux"
-                        casesensitive="false" />
+                      <contains string="${os.name}" substring="linux" casesensitive="false" />
                       <contains string="${os.arch}" substring="64" />
                     </and>
                   </condition>
                   <condition property="nexus.jsw.dir" value="linux-x86-32">
                     <and>
-                      <contains string="${os.name}" substring="linux"
-                        casesensitive="false" />
+                      <contains string="${os.name}" substring="linux" casesensitive="false" />
                       <contains string="${os.arch}" substring="32" />
                     </and>
                   </condition>
-                  <echo encoding="UTF-8"
-                    file="${project.build.directory}/antrun/nexus.exec">${nexus-base-dir}/bin/jsw/${nexus.jsw.dir}/nexus</echo>
+                  <echo encoding="UTF-8" file="${project.build.directory}/antrun/nexus.exec">${nexus-base-dir}/bin/jsw/${nexus.jsw.dir}/nexus</echo>
                 </target>
               </configuration>
             </execution>
@@ -240,8 +296,7 @@
               </goals>
               <configuration>
                 <target>
-                  <loadfile property="nexus.exec" encoding="UTF-8"
-                    srcFile="${project.build.directory}/antrun/nexus.exec" />
+                  <loadfile property="nexus.exec" encoding="UTF-8" srcFile="${project.build.directory}/antrun/nexus.exec" />
                   <exec executable="${nexus.exec}" failonerror="true">
                     <arg value="restart" />
                   </exec>
@@ -258,8 +313,7 @@
               </goals>
               <configuration>
                 <target>
-                  <loadfile property="nexus.exec"
-                    srcFile="${project.build.directory}/antrun/nexus.exec" />
+                  <loadfile property="nexus.exec" srcFile="${project.build.directory}/antrun/nexus.exec" />
                       <!-- FIXME fail if we can't stop -->
                   <exec executable="${nexus.exec}" failonerror="true">
                     <arg value="stop" />
@@ -278,21 +332,28 @@
                 <target>
                   <fail message="Could not open ${jmeter.test.file}">
                     <condition>
-                      <resourcecontains resource="${jmeter.stdout.file}"
-                        substring="Could not open " />
+                      <resourcecontains resource="${jmeter.stdout.file}" substring="Could not open " />
                     </condition>
                   </fail>
                   <fail message="Found Exception in ${jmeter.stdout.file}">
                     <condition>
-                      <resourcecontains resource="${jmeter.stdout.file}"
-                        substring="Exception " />
+                      <resourcecontains resource="${jmeter.stdout.file}" substring="Exception " />
                     </condition>
                   </fail>
-                  <fail
-                    message="JMeter log file contains ERROR - see ${jmeter.runlog.file}">
+                  <fail message="JMeter log file contains ERROR - see ${jmeter.runlog.file}">
                     <condition>
-                      <resourcecontains resource="${jmeter.runlog.file}"
-                        substring="ERROR" />
+                      <resourcecontains resource="${jmeter.runlog.file}" substring="ERROR" />
+                    </condition>
+                  </fail>
+                  <fail message="JMeter log file contains ERROR - see ${jmeter.runlog.file}">
+                    <condition>
+                      <resourcecontains resource="${jmeter.runlog.file}" substring="ERROR" />
+                    </condition>
+                  </fail>
+                  <loadfile property="jmeter.resultpropertyfromfile" srcFile="${jmeter.resultproperty.file}" encoding="UTF-8" />
+                  <fail message="JMeter execution returned something other than zero (0)">
+                    <condition>
+                      <isfailure code="${jmeter.resultpropertyfromfile}" />
                     </condition>
                   </fail>
                 </target>
@@ -424,7 +485,6 @@
       <id>runPerf</id>
       <build>
         <plugins>
-
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
           </plugin>
@@ -439,9 +499,6 @@
             <artifactId>maven-antrun-plugin</artifactId>
           </plugin>
         </plugins>
-        <testResources>
-
-        </testResources>
       </build>
     </profile>
   </profiles>
