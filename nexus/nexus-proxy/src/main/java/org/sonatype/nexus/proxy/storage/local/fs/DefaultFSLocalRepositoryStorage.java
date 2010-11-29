@@ -137,14 +137,11 @@ public class DefaultFSLocalRepositoryStorage
     /**
      * Gets the file from base.
      * 
-     * @param uid the uid
      * @return the file from base
      */
-    public File getFileFromBase( Repository repository, ResourceStoreRequest request )
+    public File getFileFromBase( final Repository repository, final ResourceStoreRequest request, final File repoBase )
         throws LocalStorageException
     {
-        File repoBase = getBaseDir( repository, request );
-
         if ( !repoBase.exists() )
         {
             repoBase.mkdir();
@@ -181,6 +178,17 @@ public class DefaultFSLocalRepositoryStorage
         {
             return result;
         }
+    }
+
+    /**
+     * Gets the file from base.
+     * 
+     * @return the file from base
+     */
+    public File getFileFromBase( Repository repository, ResourceStoreRequest request )
+        throws LocalStorageException
+    {
+        return getFileFromBase( repository, request, getBaseDir( repository, request ) );
     }
 
     /**
