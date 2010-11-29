@@ -25,6 +25,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
 import org.sonatype.nexus.proxy.repository.GroupRepository;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
@@ -260,6 +261,10 @@ public class DefaultRepositoryRegistry
         repositories.remove( repository.getId() );
 
         killMonitorThread( repository.adaptToFacet( ProxyRepository.class ) );
+        
+        if (!silently) {
+            applicationEventMulticaster.notifyEventListeners( new RepositoryRegistryEventPostRemove( this, repository ) );
+        }
     }
 
     public void dispose()

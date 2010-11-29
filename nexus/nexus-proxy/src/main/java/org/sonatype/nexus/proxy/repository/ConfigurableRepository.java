@@ -4,7 +4,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.configuration.ConfigurationException;
 import org.sonatype.nexus.configuration.AbstractConfigurable;
 import org.sonatype.nexus.configuration.Configurator;
-import org.sonatype.nexus.configuration.CoreConfiguration;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.nexus.configuration.model.CRepository;
 import org.sonatype.nexus.configuration.model.CRepositoryCoreConfiguration;
@@ -43,7 +42,7 @@ public class ConfigurableRepository
     }
 
     @Override
-    protected CoreConfiguration wrapConfiguration( Object configuration )
+    protected CRepositoryCoreConfiguration wrapConfiguration( Object configuration )
         throws ConfigurationException
     {
         if ( configuration instanceof CRepository )

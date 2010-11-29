@@ -136,9 +136,6 @@ public class DefaultNexusConfiguration
     /** The temp dir */
     private File temporaryDirectory;
 
-    /** The trash */
-    private File wastebasketDirectory;
-
     /** Names of the conf files */
     private Map<String, String> configurationFiles;
 
@@ -175,8 +172,6 @@ public class DefaultNexusConfiguration
             configurationDirectory = null;
 
             temporaryDirectory = null;
-
-            wastebasketDirectory = null;
 
             globalLocalStorageContext = new DefaultLocalStorageContext( null );
             
@@ -224,8 +219,6 @@ public class DefaultNexusConfiguration
             configurationDirectory = null;
 
             temporaryDirectory = null;
-
-            wastebasketDirectory = null;
 
             applicationEventMulticaster.notifyEventListeners( new ConfigurationCommitEvent( this ) );
 
@@ -372,15 +365,6 @@ public class DefaultNexusConfiguration
 
         }
         return configurationDirectory;
-    }
-
-    public File getWastebasketDirectory()
-    {
-        if ( wastebasketDirectory == null )
-        {
-            wastebasketDirectory = getWorkingDirectory( "trash" );
-        }
-        return wastebasketDirectory;
     }
 
     @Deprecated

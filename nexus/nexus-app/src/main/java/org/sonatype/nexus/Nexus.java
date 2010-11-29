@@ -38,7 +38,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
-import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
 import org.sonatype.nexus.templates.NoSuchTemplateIdException;
 import org.sonatype.nexus.templates.TemplateSet;
@@ -128,14 +127,6 @@ public interface Nexus
 
     SnapshotRemovalResult removeSnapshots( SnapshotRemovalRequest request )
         throws NoSuchRepositoryException, IllegalArgumentException;
-
-    /**
-     * Delete the repository folders ( storage/, proxy/attributes/, indexer/ )
-     * 
-     * @param repository
-     * @param deleteForever move storge/ into trash if it's false, otherwise 'rm -fr' it
-     */
-    void deleteRepositoryFolders( Repository repository, boolean deleteForever );
 
     /**
      * List the names of files in nexus-work/conf

@@ -18,9 +18,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
-import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
+import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
 import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
@@ -44,21 +43,12 @@ public class DeleteRepositoryFoldersEventInspector
 
     public boolean accepts( Event<?> evt )
     {
-        return ( evt instanceof RepositoryRegistryEventRemove );
+        return ( evt instanceof RepositoryRegistryEventPostRemove );
     }
 
     public void inspect( Event<?> evt )
     {
-        Repository repository = null;
-
-        if ( evt instanceof RepositoryRegistryRepositoryEvent )
-        {
-            repository = ( (RepositoryRegistryRepositoryEvent) evt ).getRepository();
-        }
-        else
-        {
-            repository = ( (RepositoryConfigurationUpdatedEvent) evt ).getRepository();
-        }
+        Repository repository = ( (RepositoryRegistryEventPostRemove) evt ).getRepository();
 
         try
         {

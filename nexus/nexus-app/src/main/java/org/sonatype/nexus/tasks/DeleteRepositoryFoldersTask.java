@@ -13,9 +13,13 @@
  */
 package org.sonatype.nexus.tasks;
 
+import java.io.IOException;
+
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
 import org.sonatype.nexus.proxy.repository.Repository;
+import org.sonatype.nexus.proxy.wastebasket.RepositoryFolderRemover;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesTask;
 import org.sonatype.scheduling.SchedulerTask;
 
@@ -28,6 +32,9 @@ import org.sonatype.scheduling.SchedulerTask;
 public class DeleteRepositoryFoldersTask
     extends AbstractNexusRepositoriesTask<Object>
 {
+    @Requirement
+    private RepositoryFolderRemover repositoryFolderRemover;
+
     private boolean deleteForever = false;
 
     private Repository repository = null;
@@ -60,8 +67,16 @@ public class DeleteRepositoryFoldersTask
     {
         if ( repository != null )
         {
-            getNexus().deleteRepositoryFolders( repository, deleteForever );
+            try
+            {
+                repositoryFolderRemover.deleteRepositoryFolders( repository, deleteForever );
+            }
+            catch ( IOException e )
+            {
+                getLogger().warn( "Unable to delete repository folders ", e );
+            }
         }
+
         return null;
     }
 
@@ -80,7 +95,7 @@ public class DeleteRepositoryFoldersTask
         }
         return null;
     }
-    
+
     @Override
     public String getRepositoryName()
     {

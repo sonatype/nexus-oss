@@ -132,6 +132,9 @@ import org.sonatype.nexus.proxy.storage.local.fs.DefaultFSLocalRepositoryStorage
 public class DefaultIndexerManager
     implements IndexerManager
 {
+    /** The key used in working directory. */
+    public static final String INDEXER_WORKING_DIRECTORY_KEY = "indexer";
+    
     /** Context id local suffix */
     public static final String CTX_LOCAL_SUFIX = "-local";
 
@@ -191,7 +194,7 @@ public class DefaultIndexerManager
     {
         if ( workingDirectory == null )
         {
-            workingDirectory = nexusConfiguration.getWorkingDirectory( "indexer" );
+            workingDirectory = nexusConfiguration.getWorkingDirectory( INDEXER_WORKING_DIRECTORY_KEY );
         }
 
         return workingDirectory;

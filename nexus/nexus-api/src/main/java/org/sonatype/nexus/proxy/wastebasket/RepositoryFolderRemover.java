@@ -4,15 +4,13 @@ import java.io.IOException;
 
 import org.sonatype.nexus.proxy.repository.Repository;
 
+/**
+ * A "hub" for invoking all registered RepositoryFolderCleaners.
+ * 
+ * @author cstamas
+ */
 public interface RepositoryFolderRemover
 {
-    /**
-     * Trash or 'rm -fr' the storage folder,'rm -fr' proxy attributes folder and index folder
-     * 
-     * @param repository
-     * @param deleteForever 'rm -fr' the storage folder if it's true, else move the storage folder into trash
-     * @throws IOException
-     */
     void deleteRepositoryFolders( Repository repository, boolean deleteForever )
         throws IOException;
 }
