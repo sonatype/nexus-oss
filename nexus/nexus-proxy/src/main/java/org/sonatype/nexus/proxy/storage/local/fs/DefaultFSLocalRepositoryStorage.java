@@ -36,7 +36,6 @@ import org.sonatype.nexus.proxy.item.ContentLocator;
 import org.sonatype.nexus.proxy.item.DefaultStorageCollectionItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageLinkItem;
-import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
@@ -58,9 +57,6 @@ public class DefaultFSLocalRepositoryStorage
     extends AbstractLocalRepositoryStorage
 {
     public static final String PROVIDER_STRING = "file";
-
-    @Requirement
-    private LinkPersister linkPersister;
 
     @Requirement
     private FSPeer fsPeer;
@@ -231,13 +227,13 @@ public class DefaultFSLocalRepositoryStorage
 
             try
             {
-                if ( linkPersister.isLinkContent( linkContent ) )
+                if ( getLinkPersister().isLinkContent( linkContent ) )
                 {
                     try
                     {
                         DefaultStorageLinkItem link =
                             new DefaultStorageLinkItem( repository, request, target.canRead(), target.canWrite(),
-                                linkPersister.readLinkContent( linkContent ) );
+                                getLinkPersister().readLinkContent( linkContent ) );
                         repository.getAttributesHandler().fetchAttributes( link );
                         link.setModified( target.lastModified() );
                         link.setCreated( target.lastModified() );
@@ -327,7 +323,7 @@ public class DefaultFSLocalRepositoryStorage
 
             try
             {
-                linkPersister.writeLinkContent( (StorageLinkItem) item, bos );
+                getLinkPersister().writeLinkContent( (StorageLinkItem) item, bos );
             }
             catch ( IOException e )
             {

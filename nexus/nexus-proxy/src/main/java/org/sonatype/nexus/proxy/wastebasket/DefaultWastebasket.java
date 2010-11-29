@@ -24,6 +24,8 @@ public class DefaultWastebasket
 {
     private static final String TRASH_PATH_PREFIX = "/.nexus/trash";
 
+    private static final long ALL = -1L;
+
     @Requirement
     private Logger logger;
 
@@ -52,7 +54,7 @@ public class DefaultWastebasket
         return deleteOperation;
     }
 
-    public void setDeleteOperation( DeleteOperation deleteOperation )
+    public void setDeleteOperation( final DeleteOperation deleteOperation )
     {
         this.deleteOperation = deleteOperation;
     }
@@ -72,10 +74,10 @@ public class DefaultWastebasket
     public void purgeAll()
         throws IOException
     {
-        purgeAll( -1L );
+        purgeAll( ALL );
     }
 
-    public void purgeAll( long age )
+    public void purgeAll( final long age )
         throws IOException
     {
         for ( Repository repository : getRepositoryRegistry().getRepositories() )
@@ -84,22 +86,43 @@ public class DefaultWastebasket
         }
     }
 
-    public DeferredLong getSize( Repository repository )
+    public DeferredLong getSize( final Repository repository )
     {
         return new DefaultDeferredLong( -1L );
     }
 
-    public void purge( Repository repository )
+    public void purge( final Repository repository )
         throws IOException
     {
-        purge( repository, -1L );
+        purge( repository, ALL );
     }
 
-    public void purge( Repository repository, long age )
+    public void purge( final Repository repository, final long age )
         throws IOException
     {
-        // TODO Auto-generated method stub
+        if ( age == ALL )
+        {
+            // simple and fast way, no need for walker
+            ResourceStoreRequest trashRoot =
+                new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
 
+            try
+            {
+                repository.getLocalStorage().shredItem( repository, trashRoot );
+            }
+            catch ( ItemNotFoundException e )
+            {
+                // silent
+            }
+            catch ( UnsupportedStorageOperationException e )
+            {
+                // silent?
+            }
+        }
+        else
+        {
+            // walker and walk and changes for age
+        }
     }
 
     public void delete( LocalRepositoryStorage ls, Repository repository, ResourceStoreRequest request )

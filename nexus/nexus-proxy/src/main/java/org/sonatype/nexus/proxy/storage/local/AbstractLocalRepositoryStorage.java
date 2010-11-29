@@ -25,6 +25,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.ResourceStoreIteratorRequest;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.item.LinkPersister;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.repository.Repository;
@@ -50,19 +51,35 @@ public abstract class AbstractLocalRepositoryStorage
     private Wastebasket wastebasket;
 
     /**
+     * The default Link persister.
+     */
+    @Requirement
+    private LinkPersister linkPersister;
+
+    /**
      * The MIME util.
      */
     @Requirement
     private MimeUtil mimeUtil;
 
-    protected MimeUtil getMimeUtil()
-    {
-        return mimeUtil;
-    }
-
     protected Logger getLogger()
     {
         return logger;
+    }
+
+    protected Wastebasket getWastebasket()
+    {
+        return wastebasket;
+    }
+    
+    protected LinkPersister getLinkPersister()
+    {
+        return linkPersister;
+    }
+
+    protected MimeUtil getMimeUtil()
+    {
+        return mimeUtil;
     }
 
     /**
@@ -105,7 +122,7 @@ public abstract class AbstractLocalRepositoryStorage
     public final void deleteItem( Repository repository, ResourceStoreRequest request )
         throws ItemNotFoundException, UnsupportedStorageOperationException, LocalStorageException
     {
-        wastebasket.delete( this, repository, request );
+        getWastebasket().delete( this, repository, request );
     }
 
     // ==
