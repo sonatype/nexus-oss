@@ -15,7 +15,8 @@ public class Nexus2145ReindexContextMenuTest
     extends AbstractContextMenuTest
 {
 
-    @Test
+    @Test( enabled = false )
+    // TODO can't test plugins
     public void contextMenuIndex()
         throws InterruptedException, NoSuchRepositoryException
     {
