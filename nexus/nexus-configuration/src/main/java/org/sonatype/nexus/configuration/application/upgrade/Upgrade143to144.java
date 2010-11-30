@@ -16,6 +16,8 @@ package org.sonatype.nexus.configuration.application.upgrade;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -96,7 +98,6 @@ public class Upgrade143to144
 
         // Upgrade for Attributes
         final File oldAttributesBase = new File( applicationConfiguration.getWorkingDirectory( "proxy" ), "attributes" );
-        final File defaultStorageBase = applicationConfiguration.getWorkingDirectory( "storage" );
 
         File sourceDirectory;
 
@@ -104,9 +105,9 @@ public class Upgrade143to144
 
         for ( CRepository repository : newc.getRepositories() )
         {
-            // we handle only repositories with "default" storage paths
+            // we handle only repositories with "default" storage paths and "file" LS
             // all other cases should be covered by manual steps performed by Admin!
-            if ( repository.getLocalStorage() != null && StringUtils.isBlank( repository.getLocalStorage().getUrl() ) )
+            if ( repository.getLocalStorage() != null && "file".equals( repository.getLocalStorage().getProvider() ) )
             {
                 getLogger().info(
                     "Upgrading proxy attributes for repository \"" + repository.getName() + "\" (id="
@@ -114,11 +115,11 @@ public class Upgrade143to144
 
                 sourceDirectory = new File( oldAttributesBase, repository.getId() );
                 destinationDirectory =
-                    new File( new File( new File( defaultStorageBase, repository.getId() ), ".nexus" ), "attributes" );
+                    getRepositoryStorageBaseDirectory( repository.getId(), repository.getLocalStorage().getUrl() );
 
                 try
                 {
-                    FileUtils.copyDirectory( sourceDirectory, destinationDirectory );
+                    FileUtils.copyDirectoryStructure( sourceDirectory, destinationDirectory );
                 }
                 catch ( IOException e )
                 {
@@ -147,7 +148,7 @@ public class Upgrade143to144
                         + repository.getName()
                         + "\" (id="
                         + repository.getId()
-                        + ") since it uses non-default storage location. Here Nexus assumes manual upgrade steps are performed already!" );
+                        + ") since it uses non-default storage provider. Here Nexus assumes manual upgrade steps are performed already!" );
             }
         }
 
@@ -165,6 +166,60 @@ public class Upgrade143to144
         newc.setVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setModelVersion( org.sonatype.nexus.configuration.model.Configuration.MODEL_VERSION );
         message.setConfiguration( newc );
+    }
+
+    //
+
+    protected File getRepositoryStorageBaseDirectory( String repositoryId, String urlStr )
+        throws ConfigurationIsCorruptedException
+    {
+        if ( StringUtils.isBlank( urlStr ) )
+        {
+            return new File( new File( new File( applicationConfiguration.getWorkingDirectory( "storage" ),
+                repositoryId ), ".nexus" ), "attributes" );
+        }
+        else
+        {
+            URL url;
+
+            try
+            {
+                url = new URL( urlStr );
+            }
+            catch ( MalformedURLException e )
+            {
+                try
+                {
+                    url = new File( urlStr ).toURI().toURL();
+                }
+                catch ( MalformedURLException e1 )
+                {
+                    throw new ConfigurationIsCorruptedException( "The local storage has a malformed URL as baseUrl!", e );
+                }
+            }
+
+            File file;
+
+            try
+            {
+                file = new File( url.toURI() );
+            }
+            catch ( Throwable t )
+            {
+                file = new File( url.getPath() );
+            }
+
+            if ( file.exists() )
+            {
+                if ( file.isFile() )
+                {
+                    throw new ConfigurationIsCorruptedException( "The repository (ID=\"" + repositoryId
+                        + "\") repository's baseDir is not a directory, path: " + file.getAbsolutePath() );
+                }
+            }
+
+            return file;
+        }
     }
 
 }
