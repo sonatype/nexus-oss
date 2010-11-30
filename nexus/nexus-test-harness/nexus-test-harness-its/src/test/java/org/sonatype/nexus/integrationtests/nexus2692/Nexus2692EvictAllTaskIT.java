@@ -17,7 +17,7 @@ public class Nexus2692EvictAllTaskIT
         runTask( days, "all_repo" );
 
         // check files
-        SortedSet<String> resultStorageFiles = getFilePaths( getStorageWorkDir() );
+        SortedSet<String> resultStorageFiles = getItemFilePaths();
         SortedSet<String> resultAttributeFiles = getAttributeFilePaths();
 
         SortedSet<String> expectedResults = buildListOfExpectedFilesForAllRepos( days );

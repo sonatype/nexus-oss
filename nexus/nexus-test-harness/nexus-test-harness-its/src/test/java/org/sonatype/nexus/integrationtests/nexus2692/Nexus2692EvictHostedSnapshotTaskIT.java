@@ -18,7 +18,7 @@ public class Nexus2692EvictHostedSnapshotTaskIT
         runTask( days, "repo_snapshots" );
 
         // check files
-        SortedSet<String> resultStorageFiles = getFilePaths( getStorageWorkDir() );
+        SortedSet<String> resultStorageFiles = getItemFilePaths();
         SortedSet<String> resultAttributeFiles = getAttributeFilePaths();
 
         // unexpected deleted files
@@ -28,10 +28,10 @@ public class Nexus2692EvictHostedSnapshotTaskIT
         SortedSet<String> attributeDiff = new TreeSet<String>( getPathMap().keySet() );
         attributeDiff.removeAll( resultAttributeFiles );
 
-        Assert.assertTrue( storageDiff.isEmpty(),
-                           "Files deleted that should not have been: " + prettyList( storageDiff ) );
-        Assert.assertTrue( attributeDiff.isEmpty(),
-                           "Files deleted that should not have been: " + prettyList( attributeDiff ) );
+        Assert.assertTrue( storageDiff.isEmpty(), "Files deleted that should not have been: "
+            + prettyList( storageDiff ) );
+        Assert.assertTrue( attributeDiff.isEmpty(), "Files deleted that should not have been: "
+            + prettyList( attributeDiff ) );
     }
 
 }

@@ -83,25 +83,27 @@ public class AbstractEvictTaskIt
                 long offset = (long) ( Double.parseDouble( parts[1] ) * A_DAY );
 
                 // get the file
-                File attributeFile = new File( storageWorkDir, filePart );
-                if ( attributeFile.isFile() )
+                File itemFile = new File( storageWorkDir, filePart );
+                if ( itemFile.isFile() )
                 {
                     this.pathMap.put( filePart, Double.parseDouble( parts[1] ) );
 
-                    fis = new FileInputStream( attributeFile );
-                    StorageItem storageItem = (StorageItem) xstream.fromXML( fis );
-                    IOUtil.close( fis );
-
+                    /*
+                     * groups are not checked, so the hashes are left behind, see: NEXUS-3026
+                     */
                     if ( filePart.startsWith( "releases/" ) || filePart.startsWith( "releases-m1/" )
-                        || filePart.startsWith( "public/" ) /*
-                                                             * groups are not checked, so the hashes are left behind,
-                                                             * see: NEXUS-3026
-                                                             */|| filePart.startsWith( "snapshots/" )
+                        || filePart.startsWith( "public/" ) || filePart.startsWith( "snapshots/" )
                         || filePart.startsWith( "thirdparty/" ) || filePart.contains( ".meta" )
-                        || filePart.contains( ".index" ) || filePart.contains( ".nexus" ) )
+                        || filePart.contains( ".index" ) )
                     {
                         neverDeleteFiles.add( filePart );
                     }
+
+                    // modify the file corresponding attribute
+                    File attributeFile = getAttributeFile( filePart );
+                    fis = new FileInputStream( attributeFile );
+                    StorageItem storageItem = (StorageItem) xstream.fromXML( fis );
+                    IOUtil.close( fis );
 
                     // update it
                     long variation = ( 1258582311671l - storageItem.getLastRequested() ) + timestamp;
@@ -124,6 +126,25 @@ public class AbstractEvictTaskIt
         }
     }
 
+    protected File getAttributeFile( String filePart )
+    {
+        String[] parts = filePart.split( "/" );
+
+        // repoId
+        StringBuilder sb = new StringBuilder( parts[0] );
+
+        // "sneak in" the ".nexus/attributes"
+        sb.append( "/.nexus/attributes" );
+
+        // the rest
+        for ( int i = 1; i < parts.length; i++ )
+        {
+            sb.append( "/" ).append( parts[i] );
+        }
+
+        return new File( storageWorkDir, sb.toString() );
+    }
+
     protected void runTask( int days, String repoId )
         throws Exception
     {
@@ -138,7 +159,7 @@ public class AbstractEvictTaskIt
         age.setValue( String.valueOf( days ) );
 
         TaskScheduleUtil.runTask( EvictUnusedItemsTaskDescriptor.ID, EvictUnusedItemsTaskDescriptor.ID, prop, age );
-        
+
         getEventInspectorsUtil().waitForCalmPeriod();
     }
 
@@ -237,10 +258,28 @@ public class AbstractEvictTaskIt
 
         for ( String attribute : attributes )
         {
-            if ( attribute.contains( "/.nexus/attributes" ) )
+            if ( attribute.contains( "/.nexus/attributes" ) && !attribute.contains( "/.nexus/trash/.nexus/attributes" ) )
             {
-                // "tweak" the path
+                // "tweak" the path, since test is dumb
                 result.add( attribute.replace( "/.nexus/attributes", "" ) );
+            }
+        }
+
+        return result;
+    }
+
+    protected SortedSet<String> getItemFilePaths()
+        throws IOException
+    {
+        SortedSet<String> result = new TreeSet<String>();
+
+        SortedSet<String> paths = getFilePaths( getStorageWorkDir() );
+
+        for ( String path : paths )
+        {
+            if ( !path.contains( "/.nexus" ) )
+            {
+                result.add( path );
             }
         }
 
@@ -287,8 +326,8 @@ public class AbstractEvictTaskIt
     {
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
-        scan.setIncludes( new String[] { "**/.index/", "**/.meta/", "**/.nexus/" } );
-        scan.addDefaultExcludes();
+        scan.setIncludes( new String[] { "**/.index/", "**/.meta/" } );
+        scan.setExcludes( new String[] { "**/.nexus/", "**/.svn", "**/.svn/**" } );
 
         scan.scan();
 
