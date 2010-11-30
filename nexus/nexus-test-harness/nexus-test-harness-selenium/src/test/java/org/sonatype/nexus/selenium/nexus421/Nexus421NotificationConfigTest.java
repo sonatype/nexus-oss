@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertNotNull;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.restlet.data.Method;
@@ -23,6 +24,7 @@ public class Nexus421NotificationConfigTest
 
     @Test
     public void systemNotificationFields()
+        throws Exception
     {
         doLogin();
 
@@ -60,8 +62,9 @@ public class Nexus421NotificationConfigTest
         } );
         
         serverCfg.save();
+        Thread.sleep( 1000 );
         
-        ml.getResult();
+        assertNotNull( ml.getResult() );
         
         MockHelper.checkAndClean();
         

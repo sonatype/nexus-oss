@@ -38,7 +38,7 @@ public class TextField
 
     public void resetValue()
     {
-        selenium.type( getId(), "" );
+        evalTrue( ".setValue( '' )" );
     }
 
     public void blur()

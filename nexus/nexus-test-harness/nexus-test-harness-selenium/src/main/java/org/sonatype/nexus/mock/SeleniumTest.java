@@ -95,7 +95,7 @@ public abstract class SeleniumTest
     public void logout()
         throws Exception
     {
-        if ( selenium != null )
+        if ( selenium != null && main != null )
         {
             main.clickLogout();
             getCoverage();

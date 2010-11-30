@@ -28,7 +28,14 @@ public class MainPage
                 return;
             }
 
-            selenium.waitForPageToLoad( "1000" );
+            try
+            {
+                selenium.waitForPageToLoad( "1000" );
+            }
+            catch ( Exception e )
+            {
+                // try again
+            }
         }
     }
 

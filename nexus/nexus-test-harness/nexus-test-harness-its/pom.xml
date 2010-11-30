@@ -124,7 +124,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.6</version>
         <configuration>
           <argLine>-Xmx512M</argLine>
           <excludes>
@@ -138,20 +137,6 @@
             <!-- inner classes -->
             <exclude>**/*$*.*</exclude>
           </excludes>
-          <properties>
-            <property>
-              <name>usedefaultlisteners</name>
-              <value>true</value>
-            </property>
-            <property>
-              <name>reporter</name>
-              <value>org.uncommons.reportng.HTMLReporter</value>
-            </property>
-            <property>
-              <name>listener</name>
-              <value>org.sonatype.nexus.integrationtests.report.ProgressListener</value>
-            </property>
-          </properties>
         </configuration>
         <executions>
           <execution>

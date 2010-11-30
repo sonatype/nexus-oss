@@ -60,6 +60,11 @@ public class MockHelper
 
     public static MockResponse expect( String uri, MockResponse mockResponse )
     {
+        if ( uri == null )
+        {
+            throw new NullPointerException( "URI is mandatory" );
+        }
+
         synchronized ( lock )
         {
             while ( mockResponses.containsKey( uri ) || mockListeneres.containsKey( uri ) )
@@ -88,6 +93,11 @@ public class MockHelper
     @SuppressWarnings( "unchecked" )
     public static <E> MockListener<E> listen( String uri, MockListener<E> mockListener )
     {
+        if ( uri == null )
+        {
+            throw new NullPointerException( "URI is mandatory" );
+        }
+
         synchronized ( lock )
         {
             while ( mockResponses.containsKey( uri ) || mockListeneres.containsKey( uri ) )

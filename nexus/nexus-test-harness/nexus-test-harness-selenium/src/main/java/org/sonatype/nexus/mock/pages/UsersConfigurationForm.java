@@ -14,7 +14,9 @@ public class UsersConfigurationForm
 
     private TextField userId;
 
-    private TextField name;
+    private TextField firstName;
+
+    private TextField lastName;
 
     private TextField email;
 
@@ -35,7 +37,8 @@ public class UsersConfigurationForm
         super( selenium, expression );
 
         userId = new TextField( selenium, expression + ".find('name', 'userId')[0]" );
-        name = new TextField( selenium, expression + ".find('name', 'name')[0]" );
+        firstName = new TextField( selenium, expression + ".find('name', 'firstName')[0]" );
+        lastName = new TextField( selenium, expression + ".find('name', 'lastName')[0]" );
         email = new TextField( selenium, expression + ".find('name', 'email')[0]" );
         status = new Combobox( selenium, expression + ".find('name', 'status')[0]" );
         password = new TextField( selenium, expression + ".find('name', 'password')[0]" );
@@ -46,19 +49,22 @@ public class UsersConfigurationForm
         cancelButton = new Button( selenium, expression + ".buttons[1]" );
     }
 
-    public UsersConfigurationForm populate( String userId, String name, String email, String status, String password,
+    public UsersConfigurationForm populate( String userId, String firstName, String lastName, String email,
+                                            String status, String password,
                                             String... roles )
     {
         this.password.type( password );
         this.passwordConfirm.type( password );
 
-        return populate( userId, name, email, status, roles );
+        return populate( userId, firstName, lastName, email, status, roles );
     }
 
-    public UsersConfigurationForm populate( String userId, String name, String email, String status, String[] roles )
+    public UsersConfigurationForm populate( String userId, String firstName, String lastName, String email,
+                                            String status, String[] roles )
     {
         this.userId.type( userId );
-        this.name.type( name );
+        this.firstName.type( firstName );
+        this.lastName.type( lastName );
         this.email.type( email );
         this.status.setValue( status );
         for ( String role : roles )
@@ -79,11 +85,6 @@ public class UsersConfigurationForm
     public final TextField getUserId()
     {
         return userId;
-    }
-
-    public final TextField getName()
-    {
-        return name;
     }
 
     public final TextField getEmail()
@@ -126,6 +127,16 @@ public class UsersConfigurationForm
         cancelButton.click();
 
         return this;
+    }
+
+    public TextField getFirstName()
+    {
+        return firstName;
+    }
+
+    public TextField getLastName()
+    {
+        return lastName;
     }
 
 }

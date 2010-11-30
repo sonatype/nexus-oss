@@ -120,7 +120,7 @@ public class RepositoriesTab
     public void contextMenuReindex( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
-        menu.click( "text", "ReIndex" );
+        menu.click( "text", "Repair Index" );
 
         new Window( selenium ).waitFor();
     }
@@ -128,7 +128,7 @@ public class RepositoriesTab
     public void contextMenuIncrementalReindex( String id )
     {
         Menu menu = grid.openContextMenu( getUiId( id ), 1, "grid-context-menu" );
-        menu.click( "text", "Incremental ReIndex" );
+        menu.click( "text", "Update ReIndex" );
     }
 
     public void contextMenuPutOutOfService( String id )

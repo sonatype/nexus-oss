@@ -23,7 +23,7 @@ public class Menu
 
     public void click( String itemKey )
     {
-        String id = getEval( ".items.items[" + expression + ".items.indexOfKey('" + itemKey + "')].el.id" );
+        String id = getEval( ".items.items[" + expression + ".items.indexOfKey('" + itemKey + "')].el.dom.id" );
         selenium.click( "//*[@id='" + id + "']" );
     }
 

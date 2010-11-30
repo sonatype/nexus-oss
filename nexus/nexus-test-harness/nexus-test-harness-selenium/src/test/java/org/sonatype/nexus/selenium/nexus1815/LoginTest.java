@@ -44,8 +44,8 @@ public class LoginTest
     protected void doLogin( MainPage main )
     {
         main.getSelenium().runScript(
-                                      "window.Sonatype.utils.doLogin( null, '" + User.ADMIN.getUsername() + "', '"
-                                          + User.ADMIN.getPassword() + "');" );
+            "window.Sonatype.utils.doLogin( null, '" + User.ADMIN.getUsername() + "', '" + User.ADMIN.getPassword()
+                + "');" );
     }
 
     @Test
@@ -55,7 +55,7 @@ public class LoginTest
 
         assertTrue( "Login button should be disabled if password is bad", loginWindow.getLoginButton().disabled() );
         assertTrue( "Password field should have error message",
-                    loginWindow.getPassword().hasErrorText( "This field is required" ) );
+            loginWindow.getPassword().hasErrorText( "This field is required" ) );
     }
 
     @Test
@@ -88,7 +88,7 @@ public class LoginTest
 
         MockResponse mock = MockHelper.expect( "/authentication/login", new MockResponse( Status.SUCCESS_OK, result ) );
 
-        doLogin( "mockingworks", "mockingworks" );
+        main.clickLogin().populate( "mockingworks", "mockingworks" ).loginExpectingSuccess();
 
         assertTrue( mock.wasExecuted() );
 

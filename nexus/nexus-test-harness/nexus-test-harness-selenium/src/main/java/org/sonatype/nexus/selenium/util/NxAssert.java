@@ -18,7 +18,7 @@ import org.sonatype.nexus.mock.components.TwinPanel;
 public class NxAssert
 {
 
-    private static Matcher NULL()
+    private static Matcher<Object> NULL()
     {
         return anyOf( equalTo( "null" ), equalTo( "" ), nullValue() );
     }
@@ -35,6 +35,7 @@ public class NxAssert
 
     public static void requiredField( TextField tf, String validText )
     {
+        tf.resetValue();
         tf.type( "" );
         hasErrorText( tf, THIS_FIELD_IS_REQUIRED );
         tf.type( validText );

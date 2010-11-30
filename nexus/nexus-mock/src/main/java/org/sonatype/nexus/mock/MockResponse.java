@@ -13,7 +13,7 @@ public class MockResponse
 
     private AssertionError assertionFailedError;
 
-    protected boolean executed = false;
+    private boolean executed = false;
 
     private Method method;
 
@@ -79,6 +79,43 @@ public class MockResponse
     public Method getMethod()
     {
         return method;
+    }
+
+    private static final Object lock = new Object();
+
+    public void waitForExecution()
+    {
+        synchronized ( lock )
+        {
+            int i = 0;
+            while ( !executed && i++ < 50 )
+            {
+                try
+                {
+                    lock.wait( 1000 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // is it recovereable?
+                }
+            }
+
+            if ( executed )
+            {
+                return;
+            }
+
+            throw new RuntimeException( "Not executed!" );
+        }
+    }
+
+    protected void setExecuted( boolean exec )
+    {
+        this.executed = exec;
+        synchronized ( lock )
+        {
+            lock.notifyAll();
+        }
     }
 
 }

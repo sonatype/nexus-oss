@@ -56,7 +56,7 @@ final class PlexusResourceInterceptor
         }
         else
         {
-            mr.executed = true;
+            mr.setExecuted( true );
 
             if ( restletMethod == Method.POST || restletMethod == Method.PUT )
             {
