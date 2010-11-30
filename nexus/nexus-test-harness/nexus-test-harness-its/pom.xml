@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -138,26 +137,6 @@
             <exclude>**/*$*.*</exclude>
           </excludes>
         </configuration>
-        <executions>
-          <execution>
-            <id>cargo</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>integration-test</goal>
-              <goal>verify</goal>
-            </goals>
-            <configuration>
-              <forkMode>always</forkMode>
-              <reportsDirectory>${project.build.directory}/forked-failsafe-reports</reportsDirectory>
-              <includes>
-                <include>**/Nexus3860*IT.*</include>
-              </includes>
-              <excludes>
-                <exclude>void</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
 
       <plugin>
@@ -326,14 +305,33 @@
   <profiles>
     <profile>
       <id>cargo</id>
-      <activation>
-        <property>
-          <name>!maven.test.skip</name>
-        </property>
-      </activation>
 
       <build>
         <plugins>
+          <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>cargo</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>integration-test</goal>
+                  <goal>verify</goal>
+                </goals>
+                <configuration>
+                  <forkMode>always</forkMode>
+                  <reportsDirectory>${project.build.directory}/forked-failsafe-reports</reportsDirectory>
+                  <includes>
+                    <include>**/Nexus3860*IT.*</include>
+                  </includes>
+                  <excludes>
+                    <exclude>void</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
