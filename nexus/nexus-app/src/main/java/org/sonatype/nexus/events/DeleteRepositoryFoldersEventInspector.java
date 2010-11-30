@@ -52,35 +52,19 @@ public class DeleteRepositoryFoldersEventInspector
 
         try
         {
-            // check registry for existance, wont be able to do much
-            // if doesn't exist yet
-            repoRegistry.getRepository( repository.getId() );
+            // remove the storage folders for the repository
+            DeleteRepositoryFoldersTask task = nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
 
-            try
-            {
-                if ( evt instanceof RepositoryRegistryEventRemove )
-                {
-                    // remove the storage folders for the repository
-                    DeleteRepositoryFoldersTask task =
-                        nexusScheduler.createTaskInstance( DeleteRepositoryFoldersTask.class );
+            task.setRepository( repository );
 
-                    task.setRepository( repository );
-
-                    nexusScheduler.submit( "Deleting repository folder for repository \"" + repository.getName()
-                        + "\" (id=" + repository.getId() + ").", task );
-                }
-
-            }
-            catch ( Exception e )
-            {
-                getLogger().error(
-                    "Could not remove repository folders for repository \"" + repository.getName() + "\" (id="
-                        + repository.getId() + ")!", e );
-            }
+            nexusScheduler.submit( "Deleting repository folder for repository \"" + repository.getName() + "\" (id="
+                + repository.getId() + ").", task );
         }
-        catch ( NoSuchRepositoryException e )
+        catch ( Exception e )
         {
-            getLogger().debug( "Attempted to handle repository that isn't yet in registry" );
+            getLogger().error(
+                "Could not remove repository folders for repository \"" + repository.getName() + "\" (id="
+                    + repository.getId() + ")!", e );
         }
     }
 }

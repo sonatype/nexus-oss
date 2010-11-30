@@ -15,10 +15,12 @@ package org.sonatype.nexus.integrationtests.nexus970;
 
 import java.io.File;
 
+import org.apache.tools.ant.taskdefs.WaitFor;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -52,8 +54,10 @@ public class Nexus970DeleteRepositoryIT
         Assert.assertTrue( status.isSuccess(), "Unable to delete nexus970-default repository" );
 
         // give a chance to wait for task to start
-        Thread.sleep( 500 );
+        Thread.sleep( 1500 );
+        getEventInspectorsUtil().waitForCalmPeriod();
         TaskScheduleUtil.waitForAllTasksToStop();
+        
 
         Assert.assertFalse( artifactFile.exists(), "Artifacts shouldn't exists on deleted repo" );
         Assert.assertFalse( storageDir.exists(), "Storage dir should be deleted" );
