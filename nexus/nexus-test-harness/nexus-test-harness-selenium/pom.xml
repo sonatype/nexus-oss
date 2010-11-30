@@ -12,7 +12,7 @@
   <name>Nexus : Test Harness : Selenium</name>
 
   <properties>
-    <threads>4</threads>
+    <threads>1</threads>
   </properties>
 
   <build>
@@ -147,6 +147,7 @@
           <parallel>true</parallel>
           <threadCount>${threads}</threadCount>
           <argLine>-Xmx512M</argLine>
+          <forkMode>always</forkMode>
         </configuration>
       </plugin>
 
