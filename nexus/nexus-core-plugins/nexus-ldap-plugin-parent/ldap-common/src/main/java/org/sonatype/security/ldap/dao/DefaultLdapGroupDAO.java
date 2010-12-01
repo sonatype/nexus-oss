@@ -50,10 +50,14 @@ public class DefaultLdapGroupDAO
         throws LdapDAOException,
             NoLdapUserRolesFoundException
     {
+        
+        boolean dynamicGroups = !StringUtils.isEmpty( configuration.getUserMemberOfAttribute() );
+        boolean groupsEnabled = isGroupsEnabled( configuration );
+        
         Set<String> roleIds = new HashSet<String>();
-        if( isGroupsEnabled( configuration ) )
+        if( groupsEnabled )
         {
-            if ( StringUtils.isEmpty( configuration.getUserMemberOfAttribute() ) )
+            if ( !dynamicGroups )
             {
                 roleIds = this.getGroupMembershipFromGroups( username, context, configuration );
             }
@@ -74,6 +78,11 @@ public class DefaultLdapGroupDAO
                 throw new NoLdapUserRolesFoundException( username );
             }
         }
+        else if ( dynamicGroups && !groupsEnabled )
+        {
+            throw new NoLdapUserRolesFoundException( username );
+        }
+        
         return roleIds;
     }
 

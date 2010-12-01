@@ -455,7 +455,7 @@ public class DefaultLdapUserDAO
         }
 
         // The user might contain the groups that he is in
-        if ( StringUtils.isNotEmpty( configuration.getUserMemberOfAttribute() ) )
+        if ( configuration.isLdapGroupsAsRoles() && StringUtils.isNotEmpty( configuration.getUserMemberOfAttribute() ) )
         {
             Set<String> groups = LdapUtils.getAttributeValues( attributes, memberOfAttribute, "Member Of" );
             Set<String> resolvedGroups = new HashSet<String>();
