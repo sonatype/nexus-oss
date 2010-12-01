@@ -14,6 +14,7 @@ import org.sonatype.nexus.mock.MockListener;
 import org.sonatype.nexus.mock.SeleniumTest;
 import org.sonatype.nexus.mock.pages.ServerTab;
 import org.sonatype.nexus.mock.rest.MockHelper;
+import org.sonatype.nexus.rest.global.GlobalConfigurationPlexusResource;
 import org.sonatype.nexus.rest.model.GlobalConfigurationResourceResponse;
 import org.testng.annotations.Test;
 
@@ -29,44 +30,51 @@ public class Nexus421NotificationConfigTest
         doLogin();
 
         ServerTab serverCfg = main.openServer();
-        
+
         serverCfg.getNotificationsEnabled().check( true );
         serverCfg.getNotificationEmails().type( "someemail@someemail.com,otheremail@otheremail.com" );
         serverCfg.getNotificationRoles().add( "anonymous" );
         serverCfg.getNotificationRoles().add( "admin" );
-        
-        MockListener ml = MockHelper.listen( "/global_settings/current", new MockListener()
-        {
-            @Override
-            public void onPayload( Object payload, MockEvent evt )
-            {
-                if ( !Method.PUT.equals( evt.getMethod() ) )
+
+        MockListener<GlobalConfigurationResourceResponse> ml =
+            MockHelper.listen( GlobalConfigurationPlexusResource.RESOURCE_URI,
+                new MockListener<GlobalConfigurationResourceResponse>()
                 {
-                    evt.block();
-                }
-                else
-                {
-                    assertThat( payload, not( nullValue() ) );
-                    assertThat( payload, is( GlobalConfigurationResourceResponse.class ) );
-                    
-                    GlobalConfigurationResourceResponse resource = ( GlobalConfigurationResourceResponse ) payload;
-                    
-                    assertThat( resource.getData().getSystemNotificationSettings(), not( nullValue() ) );
-                    assertThat( resource.getData().getSystemNotificationSettings().isEnabled(), equalTo( true ) );
-                    assertThat( resource.getData().getSystemNotificationSettings().getEmailAddresses(), equalTo( "someemail@someemail.com,otheremail@otheremail.com" ) );
-                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().size(), equalTo( 2 ) );
-                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 0 ), equalTo( "anonymous" ) );
-                    assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 1 ), equalTo( "admin" ) );
-                }
-            }
-        } );
-        
+                    @Override
+                    public void onPayload( Object payload, MockEvent evt )
+                    {
+                        if ( !Method.PUT.equals( evt.getMethod() ) )
+                        {
+                            evt.block();
+                        }
+                        else
+                        {
+                            assertThat( payload, not( nullValue() ) );
+                            assertThat( payload, is( GlobalConfigurationResourceResponse.class ) );
+
+                            GlobalConfigurationResourceResponse resource =
+                                (GlobalConfigurationResourceResponse) payload;
+
+                            assertThat( resource.getData().getSystemNotificationSettings(), not( nullValue() ) );
+                            assertThat( resource.getData().getSystemNotificationSettings().getEmailAddresses(),
+                                equalTo( "someemail@someemail.com,otheremail@otheremail.com" ) );
+                            assertThat( resource.getData().getSystemNotificationSettings().getRoles().size(),
+                                equalTo( 2 ) );
+                            assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 0 ),
+                                equalTo( "anonymous" ) );
+                            assertThat( resource.getData().getSystemNotificationSettings().getRoles().get( 1 ),
+                                equalTo( "admin" ) );
+                            assertThat( resource.getData().getSystemNotificationSettings().isEnabled(), equalTo( true ) );
+                        }
+                    }
+                } );
+
         serverCfg.save();
         Thread.sleep( 1000 );
-        
-        assertNotNull( ml.getResult() );
-        
+
+        assertNotNull( ml.waitForPayload( GlobalConfigurationResourceResponse.class ) );
+
         MockHelper.checkAndClean();
-        
+
     }
 }

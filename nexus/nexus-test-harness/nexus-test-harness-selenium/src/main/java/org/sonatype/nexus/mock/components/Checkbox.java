@@ -18,10 +18,11 @@ public class Checkbox
 
     public void check( boolean enable )
     {
-        if ( enable != evalTrue( ".checked" ) )
+        if ( enable != evalTrue( ".getValue()" ) )
         {
             click();
         }
+        runScript( ".setValue(" + enable + ")" );
     }
 
     public void click()

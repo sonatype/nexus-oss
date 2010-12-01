@@ -129,4 +129,25 @@ public class MockListener<E>
             return result;
         }
     }
+
+    @SuppressWarnings( "unchecked" )
+    public <D> D waitForPayload( Class<D> class1 )
+    {
+        synchronized ( lock )
+        {
+            while ( payload == null || !class1.isAssignableFrom( payload.getClass() ) )
+            {
+                try
+                {
+                    lock.wait( 1000 );
+                }
+                catch ( InterruptedException e )
+                {
+                    // is it recovereable?
+                }
+            }
+
+            return (D) payload;
+        }
+    }
 }
