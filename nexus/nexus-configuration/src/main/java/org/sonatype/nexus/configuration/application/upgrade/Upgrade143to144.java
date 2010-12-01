@@ -109,10 +109,6 @@ public class Upgrade143to144
             // all other cases should be covered by manual steps performed by Admin!
             if ( repository.getLocalStorage() != null && "file".equals( repository.getLocalStorage().getProvider() ) )
             {
-                getLogger().info(
-                    "Upgrading proxy attributes for repository \"" + repository.getName() + "\" (id="
-                        + repository.getId() + ")..." );
-
                 sourceDirectory = new File( oldAttributesBase, repository.getId() );
 
                 if ( !sourceDirectory.isDirectory() )
@@ -121,8 +117,13 @@ public class Upgrade143to144
                     continue;
                 }
 
+                getLogger().info(
+                    "Upgrading proxy attributes for repository \"" + repository.getName() + "\" (id="
+                        + repository.getId() + ")..." );
+
                 destinationDirectory =
-                    getRepositoryStorageBaseDirectory( repository.getId(), repository.getLocalStorage().getUrl() );
+                    new File( new File( getRepositoryStorageBaseDirectory( repository.getId(),
+                        repository.getLocalStorage().getUrl() ), ".nexus" ), "attributes" );
 
                 try
                 {
@@ -177,16 +178,23 @@ public class Upgrade143to144
 
     //
 
+    /**
+     * This "Frankenstein" method is actually redoing all that DefaultFSLocalRepositoryStorage class does, but it is
+     * moved/copied here to be able to perform upgrade even if once in future we move that out to a plugin, or
+     * fundamentally change it's behavior. This method here "freeze" the behavior of older Nexuses we are actually
+     * upgrading.
+     */
     protected File getRepositoryStorageBaseDirectory( String repositoryId, String urlStr )
         throws ConfigurationIsCorruptedException
     {
         if ( StringUtils.isBlank( urlStr ) )
         {
-            return new File( new File( new File( applicationConfiguration.getWorkingDirectory( "storage" ),
-                repositoryId ), ".nexus" ), "attributes" );
+            // the  factory default
+            return new File( applicationConfiguration.getWorkingDirectory( "storage" ), repositoryId );
         }
         else
         {
+            // do the same as DefaultFSLocalRepositoryStorage does to interpret string url
             URL url;
 
             try
