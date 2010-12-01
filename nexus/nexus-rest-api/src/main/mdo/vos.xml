@@ -4038,7 +4038,7 @@
       <description>REST response object to persist a privilege.</description>
       <annotations>
         <annotation>@com.thoughtworks.xstream.annotations.XStreamAlias( value = "privilege-request" )</annotation>
-        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "privilege" )</annotation>
+        <annotation>@javax.xml.bind.annotation.XmlRootElement( name = "privilege-request" )</annotation>
         <annotation>@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.FIELD)</annotation>
       </annotations>
       <fields>
