@@ -18,6 +18,7 @@ import org.apache.log4j.helpers.PatternParser;
 
 /**
  * @author juven
+ * @deprecated Remember, remember the 5th November... and glorified NEXUS-1358 decision.
  */
 public class ConcisePatternLayout
     extends PatternLayout
