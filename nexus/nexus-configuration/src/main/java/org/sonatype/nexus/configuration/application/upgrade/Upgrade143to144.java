@@ -114,6 +114,13 @@ public class Upgrade143to144
                         + repository.getId() + ")..." );
 
                 sourceDirectory = new File( oldAttributesBase, repository.getId() );
+
+                if ( !sourceDirectory.isDirectory() )
+                {
+                    // nothing to upgrade
+                    continue;
+                }
+
                 destinationDirectory =
                     getRepositoryStorageBaseDirectory( repository.getId(), repository.getLocalStorage().getUrl() );
 
