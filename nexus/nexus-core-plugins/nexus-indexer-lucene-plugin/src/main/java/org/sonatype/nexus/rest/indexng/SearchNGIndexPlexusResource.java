@@ -97,19 +97,38 @@ public class SearchNGIndexPlexusResource
         DEFAULT_FIRST_LOOP_EXECUTION_TIME_LIMIT );
 
     /**
+     * The default threshold of change size in relevance, from where we may "cut" the results.
+     */
+    private static final int DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = 350;
+
+    /**
      * The threshold of change size in relevance, from where we may "cut" the results.
      */
-    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = 0.35f;
+    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = Integer.getInteger(
+        "plexus.search.ga.hit.relevanceDropThreshold", DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000;
+
+    /**
+     * The default treshold of change from the very 1st hit. from where we may "cut" the results.
+     */
+    private static final int DEFAULT_DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = 750;
 
     /**
      * The treshold of change from the very 1st hit. from where we may "cut" the results.
      */
-    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = 0.75f;
+    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD =
+        Integer.getInteger( "plexus.search.ga.hit.topRelevanceDropThreshold",
+            DEFAULT_DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000;
+
+    /**
+     * The default treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).
+     */
+    private static final int DEFAULT_COLLAPSE_OVERRIDE_TRESHOLD = 35;
 
     /**
      * The treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).
      */
-    private static final int COLLAPSE_OVERRIDE_TRESHOLD = 35;
+    private static final int COLLAPSE_OVERRIDE_TRESHOLD = Integer.getInteger(
+        "plexus.search.ga.collapseOverrideThreshold", DEFAULT_COLLAPSE_OVERRIDE_TRESHOLD );
 
     public static final String RESOURCE_URI = "/lucene/search";
 
