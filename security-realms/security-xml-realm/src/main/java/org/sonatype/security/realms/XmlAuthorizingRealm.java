@@ -33,6 +33,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
+import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.usermanagement.RoleIdentifier;
 import org.sonatype.security.usermanagement.RoleMappingUserManager;
@@ -48,7 +49,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = XmlAuthorizingRealm.ROLE )
-// @Description( value = "Xml Authorizing Realm" )
+@Description( value = "Xml Authorizing Realm" )
 public class XmlAuthorizingRealm
     extends AuthorizingRealm
     implements Realm

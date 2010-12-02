@@ -435,6 +435,16 @@ public class DefaultConfigurationValidator
             response.addValidationError( message );
         }
 
+        if( StringUtils.isNotEmpty( user.getFirstName() ) )
+        {
+            user.setFirstName( user.getFirstName() );
+        }
+
+        if( StringUtils.isNotEmpty( user.getLastName() ) )
+        {
+            user.setLastName( user.getLastName() );
+        }
+
         if ( StringUtils.isEmpty( user.getFirstName() ) && StringUtils.isEmpty( user.getLastName() ) )
         {
             ValidationMessage message =

@@ -28,7 +28,7 @@ public class ApplicationPrivilegePermissionPropertyDescriptor
     
     public String getHelpText()
     {
-        return "The JSecurity permission string associated with this privilege";
+        return "The Shiro permission string associated with this privilege";
     }
 
     public String getId()

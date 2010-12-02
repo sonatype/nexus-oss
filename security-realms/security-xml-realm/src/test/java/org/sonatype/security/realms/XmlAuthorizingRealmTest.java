@@ -42,7 +42,6 @@ import org.sonatype.security.usermanagement.UserStatus;
 public class XmlAuthorizingRealmTest
     extends AbstractSecurityTestCase
 {
-    public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
     
     private static final String SECURITY_CONFIG_FILE_PATH = getBasedir() + "/target/jsecurity/security.xml"; 
     

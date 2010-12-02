@@ -46,6 +46,7 @@ import org.restlet.data.Protocol;
 import org.restlet.data.Request;
 import org.restlet.data.Response;
 import org.slf4j.Logger;
+import org.sonatype.inject.Description;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
 import org.sonatype.security.usermanagement.UserManager;
 import org.sonatype.security.usermanagement.UserNotFoundException;
@@ -60,7 +61,7 @@ import org.sonatype.security.usermanagement.UserNotFoundException;
 @Singleton
 @Typed( value = Realm.class )
 @Named( value = "url" )
-// @Description( value = "URL Realm" )
+@Description( value = "URL Realm" )
 public class URLRealm
     extends AuthorizingRealm
 {

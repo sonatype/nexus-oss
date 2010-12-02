@@ -23,6 +23,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.sonatype.configuration.validation.InvalidConfigurationException;
+import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.authorization.NoSuchRoleException;
 import org.sonatype.security.model.CRole;
@@ -50,7 +51,7 @@ import org.sonatype.security.usermanagement.UserStatus;
 @Singleton
 @Typed( value = UserManager.class )
 @Named( value = "default" )
-//@Description( value = "Default" )
+@Description( value = "Default" )
 public class SecurityXmlUserManager
     extends AbstractUserManager
     implements RoleMappingUserManager

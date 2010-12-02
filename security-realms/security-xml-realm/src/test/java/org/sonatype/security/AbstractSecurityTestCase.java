@@ -33,6 +33,8 @@ public abstract class AbstractSecurityTestCase
     extends PlexusTestCase
 {
 
+    public static final String PLEXUS_SECURITY_XML_FILE = "security-xml-file";
+    
     protected File PLEXUS_HOME = new File( "./target/plexus_home" );
 
     protected File CONFIG_DIR = new File( PLEXUS_HOME, "conf" );

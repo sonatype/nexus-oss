@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import org.codehaus.plexus.util.CollectionUtils;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
+import org.sonatype.inject.Description;
 import org.sonatype.security.SecuritySystem;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
@@ -45,7 +46,7 @@ import org.sonatype.security.usermanagement.UserSearchCriteria;
 @Singleton
 @Typed( value = UserManager.class )
 @Named( value = "allConfigured" )
-//@Description( value = "All Configured Users" )
+@Description( value = "All Configured Users" )
 public class ConfiguredUsersUserManager
     extends AbstractReadOnlyUserManager
 {

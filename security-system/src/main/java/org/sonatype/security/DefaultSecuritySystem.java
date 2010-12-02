@@ -532,7 +532,11 @@ public class DefaultSecuritySystem
             // search all user managers
             for ( UserManager tmpUserManager : this.userManagerMap.values() )
             {
-                users.addAll( tmpUserManager.searchUsers( criteria ) );
+                Set<User> result = tmpUserManager.searchUsers( criteria );
+                if( result != null )
+                {
+                    users.addAll( result );
+                }
             }
         }
         else

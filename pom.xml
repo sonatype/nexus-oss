@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.sonatype.spice</groupId>
@@ -9,22 +8,14 @@
   <groupId>org.sonatype.security</groupId>
   <artifactId>security-parent</artifactId>
   <packaging>pom</packaging>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.0.1-SNAPSHOT</version>
   <name>Plexus Security Aggregator</name>
 
   <scm>
-    <connection>scm:svn:http://svn.sonatype.org/spice/trunk/plexus-security</connection>
-    <url>http://svn.sonatype.org/spice/trunk/plexus-security</url>
-    <developerConnection>scm:svn:https://svn.sonatype.org/spice/trunk/plexus-security</developerConnection>
+    <connection>scm:git:git@github.com/sonatype/security.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/sonatype/security.git</developerConnection>
+    <url>http://github.com/sonatype/security</url>
   </scm>
-
-  <distributionManagement>
-    <repository>
-      <id>localhost</id>
-      <name>dumping to target</name>
-      <url>file://${basedir}/target/repo/</url>
-    </repository>
-  </distributionManagement>
 
   <properties>
     <plexus.version>1.2.1</plexus.version>
@@ -210,6 +201,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -317,14 +309,10 @@
             <configuration>
               <mappingId>customizable</mappingId>
               <configurators>
-                <configurator
-                  id="org.maven.ide.eclipse.jdt.javaConfigurator" />
-                <configurator
-                  id="org.maven.ide.eclipse.modello.modelloConfigurator" />
-                <configurator
-                  id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
-                <configurator
-                  id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
+                <configurator id="org.maven.ide.eclipse.jdt.javaConfigurator" />
+                <configurator id="org.maven.ide.eclipse.modello.modelloConfigurator" />
+                <configurator id="org.maven.ide.eclipse.plexus.annotations.plexusConfigurator" />
+                <configurator id="org.maven.ide.eclipse.mavenarchiver.pomProperties" />
               </configurators>
               <mojoExecutions>
                 <mojoExecution>org.apache.maven.plugins:maven-resources-plugin::</mojoExecution>

@@ -22,6 +22,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.inject.Description;
 import org.sonatype.security.model.CUserRoleMapping;
 import org.sonatype.security.realms.tools.ConfigurationManager;
 import org.sonatype.security.realms.url.config.UrlRealmConfiguration;
@@ -43,7 +44,7 @@ import org.sonatype.security.usermanagement.xml.ConfiguredUsersUserManager;
 @Singleton
 @Typed( value = UserManager.class )
 @Named( value = "url" )
-// @Description( value = "URL Realm Users" )
+@Description( value = "URL Realm Users" )
 public class URLUserManager
     extends AbstractReadOnlyUserManager
 {
