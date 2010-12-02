@@ -88,7 +88,7 @@ public class LoginTest
 
         MockResponse mock = MockHelper.expect( "/authentication/login", new MockResponse( Status.SUCCESS_OK, result ) );
 
-        main.clickLogin().populate( "mockingworks", "mockingworks" ).loginExpectingSuccess();
+        main.clickLogin().populate( User.ADMIN ).loginExpectingSuccess();
 
         assertTrue( mock.wasExecuted() );
 
