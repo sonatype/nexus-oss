@@ -653,7 +653,6 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
       }, {
         xtype : 'textfield',
         fieldLabel : 'First Name',
-        itemCls : 'required-field',
         labelStyle : 'margin-left: 15px; width: 185px;',
         helpText : ht.firstName,
         name : 'firstName',
@@ -672,7 +671,6 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
       }, {
         xtype : 'textfield',
         fieldLabel : 'Last Name',
-        itemCls : 'required-field',
         labelStyle : 'margin-left: 15px; width: 185px;',
         helpText : ht.lastName,
         name : 'lastName',
