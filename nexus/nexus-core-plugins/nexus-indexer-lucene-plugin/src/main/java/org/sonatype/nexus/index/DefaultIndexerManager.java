@@ -1272,7 +1272,9 @@ public class DefaultIndexerManager
                 }
                 catch ( ItemNotFoundException ex )
                 {
-                    throw new FileNotFoundException( name + " (item not found)" );
+                    FileNotFoundException fne = new FileNotFoundException( name + " (item not found)");
+                    fne.initCause( ex );
+                    throw fne;
                 }
                 finally
                 {
