@@ -102,13 +102,13 @@ public class DefaultMetadataManager
         {
             gav =
                 new Gav( gavRequest.getGroupId(), gavRequest.getArtifactId(), version, gavRequest.getClassifier(),
-                    gavRequest.getExtension(), null, null, null,
-                    RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ), false, null, false, null );
+                    gavRequest.getExtension(), null, null, null, VersionUtils.isSnapshot( version ), false, null,
+                    false, null );
 
             // if it is not "timestamped" version, try to get it
             if ( gav.isSnapshot() && gav.getVersion().equals( gav.getBaseVersion() ) )
             {
-                gav = repository.getMetadataManager().resolveSnapshot( gavRequest, gav );
+                gav = resolveSnapshot( gavRequest, gav );
             }
 
             return gav;
@@ -237,19 +237,7 @@ public class DefaultMetadataManager
     {
         MavenRepository repository = gavRequest.getMavenRepository();
 
-        if ( !RepositoryPolicy.SNAPSHOT.equals( repository.getRepositoryPolicy() ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Not a SNAPSHOT repository for resolving GAV: " + gav.getGroupId() + " : " + gav.getArtifactId()
-                        + " : " + gav.getVersion() + " in repository " + repository.getId() );
-            }
-
-            return gav;
-        }
-
-        if ( VersionUtils.isSnapshot( gav.getVersion() ) && !gav.getVersion().endsWith( SNAPSHOT_VERSION ) )
+        if ( gav.isSnapshot() && ( !gav.getVersion().equals( gav.getBaseVersion() ) ) )
         {
             // it is already a timestamped version, return it unmodified
             return gav;
