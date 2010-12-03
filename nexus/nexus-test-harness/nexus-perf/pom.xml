@@ -40,6 +40,5 @@
     <module>jmeter-plan-assembly-descriptor</module>
     <module>jmeter-plan-archetype</module>
     <module>jmeter-plans</module>
-    <module>jmeter-tests</module>
   </modules>
 </project>
