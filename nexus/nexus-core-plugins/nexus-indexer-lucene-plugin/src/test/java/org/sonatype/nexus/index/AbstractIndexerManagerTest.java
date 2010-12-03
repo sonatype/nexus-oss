@@ -9,6 +9,7 @@ import java.util.Collection;
 import org.apache.lucene.search.Query;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.FlatSearchResponse;
+import org.apache.maven.index.IteratorSearchRequest;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
@@ -93,12 +94,18 @@ public abstract class AbstractIndexerManagerTest
     protected void searchFor( String groupId, int expected, String repoId )
         throws IOException, Exception
     {
-        FlatSearchResponse response =
-            indexerManager.searchArtifactFlat( groupId, null, null, null, null, repoId, 0, 100, null );
+        Query q = indexerManager.constructQuery( MAVEN.GROUP_ID, groupId, SearchType.EXACT );
 
-        Collection<ArtifactInfo> result = response.getResults();
+        IteratorSearchResponse response = indexerManager.searchQueryIterator( q, repoId, null, null, null, false, null );
 
-        assertEquals( result.toString(), expected, result.size() );
+        ArrayList<ArtifactInfo> ais = new ArrayList<ArtifactInfo>( response.getTotalHits() );
+
+        for ( ArtifactInfo ai : response )
+        {
+            ais.add( ai );
+        }
+
+        assertEquals( ais.toString(), expected, ais.size() );
     }
 
     protected void assertTemporatyContexts( final Repository repo )
