@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.index.context.IndexingContext;
 import org.mortbay.jetty.Handler;
+import org.mortbay.jetty.Response;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerList;
@@ -67,8 +68,9 @@ public class DownloadRemoteIndexerManagerTest
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {
-                System.out.println( target );
+                System.err.print( "JETTY: " + target );
                 super.handle( target, request, response, dispatch );
+                System.err.println( "  ::  " + ((Response)response).getStatus() );
             }
         };
         resource_handler.setResourceBase( fakeCentral.getAbsolutePath() );
