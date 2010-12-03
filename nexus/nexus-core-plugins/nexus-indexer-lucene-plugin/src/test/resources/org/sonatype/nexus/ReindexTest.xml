@@ -3,8 +3,7 @@
     <component>
       <role>org.sonatype.jettytestsuite.ServletServer</role>
       <implementation>
-        org.sonatype.jettytestsuite.ServletServer
-			</implementation>
+        org.sonatype.jettytestsuite.ServletServer</implementation>
       <configuration>
         <port>${proxy.server.port}</port>
         <webappContexts>
@@ -14,14 +13,11 @@
               <servletInfo>
                 <mapping>/*</mapping>
                 <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-								</servletClass>
+                  org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
-                    <value>
-                      ${basedir}/target/test-classes/reposes-remote/central
-										</value>
+                    <value>${basedir}/target/test-classes/reposes-remote/central</value>
                   </property>
                   <property>
                     <name>dirAllowed</name>
@@ -36,15 +32,11 @@
             <servletInfos>
               <servletInfo>
                 <mapping>/*</mapping>
-                <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-								</servletClass>
+                <servletClass>org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
-                    <value>
-                      ${basedir}/target/test-classes/reposes-remote/central-inc1
-										</value>
+                    <value>${basedir}/target/test-classes/reposes-remote/central-inc1</value>
                   </property>
                   <property>
                     <name>dirAllowed</name>
@@ -59,15 +51,11 @@
             <servletInfos>
               <servletInfo>
                 <mapping>/*</mapping>
-                <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-								</servletClass>
+                <servletClass>org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
-                    <value>
-                      ${basedir}/target/test-classes/reposes-remote/central-inc2
-										</value>
+                    <value>${basedir}/target/test-classes/reposes-remote/central-inc2</value>
                   </property>
                   <property>
                     <name>dirAllowed</name>
@@ -82,15 +70,11 @@
             <servletInfos>
               <servletInfo>
                 <mapping>/*</mapping>
-                <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-								</servletClass>
+                <servletClass>org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
-                    <value>
-                      ${basedir}/target/test-classes/reposes-remote/central-inc3
-										</value>
+                    <value>${basedir}/target/test-classes/reposes-remote/central-inc3</value>
                   </property>
                   <property>
                     <name>dirAllowed</name>
@@ -105,9 +89,7 @@
             <servletInfos>
               <servletInfo>
                 <mapping>/*</mapping>
-                <servletClass>
-                  org.mortbay.jetty.servlet.DefaultServlet
-                </servletClass>
+                <servletClass>org.mortbay.jetty.servlet.DefaultServlet</servletClass>
                 <parameters>
                   <property>
                     <name>resourceBase</name>
