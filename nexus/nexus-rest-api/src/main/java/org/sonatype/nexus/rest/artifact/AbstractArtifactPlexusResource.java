@@ -170,6 +170,8 @@ public abstract class AbstractArtifactPlexusResource
             getResourceStoreRequest( request, false, false, repositoryId, groupId, artifactId, version, null, null,
                 "pom" );
 
+        gavRequest.setRequestLocalOnly( isLocal( request, gavRequest.getRequestPath() ) );
+
         try
         {
             MavenRepository mavenRepository = getMavenRepository( repositoryId );
@@ -245,8 +247,8 @@ public abstract class AbstractArtifactPlexusResource
         ArtifactStoreRequest gavRequest =
             getResourceStoreRequest( request, false, false, repositoryId, groupId, artifactId, version, packaging,
                 classifier, extension );
-
-        boolean isLocalOnly = isLocal( request, gavRequest.getRequestPath() );
+        
+        gavRequest.setRequestLocalOnly( isLocal( request, gavRequest.getRequestPath() ) );
 
         try
         {
