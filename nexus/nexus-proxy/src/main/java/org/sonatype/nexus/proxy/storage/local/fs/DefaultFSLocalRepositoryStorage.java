@@ -434,8 +434,10 @@ public class DefaultFSLocalRepositoryStorage
                 String newPath = ItemPathUtils.concatPaths( request.getRequestPath(), file.getName() );
 
                 request.pushRequestPath( newPath );
+                
+                ResourceStoreRequest collMemberReq = new ResourceStoreRequest( request );
 
-                result.add( retrieveItemFromFile( repository, request, file ) );
+                result.add( retrieveItemFromFile( repository, collMemberReq, file ) );
 
                 request.popRequestPath();
             }

@@ -92,6 +92,18 @@ public class ResourceStoreRequest
     }
 
     /**
+     * Creates a new request off from a given one.
+     * 
+     * @param item
+     */
+    public ResourceStoreRequest( ResourceStoreRequest request )
+    {
+        this( request.getRequestPath(), true, false );
+
+        getRequestContext().setParentContext( request.getRequestContext() );
+    }
+
+    /**
      * Gets the request context.
      * 
      * @return the request context
