@@ -26,6 +26,7 @@ import org.codehaus.plexus.context.Context;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.codehaus.plexus.util.IOUtil;
 import org.sonatype.nexus.configuration.application.NexusConfiguration;
+import org.sonatype.nexus.events.EventInspectorHost;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.scheduling.ScheduledTask;
 
@@ -34,20 +35,23 @@ public abstract class AbstractNexusTestCase
 {
     private NexusScheduler nexusScheduler;
 
+    private EventInspectorHost eventInspectorHost;
+
     public static final String RUNTIME_CONFIGURATION_KEY = "runtime";
 
     public static final String NEXUS_APP_CONFIGURATION_KEY = "nexus-app";
 
     protected NexusConfiguration nexusConfiguration;
-    
+
     private static File runtimeHomeDir = null;
+
     private static File nexusappHomeDir = null;
 
     @Override
     protected void customizeContext( Context ctx )
     {
         super.customizeContext( ctx );
-        
+
         runtimeHomeDir = new File( getPlexusHomeDir(), "runtime" );
         nexusappHomeDir = new File( getPlexusHomeDir(), "nexus-app" );
 
@@ -72,11 +76,12 @@ public abstract class AbstractNexusTestCase
         throws Exception
     {
         super.setUp();
-        
+
         runtimeHomeDir.mkdirs();
         nexusappHomeDir.mkdirs();
-        
+
         nexusScheduler = lookup( NexusScheduler.class );
+        eventInspectorHost = lookup( EventInspectorHost.class );
 
         if ( loadConfigurationAtSetUp() )
         {
@@ -102,7 +107,7 @@ public abstract class AbstractNexusTestCase
         waitForTasksToStop();
 
         super.tearDown();
-        
+
         cleanDir( runtimeHomeDir );
         cleanDir( nexusappHomeDir );
     }
@@ -118,6 +123,15 @@ public abstract class AbstractNexusTestCase
             {
                 task.cancel();
             }
+        }
+    }
+
+    protected void wairForAsyncEventsToCalmDown()
+        throws Exception
+    {
+        while ( !eventInspectorHost.isCalmPeriod() )
+        {
+            Thread.sleep( 100 );
         }
     }
 

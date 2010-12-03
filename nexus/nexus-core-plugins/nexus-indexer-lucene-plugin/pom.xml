@@ -117,7 +117,7 @@
           <execution>
             <id>default-generate-metadata</id>
             <configuration>
-              <classpathDependencyExcludes>
+               <classpathDependencyExcludes>
                 <classpathDependencyExclude>org.apache.maven.indexer:indexer-core</classpathDependencyExclude>
               </classpathDependencyExcludes>
             </configuration>

@@ -68,9 +68,9 @@ public class DownloadRemoteIndexerManagerTest
             public void handle( String target, HttpServletRequest request, HttpServletResponse response, int dispatch )
                 throws IOException, ServletException
             {
-                System.err.print( "JETTY: " + target );
+                System.out.print( "JETTY: " + target );
                 super.handle( target, request, response, dispatch );
-                System.err.println( "  ::  " + ((Response)response).getStatus() );
+                System.out.println( "  ::  " + ((Response)response).getStatus() );
             }
         };
         resource_handler.setResourceBase( fakeCentral.getAbsolutePath() );
@@ -78,6 +78,7 @@ public class DownloadRemoteIndexerManagerTest
         handlers.setHandlers( new Handler[] { resource_handler, new DefaultHandler() } );
         server.setHandler( handlers );
 
+        System.out.print( "JETTY Started on port: " + port );
         server.start();
 
         // update central to use proxy server
@@ -86,7 +87,10 @@ public class DownloadRemoteIndexerManagerTest
         central.setRepositoryPolicy( RepositoryPolicy.SNAPSHOT );
 
         nexusConfiguration.saveConfiguration();
+
+        Thread.sleep( 100 );
         
+        wairForAsyncEventsToCalmDown();
         waitForTasksToStop();
     }
 
