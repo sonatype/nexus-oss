@@ -67,6 +67,7 @@ public class DefaultApplicationConfigurationUpgraderTest
         // System.out.println(sw.toString());
 
         String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path + ".result" ) );
+        shouldBe = shouldBe.replace( "\r", "" );
 
         if ( !StringUtils.equals( shouldBe, sw.toString() ) )
         {
@@ -87,7 +88,7 @@ public class DefaultApplicationConfigurationUpgraderTest
             String message = "Files differ, you can manually diff them:\n" + diffMessage;
 
             // the method makes the error pretty, so we can keep it.
-            assertEquals( message, shouldBe, sw.toString() );
+            assertEquals( message, shouldBe, sw.toString().replace( "\r", "" ) );
         }
     }
 
@@ -95,14 +96,14 @@ public class DefaultApplicationConfigurationUpgraderTest
         throws Exception
     {
 
-        String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path ) );
+        String shouldBe = IOUtil.toString( getClass().getResourceAsStream( path ) ).replace( "\r", "" );
 
         // we can only compare the string with no encrypted passwords, because the encryption is different every time.
         SecurityConfiguration securityConfig = this.securitySource.loadConfiguration();
         SecurityConfigurationXpp3Writer writer = new SecurityConfigurationXpp3Writer();
         StringWriter stringWriter = new StringWriter();
         writer.write( stringWriter, securityConfig );
-        String actual = stringWriter.toString();
+        String actual = stringWriter.toString().replace( "\r", "" );
 
         if ( !StringUtils.equals( shouldBe, actual ) )
         {
