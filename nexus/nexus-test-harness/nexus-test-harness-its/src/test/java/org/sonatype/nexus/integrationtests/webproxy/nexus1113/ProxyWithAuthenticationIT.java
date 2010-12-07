@@ -37,7 +37,7 @@ public class ProxyWithAuthenticationIT
 {
 
     @Override
-    @BeforeMethod(alwaysRun = true)
+    @BeforeMethod( alwaysRun = true )
     public void startWebProxy()
         throws Exception
     {
@@ -49,7 +49,7 @@ public class ProxyWithAuthenticationIT
         server.getProxyServlet().getAuthentications().put( "admin", "123" );
     }
 
-    @Test(groups = PROXY)
+    @Test( groups = PROXY )
     public void validUser()
         throws Exception
     {
@@ -80,7 +80,7 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test(groups = PROXY, expectedExceptions = IOException.class )
+    @Test( groups = PROXY, expectedExceptions = IOException.class )
     public void invalidUser()
         throws Exception
     {
@@ -97,7 +97,7 @@ public class ProxyWithAuthenticationIT
         Assert.fail( "Proxy was not able to access google.com" );
     }
 
-    @Test(groups = PROXY, expectedExceptions = IOException.class )
+    @Test( groups = PROXY, expectedExceptions = IOException.class )
     public void withoutUser()
         throws Exception
     {
@@ -113,12 +113,15 @@ public class ProxyWithAuthenticationIT
     }
 
     @Override
-    @AfterMethod(alwaysRun = true)
+    @AfterMethod( alwaysRun = true )
     public void stopWebProxy()
         throws Exception
     {
-        server.getProxyServlet().setUseAuthentication( false );
-        server.getProxyServlet().setAuthentications( null );
+        if ( server != null )
+        {
+            server.getProxyServlet().setUseAuthentication( false );
+            server.getProxyServlet().setAuthentications( null );
+        }
         super.stopWebProxy();
     }
 
