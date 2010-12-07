@@ -1,20 +1,11 @@
 package org.sonatype.nexus.proxy.registry.validation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.util.IOUtil;
-import org.slf4j.Logger;
 
 @Component( role = FileTypeValidator.class )
 public class DefaultFileTypeValidator

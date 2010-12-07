@@ -13,7 +13,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.AbstractStorageItem;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
-import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.repository.ItemContentValidator;
 import org.sonatype.nexus.proxy.repository.ProxyRepository;
 
@@ -27,7 +26,7 @@ public class FileTypeItemContentValidator
 
     @Requirement
     private Logger logger;
-    
+
     public boolean isRemoteItemContentValid( ProxyRepository proxy, ResourceStoreRequest request, String baseUrl,
                                              AbstractStorageItem item, List<NexusArtifactEvent> events )
         throws StorageException
@@ -49,7 +48,7 @@ public class FileTypeItemContentValidator
             }
             catch ( IOException e )
             {
-                logger.warn( "Failed to get open file item: "+ item.getPath() );
+                logger.warn( "Failed to get open file item: " + item.getPath() );
             }
             finally
             {
