@@ -36,15 +36,19 @@ public class Nexus2810PluginConsoleIT
         List<PluginInfoDTO> pluginInfos = pluginConsoleMsgUtil.listPluginInfos();
 
         MatcherAssert.assertThat( getPluginsNames( pluginInfos ),
-                           IsCollectionContaining.hasItems( "Nexus : Core Plugins : Plugin Console", "Nexus Broken Plugin" ) );
+            IsCollectionContaining.hasItems( "Nexus : Core Plugins : Plugin Console", "Nexus Broken Plugin" ) );
 
-        PluginInfoDTO pluginConsolePlugin = this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );
+        PluginInfoDTO pluginConsolePlugin =
+            this.getPluginInfoByName( pluginInfos, "Nexus : Core Plugins : Plugin Console" );
         assertPropertyValid( "Name", pluginConsolePlugin.getName(), "Nexus : Core Plugins : Plugin Console" );
         assertPropertyValid( "Version", pluginConsolePlugin.getVersion() );
         assertPropertyValid( "Description", pluginConsolePlugin.getDescription(), "Nexus Core Plugin :: Plugin Console" );
         assertPropertyValid( "Status", pluginConsolePlugin.getStatus(), "ACTIVATED" );
-        assertPropertyValid( "SCM Version", pluginConsolePlugin.getScmVersion() );
-        assertPropertyValid( "SCM Timestamp", pluginConsolePlugin.getScmTimestamp() );
+        if ( new File( "./.svn" ).exists() )
+        {
+            assertPropertyValid( "SCM Version", pluginConsolePlugin.getScmVersion() );
+            assertPropertyValid( "SCM Timestamp", pluginConsolePlugin.getScmTimestamp() );
+        }
         assertPropertyValid( "Site", pluginConsolePlugin.getSite() );
         Assert.assertTrue( StringUtils.isEmpty( pluginConsolePlugin.getFailureReason() ) );
         Assert.assertTrue( !pluginConsolePlugin.getRestInfos().isEmpty() );
