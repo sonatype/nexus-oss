@@ -115,28 +115,6 @@ public class Nexus142UserValidationIT
     }
 
     @Test
-    public void createUserWithNoUserName()
-        throws IOException
-    {
-        UserResource resource = new UserResource();
-
-        // resource.setFirstName( "createUserWithNoUserName" );
-        resource.setUserId( "createUserWithNoUserName" );
-        resource.setStatus( "active" );
-        resource.setEmail( "nexus@user.com" );
-        resource.addRole( "role1" );
-
-        Response response = this.messageUtil.sendMessage( Method.POST, resource );
-
-        if ( response.getStatus().isSuccess() )
-        {
-            Assert.fail( "User should not have been created: " + response.getStatus() );
-        }
-        Assert.assertTrue( response.getEntity().getText().startsWith( "{\"errors\":" ) );
-
-    }
-
-    @Test
     public void createUserWithNoEmail()
         throws IOException
     {
