@@ -1131,7 +1131,7 @@
               </property>
               <property>
                 <name>reporter</name>
-                <value>org.uncommons.reportng.HTMLReporter</value>
+                <value>org.sonatype.nexus.integrationtests.report.SonatypeHTMLReporter</value>
               </property>
               <property>
                 <name>listener</name>

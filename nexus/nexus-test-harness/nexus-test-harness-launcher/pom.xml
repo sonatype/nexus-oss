@@ -296,6 +296,19 @@
       <artifactId>commons-collections</artifactId>
       <version>3.2.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.uncommons</groupId>
+      <artifactId>reportng</artifactId>
+      <version>1.1.2</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>velocity</artifactId>
+          <groupId>velocity</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
 </project>
