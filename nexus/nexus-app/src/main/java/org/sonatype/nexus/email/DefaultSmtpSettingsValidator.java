@@ -54,7 +54,7 @@ public class DefaultSmtpSettingsValidator
         MailRequest request = new MailRequest( NEXUS_MAIL_ID, DefaultMailType.DEFAULT_TYPE_ID );
         request.setFrom( new Address( smtp.getSystemEmailAddress(), "Nexus Repository Manager" ) );
         request.getToAddresses().add( new Address( email ) );
-        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: Stmp Configuration validation." );
+        request.getBodyContext().put( DefaultMailType.SUBJECT_KEY, "Nexus: SMTP Configuration validation." );
 
         StringBuilder body = new StringBuilder();
         body.append( "Your current SMTP configuration is valid!" );
