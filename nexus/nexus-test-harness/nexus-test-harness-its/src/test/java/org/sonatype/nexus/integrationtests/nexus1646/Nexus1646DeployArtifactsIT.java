@@ -4,8 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import org.apache.log4j.Logger;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.Gav;
-import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.codehaus.plexus.util.IOUtil;
 import org.restlet.data.Status;

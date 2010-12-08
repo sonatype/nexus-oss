@@ -5,9 +5,8 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -47,10 +46,10 @@ public class GroupMetadataMergeTest
         Metadata md = parseMetadata( (StorageFileItem) item );
 
         assertEquals( 4, md.getPlugins().size() );
-        assertEquals( "core-it", ( (Plugin) md.getPlugins().get( 0 ) ).getPrefix() );
-        assertEquals( "resources", ( (Plugin) md.getPlugins().get( 1 ) ).getPrefix() );
-        assertEquals( "site", ( (Plugin) md.getPlugins().get( 2 ) ).getPrefix() );
-        assertEquals( "surefire-report", ( (Plugin) md.getPlugins().get( 3 ) ).getPrefix() );
+        assertEquals( "core-it", ( md.getPlugins().get( 0 ) ).getPrefix() );
+        assertEquals( "resources", ( md.getPlugins().get( 1 ) ).getPrefix() );
+        assertEquals( "site", ( md.getPlugins().get( 2 ) ).getPrefix() );
+        assertEquals( "surefire-report", ( md.getPlugins().get( 3 ) ).getPrefix() );
     }
 
     public void testGAMerge()

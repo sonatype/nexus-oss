@@ -1,6 +1,6 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
  * Used to remove metadata files

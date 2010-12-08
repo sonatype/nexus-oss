@@ -18,7 +18,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 
 /**
  * @author juven

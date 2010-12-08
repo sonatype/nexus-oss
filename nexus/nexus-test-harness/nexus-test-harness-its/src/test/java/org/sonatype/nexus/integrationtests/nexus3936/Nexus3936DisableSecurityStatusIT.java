@@ -3,7 +3,6 @@ package org.sonatype.nexus.integrationtests.nexus3936;
 import java.util.List;
 
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
-import org.sonatype.nexus.rest.model.NexusAuthenticationClientPermissions;
 import org.sonatype.nexus.rest.model.StatusResource;
 import org.sonatype.nexus.test.utils.NexusIllegalStateException;
 import org.sonatype.nexus.test.utils.NexusStatusUtil;

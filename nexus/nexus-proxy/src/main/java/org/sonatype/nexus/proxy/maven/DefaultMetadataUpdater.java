@@ -18,15 +18,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
 import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
-import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperation;
-import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.mercury.repository.metadata.PluginOperand;
 import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
 import org.apache.maven.mercury.repository.metadata.SnapshotOperand;

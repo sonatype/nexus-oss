@@ -3,14 +3,14 @@ package org.apache.maven.mercury.repository.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.plexus.lang.DefaultLanguage;
-import org.codehaus.plexus.lang.Language;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
 import org.codehaus.plexus.util.StringUtils;
 
 public class NexusMergeOperation
     implements MetadataOperation
 {
-    private static final Language LANG = new DefaultLanguage( MergeOperation.class );
 
     private Metadata sourceMetadata;
 
@@ -80,7 +80,7 @@ public class NexusMergeOperation
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
         // plugins
-        for ( Plugin plugin : (List<Plugin>) sourceMetadata.getPlugins() )
+        for ( Plugin plugin : sourceMetadata.getPlugins() )
         {
             ops.add( new AddPluginOperation( new PluginOperand( plugin ) ) );
         }
@@ -118,7 +118,7 @@ public class NexusMergeOperation
         {            
             // versioning.verions
             // merge all versions together
-            for ( String version : (List<String>) sourceMetadata.getVersioning().getVersions() )
+            for ( String version : sourceMetadata.getVersioning().getVersions() )
             {
                 ops.add( new AddVersionOperation( new StringOperand( version ) ) );
             }
@@ -181,8 +181,9 @@ public class NexusMergeOperation
     {
         if ( data == null || !( data instanceof MetadataOperand ) )
         {
-            throw new MetadataException( LANG.getMessage( "bad.operand", "MetadataOperand", data == null ? "null"
-                            : data.getClass().getName() ) );
+            throw new MetadataException( "Operand is not correct: expected MetadataOperand, but got "
+                + ( data == null ? "null" : data.getClass().getName() ) );
+
         }
 
         sourceMetadata = ( (MetadataOperand) data ).getOperand();

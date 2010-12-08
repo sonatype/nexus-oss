@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.sonatype.nexus.proxy.item.RepositoryItemUid;
-
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Element;
 import net.sf.ehcache.Statistics;
+
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
  * The Class EhCacheCache is a thin wrapper around EHCache just to make things going.

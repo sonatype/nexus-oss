@@ -26,10 +26,10 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.jettytestsuite.ServletServer;
 import org.sonatype.nexus.proxy.AbstractProxyTestEnvironment;
@@ -266,8 +266,7 @@ public class RecreateMavenMetadataWalkerTest
     }
 
     private Metadata readMavenMetadata( File mdFle )
-        throws FileNotFoundException,
-            MetadataException
+        throws MetadataException, IOException
     {
         FileInputStream inputStream = new FileInputStream( mdFle );
         Metadata md = null;
@@ -621,10 +620,10 @@ public class RecreateMavenMetadataWalkerTest
 
         assertEquals( 4, md.getPlugins().size() );
 
-        assertEquals( "maven-a1-plugin", ( (Plugin) md.getPlugins().get( 0 ) ).getArtifactId() );
-        assertEquals( "maven-b1-plugin", ( (Plugin) md.getPlugins().get( 1 ) ).getArtifactId() );
-        assertEquals( "maven-c1-plugin", ( (Plugin) md.getPlugins().get( 2 ) ).getArtifactId() );
-        assertEquals( "maven-d1-plugin", ( (Plugin) md.getPlugins().get( 3 ) ).getArtifactId() );
+        assertEquals( "maven-a1-plugin", ( md.getPlugins().get( 0 ) ).getArtifactId() );
+        assertEquals( "maven-b1-plugin", ( md.getPlugins().get( 1 ) ).getArtifactId() );
+        assertEquals( "maven-c1-plugin", ( md.getPlugins().get( 2 ) ).getArtifactId() );
+        assertEquals( "maven-d1-plugin", ( md.getPlugins().get( 3 ) ).getArtifactId() );
     }
     
     public void testRecreatingOnBadPOM()

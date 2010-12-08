@@ -24,10 +24,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.index.artifact.GavCalculator;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.index.artifact.VersionUtils;
-import org.apache.maven.mercury.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.apache.maven.mercury.repository.metadata.MetadataOperand;

@@ -23,7 +23,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.sonatype.nexus.AbstractMavenRepoContentTests;

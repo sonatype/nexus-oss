@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.net.URL;
 import java.util.List;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.codehaus.plexus.util.IOUtil;
 import org.hamcrest.MatcherAssert;

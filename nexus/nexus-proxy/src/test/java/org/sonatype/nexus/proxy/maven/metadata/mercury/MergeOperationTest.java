@@ -2,10 +2,10 @@ package org.sonatype.nexus.proxy.maven.metadata.mercury;
 
 import java.util.Arrays;
 
-import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.mercury.repository.metadata.MetadataOperand;
-import org.apache.maven.mercury.repository.metadata.Versioning;
+import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
 

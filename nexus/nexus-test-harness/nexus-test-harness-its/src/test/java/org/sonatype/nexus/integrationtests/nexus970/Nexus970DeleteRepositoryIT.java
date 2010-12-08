@@ -15,12 +15,10 @@ package org.sonatype.nexus.integrationtests.nexus970;
 
 import java.io.File;
 
-import org.apache.tools.ant.taskdefs.WaitFor;
 import org.restlet.data.Method;
 import org.restlet.data.Status;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
-import org.sonatype.nexus.test.utils.EventInspectorsUtil;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;

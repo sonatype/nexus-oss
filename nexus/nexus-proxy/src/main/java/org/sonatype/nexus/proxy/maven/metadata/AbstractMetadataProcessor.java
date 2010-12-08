@@ -2,7 +2,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
 
-import org.apache.maven.mercury.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.apache.maven.mercury.repository.metadata.MetadataException;
 import org.codehaus.plexus.util.IOUtil;

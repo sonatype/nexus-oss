@@ -13,8 +13,6 @@
  */
 package org.sonatype.nexus.proxy.repository;
 
-import java.util.Collections;
-
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;

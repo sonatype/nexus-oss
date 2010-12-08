@@ -15,10 +15,10 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.IOException;
 
+import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
-import org.apache.maven.mercury.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.Plugin;
 import org.apache.maven.model.Model;
 
 /**
