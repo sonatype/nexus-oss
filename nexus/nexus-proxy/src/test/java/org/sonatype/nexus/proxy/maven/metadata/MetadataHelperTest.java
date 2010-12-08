@@ -39,8 +39,8 @@ public class MetadataHelperTest
         orderedVersions.add( "1.0.1" );
         orderedVersions.add( "1.0.3-SNAPSHOT" );
         orderedVersions.add( "1.1-M1" );
-        orderedVersions.add( "1.2.0-SNAPSHOT" );
         orderedVersions.add( "1.2.0-beta-1" );
+        orderedVersions.add( "1.2.0-SNAPSHOT" );
         orderedVersions.add( "1.2.0" );
         orderedVersions.add( "1.2.0.5-SNAPSHOT" );
         orderedVersions.add( "1.3.0-SNAPSHOT" );
