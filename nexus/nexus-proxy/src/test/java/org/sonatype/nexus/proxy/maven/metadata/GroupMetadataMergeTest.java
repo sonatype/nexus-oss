@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
 import org.codehaus.plexus.digest.Md5Digester;
 import org.codehaus.plexus.digest.Sha1Digester;
 import org.sonatype.jettytestsuite.ServletServer;
@@ -17,6 +16,7 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 
 public class GroupMetadataMergeTest
     extends AbstractProxyTestEnvironment

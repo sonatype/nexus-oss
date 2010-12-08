@@ -6,11 +6,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.MetadataOperation;
-import org.apache.maven.mercury.repository.metadata.StringOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.AddVersionOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 
 /**
  * Process maven metadata in artifactId directory

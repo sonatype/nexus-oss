@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 

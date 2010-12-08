@@ -16,36 +16,30 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 
 /**
- * adds new plugin to metadata
+ * removes a Plugin from Metadata
  * 
  * @author Oleg Gusakov
- * @version $Id: AddPluginOperation.java 762963 2009-04-07 21:01:07Z ogusakov $
+ * @version $Id: RemovePluginOperation.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
-public class AddPluginOperation
+public class RemovePluginOperation
     implements MetadataOperation
 {
+
     private Plugin plugin;
-
-    private static PluginComparator pluginComparator;
-
-    {
-        pluginComparator = new PluginComparator();
-    }
 
     /**
      * @throws MetadataException
      */
-    public AddPluginOperation( PluginOperand data )
+    public RemovePluginOperation( PluginOperand data )
         throws MetadataException
     {
         setOperand( data );
@@ -64,12 +58,11 @@ public class AddPluginOperation
     }
 
     /**
-     * add plugin to the in-memory metadata instance
+     * remove version to the in-memory metadata instance
      * 
      * @param metadata
      * @param version
      * @return
-     * @throws MetadataException
      */
     public boolean perform( Metadata metadata )
         throws MetadataException
@@ -81,40 +74,21 @@ public class AddPluginOperation
 
         List<Plugin> plugins = metadata.getPlugins();
 
-        for ( Plugin p : plugins )
+        if ( plugins != null && plugins.size() > 0 )
         {
-            if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
+            for ( Iterator<Plugin> pi = plugins.iterator(); pi.hasNext(); )
             {
-                // plugin already enlisted
-                return false;
+                Plugin p = pi.next();
+
+                if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
+                {
+                    pi.remove();
+
+                    return true;
+                }
             }
         }
 
-        // not found, add it
-        plugins.add( plugin );
-
-        Collections.sort( plugins, pluginComparator );
-
-        return true;
+        return false;
     }
-
-    class PluginComparator
-        implements Comparator<Plugin>
-    {
-        public int compare( Plugin p1, Plugin p2 )
-        {
-            if ( p1 == null || p2 == null )
-            {
-                throw new IllegalArgumentException();
-            }
-
-            if ( p1.getArtifactId() == null || p2.getArtifactId() == null )
-            {
-                throw new IllegalArgumentException();
-            }
-
-            return p1.getArtifactId().compareTo( p2.getArtifactId() );
-        }
-    }
-
 }

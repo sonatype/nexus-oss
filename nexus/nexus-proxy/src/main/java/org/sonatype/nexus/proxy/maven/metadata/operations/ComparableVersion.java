@@ -1,4 +1,4 @@
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

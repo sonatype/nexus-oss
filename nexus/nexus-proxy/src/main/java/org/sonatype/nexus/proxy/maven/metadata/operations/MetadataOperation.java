@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 

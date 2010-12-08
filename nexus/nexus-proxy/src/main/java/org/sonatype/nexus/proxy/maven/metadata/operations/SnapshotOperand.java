@@ -16,29 +16,29 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
 
 /**
- * Plugin storage
+ * Snapshot storage
  * 
  * @author Oleg Gusakov
- * @version $Id: PluginOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
+ * @version $Id: SnapshotOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
-public class PluginOperand
+public class SnapshotOperand
     extends AbstractOperand
 {
 
-    Plugin plugin;
+    Snapshot snapshot;
 
-    public PluginOperand( Plugin data )
+    public SnapshotOperand( Snapshot data )
     {
-        this.plugin = data;
+        this.snapshot = data;
     }
 
-    public Plugin getOperand()
+    public Snapshot getOperand()
     {
-        return plugin;
+        return snapshot;
     }
 }

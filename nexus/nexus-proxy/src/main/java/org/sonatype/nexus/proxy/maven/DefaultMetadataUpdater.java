@@ -22,21 +22,21 @@ import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
-import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
-import org.apache.maven.mercury.repository.metadata.AddVersionOperation;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.MetadataOperation;
-import org.apache.maven.mercury.repository.metadata.PluginOperand;
-import org.apache.maven.mercury.repository.metadata.SetSnapshotOperation;
-import org.apache.maven.mercury.repository.metadata.SnapshotOperand;
-import org.apache.maven.mercury.repository.metadata.StringOperand;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.item.StorageCollectionItem;
+import org.sonatype.nexus.proxy.maven.metadata.operations.AddPluginOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.AddVersionOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.PluginOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
 
 @Component( role = MetadataUpdater.class )
 public class DefaultMetadataUpdater

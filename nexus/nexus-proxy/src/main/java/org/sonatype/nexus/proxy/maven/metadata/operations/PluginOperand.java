@@ -16,34 +16,29 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
-import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
 
 /**
+ * Plugin storage
+ * 
  * @author Oleg Gusakov
- * @version $Id: MetadataOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
+ * @version $Id: PluginOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
-public class MetadataOperand
+public class PluginOperand
     extends AbstractOperand
 {
 
-    Metadata metadata;
+    Plugin plugin;
 
-    public MetadataOperand( Metadata data )
+    public PluginOperand( Plugin data )
     {
-        if ( data == null )
-        {
-            this.metadata = new Metadata();
-        }
-        else
-        {
-            this.metadata = data;
-        }
+        this.plugin = data;
     }
 
-    public Metadata getOperand()
+    public Plugin getOperand()
     {
-        return metadata;
+        return plugin;
     }
 }

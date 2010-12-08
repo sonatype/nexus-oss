@@ -7,11 +7,11 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
-import org.apache.maven.mercury.repository.metadata.AddPluginOperation;
-import org.apache.maven.mercury.repository.metadata.MetadataBuilder;
-import org.apache.maven.mercury.repository.metadata.MetadataException;
-import org.apache.maven.mercury.repository.metadata.MetadataOperation;
-import org.apache.maven.mercury.repository.metadata.PluginOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.AddPluginOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.PluginOperand;
 
 /**
  * Process maven metadata in plugin group directory

@@ -16,16 +16,31 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 /**
- *
- *
+ * String storage
+ * 
  * @author Oleg Gusakov
- * @version $Id: AbstractOperand.java 720564 2008-11-25 18:58:02Z ogusakov $
- *
+ * @version $Id: StringOperand.java 726701 2008-12-15 14:31:34Z hboutemy $
  */
-public abstract class AbstractOperand
+public class StringOperand
+    extends AbstractOperand
 {
 
+    private String str;
+
+    public StringOperand( String data )
+    {
+        if ( data == null || data.length() < 1 )
+        {
+            throw new IllegalArgumentException();
+        }
+        this.str = data;
+    }
+
+    public String getOperand()
+    {
+        return str;
+    }
 }

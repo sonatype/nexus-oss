@@ -6,9 +6,9 @@
  *  to you under the Apache License, Version 2.0 (the
  *  "License"); you may not use this file except in compliance
  *  with the License.  You may obtain a copy of the License at
- *
+ * 
  *   http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  *  Unless required by applicable law or agreed to in writing,
  *  software distributed under the License is distributed on an
  *  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -16,31 +16,16 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.repository.metadata;
-
-import java.util.Comparator;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 /**
- * version comparator used elsewhere to keep version collections sorted
+ *
  *
  * @author Oleg Gusakov
- * @version $Id: VersionComparator.java 744245 2009-02-13 21:23:44Z hboutemy $
+ * @version $Id: AbstractOperand.java 720564 2008-11-25 18:58:02Z ogusakov $
+ *
  */
-public class VersionComparator
-    implements Comparator<String>
+public abstract class AbstractOperand
 {
-
-    public int compare( String v1, String v2 )
-    {
-        if ( v1 == null || v2 == null )
-        {
-            throw new IllegalArgumentException();
-        }
-
-        ComparableVersion av1 = new ComparableVersion( v1 );
-        ComparableVersion av2 = new ComparableVersion( v2 );
-
-        return av1.compareTo( av2 );
-    }
 
 }

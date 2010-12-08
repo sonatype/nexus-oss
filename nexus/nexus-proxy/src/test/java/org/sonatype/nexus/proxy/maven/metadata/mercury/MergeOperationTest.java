@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.mercury.repository.metadata.MetadataOperand;
-import org.apache.maven.mercury.repository.metadata.NexusMergeOperation;
 import org.codehaus.plexus.PlexusTestCase;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.NexusMergeOperation;
 
 public class MergeOperationTest
     extends PlexusTestCase
