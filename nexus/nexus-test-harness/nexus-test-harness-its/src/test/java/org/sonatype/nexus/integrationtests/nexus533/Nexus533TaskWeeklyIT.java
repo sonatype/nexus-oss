@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.integrationtests.nexus533;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -20,8 +21,6 @@ import org.apache.commons.lang.time.DateUtils;
 import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.rest.model.ScheduledServiceWeeklyResource;
 import org.sonatype.nexus.tasks.descriptors.UpdateIndexTaskDescriptor;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Nexus533TaskWeeklyIT
     extends AbstractNexusTasksIntegrationIT<ScheduledServiceWeeklyResource>
