@@ -73,28 +73,38 @@ public class DefaultMacPlugin
     {
         IteratorSearchResponse infos = listArchetypes( request, ctx );
 
-        ArchetypeCatalog catalog = new ArchetypeCatalog();
-
-        Archetype archetype = null;
-
-        // fill it in
-        for ( ArtifactInfo info : infos )
+        try
         {
-            archetype = new Archetype();
-            archetype.setGroupId( info.groupId );
-            archetype.setArtifactId( info.artifactId );
-            archetype.setVersion( info.version );
-            archetype.setDescription( info.description );
+            ArchetypeCatalog catalog = new ArchetypeCatalog();
 
-            if ( StringUtils.isNotEmpty( request.getRepositoryUrl() ) )
+            Archetype archetype = null;
+
+            // fill it in
+            for ( ArtifactInfo info : infos )
             {
-                archetype.setRepository( request.getRepositoryUrl() );
+                archetype = new Archetype();
+                archetype.setGroupId( info.groupId );
+                archetype.setArtifactId( info.artifactId );
+                archetype.setVersion( info.version );
+                archetype.setDescription( info.description );
+
+                if ( StringUtils.isNotEmpty( request.getRepositoryUrl() ) )
+                {
+                    archetype.setRepository( request.getRepositoryUrl() );
+                }
+
+                catalog.addArchetype( archetype );
             }
 
-            catalog.addArchetype( archetype );
+            return catalog;
         }
-
-        return catalog;
+        finally
+        {
+            if ( infos != null )
+            {
+                infos.close();
+            }
+        }
     }
 
     public String listArchetypesAsCatalogXML( MacRequest request, IndexingContext ctx )

@@ -19,7 +19,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spice-inject-plexus.version>1.4.3</spice-inject-plexus.version>
     <plexus.version>1.5.4</plexus.version>
-    <maven-indexer.version>3.1.0-SNAPSHOT</maven-indexer.version>
+    <maven-indexer.version>3.2.0-SNAPSHOT</maven-indexer.version>
   </properties>
 
   <dependencies>
