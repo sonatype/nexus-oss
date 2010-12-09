@@ -61,7 +61,7 @@ public class SecurityConfigurationUpgradeTest
         // security should be upgraded now. lets look at the security.xml
         String securityXML = FileUtils.fileRead( getNexusSecurityConfiguration() );
 
-        Assert.assertEquals( expected, securityXML );
+        Assert.assertEquals( expected.replace( "\r", "" ), securityXML.replace( "\r", "" ) );
 
     }
 
