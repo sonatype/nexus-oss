@@ -41,7 +41,7 @@ public class SetVersionOperation
         setOperand( data );
     }
 
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
         if ( data == null || !( data instanceof StringOperand ) )

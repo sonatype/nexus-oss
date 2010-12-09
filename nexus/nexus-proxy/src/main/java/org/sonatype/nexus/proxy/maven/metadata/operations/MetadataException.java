@@ -23,4 +23,9 @@ public class MetadataException
         super( e );
     }
 
+    public MetadataException( String msg, Exception e )
+    {
+        super( msg, e );
+    }
+
 }

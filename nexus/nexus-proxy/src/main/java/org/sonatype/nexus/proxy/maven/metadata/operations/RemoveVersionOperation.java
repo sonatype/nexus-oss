@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.mercury.util.TimeUtil;
 
 /**
  * removes a version from Metadata
@@ -45,7 +44,7 @@ public class RemoveVersionOperation
         setOperand( data );
     }
 
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
         if ( data == null || !( data instanceof StringOperand ) )

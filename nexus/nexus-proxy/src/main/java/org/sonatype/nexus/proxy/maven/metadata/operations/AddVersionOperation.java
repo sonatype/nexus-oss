@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.mercury.util.TimeUtil;
 
 /**
  * adds new version to metadata
@@ -47,7 +46,7 @@ public class AddVersionOperation
         setOperand( data );
     }
   
-  public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
         if ( data == null || !( data instanceof StringOperand ) )

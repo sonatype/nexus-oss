@@ -18,7 +18,11 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 
 /**
  * Snapshot storage
@@ -30,15 +34,29 @@ public class SnapshotOperand
     extends AbstractOperand
 {
 
-    Snapshot snapshot;
+    private Snapshot snapshot;
 
-    public SnapshotOperand( Snapshot data )
+    private List<SnapshotVersion> snapshotVersions;
+
+    public SnapshotOperand( Snapshot data, SnapshotVersion... snapshotVersions )
     {
-        this.snapshot = data;
+        this( data, Arrays.asList( snapshotVersions ) );
     }
 
-    public Snapshot getOperand()
+    public SnapshotOperand( Snapshot data, List<SnapshotVersion> snapshotVersions )
+    {
+        this.snapshot = data;
+        this.snapshotVersions = snapshotVersions;
+    }
+
+    public Snapshot getSnapshot()
     {
         return snapshot;
     }
+
+    public List<SnapshotVersion> getSnapshotVersions()
+    {
+        return snapshotVersions;
+    }
+
 }

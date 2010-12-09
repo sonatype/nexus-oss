@@ -16,7 +16,7 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.maven.mercury.util;
+package org.sonatype.nexus.proxy.maven.metadata.operations;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -92,20 +92,54 @@ public class TimeUtil
     public static long toMillis( String ts )
         throws ParseException
     {
-        Date dts = TS_FORMAT.parse( ts );
+        Date dts = toDate( ts );
 
         return dts.getTime();
     }
 
-    public static void main( String[] args ) throws Exception
+    static Date toDate( String ts )
+        throws ParseException
     {
-        if( args == null || args.length < 0 )
-            return;
-        
-        if( "-t".equals( args[0] ) )
+        Date dts = TS_FORMAT.parse( ts );
+        return dts;
+    }
+
+    public static void main( String[] args )
+        throws Exception
+    {
+        if ( args == null || args.length < 0 )
         {
-            System.out.println( args[1]+" => " + new Date( toMillis( args[1] ) ) ) ;
             return;
         }
+
+        if ( "-t".equals( args[0] ) )
+        {
+            System.out.println( args[1] + " => " + new Date( toMillis( args[1] ) ) );
+            return;
+        }
+    }
+
+    public static int compare( String t1, String t2 )
+        throws ParseException
+    {
+        if ( t1 == t2 )
+        {
+            return 0;
+        }
+
+        if ( t1 == null )
+        {
+            return -1;
+        }
+
+        if ( t2 == null )
+        {
+            return 1;
+        }
+
+        Date d1 = toDate( t1 );
+        Date d2 = toDate( t2 );
+
+        return d1.compareTo( d2 );
     }
 }

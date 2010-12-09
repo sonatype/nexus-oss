@@ -176,7 +176,7 @@ public class MergeOperation
         return changed;
     }
 
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
         if ( data == null || !( data instanceof MetadataOperand ) )

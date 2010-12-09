@@ -23,7 +23,6 @@ public class NexusMergeOperation
     /**
      * always return true (known issue)
      */
-    @SuppressWarnings( "unchecked" )
     public boolean perform( Metadata targetMetadata )
         throws MetadataException
     {
@@ -158,7 +157,8 @@ public class NexusMergeOperation
                     
                     if ( sourceTimestamp > timestamp )
                     {
-                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceSnapshot ) ) );    
+                        ops.add( new SetSnapshotOperation( new SnapshotOperand( sourceSnapshot,
+                            sourceMetadata.getVersioning().getSnapshotVersions() ) ) );
                     }
                 }
             }
@@ -176,7 +176,7 @@ public class NexusMergeOperation
         return true;
     }
 
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
         if ( data == null || !( data instanceof MetadataOperand ) )

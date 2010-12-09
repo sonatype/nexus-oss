@@ -14,11 +14,15 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.M2GavCalculator;
 
 /**
  * @author juven
@@ -74,7 +78,9 @@ public class MetadataHelperTest
 
         snapshotArtifacts.add( "nexus-api-1.2.0-20081022.180215-1.pom" );
         snapshotArtifacts.add( "nexus-api-1.2.0-20081022.182430-2.pom" );
-        snapshotArtifacts.add( "nexus-api-1.2.0-20081022.184527-3.pom" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081022.184527-3.tar.gz" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081023.152127-4.jar" );
+        snapshotArtifacts.add( "nexus-api-1.2.0-20081024.111337-23-sources.jar" );
         snapshotArtifacts.add( "nexus-api-1.2.0-20081025.143218-32.pom" );
         snapshotArtifacts.add( "nexus-api-1.2.0-SNAPSHOT.pom" );
 
@@ -82,10 +88,56 @@ public class MetadataHelperTest
         metadata.setGroupId( "org.sonatype.nexus" );
         metadata.setArtifactId( "nexus-api" );
         metadata.setVersion( "1.2.0-SNAPSHOT" );
-        new VersionDirMetadataProcessor( null ).versioning( metadata, snapshotArtifacts );
+        new VersionDirMetadataProcessor( null ).versioning( metadata, toGavs( snapshotArtifacts ) );
 
         assertEquals( "20081025.143218", metadata.getVersioning().getSnapshot().getTimestamp() );
         assertEquals( 32, metadata.getVersioning().getSnapshot().getBuildNumber() );
+
+        List<SnapshotVersion> snapshots = metadata.getVersioning().getSnapshotVersions();
+        assertEquals( 4, snapshots.size() );
+
+        for ( SnapshotVersion snap : snapshots )
+        {
+            if ( snap.getClassifier() == null && "pom".equals( snap.getExtension() ) )
+            {
+                assertEquals( "20081025143218", snap.getUpdated() );
+                assertEquals( "1.2.0-20081025.143218-32", snap.getVersion() );
+            }
+            else if ( snap.getClassifier() == null && "jar".equals( snap.getExtension() ) )
+            {
+                assertEquals( "20081023152127", snap.getUpdated() );
+                assertEquals( "1.2.0-20081023.152127-4", snap.getVersion() );
+            }
+            else if ( snap.getClassifier() == null && "tar.gz".equals( snap.getExtension() ) )
+            {
+                assertEquals( "20081022184527", snap.getUpdated() );
+                assertEquals( "1.2.0-20081022.184527-3", snap.getVersion() );
+            }
+            else if ( "sources".equals( snap.getClassifier() ) && "jar".equals( snap.getExtension() ) )
+            {
+                assertEquals( "20081024111337", snap.getUpdated() );
+                assertEquals( "1.2.0-20081024.111337-23", snap.getVersion() );
+            }
+            else
+            {
+                fail( "Unexpected e:" + snap.getExtension() + " c:" + snap.getClassifier() );
+            }
+        }
+    }
+
+    private Collection<Gav> toGavs( List<String> items )
+        throws Exception
+    {
+        String path = "org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/";
+        M2GavCalculator calc = new M2GavCalculator();
+
+        List<Gav> gavs = new ArrayList<Gav>();
+        for ( String item : items )
+        {
+            gavs.add( calc.pathToGav( path + item ) );
+        }
+
+        return gavs;
     }
 
 }

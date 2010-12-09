@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.codehaus.plexus.component.annotations.Component;
@@ -37,6 +38,7 @@ import org.sonatype.nexus.proxy.maven.metadata.operations.PluginOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 
 @Component( role = MetadataUpdater.class )
 public class DefaultMetadataUpdater
@@ -79,8 +81,8 @@ public class DefaultMetadataUpdater
             // GAV metadata is only meaningful to snapshot artifacts
             if ( gav.isSnapshot() )
             {
-                operations.add( new SetSnapshotOperation( new SnapshotOperand( MetadataBuilder.createSnapshot( request
-                    .getVersion() ) ) ) );
+                operations.add( new SetSnapshotOperation( new SnapshotOperand(
+                    MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
 
                 MetadataBuilder.changeMetadata( gavMd, operations );
 
@@ -126,6 +128,16 @@ public class DefaultMetadataUpdater
         }
     }
 
+    private SnapshotVersion buildVersioning( Gav gav )
+    {
+        SnapshotVersion version = new SnapshotVersion();
+        version.setClassifier( gav.getClassifier() );
+        version.setExtension( gav.getExtension() );
+        version.setVersion( gav.getVersion() );
+        version.setUpdated( TimeUtil.getUTCTimestamp() );
+        return version;
+    }
+
     public void undeployArtifact( ArtifactStoreRequest request )
         throws IOException, IllegalArtifactCoordinateException
     {
@@ -158,8 +170,8 @@ public class DefaultMetadataUpdater
 
             if ( gav.isSnapshot() )
             {
-                operations.add( new SetSnapshotOperation( new SnapshotOperand( MetadataBuilder.createSnapshot( request
-                    .getVersion() ) ) ) );
+                operations.add( new SetSnapshotOperation( new SnapshotOperand(
+                    MetadataBuilder.createSnapshot( request.getVersion() ), buildVersioning( gav ) ) ) );
             }
 
             MetadataBuilder.changeMetadata( gavMd, operations );

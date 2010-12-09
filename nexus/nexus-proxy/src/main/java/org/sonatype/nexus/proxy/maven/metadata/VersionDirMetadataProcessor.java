@@ -6,12 +6,18 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
+import org.apache.maven.index.artifact.Gav;
+import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.M2GavCalculator;
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
-import org.sonatype.nexus.proxy.maven.metadata.operations.StringOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
+import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
 
 /**
  * Process maven metadata in snapshot version directory
@@ -68,9 +74,28 @@ public class VersionDirMetadataProcessor
 
         md.setVersion( calculateVersion( path ) );
 
-        versioning( md, metadataHelper.gavData.get( path ) );
+        versioning( md, getGavs( path, metadataHelper.gavData.get( path ) ) );
 
         return md;
+    }
+
+    private Collection<Gav> getGavs( String path, Collection<String> items )
+        throws IllegalArtifactCoordinateException
+    {
+        if ( !path.endsWith( "/" ) )
+        {
+            path = path + "/";
+        }
+        M2GavCalculator calc = new M2GavCalculator();
+
+        List<Gav> gavs = new ArrayList<Gav>();
+        for ( String item : items )
+        {
+            Gav gav = calc.pathToGav( path + item );
+            gavs.add( gav );
+        }
+
+        return gavs;
     }
 
     private String calculateGroupId( String path )
@@ -92,17 +117,68 @@ public class VersionDirMetadataProcessor
         return path.substring( path.lastIndexOf( '/' ) + 1 );
     }
 
-    void versioning( Metadata metadata, Collection<String> artifactNames )
+    void versioning( Metadata metadata, Collection<Gav> artifactNames )
         throws MetadataException
     {
         List<MetadataOperation> ops = new ArrayList<MetadataOperation>();
 
-        for ( String artifactName : artifactNames )
+        for ( Gav gav : artifactNames )
         {
-            ops.add( new SetSnapshotOperation( new StringOperand( artifactName ) ) );
+            ops.add( new SetSnapshotOperation( new SnapshotOperand( buildSnapshot( gav ), buildVersion( gav ) ) ) );
         }
 
         MetadataBuilder.changeMetadata( metadata, ops );
+    }
+
+    private SnapshotVersion[] buildVersion( Gav gav )
+        throws MetadataException
+    {
+        if ( gav.getBaseVersion().equals( gav.getVersion() ) )
+        {
+            return new SnapshotVersion[0];
+        }
+
+        SnapshotVersion snap = new SnapshotVersion();
+        snap.setClassifier( gav.getClassifier() );
+        snap.setExtension( gav.getExtension() );
+        snap.setVersion( gav.getVersion() );
+
+        Snapshot timestamp = buildSnapshot( gav );
+        if ( timestamp != null )
+        {
+            snap.setUpdated( timestamp.getTimestamp().replace( ".", "" ) );
+        }
+        else
+        {
+            snap.setUpdated( TimeUtil.getUTCTimestamp().replace( ".", "" ) );
+        }
+        return new SnapshotVersion[] { snap };
+    }
+
+    private Snapshot buildSnapshot( Gav gav )
+    {
+        Snapshot result = new Snapshot();
+
+        final String version = gav.getVersion();
+
+        if ( version.equals( gav.getBaseVersion() ) )
+        {
+            return null;
+        }
+
+        int lastHyphenPos = version.lastIndexOf( '-' );
+
+        int buildNumber = Integer.parseInt( version.substring( lastHyphenPos + 1 ) );
+
+        String timestamp = version.substring( gav.getBaseVersion().length() - 8, lastHyphenPos );
+
+        result.setLocalCopy( false );
+
+        result.setBuildNumber( buildNumber );
+
+        result.setTimestamp( timestamp );
+
+        return result;
     }
 
     @Override
@@ -129,10 +205,9 @@ public class VersionDirMetadataProcessor
             && StringUtils.equals( oldMd.getVersion(), md.getVersion() )
             && md.getVersioning() != null
             && md.getVersioning().getSnapshot() != null
-            && StringUtils.equals( oldMd.getVersioning().getSnapshot().getTimestamp(), md.getVersioning().getSnapshot()
-                .getTimestamp() )
-            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md.getVersioning().getSnapshot()
-                .getBuildNumber() )
+            && StringUtils.equals( oldMd.getVersioning().getSnapshot().getTimestamp(),
+                md.getVersioning().getSnapshot().getTimestamp() )
+            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md.getVersioning().getSnapshot().getBuildNumber() )
         {
             return true;
         }

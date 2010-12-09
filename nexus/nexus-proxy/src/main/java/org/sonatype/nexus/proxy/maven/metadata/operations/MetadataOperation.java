@@ -32,7 +32,7 @@ public interface MetadataOperation
     /**
      *  sets the operation's data
      */
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException;
   
     /**

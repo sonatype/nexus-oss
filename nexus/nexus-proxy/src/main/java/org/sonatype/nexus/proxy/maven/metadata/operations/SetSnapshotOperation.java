@@ -18,10 +18,13 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import java.text.ParseException;
+import java.util.List;
+
 import org.apache.maven.artifact.repository.metadata.Metadata;
-import org.apache.maven.artifact.repository.metadata.Snapshot;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.apache.maven.mercury.util.TimeUtil;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * adds new snapshot to metadata
@@ -33,9 +36,7 @@ public class SetSnapshotOperation
     implements MetadataOperation
 {
 
-    private Snapshot snapshot;
-    
-    private String snapshotPomName;
+    private SnapshotOperand operand;
 
     /**
      * @throws MetadataException
@@ -45,30 +46,16 @@ public class SetSnapshotOperation
     {
         setOperand( data );
     }
-    
-    public SetSnapshotOperation( StringOperand data )
-    	throws MetadataException
-    {
-    	setOperand( data );
-    }
 
-    public void setOperand( Object data )
+    public void setOperand( AbstractOperand data )
         throws MetadataException
     {
-        if ( data != null && data instanceof SnapshotOperand  )
-        {
-        	snapshot = ( (SnapshotOperand) data ).getOperand();
-        }
-        else if ( data != null && data instanceof StringOperand )
-        {
-        	snapshotPomName = ( (StringOperand) data ).getOperand();
-        }
-        else
+        if ( data == null || !( data instanceof SnapshotOperand ) )
         {
             throw new MetadataException( "Operand is not correct: expected SnapshotOperand, but got "
                 + ( data == null ? "null" : data.getClass().getName() ) );
         }
-
+        this.operand = (SnapshotOperand) data;
     }
 
     /**
@@ -85,7 +72,7 @@ public class SetSnapshotOperation
         {
             return false;
         }
-        
+
         Versioning vs = metadata.getVersioning();
 
         if ( vs == null )
@@ -94,99 +81,61 @@ public class SetSnapshotOperation
 
             metadata.setVersioning( vs );
         }
-        
-        if ( snapshotPomName != null )
-        {
-        	return updateSnapshot( snapshotPomName, metadata );
-        }
-        else
-        {
-        	return updateSnapshot( snapshot, vs );
-        }
-        
+
+        return updateSnapshot( vs );
     }
-    
-    private boolean updateSnapshot( String snapshotVersion, Metadata metadata )
+
+    private boolean updateSnapshot( Versioning vs )
+        throws MetadataException
     {
-    	Snapshot snapshot = buildSnapshot( snapshotVersion, metadata );
-    	
-    	Snapshot oldSnapshot = metadata.getVersioning().getSnapshot();
-    	
-    	if ( needUpdateSnapshot( oldSnapshot, snapshot) )
-    	{
-    		return updateSnapshot( snapshot, metadata.getVersioning() );
-    	}
-    	
-    	return false;
-    	
-    	
-    }
-    
-    private boolean updateSnapshot( Snapshot snapshot, Versioning vs )
-    {
-    	vs.setSnapshot( snapshot );
-    	
-    	vs.setLastUpdated( TimeUtil.getUTCTimestamp() );
-    	
-    	return true;
-    }
-    
-    private boolean needUpdateSnapshot( Snapshot oldSnapshot, Snapshot newSnapshot )
-    {
-    	if ( newSnapshot == null )
-    	{
-    		return false;
-    	}
-    	
-    	if ( oldSnapshot == null )
-    	{
-    		return true;
-    	}
-    	
-    	if ( oldSnapshot.getBuildNumber() < newSnapshot.getBuildNumber() )
-    	{
-    		return true;
-    	}
-    	
-    	return false;
-    }
-    
-    private Snapshot buildSnapshot( String pomName, Metadata md )
-    {
-        // skip files like groupId-artifactId-versionSNAPSHOT.pom
-        if ( pomName.endsWith( "SNAPSHOT.pom" ) )
+        if ( operand.getSnapshot() != null )
         {
-            return null;
+            vs.setSnapshot( operand.getSnapshot() );
         }
-        
-        Snapshot result = new Snapshot();
-        
-        int lastHyphenPos = pomName.lastIndexOf( '-' );
-        
-        try
+
+        vs.setLastUpdated( TimeUtil.getUTCTimestamp() );
+
+        List<SnapshotVersion> extras = operand.getSnapshotVersions();
+        List<SnapshotVersion> currents = vs.getSnapshotVersions();
+        for ( SnapshotVersion extra : extras )
         {
-            int buildNumber = Integer.parseInt( pomName.substring(
-                lastHyphenPos + 1,
-                pomName.length() - 4 ) );
-            
-            String timestamp = pomName.substring( ( md.getArtifactId() + '-' + md.getVersion() + '-' )
-                    .length()
-                    - "-SNAPSHOT".length(), lastHyphenPos );
-            
-            result.setLocalCopy( false );
-            
-            result.setBuildNumber( buildNumber );
-            
-            result.setTimestamp( timestamp );
-            
-            return result;
+            SnapshotVersion current = getCurrent( extra, currents );
+            if ( current == null )
+            {
+                currents.add( extra );
+            }
+            else
+            {
+                try
+                {
+                    if ( TimeUtil.compare( current.getUpdated(), extra.getUpdated() ) < 0 )
+                    {
+                        currents.remove( current );
+                        currents.add( extra );
+                    }
+                }
+                catch ( ParseException e )
+                {
+                    throw new MetadataException(
+                        "Invalid timetamp: " + current.getUpdated() + "-" + extra.getUpdated(), e );
+                }
+            }
         }
-        catch ( Exception e )
+
+        return true;
+    }
+
+    private SnapshotVersion getCurrent( SnapshotVersion exVersion, List<SnapshotVersion> current )
+    {
+        for ( SnapshotVersion curVersion : current )
         {
-            // skip any exception because of illegal version numbers
-        	return null;
-        }        
-        
+            if ( StringUtils.equals( exVersion.getClassifier(), curVersion.getClassifier() )
+                && StringUtils.equals( exVersion.getExtension(), curVersion.getExtension() ) )
+            {
+                return curVersion;
+            }
+        }
+        return null;
     }
 
 }
