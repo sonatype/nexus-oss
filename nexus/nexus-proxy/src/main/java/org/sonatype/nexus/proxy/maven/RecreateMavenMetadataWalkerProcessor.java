@@ -49,9 +49,8 @@ public class RecreateMavenMetadataWalkerProcessor
     {
         isHostedRepo = false;
 
-        repository = context.getRepository() instanceof MavenRepository
-            ? (MavenRepository) context.getRepository()
-            : null;
+        repository =
+            context.getRepository() instanceof MavenRepository ? (MavenRepository) context.getRepository() : null;
 
         if ( repository != null )
         {

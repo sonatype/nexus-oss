@@ -81,7 +81,14 @@ public abstract class AbstractMetadataProcessor
         }
         catch ( MetadataException e )
         {
-            metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'", e );
+            if ( metadataHelper.logger.isDebugEnabled() )
+            {
+                metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'", e );
+            }
+            else
+            {
+                metadataHelper.logger.info( "Failed to parse metadata from '" + path + "'" );
+            }
 
             return null;
         }

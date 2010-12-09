@@ -639,7 +639,7 @@ public class RecreateMavenMetadataWalkerTest
         expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom", Boolean.TRUE );
         expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj1/1.0/proj1-1.0.pom.sha1", Boolean.TRUE );
-        expected.put( "/com/mycom/proj5/maven-metadata.xml", Boolean.FALSE );
+        expected.put( "/com/mycom/proj5/maven-metadata.xml", Boolean.TRUE );
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar", Boolean.TRUE );
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.jar.sha1", Boolean.TRUE );

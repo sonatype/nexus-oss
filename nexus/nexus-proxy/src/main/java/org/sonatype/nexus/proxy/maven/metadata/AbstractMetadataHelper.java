@@ -23,7 +23,7 @@ import java.util.Map;
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.GavCalculator;
-import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
+import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.logging.Logger;
@@ -108,7 +108,7 @@ abstract public class AbstractMetadataHelper
 
         rebuildChecksum( path );
 
-        if ( path.endsWith( "pom" ) )
+        if ( !M2ArtifactRecognizer.isMetadata( path ) )
         {
             updateMavenInfo( path );
         }
@@ -147,74 +147,112 @@ abstract public class AbstractMetadataHelper
     protected void updateMavenInfo( String path )
         throws Exception
     {
-        Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
-
-        MavenXpp3Reader xpp3 = new MavenXpp3Reader();
-
-        Model model = null;
-
-        try
-        {
-            model = xpp3.read( reader );
-        }
-        catch ( Exception e )
-        {
-            throw new Exception( "Unable to parse POM model from '" + path + "'.", e );
-        }
-        finally
-        {
-            reader.close();
-
-            reader = null;
-        }
-
         // groupId, artifactId, version, artifactName
-        String g, a, v, n;
-
-        g = model.getGroupId() == null ? model.getParent().getGroupId() : model.getGroupId();
-        a = model.getArtifactId();
-        v = model.getVersion() == null ? model.getParent().getVersion() : model.getVersion();
+        String g = null;
+        String a = null;
+        String v = null;
+        String n = null;
         n = path.substring( path.lastIndexOf( '/' ) + 1 );
 
-        // if the pom could not provide good values, parse GAV from path
-        if ( isInpropriateValue( g ) || isInpropriateValue( a ) || isInpropriateValue( v ) )
+        Gav gav = getGavCalculator().pathToGav( path );
+        if ( gav != null )
         {
+            g = gav.getGroupId();
+            a = gav.getArtifactId();
+            v = gav.getBaseVersion();
+        }
+        else
+        {
+            logger.warn( "Unable to parse good GAV values. Path: '" + path + "'. GAV: '" + g + ":" + a + ":" + v + "'" );
+        }
+
+        Model model = null;
+        if ( path.endsWith( "pom" ) )
+        {
+            Reader reader = ReaderFactory.newXmlReader( retrieveContent( path ) );
+
+            MavenXpp3Reader xpp3 = new MavenXpp3Reader();
+
             try
             {
-                Gav gav = getGavCalculator().pathToGav( path );
+                model = xpp3.read( reader );
 
-                if ( isInpropriateValue( g ) )
+                String mg = model.getGroupId() == null ? model.getParent().getGroupId() : model.getGroupId();
+                String ma = model.getArtifactId();
+                String mv = model.getVersion() == null ? model.getParent().getVersion() : model.getVersion();
+
+                // if the pom could provide good values
+                if ( !isInpropriateValue( mg ) )
                 {
-                    g = gav.getGroupId();
+                    g = mg;
                 }
-
-                if ( isInpropriateValue( a ) )
+                if ( !isInpropriateValue( ma ) )
                 {
-                    a = gav.getArtifactId();
+                    a = ma;
                 }
-
-                if ( isInpropriateValue( v ) )
+                if ( !isInpropriateValue( mv ) )
                 {
-                    v = gav.getBaseVersion();
+                    v = mv;
                 }
             }
-            catch ( IllegalArtifactCoordinateException e )
+            catch ( Exception e )
             {
-                logger.warn( "Unable to parse good GAV values. Path: '" + path + "'. GAV: '" + g + ":" + a + ":" + v
-                    + "'" );
+                // quietly ignore, we still can process this using gav from path
+                logger.debug( "Unable to parse POM model from '" + path + "'.", e );
+                // throw new Exception( "Unable to parse POM model from '" + path + "'.", e );
             }
+            finally
+            {
+                reader.close();
+
+                reader = null;
+            }
+
         }
-        
 
-        // GA
-        String gaPath = "/" + g.replace( '.', '/' ) + "/" + a;
-
-        if ( gaData.get( gaPath ) == null )
+        if ( g == null || a == null || v == null )
         {
-            gaData.put( gaPath, new ArrayList<String>() );
+            logger.warn( "Unable to resolve gav for '" + path + "'. g:" + g + " a:" + a + " v:" + v );
+            return;
         }
 
-        gaData.get( gaPath ).add( v );
+        if ( path.endsWith( "pom" ) )
+        {
+            // G
+            if ( model != null && model.getPackaging().equals( "maven-plugin" ) )
+            {
+                Plugin plugin = new Plugin();
+
+                plugin.setArtifactId( a );
+
+                plugin.setPrefix( getPluginPrefix( a ) );
+
+                if ( !StringUtils.isEmpty( model.getName() ) )
+                {
+                    plugin.setName( model.getName() );
+                }
+
+                String gPath = "/" + g.replace( '.', '/' );
+
+                if ( gData.get( gPath ) == null )
+                {
+                    gData.put( gPath, new ArrayList<Plugin>() );
+                }
+
+                gData.get( gPath ).add( plugin );
+            }
+
+            // GA
+            String gaPath = "/" + g.replace( '.', '/' ) + "/" + a;
+
+            if ( gaData.get( gaPath ) == null )
+            {
+                gaData.put( gaPath, new ArrayList<String>() );
+            }
+
+            gaData.get( gaPath ).add( v );
+
+        }
 
         // GAV
         if ( v.endsWith( "SNAPSHOT" ) )
@@ -227,30 +265,6 @@ abstract public class AbstractMetadataHelper
             }
 
             gavData.get( gavPath ).add( n );
-        }
-
-        // G
-        if ( model.getPackaging().equals( "maven-plugin" ) )
-        {
-            Plugin plugin = new Plugin();
-
-            plugin.setArtifactId( a );
-
-            plugin.setPrefix( getPluginPrefix( a ) );
-
-            if ( !StringUtils.isEmpty( model.getName() ) )
-            {
-                plugin.setName( model.getName() );
-            }
-
-            String gPath = "/" + g.replace( '.', '/' );
-
-            if ( gData.get( gPath ) == null )
-            {
-                gData.put( gPath, new ArrayList<Plugin>() );
-            }
-
-            gData.get( gPath ).add( plugin );
         }
     }
 
@@ -368,7 +382,7 @@ abstract public class AbstractMetadataHelper
      */
     abstract public boolean exists( String path )
         throws Exception;
-    
+
     abstract protected GavCalculator getGavCalculator();
 
 }
