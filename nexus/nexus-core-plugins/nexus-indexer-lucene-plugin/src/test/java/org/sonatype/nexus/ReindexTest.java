@@ -137,10 +137,10 @@ public class ReindexTest
                     }
                 }
             }
-
-            iw.optimize();
-
-            iw.close();
+            
+            ctx.optimize();
+            
+            ctx.commit();
 
             // shift timestamp too
             if ( ctx.getTimestamp() != null )

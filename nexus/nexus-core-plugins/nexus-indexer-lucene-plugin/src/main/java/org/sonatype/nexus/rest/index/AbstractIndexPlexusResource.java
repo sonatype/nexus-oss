@@ -13,6 +13,7 @@
  */
 package org.sonatype.nexus.rest.index;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -162,63 +163,85 @@ public abstract class AbstractIndexPlexusResource
         {
             try
             {
-                searchResult =
-                    searchByTerms( terms, getRepositoryId( request ), from, count == null ? 500 : count, exact,
-                        expandVersion, expandPackaging, expandClassifier, collapseResults );
-
-                // non-identify search happened
-                boolean tooManyResults = searchResult.isHitLimitExceeded();
-
-                result.setTooManyResults( tooManyResults );
-
-                result.setTotalCount( searchResult.getTotalHits() );
-
-                result.setFrom( from == null ? -1 : from.intValue() );
-
-                result.setCount( count == null ? -1 : count );
-
-                if ( tooManyResults )
+                try
                 {
-                    result.setData( new ArrayList<NexusArtifact>() );
-                }
-                else
-                {
-                    result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
+                    searchResult =
+                        searchByTerms( terms, getRepositoryId( request ), from, count == null ? 500 : count, exact,
+                            expandVersion, expandPackaging, expandClassifier, collapseResults );
 
-                    // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results, and
-                    // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
-                    // and full result set is smaller than HIT_LIMIT
-                    // then repeat without collapse
-                    if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
-                        && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
-                        && searchResult.getTotalHits() < HIT_LIMIT )
+                    // non-identify search happened
+                    boolean tooManyResults = searchResult.isHitLimitExceeded();
+
+                    result.setTooManyResults( tooManyResults );
+
+                    result.setTotalCount( searchResult.getTotalHits() );
+
+                    result.setFrom( from == null ? -1 : from.intValue() );
+
+                    result.setCount( count == null ? -1 : count );
+
+                    if ( tooManyResults )
                     {
-                        collapseResults = false;
+                        result.setData( new ArrayList<NexusArtifact>() );
+                    }
+                    else
+                    {
+                        result.setData( new ArrayList<NexusArtifact>( ai2NaColl( request, searchResult.getResults() ) ) );
 
-                        continue;
+                        // if we had collapseResults ON, and the totalHits are larger than actual (filtered) results,
+                        // and
+                        // the actual result count is below COLLAPSE_OVERRIDE_TRESHOLD,
+                        // and full result set is smaller than HIT_LIMIT
+                        // then repeat without collapse
+                        if ( collapseResults && result.getData().size() < searchResult.getTotalHits()
+                            && result.getData().size() < COLLAPSE_OVERRIDE_TRESHOLD
+                            && searchResult.getTotalHits() < HIT_LIMIT )
+                        {
+                            collapseResults = false;
+
+                            continue;
+                        }
+                    }
+
+                    // we came here, so we break the while-loop, we got what we need
+                    break;
+                }
+                catch ( NoSuchRepositoryException e )
+                {
+                    throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
+                        + getRepositoryId( request ) + "' does not exists!", e );
+                }
+                catch ( AlreadyClosedException e )
+                {
+                    getLogger().info(
+                        "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
+
+                    if ( getLogger().isDebugEnabled() )
+                    {
+                        // just keep it silent (DEBUG)
+                        getLogger().debug( "Got AlreadyClosedException exception!", e );
+                    }
+
+                    result.setData( null );
+                }
+                finally
+                {
+                    if ( searchResult != null )
+                    {
+                        try
+                        {
+                            searchResult.close();
+                        }
+                        catch ( IOException e )
+                        {
+                            throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
+                        }
                     }
                 }
-
-                // we came here, so we break the while-loop, we got what we need
-                break;
             }
-            catch ( NoSuchRepositoryException e )
+            catch ( IOException e )
             {
-                throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST, "Repository with ID='"
-                    + getRepositoryId( request ) + "' does not exists!", e );
-            }
-            catch ( AlreadyClosedException e )
-            {
-                getLogger().info(
-                    "*** NexusIndexer bug, we got AlreadyClosedException that should never happen with ReadOnly IndexReaders! Please put Nexus into DEBUG log mode and report this issue together with the stack trace!" );
-
-                if ( getLogger().isDebugEnabled() )
-                {
-                    // just keep it silent (DEBUG)
-                    getLogger().debug( "Got AlreadyClosedException exception!", e );
-                }
-
-                result.setData( null );
+                throw new ResourceException( Status.SERVER_ERROR_INTERNAL, e.getMessage(), e );
             }
 
             runCount++;
@@ -242,7 +265,7 @@ public abstract class AbstractIndexPlexusResource
                                                   final Integer from, final Integer count, final Boolean exact,
                                                   final Boolean expandVersion, final Boolean expandPackaging,
                                                   final Boolean expandClassifier, final Boolean collapseResults )
-        throws NoSuchRepositoryException, ResourceException
+        throws NoSuchRepositoryException, ResourceException, IOException
     {
         for ( Searcher searcher : m_searchers )
         {
@@ -306,10 +329,14 @@ public abstract class AbstractIndexPlexusResource
                 {
                     if ( searchResponse.isHitLimitExceeded() )
                     {
+                        searchResponse.close();
+
                         return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
                     }
                     else if ( collapseResults && searchResponse.getTotalHits() < COLLAPSE_OVERRIDE_TRESHOLD )
                     {
+                        searchResponse.close();
+
                         // this was a "collapsed" search (probably initiated by UI), and we have less then treshold hits
                         // override collapse
                         return searchByTerms( terms, repositoryId, from, count, exact, expandVersion, expandPackaging,

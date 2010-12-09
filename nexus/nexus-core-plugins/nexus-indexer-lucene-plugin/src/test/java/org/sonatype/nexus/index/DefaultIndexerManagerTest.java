@@ -90,11 +90,15 @@ public class DefaultIndexerManagerTest
                 null, null, null );
 
         assertEquals( "There should be one hit!", 1, response.getTotalHits() );
+        
+        response.close();
 
         // this will be SCORED search, since we have just part of the SHA1 checksum
         response = indexerManager.searchArtifactSha1ChecksumIterator( "86e12071021", null, null, null, null, null );
 
         assertEquals( "There should be still one hit!", 1, response.getTotalHits() );
+        
+        response.close();
     }
 
     public void testInvalidRemoteUrl()

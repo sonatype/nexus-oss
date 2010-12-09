@@ -68,27 +68,32 @@ public abstract class AbstractIndexerManagerTest
         assertEquals( "Query \"" + query + "\" returned wrong results: " + results + "!", expected, results.size() );
     }
 
-    protected IteratorSearchResponse searchForKeywordNG( String term, int expected )
+    protected void searchForKeywordNG( String term, int expected )
         throws Exception
     {
         IteratorSearchResponse result =
             indexerManager.searchArtifactIterator( term, null, null, null, null, false, SearchType.SCORED, null );
 
-        if ( expected != result.getTotalHits() )
+        try
         {
-            // dump the stuff
-            StringBuilder sb = new StringBuilder( "Found artifacts:\n" );
-
-            for ( ArtifactInfo ai : result )
+            if ( expected != result.getTotalHits() )
             {
-                sb.append( ai.context ).append( " : " ).append( ai.toString() ).append( "\n" );
+                // dump the stuff
+                StringBuilder sb = new StringBuilder( "Found artifacts:\n" );
+
+                for ( ArtifactInfo ai : result )
+                {
+                    sb.append( ai.context ).append( " : " ).append( ai.toString() ).append( "\n" );
+                }
+
+                fail( sb.toString() + "\nUnexpected result set size! We expected " + expected + " but got "
+                    + result.getTotalHits() );
             }
-
-            fail( sb.toString() + "\nUnexpected result set size! We expected " + expected + " but got "
-                + result.getTotalHits() );
         }
-
-        return result;
+        finally
+        {
+            result.close();
+        }
     }
 
     protected void searchFor( String groupId, int expected, String repoId )

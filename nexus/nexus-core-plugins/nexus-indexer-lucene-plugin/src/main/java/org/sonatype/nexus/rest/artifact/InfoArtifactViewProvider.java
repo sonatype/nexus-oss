@@ -72,9 +72,11 @@ public class InfoArtifactViewProvider
             fileItem == null ? null : fileItem.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
         if ( checksum != null )
         {
+            IteratorSearchResponse searchResponse = null;
+            
             try
             {
-                IteratorSearchResponse searchResponse =
+                searchResponse =
                     indexerManager.searchArtifactSha1ChecksumIterator( checksum, null, null, null, null, null );
 
                 for ( ArtifactInfo info : searchResponse )
@@ -86,6 +88,13 @@ public class InfoArtifactViewProvider
             {
                 // should never trigger this exception since I'm searching on all repositories
                 getLogger().error( e.getMessage(), e );
+            }
+            finally
+            {
+                if ( searchResponse != null )
+                {
+                    searchResponse.close();
+                }
             }
         }
 

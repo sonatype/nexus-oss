@@ -493,7 +493,7 @@ public class DefaultIndexerManager
             try
             {
                 // if remote is here and is downloaded, it is the best (it is always the superset of local cache)
-                if ( bestContext.getIndexReader().numDocs() < remoteContext.getIndexReader().numDocs() )
+                if ( bestContext.getSize() < remoteContext.getSize() )
                 {
                     bestContext = remoteContext;
                 }
@@ -1404,12 +1404,12 @@ public class DefaultIndexerManager
                     // rebuild group info
                     groupContext.rebuildGroups();
 
+                    groupContext.updateTimestamp();
+
                     // committing changes
-                    groupContext.getIndexWriter().commit();
+                    groupContext.commit();
 
                     groupContext.optimize();
-
-                    groupContext.updateTimestamp();
                 }
                 finally
                 {
