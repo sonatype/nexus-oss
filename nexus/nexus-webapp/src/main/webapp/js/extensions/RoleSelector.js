@@ -220,7 +220,7 @@ RoleSelectorGrid = function(config) {
         tooltip : 'Add filter that will show roles',
         pressed : true
       });
-      
+
   this.externalRolesFilter = new Ext.Button({
         text : 'External Roles',
         enableToggle : true,
@@ -233,7 +233,7 @@ RoleSelectorGrid = function(config) {
         enableToggle : true,
         tooltip : 'Add filter that will show privileges',
         pressed : true
-      });    
+      });
 
   // toolbar at top
   this.tbar = ['Filter: ', ' ', this.textFilter, '-', this.selectedFilter, '-'];
@@ -456,6 +456,9 @@ Ext.extend(RoleSelectorGrid, Ext.grid.GridPanel, {
       resetFilter : function() {
         this.textFilter.setValue(null);
         this.selectedFilter.toggle(false);
+        this.rolesFilter.toggle(true);
+        this.externalRolesFilter.toggle(true);
+        this.privilegesFilter.toggle(true);
 
         this.storeProxy.conn.jsonData.data.name = null;
         this.storeProxy.conn.jsonData.data.selectedRoleIds = [];
