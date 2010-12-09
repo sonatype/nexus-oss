@@ -63,6 +63,7 @@
   <script src="js/extensions/Sonatype.panels.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Ext.ux.form.LovCombo.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/extensions/Ext.ux.ThemeCombo.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
+  <script src="js/extensions/RoleSelector.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   
   <script src="js/Sonatype.utils.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
   <script src="js/Sonatype.config.js?$nexusVersion" type="text/javascript" charset="utf-8"></script>
