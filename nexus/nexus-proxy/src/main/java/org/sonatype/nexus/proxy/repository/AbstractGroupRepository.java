@@ -161,14 +161,13 @@ public abstract class AbstractGroupRepository
                 {
                     if ( getLogger().isDebugEnabled() )
                     {
-                        getLogger()
-                            .debug(
-                                "A repository CYCLE detected (doListItems()), while processing group ID='"
-                                    + this.getId()
-                                    + "'. The repository with ID='"
-                                    + repo.getId()
-                                    + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                    + request.toString() );
+                        getLogger().debug(
+                            "Repository ID='"
+                                + repo.getId()
+                                + "' in group ID='"
+                                + this.getId()
+                                + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                + request.toString() );
                     }
                 }
             }
@@ -240,14 +239,14 @@ public abstract class AbstractGroupRepository
                 }
                 else
                 {
-                    getLogger()
-                        .info(
-                            "A repository CYCLE detected (doRetrieveItem()), while processing group ID='"
-                                + this.getId()
-                                + "'. The repository with ID='"
-                                + repo.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
+                    getLogger().info(
+                        "Repository ID='"
+                            + repo.getId()
+                            + "' in group ID='"
+                            + this.getId()
+                            + "' was already processed during this request! This repository is skipped from processing. Request: "
+                            + request.toString() );
+
                 }
             }
         }
@@ -392,14 +391,14 @@ public abstract class AbstractGroupRepository
             {
                 if ( getLogger().isDebugEnabled() )
                 {
-                    getLogger()
-                        .debug(
-                            "A repository CYCLE detected (doRetrieveItems()), while processing group ID='"
-                                + this.getId()
-                                + "'. The repository with ID='"
-                                + repository.getId()
-                                + "' was already processed during this request! This repository is skipped from processing. Request: "
-                                + request.toString() );
+                    getLogger().debug(
+                        "Repository ID='"
+                            + repository.getId()
+                            + "' in group ID='"
+                            + this.getId()
+                            + "' was already processed during this request! This repository is skipped from processing. Request: "
+                            + request.toString() );
+
                 }
             }
         }
