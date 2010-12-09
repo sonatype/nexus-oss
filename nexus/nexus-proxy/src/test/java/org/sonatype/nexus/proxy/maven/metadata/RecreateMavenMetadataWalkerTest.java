@@ -508,7 +508,7 @@ public class RecreateMavenMetadataWalkerTest
             inhouseSnapshot,
             "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        Assert.assertFalse( md.getVersioning().getLastUpdated().equals( "20090226060812" ) );
+        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
         Assert.assertEquals( "com.mycom", md.getGroupId() );
         Assert.assertEquals( "proj4", md.getArtifactId() );
         Assert.assertEquals( "1.0-SNAPSHOT", md.getVersion() );
