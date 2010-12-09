@@ -472,12 +472,8 @@ public class RecreateMavenMetadataWalkerTest
         Metadata md =
             readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-<<<<<<< HEAD
         // everytime nexus thouch the metadata it bumps the last update time
         // Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
-=======
-        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
->>>>>>> Fix test assertion
         Assert.assertEquals( "com.mycom", md.getGroupId() );
         Assert.assertEquals( "proj4", md.getArtifactId() );
         Assert.assertEquals( "1.0-SNAPSHOT", md.getVersion() );
