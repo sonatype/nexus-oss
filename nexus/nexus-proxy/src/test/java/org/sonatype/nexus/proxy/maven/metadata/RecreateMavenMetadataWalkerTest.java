@@ -60,35 +60,19 @@ public class RecreateMavenMetadataWalkerTest
 
     private Walker walker;
 
-    private String[] releaseArtifactFiles = {
-        "/junit/junit/3.8.1/junit-3.8.1.jar",
-        "/junit/junit/3.8.1/junit-3.8.1.pom",
-        "/junit/junit/3.8.2/junit-3.8.2.jar",
-        "/junit/junit/3.8.2/junit-3.8.2.pom",
-        "/junit/junit/4.0/junit-4.0.jar",
-        "/junit/junit/4.0/junit-4.0.pom",
-        "/junit/junit/4.4/junit-4.4.jar",
-        "/junit/junit/4.4/junit-4.4.pom",
-        "/junit/junit/4.4/junit-4.4.sources.jar.md5",
-        "/junit/junit-mock/maven-metadata.xml",
-        "/junit/junit-mock/1.1/readme.txt",
-        "/com/mycom/proj1/1.0/proj1-1.0.jar",
-        "/com/mycom/proj1/1.0/proj1-1.0.pom",
-        "/com/mycom/proj1/2.0/proj1-2.0.jar",
-        "/com/mycom/proj1/2.0/proj1-2.0.pom",
-        "/com/mycom/proj1/maven-metadata.xml",
-        "/com/mycom/proj5/1.0/proj5-1.0.jar",
-        "/com/mycom/proj5/1.0/proj5-1.0.pom",
-        "/com/mycom/proj6/1.0/proj6-1.0.jar",
-        "/com/mycom/proj6/1.0/proj6-1.0.pom",
-        "/com/mycom1/1-proj/1.0/1-proj-1.0.pom",
-        "/com/mycom1/1.0/mycom1-1.0.pom",
-        "/com/mycom1/2-proj/1.0/2-proj-1.0.pom",
-        "/com/mycom1/2.0/mycom1-2.0.pom",
-        "/com/mycom2/proj-1/1.0/proj-1-1.0.pom",
-        "/com/mycom2/proj-1/2.0/proj-1-2.0.pom",
-        "/com/mycom2/proj-1/maven-metadata.xml"
-    };
+    private String[] releaseArtifactFiles = { "/junit/junit/3.8.1/junit-3.8.1.jar",
+        "/junit/junit/3.8.1/junit-3.8.1.pom", "/junit/junit/3.8.2/junit-3.8.2.jar",
+        "/junit/junit/3.8.2/junit-3.8.2.pom", "/junit/junit/4.0/junit-4.0.jar", "/junit/junit/4.0/junit-4.0.pom",
+        "/junit/junit/4.4/junit-4.4.jar", "/junit/junit/4.4/junit-4.4.pom",
+        "/junit/junit/4.4/junit-4.4.sources.jar.md5", "/junit/junit-mock/maven-metadata.xml",
+        "/junit/junit-mock/1.1/readme.txt", "/com/mycom/proj1/1.0/proj1-1.0.jar", "/com/mycom/proj1/1.0/proj1-1.0.pom",
+        "/com/mycom/proj1/2.0/proj1-2.0.jar", "/com/mycom/proj1/2.0/proj1-2.0.pom",
+        "/com/mycom/proj1/maven-metadata.xml", "/com/mycom/proj5/1.0/proj5-1.0.jar",
+        "/com/mycom/proj5/1.0/proj5-1.0.pom", "/com/mycom/proj6/1.0/proj6-1.0.jar",
+        "/com/mycom/proj6/1.0/proj6-1.0.pom", "/com/mycom1/1-proj/1.0/1-proj-1.0.pom",
+        "/com/mycom1/1.0/mycom1-1.0.pom", "/com/mycom1/2-proj/1.0/2-proj-1.0.pom", "/com/mycom1/2.0/mycom1-2.0.pom",
+        "/com/mycom2/proj-1/1.0/proj-1-1.0.pom", "/com/mycom2/proj-1/2.0/proj-1-2.0.pom",
+        "/com/mycom2/proj-1/maven-metadata.xml" };
 
     private String[] snapshotArtifactFiles = {
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081022.180215-1.jar",
@@ -101,12 +85,9 @@ public class RecreateMavenMetadataWalkerTest
         "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/nexus-api-1.2.0-20081025.143218-32.pom",
         "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.jar",
         "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/artifact-interp-main-14.0.0-20090108.150441-1.pom",
-        "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.jar",
-        "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom",
-        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar",
-        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom",
-        "/com/mycom/proj2/maven-metadata.xml",
-        "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.jar",
+        "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.jar", "/com/mycom/proj2/1.0-SNAPSHOT/proj2-1.0-SNAPSHOT.pom",
+        "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.jar", "/com/mycom/proj2/2.0SNAPSHOT/proj2-2.0SNAPSHOT.pom",
+        "/com/mycom/proj2/maven-metadata.xml", "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.jar",
         "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080923.191343-1.pom",
         "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080924.191343-2.jar",
         "/com/mycom/proj3/1.0-SNAPSHOT/proj3-1.0-20080924.191343-2.pom",
@@ -117,8 +98,7 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/proj4/1.0-SNAPSHOT/proj4-1.0-20080924.191343-2.pom",
         "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml",
         "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.pom",
-        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.jar"
-    };
+        "/com/mycom/proj7/1.0-SNAPSHOT/proj7-1.0-20080924.191343-2.jar" };
 
     private String[] pluginArtifactFiles = {
         "/org/apache/maven/plugins/maven-antrun-plugin/1.1/maven-antrun-plugin-1.1.jar",
@@ -134,22 +114,19 @@ public class RecreateMavenMetadataWalkerTest
         "/com/mycom/group1/maven-p1-plugin/1.0/maven-p1-plugin-1.0.jar",
         "/com/mycom/group1/maven-p1-plugin/1.0/maven-p1-plugin-1.0.pom",
         "/com/mycom/group1/maven-p2-plugin/1.0/maven-p2-plugin-1.0.jar",
-        "/com/mycom/group1/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom",
-        "/com/mycom/group1/maven-metadata.xml",
+        "/com/mycom/group1/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom", "/com/mycom/group1/maven-metadata.xml",
         "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.jar",
         "/com/mycom/group2/maven-p1-plugin/1.0/maven-p1-plugin-1.0.pom",
         "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.jar",
         "/com/mycom/group2/maven-p1-plugin/2.0/maven-p1-plugin-2.0.pom",
         "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.jar",
-        "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom",
-        "/com/mycom/group2/maven-metadata.xml",
+        "/com/mycom/group2/maven-p2-plugin/1.0/maven-p2-plugin-1.0.pom", "/com/mycom/group2/maven-metadata.xml",
         "/com/mycom/group3/maven-a1-plugin/1.0/maven-a1-plugin-1.0.pom",
         "/com/mycom/group3/maven-a1-plugin/2.0/maven-a1-plugin-2.0.pom",
         "/com/mycom/group3/maven-a1-plugin/3.0/maven-a1-plugin-3.0.pom",
         "/com/mycom/group3/maven-b1-plugin/1.0/maven-b1-plugin-1.0.pom",
         "/com/mycom/group3/maven-c1-plugin/1.0/maven-c1-plugin-1.0.pom",
-        "/com/mycom/group3/maven-d1-plugin/1.0/maven-d1-plugin-1.0.pom"
-    };
+        "/com/mycom/group3/maven-d1-plugin/1.0/maven-d1-plugin-1.0.pom" };
 
     @Override
     protected EnvironmentBuilder getEnvironmentBuilder()
@@ -215,9 +192,8 @@ public class RecreateMavenMetadataWalkerTest
     {
         RecreateMavenMetadataWalkerProcessor wp = new RecreateMavenMetadataWalkerProcessor( getLogger() );
 
-        DefaultWalkerContext ctx = new DefaultWalkerContext( repo, new ResourceStoreRequest(
-            RepositoryItemUid.PATH_ROOT,
-            true ) );
+        DefaultWalkerContext ctx =
+            new DefaultWalkerContext( repo, new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT, true ) );
 
         ctx.getProcessors().add( wp );
 
@@ -296,8 +272,7 @@ public class RecreateMavenMetadataWalkerTest
     {
         rebuildMavenMetadata( inhouseRelease );
 
-        assertNotNull( inhouseRelease
-            .retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
+        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml", false ) ) );
 
     }
 
@@ -307,12 +282,10 @@ public class RecreateMavenMetadataWalkerTest
         rebuildMavenMetadata( inhouseSnapshot );
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-api/maven-metadata.xml",
-            false ) ) );
+            "/org/sonatype/nexus/nexus-api/maven-metadata.xml", false ) ) );
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
-            "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml",
-            false ) ) );
+            "/org/sonatype/nexus/nexus-api/1.2.0-SNAPSHOT/maven-metadata.xml", false ) ) );
     }
 
     public void BROKENtestRecreateMavenMetadataWalkerWalkerSnapshotWithInterpolation()
@@ -321,12 +294,10 @@ public class RecreateMavenMetadataWalkerTest
         rebuildMavenMetadata( inhouseSnapshot );
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
-            "/nexus1332/artifact-interp-main/maven-metadata.xml",
-            false ) ) );
+            "/nexus1332/artifact-interp-main/maven-metadata.xml", false ) ) );
 
         assertNotNull( inhouseSnapshot.retrieveItem( new ResourceStoreRequest(
-            "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/maven-metadata.xml",
-            false ) ) );
+            "/nexus1332/artifact-interp-main/14.0.0-SNAPSHOT/maven-metadata.xml", false ) ) );
     }
 
     public void testRecreateMavenMetadataWalkerWalkerPlugin()
@@ -335,8 +306,7 @@ public class RecreateMavenMetadataWalkerTest
         rebuildMavenMetadata( inhouseRelease );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/org/apache/maven/plugins/maven-metadata.xml",
-            false ) ) );
+            "/org/apache/maven/plugins/maven-metadata.xml", false ) ) );
     }
 
     public void testRebuildChecksumFiles()
@@ -344,25 +314,20 @@ public class RecreateMavenMetadataWalkerTest
     {
         rebuildMavenMetadata( inhouseRelease );
 
-        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/junit/junit/3.8.1/junit-3.8.1.jar.md5",
+        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/3.8.1/junit-3.8.1.jar.md5",
             false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/junit/junit/3.8.1/junit-3.8.1.jar.sha1",
+            "/junit/junit/3.8.1/junit-3.8.1.jar.sha1", false ) ) );
+
+        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/4.0/junit-4.0.pom.md5",
+            false ) ) );
+
+        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( "/junit/junit/maven-metadata.xml.md5",
             false ) ) );
 
         assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/junit/junit/4.0/junit-4.0.pom.md5",
-            false ) ) );
-
-        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/junit/junit/maven-metadata.xml.md5",
-            false ) ) );
-
-        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/org/apache/maven/plugins/maven-metadata.xml.sha1",
-            false ) ) );
+            "/org/apache/maven/plugins/maven-metadata.xml.sha1", false ) ) );
     }
 
     public void testRemoveObsoleteFiles()
@@ -378,7 +343,8 @@ public class RecreateMavenMetadataWalkerTest
         expected.put( "/junit/junit/3.8.1/maven-metadata.xml.md5", Boolean.FALSE );
         expected.put( "/junit/junit/3.8.1/maven-metadata.xml.sha1", Boolean.FALSE );
 
-        validateResults( inhouseRelease, expected );;
+        validateResults( inhouseRelease, expected );
+        ;
     }
 
     public void testArtifactDirMdCorrect()
@@ -409,8 +375,8 @@ public class RecreateMavenMetadataWalkerTest
 
         // NEXUS-3148
         // the MD has to be updated, the 2.0SNAPSHOT was added
-        Assert.assertFalse( "20090226060812".equals(  md.getVersioning().getLastUpdated() ) );
-        Assert.assertEquals( "2.0SNAPSHOT",  md.getVersioning().getLatest()  );
+        Assert.assertFalse( "20090226060812".equals( md.getVersioning().getLastUpdated() ) );
+        Assert.assertEquals( "2.0SNAPSHOT", md.getVersioning().getLatest() );
     }
 
     public void testArtifactDirMdIncorrect()
@@ -473,9 +439,8 @@ public class RecreateMavenMetadataWalkerTest
 
         validateResults( inhouseSnapshot, expected );
 
-        Metadata md = readMavenMetadata( retrieveFile(
-            inhouseSnapshot,
-            "/com/mycom/proj3/1.0-SNAPSHOT/maven-metadata.xml" ) );
+        Metadata md =
+            readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj3/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
         Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
     }
@@ -504,11 +469,11 @@ public class RecreateMavenMetadataWalkerTest
 
         validateResults( inhouseSnapshot, expected );
 
-        Metadata md = readMavenMetadata( retrieveFile(
-            inhouseSnapshot,
-            "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml" ) );
+        Metadata md =
+            readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj4/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
+        // everytime nexus thouch the metadata it bumps the last update time
+        // Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
         Assert.assertEquals( "com.mycom", md.getGroupId() );
         Assert.assertEquals( "proj4", md.getArtifactId() );
         Assert.assertEquals( "1.0-SNAPSHOT", md.getVersion() );
@@ -603,7 +568,7 @@ public class RecreateMavenMetadataWalkerTest
             }
         }
     }
-    
+
     public void testGroupDirMdElementUniqueAndSorted()
         throws Exception
     {
@@ -625,12 +590,12 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( "maven-c1-plugin", ( md.getPlugins().get( 2 ) ).getArtifactId() );
         assertEquals( "maven-d1-plugin", ( md.getPlugins().get( 3 ) ).getArtifactId() );
     }
-    
+
     public void testRecreatingOnBadPOM()
         throws Exception
     {
         rebuildMavenMetadata( inhouseRelease );
-        
+
         Map<String, Boolean> expected = new LinkedHashMap<String, Boolean>();
         expected.put( "/com/mycom/proj1/maven-metadata.xml", Boolean.TRUE );
         expected.put( "/com/mycom/proj1/1.0/proj1-1.0.jar", Boolean.TRUE );
@@ -646,12 +611,12 @@ public class RecreateMavenMetadataWalkerTest
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom", Boolean.TRUE );
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom.md5", Boolean.TRUE );
         expected.put( "/com/mycom/proj5/1.0/proj5-1.0.pom.sha1", Boolean.TRUE );
-        
+
         validateResults( inhouseRelease, expected );
-        
+
         // should see warning log here
     }
-    
+
     public void testReleasePOMWithInterpolation()
         throws Exception
     {
@@ -668,7 +633,7 @@ public class RecreateMavenMetadataWalkerTest
 
         validateResults( inhouseRelease, expected );
     }
-    
+
     public void testSnapshotPOMWithInterpolation()
         throws Exception
     {
@@ -681,7 +646,7 @@ public class RecreateMavenMetadataWalkerTest
 
         validateResults( inhouseSnapshot, expected );
     }
-    
+
     public void testGroupPathIsArtifactPathAtTheSameTime()
         throws Exception
     {
@@ -702,7 +667,7 @@ public class RecreateMavenMetadataWalkerTest
         versions.add( "2.0" );
         assertEquals( versions, md.getVersioning().getVersions() );
     }
-    
+
     public void testMetadata0Bytes()
         throws Exception
     {
