@@ -134,9 +134,6 @@ public interface IndexerManager
     void reindexRepository( String path, String repositoryId, boolean fullReindex )
         throws NoSuchRepositoryException, IOException;
 
-    void resetGroupIndex( String groupId, boolean purgeOnly )
-        throws NoSuchRepositoryException, IOException;
-
     // ----------------------------------------------------------------------------
     // Downloading remote indexes (will do remote-download, merge only)
     // ----------------------------------------------------------------------------

@@ -59,10 +59,13 @@ import org.apache.maven.index.SearchType;
 import org.apache.maven.index.artifact.Gav;
 import org.apache.maven.index.artifact.IllegalArtifactCoordinateException;
 import org.apache.maven.index.artifact.VersionUtils;
+import org.apache.maven.index.context.ContextMemberProvider;
 import org.apache.maven.index.context.DefaultIndexingContext;
 import org.apache.maven.index.context.DocumentFilter;
 import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexingContext;
+import org.apache.maven.index.context.MergedIndexingContext;
+import org.apache.maven.index.context.StaticContextMemberProvider;
 import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
 import org.apache.maven.index.creator.JarFileContentsIndexCreator;
 import org.apache.maven.index.creator.MavenArchetypeArtifactInfoIndexCreator;
@@ -134,7 +137,7 @@ public class DefaultIndexerManager
 {
     /** The key used in working directory. */
     public static final String INDEXER_WORKING_DIRECTORY_KEY = "indexer";
-    
+
     /** Context id local suffix */
     public static final String CTX_LOCAL_SUFIX = "-local";
 
@@ -309,36 +312,94 @@ public class DefaultIndexerManager
             {
                 // group repository
                 // just to throw NoSuchRepositoryGroupException if not existing
-                repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
+                final GroupRepository groupRepository =
+                    repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
+
+                File repoRoot = getRepositoryLocalStorageAsFile( repository );
+
+                ContextMemberProvider localCtxProvider = new ContextMemberProvider()
+                {
+                    @Override
+                    public Collection<IndexingContext> getMembers()
+                    {
+                        List<Repository> members = groupRepository.getMemberRepositories();
+
+                        ArrayList<IndexingContext> result = new ArrayList<IndexingContext>( members.size() );
+
+                        for ( Repository member : members )
+                        {
+                            IndexingContext ctx = getRepositoryLocalIndexContext( member );
+                            if ( ctx != null )
+                            {
+                                result.add( ctx );
+                            }
+                        }
+
+                        return result;
+                    }
+                };
+
+                ctxLocal =
+                    nexusIndexer.addMergedIndexingContext( getLocalContextId( repository.getId() ), repository.getId(),
+                        repoRoot, repository.isSearchable(), localCtxProvider );
+
+                ContextMemberProvider remoteCtxProvider = new ContextMemberProvider()
+                {
+                    @Override
+                    public Collection<IndexingContext> getMembers()
+                    {
+                        List<Repository> members = groupRepository.getMemberRepositories();
+
+                        ArrayList<IndexingContext> result = new ArrayList<IndexingContext>( members.size() );
+
+                        for ( Repository member : members )
+                        {
+                            IndexingContext ctx = getRepositoryRemoteIndexContext( member );
+                            if ( ctx != null )
+                            {
+                                result.add( ctx );
+                            }
+                        }
+
+                        return result;
+                    }
+                };
+
+                ctxRemote =
+                    nexusIndexer.addMergedIndexingContext( getRemoteContextId( repository.getId() ),
+                        repository.getId(), repoRoot, repository.isSearchable(), remoteCtxProvider );
             }
             else
             {
                 repositoryRegistry.getRepositoryWithFacet( repositoryId, Repository.class );
+
+                File repoRoot = getRepositoryLocalStorageAsFile( repository );
+
+                // add context for repository
+                ctxLocal =
+                    nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
+                        repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null,
+                        null, indexCreators );
+                ctxLocal.setSearchable( repository.isSearchable() );
+
+                ctxRemote =
+                    nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ),
+                        repository.getId(), repoRoot,
+                        new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ), null, null,
+                        indexCreators );
+                ctxRemote.setSearchable( repository.isSearchable() );
+
+                // this handles all legacy cases, when group used -remote context to hold merged data!
+                // They still sit in there, with OLD data.
+                // Since 1.6, groups are consistent, and their -local contexts holds the data (since all reposes are
+                // equal)
+                // -remote is used by proxy repositories only!
+                if ( !repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+                {
+                    ctxRemote.purge();
+                }
             }
 
-            File repoRoot = getRepositoryLocalStorageAsFile( repository );
-
-            // add context for repository
-            ctxLocal =
-                nexusIndexer.addIndexingContextForced( getLocalContextId( repository.getId() ), repository.getId(),
-                    repoRoot, new File( getWorkingDirectory(), getLocalContextId( repository.getId() ) ), null, null,
-                    indexCreators );
-            ctxLocal.setSearchable( repository.isSearchable() );
-
-            ctxRemote =
-                nexusIndexer.addIndexingContextForced( getRemoteContextId( repository.getId() ), repository.getId(),
-                    repoRoot, new File( getWorkingDirectory(), getRemoteContextId( repository.getId() ) ), null, null,
-                    indexCreators );
-            ctxRemote.setSearchable( repository.isSearchable() );
-
-            // this handles all legacy cases, when group used -remote context to hold merged data!
-            // They still sit in there, with OLD data.
-            // Since 1.6, groups are consistent, and their -local contexts holds the data (since all reposes are equal)
-            // -remote is used by proxy repositories only!
-            if ( !repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-            {
-                ctxRemote.purge();
-            }
         }
         finally
         {
@@ -593,13 +654,6 @@ public class DefaultIndexerManager
     public void addItemToIndex( Repository repository, StorageItem item )
         throws IOException
     {
-        addItemToIndex( repository, item, new ArrayList<Repository>(), null );
-    }
-
-    protected void addItemToIndex( Repository repository, StorageItem item, List<Repository> processedRepositories,
-                                   ArtifactContext ac )
-        throws IOException
-    {
         // is indexing supported at all on this repository?
         // sadly, the nexus-indexer is maven2 only, hence we check is the repo
         // from where we get the event is a maven2 repo, is indexing supported at all
@@ -618,22 +672,9 @@ public class DefaultIndexerManager
             return;
         }
 
-        // check for cycles in recursion
-        if ( processedRepositories.contains( repository ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
-            }
-
-            return;
-        }
-
         // is this hidden path?
         Boolean isHidden = item.getRepositoryItemUid().getAttributeValue( IsHiddenUidAttribute.class );
-        
+
         if ( isHidden != null && isHidden.booleanValue() )
         {
             getLogger().debug( "Will not index hidden file path: " + item.getPath() );
@@ -646,64 +687,63 @@ public class DefaultIndexerManager
 
         if ( context != null )
         {
-            if ( ac == null )
+            // by calculating GAV we check wether the request is against a repo artifact at all
+            Gav gav = null;
+
+            try
             {
-                // by calculating GAV we check wether the request is against a repo artifact at all
-                Gav gav = null;
+                gav =
+                    ( (MavenRepository) repository ).getGavCalculator().pathToGav(
+                        item.getRepositoryItemUid().getPath() );
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                gav = null;
+            }
 
-                try
-                {
-                    gav =
-                        ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
-                }
-                catch ( IllegalArtifactCoordinateException e )
-                {
-                    gav = null;
-                }
+            // signatures and hashes are not considered for processing
+            // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+            // emitted events about modifying them
+            if ( gav == null || gav.isSignature() || gav.isHash() )
+            {
+                // we do not index these
+                return;
+            }
 
-                // signatures and hashes are not considered for processing
-                // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
-                // emitted events about modifying them
-                if ( gav == null || gav.isSignature() || gav.isHash() )
-                {
-                    // we do not index these
-                    return;
-                }
+            ArtifactContext ac = null;
 
-                // if we have a valid indexing context and have access to a File
-                if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
-                {
-                    File file =
-                        ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
-                            new ResourceStoreRequest( item ) );
+            // if we have a valid indexing context and have access to a File
+            if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
+            {
+                File file =
+                    ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
+                        new ResourceStoreRequest( item ) );
 
-                    if ( file.exists() )
+                if ( file.exists() )
+                {
+                    try
                     {
-                        try
+                        ac = artifactContextProducer.getArtifactContext( context, file );
+                    }
+                    catch ( IllegalArtifactCoordinateException e )
+                    {
+                        // cannot create artifact context, forget it
+                        return;
+                    }
+
+                    if ( ac != null )
+                    {
+                        if ( getLogger().isDebugEnabled() )
                         {
-                            ac = artifactContextProducer.getArtifactContext( context, file );
+                            getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
                         }
-                        catch ( IllegalArtifactCoordinateException e )
+
+                        ArtifactInfo ai = ac.getArtifactInfo();
+
+                        if ( ai.sha1 == null )
                         {
-                            // cannot create artifact context, forget it
-                            return;
-                        }
-
-                        if ( ac != null )
-                        {
-                            if ( getLogger().isDebugEnabled() )
-                            {
-                                getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
-                            }
-
-                            ArtifactInfo ai = ac.getArtifactInfo();
-
-                            if ( ai.sha1 == null )
-                            {
-                                // if repo has no sha1 checksum, odd nexus one
-                                ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
-                            }
+                            // if repo has no sha1 checksum, odd nexus one
+                            ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
                         }
                     }
                 }
@@ -712,35 +752,9 @@ public class DefaultIndexerManager
             // and finally: index it
             getNexusIndexer().addArtifactToIndex( ac, context );
         }
-
-        // mark repository as "job done"
-        processedRepositories.add( repository );
-
-        // finally, propagate to group contexts where this repository is member
-        List<GroupRepository> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository );
-
-        for ( GroupRepository group : groupsOfRepository )
-        {
-            try
-            {
-                addItemToIndex( group, item, processedRepositories, ac );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got IO exception during index processing, continuing to do the best...", e );
-            }
-        }
     }
 
     public void removeItemFromIndex( Repository repository, StorageItem item )
-        throws IOException
-    {
-        // just call the recursive one with empty list
-        removeItemFromIndex( repository, item, new ArrayList<Repository>(), null );
-    }
-
-    protected void removeItemFromIndex( Repository repository, StorageItem item,
-                                        List<Repository> processedRepositories, ArtifactContext ac )
         throws IOException
     {
         // is indexing supported at all on this repository?
@@ -761,75 +775,61 @@ public class DefaultIndexerManager
             return;
         }
 
-        // check for cycles in recursion
-        if ( processedRepositories.contains( repository ) )
-        {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Repository '" + repository.getId()
-                        + "' is already processed in recursive calls, will not process it." );
-            }
-
-            return;
-        }
-
         // do the work
         IndexingContext context = getRepositoryLocalIndexContext( repository );
 
         if ( context != null )
         {
-            if ( ac == null )
+            // by calculating GAV we check wether the request is against a repo artifact at all
+            Gav gav = null;
+
+            try
             {
-                // by calculating GAV we check wether the request is against a repo artifact at all
-                Gav gav = null;
+                gav =
+                    ( (MavenRepository) repository ).getGavCalculator().pathToGav(
+                        item.getRepositoryItemUid().getPath() );
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                gav = null;
+            }
 
-                try
-                {
-                    gav =
-                        ( (MavenRepository) repository ).getGavCalculator().pathToGav(
-                            item.getRepositoryItemUid().getPath() );
-                }
-                catch ( IllegalArtifactCoordinateException e )
-                {
-                    gav = null;
-                }
+            // signatures and hashes are not considered for processing
+            // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
+            // emitted events about modifying them
+            if ( gav == null || gav.isSignature() || gav.isHash() )
+            {
+                return;
+            }
 
-                // signatures and hashes are not considered for processing
-                // reason (NEXUS-814 related): the actual artifact and it's POM will (or already did)
-                // emitted events about modifying them
-                if ( gav == null || gav.isSignature() || gav.isHash() )
-                {
-                    return;
-                }
+            ArtifactInfo ai =
+                new ArtifactInfo( context.getRepositoryId(), gav.getGroupId(), gav.getArtifactId(),
+                    gav.getBaseVersion(), gav.getClassifier() );
 
-                ArtifactInfo ai =
-                    new ArtifactInfo( context.getRepositoryId(), gav.getGroupId(), gav.getArtifactId(),
-                        gav.getBaseVersion(), gav.getClassifier() );
+            // store extension if classifier is not empty
+            if ( !StringUtils.isEmpty( ai.classifier ) )
+            {
+                ai.packaging = gav.getExtension();
+            }
 
-                // store extension if classifier is not empty
-                if ( !StringUtils.isEmpty( ai.classifier ) )
-                {
-                    ai.packaging = gav.getExtension();
-                }
+            ArtifactContext ac = null;
 
-                try
-                {
-                    ac = new ArtifactContext( null, null, null, ai, gav );
-                }
-                catch ( IllegalArtifactCoordinateException e )
-                {
-                    // ac cannot be created, just forget it being indexed
-                    return;
-                }
+            try
+            {
+                ac = new ArtifactContext( null, null, null, ai, gav );
+            }
+            catch ( IllegalArtifactCoordinateException e )
+            {
+                // ac cannot be created, just forget it being indexed
+                return;
+            }
 
-                // remove file from index
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug(
-                        "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
-                            + " from index (DELETE)." );
-                }
+            // remove file from index
+            if ( getLogger().isDebugEnabled() )
+            {
+                getLogger().debug(
+                    "Deleting artifact " + ai.groupId + ":" + ai.artifactId + ":" + ai.version
+                        + " from index (DELETE)." );
             }
 
             // NEXUS-814: we should not delete always
@@ -847,24 +847,6 @@ public class DefaultIndexerManager
                             + ":" + ac.getArtifactInfo().version
                             + " from index (DELETE), since it is a timestamped snapshot and more builds exists." );
                 }
-            }
-        }
-
-        // mark the repo as "job done"
-        processedRepositories.add( repository );
-
-        // finally, propagate to group contexts where this repository is member
-        List<GroupRepository> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository );
-
-        for ( GroupRepository group : groupsOfRepository )
-        {
-            try
-            {
-                removeItemFromIndex( group, item, processedRepositories, ac );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got IO exception during index processing, continuing to do the best...", e );
             }
         }
     }
@@ -916,11 +898,6 @@ public class DefaultIndexerManager
     {
         if ( groupRepo.isIndexable() )
         {
-            if ( fullReindex )
-            {
-                resetGroupIndex( groupRepo.getId(), true );
-            }
-
             List<Repository> group = groupRepo.getMemberRepositories();
 
             for ( Repository repository : group )
@@ -928,7 +905,6 @@ public class DefaultIndexerManager
                 if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
                 {
                     reindexRepositoryGroup( repository.adaptToFacet( GroupRepository.class ), path, fullReindex );
-                    mergeRepositoryGroupIndexWithMember( repository );
                 }
                 else
                 {
@@ -937,62 +913,6 @@ public class DefaultIndexerManager
             }
 
             publishRepositoryGroupIndex( groupRepo );
-        }
-    }
-
-    public void resetGroupIndex( String groupId, boolean purgeOnly )
-        throws NoSuchRepositoryException, IOException
-    {
-        GroupRepository group = repositoryRegistry.getRepositoryWithFacet( groupId, GroupRepository.class );
-
-        if ( !isIndexingSupported( group ) )
-        {
-            logSkippingRepositoryMessage( group );
-
-            return;
-        }
-
-        if ( !group.isIndexable() )
-        {
-            logSkippingRepositoryMessage( group );
-
-            return;
-        }
-
-        if ( isAlreadyBeingIndexed( groupId ) )
-        {
-            return;
-        }
-
-        Lock lock = getLock( groupId ).writeLock();
-        lock.lock();
-        try
-        {
-            getLogger().info( "Remerging group '" + groupId + "'" );
-
-            List<Repository> repositoriesList = group.getMemberRepositories();
-
-            IndexingContext localContext = getRepositoryLocalIndexContext( groupId );
-            IndexingContext remoteContext = getRepositoryRemoteIndexContext( group );
-            purgeCurrentIndex( localContext );
-
-            // purge it, and below will be repopulated
-            localContext.purge();
-            remoteContext.purge();
-
-            if ( !purgeOnly )
-            {
-                for ( Repository repository : repositoriesList )
-                {
-                    getLogger().info( "Remerging '" + repository.getId() + "' to '" + groupId + "'" );
-                    mergeRepositoryGroupIndexWithMember( repository );
-                }
-                publishRepositoryGroupIndex( group );
-            }
-        }
-        finally
-        {
-            lock.unlock();
         }
     }
 
@@ -1042,8 +962,6 @@ public class DefaultIndexerManager
 
                 remoteContext.optimize();
             }
-
-            mergeRepositoryGroupIndexWithMember( repository );
         }
         finally
         {
@@ -1077,10 +995,9 @@ public class DefaultIndexerManager
         {
             if ( repository.isIndexable() )
             {
-                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() )
-                    && downloadRepositoryIndex( repository ) )
+                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
                 {
-                    mergeRepositoryGroupIndexWithMember( repository );
+                    downloadRepositoryIndex( repository );
                 }
             }
         }
@@ -1097,10 +1014,9 @@ public class DefaultIndexerManager
 
             downloadRepositoryGroupIndex( group );
         }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) && repository.isIndexable()
-            && downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
+        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) && repository.isIndexable() )
         {
-            mergeRepositoryGroupIndexWithMember( repository );
+            downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) );
         }
     }
 
@@ -1123,10 +1039,7 @@ public class DefaultIndexerManager
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
             {
-                if ( downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) ) )
-                {
-                    mergeRepositoryGroupIndexWithMember( repository );
-                }
+                downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ) );
             }
         }
     }
@@ -1272,7 +1185,7 @@ public class DefaultIndexerManager
                 }
                 catch ( ItemNotFoundException ex )
                 {
-                    FileNotFoundException fne = new FileNotFoundException( name + " (item not found)");
+                    FileNotFoundException fne = new FileNotFoundException( name + " (item not found)" );
                     fne.initCause( ex );
                     throw fne;
                 }
@@ -1325,102 +1238,6 @@ public class DefaultIndexerManager
                 }
             }
         };
-    }
-
-    protected void mergeRepositoryGroupIndexWithMember( Repository repository )
-        throws IOException
-    {
-        if ( !isIndexingSupported( repository ) )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        if ( !repository.isIndexable() )
-        {
-            logSkippingRepositoryMessage( repository );
-
-            return;
-        }
-
-        if ( isAlreadyBeingIndexed( repository ) )
-        {
-            return;
-        }
-
-        List<GroupRepository> groupsOfRepository = repositoryRegistry.getGroupsOfRepository( repository );
-
-        Lock repoLock = getLock( repository.getId() ).readLock();
-        repoLock.lock();
-        try
-        {
-            for ( GroupRepository group : groupsOfRepository )
-            {
-                if ( !isIndexingSupported( group ) )
-                {
-                    logSkippingRepositoryMessage( group );
-
-                    continue;
-                }
-
-                if ( !group.isIndexable() )
-                {
-                    logSkippingRepositoryMessage( group );
-
-                    continue;
-                }
-
-                if ( isAlreadyBeingIndexed( group ) )
-                {
-                    continue;
-                }
-
-                String groupId = group.getId();
-                getLogger().info(
-                    "Cascading merge of group indexes for group \"" + groupId + "\", where repository \""
-                        + repository.getId() + "\" is member." );
-
-                // get the groups target ctx
-                IndexingContext groupContext = getRepositoryLocalIndexContext( group );
-
-                Lock groupLock = getLock( groupId ).writeLock();
-                groupLock.lock();
-
-                try
-                {
-                    // local index include all repositories
-                    IndexingContext localContext = getRepositoryLocalIndexContext( repository );
-                    IndexingContext remoteContext = getRepositoryRemoteIndexContext( repository );
-
-                    groupContext.merge( localContext.getIndexDirectory() );
-                    groupContext.merge( remoteContext.getIndexDirectory() );
-
-                    if ( getLogger().isDebugEnabled() )
-                    {
-                        getLogger().debug( "Rebuilding groups in merged index for repository group " + group );
-                    }
-
-                    // rebuild group info
-                    groupContext.rebuildGroups();
-
-                    groupContext.updateTimestamp();
-
-                    // committing changes
-                    groupContext.commit();
-
-                    groupContext.optimize();
-                }
-                finally
-                {
-                    groupLock.unlock();
-                }
-            }
-        }
-        finally
-        {
-            repoLock.unlock();
-        }
     }
 
     // ----------------------------------------------------------------------------
@@ -1527,7 +1344,10 @@ public class DefaultIndexerManager
 
             IndexingContext context = getRepositoryLocalIndexContext( repository );
             IndexingContext remoteContext = getRepositoryRemoteIndexContext( repository );
-            mergedContext = mergeContexts( context, remoteContext );
+            mergedContext =
+                new MergedIndexingContext( repository.getId(), repository.getId(),
+                    getRepositoryLocalStorageAsFile( repository ), false, new StaticContextMemberProvider(
+                        Arrays.asList( new IndexingContext[] { context, remoteContext } ) ) );
 
             targetDir = new File( getTempDirectory(), "nx-index-" + Long.toHexString( System.nanoTime() ) );
 
@@ -1623,24 +1443,6 @@ public class DefaultIndexerManager
                 throw eek;
             }
         }
-    }
-
-    private IndexingContext mergeContexts( IndexingContext... contexts )
-        throws IOException
-    {
-        IndexingContext mergedContext = null;
-
-        for ( IndexingContext context : contexts )
-        {
-            if ( mergedContext == null )
-            {
-                mergedContext = getTempContext( context );
-            }
-
-            mergedContext.merge( context.getIndexDirectory() );
-        }
-
-        return mergedContext;
     }
 
     private void copyIndexPropertiesToTempDir( Repository repository, File tempDir )
@@ -2738,10 +2540,7 @@ public class DefaultIndexerManager
         {
             getLogger().error( e.getMessage(), e );
 
-            IOException eek = new IOException( e.getMessage() );
-
-            // TODO: For god sake, switch to Java6 ASAP!
-            eek.initCause( e );
+            IOException eek = new IOException( e.getMessage(), e );
 
             throw eek;
         }
