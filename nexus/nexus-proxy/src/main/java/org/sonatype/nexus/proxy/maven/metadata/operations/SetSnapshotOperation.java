@@ -24,7 +24,6 @@ import java.util.List;
 import org.apache.maven.artifact.repository.metadata.Metadata;
 import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
-import org.codehaus.plexus.util.StringUtils;
 
 /**
  * adds new snapshot to metadata
@@ -99,7 +98,7 @@ public class SetSnapshotOperation
         List<SnapshotVersion> currents = vs.getSnapshotVersions();
         for ( SnapshotVersion extra : extras )
         {
-            SnapshotVersion current = getCurrent( extra, currents );
+            SnapshotVersion current = MetadataUtil.searchForEquivalent( extra, currents );
             if ( current == null )
             {
                 currents.add( extra );
@@ -123,19 +122,6 @@ public class SetSnapshotOperation
         }
 
         return true;
-    }
-
-    private SnapshotVersion getCurrent( SnapshotVersion exVersion, List<SnapshotVersion> current )
-    {
-        for ( SnapshotVersion curVersion : current )
-        {
-            if ( StringUtils.equals( exVersion.getClassifier(), curVersion.getClassifier() )
-                && StringUtils.equals( exVersion.getExtension(), curVersion.getExtension() ) )
-            {
-                return curVersion;
-            }
-        }
-        return null;
     }
 
 }

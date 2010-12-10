@@ -15,6 +15,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataBuilder;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataException;
 import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataOperation;
+import org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SetSnapshotOperation;
 import org.sonatype.nexus.proxy.maven.metadata.operations.SnapshotOperand;
 import org.sonatype.nexus.proxy.maven.metadata.operations.TimeUtil;
@@ -207,7 +208,10 @@ public class VersionDirMetadataProcessor
             && md.getVersioning().getSnapshot() != null
             && StringUtils.equals( oldMd.getVersioning().getSnapshot().getTimestamp(),
                 md.getVersioning().getSnapshot().getTimestamp() )
-            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md.getVersioning().getSnapshot().getBuildNumber() )
+            && oldMd.getVersioning().getSnapshot().getBuildNumber() == md.getVersioning().getSnapshot().getBuildNumber()
+            && ( oldMd.getVersioning().getVersions().containsAll( md.getVersioning().getVersions() ) && md.getVersioning().getVersions().containsAll(
+                oldMd.getVersioning().getVersions() ) )
+            && equals( oldMd.getVersioning().getSnapshotVersions(), md.getVersioning().getSnapshotVersions() ) )
         {
             return true;
         }
@@ -215,4 +219,28 @@ public class VersionDirMetadataProcessor
         return false;
     }
 
+    private boolean equals( List<SnapshotVersion> old, List<SnapshotVersion> md )
+    {
+        if ( old.size() != md.size() )
+        {
+            return false;
+        }
+
+        for ( SnapshotVersion version : md )
+        {
+            SnapshotVersion oldVersion = MetadataUtil.searchForEquivalent( version, old );
+            if ( oldVersion == null )
+            {
+                return false;
+            }
+
+            if ( !StringUtils.equals( oldVersion.getVersion(), version.getVersion() )
+                || !StringUtils.equals( oldVersion.getUpdated(), version.getUpdated() ) )
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }
