@@ -22,17 +22,4 @@ public interface MacPlugin
      */
     ArchetypeCatalog listArcherypesAsCatalog( MacRequest request, IndexingContext ctx )
         throws IOException;
-
-    /**
-     * Returns the archetype catalog as XML String for given request and sourced from given indexing context. Warning:
-     * this may be memory hungry operation if catalog is big! Try to avoid this method use (it is used in CLI and should
-     * stay like that).
-     * 
-     * @param request
-     * @param ctx
-     * @return
-     * @throws IOException
-     */
-    String listArchetypesAsCatalogXML( MacRequest request, IndexingContext ctx )
-        throws IOException;
 }

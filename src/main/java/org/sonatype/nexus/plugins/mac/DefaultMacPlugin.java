@@ -1,13 +1,11 @@
 package org.sonatype.nexus.plugins.mac;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Arrays;
 
 import org.apache.lucene.search.Query;
 import org.apache.maven.archetype.catalog.Archetype;
 import org.apache.maven.archetype.catalog.ArchetypeCatalog;
-import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
 import org.apache.maven.index.AndMultiArtifactInfoFilter;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.ArtifactInfoFilter;
@@ -27,8 +25,6 @@ public class DefaultMacPlugin
 {
     @Requirement
     private NexusIndexer indexer;
-
-    private ArchetypeCatalogXpp3Writer writer = new ArchetypeCatalogXpp3Writer();
 
     /**
      * Lists available archatypes for given request.
@@ -105,19 +101,6 @@ public class DefaultMacPlugin
                 infos.close();
             }
         }
-    }
-
-    public String listArchetypesAsCatalogXML( MacRequest request, IndexingContext ctx )
-        throws IOException
-    {
-        ArchetypeCatalog catalog = listArcherypesAsCatalog( request, ctx );
-
-        // serialize it to XML
-        StringWriter sw = new StringWriter();
-
-        writer.write( sw, catalog );
-
-        return sw.toString();
     }
 
     // ==

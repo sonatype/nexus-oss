@@ -2,10 +2,13 @@ package org.sonatype.nexus.plugins.mac.cli;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.StringWriter;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.apache.maven.archetype.catalog.ArchetypeCatalog;
+import org.apache.maven.archetype.catalog.io.xpp3.ArchetypeCatalogXpp3Writer;
 import org.apache.maven.index.context.IndexingContext;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.tools.cli.AbstractCli;
@@ -92,7 +95,14 @@ public class NexusArchetypeCli
 
         System.out.println( "Generating archetype catalog ..." );
 
-        String catalogXML = macPlugin.listArchetypesAsCatalogXML( new MacRequest( "tmp" ), ctx );
+        ArchetypeCatalog catalog = macPlugin.listArcherypesAsCatalog( new MacRequest( "tmp" ), ctx );
+
+        // serialize it to XML
+        ArchetypeCatalogXpp3Writer cw = new ArchetypeCatalogXpp3Writer();
+
+        StringWriter sw = new StringWriter();
+
+        cw.write( sw, catalog );
 
         File catalogFile = new File( repo, "archetype-catalog.xml" );
 
@@ -100,7 +110,7 @@ public class NexusArchetypeCli
 
         try
         {
-            writer.write( catalogXML );
+            writer.write( sw.toString() );
         }
         finally
         {
