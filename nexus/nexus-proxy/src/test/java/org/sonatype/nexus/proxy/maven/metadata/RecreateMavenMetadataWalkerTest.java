@@ -415,7 +415,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertTrue( md.getVersioning().getVersions().contains( "2.0" ) );
     }
 
-    public void /* FIXME test */VersionDirMdCorrect()
+    public void testVersionDirMdCorrect()
         throws Exception
     {
         rebuildMavenMetadata( inhouseSnapshot );
@@ -442,7 +442,8 @@ public class RecreateMavenMetadataWalkerTest
         Metadata md =
             readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj3/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
+        Assert.assertTrue( "20090226060812".equals( md.getVersioning().getLastUpdated() ));
+        Assert.assertTrue( "We have two snapshots", md.getVersioning().getSnapshotVersions().size() == 2 );
     }
 
     public void testVersionDirMdIncorrect()
