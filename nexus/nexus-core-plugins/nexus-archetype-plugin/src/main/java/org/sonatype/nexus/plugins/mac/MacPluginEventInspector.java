@@ -3,7 +3,7 @@ package org.sonatype.nexus.plugins.mac;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.sonatype.nexus.logging.AbstractLoggingComponent;
+import org.slf4j.Logger;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
@@ -25,10 +25,12 @@ import org.sonatype.plexus.appevents.Event;
  * @author cstamas
  */
 public class MacPluginEventInspector
-    extends AbstractLoggingComponent
     implements EventInspector
 {
     private static final String ARCHETYPE_PATH = "/archetype-catalog.xml";
+
+    @Inject
+    private Logger logger;
 
     @Inject
     @Named( "maven2" )
@@ -80,13 +82,13 @@ public class MacPluginEventInspector
                 }
                 catch ( Exception e )
                 {
-                    if ( getLogger().isDebugEnabled() )
+                    if ( logger.isDebugEnabled() )
                     {
-                        getLogger().info( "Unable to install the generated archetype catalog!", e );
+                        logger.info( "Unable to install the generated archetype catalog!", e );
                     }
                     else
                     {
-                        getLogger().info( "Unable to install the generated archetype catalog!" );
+                        logger.info( "Unable to install the generated archetype catalog!" );
                     }
                 }
             }
