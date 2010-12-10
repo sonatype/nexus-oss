@@ -51,8 +51,8 @@ public class DefaultSnapshotRemoverTest
 
                 // we succeeded, the value must be true
                 assertTrue(
-                            "The entry '" + entry.getKey() + "' was found in repository '" + repository.getId() + "' !",
-                            entry.getValue() );
+                    "The entry '" + entry.getKey() + "' was found in repository '" + repository.getId() + "' !",
+                    entry.getValue() );
             }
             catch ( ItemNotFoundException e )
             {
@@ -76,7 +76,7 @@ public class DefaultSnapshotRemoverTest
 
         File itemFile =
             new File( snapshotsRoot,
-                      "/org/nonuniquesnapgroup/nonuniquesnap/1.1-SNAPSHOT/nonuniquesnap-1.1-SNAPSHOT.jar" );
+                "/org/nonuniquesnapgroup/nonuniquesnap/1.1-SNAPSHOT/nonuniquesnap-1.1-SNAPSHOT.jar" );
 
         itemFile.setLastModified( tenDaysAgo );
 
@@ -115,7 +115,7 @@ public class DefaultSnapshotRemoverTest
 
         File itemFile =
             new File( snapshotsRoot,
-                      "/org/sonatype/nexus/nexus-indexer/1.0-beta-3-SNAPSHOT/nexus-indexer-1.0-beta-3-SNAPSHOT.jar" );
+                "/org/sonatype/nexus/nexus-indexer/1.0-beta-3-SNAPSHOT/nexus-indexer-1.0-beta-3-SNAPSHOT.jar" );
 
         itemFile.setLastModified( threeDayAgo );
         // -----------------------------
@@ -154,68 +154,68 @@ public class DefaultSnapshotRemoverTest
 
         // 1.0-beta-4-SNAPSHOT should be nuked completely
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
-                       Boolean.FALSE );
+            Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
-                       Boolean.FALSE );
+            Boolean.FALSE );
 
         // 1.0-beta-5-SNAPSHOT should have only one snapshot remaining, the newest
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom.sha1",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom.sha1",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar.sha1",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar.sha1",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom.sha1",
+            Boolean.TRUE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml", Boolean.TRUE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/maven-metadata.xml.sha1", Boolean.TRUE );
 
@@ -242,44 +242,44 @@ public class DefaultSnapshotRemoverTest
 
         // 1.0-beta-4-SNAPSHOT should be untouched completely
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-cli.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-jdk14.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT-sources.jar",
+            Boolean.TRUE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.pom",
-                       Boolean.TRUE );
+            Boolean.TRUE );
         expecting.put( "/org/sonatype/nexus/nexus-indexer/1.0-beta-4-SNAPSHOT/nexus-indexer-1.0-beta-4-SNAPSHOT.jar",
-                       Boolean.TRUE );
+            Boolean.TRUE );
 
         // 1.0-beta-5-SNAPSHOT should have only two snapshot remaining, the two newest
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
 
         validateResults( snapshots, expecting );
     }
@@ -333,11 +333,12 @@ public class DefaultSnapshotRemoverTest
         Metadata mdAfter =
             readMavenMetadata( retrieveFile( snapshots, "org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        assertEquals( mdBefore.getVersioning().getLastUpdated(), mdAfter.getVersioning().getLastUpdated() );
+        // cstamas: simply not true since maven md 1.1 support
+        // assertEquals( mdBefore.getVersioning().getLastUpdated(), mdAfter.getVersioning().getLastUpdated() );
         assertEquals( mdBefore.getVersioning().getSnapshot().getTimestamp(),
-                      mdAfter.getVersioning().getSnapshot().getTimestamp() );
+            mdAfter.getVersioning().getSnapshot().getTimestamp() );
         assertEquals( mdBefore.getVersioning().getSnapshot().getBuildNumber(),
-                      mdAfter.getVersioning().getSnapshot().getBuildNumber() );
+            mdAfter.getVersioning().getSnapshot().getBuildNumber() );
 
     }
 
@@ -367,7 +368,7 @@ public class DefaultSnapshotRemoverTest
 
         Metadata md = readMavenMetadata( retrieveFile( snapshots, "org/sonatype/nexus/nexus/maven-metadata.xml" ) );
         assertFalse( "The artifact metadata should not contain the removed version!",
-                     md.getVersioning().getVersions().contains( "1.3.0-SNAPSHOT" ) );
+            md.getVersioning().getVersions().contains( "1.3.0-SNAPSHOT" ) );
     }
 
     /**
@@ -421,7 +422,7 @@ public class DefaultSnapshotRemoverTest
 
         Metadata md =
             readMavenMetadata( retrieveFile( snapshots,
-                                             "org/sonatype/nexus/nexus-indexer/1.0-beta-3-SNAPSHOT/maven-metadata.xml" ) );
+                "org/sonatype/nexus/nexus-indexer/1.0-beta-3-SNAPSHOT/maven-metadata.xml" ) );
 
         Assert.assertEquals( 2, md.getVersioning().getSnapshot().getBuildNumber() );
         Assert.assertEquals( "20010711.162119", md.getVersioning().getSnapshot().getTimestamp() );
@@ -471,33 +472,33 @@ public class DefaultSnapshotRemoverTest
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom", Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090210.090218-375.pom", Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
 
         validateResults( snapshots, expecting );
     }
-    
+
     public void testAllReposNotDoingRepoMoreThanOnce()
         throws Exception
     {
@@ -508,9 +509,10 @@ public class DefaultSnapshotRemoverTest
         SnapshotRemovalResult result = defaultNexus.removeSnapshots( request );
 
         assertTrue( result.isSuccessful() );
-        
+
         // we should have skipped once, when processing the public group
-        assertEquals( "should have found 1 instance of skipped repo", 1, result.getProcessedRepositories().get( "snapshots" ).getSkippedCount() );
+        assertEquals( "should have found 1 instance of skipped repo", 1,
+            result.getProcessedRepositories().get( "snapshots" ).getSkippedCount() );
 
         HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
         expecting.put( "/org/sonatype/nexus/nexus/1.2.2-SNAPSHOT/nexus-1.2.2-20080123.160704-197.pom", Boolean.FALSE );
@@ -521,29 +523,29 @@ public class DefaultSnapshotRemoverTest
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom", Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090210.090218-375.pom", Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
 
         validateResults( snapshots, expecting );
     }
@@ -568,29 +570,29 @@ public class DefaultSnapshotRemoverTest
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090209.062729-356.pom", Boolean.FALSE );
         expecting.put( "/org/sonatype/nexus/nexus/1.3.0-SNAPSHOT/nexus-1.3.0-20090210.090218-375.pom", Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080711.162119-2.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080718.231118-50.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
-                       Boolean.FALSE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080730.002543-149.pom",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.jar",
+            Boolean.TRUE );
         expecting.put(
-                       "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
-                       Boolean.TRUE );
+            "/org/sonatype/nexus/nexus-indexer/1.0-beta-5-SNAPSHOT/nexus-indexer-1.0-beta-5-20080731.150252-163.pom",
+            Boolean.TRUE );
 
         validateResults( snapshots, expecting );
     }
@@ -606,22 +608,22 @@ public class DefaultSnapshotRemoverTest
 
         HashMap<String, Boolean> expecting = new HashMap<String, Boolean>();
         expecting.put(
-                       "/org/myorg/very.very.long.project.id/1.1-SNAPSHOT/very.very.long.project.id-1.1-20070807.081844-1.jar",
-                       Boolean.FALSE );
+            "/org/myorg/very.very.long.project.id/1.1-SNAPSHOT/very.very.long.project.id-1.1-20070807.081844-1.jar",
+            Boolean.FALSE );
         expecting.put(
-                       "/org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar",
-                       Boolean.FALSE );
+            "/org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar",
+            Boolean.FALSE );
         validateResults( snapshots, expecting );
 
         // we could not retrieve the illegal artifact, but we can check the file system
         File snapshotsStorageBase = new File( getWorkHomeDir(), "storage/" + snapshots.getId() );
         File illegalArtifact =
             new File(
-                      snapshotsStorageBase,
-                      "org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar" );
+                snapshotsStorageBase,
+                "org/myorg/very.very.long.project.id/1.0.0-SNAPSHOT/1.0.0-SNAPSHOT/very.very.long.project.id-1.0.0-20070807.081844-1.jar" );
         assertTrue( illegalArtifact.exists() );
     }
-    
+
     /**
      * @see <a href='https://issues.sonatype.org/browse/NEXUS-3148'>NEXUS-3148</a>
      */

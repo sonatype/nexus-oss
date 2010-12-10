@@ -36,7 +36,6 @@ public class VersionDirMetadataProcessor
     @Override
     public boolean shouldProcessMetadata( String path )
     {
-
         Collection<String> names = metadataHelper.gavData.get( path );
 
         if ( names != null && !names.isEmpty() )
