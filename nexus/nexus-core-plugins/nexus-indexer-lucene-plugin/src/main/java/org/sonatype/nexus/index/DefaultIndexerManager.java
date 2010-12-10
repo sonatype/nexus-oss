@@ -293,7 +293,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        Lock lock = getLock( repository ).writeLock();
+        Lock lock = getLock( repository.getId() ).writeLock();
         lock.lock();
 
         try
@@ -412,7 +412,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        Lock lock = getLock( repository ).writeLock();
+        Lock lock = getLock( repository.getId() ).writeLock();
         lock.lock();
 
         try
@@ -448,7 +448,7 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        Lock lock = getLock( repository ).writeLock();
+        Lock lock = getLock( repository.getId() ).writeLock();
         lock.lock();
 
         try
@@ -930,7 +930,7 @@ public class DefaultIndexerManager
             return;
         }
 
-        if ( isAlreadyBeingIndexed( repository ) )
+        if ( isAlreadyBeingIndexed( repository.getId() ) )
         {
             return;
         }
@@ -2559,11 +2559,6 @@ public class DefaultIndexerManager
         return locks.get( repositoryId );
     }
 
-    private ReadWriteLock getLock( Repository repository )
-    {
-        return getLock( repository.getId() );
-    }
-
     private boolean isAlreadyBeingIndexed( String repositoryId )
     {
         Lock lock = getLock( repositoryId ).readLock();
@@ -2581,10 +2576,5 @@ public class DefaultIndexerManager
                 lock.unlock();
             }
         }
-    }
-
-    private boolean isAlreadyBeingIndexed( Repository repository )
-    {
-        return isAlreadyBeingIndexed( repository.getId() );
     }
 }

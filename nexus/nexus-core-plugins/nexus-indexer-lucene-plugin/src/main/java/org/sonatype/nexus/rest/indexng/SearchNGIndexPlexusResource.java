@@ -100,13 +100,13 @@ public class SearchNGIndexPlexusResource
     /**
      * The default threshold of change size in relevance, from where we may "cut" the results.
      */
-    private static final int DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = 350;
+    private static final int DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = 500;
 
     /**
      * The threshold of change size in relevance, from where we may "cut" the results.
      */
-    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = Integer.getInteger(
-        "plexus.search.ga.hit.relevanceDropThreshold", DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000;
+    private static final float DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) Integer.getInteger(
+        "plexus.search.ga.hit.relevanceDropThreshold", DEFAULT_DOCUMENT_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000f;
 
     /**
      * The default treshold of change from the very 1st hit. from where we may "cut" the results.
@@ -116,8 +116,8 @@ public class SearchNGIndexPlexusResource
     /**
      * The treshold of change from the very 1st hit. from where we may "cut" the results.
      */
-    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = Integer.getInteger(
-        "plexus.search.ga.hit.topRelevanceDropThreshold", DEFAULT_DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000;
+    private static final float DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD = (float) Integer.getInteger(
+        "plexus.search.ga.hit.topRelevanceDropThreshold", DEFAULT_DOCUMENT_TOP_RELEVANCE_HIT_CHANGE_THRESHOLD ) / 1000f;
 
     /**
      * The default treshold, that is used to "uncollapse" the collapsed results (if less hits than threshold).

@@ -1,8 +1,8 @@
 package org.sonatype.nexus.rest.indexng;
 
-import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.artifact.VersionUtils;
+import org.sonatype.aether.version.Version;
 
 /**
  * A holder for the latest version (both release and snapshot).
@@ -20,11 +20,11 @@ public class LatestVersionHolder
 
     private final String artifactId;
 
-    private ArtifactVersion latestSnapshot;
+    private Version latestSnapshot;
 
     private String latestSnapshotRepositoryId;
 
-    private ArtifactVersion latestRelease;
+    private Version latestRelease;
 
     private String latestReleaseRepositoryId;
 
@@ -42,11 +42,9 @@ public class LatestVersionHolder
      * @param ai
      * @return relation of passed in ai paramter to current state
      */
-    @SuppressWarnings( "unchecked" )
     public VersionChange maintainLatestVersions( final ArtifactInfo ai )
     {
-        @SuppressWarnings( "deprecation" )
-        ArtifactVersion version = ai.getArtifactVersion();
+        Version version = ai.getArtifactVersion();
 
         VersionChange versionChange = VersionChange.EQUALS;
 
@@ -130,7 +128,7 @@ public class LatestVersionHolder
         return artifactId;
     }
 
-    public ArtifactVersion getLatestSnapshot()
+    public Version getLatestSnapshot()
     {
         return latestSnapshot;
     }
@@ -140,7 +138,7 @@ public class LatestVersionHolder
         return latestSnapshotRepositoryId;
     }
 
-    public ArtifactVersion getLatestRelease()
+    public Version getLatestRelease()
     {
         return latestRelease;
     }
