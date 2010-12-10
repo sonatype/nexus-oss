@@ -2,8 +2,10 @@ package org.sonatype.nexus.proxy.maven;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
@@ -33,16 +35,16 @@ public class MavenFileTypeValidator
     @Requirement
     private MimeUtil mimeUtil;
 
-    private Map<String, String> supportedTypeMap = new HashMap<String, String>();
+    private Map<String, List<String>> supportedTypeMap = new HashMap<String, List<String>>();
 
     public MavenFileTypeValidator()
     {
-        supportedTypeMap.put( "jar", "application/zip" );
-        supportedTypeMap.put( "zip", "application/zip" );
-        supportedTypeMap.put( "war", "application/zip" );
-        supportedTypeMap.put( "ear", "application/zip" );
-        supportedTypeMap.put( "pom", "application/x-maven-pom" );
-        supportedTypeMap.put( "xml", "text/xml" );
+        supportedTypeMap.put( "jar", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "zip", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "war", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "ear", Arrays.asList( "application/zip" ) );
+        supportedTypeMap.put( "pom", Arrays.asList( "application/x-maven-pom", "application/xml", "text/xml" ) );
+        supportedTypeMap.put( "xml", Arrays.asList( "application/xml", "text/xml" ) );
     }
 
     @Override
@@ -92,11 +94,11 @@ public class MavenFileTypeValidator
         {
             Set<String> expectedMimeTypes = new HashSet<String>();
 
-            for ( Entry<String, String> entry : supportedTypeMap.entrySet() )
+            for ( Entry<String, List<String>> entry : supportedTypeMap.entrySet() )
             {
                 if ( file.getPath().toLowerCase().endsWith( entry.getKey() ) )
                 {
-                    expectedMimeTypes.add( entry.getValue() );
+                    expectedMimeTypes.addAll( entry.getValue() );
                 }
             }
 
