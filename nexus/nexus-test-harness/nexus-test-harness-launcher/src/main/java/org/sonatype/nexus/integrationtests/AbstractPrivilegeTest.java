@@ -90,12 +90,13 @@ public abstract class AbstractPrivilegeTest
             Assert.fail( e.getMessage() );
         }
     }
-    
-    @BeforeClass(alwaysRun = true)
+
+    @BeforeClass( alwaysRun = true )
     @org.junit.BeforeClass
-    public static void enableSecurity(){
+    public static void enableSecurity()
+    {
         // turn on security for the test
-        TestContainer.getInstance().getTestContext().setSecureTest( true );    	
+        TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
     private void init()
@@ -109,11 +110,11 @@ public abstract class AbstractPrivilegeTest
         this.targetUtil = new TargetMessageUtil( this, xstream, MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         this.routeUtil = new RoutesMessageUtil( this, xstream, MediaType.APPLICATION_XML );
-        this.repoUtil = new RepositoryMessageUtil( this, xstream, MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
-        this.groupUtil = new GroupMessageUtil( this,xstream, MediaType.APPLICATION_XML );
+        this.repoUtil = new RepositoryMessageUtil( this, xstream, MediaType.APPLICATION_XML );
+        this.groupUtil = new GroupMessageUtil( this, xstream, MediaType.APPLICATION_XML );
     }
 
-    @BeforeMethod(alwaysRun = true)
+    @BeforeMethod( alwaysRun = true )
     @Before
     public void resetTestUserPrivs()
         throws Exception
@@ -323,7 +324,7 @@ public abstract class AbstractPrivilegeTest
     }
 
     @Override
-    @AfterMethod(alwaysRun = true)
+    @AfterMethod( alwaysRun = true )
     @After
     public void afterTest()
         throws Exception

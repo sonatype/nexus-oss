@@ -36,9 +36,7 @@ public class Nexus2556BrandNewRepositorySearchIT
     public void init()
         throws ComponentLookupException
     {
-        this.repoUtil =
-            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
-                                       getRepositoryTypeRegistry() );
+        this.repoUtil = new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
     }
 
     @Test
@@ -67,7 +65,7 @@ public class Nexus2556BrandNewRepositorySearchIT
 
         repo = (RepositoryResource) repoUtil.getRepository( repoId );
         Assert.assertTrue( repo.isIndexable() );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
         getEventInspectorsUtil().waitForCalmPeriod();
 

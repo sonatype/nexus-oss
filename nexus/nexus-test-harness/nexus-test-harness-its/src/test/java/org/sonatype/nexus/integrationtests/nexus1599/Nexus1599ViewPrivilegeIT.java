@@ -41,8 +41,7 @@ public class Nexus1599ViewPrivilegeIT
 
         this.repoMsgUtil = new RepositoryMessageUtil(
             this, this.getJsonXStream(),
-            MediaType.APPLICATION_JSON,
-            getRepositoryTypeRegistry() );
+            MediaType.APPLICATION_JSON );
     }
 
     @BeforeClass

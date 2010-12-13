@@ -53,9 +53,7 @@ public class Nexus531RepositoryCrudJsonIT
     public void init()
         throws ComponentLookupException
     {
-        this.messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
-                                       getRepositoryTypeRegistry() );
+        this.messageUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @BeforeClass
@@ -238,12 +236,12 @@ public class Nexus531RepositoryCrudJsonIT
 
                 String storageURL =
                     repo.getDefaultLocalStorageUrl() != null ? repo.getDefaultLocalStorageUrl()
-                                    : repo.getOverrideLocalStorageUrl();
+                        : repo.getOverrideLocalStorageUrl();
 
                 storageURL = storageURL.endsWith( "/" ) ? storageURL : storageURL + "/";
                 String effectiveLocalStorage =
                     listRepo.getEffectiveLocalStorageUrl().endsWith( "/" ) ? listRepo.getEffectiveLocalStorageUrl()
-                                    : listRepo.getEffectiveLocalStorageUrl() + "/";
+                        : listRepo.getEffectiveLocalStorageUrl() + "/";
 
                 Assert.assertEquals( storageURL, effectiveLocalStorage );
             }

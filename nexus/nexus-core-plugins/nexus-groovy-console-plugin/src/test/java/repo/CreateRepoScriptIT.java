@@ -28,8 +28,7 @@ public class CreateRepoScriptIT
     public CreateRepoScriptIT()
         throws Exception
     {
-        this.messageUtil =
-            new RepositoryMessageUtil(this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+        this.messageUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
     @Override

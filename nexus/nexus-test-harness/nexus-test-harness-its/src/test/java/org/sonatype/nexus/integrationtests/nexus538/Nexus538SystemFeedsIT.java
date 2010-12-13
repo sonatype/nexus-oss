@@ -46,13 +46,13 @@ public class Nexus538SystemFeedsIT
         Assert.assertTrue( findFeedEntry( feed, "Booting", null ) );
     }
 
-    @Test(dependsOnMethods = {"bootEventTest"})
+    @Test( dependsOnMethods = { "bootEventTest" } )
     public void updateRepoTest()
         throws Exception
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
 
         RepositoryBaseResource repo = repoUtil.getRepository( this.getTestRepositoryId() );
         String oldName = repo.getName();
@@ -66,16 +66,16 @@ public class Nexus538SystemFeedsIT
         final SyndFeed feed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( feed );
         Assert.assertTrue( findFeedEntry( feed, "Configuration change", new String[] { newName, oldName } ),
-                           "Update repo feed not found\r\n\r\n" + feed );
+            "Update repo feed not found\r\n\r\n" + feed );
     }
 
-    @Test(dependsOnMethods = {"updateRepoTest"})
+    @Test( dependsOnMethods = { "updateRepoTest" } )
     public void changeProxyStatusTest()
         throws Exception
     {
         // change the name of the test repo
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
 
         RepositoryStatusResource repo = repoUtil.getStatus( "release-proxy-repo-1" );
         repo.setProxyMode( ProxyMode.BLOCKED_AUTO.name() );
@@ -83,7 +83,7 @@ public class Nexus538SystemFeedsIT
 
         TaskScheduleUtil.waitForAllTasksToStop();
         new EventInspectorsUtil( this ).waitForCalmPeriod();
-        
+
         SyndFeed systemFeed = FeedUtil.getFeed( "systemChanges" );
         this.validateLinksInFeeds( systemFeed );
 
@@ -91,10 +91,10 @@ public class Nexus538SystemFeedsIT
         this.validateLinksInFeeds( systemStatusFeed );
 
         Assert.assertTrue( findFeedEntry( systemFeed, "Repository proxy mode change",
-                                          new String[] { "release-proxy-repo-1" } ) );
+            new String[] { "release-proxy-repo-1" } ) );
 
         Assert.assertTrue( findFeedEntry( systemStatusFeed, "Repository proxy mode change",
-                                          new String[] { "release-proxy-repo-1" } ) );
+            new String[] { "release-proxy-repo-1" } ) );
     }
 
     @SuppressWarnings( "unchecked" )
@@ -145,7 +145,7 @@ public class Nexus538SystemFeedsIT
         {
             Assert.assertNotNull( "Feed item link is empty.", syndEntry.getLink() );
             Assert.assertTrue( syndEntry.getLink().startsWith( this.getBaseNexusUrl() ),
-                               "Feed item link is wrong, is: " + syndEntry.getLink() );
+                "Feed item link is wrong, is: " + syndEntry.getLink() );
         }
     }
 }

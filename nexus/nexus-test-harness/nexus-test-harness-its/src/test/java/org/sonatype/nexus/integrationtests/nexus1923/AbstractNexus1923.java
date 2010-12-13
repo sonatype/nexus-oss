@@ -72,12 +72,11 @@ public abstract class AbstractNexus1923
         super();
     }
 
-    @BeforeClass(alwaysRun = true)
-    public void init() throws ComponentLookupException
+    @BeforeClass( alwaysRun = true )
+    public void init()
+        throws ComponentLookupException
     {
-        this.repoUtils =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
-                                       getRepositoryTypeRegistry() );
+        this.repoUtils = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         this.groupUtils = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
     }
 
@@ -500,7 +499,7 @@ public abstract class AbstractNexus1923
         else
         {
             Assert.assertEquals( properties.getProperty( IndexingContext.INDEX_CHUNK_COUNTER ),
-                                 Integer.toString( current ) );
+                Integer.toString( current ) );
         }
     }
 
@@ -610,7 +609,7 @@ public abstract class AbstractNexus1923
         }
     }
 
-    @BeforeClass(alwaysRun = true)
+    @BeforeClass( alwaysRun = true )
     public static void clean()
         throws Exception
     {

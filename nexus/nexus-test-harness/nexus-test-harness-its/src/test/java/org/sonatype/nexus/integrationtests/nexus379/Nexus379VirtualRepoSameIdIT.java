@@ -39,11 +39,10 @@ public class Nexus379VirtualRepoSameIdIT
     protected RepositoryMessageUtil messageUtil;
 
     @BeforeClass
-    public void setSecureTest() throws ComponentLookupException{
-    	this.messageUtil = new RepositoryMessageUtil(
-            this, this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            getRepositoryTypeRegistry() );
+    public void setSecureTest()
+        throws ComponentLookupException
+    {
+        this.messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

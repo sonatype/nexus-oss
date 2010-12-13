@@ -75,16 +75,16 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( RepositoryGroupListResource group : groups )
         {
-            Assert.assertTrue( group.getResourceURI().startsWith( baseUrl ), "Repository '" + group.getId() + "' uri do not start with baseUrl.  Expected: "
-                    + baseUrl + ", but got: " + group.getResourceURI() );
+            Assert.assertTrue( group.getResourceURI().startsWith( baseUrl ), "Repository '" + group.getId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + group.getResourceURI() );
 
             List<ContentListResource> contents = contentUtil.getContentListResource( group.getId(), "/", true );
 
             for ( ContentListResource content : contents )
             {
-                Assert.assertTrue( content.getResourceURI().startsWith( baseUrl ), "Group content '" + content.getText()
-                        + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: "
-                        + content.getResourceURI() );
+                Assert.assertTrue( content.getResourceURI().startsWith( baseUrl ),
+                    "Group content '" + content.getText() + "' uri do not start with baseUrl.  Expected: " + baseUrl
+                        + ", but got: " + content.getResourceURI() );
             }
         }
     }
@@ -94,8 +94,7 @@ public class Nexus1696ValidateBaseUrlIT
         throws Exception
     {
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
-                getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
         ContentListMessageUtil contentUtil =
             new ContentListMessageUtil( this.getXMLXStream(), MediaType.APPLICATION_XML );
 
@@ -104,16 +103,16 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( RepositoryListResource repo : repositories )
         {
-            Assert.assertTrue( repo.getResourceURI().startsWith( baseUrl ), "Repository '" + repo.getId() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + repo.getResourceURI() );
+            Assert.assertTrue( repo.getResourceURI().startsWith( baseUrl ), "Repository '" + repo.getId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + repo.getResourceURI() );
 
             List<ContentListResource> contents = contentUtil.getContentListResource( repo.getId(), "/", false );
 
             for ( ContentListResource content : contents )
             {
-                Assert.assertTrue( content.getResourceURI().startsWith( baseUrl ), "Repository content '" + content.getText()
-                        + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: "
-                        + content.getResourceURI() );
+                Assert.assertTrue( content.getResourceURI().startsWith( baseUrl ),
+                    "Repository content '" + content.getText() + "' uri do not start with baseUrl.  Expected: "
+                        + baseUrl + ", but got: " + content.getResourceURI() );
             }
         }
     }
@@ -128,8 +127,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( PrivilegeStatusResource priv : privs )
         {
-            Assert.assertTrue( priv.getResourceURI().startsWith( baseUrl ), "Privilege '" + priv.getId() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + priv.getResourceURI() );
+            Assert.assertTrue( priv.getResourceURI().startsWith( baseUrl ), "Privilege '" + priv.getId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + priv.getResourceURI() );
         }
     }
 
@@ -142,8 +141,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( RoleResource role : roles )
         {
-            Assert.assertTrue( role.getResourceURI().startsWith( baseUrl ), "Role '" + role.getId() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + role.getResourceURI() );
+            Assert.assertTrue( role.getResourceURI().startsWith( baseUrl ), "Role '" + role.getId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + role.getResourceURI() );
         }
     }
 
@@ -156,8 +155,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( UserResource user : users )
         {
-            Assert.assertTrue( user.getResourceURI().startsWith( baseUrl ), "User '" + user.getUserId() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + user.getResourceURI() );
+            Assert.assertTrue( user.getResourceURI().startsWith( baseUrl ), "User '" + user.getUserId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + user.getResourceURI() );
         }
     }
 
@@ -182,8 +181,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( RepositoryRouteListResource route : routes )
         {
-            Assert.assertTrue( route.getResourceURI().startsWith( baseUrl ), "Route '" + route.getGroupId() + "' uri do not start with baseUrl.  Expected: "
-                    + baseUrl + ", but got: " + route.getResourceURI() );
+            Assert.assertTrue( route.getResourceURI().startsWith( baseUrl ), "Route '" + route.getGroupId()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + route.getResourceURI() );
         }
     }
 
@@ -211,8 +210,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( ScheduledServiceListResource task : tasks )
         {
-            Assert.assertTrue( task.getResourceURI().startsWith( baseUrl ), "Task '" + task.getName() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + task.getResourceURI() );
+            Assert.assertTrue( task.getResourceURI().startsWith( baseUrl ), "Task '" + task.getName()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + task.getResourceURI() );
         }
     }
 
@@ -239,8 +238,8 @@ public class Nexus1696ValidateBaseUrlIT
 
         for ( RepositoryTargetListResource target : targets )
         {
-            Assert.assertTrue( target.getResourceURI().startsWith( baseUrl ), "Target '" + target.getName() + "' uri do not start with baseUrl.  Expected: " + baseUrl
-                    + ", but got: " + target.getResourceURI() );
+            Assert.assertTrue( target.getResourceURI().startsWith( baseUrl ), "Target '" + target.getName()
+                + "' uri do not start with baseUrl.  Expected: " + baseUrl + ", but got: " + target.getResourceURI() );
         }
     }
 

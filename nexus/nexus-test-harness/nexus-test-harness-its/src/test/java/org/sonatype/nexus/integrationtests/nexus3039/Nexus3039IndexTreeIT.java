@@ -20,25 +20,24 @@ public class Nexus3039IndexTreeIT
         String repoId = this.getTestRepositoryId();
 
         // get the index tree
-        Response response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
+        Response response =
+            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
         Assert.assertEquals( 200, response.getStatus().getCode() );
-        
-        RepositoryMessageUtil repoUtil = new RepositoryMessageUtil(
-            this, this.getXMLXStream(),
-            MediaType.APPLICATION_XML,
-            this.getRepositoryTypeRegistry() );
+
+        RepositoryMessageUtil repoUtil =
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
 
         RepositoryResource resource = (RepositoryResource) repoUtil.getRepository( repoId );
         resource.setIndexable( false );
         repoUtil.updateRepo( resource );
 
         // get the index tree
-        response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
+        response =
+            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repositories/" + repoId + "/index_content/" );
         Assert.assertEquals( 404, response.getStatus().getCode() );
 
     }
-    
-    
+
     @Test
     public void testGroupIndexTree()
         throws Exception
@@ -46,9 +45,9 @@ public class Nexus3039IndexTreeIT
         String repoId = "public";
 
         // get the index tree
-        Response response = RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repo_groups/" + repoId + "/index_content/" );
+        Response response =
+            RequestFacade.doGetRequest( RequestFacade.SERVICE_LOCAL + "repo_groups/" + repoId + "/index_content/" );
         Assert.assertEquals( 200, response.getStatus().getCode() );
     }
-    
 
 }

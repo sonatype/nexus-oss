@@ -32,9 +32,10 @@ import org.testng.annotations.Test;
 public class Nexus642SynchShadowTaskIT
     extends AbstractNexusIntegrationTest
 {
-	
+
     @BeforeClass
-    public void setSecureTest(){
+    public void setSecureTest()
+    {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 
@@ -44,7 +45,7 @@ public class Nexus642SynchShadowTaskIT
     {
         // create shadow repo 'nexus-shadow-repo'
         RepositoryMessageUtil repoUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         String shadowRepoId = "nexus-shadow-repo";
         String taskName = "synchShadowTest";
 
@@ -68,8 +69,9 @@ public class Nexus642SynchShadowTaskIT
 
         // download the file using the shadow repo
         File actualFile =
-            this.downloadFile( new URL( this.getBaseNexusUrl() + "content/repositories/" + shadowRepoId + "/"
-                + this.getTestId() + "/jars/artifact-5.4.3.jar" ), "target/downloads/nexus642.jar" );
+            this.downloadFile(
+                new URL( this.getBaseNexusUrl() + "content/repositories/" + shadowRepoId + "/" + this.getTestId()
+                    + "/jars/artifact-5.4.3.jar" ), "target/downloads/nexus642.jar" );
         File expectedFile = this.getTestResourceAsFile( "projects/artifact/artifact.jar" );
         Assert.assertTrue( FileTestingUtils.compareFileSHA1s( expectedFile, actualFile ) );
 

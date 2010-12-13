@@ -52,9 +52,7 @@ public class Nexus874SecurityRealmReplacementIT
     {
         TestContainer.getInstance().getTestContext().setSecureTest( true );
         groupUtil = new GroupMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
-        repoUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON,
-                                       getRepositoryTypeRegistry() );
+        repoUtil = new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         // targetUtil = new TargetMessageUtil( this.getJsonXStream(), MediaType.APPLICATION_JSON );
         roleUtil = new RoleMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         userUtil = new UserMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );

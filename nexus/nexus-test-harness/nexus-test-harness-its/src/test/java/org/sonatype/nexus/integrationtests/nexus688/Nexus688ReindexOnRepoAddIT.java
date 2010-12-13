@@ -48,9 +48,7 @@ public class Nexus688ReindexOnRepoAddIT
     public void setSecureTest()
         throws ComponentLookupException
     {
-        messageUtil =
-            new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML,
-                getRepositoryTypeRegistry() );
+        messageUtil = new RepositoryMessageUtil( this, this.getXMLXStream(), MediaType.APPLICATION_XML );
         TestContainer.getInstance().getTestContext().setSecureTest( true );
     }
 

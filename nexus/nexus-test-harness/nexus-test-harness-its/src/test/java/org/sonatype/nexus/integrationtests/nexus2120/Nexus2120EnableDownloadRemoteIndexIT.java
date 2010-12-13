@@ -46,9 +46,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         throws Exception
     {
         server = (ControlledServer) lookup( ControlledServer.ROLE );
-        repoUtil =
-            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
-                                       getRepositoryTypeRegistry() );
+        repoUtil = new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
     }
 
     @AfterMethod
@@ -67,7 +65,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         RepositoryResource basic = (RepositoryResource) repoUtil.getRepository( "basic" );
         // ensure URL
         Assert.assertEquals( "http://localhost:" + webProxyPort + "/repository/",
-                             basic.getRemoteStorage().getRemoteStorageUrl() );
+            basic.getRemoteStorage().getRemoteStorageUrl() );
         // ensure is not downloading index
         Assert.assertFalse( basic.isDownloadRemoteIndexes() );
 
@@ -86,9 +84,9 @@ public class Nexus2120EnableDownloadRemoteIndexIT
         // if index_context does not exist (or repo does not exist)
         Response response = RequestFacade.doGetRequest( URI );
         Assert.assertTrue( response.getStatus().isSuccess(), "Error downloading index content\n" + response.getStatus() );
-       
+
         XStream xstream = XStreamFactory.getXmlXStream();
-        
+
         xstream.processAnnotations( IndexBrowserTreeNode.class );
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
 
@@ -96,7 +94,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
             new XStreamRepresentation( xstream, response.getEntity().getText(), MediaType.APPLICATION_XML );
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
-        
+
         Assert.assertTrue( resourceResponse.getData().getChildren().isEmpty(), "index response should have 0 entries" );
 
         // I changed my mind, I do wanna remote index
@@ -109,7 +107,7 @@ public class Nexus2120EnableDownloadRemoteIndexIT
 
         // did nexus downloaded indexes?
         Assert.assertTrue( repoUrls.contains( "/repository/.index/nexus-maven-repository-index.gz" ),
-                           "nexus should download remote indexes!!! " + repoUrls );
+            "nexus should download remote indexes!!! " + repoUrls );
         response = RequestFacade.doGetRequest( URI );
         Assert.assertTrue( response.getStatus().isSuccess(), "Error downloading index content\n" + response.getStatus() );
     }

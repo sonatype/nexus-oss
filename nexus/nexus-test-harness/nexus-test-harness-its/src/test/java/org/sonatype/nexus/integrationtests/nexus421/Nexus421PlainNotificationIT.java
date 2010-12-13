@@ -48,8 +48,7 @@ public class Nexus421PlainNotificationIT
         throws Exception
     {
         // set up repo message util
-        this.repoMessageUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+        this.repoMessageUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
 
         // CONFIG CHANGES (using Nexus factory-defaults!)
         // set up SMTP to use our mailServer
@@ -85,7 +84,7 @@ public class Nexus421PlainNotificationIT
         notificationSettings.setEnabled( true );
 
         Assert.assertTrue( SettingsMessageUtil.save( globalSettings ).isSuccess(),
-                           "On saving global config, response should be success." );
+            "On saving global config, response should be success." );
 
         // make a proxy server to block (do it by taking central, and breaking it's remoteURL)
         RepositoryProxyResource central = (RepositoryProxyResource) repoMessageUtil.getRepository( "central" );

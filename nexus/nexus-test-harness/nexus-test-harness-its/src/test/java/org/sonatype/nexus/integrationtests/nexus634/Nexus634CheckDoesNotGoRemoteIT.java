@@ -55,13 +55,14 @@ public class Nexus634CheckDoesNotGoRemoteIT
         super();
 
     }
-    
+
     @BeforeClass
-    public void init() throws ComponentLookupException{
+    public void init()
+        throws ComponentLookupException
+    {
         this.localStorageDir = TestProperties.getString( "proxy.repo.base.dir" );
         this.proxyPort = TestProperties.getInteger( "proxy.server.port" );
-        this.repositoryMessageUtil =
-            new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );        
+        this.repositoryMessageUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
 
     @BeforeMethod
@@ -89,7 +90,7 @@ public class Nexus634CheckDoesNotGoRemoteIT
         server.start();
     }
 
-    @AfterMethod  
+    @AfterMethod
     public void stopProxy()
         throws Exception
     {
@@ -116,13 +117,12 @@ public class Nexus634CheckDoesNotGoRemoteIT
         repoOrGroupProp.setKey( "repositoryOrGroupId" );
         repoOrGroupProp.setValue( "repo_" + REPO_RELEASE_PROXY_REPO1 );
         TaskScheduleUtil.runTask( ExpireCacheTaskDescriptor.ID, repoOrGroupProp );
-        
+
         // run snapshot remover
         runSnapshotRemover( "repo_nexus-test-harness-snapshot-repo", 0, 0, true );
 
         // check is proxy touched
-        Assert.assertEquals(
-            touchTrackingHandler.getTouchedTargets().size(), 0,
+        Assert.assertEquals( touchTrackingHandler.getTouchedTargets().size(), 0,
             "Proxy should not be touched! It was asked for " + touchTrackingHandler.getTouchedTargets() );
     }
 }

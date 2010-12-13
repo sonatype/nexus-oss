@@ -28,56 +28,60 @@ public class Nexus1730DeleteRepoIT
     extends AbstractNexusIntegrationTest
 {
     protected PrivilegesMessageUtil privUtil;
+
     protected RepositoryMessageUtil repoUtil;
+
     protected GroupMessageUtil groupUtil;
-    
+
     @BeforeClass
-    public void prepare() throws ComponentLookupException{
-    	privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
-        repoUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+    public void prepare()
+        throws ComponentLookupException
+    {
+        privUtil = new PrivilegesMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
+        repoUtil = new RepositoryMessageUtil( this, getJsonXStream(), MediaType.APPLICATION_JSON );
         groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
     }
-    
+
     @Test
     public void testDeleteRepo()
         throws Exception
     {
         createRepository();
         List<String> privilegeIds = createPrivileges();
-        
+
         for ( String privilegeId : privilegeIds )
         {
             checkForPrivilege( privilegeId, true );
         }
-        
+
         deleteRepository();
-        
+
         for ( String privilegeId : privilegeIds )
         {
             checkForPrivilege( privilegeId, false );
         }
     }
-    
+
     @Test
     public void testDeleteGroup()
         throws Exception
     {
         createGroup();
         List<String> privilegeIds = createGroupPrivileges();
-        
+
         for ( String privilegeId : privilegeIds )
         {
             checkForPrivilege( privilegeId, true );
         }
-        
+
         deleteGroup();
-        
+
         for ( String privilegeId : privilegeIds )
         {
             checkForPrivilege( privilegeId, false );
         }
     }
-    
+
     private void createRepository()
         throws Exception
     {
@@ -88,16 +92,16 @@ public class Nexus1730DeleteRepoIT
         repo.setProvider( "maven2" );
         repo.setFormat( "maven2" );
         repo.setRepoPolicy( RepositoryPolicy.RELEASE.name() );
-        repoUtil.createRepository( repo );   
+        repoUtil.createRepository( repo );
     }
-    
-    private void deleteRepository() 
+
+    private void deleteRepository()
         throws IOException
     {
         repoUtil.sendMessage( Method.DELETE, null, "nexus1730-repo" );
     }
-    
-    private void createGroup() 
+
+    private void createGroup()
         throws IOException
     {
         RepositoryGroupResource group = new RepositoryGroupResource();
@@ -105,67 +109,67 @@ public class Nexus1730DeleteRepoIT
         group.setFormat( "maven2" );
         group.setProvider( "maven2" );
         group.setName( "nexus1730-group" );
-        
+
         RepositoryGroupMemberRepository repo = new RepositoryGroupMemberRepository();
         repo.setId( testRepositoryId );
         group.setRepositories( Arrays.asList( repo ) );
-        
+
         groupUtil.createGroup( group );
     }
-    
-    private void deleteGroup() 
+
+    private void deleteGroup()
         throws IOException
     {
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( "nexus1730-group" );
-        
+
         groupUtil.sendMessage( Method.DELETE, group );
     }
-    
+
     private List<String> createPrivileges()
         throws Exception
     {
         PrivilegeResource priv = new PrivilegeResource();
         priv.setDescription( "nexus1730-priv" );
-        priv.setMethod( Arrays.asList( "read","delete","create","update" ) );
+        priv.setMethod( Arrays.asList( "read", "delete", "create", "update" ) );
         priv.setRepositoryId( "nexus1730-repo" );
         priv.setRepositoryTargetId( "1" );
         priv.setType( TargetPrivilegeDescriptor.TYPE );
         priv.setName( "nexus1730-priv" );
         List<PrivilegeStatusResource> privs = privUtil.createPrivileges( priv );
-        
+
         List<String> privIds = new ArrayList<String>();
-        
+
         for ( PrivilegeStatusResource privilege : privs )
         {
             privIds.add( privilege.getId() );
         }
-        
+
         return privIds;
     }
-    
-    private List<String> createGroupPrivileges() 
+
+    private List<String> createGroupPrivileges()
         throws IOException
     {
         PrivilegeResource priv = new PrivilegeResource();
         priv.setDescription( "nexus1730-priv" );
-        priv.setMethod( Arrays.asList( "read","delete","create","update" ) );
+        priv.setMethod( Arrays.asList( "read", "delete", "create", "update" ) );
         priv.setRepositoryGroupId( "nexus1730-group" );
         priv.setRepositoryTargetId( "1" );
         priv.setType( TargetPrivilegeDescriptor.TYPE );
         priv.setName( "nexus1730-priv" );
         List<PrivilegeStatusResource> privs = privUtil.createPrivileges( priv );
-        
+
         List<String> privIds = new ArrayList<String>();
-        
+
         for ( PrivilegeStatusResource privilege : privs )
         {
             privIds.add( privilege.getId() );
         }
-        
+
         return privIds;
     }
-    
+
     private boolean checkForPrivilege( String id, boolean shouldFind )
         throws Exception
     {
@@ -174,7 +178,7 @@ public class Nexus1730DeleteRepoIT
         {
             Assert.fail( "Privilege " + id + " should " + ( shouldFind ? "" : " not " ) + "have been found" );
         }
-        
+
         return true;
     }
 }

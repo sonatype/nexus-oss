@@ -1212,12 +1212,6 @@ public abstract class AbstractNexusIntegrationTest
         return XStreamFactory.getJsonXStream();
     }
 
-    public RepositoryTypeRegistry getRepositoryTypeRegistry()
-        throws ComponentLookupException
-    {
-        return getITPlexusContainer().lookup( RepositoryTypeRegistry.class );
-    }
-
     // == IT Container management
 
     private static PlexusContainer itPlexusContainer;

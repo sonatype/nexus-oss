@@ -38,9 +38,7 @@ public class Nexus3045GroupRemovalIT
     {
         super();
         routesUtil = new RoutesMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
-        repoUtil =
-            new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML,
-                                       getRepositoryTypeRegistry() );
+        repoUtil = new RepositoryMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
         groupUtil = new GroupMessageUtil( this, XStreamFactory.getXmlXStream(), MediaType.APPLICATION_XML );
     }
 
@@ -75,7 +73,7 @@ public class Nexus3045GroupRemovalIT
         Assert.assertNotNull( route );
         MatcherAssert.assertThat( getRepoIds( route.getRepositories() ), IsCollectionContaining.hasItem( "thirdparty" ) );
         MatcherAssert.assertThat( getRepoIds( route.getRepositories() ),
-                           CoreMatchers.not( IsCollectionContaining.hasItem( "releases" ) ) );
+            CoreMatchers.not( IsCollectionContaining.hasItem( "releases" ) ) );
     }
 
     private List<String> getRepoIds( List<RepositoryRouteMemberRepository> repositories )

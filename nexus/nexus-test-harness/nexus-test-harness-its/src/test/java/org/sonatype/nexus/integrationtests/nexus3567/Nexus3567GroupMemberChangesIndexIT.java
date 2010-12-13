@@ -37,82 +37,84 @@ public class Nexus3567GroupMemberChangesIndexIT
     extends AbstractNexusIntegrationTest
 {
     private RepositoryMessageUtil repoUtil = null;
+
     private GroupMessageUtil groupUtil = null;
+
     private SearchMessageUtil searchUtil = null;
-    
+
     private RepositoryResource repoResource = null;
-    
-    public Nexus3567GroupMemberChangesIndexIT() 
+
+    public Nexus3567GroupMemberChangesIndexIT()
         throws ComponentLookupException
     {
-        repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML, getRepositoryTypeRegistry() );
+        repoUtil = new RepositoryMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         groupUtil = new GroupMessageUtil( this, getXMLXStream(), MediaType.APPLICATION_XML );
         searchUtil = new SearchMessageUtil( this );
     }
-    
+
     @Test
     public void validateGroupIndexTreeOnDelete()
         throws Exception
     {
         prepare( "nexus3567deletememberrepo", "nexus3567deletemembergroup" );
-        
+
         IndexBrowserTreeNode node = getIndexContent( "nexus3567deletemembergroup" );
-        
+
         List<TreeNode> children = node.getChildren();
-        
+
         Assert.assertEquals( 1, children.size() );
         Assert.assertEquals( "nexus3567", children.get( 0 ).getNodeName() );
-        
-        //now delete the child repo and validate that there is no root node
+
+        // now delete the child repo and validate that there is no root node
         Response response = repoUtil.sendMessage( Method.DELETE, repoResource );
         Assert.assertTrue( response.getStatus().isSuccess() );
         TaskScheduleUtil.waitForAllTasksToStop();
-        
-        //now reindex the repo
+
+        // now reindex the repo
         searchUtil.reindexGroup( "nexus3567_deleteandreindex", "nexus3567deletemembergroup", true );
         TaskScheduleUtil.waitForAllTasksToStop();
-        
+
         node = getIndexContent( "nexus3567deletemembergroup" );
-        
+
         children = node.getChildren();
-        
+
         Assert.assertEquals( 0, children.size() );
     }
-    
+
     @Test
     public void validateGroupIndexTreeOnMemberRemove()
         throws Exception
     {
         prepare( "nexus3567removememberrepo", "nexus3567removemembergroup" );
-        
+
         IndexBrowserTreeNode node = getIndexContent( "nexus3567removemembergroup" );
-        
+
         List<TreeNode> children = node.getChildren();
-        
+
         Assert.assertEquals( 1, children.size() );
         Assert.assertEquals( "nexus3567", children.get( 0 ).getNodeName() );
-        
-        //now remove the child repo and validate that there is no root node
+
+        // now remove the child repo and validate that there is no root node
         RepositoryGroupResource group = groupUtil.getGroup( "nexus3567removemembergroup" );
         group.getRepositories().clear();
         groupUtil.updateGroup( group );
         TaskScheduleUtil.waitForAllTasksToStop();
-        
-        //now reindex the repo
+
+        // now reindex the repo
         searchUtil.reindexGroup( "nexus3567_removeandreindex", "nexus3567removemembergroup", true );
         TaskScheduleUtil.waitForAllTasksToStop();
-        
+
         node = getIndexContent( "nexus3567removemembergroup" );
-        
+
         children = node.getChildren();
-        
+
         Assert.assertEquals( 0, children.size() );
     }
-    
-    private void prepare( String repoId, String groupId ) 
+
+    private void prepare( String repoId, String groupId )
         throws Exception
     {
-        //first thing, create the repo and the group
+        // first thing, create the repo and the group
         repoResource = new RepositoryResource();
         repoResource.setProvider( "maven2" );
         repoResource.setFormat( "maven2" );
@@ -130,10 +132,10 @@ public class Nexus3567GroupMemberChangesIndexIT
         repoResource.setNotFoundCacheTTL( 1440 );
         repoResource.setDownloadRemoteIndexes( false );
         repoUtil.createRepository( repoResource, false );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
-        
-        //now create the group
+
+        // now create the group
         RepositoryGroupResource group = new RepositoryGroupResource();
         group.setId( groupId );
         group.setFormat( "maven2" );
@@ -144,19 +146,19 @@ public class Nexus3567GroupMemberChangesIndexIT
         repo.setId( repoId );
         group.addRepository( repo );
         groupUtil.createGroup( group );
-        
+
         TaskScheduleUtil.waitForAllTasksToStop();
-        
-        //now upload an artifact to the repo
+
+        // now upload an artifact to the repo
         File artifact = getTestFile( "artifact.jar" );
         Gav gav = GavUtil.newGav( "nexus3567", "artifact", "1.0.0" );
         int code = getDeployUtils().deployUsingGavWithRest( repoId, gav, artifact );
         Assert.assertTrue( Status.isSuccess( code ), "Unable to deploy artifact " + code );
-        
+
         getEventInspectorsUtil().waitForCalmPeriod();
     }
-    
-    private IndexBrowserTreeNode getIndexContent( String repoId ) 
+
+    private IndexBrowserTreeNode getIndexContent( String repoId )
         throws IOException
     {
         String serviceURI = "service/local/repositories/" + repoId + "/index_content/";
@@ -167,12 +169,11 @@ public class Nexus3567GroupMemberChangesIndexIT
         Assert.assertTrue( status.isSuccess(), responseText + status );
 
         XStream xstream = XStreamFactory.getXmlXStream();
-        
+
         xstream.processAnnotations( IndexBrowserTreeNode.class );
         xstream.processAnnotations( IndexBrowserTreeViewResponseDTO.class );
 
-        XStreamRepresentation re =
-            new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
+        XStreamRepresentation re = new XStreamRepresentation( xstream, responseText, MediaType.APPLICATION_XML );
         IndexBrowserTreeViewResponseDTO resourceResponse =
             (IndexBrowserTreeViewResponseDTO) re.getPayload( new IndexBrowserTreeViewResponseDTO() );
 
