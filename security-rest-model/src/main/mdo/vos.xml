@@ -1312,6 +1312,13 @@
                     <description>If true, roles will be left out of results.</description>
                 </field>
                 <field>
+                    <name>onlySelected</name>
+                    <version>1.0.0+</version>
+                    <type>boolean</type>
+                    <required>true</required>
+                    <description>If true, only selected results will be returned.</description>
+                </field>
+                <field>
                     <name>noExternalRoles</name>
                     <version>1.0.0+</version>
                     <type>boolean</type>
@@ -1344,6 +1351,34 @@
                     <annotations>
                         <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "selctedPrivilegeIds" )</annotation>
                         <annotation>@javax.xml.bind.annotation.XmlElement( name = "selectedPrivilegeId" )</annotation>
+                    </annotations>
+                </field>
+                <field>
+                    <name>hiddenRoleIds</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>String</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <required>true</required>
+                    <description>List of roleIds that should be hidden from response.</description>
+                    <annotations>
+                        <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "hiddenRoleIds" )</annotation>
+                        <annotation>@javax.xml.bind.annotation.XmlElement( name = "hiddenRoleId" )</annotation>
+                    </annotations>
+                </field>
+                <field>
+                    <name>hiddenPrivilegeIds</name>
+                    <version>1.0.0+</version>
+                    <association>
+                        <type>String</type>
+                        <multiplicity>*</multiplicity>
+                    </association>
+                    <required>true</required>
+                    <description>List of privilegeIds that should be hidden from response.</description>
+                    <annotations>
+                        <annotation>@javax.xml.bind.annotation.XmlElementWrapper( name = "hiddenPrivilegeIds" )</annotation>
+                        <annotation>@javax.xml.bind.annotation.XmlElement( name = "hiddenPrivilegeId" )</annotation>
                     </annotations>
                 </field>
                 <field>

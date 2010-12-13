@@ -11,8 +11,6 @@ public final class RoleAndPrivilegeListResourceComparator
 
     private final String dir;
 
-    public static final String SORT_TYPE = "type";
-
     public static final String SORT_NAME = "name";
 
     public static final String SORT_DESCRIPTION = "description";
@@ -39,7 +37,7 @@ public final class RoleAndPrivilegeListResourceComparator
             return 1;
         }
 
-        if ( SORT_TYPE.equals( sort ) )
+        if ( SORT_NAME.equals( sort ) )
         {
             int compare = doCompare( o1.getType(), o2.getType(), dir );
             if ( compare == 0 )
@@ -47,10 +45,6 @@ public final class RoleAndPrivilegeListResourceComparator
                 return doCompare( o1.getName(), o2.getName(), dir );
             }
             return compare;
-        }
-        else if ( SORT_NAME.equals( sort ) )
-        {
-            return doCompare( o1.getName(), o2.getName(), dir );
         }
         else if ( SORT_DESCRIPTION.equals( sort ) )
         {

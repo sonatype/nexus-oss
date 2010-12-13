@@ -96,7 +96,7 @@ public class RoleAndPrivilegeListPlexusResource
         {
             Form form = request.getResourceRef().getQueryAsForm();
 
-            FilterRequest filter = buildFilterRequest( filterRequest );
+            FilterRequest filter = new FilterRequest( filterRequest );
 
             for ( Role role : getSecuritySystem().getAuthorizationManager( DEFAULT_SOURCE ).listRoles() )
             {
@@ -194,16 +194,6 @@ public class RoleAndPrivilegeListPlexusResource
         resource.setExternal( true );
 
         return resource;
-    }
-
-    protected FilterRequest buildFilterRequest( RoleAndPrivilegeListFilterResourceRequest filterRequest )
-    {
-        FilterRequest filter =
-            new FilterRequest( !filterRequest.getData().isNoPrivileges(), !filterRequest.getData().isNoRoles(),
-                !filterRequest.getData().isNoExternalRoles(), filterRequest.getData().getName(),
-                filterRequest.getData().getSelectedRoleIds(), filterRequest.getData().getSelectedPrivilegeIds() );
-
-        return filter;
     }
 
     protected List<RoleAndPrivilegeListResource> generateResultSet( List<RoleAndPrivilegeListResource> resources,

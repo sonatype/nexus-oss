@@ -3,6 +3,7 @@ package org.sonatype.security.rest.roles;
 import java.util.List;
 
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResourceRequest;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListResource;
 
 public class FilterRequest
@@ -13,21 +14,32 @@ public class FilterRequest
 
     private final boolean showExternalRoles;
 
+    private final boolean onlySelected;
+
     private final String text;
 
     private final List<String> roleIds;
 
     private final List<String> privilegeIds;
 
-    public FilterRequest( boolean showPrivileges, boolean showRoles, boolean showExternalRoles, String text,
-                          List<String> roleIds, List<String> privilegeIds )
+    private final List<String> hiddenRoleIds;
+
+    private final List<String> hiddenPrivilegeIds;
+
+    private final String userId;
+
+    public FilterRequest( RoleAndPrivilegeListFilterResourceRequest request )
     {
-        this.showPrivileges = showPrivileges;
-        this.showRoles = showRoles;
-        this.showExternalRoles = showExternalRoles;
-        this.text = text;
-        this.roleIds = roleIds;
-        this.privilegeIds = privilegeIds;
+        this.showPrivileges = !request.getData().isNoPrivileges();
+        this.showRoles = !request.getData().isNoRoles();
+        this.showExternalRoles = !request.getData().isNoExternalRoles();
+        this.onlySelected = request.getData().isOnlySelected();
+        this.text = request.getData().getName();
+        this.roleIds = request.getData().getSelectedRoleIds();
+        this.privilegeIds = request.getData().getSelectedPrivilegeIds();
+        this.hiddenRoleIds = request.getData().getHiddenRoleIds();
+        this.hiddenPrivilegeIds = request.getData().getHiddenPrivilegeIds();
+        this.userId = request.getData().getUserId();
     }
 
     public boolean isShowPrivileges()
@@ -45,6 +57,11 @@ public class FilterRequest
         return showExternalRoles;
     }
 
+    public boolean isOnlySelected()
+    {
+        return onlySelected;
+    }
+
     public String getText()
     {
         return text;
@@ -60,14 +77,31 @@ public class FilterRequest
         return privilegeIds;
     }
 
+    public List<String> getHiddenRoleIds()
+    {
+        return hiddenRoleIds;
+    }
+
+    public List<String> getHiddenPrivilegeIds()
+    {
+        return hiddenPrivilegeIds;
+    }
+
+    public String getUserId()
+    {
+        return userId;
+    }
+
     public boolean applies( RoleAndPrivilegeListResource resource )
     {
         if ( resource != null )
         {
             if ( resource.getType().equals( "role" ) )
             {
-                if ( ( ( isShowRoles() && !resource.isExternal() ) || ( isShowExternalRoles() && resource.isExternal() ) )
-                    && ( resource.isExternal() || getRoleIds().isEmpty() || getRoleIds().contains( resource.getId() ) )
+                if ( ( ( isShowRoles() && !resource.isExternal() && !( getUserId() != null && getRoleIds().isEmpty() ) ) || ( isShowExternalRoles() && resource.isExternal() ) )
+                    && ( !getHiddenRoleIds().contains( resource.getId() ) )
+                    && ( resource.isExternal() || ( ( ( getRoleIds().isEmpty() && !isOnlySelected() ) || getRoleIds().contains(
+                        resource.getId() ) ) ) )
                     && ( StringUtils.isEmpty( getText() ) || resource.getName().contains( getText() ) ) )
                 {
                     return true;
@@ -76,7 +110,9 @@ public class FilterRequest
             else if ( resource.getType().equals( "privilege" ) )
             {
                 if ( isShowPrivileges()
-                    && ( getPrivilegeIds().isEmpty() || getPrivilegeIds().contains( resource.getId() ) )
+                    && ( !getHiddenPrivilegeIds().contains( resource.getId() ) )
+                    && ( ( getPrivilegeIds().isEmpty() && !isOnlySelected() ) || getPrivilegeIds().contains(
+                        resource.getId() ) )
                     && ( StringUtils.isEmpty( getText() ) || resource.getName().contains( getText() ) ) )
                 {
                     return true;
