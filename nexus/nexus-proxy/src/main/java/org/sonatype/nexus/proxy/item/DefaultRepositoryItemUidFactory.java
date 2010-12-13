@@ -15,9 +15,9 @@ package org.sonatype.nexus.proxy.item;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,8 +43,10 @@ public class DefaultRepositoryItemUidFactory
     @Requirement
     private RepositoryRegistry repositoryRegistry;
 
-    private final ConcurrentHashMap<String, WeakReference<RepositoryItemUid>> itemUidMap =
-        new ConcurrentHashMap<String, WeakReference<RepositoryItemUid>>();
+    private final HashMap<String, WeakReference<RepositoryItemUid>> itemUidMap =
+        new HashMap<String, WeakReference<RepositoryItemUid>>();
+
+    private final ReentrantLock uidCreateLock = new ReentrantLock();
 
     public RepositoryItemUid createUid( Repository repository, String path )
     {
@@ -61,55 +63,39 @@ public class DefaultRepositoryItemUidFactory
             path = RepositoryItemUid.PATH_ROOT;
         }
 
-        String key = repository.getId() + ":" + path;
-
-        RepositoryItemUid newGuy = new DefaultRepositoryItemUid( this, repository, path );
-
-        itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
-
-        WeakReference<RepositoryItemUid> ref = itemUidMap.get( key );
+        final String key = repository.getId() + ":" + path;
 
         RepositoryItemUid toBeReturned = null;
 
-        if ( ref != null )
-        {
-            toBeReturned = ref.get();
-        }
+        uidCreateLock.lock();
 
-        if ( toBeReturned != null )
+        try
         {
-            // we have an UID instance found "alive" in the map
-            cleanUpItemUidMap( false );
+            // try to get it 1st
+            WeakReference<RepositoryItemUid> ref = itemUidMap.get( key );
 
-            return toBeReturned;
-        }
-        else
-        {
-            synchronized ( itemUidMap )
+            if ( ref != null )
             {
-                // we have not found an UID instance in the map, we have to make one and stick in into map
-
-                // try it again, since we were maybe sitting there waiting for someone who already did the job
-                itemUidMap.putIfAbsent( key, new WeakReference<RepositoryItemUid>( newGuy ) );
-
-                toBeReturned = itemUidMap.get( key ).get();
+                toBeReturned = ref.get();
 
                 if ( toBeReturned != null )
                 {
+                    cleanUpItemUidMap( false );
+
                     return toBeReturned;
                 }
-
-                // still no luck, do it
-                itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
-
-                toBeReturned = newGuy;
-
-                // do cleansing of the map if needed, this call might do nothing or clean up the itemUidMap for gc'ed
-                // UIDs
-                cleanUpItemUidMap( false );
-
-                return toBeReturned;
             }
+
+            // not here, then put it
+            RepositoryItemUid newGuy = new DefaultRepositoryItemUid( this, repository, path );
+
+            itemUidMap.put( key, new WeakReference<RepositoryItemUid>( newGuy ) );
+
+            return newGuy;
+        }
+        finally
+        {
+            uidCreateLock.unlock();
         }
     }
 
@@ -145,7 +131,8 @@ public class DefaultRepositoryItemUidFactory
     }
 
     /**
-     * Used in UTs only, NOT public method!
+     * Used in UTs only, NOT public method! This method call should be called from UTs only, not from production code
+     * since it interferes with locking!
      * 
      * @return
      */

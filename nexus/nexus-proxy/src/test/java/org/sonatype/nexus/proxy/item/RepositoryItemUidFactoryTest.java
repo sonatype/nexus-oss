@@ -1,5 +1,6 @@
 package org.sonatype.nexus.proxy.item;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -100,7 +101,7 @@ public class RepositoryItemUidFactoryTest
         final int count = 3000;
         final int threadPerPath = 4;
 
-        ExecutorService es = Executors.newFixedThreadPool( 25 );
+        ExecutorService es = Executors.newFixedThreadPool( 50 );
 
         Repository repository = getRepositoryRegistry().getRepositoryWithFacet( "repo1", ProxyRepository.class );
 
@@ -113,9 +114,10 @@ public class RepositoryItemUidFactoryTest
         }
         System.gc();
 
-        Multimap<String, RepositoryItemUid> uidMap = Multimaps.newArrayListMultimap();
-
         long ser = 1;
+
+        ArrayList<FactoryCreateUidTester> testers =
+            new ArrayList<RepositoryItemUidFactoryTest.FactoryCreateUidTester>();
 
         for ( int i = 0; i < count; i++ )
         {
@@ -123,7 +125,11 @@ public class RepositoryItemUidFactoryTest
 
             for ( int j = 0; j < threadPerPath; j++ )
             {
-                es.execute( new FactoryCreateUidTester( ser++, factory, uid, uidMap ) );
+                FactoryCreateUidTester tester = new FactoryCreateUidTester( ser++, factory, uid );
+
+                es.execute( tester );
+
+                testers.add( tester );
             }
         }
 
@@ -143,6 +149,13 @@ public class RepositoryItemUidFactoryTest
 
         System.out.println( "Checking results... " );
 
+        Multimap<String, RepositoryItemUid> uidMap = Multimaps.newArrayListMultimap();
+
+        for ( FactoryCreateUidTester tester : testers )
+        {
+            uidMap.putAll( tester.getUidMap() );
+        }
+
         for ( String key : uidMap.keySet() )
         {
             Collection<RepositoryItemUid> uids = uidMap.get( key );
@@ -154,8 +167,9 @@ public class RepositoryItemUidFactoryTest
 
             for ( RepositoryItemUid uid : uids )
             {
-                Assert.assertEquals( "Have to have same instance!", ( (DefaultRepositoryItemUid) firstUid )
-                    .toDebugString(), ( (DefaultRepositoryItemUid) uid ).toDebugString() );
+                Assert.assertEquals( "Have to have same instance!",
+                    ( (DefaultRepositoryItemUid) firstUid ).toDebugString(),
+                    ( (DefaultRepositoryItemUid) uid ).toDebugString() );
             }
         }
     }
@@ -173,8 +187,7 @@ public class RepositoryItemUidFactoryTest
 
         private final Multimap<String, RepositoryItemUid> uidMap;
 
-        public FactoryCreateUidTester( long serial, RepositoryItemUidFactory factory, RepositoryItemUid uid,
-            Multimap<String, RepositoryItemUid> uidMap )
+        public FactoryCreateUidTester( long serial, RepositoryItemUidFactory factory, RepositoryItemUid uid )
         {
             this.serial = serial;
 
@@ -184,7 +197,12 @@ public class RepositoryItemUidFactoryTest
 
             this.path = uid.getPath();
 
-            this.uidMap = uidMap;
+            this.uidMap = Multimaps.newArrayListMultimap();
+        }
+
+        public Multimap<String, RepositoryItemUid> getUidMap()
+        {
+            return uidMap;
         }
 
         public void run()
@@ -199,10 +217,7 @@ public class RepositoryItemUidFactoryTest
             RepositoryItemUid uid = factory.createUid( repository, path );
 
             // need to sync here, since all thread access this same multimap
-            synchronized ( uidMap )
-            {
-                uidMap.put( uid.getPath(), uid );
-            }
+            uidMap.put( uid.getPath(), uid );
         }
     }
 }
