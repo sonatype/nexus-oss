@@ -131,12 +131,6 @@ public class DefaultNexus
     private SnapshotRemover snapshotRemover;
 
     /**
-     * The Wastebasket component.
-     */
-    @Requirement
-    private Wastebasket wastebasket;
-    
-    /**
      * The SecurityConfiguration component.
      */
     @Requirement
