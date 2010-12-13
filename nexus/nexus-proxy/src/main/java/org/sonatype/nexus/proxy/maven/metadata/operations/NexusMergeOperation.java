@@ -26,7 +26,6 @@ public class NexusMergeOperation
     public boolean perform( Metadata targetMetadata )
         throws MetadataException
     {
-        // FIXME Metadata class has now a merge() method, we should use that probably!
         if ( sourceMetadata == null || targetMetadata == null )
         {
             return false;
