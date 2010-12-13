@@ -326,7 +326,7 @@ public class AbstractEvictTaskIt
     {
         DirectoryScanner scan = new DirectoryScanner();
         scan.setBasedir( new File( nexusWorkDir, "storage" ) );
-        scan.setIncludes( new String[] { "**/.index/", "**/.meta/" } );
+        scan.setIncludes( new String[] { "**/.index/", "**/.meta/", "*/archetype-catalog.xml" } );
         scan.setExcludes( new String[] { "**/.nexus/", "**/.svn", "**/.svn/**" } );
 
         scan.scan();
