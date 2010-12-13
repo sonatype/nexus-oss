@@ -97,6 +97,7 @@ import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
+import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
@@ -710,47 +711,57 @@ public class DefaultIndexerManager
                 return;
             }
 
-            ArtifactContext ac = null;
+            item.getRepositoryItemUid().lock( Action.read );
 
-            // if we have a valid indexing context and have access to a File
-            if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
+            try
             {
-                File file =
-                    ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
-                        new ResourceStoreRequest( item ) );
 
-                if ( file.exists() )
+                ArtifactContext ac = null;
+
+                // if we have a valid indexing context and have access to a File
+                if ( DefaultFSLocalRepositoryStorage.class.isAssignableFrom( repository.getLocalStorage().getClass() ) )
                 {
-                    try
-                    {
-                        ac = artifactContextProducer.getArtifactContext( context, file );
-                    }
-                    catch ( IllegalArtifactCoordinateException e )
-                    {
-                        // cannot create artifact context, forget it
-                        return;
-                    }
+                    File file =
+                        ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getFileFromBase( repository,
+                            new ResourceStoreRequest( item ) );
 
-                    if ( ac != null )
+                    if ( file.exists() )
                     {
-                        if ( getLogger().isDebugEnabled() )
+                        try
                         {
-                            getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
+                            ac = artifactContextProducer.getArtifactContext( context, file );
+                        }
+                        catch ( IllegalArtifactCoordinateException e )
+                        {
+                            // cannot create artifact context, forget it
+                            return;
                         }
 
-                        ArtifactInfo ai = ac.getArtifactInfo();
-
-                        if ( ai.sha1 == null )
+                        if ( ac != null )
                         {
-                            // if repo has no sha1 checksum, odd nexus one
-                            ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                            if ( getLogger().isDebugEnabled() )
+                            {
+                                getLogger().debug( "The ArtifactContext created from file is fine, continuing." );
+                            }
+
+                            ArtifactInfo ai = ac.getArtifactInfo();
+
+                            if ( ai.sha1 == null )
+                            {
+                                // if repo has no sha1 checksum, odd nexus one
+                                ai.sha1 = item.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY );
+                            }
                         }
                     }
                 }
-            }
 
-            // and finally: index it
-            getNexusIndexer().addArtifactToIndex( ac, context );
+                // and finally: index it
+                getNexusIndexer().addArtifactToIndex( ac, context );
+            }
+            finally
+            {
+                item.getRepositoryItemUid().unlock();
+            }
         }
     }
 
@@ -835,7 +846,16 @@ public class DefaultIndexerManager
             // NEXUS-814: we should not delete always
             if ( !item.getItemContext().containsKey( SnapshotRemover.MORE_TS_SNAPSHOTS_EXISTS_FOR_GAV ) )
             {
-                getNexusIndexer().deleteArtifactFromIndex( ac, context );
+                item.getRepositoryItemUid().lock( Action.read );
+
+                try
+                {
+                    getNexusIndexer().deleteArtifactFromIndex( ac, context );
+                }
+                finally
+                {
+                    item.getRepositoryItemUid().unlock();
+                }
             }
             else
             {
