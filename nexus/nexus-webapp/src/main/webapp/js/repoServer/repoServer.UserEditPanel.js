@@ -599,13 +599,13 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
     dataModifiers : {
       load : {
         roles : function(arr, srcObj, fpanel) {
-          fpanel.find('name', 'roleSelector')[0].setSelectedRoleIds(arr);
+          fpanel.find('name', 'roleManager')[0].setSelectedRoleIds(arr, true);
           return arr;
         }
       },
       submit : {
         roles : function(value, fpanel) {
-          return fpanel.find('name', 'roleSelector')[0].getSelectedRoleIds()
+          return fpanel.find('name', 'roleManager')[0].getSelectedRoleIds();
         }
       }
     }
@@ -742,11 +742,11 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
                     width : 600,
                     items : items
                   }, {
-                    xtype : 'roleselector',
-                    name : 'roleSelector',
-                    height : 350,
-                    width : 1000,
-                    showPrivileges : false
+                    xtype : 'rolemanager',
+                    name : 'roleManager',
+                    height : 200,
+                    width : 505,
+                    usePrivileges : false
                   }]
             }],
         listeners : {
@@ -769,7 +769,7 @@ Ext.extend(Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
             {
               s += ', ';
             }
-            s += this.find('name', 'roleSelector')[0].getRoleNameFromId(val[i]);
+            s += this.find('name', 'roleManager')[0].getRoleNameFromId(val[i]);
           }
         }
 
@@ -777,7 +777,7 @@ Ext.extend(Sonatype.repoServer.DefaultUserEditor, Sonatype.ext.FormPanel, {
       },
 
       isValid : function() {
-        return this.form.isValid() && this.find('name', 'roleSelector')[0].validate();
+        return this.form.isValid() && this.find('name', 'roleManager')[0].validate();
       },
 
       saveHandler : function(button, event) {
@@ -813,18 +813,22 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
     dataModifiers : {
       load : {
         roles : function(arr, srcObj, fpanel) {
-          var roleSelector = fpanel.find('name', 'roleSelector')[0];
-          if (fpanel.payload)
+          var roleManager = fpanel.find('name', 'roleManager')[0];
+          if (this.lastLoadedId)
           {
-            roleSelector.setExternalUserId(fpanel.payload.get('userId'));
+            roleManager.setUserId(this.lastLoadedId);
           }
-          roleSelector.setSelectedRoleIds(arr, true);
+          else if (fpanel.payload && fpanel.payload.get)
+          {
+            roleManager.setUserId(fpanel.payload.get('userId'));
+          }
+          roleManager.setSelectedRoleIds(arr, true);
           return arr;
         }
       },
       submit : {
         roles : function(value, fpanel) {
-          return fpanel.find('name', 'roleSelector')[0].getSelectedRoleIds();
+          return fpanel.find('name', 'roleManager')[0].getSelectedRoleIds();
         }
       }
     },
@@ -929,12 +933,11 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
                           width : this.COMBO_WIDTH
                         }]
                   }, {
-                    xtype : 'roleselector',
-                    name : 'roleSelector',
-                    height : 350,
-                    width : 1000,
-                    showPrivileges : false,
-                    externalRoleFilter : true
+                    xtype : 'rolemanager',
+                    name : 'roleManager',
+                    height : 200,
+                    width : 505,
+                    usePrivileges : false
                   }]
             }],
         listeners : {
@@ -950,11 +953,11 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         if (this.isValid())
         {
           var method = 'PUT';
-          var roleSelector = this.find('name', 'roleSelector')[0];
-          var roles = roleSelector.getSelectedRoleIds();
+          var roleManager = this.find('name', 'roleManager')[0];
+          var roles = roleManager.getSelectedRoleIds();
           if (roles.length == 0)
           {
-            if (roleSelector.noRolesOnStart)
+            if (roleManager.noRolesOnStart)
             {
               // if there weren't any nexus roles on load, and we're not saving
               // any - do nothing
@@ -1005,10 +1008,10 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
           for (var i = 0; i < sentRoles.length; i++)
           {
             var roleName = sentRoles[i];
-            var roleSelector = this.find('name', 'roleSelector')[0];
+            var roleManager = this.find('name', 'roleManager')[0];
             var newRole = {
               id : sentRoles[i],
-              name : roleSelector.getRoleNameFromId(sentRoles[i]),
+              name : roleManager.getRoleNameFromId(sentRoles[i]),
               source : 'default'
             }
             roles.push(newRole);
@@ -1048,7 +1051,7 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
       },
 
       isValid : function() {
-        return this.form.findField('userId').userFound && this.form.findField('source').getValue() && this.find('name', 'roleSelector')[0].validate();
+        return this.form.findField('userId').userFound && this.form.findField('source').getValue() && this.find('name', 'roleManager')[0].validate();
       },
 
       loadHandler : function(form, action, receivedData) {
@@ -1060,8 +1063,8 @@ Ext.extend(Sonatype.repoServer.UserMappingEditor, Sonatype.ext.FormPanel, {
         testField.clearInvalid();
         testField.userFound = true;
         this.lastLoadedId = testField.getValue();
-        var roleSelector = this.find('name', 'roleSelector')[0];
-        roleSelector.setExternalUserId(testField.getValue());
+        var roleManager = this.find('name', 'roleManager')[0];
+        roleManager.setUserId(testField.getValue());
 
         this.form.doAction('sonatypeLoad', {
               url : this.uri + '/' + testField.getValue(),

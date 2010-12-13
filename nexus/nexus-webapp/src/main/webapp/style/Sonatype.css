@@ -296,3 +296,16 @@ button.st-icon-refresh {
 .x-layout-cmini-south .x-layout-mini{left:48%;height:5px;width:35px;background-image:url(../images/icons/mini-top.gif);}
 .x-layout-cmini-west .x-layout-mini{top:48%;background-image:url(../images/icons/mini-right.gif);}
 .x-layout-cmini-east .x-layout-mini{top:48%;background-image:url(../images/icons/mini-left.gif);}
+
+.roleRow {
+  background: url(../ext-2.3/resources/images/default/tree/folder.gif) left no-repeat;
+}
+
+.privilegeRow {
+  background: url(../ext-2.3/resources/images/default/tree/leaf.gif) left no-repeat;
+}
+
+.placeholder {
+  width: 18px;
+  height: 0px;
+}
