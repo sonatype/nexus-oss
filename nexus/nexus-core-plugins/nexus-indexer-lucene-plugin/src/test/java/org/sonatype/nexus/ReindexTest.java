@@ -169,7 +169,7 @@ public class ReindexTest
     {
         File indexDirectory = getIndexFamilyDirectory( repositoryId );
 
-        Directory directory = FSDirectory.getDirectory( indexDirectory );
+        Directory directory = FSDirectory.open( indexDirectory );
 
         IndexingContext ctx =
             nexusIndexer.addIndexingContextForced( repositoryId + "-temp", repositoryId, repositoryRoot, directory,

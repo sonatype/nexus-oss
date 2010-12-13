@@ -219,7 +219,8 @@ public interface IndexerManager
     // Query construction
     // ----------------------------------------------------------------------------
 
-    Query constructQuery( Field field, String query, SearchType type );
+    Query constructQuery( Field field, String query, SearchType type )
+        throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
     // Tree nodes

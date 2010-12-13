@@ -1609,9 +1609,9 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            Query q1 = nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, term );
+            Query q1 = nexusIndexer.constructQuery( MAVEN.GROUP_ID, term, SearchType.SCORED );
 
-            Query q2 = nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, term );
+            Query q2 = nexusIndexer.constructQuery( MAVEN.ARTIFACT_ID, term, SearchType.SCORED );
 
             BooleanQuery bq = new BooleanQuery();
 
@@ -1708,7 +1708,7 @@ public class DefaultIndexerManager
                 term = term.substring( 0, term.length() - 6 );
             }
 
-            Query q = nexusIndexer.constructQuery( ArtifactInfo.NAMES, term );
+            Query q = nexusIndexer.constructQuery( MAVEN.CLASSNAMES, term, SearchType.SCORED );
 
             FlatSearchRequest req = null;
 
@@ -1802,27 +1802,27 @@ public class DefaultIndexerManager
 
             if ( gTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.GROUP_ID, gTerm ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.ARTIFACT_ID, aTerm ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.VERSION, vTerm ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.VERSION, vTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
             }
 
             if ( pTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.PACKAGING, pTerm ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.PACKAGING, pTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
             }
 
             if ( cTerm != null )
             {
-                bq.add( nexusIndexer.constructQuery( ArtifactInfo.CLASSIFIER, cTerm ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
             }
 
             FlatSearchRequest req = null;
@@ -1943,11 +1943,6 @@ public class DefaultIndexerManager
     }
 
     // == NG stuff
-
-    protected Query createQuery( Field field, String term, SearchType type )
-    {
-        return nexusIndexer.constructQuery( field, term, type );
-    }
 
     protected IteratorSearchRequest createRequest( Query bq, Integer from, Integer count, Integer hitLimit,
                                                    boolean uniqueRGA, List<ArtifactInfoFilter> extraFilters )
@@ -2109,11 +2104,11 @@ public class DefaultIndexerManager
                 remoteContext = getRepositoryRemoteIndexContext( repositoryId );
             }
 
-            Query q1 = createQuery( MAVEN.GROUP_ID, term, searchType );
+            Query q1 = constructQuery( MAVEN.GROUP_ID, term, searchType );
 
             q1.setBoost( 2.0f );
 
-            Query q2 = createQuery( MAVEN.ARTIFACT_ID, term, searchType );
+            Query q2 = constructQuery( MAVEN.ARTIFACT_ID, term, searchType );
 
             q2.setBoost( 2.0f );
 
@@ -2124,24 +2119,24 @@ public class DefaultIndexerManager
             bq.add( q2, BooleanClause.Occur.SHOULD );
 
             // switch for "extended" keywords
-            if ( false )
-            {
-                Query q3 = createQuery( MAVEN.VERSION, term, searchType );
-
-                Query q4 = createQuery( MAVEN.CLASSIFIER, term, searchType );
-
-                Query q5 = createQuery( MAVEN.NAME, term, searchType );
-
-                Query q6 = createQuery( MAVEN.DESCRIPTION, term, searchType );
-
-                bq.add( q3, BooleanClause.Occur.SHOULD );
-
-                bq.add( q4, BooleanClause.Occur.SHOULD );
-
-                bq.add( q5, BooleanClause.Occur.SHOULD );
-
-                bq.add( q6, BooleanClause.Occur.SHOULD );
-            }
+            // if ( false )
+            // {
+            // Query q3 = constructQuery( MAVEN.VERSION, term, searchType );
+            //
+            // Query q4 = constructQuery( MAVEN.CLASSIFIER, term, searchType );
+            //
+            // Query q5 = constructQuery( MAVEN.NAME, term, searchType );
+            //
+            // Query q6 = constructQuery( MAVEN.DESCRIPTION, term, searchType );
+            //
+            // bq.add( q3, BooleanClause.Occur.SHOULD );
+            //
+            // bq.add( q4, BooleanClause.Occur.SHOULD );
+            //
+            // bq.add( q5, BooleanClause.Occur.SHOULD );
+            //
+            // bq.add( q6, BooleanClause.Occur.SHOULD );
+            // }
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
 
@@ -2214,7 +2209,7 @@ public class DefaultIndexerManager
                 term = term.substring( 0, term.length() - 6 );
             }
 
-            Query q = createQuery( MAVEN.CLASSNAMES, term, searchType );
+            Query q = constructQuery( MAVEN.CLASSNAMES, term, searchType );
 
             IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false, filters );
 
@@ -2290,22 +2285,22 @@ public class DefaultIndexerManager
 
             if ( gTerm != null )
             {
-                bq.add( createQuery( MAVEN.GROUP_ID, gTerm, searchType ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( aTerm != null )
             {
-                bq.add( createQuery( MAVEN.ARTIFACT_ID, aTerm, searchType ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( vTerm != null )
             {
-                bq.add( createQuery( MAVEN.VERSION, vTerm, searchType ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.VERSION, vTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             if ( pTerm != null )
             {
-                bq.add( createQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
             }
 
             // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
@@ -2327,7 +2322,7 @@ public class DefaultIndexerManager
                 }
                 else
                 {
-                    bq.add( createQuery( MAVEN.CLASSIFIER, cTerm, searchType ), BooleanClause.Occur.MUST );
+                    bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, searchType ), BooleanClause.Occur.MUST );
                 }
             }
 
@@ -2403,7 +2398,7 @@ public class DefaultIndexerManager
 
             if ( sha1Checksum != null )
             {
-                bq.add( createQuery( MAVEN.SHA1, sha1Checksum, searchType ), BooleanClause.Occur.MUST );
+                bq.add( constructQuery( MAVEN.SHA1, sha1Checksum, searchType ), BooleanClause.Occur.MUST );
             }
 
             IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false, filters );
@@ -2452,6 +2447,7 @@ public class DefaultIndexerManager
     // ----------------------------------------------------------------------------
 
     public Query constructQuery( Field field, String query, SearchType type )
+        throws IllegalArgumentException
     {
         return nexusIndexer.constructQuery( field, query, type );
     }
@@ -2523,7 +2519,7 @@ public class DefaultIndexerManager
 
         IndexingContext tmpContext = null;
 
-        FSDirectory directory = FSDirectory.getDirectory( tmpDir );
+        FSDirectory directory = FSDirectory.open( tmpDir );
 
         try
         {

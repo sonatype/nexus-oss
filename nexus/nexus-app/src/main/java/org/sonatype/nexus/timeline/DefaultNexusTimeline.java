@@ -12,6 +12,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Initializable;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.InitializationException;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.Startable;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.StartingException;
 import org.sonatype.nexus.configuration.application.ApplicationConfiguration;
 import org.sonatype.timeline.Timeline;
 import org.sonatype.timeline.TimelineConfiguration;
@@ -21,7 +23,7 @@ import org.sonatype.timeline.TimelineResult;
 
 @Component( role = NexusTimeline.class )
 public class DefaultNexusTimeline
-    implements NexusTimeline, Initializable
+    implements NexusTimeline, Initializable, Startable
 {
     private static final String TIMELINE_BASEDIR = "timeline";
 
@@ -47,17 +49,33 @@ public class DefaultNexusTimeline
             getLogger().info( "Initializing Nexus Timeline..." );
 
             moveLegacyTimeline();
+        }
+        catch ( IOException e )
+        {
+            throw new InitializationException( "Unable to move legacy Timeline!", e );
+        }
+    }
 
+    public void start()
+        throws StartingException
+    {
+        try
+        {
             updateConfiguration();
         }
         catch ( TimelineException e )
         {
-            throw new InitializationException( "Unable to initialize Timeline!", e );
+            throw new StartingException( "Unable to initialize Timeline!", e );
         }
     }
 
+    public void stop()
+    {
+        timeline.stop();
+    }
+
     private void moveLegacyTimeline()
-        throws TimelineException
+        throws IOException
     {
         File timelineDir = applicationConfiguration.getWorkingDirectory( TIMELINE_BASEDIR );
 
@@ -92,17 +110,9 @@ public class DefaultNexusTimeline
             newIndexDir.mkdirs();
         }
 
-        try
+        for ( File legacyIndexFile : legacyIndexFiles )
         {
-
-            for ( File legacyIndexFile : legacyIndexFiles )
-            {
-                FileUtils.moveFileToDirectory( legacyIndexFile, newIndexDir, false );
-            }
-        }
-        catch ( IOException e )
-        {
-            throw new TimelineException( "Failed to move legacy timeline index!", e );
+            FileUtils.moveFileToDirectory( legacyIndexFile, newIndexDir, false );
         }
     }
 
@@ -113,18 +123,12 @@ public class DefaultNexusTimeline
 
         TimelineConfiguration config = new TimelineConfiguration( timelineDir );
 
-        configure( config );
-    }
-
-    public void configure( TimelineConfiguration config )
-        throws TimelineException
-    {
         timeline.configure( config );
     }
 
     public void add( long timestamp, String type, String subType, Map<String, String> data )
     {
-        //FIXME shouldn't handle this exception here, must handle the shutdown cycle properly
+        // FIXME shouldn't handle this exception here, must handle the shutdown cycle properly
         try
         {
             timeline.add( timestamp, type, subType, data );
