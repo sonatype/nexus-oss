@@ -442,7 +442,7 @@ public class RecreateMavenMetadataWalkerTest
         Metadata md =
             readMavenMetadata( retrieveFile( inhouseSnapshot, "/com/mycom/proj3/1.0-SNAPSHOT/maven-metadata.xml" ) );
 
-        Assert.assertTrue( "20090226060812".equals( md.getVersioning().getLastUpdated() ));
+        Assert.assertEquals( "20090226060812", md.getVersioning().getLastUpdated() );
         Assert.assertTrue( "We have two snapshots", md.getVersioning().getSnapshotVersions().size() == 2 );
     }
 
