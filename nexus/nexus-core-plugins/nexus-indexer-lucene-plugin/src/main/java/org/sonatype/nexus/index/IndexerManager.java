@@ -14,6 +14,7 @@
 package org.sonatype.nexus.index;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -168,7 +169,7 @@ public interface IndexerManager
     // Identify
     // ----------------------------------------------------------------------------
 
-    ArtifactInfo identifyArtifact( Field field, String data )
+    Collection<ArtifactInfo> identifyArtifact( Field field, String data )
         throws IOException;
 
     // ----------------------------------------------------------------------------

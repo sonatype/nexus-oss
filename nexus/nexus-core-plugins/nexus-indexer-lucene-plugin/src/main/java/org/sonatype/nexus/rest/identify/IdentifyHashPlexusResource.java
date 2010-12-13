@@ -14,6 +14,7 @@
 package org.sonatype.nexus.rest.identify;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -51,9 +52,9 @@ public class IdentifyHashPlexusResource
     public static final String ALGORITHM_KEY = "algorithm";
 
     public static final String HASH_KEY = "hash";
-    
+
     public static final String RESOURCE_URI = "/identify/{" + ALGORITHM_KEY + "}/{" + HASH_KEY + "}";
-    
+
     @Requirement
     private IndexerManager indexerManager;
 
@@ -77,14 +78,14 @@ public class IdentifyHashPlexusResource
 
     /**
      * Retrieve artifact details using a hash value.
+     * 
      * @param algorithm The hash algorithm (i.e. md5 or sha1).
      * @param hash The hash string to compare.
      */
     @Override
     @GET
-    @ResourceMethodSignature( pathParams = { @PathParam( IdentifyHashPlexusResource.ALGORITHM_KEY ), 
-                                             @PathParam( IdentifyHashPlexusResource.HASH_KEY ) }, 
-                              output = NexusArtifact.class )
+    @ResourceMethodSignature( pathParams = { @PathParam( IdentifyHashPlexusResource.ALGORITHM_KEY ),
+        @PathParam( IdentifyHashPlexusResource.HASH_KEY ) }, output = NexusArtifact.class )
     public Object get( Context context, Request request, Response response, Variant variant )
         throws ResourceException
     {
@@ -98,7 +99,13 @@ public class IdentifyHashPlexusResource
         {
             if ( "sha1".equalsIgnoreCase( alg ) )
             {
-                na = ai2Na( request, indexerManager.identifyArtifact( MAVEN.SHA1, checksum ) );
+                Collection<NexusArtifact> nas =
+                    ai2NaColl( request, indexerManager.identifyArtifact( MAVEN.SHA1, checksum ) );
+
+                if ( nas != null && nas.size() > 0 )
+                {
+                    na = nas.iterator().next();
+                }
             }
         }
         catch ( IOException e )
@@ -108,5 +115,4 @@ public class IdentifyHashPlexusResource
 
         return na;
     }
-
 }

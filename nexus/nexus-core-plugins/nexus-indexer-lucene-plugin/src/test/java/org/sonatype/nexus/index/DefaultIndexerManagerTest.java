@@ -13,6 +13,8 @@
  */
 package org.sonatype.nexus.index;
 
+import java.util.Collection;
+
 import org.apache.maven.index.ArtifactInfo;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
@@ -78,9 +80,9 @@ public class DefaultIndexerManagerTest
         // org.sonatype.nexus : nexus-indexer : 1.0-beta-4
         // sha1: 86e12071021fa0be4ec809d4d2e08f07b80d4877
 
-        ArtifactInfo ai = indexerManager.identifyArtifact( MAVEN.SHA1, "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
+        Collection<ArtifactInfo> ais = indexerManager.identifyArtifact( MAVEN.SHA1, "86e12071021fa0be4ec809d4d2e08f07b80d4877" );
 
-        assertNotNull( "The artifact has to be found!", ai );
+        assertTrue( "The artifact has to be found!", ais.size() == 1 );
 
         IteratorSearchResponse response;
 

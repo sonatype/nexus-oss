@@ -15,6 +15,7 @@ package org.sonatype.nexus;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.lucene.document.Document;
@@ -201,19 +202,21 @@ public class ReindexTest
                                               String version )
         throws Exception
     {
-        ArtifactInfo ai = indexerManager.identifyArtifact( MAVEN.SHA1, sha1Hash );
+        Collection<ArtifactInfo> ais = indexerManager.identifyArtifact( MAVEN.SHA1, sha1Hash );
 
         if ( shouldBePresent )
         {
-            assertNotNull( "Should find " + gid + ":" + aid + ":" + version, ai );
+            assertTrue( "Should find " + gid + ":" + aid + ":" + version, ais.size() > 0 );
 
+            ArtifactInfo ai = ais.iterator().next();
+            
             assertEquals( gid, ai.groupId );
             assertEquals( aid, ai.artifactId );
             assertEquals( version, ai.version );
         }
         else
         {
-            assertNull( "Should not find " + gid + ":" + aid + ":" + version, ai );
+            assertEquals( "Should not find " + gid + ":" + aid + ":" + version, 0, ais.size() );
         }
     }
 

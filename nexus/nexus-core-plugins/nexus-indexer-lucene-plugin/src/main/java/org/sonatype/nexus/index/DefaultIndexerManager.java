@@ -1579,7 +1579,7 @@ public class DefaultIndexerManager
     // Identify
     // ----------------------------------------------------------------------------
 
-    public ArtifactInfo identifyArtifact( Field field, String data )
+    public Collection<ArtifactInfo> identifyArtifact( Field field, String data )
         throws IOException
     {
         return nexusIndexer.identify( field, data );
