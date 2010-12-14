@@ -26,8 +26,18 @@ public final class RoleAndPrivilegeListResourceComparator
     }
 
     public int compare( RoleAndPrivilegeListResource o1, RoleAndPrivilegeListResource o2 )
-    {
-        // always put external realms first
+    {        
+        // always sort by roles first, then privileges
+        if ( o1.getType().equals( "role" ) && o2.getType().equals( "privilege" ) )
+        {
+            return -1;
+        }
+        else if ( o1.getType().equals( "privilege" ) && o2.getType().equals( "role" ) )
+        {
+            return 1;
+        }
+        
+        // always put external items first
         if ( o1.isExternal() && !o2.isExternal() )
         {
             return -1;
@@ -39,12 +49,7 @@ public final class RoleAndPrivilegeListResourceComparator
 
         if ( SORT_NAME.equals( sort ) )
         {
-            int compare = doCompare( o1.getType(), o2.getType(), dir );
-            if ( compare == 0 )
-            {
-                return doCompare( o1.getName(), o2.getName(), dir );
-            }
-            return compare;
+            return doCompare( o1.getName(), o2.getName(), dir );
         }
         else if ( SORT_DESCRIPTION.equals( sort ) )
         {
