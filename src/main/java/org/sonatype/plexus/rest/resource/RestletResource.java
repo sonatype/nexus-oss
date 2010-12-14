@@ -153,10 +153,18 @@ public class RestletResource
                     return null;
                 }
 
-                if ( text != null && !CharacterSet.UTF_8.equals( variant.getCharacterSet() ) )
+                if ( text != null )
                 {
-                    // must fix text encoding NXCM-2494
-                    text = new String( new String( text.getBytes(), "UTF-8" ).getBytes( "ISO-8859-1" ) );
+                    CharacterSet charset = variant.getCharacterSet();
+                    if ( charset == null )
+                    {
+                        charset = CharacterSet.ISO_8859_1;
+                    }
+                    if ( !CharacterSet.UTF_8.equals( charset ) )
+                    {
+                        // must fix text encoding NXCM-2494
+                        text = new String( new String( text.getBytes(), "UTF-8" ).getBytes( charset.getName() ) );
+                    }
                 }
 
                 representation = new XStreamRepresentation( xstream, text, variant.getMediaType() );
