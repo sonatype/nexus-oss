@@ -329,79 +329,30 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
     labelWidth : 100,
     referenceData : Sonatype.repoServer.referenceData.roles,
     dataModifiers : {
-      load : {},
+      load : {
+        roles : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'roleManager')[0].setSelectedRoleIds(arr, true);
+          return arr;
+        },
+        privileges : function(arr, srcObj, fpanel) {
+          fpanel.find('name', 'roleManager')[0].setSelectedPrivilegeIds(arr, true);
+          return arr;
+        }
+      },
       submit : {
-        roles : this.saveRolesTreeHelper.createDelegate(this),
-        privileges : this.savePrivilegesTreeHelper.createDelegate(this),
+        roles : function(value, fpanel) {
+          return fpanel.find('name', 'roleManager')[0].getSelectedRoleIds();
+        },
+        privileges : function(value, fpanel) {
+          return fpanel.find('name', 'roleManager')[0].getSelectedPrivilegeIds();
+        },
         sessionTimeout : function() {
           return 60;
         }
       }
-    },
-    validationModifiers : {
-      roles : this.treeValidationError.createDelegate(this),
-      privileges : this.treeValidationError.createDelegate(this)
     }
   };
   Ext.apply(this, config, defaultConfig);
-
-  this.roleDataStore = new Ext.data.JsonStore({
-        root : 'data',
-        id : 'id',
-        url : Sonatype.config.repos.urls.roles,
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        autoLoad : false,
-        fields : [{
-              name : 'id'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
-            }],
-        listeners : {
-          load : {
-            fn : function() {
-              this.rolesLoaded = true;
-              if (this.privsLoaded == true)
-              {
-                this.resetHandler();
-              }
-            },
-            scope : this
-          }
-        }
-      });
-
-  this.privDataStore = new Ext.data.JsonStore({
-        root : 'data',
-        id : 'id',
-        url : Sonatype.config.repos.urls.privileges,
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        autoLoad : false,
-        fields : [{
-              name : 'id'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
-            }],
-        listeners : {
-          load : {
-            fn : function() {
-              this.privsLoaded = true;
-              if (this.rolesLoaded == true)
-              {
-                this.resetHandler();
-              }
-            },
-            scope : this
-          }
-        }
-      });
 
   var ht = Sonatype.repoServer.resources.help.roles;
 
@@ -445,170 +396,14 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         allowBlank : true,
         width : this.COMBO_WIDTH
       }, {
-        xtype : 'panel',
-        layout : 'table',
-        layoutConfig : {
-          columns : 3
-        },
-        autoHeight : true,
-        style : 'padding: 10px 0 0 0',
-        name : 'privileges',
-
-        items : [{
-              xtype : 'multiselecttreepanel',
-              name : 'roles-privs-tree', // note: unique ID is assinged before
-                                          // instantiation
-              title : 'Selected Roles / Privileges',
-              cls : 'required-field',
-              border : true, // note: this seem to have no effect w/in form
-                              // panel
-              bodyBorder : true, // note: this seem to have no effect w/in form
-                                  // panel
-              // note: this style matches the expected behavior
-              bodyStyle : 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              width : 400,
-              height : 300,
-              animate : true,
-              lines : false,
-              autoScroll : true,
-              containerScroll : true,
-              // @note: root node must be instantiated uniquely for each
-              // instance of treepanel
-              // @ext: can TreeNode be registerd as a component with an xtype so
-              // this new root node
-              // may be instantiated uniquely for each form panel that uses this
-              // config?
-              rootVisible : false,
-              root : new Ext.tree.TreeNode({
-                    text : 'root'
-                  }),
-              enableDD : true,
-              ddScroll : true,
-              dropConfig : {
-                allowContainerDrop : true,
-                onContainerDrop : function(source, e, data) {
-                  if (data.nodes)
-                  {
-                    for (var i = 0; i < data.nodes.length; i++)
-                    {
-                      this.tree.root.appendChild(data.nodes[i]);
-                    }
-                  }
-                  return true;
-                },
-                onContainerOver : function(source, e, data) {
-                  return this.dropAllowed;
-                },
-                // passign padding to make whole treePanel the drop zone. This
-                // is dependent
-                // on a sonatype fix in the Ext.dd.DropTarget class. This is
-                // necessary
-                // because treepanel.dropZone.setPadding is never available in
-                // time to be useful.
-                padding : [0, 0, 274, 0]
-              },
-              // added Field values to simulate form field validation
-              invalidText : 'One or more roles or privileges are required',
-              validate : function() {
-                return (this.root.childNodes.length > 0);
-              },
-              invalid : false,
-              listeners : {
-                'append' : {
-                  fn : function(tree, parentNode, insertedNode, i) {
-                    if (tree.invalid)
-                    {
-                      // remove error messaging
-                      tree.getEl().child('.x-panel-body').setStyle({
-                            'background-color' : '#FFFFFF',
-                            border : '1px solid #B5B8C8'
-                          });
-                      Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                    }
-                  },
-                  scope : this
-                },
-                'remove' : {
-                  fn : function(tree, parentNode, removedNode) {
-                    if (tree.root.childNodes.length < 1)
-                    {
-                      this.markTreeInvalid(tree);
-                    }
-                    else if (tree.invalid)
-                    {
-                      // remove error messaging
-                      tree.getEl().child('.x-panel-body').setStyle({
-                            'background-color' : '#FFFFFF',
-                            border : '1px solid #B5B8C8'
-                          });
-                      Ext.form.Field.msgFx['normal'].hide(tree.errorEl, tree);
-                    }
-                  },
-                  scope : this
-                }
-              }
-            }, {
-              xtype : 'twinpanelcontroller',
-              name : 'twinpanel',
-              halfSize : true
-            }, {
-              xtype : 'multiselecttreepanel',
-              name : 'all-roles-privs-tree', // note: unique ID is assinged
-                                              // before instantiation
-              title : 'Available Roles / Privileges',
-              border : true, // note: this seem to have no effect w/in form
-                              // panel
-              bodyBorder : true, // note: this seem to have no effect w/in form
-                                  // panel
-              // note: this style matches the expected behavior
-              bodyStyle : 'background-color:#FFFFFF; border: 1px solid #B5B8C8',
-              width : 400,
-              height : 300,
-              animate : true,
-              lines : false,
-              autoScroll : true,
-              containerScroll : true,
-              // @note: root node must be instantiated uniquely for each
-              // instance of treepanel
-              // @ext: can TreeNode be registerd as a component with an xtype so
-              // this new root node
-              // may be instantiated uniquely for each form panel that uses this
-              // config?
-              rootVisible : false,
-              root : new Ext.tree.TreeNode({
-                    text : 'root'
-                  }),
-              enableDD : true,
-              ddScroll : true,
-              dropConfig : {
-                allowContainerDrop : true,
-                onContainerDrop : function(source, e, data) {
-                  if (data.nodes)
-                  {
-                    for (var i = 0; i < data.nodes.length; i++)
-                    {
-                      this.tree.root.appendChild(data.nodes[i]);
-                    }
-                  }
-                  return true;
-                },
-                onContainerOver : function(source, e, data) {
-                  return this.dropAllowed;
-                },
-                // passign padding to make whole treePanel the drop zone. This
-                // is dependent
-                // on a sonatype fix in the Ext.dd.DropTarget class. This is
-                // necessary
-                // because treepanel.dropZone.setPadding is never available in
-                // time to be useful.
-                padding : [0, 0, 274, 0]
-              }
-            }]
+        xtype : 'rolemanager',
+        name : 'roleManager',
+        height : 200,
+        width : 505
       }];
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call(this, {
         items : items,
-        dataStores : [this.privDataStore, this.roleDataStore],
         listeners : {
           submit : {
             fn : this.submitHandler,
@@ -627,33 +422,6 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
         this.el.mask('Loading...', 'x-mask-loading');
         Sonatype.repoServer.DefaultRoleEditor.superclass.resetHandler.call(this, button, event);
 
-        var allTree = this.find('name', 'all-roles-privs-tree')[0];
-        var selectedTree = this.find('name', 'roles-privs-tree')[0];
-
-        while (allTree.root.lastChild)
-        {
-          allTree.root.removeChild(allTree.root.lastChild);
-        }
-
-        while (selectedTree.root.lastChild)
-        {
-          selectedTree.root.removeChild(selectedTree.root.lastChild);
-        }
-
-        this.initializeRolesTreeHelper(allTree);
-        if (this.payload.data.roles)
-        {
-          this.loadTreeHelper(allTree, selectedTree, this.payload.data.roles);
-        }
-        this.initializePrivilegesTreeHelper(allTree);
-        if (this.payload.data.privileges)
-        {
-          this.loadTreeHelper(allTree, selectedTree, this.payload.data.privileges);
-        }
-
-        this.sortTree(allTree);
-        this.sortTree(selectedTree);
-
         if (this.presetData)
         {
           this.getForm().setValues(this.presetData);
@@ -668,9 +436,6 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
           this.find('name', 'id')[0].disable();
           this.find('name', 'name')[0].disable();
           this.find('name', 'description')[0].disable();
-          this.find('name', 'twinpanel')[0].disable();
-          this.find('name', 'roles-privs-tree')[0].dragZone.lock();
-          this.find('name', 'all-roles-privs-tree')[0].dragZone.lock();
           for (var i = 0; i < this.buttons.length; i++)
           {
             this.buttons[i].disable();
@@ -686,136 +451,10 @@ Ext.extend(Sonatype.repoServer.DefaultRoleEditor, Sonatype.ext.FormPanel, {
         }
       },
       isValid : function() {
-        var selectedTree = this.find('name', 'roles-privs-tree')[0];
-        var treeValid = selectedTree.validate.call(selectedTree);
-
-        if (!treeValid)
-        {
-          this.markTreeInvalid(selectedTree);
-        }
-
-        return treeValid && this.form.isValid();
+        return this.form.isValid() && this.find('name', 'roleManager')[0].validate();
       },
       submitHandler : function(form, action, receivedData) {
         receivedData.mapping = this.payload.data.mapping;
-      },
-      markTreeInvalid : function(tree) {
-        var elp = tree.getEl();
-
-        if (!tree.errorEl)
-        {
-          tree.errorEl = elp.createChild({
-                cls : 'x-form-invalid-msg'
-              });
-          tree.errorEl.setWidth(elp.getWidth(true)); // note removed -20 like
-                                                      // on form fields
-        }
-        tree.invalid = true;
-        tree.errorEl.update(tree.invalidText);
-        elp.child('.x-panel-body').setStyle({
-              'background-color' : '#fee',
-              border : '1px solid #dd7870'
-            });
-        Ext.form.Field.msgFx['normal'].show(tree.errorEl, tree);
-      },
-
-      initializeRolesTreeHelper : function(allTree) {
-        this.roleDataStore.each(function(item, i, len) {
-              if (this.payload.data.id != item.data.id)
-              {
-                allTree.root.appendChild(new Ext.tree.TreeNode({
-                          id : item.data.id,
-                          text : item.data.name,
-                          payload : item.data.id, // sonatype added attribute
-                          allowChildren : false,
-                          draggable : true,
-                          leaf : true,
-                          qtip : item.data.description,
-                          nodeType : 'role',
-                          icon : Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
-                        }));
-              }
-            }, this);
-      },
-
-      initializePrivilegesTreeHelper : function(allTree) {
-        this.privDataStore.each(function(item, i, len) {
-              allTree.root.appendChild(new Ext.tree.TreeNode({
-                        id : item.data.id,
-                        text : item.data.name,
-                        payload : item.data.id, // sonatype added attribute
-                        allowChildren : false,
-                        draggable : true,
-                        leaf : true,
-                        qtip : item.data.description,
-                        nodeType : 'priv'
-                      }));
-            }, this);
-      },
-
-      loadTreeHelper : function(allTree, selectedTree, data) {
-        var nodes = allTree.root.childNodes;
-        for (var i = 0; i < data.length; i++)
-        {
-          for (var j = 0; j < nodes.length; j++)
-          {
-            if (nodes[j].id == data[i])
-            {
-              selectedTree.root.appendChild(nodes[j]);
-              break;
-            }
-          }
-        }
-      },
-
-      sortTree : function(tree) {
-        var sortTypeFunc = function(node) {
-          return (node.attributes.nodeType == 'role' ? '0' : '1') + node.text.toLowerCase();
-        }
-
-        tree.sorter = new Ext.tree.SonatypeTreeSorter(tree, {
-              sortType : sortTypeFunc
-            });
-      },
-
-      saveRolesTreeHelper : function(val, fpanel) {
-        var tree = fpanel.find('name', 'roles-privs-tree')[0];
-
-        var outputArr = [];
-        var nodes = tree.root.childNodes;
-
-        for (var i = 0; i < nodes.length; i++)
-        {
-          if (nodes[i].attributes.nodeType == 'role')
-          {
-            outputArr[i] = nodes[i].attributes.payload;
-          }
-        }
-
-        return outputArr;
-      },
-
-      savePrivilegesTreeHelper : function(val, fpanel) {
-        var tree = fpanel.find('name', 'roles-privs-tree')[0];
-
-        var outputArr = [];
-        var nodes = tree.root.childNodes;
-
-        for (var i = 0; i < nodes.length; i++)
-        {
-          if (nodes[i].attributes.nodeType == 'priv')
-          {
-            outputArr[i] = nodes[i].attributes.payload;
-          }
-        }
-
-        return outputArr;
-      },
-
-      treeValidationError : function(error, fpanel) {
-        var tree = fpanel.find('name', 'roles-privs-tree')[0];
-        this.markTreeInvalid(tree);
-        tree.errorEl.update(error.msg);
       }
     });
 

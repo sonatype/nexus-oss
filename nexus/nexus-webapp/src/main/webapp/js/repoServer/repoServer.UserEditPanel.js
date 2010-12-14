@@ -730,25 +730,17 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
             return true;
           }
         });
+    items.push({
+          xtype : 'rolemanager',
+          name : 'roleManager',
+          height : 200,
+          width : 505,
+          usePrivileges : false
+        });
   }
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call(this, {
-        items : [{
-              xtype : 'panel',
-              layout : 'column',
-              items : [{
-                    xtype : 'panel',
-                    layout : 'form',
-                    width : 600,
-                    items : items
-                  }, {
-                    xtype : 'rolemanager',
-                    name : 'roleManager',
-                    height : 200,
-                    width : 505,
-                    usePrivileges : false
-                  }]
-            }],
+        items : items,
         listeners : {
           submit : {
             fn : this.submitHandler,
@@ -890,48 +882,44 @@ Sonatype.repoServer.UserMappingEditor = function(config) {
   Sonatype.repoServer.UserMappingEditor.superclass.constructor.call(this, {
         items : [{
               xtype : 'panel',
-              layout : 'column',
-              items : [{
-                    xtype : 'panel',
-                    layout : 'form',
-                    width : 600,
-                    items : [useridField, {
-                          xtype : 'textfield',
-                          fieldLabel : 'Realm',
-                          itemCls : 'required-field',
-                          labelStyle : 'margin-left: 15px; width: 185px;',
-                          name : 'source',
-                          disabled : true,
-                          allowBlank : false,
-                          width : this.COMBO_WIDTH
-                        }, {
-                          xtype : 'textfield',
-                          fieldLabel : 'First Name',
-                          itemCls : 'required-field',
-                          labelStyle : 'margin-left: 15px; width: 185px;',
-                          name : 'firstName',
-                          disabled : true,
-                          allowBlank : false,
-                          width : this.COMBO_WIDTH
-                        }, {
-                          xtype : 'textfield',
-                          fieldLabel : 'Last Name',
-                          itemCls : 'required-field',
-                          labelStyle : 'margin-left: 15px; width: 185px;',
-                          name : 'lastName',
-                          disabled : true,
-                          allowBlank : false,
-                          width : this.COMBO_WIDTH
-                        }, {
-                          xtype : 'textfield',
-                          fieldLabel : 'Email',
-                          itemCls : 'required-field',
-                          labelStyle : 'margin-left: 15px; width: 185px;',
-                          name : 'email',
-                          disabled : true,
-                          allowBlank : false,
-                          width : this.COMBO_WIDTH
-                        }]
+              layout : 'form',
+              width : 600,
+              items : [useridField, {
+                    xtype : 'textfield',
+                    fieldLabel : 'Realm',
+                    itemCls : 'required-field',
+                    labelStyle : 'margin-left: 15px; width: 185px;',
+                    name : 'source',
+                    disabled : true,
+                    allowBlank : false,
+                    width : this.COMBO_WIDTH
+                  }, {
+                    xtype : 'textfield',
+                    fieldLabel : 'First Name',
+                    itemCls : 'required-field',
+                    labelStyle : 'margin-left: 15px; width: 185px;',
+                    name : 'firstName',
+                    disabled : true,
+                    allowBlank : false,
+                    width : this.COMBO_WIDTH
+                  }, {
+                    xtype : 'textfield',
+                    fieldLabel : 'Last Name',
+                    itemCls : 'required-field',
+                    labelStyle : 'margin-left: 15px; width: 185px;',
+                    name : 'lastName',
+                    disabled : true,
+                    allowBlank : false,
+                    width : this.COMBO_WIDTH
+                  }, {
+                    xtype : 'textfield',
+                    fieldLabel : 'Email',
+                    itemCls : 'required-field',
+                    labelStyle : 'margin-left: 15px; width: 185px;',
+                    name : 'email',
+                    disabled : true,
+                    allowBlank : false,
+                    width : this.COMBO_WIDTH
                   }, {
                     xtype : 'rolemanager',
                     name : 'roleManager',

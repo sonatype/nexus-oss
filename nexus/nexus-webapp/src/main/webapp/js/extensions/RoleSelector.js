@@ -369,7 +369,7 @@ Ext.reg('rolemanager', RoleManager);
  * A RoleSelectorGrid is used to display the roles and privileges (optional) in a grid with checkboxes for simple selection
  * The grid supports pagination
  *  
- * showPrivileges - boolean flag, if true will show the privileges along with the roles 
+ * usePrivileges - boolean flag, if true will show the privileges along with the roles 
  * selectedRoleIds - role ids that should show as selected 
  * selectedPrivilegeIds - privilege ids that should show as selected
  */
@@ -400,6 +400,7 @@ RoleSelectorGrid = function(config) {
             name : null,
             noPrivileges : !this.usePrivileges,
             noRoles : false,
+            onlySelected : false,
             selectedRoleIds : [],
             selectedPrivilegeIds : [],
             hiddenRoleIds : this.hiddenRoleIds,
@@ -724,11 +725,13 @@ Ext.extend(RoleSelectorGrid, Ext.grid.GridPanel, {
         {
           this.storeProxy.conn.jsonData.data.selectedRoleIds = this.selectedRoleIds;
           this.storeProxy.conn.jsonData.data.selectedPrivilegeIds = this.selectedPrivilegeIds;
+          this.storeProxy.conn.jsonData.data.onlySelected = true;
         }
         else
         {
           this.storeProxy.conn.jsonData.data.selectedRoleIds = [];
           this.storeProxy.conn.jsonData.data.selectedPrivilegeIds = [];
+          this.storeProxy.conn.jsonData.data.onlySelected = false;
         }
 
         if (!this.rolesFilter.pressed)
@@ -740,7 +743,7 @@ Ext.extend(RoleSelectorGrid, Ext.grid.GridPanel, {
           this.storeProxy.conn.jsonData.data.noRoles = false;
         }
 
-        if (!this.privilegesFilter.pressed || !this.showPrivileges)
+        if (!this.privilegesFilter.pressed || !this.usePrivileges)
         {
           this.storeProxy.conn.jsonData.data.noPrivileges = true;
         }
@@ -763,10 +766,11 @@ Ext.extend(RoleSelectorGrid, Ext.grid.GridPanel, {
         this.privilegesFilter.toggle(true);
 
         this.storeProxy.conn.jsonData.data.name = null;
+        this.storeProxy.conn.jsonData.data.onlySelected = false;
         this.storeProxy.conn.jsonData.data.selectedRoleIds = [];
         this.storeProxy.conn.jsonData.data.selectedPrivilegeIds = [];
         this.storeProxy.conn.jsonData.data.noRoles = false;
-        this.storeProxy.conn.jsonData.data.noPrivileges = !this.showPrivileges;
+        this.storeProxy.conn.jsonData.data.noPrivileges = !this.usePrivileges;
 
         this.store.load({
               params : {
