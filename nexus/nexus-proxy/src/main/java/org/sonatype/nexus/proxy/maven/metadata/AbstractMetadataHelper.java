@@ -64,7 +64,7 @@ abstract public class AbstractMetadataHelper
         this.logger = logger;
 
         // here the order matters
-        metadataProcessors = new ArrayList<AbstractMetadataProcessor>( 3 );
+        metadataProcessors = new ArrayList<AbstractMetadataProcessor>( 4 );
 
         metadataProcessors.add( new VersionDirMetadataProcessor( this ) );
 
