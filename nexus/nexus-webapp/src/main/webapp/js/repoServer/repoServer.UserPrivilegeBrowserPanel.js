@@ -3,10 +3,10 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function(config) {
   var defaultConfig = {};
   Ext.apply(this, config, defaultConfig);
 
-  this.roleDataStore = new Ext.data.JsonStore({
+  this.appliedPrivilegesDataStore = new Ext.data.JsonStore({
         root : 'data',
         id : 'id',
-        url : Sonatype.config.repos.urls.roles,
+        url : Sonatype.config.servicePath + '/assigned_privileges/' + this.payload.get('userId'),
         sortInfo : {
           field : 'name',
           direction : 'ASC'
@@ -15,66 +15,19 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function(config) {
         fields : [{
               name : 'id'
             }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
+              name : 'name'
             }, {
-              name : 'description'
-            }, {
-              name : 'privileges'
-            }, {
-              name : 'roles'
+              name : 'parents'
             }],
         listeners : {
           load : {
             fn : function(store, records, options) {
-              this.rolesLoaded = true;
-              if (this.privsLoaded)
-              {
-                this.loadPrivilegeList();
-                this.privsLoaded = false;
-                this.rolesLoaded = false;
-              }
+              this.loadPrivilegeList();
             },
             scope : this
           }
         }
       });
-
-  this.privDataStore = new Ext.data.JsonStore({
-        root : 'data',
-        id : 'id',
-        url : Sonatype.config.repos.urls.privileges,
-        sortInfo : {
-          field : 'name',
-          direction : 'ASC'
-        },
-        autoLoad : true,
-        fields : [{
-              name : 'id'
-            }, {
-              name : 'name',
-              sortType : Ext.data.SortTypes.asUCString
-            }, {
-              name : 'description'
-            }],
-        listeners : {
-          load : {
-            fn : function(store, records, options) {
-              this.privsLoaded = true;
-              if (this.rolesLoaded)
-              {
-                this.loadPrivilegeList();
-                this.privsLoaded = false;
-                this.rolesLoaded = false;
-              }
-            },
-            scope : this
-          }
-        }
-      });
-
-  this.roleDataStore.load();
-  this.privDataStore.load();
 
   Sonatype.repoServer.UserPrivilegeBrowsePanel.superclass.constructor.call(this, {
         region : 'center',
@@ -156,53 +109,45 @@ Sonatype.repoServer.UserPrivilegeBrowsePanel = function(config) {
 Ext.extend(Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
       refreshHandler : function(button, e) {
         // the load listener on these stores will reload the privileges
-        this.roleDataStore.reload();
-        this.privDataStore.reload();
+        this.appliedPrivilegesDataStore.reload();
         var tree = this.find('name', 'role-tree')[0];
         while (tree.root.lastChild)
         {
           tree.root.removeChild(tree.root.lastChild);
         }
       },
-      handleNodeClicked : function(id) {
+      clickHandler : function(node, event) {
         var tree = this.find('name', 'role-tree')[0];
         while (tree.root.lastChild)
         {
           tree.root.removeChild(tree.root.lastChild);
         }
-        var routeArray = this.getPrivilegeRouteArray(id);
-        if (routeArray)
+
+        this.idCounter = 0;
+
+        for (var i = 0; i < node.attributes.payload.data.parents.length; i++)
         {
+          this.addRoleToTree(tree.root, node.attributes.payload.data.parents[i]);
+        }
+      },
+      addRoleToTree : function(rootNode, childData) {
+        var childNode = new Ext.tree.TreeNode({
+              id : this.idCounter++,
+              text : childData.name,
+              payload : childData,
+              allowChildren : (childData.parents && childData.parents.length > 0) ? true : false,
+              draggable : false,
+              leaf : (childData.parents && childData.parents.length > 0) ? false : true,
+              icon : Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
+            });
 
-          for (var i = 0; i < routeArray.length; i++)
+        rootNode.appendChild(childNode);
+
+        if (childData.parents)
+        {
+          for (var i = 0; i < childData.parents.length; i++)
           {
-            var roles = routeArray[i].split('||');
-            if (roles)
-            {
-              var base = tree.root;
-              for (var j = 0; j < roles.length; j++)
-              {
-                var nodeId = (base == tree.root) ? roles[j] : (base.id + '$$' + roles[j]);
-                var foundNode = base.findChild('id', nodeId);
-
-                if (foundNode)
-                {
-                  base = foundNode;
-                }
-                else
-                {
-                  base = base.appendChild(new Ext.tree.TreeNode({
-                            id : nodeId,
-                            text : roles[j],
-                            payload : roles[j],
-                            allowChildren : (j + 1 == roles.length) ? false : true,
-                            draggable : false,
-                            leaf : (j + 1 == roles.length) ? true : false,
-                            icon : Sonatype.config.extPath + '/resources/images/default/tree/folder.gif'
-                          }));
-                }
-              }
-            }
+            this.addRoleToTree(childNode, childData.parents[i]);
           }
         }
       },
@@ -212,152 +157,24 @@ Ext.extend(Sonatype.repoServer.UserPrivilegeBrowsePanel, Ext.FormPanel, {
         {
           privilegeList.root.removeChild(privilegeList.root.lastChild);
         }
-        var privilegeRecs = this.privDataStore.getRange();
+        var privilegeRecs = this.appliedPrivilegesDataStore.getRange();
         for (var i = 0; i < privilegeRecs.length; i++)
         {
-          if (this.userHasPrivilege(privilegeRecs[i].data.id))
-          {
-            privilegeList.root.appendChild(new Ext.tree.TreeNode({
-                      id : privilegeRecs[i].data.id,
-                      text : privilegeRecs[i].data.name,
-                      payload : privilegeRecs[i].data, // sonatype added
-                                                        // attribute
-                      allowChildren : false,
-                      draggable : false,
-                      leaf : true,
-                      qtip : privilegeRecs[i].data.description,
-                      listeners : {
-                        click : {
-                          fn : function(node, event) {
-                            this.handleNodeClicked(node.id);
-                          },
-                          scope : this
-                        }
-                      }
-                    }));
-          }
-        }
-      },
-      userHasPrivilege : function(privId) {
-        if (this.payload.data.roles)
-        {
-          for (var i = 0; i < this.payload.data.roles.length; i++)
-          {
-            if (this.roleHasPrivilege(privId, this.getRoleIdFromPayload(this.payload.data.roles[i])))
-            {
-              return true;
-            }
-          }
-        }
-        return false;
-      },
-      roleHasPrivilege : function(privId, roleId) {
-        var role = this.roleDataStore.getAt(this.roleDataStore.findBy(function(rec, recid) {
-              return rec.id == roleId;
-            }, this));
-
-        if (role == null || role.data == null)
-        {
-          return false;
-        }
-
-        if (role.data.privileges)
-        {
-          for (var i = 0; i < role.data.privileges.length; i++)
-          {
-            if (role.data.privileges[i] == privId)
-            {
-              return true;
-            }
-          }
-        }
-        if (role.data.roles)
-        {
-          for (var i = 0; i < role.data.roles.length; i++)
-          {
-            if (this.roleHasPrivilege(privId, this.getRoleIdFromPayload(role.data.roles[i])))
-            {
-              return true;
-            }
-          }
-        }
-        return false;
-      },
-      getPrivilegeRouteArray : function(privId) {
-        var userRoles = this.payload.data.roles;
-
-        var routeArray = [];
-
-        if (userRoles)
-        {
-          for (var i = 0; i < userRoles.length; i++)
-          {
-            var role = this.roleDataStore.getAt(this.roleDataStore.findBy(function(rec, recid) {
-                  return rec.id == this.getRoleIdFromPayload(userRoles[i]);
-                }, this));
-            if (role)
-            {
-              var childRouteArray = this.getPrivilegeRoleRouteArray(privId, role.data);
-              if (childRouteArray)
-              {
-                for (var j = 0; j < childRouteArray.length; j++)
-                {
-                  routeArray[routeArray.length] = childRouteArray[j];
+          privilegeList.root.appendChild(new Ext.tree.TreeNode({
+                id : privilegeRecs[i].data.id,
+                text : privilegeRecs[i].data.name,
+                payload : privilegeRecs[i], // sonatype added
+                allowChildren : false,
+                draggable : false,
+                leaf : true,
+                listeners : {
+                  click : {
+                    fn : this.clickHandler,
+                    scope : this
+                  }
                 }
-              }
-            }
-          }
+              }));
         }
-
-        routeArray.sort();
-
-        return routeArray;
-      },
-      getPrivilegeRoleRouteArray : function(privId, role) {
-        var routeArray = [];
-        if (role.roles)
-        {
-          for (var i = 0; i < role.roles.length; i++)
-          {
-            var childRole = this.roleDataStore.getAt(this.roleDataStore.findBy(function(rec, recid) {
-                  return rec.id == role.roles[i];
-                }, this));
-            var childRouteArray = this.getPrivilegeRoleRouteArray(privId, childRole.data);
-            if (childRouteArray)
-            {
-              for (var j = 0; j < childRouteArray.length; j++)
-              {
-                routeArray[routeArray.length] = role.name + '||' + childRouteArray[j];
-              }
-            }
-          }
-        }
-        if (role.privileges)
-        {
-          for (var i = 0; i < role.privileges.length; i++)
-          {
-            // Found a priv, add this role
-            if (role.privileges[i] == privId)
-            {
-              routeArray[routeArray.length] = role.name;
-              break;
-            }
-          }
-        }
-
-        return routeArray;
-      },
-      getRoleIdFromPayload : function(role) {
-        if (role.roleId)
-        {
-          return role.roleId;
-        }
-        else if (role.id)
-        {
-          return role.id;
-        }
-
-        return role;
       }
     });
 
@@ -365,8 +182,8 @@ Sonatype.Events.addListener('userViewInit', function(cardPanel, rec, gridPanel) 
       if (rec.data.resourceURI)
       {
         cardPanel.add(new Sonatype.repoServer.UserPrivilegeBrowsePanel({
-                  payload : rec,
-                  tabTitle : 'Privilege Trace'
-                }));
+              payload : rec,
+              tabTitle : 'Privilege Trace'
+            }));
       }
     });
