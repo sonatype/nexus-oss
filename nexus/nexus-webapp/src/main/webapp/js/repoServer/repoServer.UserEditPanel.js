@@ -730,14 +730,15 @@ Sonatype.repoServer.DefaultUserEditor = function(config) {
             return true;
           }
         });
-    items.push({
-          xtype : 'rolemanager',
-          name : 'roleManager',
-          height : 200,
-          width : 505,
-          usePrivileges : false
-        });
   }
+
+  items.push({
+        xtype : 'rolemanager',
+        name : 'roleManager',
+        height : 200,
+        width : 505,
+        usePrivileges : false
+      });
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call(this, {
         items : items,
