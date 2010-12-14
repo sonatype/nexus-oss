@@ -26,6 +26,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
 import org.restlet.Context;
+import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Method;
 import org.restlet.data.Request;
@@ -137,26 +138,34 @@ public class RestletResource
             {
                 String text = ( variant instanceof Representation ) ? ( (Representation) variant ).getText() : "";
 
+                XStream xstream;
                 if ( MediaType.APPLICATION_JSON.equals( variant.getMediaType(), true )
                     || MediaType.TEXT_HTML.equals( variant.getMediaType(), true ) )
                 {
-                    representation =
-                        new XStreamRepresentation(
-                                                   (XStream) getContext().getAttributes().get(
-                                                                                               PlexusRestletApplicationBridge.JSON_XSTREAM ),
-                                                   text, variant.getMediaType() );
+                    xstream = (XStream) getContext().getAttributes().get( PlexusRestletApplicationBridge.JSON_XSTREAM );
                 }
                 else if ( MediaType.APPLICATION_XML.equals( variant.getMediaType(), true ) )
                 {
-                    representation =
-                        new XStreamRepresentation(
-                                                   (XStream) getContext().getAttributes().get(
-                                                                                               PlexusRestletApplicationBridge.XML_XSTREAM ),
-                                                   text, variant.getMediaType() );
+                    xstream = (XStream) getContext().getAttributes().get( PlexusRestletApplicationBridge.XML_XSTREAM );
+                }
+                else
+                {
+                    return null;
                 }
 
-                representation.setModificationDate( getModificationDate() );
+                if ( text != null )
+                {
+                    // must fix text encoding NXCM-2494
+                    Form form = (Form) getRequest().getAttributes().get( "org.restlet.http.headers" );
+                    String contentType = form == null ? null : form.getValues( "Content-Type" );
+                    if ( contentType != null && !contentType.toLowerCase().contains( "utf-8" ) )
+                    {
+                        text = new String( new String( text.getBytes(), "UTF-8" ).getBytes( "ISO-8859-1" ) );
+                    }
+                }
 
+                representation = new XStreamRepresentation( xstream, text, variant.getMediaType() );
+                representation.setModificationDate( getModificationDate() );
                 return representation;
             }
             else
@@ -223,12 +232,12 @@ public class RestletResource
                 catch ( XStreamException e )
                 {
                     this.getLogger().log(
-                                          Level.WARNING,
-                                          "Invalid XML, unable to parse using XStream "
-                                              + ( delegate == null ? "" : delegate.getClass() ), e );
+                        Level.WARNING,
+                        "Invalid XML, unable to parse using XStream " + ( delegate == null ? "" : delegate.getClass() ),
+                        e );
 
                     throw new ResourceException( Status.CLIENT_ERROR_BAD_REQUEST,
-                                                 "Invalid XML, unable to parse using XStream", e );
+                        "Invalid XML, unable to parse using XStream", e );
                 }
             }
         }
