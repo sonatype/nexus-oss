@@ -15,7 +15,7 @@ public class EventInspectorsUtil
         super( test );
     }
 
-    public boolean isCalmPeriod()
+    protected boolean isCalmPeriod()
         throws IOException
     {
         final Response response = RequestFacade.doGetRequest( "service/local/eventInspectors/isCalmPeriod" );

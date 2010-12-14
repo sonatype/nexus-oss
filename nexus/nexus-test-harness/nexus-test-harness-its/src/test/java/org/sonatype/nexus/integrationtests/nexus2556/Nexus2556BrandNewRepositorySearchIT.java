@@ -72,6 +72,7 @@ public class Nexus2556BrandNewRepositorySearchIT
         Gav gav = GavUtil.newGav( "nexus2556", "artifact", "1.0" );
         getDeployUtils().deployUsingGavWithRest( repoId, gav, getTestFile( "artifact.jar" ) );
 
+        TaskScheduleUtil.waitForAllTasksToStop();
         getEventInspectorsUtil().waitForCalmPeriod();
 
         List<NexusArtifact> result = getSearchMessageUtil().searchForGav( gav, repoId );
