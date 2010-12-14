@@ -101,7 +101,7 @@ public class NXCM1008SiteDeployIT
         resource.setChecksumPolicy( ChecksumPolicy.WARN.name() );
 
         RepositoryMessageUtil messageUtil =
-            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON, getRepositoryTypeRegistry() );
+            new RepositoryMessageUtil( this, this.getJsonXStream(), MediaType.APPLICATION_JSON );
         // this also validates
         // TODO: No, it's not: it uses RepositoryTypeRegistry from _this_ plexus container,
         // while Nexus (where the new repo type is registered) runs in Guice!
