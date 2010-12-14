@@ -22,6 +22,7 @@ RoleManager = function(config) {
     onlySelected : true,
     userId : null,
     hideHeaders : true,
+    doValidation : true,
     style : 'border:1px solid #B5B8C8'
   };
   //apply the config and defaults to 'this'
@@ -322,7 +323,7 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
         return id;
       },
       validate : function() {
-        if (!this.userId && this.selectedRoleIds.length == 0 && this.selectedPrivilegeIds.length == 0)
+        if (this.doValidation && !this.userId && this.selectedRoleIds.length == 0 && this.selectedPrivilegeIds.length == 0)
         {
           var elp = this.getEl();
 
@@ -542,7 +543,7 @@ RoleSelectorGrid = function(config) {
         dataIndex : 'description',
         sortable : true
       });
-      
+
   this.autoExpandColumn = 'description';
 
   //columns in the grid
