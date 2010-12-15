@@ -15,7 +15,6 @@ import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.NexusStartedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryConfigurationUpdatedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
-import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.mirror.PublishedMirrors;
@@ -186,10 +185,10 @@ public class NexusRepositoryMetadataEventInspector
                 // "decorate" the file attrs
                 StorageFileItem file = nrt.getLastWriteFile();
 
-                file.getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID,
-                    "NexusRepositoryMetadataContentGenerator" );
+                file.setContentGeneratorId( NexusRepositoryMetadataContentGenerator.ID );
 
-                repository.getAttributesHandler().updateItemAttributes( repository, new ResourceStoreRequest( file ), file );
+                repository.getAttributesHandler().updateItemAttributes( repository, new ResourceStoreRequest( file ),
+                    file );
             }
             catch ( MetadataHandlerException e )
             {

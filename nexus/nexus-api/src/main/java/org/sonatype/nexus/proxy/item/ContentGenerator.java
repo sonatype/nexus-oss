@@ -20,8 +20,8 @@ public interface ContentGenerator
 {
     public static final String CONTENT_GENERATOR_ID = "contentGenerator";
 
+    String getGeneratorId();
+
     ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException;
+        throws IllegalOperationException, ItemNotFoundException, StorageException;
 }

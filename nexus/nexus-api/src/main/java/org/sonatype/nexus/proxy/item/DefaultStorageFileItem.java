@@ -16,6 +16,7 @@ package org.sonatype.nexus.proxy.item;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.proxy.router.RepositoryRouter;
@@ -98,37 +99,44 @@ public class DefaultStorageFileItem
         this( router, new ResourceStoreRequest( path, true, false ), canRead, canWrite, contentLocator );
     }
 
+    @Override
     public long getLength()
     {
         return length;
     }
 
+    @Override
     public void setLength( long length )
     {
         this.length = length;
     }
 
+    @Override
     public String getMimeType()
     {
         return getContentLocator().getMimeType();
     }
 
+    @Override
     public boolean isReusableStream()
     {
         return getContentLocator().isReusable();
     }
 
+    @Override
     public InputStream getInputStream()
         throws IOException
     {
         return getContentLocator().getContent();
     }
 
+    @Override
     public void setContentLocator( ContentLocator locator )
     {
         this.contentLocator = locator;
     }
 
+    @Override
     public ContentLocator getContentLocator()
     {
         return this.contentLocator;
@@ -139,5 +147,39 @@ public class DefaultStorageFileItem
     {
         // we have an exception here, so, Files are overlayable with any other Files
         return super.isOverlayable( item ) || StorageFileItem.class.isAssignableFrom( item.getClass() );
+    }
+
+    @Override
+    public String getContentGeneratorId()
+    {
+        if ( isContentGenerated() )
+        {
+            return getAttributes().get( ContentGenerator.CONTENT_GENERATOR_ID );
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    @Override
+    public void setContentGeneratorId( String contentGeneratorId )
+    {
+        if ( StringUtils.isBlank( contentGeneratorId ) )
+        {
+            // rempve it from attributes
+            getAttributes().remove( ContentGenerator.CONTENT_GENERATOR_ID );
+        }
+        else
+        {
+            // add it to attributes
+            getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID, contentGeneratorId );
+        }
+    }
+
+    @Override
+    public boolean isContentGenerated()
+    {
+        return getAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID );
     }
 }

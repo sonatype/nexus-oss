@@ -68,4 +68,25 @@ public interface StorageFileItem
      * Exposes the content locator.
      */
     ContentLocator getContentLocator();
+
+    /**
+     * Returns the ID of content generator to be used with this file, or null if not set.
+     * 
+     * @return
+     */
+    String getContentGeneratorId();
+
+    /**
+     * Set's content generator to be used with this file item. Passing in null removes use of content generator.
+     * 
+     * @param contentGenerator
+     */
+    void setContentGeneratorId( String contentGeneratorId );
+
+    /**
+     * Returns true if this file item's content is generated on the fly (is not static).
+     * 
+     * @return
+     */
+    boolean isContentGenerated();
 }

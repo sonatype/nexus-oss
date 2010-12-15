@@ -37,6 +37,13 @@ public class ArchetypeContentGenerator
     @Inject
     private IndexArtifactFilter indexArtifactFilter;
 
+    @Override
+    public String getGeneratorId()
+    {
+        return ID;
+    }
+
+    @Override
     public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
         throws IllegalOperationException, ItemNotFoundException, LocalStorageException
     {
@@ -53,5 +60,4 @@ public class ArchetypeContentGenerator
                 }
             } );
     }
-
 }

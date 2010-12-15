@@ -111,7 +111,7 @@ public abstract class AbstractRepository
 
     @Requirement
     private RepositoryItemUidFactory repositoryItemUidFactory;
-    
+
     @Requirement
     private RepositoryItemUidAttributeManager repositoryItemUidAttributeManager;
 
@@ -441,7 +441,7 @@ public abstract class AbstractRepository
         {
             return;
         }
-        
+
         if ( StringUtils.isBlank( request.getRequestPath() ) )
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
@@ -487,7 +487,7 @@ public abstract class AbstractRepository
         {
             return false;
         }
-        
+
         if ( StringUtils.isEmpty( request.getRequestPath() ) )
         {
             request.setRequestPath( RepositoryItemUid.PATH_ROOT );
@@ -762,12 +762,11 @@ public abstract class AbstractRepository
             StorageItem item = doRetrieveItem( request );
 
             // file with generated content?
-            if ( item instanceof StorageFileItem
-                && item.getAttributes().containsKey( ContentGenerator.CONTENT_GENERATOR_ID ) )
+            if ( item instanceof StorageFileItem && ( (StorageFileItem) item ).isContentGenerated() )
             {
                 StorageFileItem file = (StorageFileItem) item;
 
-                String key = file.getAttributes().get( ContentGenerator.CONTENT_GENERATOR_ID );
+                String key = file.getContentGeneratorId();
 
                 if ( getContentGenerators().containsKey( key ) )
                 {
@@ -1064,7 +1063,7 @@ public abstract class AbstractRepository
     {
         return getRepositoryItemUidFactory().createUid( this, path );
     }
-    
+
     public RepositoryItemUidAttributeManager getRepositoryItemUidAttributeManager()
     {
         return repositoryItemUidAttributeManager;

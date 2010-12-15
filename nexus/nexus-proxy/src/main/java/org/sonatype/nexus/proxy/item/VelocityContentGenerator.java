@@ -14,15 +14,22 @@ import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.StorageException;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component( role = ContentGenerator.class, hint = VelocityContentGenerator.VELOCITY )
+@Component( role = ContentGenerator.class, hint = VelocityContentGenerator.ID )
 public class VelocityContentGenerator
     implements ContentGenerator
 {
-    public static final String VELOCITY = "velocity";
+    public static final String ID = "velocity";
 
     @Requirement
     private VelocityComponent velocityComponent;
 
+    @Override
+    public String getGeneratorId()
+    {
+        return ID;
+    }
+
+    @Override
     public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
         throws IllegalOperationException, ItemNotFoundException, StorageException
     {

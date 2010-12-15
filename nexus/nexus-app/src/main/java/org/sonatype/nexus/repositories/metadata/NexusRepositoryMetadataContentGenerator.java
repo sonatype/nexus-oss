@@ -16,14 +16,21 @@ import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.repository.Repository;
 
-@Component( role = ContentGenerator.class, hint = "NexusRepositoryMetadataContentGenerator" )
+@Component( role = ContentGenerator.class, hint = NexusRepositoryMetadataContentGenerator.ID )
 public class NexusRepositoryMetadataContentGenerator
     implements ContentGenerator
 {
+    public static final String ID = "NexusRepositoryMetadataContentGenerator";
+
+    @Override
+    public String getGeneratorId()
+    {
+        return ID;
+    }
+
+    @Override
     public ContentLocator generateContent( Repository repository, String path, StorageFileItem item )
-        throws IllegalOperationException,
-            ItemNotFoundException,
-            StorageException
+        throws IllegalOperationException, ItemNotFoundException, StorageException
     {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 

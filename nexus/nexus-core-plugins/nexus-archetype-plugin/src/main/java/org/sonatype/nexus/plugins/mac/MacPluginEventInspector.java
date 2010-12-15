@@ -8,7 +8,6 @@ import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventAdd;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryRepositoryEvent;
-import org.sonatype.nexus.proxy.item.ContentGenerator;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.StringContentLocator;
 import org.sonatype.nexus.proxy.registry.ContentClass;
@@ -76,7 +75,7 @@ public class MacPluginEventInspector
                         new DefaultStorageFileItem( repository, new ResourceStoreRequest( ARCHETYPE_PATH ), true,
                             false, new StringContentLocator( ArchetypeContentGenerator.ID ) );
 
-                    file.getAttributes().put( ContentGenerator.CONTENT_GENERATOR_ID, ArchetypeContentGenerator.ID );
+                    file.setContentGeneratorId( ArchetypeContentGenerator.ID );
 
                     repository.storeItem( false, file );
                 }
