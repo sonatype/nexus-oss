@@ -89,5 +89,14 @@ public interface RepositoryItemUid
      * @param attr
      * @return
      */
-    <A extends Attribute<V>,V> V getAttributeValue( Class<A> attr );
+    <A extends Attribute<V>, V> V getAttributeValue( Class<A> attr );
+
+    /**
+     * Gets the value of the attribute from this UID, or null if no attribute found.
+     * 
+     * @param <T>
+     * @param attr
+     * @return
+     */
+    <A extends Attribute<Boolean>> boolean getBooleanAttributeValue( Class<A> attr );
 }

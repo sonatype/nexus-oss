@@ -1,8 +1,9 @@
 package org.sonatype.nexus.proxy.item.uid;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
@@ -15,37 +16,21 @@ import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 public class DefaultRepositoryItemUidAttributeManager
     implements RepositoryItemUidAttributeManager
 {
-    private final ConcurrentHashMap<Class<?>, Object> attributes;
+    @Requirement( role = RepositoryItemUidAttributeSource.class )
+    private Map<String, RepositoryItemUidAttributeSource> attributeSources;
 
-    public DefaultRepositoryItemUidAttributeManager()
+    public <T extends Attribute<?>> T getAttribute( final Class<T> attributeKey, final RepositoryItemUid subject )
     {
-        super();
+        for ( RepositoryItemUidAttributeSource attributeSource : attributeSources.values() )
+        {
+            T attribute = attributeSource.getAttribute( attributeKey, subject );
 
-        attributes = new ConcurrentHashMap<Class<?>, Object>();
+            if ( attribute != null )
+            {
+                return attribute;
+            }
+        }
 
-        fillInDefaults();
-    }
-
-    protected void fillInDefaults()
-    {
-        registerAttribute( new IsHiddenUidAttribute() );
-
-        registerAttribute( new IsMetadataMaintainedAttribute() );
-    }
-
-    @SuppressWarnings( "unchecked" )
-    public <T extends Attribute<?>> T getAttribute( final Class<T> attribute, final RepositoryItemUid subject )
-    {
-        return (T) attributes.get( attribute );
-    }
-
-    public <T extends Attribute<?>> void registerAttribute( T attr )
-    {
-        attributes.put( attr.getClass(), attr );
-    }
-
-    public <T extends Attribute<?>> void deregisterAttribute( Class<T> attr )
-    {
-        attributes.remove( attr );
+        return null;
     }
 }

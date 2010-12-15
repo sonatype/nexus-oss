@@ -687,9 +687,7 @@ public class DefaultIndexerManager
         }
 
         // is this hidden path?
-        Boolean isHidden = item.getRepositoryItemUid().getAttributeValue( IsHiddenUidAttribute.class );
-
-        if ( isHidden != null && isHidden.booleanValue() )
+        if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenUidAttribute.class ) )
         {
             getLogger().debug( "Will not index hidden file path: " + item.getPath() );
 

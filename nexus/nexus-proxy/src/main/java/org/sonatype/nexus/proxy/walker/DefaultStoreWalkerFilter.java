@@ -21,15 +21,6 @@ public class DefaultStoreWalkerFilter
 
     protected boolean isHidden( WalkerContext context, StorageItem item )
     {
-        Boolean isHidden = item.getRepositoryItemUid().getAttributeValue( IsHiddenUidAttribute.class );
-
-        if ( isHidden != null )
-        {
-            return isHidden.booleanValue();
-        }
-        else
-        {
-            return false;
-        }
+        return item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenUidAttribute.class );
     }
 }

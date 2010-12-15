@@ -136,41 +136,49 @@ public class DefaultRepositoryItemUid
         return factory;
     }
 
+    @Override
     public Repository getRepository()
     {
         return repository;
     }
 
+    @Override
     public String getPath()
     {
         return path;
     }
 
+    @Override
     public void lock( Action action )
     {
         doLock( action, getLockKey(), contentLock );
     }
 
+    @Override
     public void unlock()
     {
         doUnlock( null, getLockKey(), contentLock );
     }
 
+    @Override
     public void lockAttributes( Action action )
     {
         doLock( action, getAttributeLockKey(), attributesLock );
     }
 
+    @Override
     public void unlockAttributes()
     {
         doUnlock( null, getAttributeLockKey(), attributesLock );
     }
 
+    @Override
     public <A extends Attribute<?>> A getAttribute( Class<A> attrClass )
     {
         return getRepository().getRepositoryItemUidAttributeManager().getAttribute( attrClass, this );
     }
 
+    @Override
     public <A extends Attribute<V>, V> V getAttributeValue( Class<A> attrClass )
     {
         A attr = getAttribute( attrClass );
@@ -182,6 +190,21 @@ public class DefaultRepositoryItemUid
         else
         {
             return null;
+        }
+    }
+
+    @Override
+    public <A extends Attribute<Boolean>> boolean getBooleanAttributeValue( Class<A> attr )
+    {
+        Boolean bool = getAttributeValue( attr );
+
+        if ( bool != null && bool.booleanValue() )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 

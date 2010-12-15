@@ -2,11 +2,12 @@ package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
+/**
+ * Core component doing "aggregation" of attribute sources, possibly contributed by plugins.
+ * 
+ * @author cstamas
+ */
 public interface RepositoryItemUidAttributeManager
 {
-    <T extends Attribute<?>> void registerAttribute( T attr );
-
-    <T extends Attribute<?>> void deregisterAttribute( Class<T> attr );
-
-    <T extends Attribute<?>> T getAttribute( Class<T> attribute, RepositoryItemUid subject );
+    <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject );
 }
