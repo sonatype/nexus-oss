@@ -90,6 +90,21 @@ public interface SecuritySystem
     public Subject getSubject();
 
     /**
+     * Returns the user id of the currently logged in user.
+     * @return The id of the currently logged in user.
+     */
+    public String getCurrentUserId();
+    
+    /**
+     * Returns a user object representing the currently logged in user.
+     * This may return null if the 
+     * 
+     * @return A user object represent the currently logged in user.
+     * @throws If the the subjects User Manager does not exist.
+     */
+    public User getCurrentUser() throws NoSuchUserManagerException;
+    
+    /**
      * Logs the subject out.
      * 
      * @param subject
