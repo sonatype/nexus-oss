@@ -314,7 +314,14 @@ public class RecreateMavenMetadataWalkerTest
         assertEquals( 4, plugins.size() );
 
         Plugin pluginPlugin = plugins.get( 2 );
-        assertEquals( "p243", pluginPlugin.getPrefix() );
+        // cstamas: the plugin prefix is usually _same_ across versions
+        // Here, Velo changed prefix -- it corresponds to "p<VersionWithoutDots>.
+        // Since AddPluginOperation adds only the 1st plugin it encounters (equality is checked by GA)
+        // and since Gian's fix for _ordered_ file input, the "first plugin prefix" wins case happens here.
+        // so, the line below is wrong, since maven-plugin-plugin 2.4.1 is added 1st time, and it's metadata 
+        // will get into group level metadata.xml, while next one -- with different prefix -- will be just ignored.
+        // assertEquals( "p243", pluginPlugin.getPrefix() );
+        assertEquals( "p241", pluginPlugin.getPrefix() );
     }
 
     public void testRebuildChecksumFiles()
