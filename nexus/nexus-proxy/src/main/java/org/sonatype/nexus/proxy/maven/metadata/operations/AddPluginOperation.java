@@ -92,14 +92,6 @@ public class AddPluginOperation
                     // plugin already enlisted
                     return false;
                 }
-                else
-                {
-                    // just need to update some plugin information
-                    p.setArtifactId( plugin.getArtifactId() );
-                    p.setName( plugin.getName() );
-                    p.setPrefix( plugin.getPrefix() );
-                    return true;
-                }
             }
         }
 

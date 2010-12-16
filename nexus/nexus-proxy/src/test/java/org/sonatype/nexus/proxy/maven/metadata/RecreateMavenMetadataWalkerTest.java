@@ -311,17 +311,45 @@ public class RecreateMavenMetadataWalkerTest
         Metadata md = readMavenMetadata( retrieveFile( inhouseRelease, path ) );
         List<Plugin> plugins = md.getPlugins();
         assertNotNull( plugins );
-        assertEquals( 4, plugins.size() );
+        assertEquals( 5, plugins.size() );
 
-        Plugin pluginPlugin = plugins.get( 2 );
         // cstamas: the plugin prefix is usually _same_ across versions
         // Here, Velo changed prefix -- it corresponds to "p<VersionWithoutDots>.
         // Since AddPluginOperation adds only the 1st plugin it encounters (equality is checked by GA)
         // and since Gian's fix for _ordered_ file input, the "first plugin prefix" wins case happens here.
-        // so, the line below is wrong, since maven-plugin-plugin 2.4.1 is added 1st time, and it's metadata 
+        // so, the line below is wrong, since maven-plugin-plugin 2.4.1 is added 1st time, and it's metadata
         // will get into group level metadata.xml, while next one -- with different prefix -- will be just ignored.
         // assertEquals( "p243", pluginPlugin.getPrefix() );
-        assertEquals( "p241", pluginPlugin.getPrefix() );
+
+        // more fixes: it turned out that AddPluginOperation was wrongly implemented: plugins with same artifactId and
+        // different prefixes should be enlisted as _two_ (or as many as many prefixes found) times.
+        // So below, the test changed to check that both prefixes are enlisted!
+
+        boolean contains;
+
+        contains = false;
+        for ( Plugin plugin : plugins )
+        {
+            if ( "p241".equals( plugin.getPrefix() ) )
+            {
+                contains = true;
+                break;
+            }
+        }
+
+        assertTrue( "p241 is not enlisted as prefix!", contains );
+
+        contains = false;
+        for ( Plugin plugin : plugins )
+        {
+            if ( "p243".equals( plugin.getPrefix() ) )
+            {
+                contains = true;
+                break;
+            }
+        }
+
+        assertTrue( "p243 is not enlisted as prefix!", contains );
     }
 
     public void testRebuildChecksumFiles()
