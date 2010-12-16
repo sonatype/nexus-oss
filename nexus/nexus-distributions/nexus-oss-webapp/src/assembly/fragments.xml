@@ -109,16 +109,6 @@
         <unpack>true</unpack>
         <outputDirectory>${runtimeDir}/runtime/apps/${appName}/optional-plugins</outputDirectory>
       </itar>
-      <itar>
-        <groupId>org.sonatype.nexus.plugins</groupId>
-        <artifactId>nexus-archetype-plugin</artifactId>
-        <version>${project.version}</version>
-        <classifier>bundle</classifier>
-        <type>zip</type>
-        <virtual>true</virtual>
-        <unpack>true</unpack>
-        <outputDirectory>${runtimeDir}/runtime/apps/${appName}/optional-plugins</outputDirectory>
-      </itar>
     </itars>    
     
   </assembly>
