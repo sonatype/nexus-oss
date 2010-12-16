@@ -30,7 +30,7 @@ import org.sonatype.security.authorization.ExceptionCatchingModularRealmAuthoriz
 @Named( value = "web" )
 public class WebRealmSecurityManager
     extends DefaultWebSecurityManager
-    implements Initializable
+    implements Initializable, org.apache.shiro.util.Initializable
 {
 
     @Inject
