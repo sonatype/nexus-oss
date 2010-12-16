@@ -14,11 +14,14 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.maven.artifact.repository.metadata.Plugin;
 import org.apache.maven.index.artifact.Gav;
@@ -26,7 +29,10 @@ import org.apache.maven.index.artifact.GavCalculator;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -225,7 +231,7 @@ abstract public class AbstractMetadataHelper
 
                 plugin.setArtifactId( a );
 
-                plugin.setPrefix( getPluginPrefix( a ) );
+                plugin.setPrefix( getPluginPrefix( a, path ) );
 
                 if ( !StringUtils.isEmpty( model.getName() ) )
                 {
@@ -282,8 +288,47 @@ abstract public class AbstractMetadataHelper
         return false;
     }
 
-    private String getPluginPrefix( String artifactId )
+    private String getPluginPrefix( String artifactId, String path )
     {
+        String jarPath = path.replace( ".pom", ".jar" );
+        PluginDescriptor descriptor = null;
+        try
+        {
+            if ( exists( jarPath ) )
+            {
+                InputStream jar = retrieveContent( jarPath );
+                ZipInputStream zip = new ZipInputStream( jar );
+                try
+                {
+                    ZipEntry entry;
+                    while ( ( entry = zip.getNextEntry() ) != null )
+                    {
+                        if ( !entry.isDirectory() && entry.getName().equals( "META-INF/maven/plugin.xml" ) )
+                        {
+                            descriptor = new PluginDescriptorBuilder().build( new InputStreamReader( zip ) );
+                            break;
+                        }
+                        zip.closeEntry();
+                    }
+                }
+                finally
+                {
+                    IOUtil.close( zip );
+                    IOUtil.close( jar );
+                }
+            }
+        }
+        catch ( Exception e )
+        {
+            // can't read plugin.xml
+            logger.debug( "Unable to read plugin.xml", e );
+        }
+
+        if ( descriptor != null )
+        {
+            return descriptor.getGoalPrefix();
+        }
+
         if ( "maven-plugin-plugin".equals( artifactId ) )
         {
             return "plugin";

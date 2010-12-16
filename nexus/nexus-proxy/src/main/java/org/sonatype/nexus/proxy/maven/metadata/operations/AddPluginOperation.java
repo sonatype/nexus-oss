@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.proxy.maven.metadata.operations;
 
+import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -85,8 +87,19 @@ public class AddPluginOperation
         {
             if ( p.getArtifactId().equals( plugin.getArtifactId() ) )
             {
-                // plugin already enlisted
-                return false;
+                if ( isPluginEquals( p, plugin ) )
+                {
+                    // plugin already enlisted
+                    return false;
+                }
+                else
+                {
+                    // just need to update some plugin information
+                    p.setArtifactId( plugin.getArtifactId() );
+                    p.setName( plugin.getName() );
+                    p.setPrefix( plugin.getPrefix() );
+                    return true;
+                }
             }
         }
 

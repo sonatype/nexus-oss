@@ -305,8 +305,16 @@ public class RecreateMavenMetadataWalkerTest
     {
         rebuildMavenMetadata( inhouseRelease );
 
-        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest(
-            "/org/apache/maven/plugins/maven-metadata.xml", false ) ) );
+        final String path = "/org/apache/maven/plugins/maven-metadata.xml";
+        assertNotNull( inhouseRelease.retrieveItem( new ResourceStoreRequest( path, false ) ) );
+
+        Metadata md = readMavenMetadata( retrieveFile( inhouseRelease, path ) );
+        List<Plugin> plugins = md.getPlugins();
+        assertNotNull( plugins );
+        assertEquals( 4, plugins.size() );
+
+        Plugin pluginPlugin = plugins.get( 2 );
+        assertEquals( "p243", pluginPlugin.getPrefix() );
     }
 
     public void testRebuildChecksumFiles()
@@ -344,7 +352,6 @@ public class RecreateMavenMetadataWalkerTest
         expected.put( "/junit/junit/3.8.1/maven-metadata.xml.sha1", Boolean.FALSE );
 
         validateResults( inhouseRelease, expected );
-        ;
     }
 
     public void testArtifactDirMdCorrect()

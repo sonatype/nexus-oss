@@ -1,5 +1,7 @@
 package org.sonatype.nexus.proxy.maven.metadata;
 
+import static org.sonatype.nexus.proxy.maven.metadata.operations.MetadataUtil.isPluginEquals;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -80,7 +82,6 @@ public class GroupDirMetadataProcessor
         metadataHelper.gData.remove( path );
     }
 
-    @SuppressWarnings( "unchecked" )
     @Override
     protected boolean isMetadataCorrect( Metadata oldMd, String path )
         throws Exception
@@ -128,24 +129,4 @@ public class GroupDirMetadataProcessor
         return false;
     }
 
-    private boolean isPluginEquals( Plugin p1, Plugin p2 )
-    {
-        if ( p1.getName() == null )
-        {
-            p1.setName( "" );
-        }
-
-        if ( p2.getName() == null )
-        {
-            p2.setName( "" );
-        }
-
-        if ( p1.getArtifactId().equals( p2.getArtifactId() ) && p1.getPrefix().equals( p2.getPrefix() )
-            && p1.getName().equals( p2.getName() ) )
-        {
-            return true;
-        }
-
-        return false;
-    }
 }
