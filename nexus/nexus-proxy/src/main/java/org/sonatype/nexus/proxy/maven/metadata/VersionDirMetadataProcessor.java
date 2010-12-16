@@ -3,6 +3,7 @@ package org.sonatype.nexus.proxy.maven.metadata;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
@@ -89,6 +90,7 @@ public class VersionDirMetadataProcessor
         M2GavCalculator calc = new M2GavCalculator();
 
         List<Gav> gavs = new ArrayList<Gav>();
+        Collections.sort( (ArrayList<String>) items );
         for ( String item : items )
         {
             Gav gav = calc.pathToGav( path + item );

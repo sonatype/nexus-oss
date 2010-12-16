@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.feeds.FeedRecorder;
+import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.scheduling.AbstractNexusRepositoriesPathAwareTask;
 import org.sonatype.nexus.tasks.descriptors.AbstractIndexTaskDescriptor;
 
@@ -46,17 +47,33 @@ public abstract class AbstractIndexerTask
     {
         for ( ReindexTaskHandler handler : handlers )
         {
-            if ( getRepositoryId() != null )
+            try
             {
-                handler.reindexRepository( getRepositoryId(), getResourceStorePath(), fullReindex );
+                if ( getRepositoryId() != null )
+                {
+                    handler.reindexRepository( getRepositoryId(), getResourceStorePath(), fullReindex );
+                }
+                else if ( getRepositoryGroupId() != null )
+                {
+                    handler.reindexRepository( getRepositoryGroupId(), getResourceStorePath(), fullReindex );
+                }
+                else
+                {
+                    handler.reindexAllRepositories( getResourceStorePath(), fullReindex );
+                }
             }
-            else if ( getRepositoryGroupId() != null )
+            catch ( NoSuchRepositoryException nsre )
             {
-                handler.reindexRepository( getRepositoryGroupId(), getResourceStorePath(), fullReindex );
-            }
-            else
-            {
-                handler.reindexAllRepositories( getResourceStorePath(), fullReindex );
+                // TODO: When we get to implement NEXUS-3977/NEXUS-1002 we'll be able to stop the indexing task when the
+                // repo is deleted, so this exception handling/warning won't be needed anymore.
+                if ( getRepositoryId() != null || getRepositoryGroupId() != null )
+                {
+                    getLogger().warn(
+                        "Repository "
+                            + ( getRepositoryId() != null ? getRepositoryId() : "group " + getRepositoryGroupId() )
+                            + " was not found. It's likely that the repository was deleted while either the repair or the update index task was running." );
+                }
+                throw nsre;
             }
         }
 

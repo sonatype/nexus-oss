@@ -52,7 +52,63 @@ public abstract class AbstractRepositoryFolderCleaner
                 FileUtils.copyFile( file, basketFile );
             }
         }
+        if ( file.isDirectory() )
+        {
+            deleteFilesRecursively( file );
+        }
+        else
+        {
+            FileUtils.forceDelete( file );
+        }
+    }
 
-        FileUtils.forceDelete( file );
+    // This method prevents locked files on Windows from not allowing to delete unlocked files, i.e., it will keep on
+    // deleting other files even if it reaches a locked file first.
+    private void deleteFilesRecursively( File folder )
+    {
+        // First check if it's a directory to avoid future misuse.
+        if ( folder.isDirectory() )
+        {
+            File[] files = folder.listFiles();
+            for ( File file : files )
+            {
+                if ( file.isDirectory() )
+                {
+                    deleteFilesRecursively( file );
+                }
+                else
+                {
+                    try
+                    {
+                        FileUtils.forceDelete( file );
+                    }
+                    catch ( IOException ioe )
+                    {
+                        ioe.printStackTrace();
+                    }
+                }
+            }
+            // After cleaning the files, tries to delete the containing folder.
+            try
+            {
+                FileUtils.forceDelete( folder );
+            }
+            catch ( IOException ioe )
+            {
+                // If the folder cannot be deleted it means there are locked files in it. But we don't need to log it
+                // here once the file locks had already been detected and logged in the for loop above.
+            }
+        }
+        else
+        {
+            try
+            {
+                FileUtils.forceDelete( folder );
+            }
+            catch ( IOException ioe )
+            {
+                ioe.printStackTrace();
+            }
+        }
     }
 }
