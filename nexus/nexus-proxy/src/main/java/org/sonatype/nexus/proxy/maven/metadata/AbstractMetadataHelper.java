@@ -29,12 +29,13 @@ import org.apache.maven.index.artifact.GavCalculator;
 import org.apache.maven.index.artifact.M2ArtifactRecognizer;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.plugin.descriptor.PluginDescriptorBuilder;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.IOUtil;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
 /**
  * a Maven metadata helper containing all the logic for creating maven-metadata.xml <br/>
@@ -291,7 +292,7 @@ abstract public class AbstractMetadataHelper
     private String getPluginPrefix( String artifactId, String path )
     {
         String jarPath = path.replace( ".pom", ".jar" );
-        PluginDescriptor descriptor = null;
+        String prefix = null;
         try
         {
             if ( exists( jarPath ) )
@@ -305,7 +306,11 @@ abstract public class AbstractMetadataHelper
                     {
                         if ( !entry.isDirectory() && entry.getName().equals( "META-INF/maven/plugin.xml" ) )
                         {
-                            descriptor = new PluginDescriptorBuilder().build( new InputStreamReader( zip ) );
+                            PlexusConfiguration plexusConfig =
+                                new XmlPlexusConfiguration( Xpp3DomBuilder.build( new InputStreamReader( zip ) ) );
+
+                            prefix = plexusConfig.getChild( "goalPrefix" ).getValue();
+                            zip.closeEntry();
                             break;
                         }
                         zip.closeEntry();
@@ -324,9 +329,9 @@ abstract public class AbstractMetadataHelper
             logger.debug( "Unable to read plugin.xml", e );
         }
 
-        if ( descriptor != null )
+        if ( prefix != null )
         {
-            return descriptor.getGoalPrefix();
+            return prefix;
         }
 
         if ( "maven-plugin-plugin".equals( artifactId ) )
