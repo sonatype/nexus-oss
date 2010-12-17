@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 
@@ -71,46 +70,6 @@ public class RestletResource
         setReadable( delegate.isReadable() );
         setModifiable( delegate.isModifiable() );
         setNegotiateContent( delegate.isNegotiateContent() );
-    }
-
-    private String getModificationDateKey( boolean parent )
-    {
-        if ( parent )
-        {
-            return getRequest().getResourceRef().getParentRef().getPath() + "#modified";
-        }
-        else
-        {
-            return getRequest().getResourceRef().getPath() + "#modified";
-        }
-    }
-
-    protected Date getModificationDate()
-    {
-        Date result = (Date) getContext().getAttributes().get( getModificationDateKey( false ) );
-
-        if ( result == null )
-        {
-            // get parent's date
-            result = (Date) getContext().getAttributes().get( getModificationDateKey( true ) );
-
-            if ( result == null )
-            {
-                // get app date
-                PlexusRestletApplicationBridge application = (PlexusRestletApplicationBridge) getApplication();
-
-                result = application.getCreatedOn();
-            }
-
-            getContext().getAttributes().put( getModificationDateKey( false ), result );
-        }
-
-        return result;
-    }
-
-    protected void updateModificationDate( boolean parent )
-    {
-        getContext().getAttributes().put( getModificationDateKey( parent ), new Date() );
     }
 
     /**
@@ -168,7 +127,6 @@ public class RestletResource
                 }
 
                 representation = new XStreamRepresentation( xstream, text, variant.getMediaType() );
-                representation.setModificationDate( getModificationDate() );
                 return representation;
             }
             else
@@ -333,11 +291,6 @@ public class RestletResource
                 getResponse().setEntity( doRepresent( result, representation ) );
             }
         }
-
-        if ( getResponse().getStatus().isSuccess() )
-        {
-            updateModificationDate( false );
-        }
     }
 
     @Override
@@ -376,13 +329,6 @@ public class RestletResource
                 getResponse().setEntity( doRepresent( result, representation ) );
             }
         }
-
-        if ( getResponse().getStatus().isSuccess() )
-        {
-            updateModificationDate( false );
-
-            updateModificationDate( true );
-        }
     }
 
     @Override
@@ -396,13 +342,6 @@ public class RestletResource
         if ( getResponse().getStatus() == Status.SUCCESS_OK && !getResponse().isEntityAvailable() )
         {
             getResponse().setStatus( Status.SUCCESS_NO_CONTENT );
-        }
-
-        if ( getResponse().getStatus().isSuccess() )
-        {
-            updateModificationDate( false );
-
-            updateModificationDate( true );
         }
     }
 
