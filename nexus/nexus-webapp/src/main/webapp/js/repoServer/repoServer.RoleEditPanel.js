@@ -315,7 +315,8 @@ Ext.extend(Sonatype.repoServer.ExternapRoleMappingPopup, Ext.Window, {
           };
 
           this.hostPanel.cardPanel.getLayout().activeItem.find('name', 'id')[0].disable();
-          this.hostPanel.cardPanel.getLayout().activeItem.getComponent(0).presetData = defaultData;
+          this.hostPanel.cardPanel.getLayout().activeItem.items.get(0).presetData = defaultData;
+          this.hostPanel.cardPanel.getLayout().activeItem.items.get(0).resetHandler();
 
           this.close();
         }
