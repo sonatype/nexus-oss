@@ -75,6 +75,8 @@ public class VersionDirMetadataProcessor
 
         md.setVersion( calculateVersion( path ) );
 
+        md.setModelVersion( "1.1.0" );
+
         versioning( md, getGavs( path, metadataHelper.gavData.get( path ) ) );
 
         return md;

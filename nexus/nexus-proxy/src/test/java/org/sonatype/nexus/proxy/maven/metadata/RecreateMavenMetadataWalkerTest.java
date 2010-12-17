@@ -522,6 +522,7 @@ public class RecreateMavenMetadataWalkerTest
         Assert.assertEquals( "1.0-SNAPSHOT", md.getVersion() );
         Assert.assertEquals( "20080924.191343", md.getVersioning().getSnapshot().getTimestamp() );
         Assert.assertEquals( 2, md.getVersioning().getSnapshot().getBuildNumber() );
+        Assert.assertEquals( "1.1.0", md.getModelVersion() );
     }
 
     public void testGroupDirMdCorrect()
