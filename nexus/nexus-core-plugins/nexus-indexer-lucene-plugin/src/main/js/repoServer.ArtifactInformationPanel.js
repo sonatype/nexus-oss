@@ -205,10 +205,16 @@ Ext.extend(Sonatype.repoServer.ArtifactInformationPanel, Ext.form.FormPanel, {
       deleteRepoItemCallback : function(options, isSuccess, response) {
         if (isSuccess)
         {
-          var panel = Sonatype.view.mainTabPanel.addOrShowTab('nexus-search', Sonatype.repoServer.SearchPanel, {
-                title : 'Search'
-              });
-          panel.startSearch(panel, false);
+          var panel = Sonatype.view.mainTabPanel.getActiveTab();
+          var id = panel.getId();
+          if (id == 'nexus-search')
+          {
+            panel.startSearch(panel, false);
+          }
+          else if (id == 'view-repositories')
+          {
+            panel.refreshHandler(null, null);
+          }
         }
         else
         {
