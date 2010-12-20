@@ -983,7 +983,7 @@ Ext.extend(Sonatype.repoServer.ArtifactUploadPanel, Ext.FormPanel, {
 Sonatype.Events.addListener('repositoryViewInit', function(cardPanel, rec) {
       var sp = Sonatype.lib.Permissions;
 
-      if (rec.data.exposed && rec.data.resourceURI && rec.data.userManaged && sp.checkPermission('nexus:artifact', sp.CREATE) && rec.data.repoType == 'hosted' && rec.data.repoPolicy && rec.data.repoPolicy.toUpperCase() == 'RELEASE')
+      if (rec.data.resourceURI && rec.data.userManaged && sp.checkPermission('nexus:artifact', sp.CREATE) && rec.data.repoType == 'hosted' && rec.data.repoPolicy && rec.data.repoPolicy.toUpperCase() == 'RELEASE')
       {
 
         Ext.Ajax.request({
