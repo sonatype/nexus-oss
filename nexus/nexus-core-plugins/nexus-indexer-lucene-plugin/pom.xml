@@ -98,7 +98,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-api</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 

@@ -16,14 +16,14 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>compile</scope>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>compile</scope>
     </dependency>
 

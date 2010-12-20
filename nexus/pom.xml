@@ -748,85 +748,85 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-utils</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-web-utils</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-logging-extras</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-api</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-oss-edition</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-configuration</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-proxy</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-app</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus.plugins</groupId>
         <artifactId>nexus-indexer-lucene-plugin</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
         <type>nexus-plugin</type>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-webapp</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-rest-api</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
         <classifier>tests</classifier>
         <scope>test</scope>
       </dependency>
@@ -836,17 +836,17 @@
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-api</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-host-api</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.nexus</groupId>
         <artifactId>nexus-plugin-manager</artifactId>
-        <version>${project.version}</version>
+        <version>${nexus.version}</version>
       </dependency>
       <dependency>
         <groupId>org.sonatype.spice</groupId>

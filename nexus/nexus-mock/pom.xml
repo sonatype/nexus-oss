@@ -49,7 +49,7 @@
                 <artifactItem>
                   <groupId>org.sonatype.nexus</groupId>
                   <artifactId>nexus-oss-webapp</artifactId>
-                  <version>${project.version}</version>
+                  <version>${nexus.version}</version>
                   <type>zip</type>
                   <classifier>bundle</classifier>
                 </artifactItem>
@@ -119,7 +119,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-webapp</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <type>zip</type>
       <classifier>bundle</classifier>
       <exclusions>

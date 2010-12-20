@@ -33,6 +33,7 @@
     <plexus-utils.version>2.0.5</plexus-utils.version>
 
     <jetty.version>6.1.19</jetty.version>
+    <nexus.version>${project.version}</nexus.version>
   </properties>
 
   <dependencyManagement>

@@ -26,41 +26,41 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>car-nexus-oss</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-webapp</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>itar</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-groovy-console-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-archetype-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
@@ -73,33 +73,33 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-core-documentation-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-plugin-manager</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>itar-plexus-container-guice</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <type>zip</type>
     </dependency>
     <dependency>
@@ -111,7 +111,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-oss-edition</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.sonatype.runtime.itars</groupId>
@@ -128,7 +128,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>nexus-ldap-realm-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>
@@ -211,7 +211,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${project.version}/runtime/apps/nexus</tattletale-source>
+        <tattletale-source>${project.build.directory}/runtime-bundle/target/${project.artifactId}-${nexus.version}/runtime/apps/nexus</tattletale-source>
         <tattletale-destination-directory>${project.build.directory}/tattletale</tattletale-destination-directory>
       </properties>
 

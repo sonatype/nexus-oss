@@ -22,7 +22,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.indexer</groupId>

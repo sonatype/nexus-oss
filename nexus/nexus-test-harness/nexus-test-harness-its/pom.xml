@@ -16,7 +16,7 @@
     <!-- Below is the "product", the subject of the ITs -->
     <product-groupId>org.sonatype.nexus</product-groupId>
     <product-artifactId>nexus-oss-webapp</product-artifactId>
-    <product-version>${project.version}</product-version>
+    <product-version>${nexus.version}</product-version>
     <product-classifier>bundle</product-classifier>
     <product-type>zip</product-type>
   </properties>
@@ -90,7 +90,7 @@
             <classifier>${product-classifier}</classifier>
             <type>${product-type}</type>
           </nexusBundleArtifact>
-          <nexusBundleName>nexus-oss-webapp-${project.version}</nexusBundleName>
+          <nexusBundleName>nexus-oss-webapp-${nexus.version}</nexusBundleName>
           <nexusPluginsArtifacts>
             <plugin>
               <groupId>org.sonatype.nexus</groupId>
@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-test-harness-launcher</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
@@ -179,7 +179,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-lvo-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
@@ -192,21 +192,21 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-plugin-console-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- NEXUS-156 -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-indexer-lucene-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <!-- NEXUS-3699 -->
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
     
     <!-- NEXUS-3947 ArchetypeCatalog -->
@@ -272,7 +272,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-webapp</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <type>war</type>
     </dependency>
     <dependency>
@@ -413,7 +413,7 @@
         <dependency>
           <groupId>org.sonatype.nexus</groupId>
           <artifactId>nexus-it-helper-plugin</artifactId>
-          <version>${project.version}</version>
+          <version>${nexus.version}</version>
         </dependency>
       </dependencies>
     </profile>

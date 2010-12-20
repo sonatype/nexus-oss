@@ -135,7 +135,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-client-java</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
@@ -246,26 +246,26 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-rrb-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>cp</classifier>
       <type>jar</type>
     </dependency>
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-it-helper-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
       <exclusions>
@@ -278,7 +278,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins</groupId>
       <artifactId>nexus-capabilities-plugin</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <classifier>bundle</classifier>
       <type>zip</type>
     </dependency>

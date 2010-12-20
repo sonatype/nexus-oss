@@ -65,7 +65,7 @@
     <dependency>
       <groupId>org.sonatype.nexus</groupId>
       <artifactId>nexus-rest-api</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -85,7 +85,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.plugins.ldap</groupId>
       <artifactId>ldap-common</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
 
     <dependency>

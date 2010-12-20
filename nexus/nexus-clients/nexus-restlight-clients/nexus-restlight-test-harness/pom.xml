@@ -51,7 +51,7 @@
     <dependency>
       <groupId>org.sonatype.nexus.restlight</groupId>
       <artifactId>nexus-restlight-client-common</artifactId>
-      <version>${project.version}</version>
+      <version>${nexus.version}</version>
     </dependency>
   </dependencies>
 </project>
