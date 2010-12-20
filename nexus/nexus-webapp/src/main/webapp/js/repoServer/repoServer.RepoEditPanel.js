@@ -519,7 +519,10 @@ Ext.extend(Sonatype.repoServer.HostedRepositoryEditor, Sonatype.repoServer.Abstr
         {
           writePolicyField.store.clearFilter();
 
-          writePolicyField.setValue('ALLOW_WRITE_ONCE');
+          if (writePolicyField.getValue() == null || writePolicyField.getValue() == '')
+          {
+            writePolicyField.setValue('ALLOW_WRITE_ONCE');
+          }
         }
       }
     });
@@ -739,8 +742,7 @@ Sonatype.repoServer.ProxyRepositoryEditor = function(config) {
                     emptyText : 'Select...',
                     selectOnFocus : true,
                     allowBlank : false
-                  }, {
-                  }, {
+                  }, {}, {
                     xtype : 'combo',
                     fieldLabel : 'Auto blocking active',
                     helpText : ht.autoBlockActive,
