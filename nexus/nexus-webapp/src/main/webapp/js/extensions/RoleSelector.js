@@ -93,27 +93,40 @@ RoleManager = function(config) {
 
   this.autoExpandColumn = 'name';
 
-  this.tbar = ['Roles' + (this.usePrivileges ? '/Privileges' : ''), '->', '-', {
+  this.addButton = new Ext.Toolbar.Button({
         text : 'Add',
         handler : this.addHandler,
-        scope : this
-      }, '-', {
+        scope : this,
+        disabled : this.readOnly
+      });
+
+  this.removeButton = new Ext.Toolbar.Button({
         text : 'Remove',
         handler : this.removeHandler,
-        scope : this
-      }];
+        scope : this,
+        disabled : true
+      });
+
+  this.tbar = ['Roles' + (this.usePrivileges ? '/Privileges' : ''), '->', '-', this.addButton, '-', this.removeButton];
 
   RoleManager.superclass.constructor.call(this, {});
 
   this.getView().scrollOffset = 1;
 
-  if (this.readOnly)
-  {
-    this.disable();
-  }
+  this.getSelectionModel().on('selectionchange', this.selectionChangeHandler, this);
 };
 
 Ext.extend(RoleManager, Ext.grid.GridPanel, {
+      selectionChangeHandler : function(selectionModel) {
+        if (selectionModel.getCount() > 0 && !this.readOnly)
+        {
+          this.removeButton.enable();
+        }
+        else
+        {
+          this.removeButton.disable();
+        }
+      },
       addHandler : function() {
         this.roleSelectorWindow = new Ext.Window({
               modal : true,
@@ -368,18 +381,15 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
         this.storeProxy.conn.jsonData.data.userId = this.userId;
       },
       disable : function() {
-        var buttons = this.getTopToolbar().items.getRange();
-        for (var i = 0; i < buttons.length; i++)
-        {
-          buttons[i].disable();
-        }
+        this.readOnly = true;
+        this.addButton.disable();
+        this.removeButton.disable();
       },
       enable : function() {
-        var buttons = this.getTopToolbar().items.getRange();
-        for (var i = 0; i < buttons.length; i++)
-        {
-          buttons[i].enable();
-        }
+        this.readOnly = false;
+        this.addButton.enable();
+        //dont blatantly enable, unless something is selected
+        this.selectionChangeHandler(this.getSelectionModel());
       }
     });
 
