@@ -23,7 +23,8 @@ RoleManager = function(config) {
     userId : null,
     hideHeaders : true,
     doValidation : true,
-    style : 'border:1px solid #B5B8C8'
+    style : 'border:1px solid #B5B8C8',
+    readOnly : false
   };
   //apply the config and defaults to 'this'
   Ext.apply(this, config, defaultConfig);
@@ -105,6 +106,11 @@ RoleManager = function(config) {
   RoleManager.superclass.constructor.call(this, {});
 
   this.getView().scrollOffset = 1;
+
+  if (this.readOnly)
+  {
+    this.disable();
+  }
 };
 
 Ext.extend(RoleManager, Ext.grid.GridPanel, {
@@ -360,6 +366,20 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
       setUserId : function(userId) {
         this.userId = userId;
         this.storeProxy.conn.jsonData.data.userId = this.userId;
+      },
+      disable : function() {
+        var buttons = this.getTopToolbar().items.getRange();
+        for (var i = 0; i < buttons.length; i++)
+        {
+          buttons[i].disable();
+        }
+      },
+      enable : function() {
+        var buttons = this.getTopToolbar().items.getRange();
+        for (var i = 0; i < buttons.length; i++)
+        {
+          buttons[i].enable();
+        }
       }
     });
 
