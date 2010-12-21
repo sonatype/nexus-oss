@@ -172,7 +172,14 @@ public class UserRoleTreePlexusResource
                 childResource.setId( childPrivilege.getId() );
                 childResource.setName( childPrivilege.getName() );
                 childResource.setType( "privilege" );
-                resource.addChildren( childResource );
+                if ( resource != null )
+                {
+                    resource.addChildren( childResource );
+                }
+                else
+                {
+                    response.addData( childResource );
+                }
             }
             catch ( NoSuchPrivilegeException e )
             {
