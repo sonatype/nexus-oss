@@ -85,13 +85,13 @@ public class UserRoleTreePlexusResource
             {
                 Role role = authzManager.getRole( userId );
 
-                handleRoles( role, authzManager, responseResource );
+                handleRole( role, authzManager, responseResource, null );
             }
             else
             {
                 User user = getSecuritySystem().getUser( userId );
 
-                handleRoles( user, authzManager, responseResource );
+                handleUser( user, authzManager, responseResource );
             }
 
             return responseResource;
@@ -110,7 +110,7 @@ public class UserRoleTreePlexusResource
         }
     }
 
-    protected void handleRoles( User user, AuthorizationManager authzManager, RoleTreeResourceResponse response )
+    protected void handleUser( User user, AuthorizationManager authzManager, RoleTreeResourceResponse response )
     {
         for ( RoleIdentifier roleIdentifier : user.getRoles() )
         {
@@ -124,7 +124,7 @@ public class UserRoleTreePlexusResource
                 resource.setType( "role" );
                 response.addData( resource );
 
-                handleRole( role, authzManager, resource );
+                handleRole( role, authzManager, response, resource );
             }
             catch ( NoSuchRoleException e )
             {
@@ -135,31 +135,8 @@ public class UserRoleTreePlexusResource
         }
     }
 
-    protected void handleRoles( Role role, AuthorizationManager authzManager, RoleTreeResourceResponse response )
-    {
-        for ( String roleId : role.getRoles() )
-        {
-            try
-            {
-                Role childRole = authzManager.getRole( roleId );
-
-                RoleTreeResource resource = new RoleTreeResource();
-                resource.setId( childRole.getRoleId() );
-                resource.setName( childRole.getName() );
-                resource.setType( "role" );
-                response.addData( resource );
-
-                handleRole( childRole, authzManager, resource );
-            }
-            catch ( NoSuchRoleException e )
-            {
-                getLogger().debug(
-                    "Invalid roleId: " + roleId + " from source: " + authzManager.getSource() + " not found." );
-            }
-        }
-    }
-
-    protected void handleRole( Role role, AuthorizationManager authzManager, RoleTreeResource resource )
+    protected void handleRole( Role role, AuthorizationManager authzManager, RoleTreeResourceResponse response,
+                               RoleTreeResource resource )
     {
         for ( String roleId : role.getRoles() )
         {
@@ -170,8 +147,15 @@ public class UserRoleTreePlexusResource
                 childResource.setId( childRole.getRoleId() );
                 childResource.setName( childRole.getName() );
                 childResource.setType( "role" );
-                resource.addChildren( childResource );
-                handleRole( childRole, authzManager, childResource );
+                if ( resource != null )
+                {
+                    resource.addChildren( childResource );
+                }
+                else
+                {
+                    response.addData( childResource );
+                }
+                handleRole( childRole, authzManager, response, childResource );
             }
             catch ( NoSuchRoleException e )
             {
