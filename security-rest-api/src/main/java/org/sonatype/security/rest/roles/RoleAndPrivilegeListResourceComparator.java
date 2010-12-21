@@ -36,16 +36,6 @@ public final class RoleAndPrivilegeListResourceComparator
         {
             return 1;
         }
-        
-        // always put external items first
-        if ( o1.isExternal() && !o2.isExternal() )
-        {
-            return -1;
-        }
-        else if ( o2.isExternal() && !o1.isExternal() )
-        {
-            return 1;
-        }
 
         if ( SORT_NAME.equals( sort ) )
         {
@@ -63,11 +53,11 @@ public final class RoleAndPrivilegeListResourceComparator
     {
         if ( DIR_DESC.equals( dir ) )
         {
-            return value2.compareTo( value1 );
+            return value2.compareToIgnoreCase( value1 );
         }
         else
         {
-            return value1.compareTo( value2 );
+            return value1.compareToIgnoreCase( value2 );
         }
     }
 }
