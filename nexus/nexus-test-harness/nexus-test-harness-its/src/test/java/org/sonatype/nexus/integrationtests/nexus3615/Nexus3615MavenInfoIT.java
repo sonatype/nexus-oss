@@ -161,7 +161,7 @@ public class Nexus3615MavenInfoIT
         Assert.assertEquals( gav.getClassifier(), data.getClassifier() );
         Assert.assertEquals( gav.getExtension(), data.getExtension() );
 
-        Assert.assertEquals( buildExpectedDepBlock( gav ), data.getDependencyXmlChunk() );
+        Assert.assertEquals( data.getDependencyXmlChunk(), buildExpectedDepBlock( gav ) );
     }
 
     private Maven2ArtifactInfoResource downloadViewResource( Gav gav, String repoId )

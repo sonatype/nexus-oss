@@ -20,6 +20,7 @@ import org.sonatype.plexus.rest.xstream.json.PrimitiveKeyedMapConverter;
 import org.sonatype.plexus.rest.xstream.xml.LookAheadXppDriver;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.StringConverter;
 
 /**
  * XStream factory for Nexus Core. It gives away a preconfigured XStream to communicate with Core REST Resources.
@@ -32,11 +33,7 @@ public class XStreamFactory
     {
         XStream xs = new XStream( new LookAheadXppDriver() );
 
-        NexusApplication napp = new NexusApplication();
-
-        napp.doConfigureXstream( xs );
-
-        XStreamInitializer.init( xs );
+        initXStream( xs );
 
         return xs;
     }
@@ -48,13 +45,22 @@ public class XStreamFactory
         // for JSON, we use a custom converter for Maps
         xs.registerConverter( new PrimitiveKeyedMapConverter( xs.getMapper() ) );
 
-        NexusApplication napp = new NexusApplication();
-
-        napp.doConfigureXstream( xs );
-
-        XStreamInitializer.init( xs );
+        initXStream( xs );
 
         return xs;
+    }
+    
+    private static void initXStream( XStream xstream )
+    {
+
+        NexusApplication napp = new NexusApplication();
+
+        napp.doConfigureXstream( xstream );
+
+        XStreamInitializer.init( xstream );
+        
+        // Nexus replaces the String converter with one that escape HTML, we do NOT want that on the IT client.
+        xstream.registerConverter( new StringConverter() );
     }
 
 }

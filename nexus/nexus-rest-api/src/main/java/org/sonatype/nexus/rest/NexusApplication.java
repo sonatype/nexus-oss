@@ -117,6 +117,7 @@ import org.sonatype.plexus.rest.resource.PlexusResource;
 import org.sonatype.plexus.rest.resource.error.ErrorMessage;
 import org.sonatype.plexus.rest.resource.error.ErrorResponse;
 import org.sonatype.plexus.rest.xstream.AliasingListConverter;
+import org.sonatype.plexus.rest.xstream.HtmlEscapeStringConverter;
 import org.sonatype.security.rest.model.AuthenticationClientPermissions;
 import org.sonatype.security.rest.model.AuthenticationLoginResourceResponse;
 import org.sonatype.security.rest.model.ClientPermission;
@@ -226,6 +227,9 @@ public class NexusApplication
     @Override
     public XStream doConfigureXstream( XStream xstream )
     {
+        // protect against XSS, escape HTML from input.
+        xstream.registerConverter( new HtmlEscapeStringConverter() );
+        
         xstream.registerConverter( new RepositoryBaseResourceConverter( xstream.getMapper(), xstream
             .getReflectionProvider() ), XStream.PRIORITY_VERY_HIGH );
         xstream.registerConverter( new RepositoryResourceResponseConverter( xstream.getMapper(), xstream
