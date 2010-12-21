@@ -1177,31 +1177,37 @@ public abstract class AbstractRepository
 
         // check for writing to read only repo
         // Readonly is ALWAYS read only
-        if ( RepositoryWritePolicy.READ_ONLY.equals( this.getWritePolicy() ) && !isActionAllowedReadOnly( action ) )
+        if ( RepositoryWritePolicy.READ_ONLY.equals( getWritePolicy() ) && !isActionAllowedReadOnly( action ) )
         {
             throw new IllegalRequestException( request, "Repository with ID='" + getId()
                 + "' is Read Only, but action was '" + action.toString() + "'!" );
         }
         // but Write/write once may need to allow updating metadata
         // check the write policy
-        this.enforceWritePolicy( request, action );
+        enforceWritePolicy( request, action );
 
         if ( isExposed() )
         {
             getAccessManager().decide( this, request, action );
         }
 
-        boolean shouldProcess = true;
+        return checkRequestProcessors( request, action );
+    }
 
+    protected boolean checkRequestProcessors( final ResourceStoreRequest request, final Action action )
+    {
         if ( getRequestProcessors().size() > 0 )
         {
             for ( RequestProcessor processor : getRequestProcessors().values() )
             {
-                shouldProcess = shouldProcess && processor.process( this, request, action );
+                if ( !processor.process( this, request, action ) )
+                {
+                    return false;
+                }
             }
         }
 
-        return shouldProcess;
+        return true;
     }
 
     protected void enforceWritePolicy( ResourceStoreRequest request, Action action )

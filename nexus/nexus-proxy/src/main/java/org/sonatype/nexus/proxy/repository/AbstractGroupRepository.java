@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.sonatype.nexus.configuration.ConfigurationPrepareForSaveEvent;
+import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
 import org.sonatype.nexus.proxy.LocalStorageException;
@@ -28,6 +29,7 @@ import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.NoSuchResourceStoreException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
 import org.sonatype.nexus.proxy.StorageException;
+import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryEventEvictUnusedItems;
 import org.sonatype.nexus.proxy.events.RepositoryGroupMembersChangedEvent;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
@@ -66,8 +68,8 @@ public abstract class AbstractGroupRepository
         boolean membersChanged =
             getCurrentCoreConfiguration().isDirty()
                 && ( getExternalConfiguration( false ).getMemberRepositoryIds().size() != getExternalConfiguration(
-                    true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false )
-                    .getMemberRepositoryIds().containsAll( getExternalConfiguration( true ).getMemberRepositoryIds() ) );
+                    true ).getMemberRepositoryIds().size() || !getExternalConfiguration( false ).getMemberRepositoryIds().containsAll(
+                    getExternalConfiguration( true ).getMemberRepositoryIds() ) );
 
         super.onEvent( evt );
 
@@ -76,8 +78,7 @@ public abstract class AbstractGroupRepository
         {
             RepositoryRegistryEventRemove revt = (RepositoryRegistryEventRemove) evt;
 
-            if ( this.getExternalConfiguration( false ).getMemberRepositoryIds()
-                .contains( revt.getRepository().getId() ) )
+            if ( this.getExternalConfiguration( false ).getMemberRepositoryIds().contains( revt.getRepository().getId() ) )
             {
                 removeMemberRepositoryId( revt.getRepository().getId() );
             }
@@ -96,7 +97,7 @@ public abstract class AbstractGroupRepository
         {
             return Collections.emptyList();
         }
-        
+
         getLogger().info(
             "Evicting unused items from group repository \"" + getName() + "\" (id=\"" + getId() + "\") from path "
                 + request.getRequestPath() );
@@ -182,7 +183,7 @@ public abstract class AbstractGroupRepository
     }
 
     private static void addItems( HashSet<String> names, ArrayList<StorageItem> result,
-        Collection<StorageItem> listItems )
+                                  Collection<StorageItem> listItems )
     {
         for ( StorageItem item : listItems )
         {
@@ -207,47 +208,68 @@ public abstract class AbstractGroupRepository
             // ignored
         }
 
-        if ( !request.isRequestGroupLocalOnly() )
+        boolean hasRequestAuthorizedFlag = request.getRequestContext().containsKey( AccessManager.REQUEST_AUTHORIZED );
+
+        if ( !hasRequestAuthorizedFlag )
         {
-            for ( Repository repo : getRequestRepositories( request ) )
+            request.getRequestContext().put( AccessManager.REQUEST_AUTHORIZED, Boolean.TRUE );
+        }
+
+        try
+        {
+            if ( !request.isRequestGroupLocalOnly() )
             {
-                if ( !request.getProcessedRepositories().contains( repo.getId() ) )
+                for ( Repository repo : getRequestRepositories( request ) )
                 {
-                    try
+                    if ( !request.getProcessedRepositories().contains( repo.getId() ) )
                     {
-                        StorageItem item = repo.retrieveItem( false, request );
-
-                        if ( item instanceof StorageCollectionItem )
+                        try
                         {
-                            item = new DefaultStorageCollectionItem( this, request, true, false );
+                            StorageItem item = repo.retrieveItem( request );
+
+                            if ( item instanceof StorageCollectionItem )
+                            {
+                                item = new DefaultStorageCollectionItem( this, request, true, false );
+                            }
+
+                            return item;
                         }
+                        catch ( IllegalOperationException e )
+                        {
+                            // ignored
+                        }
+                        catch ( ItemNotFoundException e )
+                        {
+                            // ignored
+                        }
+                        catch ( StorageException e )
+                        {
+                            // ignored
+                        }
+                        catch ( AccessDeniedException e )
+                        {
+                            // cannot happen, since we add/check for AccessManager.REQUEST_AUTHORIZED flag
+                        }
+                    }
+                    else
+                    {
+                        getLogger().info(
+                            "Repository ID='"
+                                + repo.getId()
+                                + "' in group ID='"
+                                + this.getId()
+                                + "' was already processed during this request! This repository is skipped from processing. Request: "
+                                + request.toString() );
 
-                        return item;
-                    }
-                    catch ( IllegalOperationException e )
-                    {
-                        // ignored
-                    }
-                    catch ( ItemNotFoundException e )
-                    {
-                        // ignored
-                    }
-                    catch ( StorageException e )
-                    {
-                        // ignored
                     }
                 }
-                else
-                {
-                    getLogger().info(
-                        "Repository ID='"
-                            + repo.getId()
-                            + "' in group ID='"
-                            + this.getId()
-                            + "' was already processed during this request! This repository is skipped from processing. Request: "
-                            + request.toString() );
-
-                }
+            }
+        }
+        finally
+        {
+            if ( !hasRequestAuthorizedFlag )
+            {
+                request.getRequestContext().remove( AccessManager.REQUEST_AUTHORIZED );
             }
         }
 
@@ -326,21 +348,20 @@ public abstract class AbstractGroupRepository
     {
         ArrayList<Repository> result = new ArrayList<Repository>();
 
-        
-            for ( String repoId : getMemberRepositoryIds() )
+        for ( String repoId : getMemberRepositoryIds() )
+        {
+            try
             {
-                try
-                {
-                    Repository repo = repoRegistry.getRepository( repoId );
-                    result.add( repo );
-                }
-                catch ( NoSuchRepositoryException e )
-                {
-                    this.getLogger().warn( "Could not find repository: " + repoId, e );
-                    // XXX throw new StorageException( e );
-                }
+                Repository repo = repoRegistry.getRepository( repoId );
+                result.add( repo );
             }
-            
+            catch ( NoSuchRepositoryException e )
+            {
+                this.getLogger().warn( "Could not find repository: " + repoId, e );
+                // XXX throw new StorageException( e );
+            }
+        }
+
         return result;
     }
 
