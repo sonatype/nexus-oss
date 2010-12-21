@@ -13,9 +13,9 @@ Sonatype.repoServer.UserBrowsePanel = function(config) {
           isRole : this.isRole
         },
         proxy : new Ext.data.HttpProxy({
-            url : Sonatype.config.servicePath + '/role_tree/' + this.parentId,
-            method : 'GET'
-        }),
+              url : Sonatype.config.servicePath + '/role_tree/' + this.parentId,
+              method : 'GET'
+            }),
         sortInfo : {
           field : 'name',
           direction : 'ASC'
@@ -71,6 +71,10 @@ Ext.extend(Sonatype.repoServer.UserBrowsePanel, Ext.tree.TreePanel, {
       },
       roleTreeLoadHandler : function(store, records, options) {
         this.idCounter = 0;
+        while (this.getRootNode().lastChild)
+        {
+          this.getRootNode().removeChild(this.getRootNode().lastChild);
+        }
         for (var i = 0; i < records.length; i++)
         {
           this.loadItemIntoTree(records[i].data.name, records[i].data.type, this.getRootNode(), records[i].data.children);
@@ -101,11 +105,27 @@ Ext.extend(Sonatype.repoServer.UserBrowsePanel, Ext.tree.TreePanel, {
 Sonatype.Events.addListener('userViewInit', function(cardPanel, rec, gridPanel) {
       if (rec.data.resourceURI)
       {
+        var parentName = null;
+
+        if (rec.data.firstName)
+        {
+          parentName = rec.data.firstName;
+        }
+
+        if (rec.data.lastName)
+        {
+          parentName += ' ' + rec.data.lastName;
+        }
+
+        if (parentName == null)
+        {
+          parentName = rec.data.userId;
+        }
         cardPanel.add(new Sonatype.repoServer.UserBrowsePanel({
               payload : rec,
               tabTitle : 'Role Tree',
               parentId : rec.data.userId,
-              parentName : rec.data.firstName + ' ' + rec.data.lastName
+              parentName : parentName
             }));
       }
     });
