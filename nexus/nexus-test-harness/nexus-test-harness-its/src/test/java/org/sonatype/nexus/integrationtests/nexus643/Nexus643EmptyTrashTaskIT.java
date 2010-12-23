@@ -20,6 +20,7 @@ import org.restlet.data.Method;
 import org.restlet.data.Response;
 import org.sonatype.nexus.integrationtests.AbstractNexusIntegrationTest;
 import org.sonatype.nexus.integrationtests.RequestFacade;
+import org.sonatype.nexus.rest.model.ScheduledServicePropertyResource;
 import org.sonatype.nexus.tasks.descriptors.EmptyTrashTaskDescriptor;
 import org.sonatype.nexus.test.utils.TaskScheduleUtil;
 import org.testng.Assert;
@@ -42,22 +43,26 @@ public class Nexus643EmptyTrashTaskIT
         Assert.assertTrue( trashContent.exists(), "Something should be at trash!" );
 
         // Empty trash content older than 1 days
-        File oldTrashFile = new File( nexusWorkDir, "storage/nexus-test-harness-repo/.nexus/trash/nexus643/artifact-1/1.0.0/artifact-1-1.0.0.pom" );
-        File newTrashFile = new File( nexusWorkDir, "storage/nexus-test-harness-repo/.nexus/trash/nexus643/artifact-1/1.0.0/artifact-1-1.0.0.jar" );
+        File oldTrashFile =
+            new File( nexusWorkDir,
+                "storage/nexus-test-harness-repo/.nexus/trash/nexus643/artifact-1/1.0.0/artifact-1-1.0.0.pom" );
+        File newTrashFile =
+            new File( nexusWorkDir,
+                "storage/nexus-test-harness-repo/.nexus/trash/nexus643/artifact-1/1.0.0/artifact-1-1.0.0.jar" );
         oldTrashFile.setLastModified( System.currentTimeMillis() - 24L * 60L * 60L * 1000L * 2 );
 
         Assert.assertTrue( newTrashFile.exists(), "New trash content should be kept! " );
         Assert.assertTrue( oldTrashFile.exists(), "Old trash content should be kept!" );
-        
+
         // this is unsupported, disabled for now (UI is not using it either)
-        // ScheduledServicePropertyResource prop = new ScheduledServicePropertyResource();
-        // prop.setKey( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID );
-        // prop.setValue( "1" );
+        ScheduledServicePropertyResource age = new ScheduledServicePropertyResource();
+        age.setKey( EmptyTrashTaskDescriptor.OLDER_THAN_FIELD_ID );
+        age.setValue( "1" );
 
-        // TaskScheduleUtil.runTask( "Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, prop );
+        TaskScheduleUtil.runTask( "Empty Trash Older Than", EmptyTrashTaskDescriptor.ID, age );
 
-        // Assert.assertTrue( newTrashFile.exists(), "New trash content should be kept! " );
-        // Assert.assertFalse( oldTrashFile.exists(), "Old trash content should be removed!" );
+        Assert.assertTrue( newTrashFile.exists(), "New trash content should be kept! " );
+        Assert.assertFalse( oldTrashFile.exists(), "Old trash content should be removed!" );
 
         // Empty the whole trash
         TaskScheduleUtil.runTask( "Empty Whole Trash", EmptyTrashTaskDescriptor.ID );

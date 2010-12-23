@@ -17,6 +17,9 @@ import org.sonatype.nexus.proxy.statistics.DeferredLongSum;
 import org.sonatype.nexus.proxy.statistics.impl.DefaultDeferredLong;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.proxy.storage.local.LocalRepositoryStorage;
+import org.sonatype.nexus.proxy.walker.AffirmativeStoreWalkerFilter;
+import org.sonatype.nexus.proxy.walker.DefaultWalkerContext;
+import org.sonatype.nexus.proxy.walker.Walker;
 
 @Component( role = Wastebasket.class )
 public class DefaultWastebasket
@@ -28,6 +31,9 @@ public class DefaultWastebasket
 
     @Requirement
     private Logger logger;
+
+    @Requirement
+    private Walker walker;
 
     protected Logger getLogger()
     {
@@ -100,12 +106,12 @@ public class DefaultWastebasket
     public void purge( final Repository repository, final long age )
         throws IOException
     {
+        ResourceStoreRequest trashRoot =
+            new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
+
         if ( age == ALL )
         {
             // simple and fast way, no need for walker
-            ResourceStoreRequest trashRoot =
-                new ResourceStoreRequest( getTrashPath( repository, RepositoryItemUid.PATH_ROOT ) );
-
             try
             {
                 repository.getLocalStorage().shredItem( repository, trashRoot );
@@ -122,6 +128,15 @@ public class DefaultWastebasket
         else
         {
             // walker and walk and changes for age
+            if ( repository.getLocalStorage().containsItem( repository, trashRoot ) )
+            {
+                DefaultWalkerContext ctx =
+                    new DefaultWalkerContext( repository, trashRoot, new AffirmativeStoreWalkerFilter() );
+                
+                ctx.getProcessors().add( new WastebasketWalker( age ) );
+
+                walker.walk( ctx );
+            }
         }
     }
 
