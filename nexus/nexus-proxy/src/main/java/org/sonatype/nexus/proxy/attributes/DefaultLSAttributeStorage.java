@@ -319,9 +319,33 @@ public class DefaultLSAttributeStorage
                 }
             }
         }
+        catch ( IOException e )
+        {
+            getLogger().info( "While reading attributes of " + uid + " we got IOException:", e );
+
+            throw e;
+        }
+        catch ( NullPointerException e )
+        {
+            // NEXUS-3911: seems that on malformed XML the XMLpull parser throws NPE?
+            // org.xmlpull.mxp1.MXParser.fillBuf(MXParser.java:3020) : NPE
+            // it is corrupt
+            if ( getLogger().isDebugEnabled() )
+            {
+                // we log the stacktrace
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it.", e );
+            }
+            else
+            {
+                // just remark about this
+                getLogger().info( "Attributes of " + uid + " are corrupt, deleting it." );
+            }
+
+            corrupt = true;
+        }
         catch ( XStreamException e )
         {
-            // it is corrupt
+            // it is corrupt -- so says XStream, but see above and NEXUS-3911
             if ( getLogger().isDebugEnabled() )
             {
                 // we log the stacktrace

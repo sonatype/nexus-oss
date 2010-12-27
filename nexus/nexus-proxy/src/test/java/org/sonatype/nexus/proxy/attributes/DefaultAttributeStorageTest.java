@@ -46,6 +46,8 @@ public class DefaultAttributeStorageTest
 
     protected Repository repository;
 
+    protected File localStorageDirectory;
+
     public void setUp()
         throws Exception
     {
@@ -65,7 +67,7 @@ public class DefaultAttributeStorageTest
 
         repoConf.setLocalStorage( new CLocalStorage() );
         repoConf.getLocalStorage().setProvider( "file" );
-        File localStorageDirectory = new File( getBasedir(), "target/test-reposes/repo1" );
+        localStorageDirectory = new File( getBasedir(), "target/test-reposes/repo1" );
         repoConf.getLocalStorage().setUrl( localStorageDirectory.toURI().toURL().toString() );
 
         Xpp3Dom exRepo = new Xpp3Dom( "externalConfiguration" );
@@ -104,6 +106,40 @@ public class DefaultAttributeStorageTest
         assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
     }
 
+    public void testSimplePutGetNEXUS3911()
+        throws Exception
+    {
+        DefaultStorageFileItem file =
+            new DefaultStorageFileItem( repository, new ResourceStoreRequest( "/a.txt" ), true, true,
+                new StringContentLocator( "CONTENT" ) );
+
+        file.getAttributes().put( "kuku", "kuku" );
+
+        attributeStorage.putAttribute( file );
+
+        RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/a.txt" );
+        DefaultStorageFileItem file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
+
+        assertTrue( file1.getAttributes().containsKey( "kuku" ) );
+        assertTrue( "kuku".equals( file1.getAttributes().get( "kuku" ) ) );
+
+        // this above is same as in testSimplePutGet(), but now we will replace the attribute file
+        File attributeFile = new File( localStorageDirectory, ".nexus/attributes/a.txt" );
+        FileUtils.fileWrite( attributeFile.getAbsolutePath(), "<file" );
+
+        // try to read it, we should not get NPE
+        try
+        {
+            file1 = (DefaultStorageFileItem) attributeStorage.getAttributes( uid );
+        }
+        catch ( NullPointerException e )
+        {
+            fail( "We should not get NPE!" );
+        }
+
+        assertNull( "file1 is corrupt, hence it should be null!", file1 );
+    }
+
     public void testSimplePutDelete()
         throws Exception
     {
@@ -117,10 +153,10 @@ public class DefaultAttributeStorageTest
 
         RepositoryItemUid uid = getRepositoryItemUidFactory().createUid( repository, "/b.txt" );
 
-        assertNotNull(attributeStorage.getAttributes( uid ));
+        assertNotNull( attributeStorage.getAttributes( uid ) );
 
         assertTrue( attributeStorage.deleteAttributes( uid ) );
 
-        assertNull(attributeStorage.getAttributes( uid ));
+        assertNull( attributeStorage.getAttributes( uid ) );
     }
 }
