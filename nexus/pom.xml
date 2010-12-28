@@ -1144,13 +1144,13 @@
   </distributionManagement>
 
   <modules>
-   <!-- <module>nexus-plugins</module>
+    <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
-    <module>nexus-logging-extras</module> --> 
+    <module>nexus-logging-extras</module>
     <module>nexus-api</module>
-    <!-- <module>nexus-oss-edition</module>
+    <module>nexus-oss-edition</module>
     <module>nexus-configuration</module>
     <module>nexus-proxy</module>
     <module>nexus-app</module>
@@ -1160,7 +1160,7 @@
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
     <module>nexus-distributions</module>
-    <module>nexus-test-harness</module> --> 
+    <module>nexus-test-harness</module>
   </modules>
 
   <profiles>
