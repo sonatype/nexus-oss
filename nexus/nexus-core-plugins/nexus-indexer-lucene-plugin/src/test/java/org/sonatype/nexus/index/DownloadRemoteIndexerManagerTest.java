@@ -100,9 +100,9 @@ public class DownloadRemoteIndexerManagerTest
     {
         server.stop();
 
-        // FileUtils.forceDelete( fakeCentral );
+        FileUtils.forceDelete( fakeCentral );
 
-        // super.tearDown();
+        super.tearDown();
     }
 
     public void testRepoReindex()
