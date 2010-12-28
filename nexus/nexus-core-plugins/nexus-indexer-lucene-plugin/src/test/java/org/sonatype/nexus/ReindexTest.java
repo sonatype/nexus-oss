@@ -283,12 +283,12 @@ public class ReindexTest
 
         // day 2 (1 day passed), so shift both ctxes "in time"
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc2" ), "central", false, -1 );
-        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryRemoteIndexContext( "central" ), -1 );
+        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( "central" ), -1 );
 
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc2/" );
 
-        indexerManager.reindexRepository( null, "central", true );
+        indexerManager.reindexRepository( null, "central", false );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -300,12 +300,12 @@ public class ReindexTest
 
         // day 3
         reindexRemoteRepositoryAndPublish( getRemoteRepositoryRoot( "central-inc3" ), "central", false, -1 );
-        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryRemoteIndexContext( "central" ), -1 );
+        shiftContextInTime( ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( "central" ), -1 );
 
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc3/" );
 
-        indexerManager.reindexRepository( null, "central", true );
+        indexerManager.reindexRepository( null, "central", false );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -337,7 +337,7 @@ public class ReindexTest
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc2-v1/" );
 
-        indexerManager.reindexRepository( null, "central", true );
+        indexerManager.reindexRepository( null, "central", false );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );
@@ -351,7 +351,7 @@ public class ReindexTest
         makeCentralPointTo( "http://localhost:" + super.getContainer().getContext().get( PROXY_SERVER_PORT )
             + "/central-inc3-v1/" );
 
-        indexerManager.reindexRepository( null, "central", true );
+        indexerManager.reindexRepository( null, "central", false );
 
         // validation
         validateIndexWithIdentify( true, "cf4f67dae5df4f9932ae7810f4548ef3e14dd35e", "antlr", "antlr", "2.7.6" );

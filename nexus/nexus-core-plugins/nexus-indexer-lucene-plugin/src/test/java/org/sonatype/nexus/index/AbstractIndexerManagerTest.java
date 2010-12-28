@@ -4,12 +4,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.lucene.search.Query;
 import org.apache.maven.index.ArtifactInfo;
-import org.apache.maven.index.FlatSearchResponse;
-import org.apache.maven.index.IteratorSearchRequest;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.MAVEN;
 import org.apache.maven.index.SearchType;
@@ -117,14 +114,14 @@ public abstract class AbstractIndexerManagerTest
         throws Exception
     {
         IndexingContext context =
-            ( (DefaultIndexerManager) indexerManager ).getRepositoryLocalIndexContext( repo.getId() );
+            ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repo.getId() );
         File dir = context.getIndexDirectoryFile().getParentFile();
 
         File[] contextDirs = dir.listFiles( new FilenameFilter()
         {
             public boolean accept( File dir, String name )
             {
-                return name.startsWith( repo.getId() + "-local" );
+                return name.startsWith( repo.getId() + "-ctx" );
             }
         } );
 

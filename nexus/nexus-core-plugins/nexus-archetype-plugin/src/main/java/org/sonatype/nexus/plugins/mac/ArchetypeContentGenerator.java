@@ -50,8 +50,8 @@ public class ArchetypeContentGenerator
         // make length unknown (since it will be known only in the moment of actual content pull)
         item.setLength( -1 );
 
-        return new ArchetypeContentLocator( repository.getId(),
-            ( (DefaultIndexerManager) indexerManager ).getRepositoryBestIndexContext( repository ), macPlugin,
+        return new ArchetypeContentLocator( repository.getId(), 
+            ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( repository ), macPlugin,
             new ArtifactInfoFilter()
             {
                 public boolean accepts( IndexingContext ctx, ArtifactInfo ai )

@@ -39,7 +39,8 @@ public class GroupReindexIndexerManagerTest
         assertTrue( "Index .gz file should exist.", indexFile.exists() );
         assertTrue( "Incremental chunk should exists.", incrementalIndexFile.exists() );
 
-        assertTrue(incrementalIndexFile.length() < 300 );
+        assertTrue( "We expected less than 300 bytes but got " + incrementalIndexFile.length(),
+            incrementalIndexFile.length() < 300 );
 
     }
 }

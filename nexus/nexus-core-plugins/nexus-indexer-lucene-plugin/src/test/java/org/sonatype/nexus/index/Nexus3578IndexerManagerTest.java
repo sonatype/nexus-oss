@@ -56,7 +56,7 @@ public class Nexus3578IndexerManagerTest
     {
         super.setUp();
 
-        hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryLocalIndexContext( snapshots.getId() ) );
+        hackContext( (DefaultIndexingContext) ( (DefaultIndexerManager) indexerManager ).getRepositoryIndexContext( snapshots.getId() ) );
 
         this.mimeUtil = lookup( MimeUtil.class );
     }

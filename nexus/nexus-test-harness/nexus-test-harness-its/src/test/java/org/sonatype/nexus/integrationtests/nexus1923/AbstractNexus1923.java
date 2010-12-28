@@ -349,7 +349,7 @@ public abstract class AbstractNexus1923
 
     protected File getRepositoryIndex( File directory )
     {
-        return new File( directory, IndexingContext.INDEX_FILE + ".gz" );
+        return new File( directory, IndexingContext.INDEX_FILE_PREFIX + ".gz" );
     }
 
     protected File getHostedRepositoryIndex()
@@ -385,7 +385,7 @@ public abstract class AbstractNexus1923
         FileInputStream fis = null;
         try
         {
-            fis = new FileInputStream( new File( baseDir, IndexingContext.INDEX_FILE + ".properties" ) );
+            fis = new FileInputStream( new File( baseDir, IndexingContext.INDEX_FILE_PREFIX + ".properties" ) );
             props.load( fis );
         }
         finally
@@ -431,7 +431,7 @@ public abstract class AbstractNexus1923
 
     protected File getRepositoryIndexIncrement( File directory, String id )
     {
-        return new File( directory, IndexingContext.INDEX_FILE + "." + id + ".gz" );
+        return new File( directory, IndexingContext.INDEX_FILE_PREFIX + "." + id + ".gz" );
     }
 
     protected File getHostedRepositoryIndexIncrement( String id )
