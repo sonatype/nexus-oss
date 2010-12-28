@@ -1,0 +1,12 @@
+<project>
+  <bannerLeft>
+    <name>Sonatype</name>
+    <src>http://www.sonatype.com/images/sonatype_logo.gif</src>
+    <href>http://www.sonatype.com</href>
+  </bannerLeft>
+  <body>
+    <menu ref="parent" inherit="top"/>
+    <menu ref="modules" inherit="top"/>
+    <menu ref="reports" inherit="top"/>
+  </body>
+</project>

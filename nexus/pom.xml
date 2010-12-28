@@ -15,6 +15,9 @@
   <version>1.9-SNAPSHOT</version>
   <description>Sonatype Nexus Repository Manager</description>
   <inceptionYear>2007</inceptionYear>
+  
+  <url>${nexus-site-base-url}/nexus</url>
+  
   <mailingLists />
   <licenses>
     <license>
@@ -1107,23 +1110,19 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.0</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>1.1.1</version>
         <configuration>
           <omitVisitors>UnreadFields</omitVisitors>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.0</version>
       </plugin>
       <plugin>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.3</version>
         <configuration>
           <targetJdk>1.6</targetJdk>
         </configuration>
@@ -1136,15 +1135,22 @@
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus</developerConnection>
     <url>http://svn.sonatype.org/nexus/trunk/nexus</url>
   </scm>
+  
+  <distributionManagement>
+    <site>
+      <id>forge-sites</id>
+      <url>dav:${nexus-site-base-url}/nexus</url>
+    </site>
+  </distributionManagement>
 
   <modules>
-    <module>nexus-plugins</module>
+   <!-- <module>nexus-plugins</module>
     <module>nexus-mock</module>
     <module>nexus-utils</module>
     <module>nexus-web-utils</module>
-    <module>nexus-logging-extras</module>
+    <module>nexus-logging-extras</module> --> 
     <module>nexus-api</module>
-    <module>nexus-oss-edition</module>
+    <!-- <module>nexus-oss-edition</module>
     <module>nexus-configuration</module>
     <module>nexus-proxy</module>
     <module>nexus-app</module>
@@ -1154,7 +1160,7 @@
     <module>nexus-webapp</module>
     <module>nexus-clients</module>
     <module>nexus-distributions</module>
-    <module>nexus-test-harness</module>
+    <module>nexus-test-harness</module> --> 
   </modules>
 
   <profiles>

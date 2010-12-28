@@ -14,6 +14,7 @@
   <packaging>pom</packaging>
 
   <name>Sonatype Nexus Repository Metadata</name>
+  <url>${nexus-site-base-url}/nexus-repository-metadata</url>
 
   <licenses>
     <license>
@@ -111,5 +112,12 @@
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</developerConnection>
     <url>http://svn.sonatype.org/nexus/trunk/nexus-repository-metadata</url>
   </scm>
+  
+  <distributionManagement>
+    <site>
+      <id>forge-sites</id>
+      <url>dav:${nexus-site-base-url}/nexus-repository-metadata</url>
+    </site>
+  </distributionManagement>
  
 </project>

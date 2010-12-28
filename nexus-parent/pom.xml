@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.sonatype.forge</groupId>
     <artifactId>forge-parent</artifactId>
-    <version>6</version>
+    <version>7</version>
     <relativePath />
   </parent>
 
@@ -16,14 +16,23 @@
 
   <packaging>pom</packaging>
   <name>Sonatype Nexus Parent</name>
+  <url>${nexus-site-base-url}/nexus-parent</url>
 
   <scm>
     <connection>scm:svn:http://svn.sonatype.org/nexus/trunk/nexus-parent</connection>
     <url>http://svn.sonatype.org/nexus/trunk/nexus-parent</url>
     <developerConnection>scm:svn:https://svn.sonatype.org/nexus/trunk/nexus-parent</developerConnection>
   </scm>
+  
+  <distributionManagement>
+    <site>
+      <id>forge-sites</id>
+      <url>dav:${nexus-site-base-url}/nexus-parent</url>
+    </site>
+  </distributionManagement>
 
   <properties>
+    <nexus-site-base-url>https://repository.sonatype.org/content/sites/maven-sites/nexus-oss</nexus-site-base-url>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <sisu-guice.version>2.9.1</sisu-guice.version>
