@@ -21,13 +21,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
@@ -87,6 +86,7 @@ import org.sonatype.nexus.maven.tasks.SnapshotRemover;
 import org.sonatype.nexus.mime.MimeUtil;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.ItemNotFoundException;
+import org.sonatype.nexus.proxy.LocalStorageException;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.RemoteAccessException;
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
@@ -94,6 +94,7 @@ import org.sonatype.nexus.proxy.access.Action;
 import org.sonatype.nexus.proxy.attributes.inspectors.DigestCalculatingInspector;
 import org.sonatype.nexus.proxy.item.DefaultStorageFileItem;
 import org.sonatype.nexus.proxy.item.PreparedContentLocator;
+import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.uid.IsHiddenUidAttribute;
@@ -135,7 +136,7 @@ public class DefaultIndexerManager
     /** Context id local suffix */
     public static final String CTX_SUFIX = "-ctx";
 
-    private static final Map<String, ReadWriteLock> locks = new LinkedHashMap<String, ReadWriteLock>();
+    private static final Map<String, ReadWriteLock> locks = new HashMap<String, ReadWriteLock>();
 
     @Requirement
     private Logger logger;
@@ -516,40 +517,33 @@ public class DefaultIndexerManager
      */
     protected File getRepositoryLocalStorageAsFile( Repository repository )
     {
-        File repoRoot = null;
-
         if ( repository.getLocalUrl() != null
             && repository.getLocalStorage() instanceof DefaultFSLocalRepositoryStorage )
         {
             try
             {
-                URL url = new URL( repository.getLocalUrl() );
-                try
-                {
-                    repoRoot = new File( url.toURI() );
-                }
-                catch ( Throwable t )
-                {
-                    repoRoot = new File( url.getPath() );
-                }
+                File baseDir =
+                    ( (DefaultFSLocalRepositoryStorage) repository.getLocalStorage() ).getBaseDir( repository,
+                        new ResourceStoreRequest( RepositoryItemUid.PATH_ROOT ) );
+
+                return baseDir;
             }
-            catch ( MalformedURLException e )
+            catch ( LocalStorageException e )
             {
-                // Try just a regular file
-                repoRoot = new File( repository.getLocalUrl() );
+                getLogger().warn(
+                    String.format( "Cannot determine \"%s\" (ID=%s) repository's basedir:", repository.getName(),
+                        repository.getId() ), e );
             }
-
         }
-
-        return repoRoot;
+        
+        return null;
     }
 
     // ----------------------------------------------------------------------------
     // Publish the used NexusIndexer
     // ----------------------------------------------------------------------------
 
-    @Deprecated
-    public NexusIndexer getNexusIndexer()
+    protected NexusIndexer getNexusIndexer()
     {
         return nexusIndexer;
     }
@@ -581,7 +575,7 @@ public class DefaultIndexerManager
         // is this hidden path?
         if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenUidAttribute.class ) )
         {
-            getLogger().debug( "Will not index hidden file path: " + item.getPath() );
+            getLogger().debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
 
             return;
         }
@@ -867,7 +861,9 @@ public class DefaultIndexerManager
 
             if ( fullReindex )
             {
-                purgeCurrentIndex( repository, context );
+                context.purge();
+
+                deleteIndexItems( repository );
             }
 
             if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
@@ -882,14 +878,6 @@ public class DefaultIndexerManager
         {
             lock.unlock();
         }
-    }
-
-    private void purgeCurrentIndex( Repository repository, IndexingContext context )
-        throws IOException
-    {
-        context.purge();
-
-        deleteIndexItems( repository );
     }
 
     // ----------------------------------------------------------------------------
@@ -1314,7 +1302,7 @@ public class DefaultIndexerManager
     }
 
     @SuppressWarnings( "deprecation" )
-    private void deleteIndexItems( Repository repository )
+    protected void deleteIndexItems( Repository repository )
     {
         ResourceStoreRequest request = new ResourceStoreRequest( "/.index/" );
 
@@ -1329,7 +1317,7 @@ public class DefaultIndexerManager
     }
 
     @SuppressWarnings( "deprecation" )
-    private void storeIndexItem( Repository repository, File file, IndexingContext context )
+    protected void storeIndexItem( Repository repository, File file, IndexingContext context )
     {
         String path = "/.index/" + file.getName();
 
@@ -2324,31 +2312,28 @@ public class DefaultIndexerManager
 
     // Lock management
 
-    private ReadWriteLock getLock( String repositoryId )
+    protected synchronized ReadWriteLock getLock( String repositoryId )
     {
         if ( !locks.containsKey( repositoryId ) )
         {
             locks.put( repositoryId, new ReentrantReadWriteLock() );
         }
+
         return locks.get( repositoryId );
     }
 
-    private boolean isAlreadyBeingIndexed( String repositoryId )
+    protected boolean isAlreadyBeingIndexed( String repositoryId )
     {
         Lock lock = getLock( repositoryId ).readLock();
-        boolean locked = true;
-        try
+
+        boolean locked = lock.tryLock();
+
+        if ( locked )
         {
-            locked = lock.tryLock();
-            // if I can't get a read lock means someone else has the write lock (index tasks do write lock)
-            return !locked;
+            lock.unlock();
         }
-        finally
-        {
-            if ( locked )
-            {
-                lock.unlock();
-            }
-        }
+
+        // if I can't get a read lock means someone else has the write lock (index tasks do write lock)
+        return !locked;
     }
 }
