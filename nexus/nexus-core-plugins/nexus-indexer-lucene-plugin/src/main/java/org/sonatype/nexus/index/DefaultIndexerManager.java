@@ -16,10 +16,8 @@ package org.sonatype.nexus.index;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,6 +62,7 @@ import org.apache.maven.index.context.DocumentFilter;
 import org.apache.maven.index.context.IndexCreator;
 import org.apache.maven.index.context.IndexingContext;
 import org.apache.maven.index.context.UnsupportedExistingLuceneIndexException;
+import org.apache.maven.index.expr.SearchExpression;
 import org.apache.maven.index.packer.IndexPacker;
 import org.apache.maven.index.packer.IndexPackingRequest;
 import org.apache.maven.index.packer.IndexPackingRequest.IndexFormat;
@@ -71,10 +70,10 @@ import org.apache.maven.index.treeview.IndexTreeView;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.apache.maven.index.treeview.TreeViewRequest;
-import org.apache.maven.index.updater.AbstractResourceFetcher;
 import org.apache.maven.index.updater.IndexUpdateRequest;
 import org.apache.maven.index.updater.IndexUpdateResult;
 import org.apache.maven.index.updater.IndexUpdater;
+import org.apache.maven.index.updater.ResourceFetcher;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -535,7 +534,7 @@ public class DefaultIndexerManager
                         repository.getId() ), e );
             }
         }
-        
+
         return null;
     }
 
@@ -1018,7 +1017,7 @@ public class DefaultIndexerManager
 
         IndexingContext context = getRepositoryIndexContext( repository );
 
-        IndexUpdateRequest updateRequest = new IndexUpdateRequest( context, new AbstractResourceFetcher()
+        IndexUpdateRequest updateRequest = new IndexUpdateRequest( context, new ResourceFetcher()
         {
             public void connect( String id, String url )
                 throws IOException
@@ -1030,14 +1029,10 @@ public class DefaultIndexerManager
             {
             }
 
-            // TODO is there a better way to fetch a file at given location?
-            public void retrieve( String name, File targetFile )
+            public InputStream retrieve( String name )
                 throws IOException
             {
                 ResourceStoreRequest req = new ResourceStoreRequest( "/.index/" + name );
-
-                OutputStream fos = null;
-                InputStream is = null;
 
                 try
                 {
@@ -1060,11 +1055,7 @@ public class DefaultIndexerManager
                         throw new ItemNotFoundException( req, repository );
                     }
 
-                    is = item.getInputStream();
-
-                    fos = new FileOutputStream( targetFile );
-
-                    IOUtil.copy( is, fos, 8192 );
+                    return item.getInputStream();
                 }
                 catch ( RemoteAccessException ex )
                 {
@@ -1076,11 +1067,6 @@ public class DefaultIndexerManager
                     FileNotFoundException fne = new FileNotFoundException( name + " (item not found)" );
                     fne.initCause( ex );
                     throw fne;
-                }
-                finally
-                {
-                    IOUtil.close( is );
-                    IOUtil.close( fos );
                 }
             }
         } );
@@ -1316,7 +1302,6 @@ public class DefaultIndexerManager
         }
     }
 
-    @SuppressWarnings( "deprecation" )
     protected void storeIndexItem( Repository repository, File file, IndexingContext context )
     {
         String path = "/.index/" + file.getName();
@@ -1431,86 +1416,72 @@ public class DefaultIndexerManager
     {
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        Query q1 = nexusIndexer.constructQuery( MAVEN.GROUP_ID, term, SearchType.SCORED );
+
+        Query q2 = nexusIndexer.constructQuery( MAVEN.ARTIFACT_ID, term, SearchType.SCORED );
+
+        BooleanQuery bq = new BooleanQuery();
+
+        bq.add( q1, BooleanClause.Occur.SHOULD );
+
+        bq.add( q2, BooleanClause.Occur.SHOULD );
+
+        FlatSearchRequest req = null;
+
+        if ( repositoryId == null )
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+            req.getContexts().add( context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setCount( count );
+        }
+
+        if ( hitLimit != null )
+        {
+            req.setResultHitLimit( hitLimit );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
+            postprocessResults( result.getResults() );
 
-            Query q1 = nexusIndexer.constructQuery( MAVEN.GROUP_ID, term, SearchType.SCORED );
-
-            Query q2 = nexusIndexer.constructQuery( MAVEN.ARTIFACT_ID, term, SearchType.SCORED );
-
-            BooleanQuery bq = new BooleanQuery();
-
-            bq.add( q1, BooleanClause.Occur.SHOULD );
-
-            bq.add( q2, BooleanClause.Occur.SHOULD );
-
-            FlatSearchRequest req = null;
-
-            if ( repositoryId == null )
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-
-                req.getContexts().add( context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setCount( count );
-            }
-
-            if ( hitLimit != null )
-            {
-                req.setResultHitLimit( hitLimit );
-            }
-
-            try
-            {
-                FlatSearchResponse result = nexusIndexer.searchFlat( req );
-
-                postprocessResults( result.getResults() );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
-
-                return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
 
@@ -1521,83 +1492,69 @@ public class DefaultIndexerManager
     {
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        if ( term.endsWith( ".class" ) )
+        {
+            term = term.substring( 0, term.length() - 6 );
+        }
+
+        Query q = nexusIndexer.constructQuery( MAVEN.CLASSNAMES, term, SearchType.SCORED );
+
+        FlatSearchRequest req = null;
+
+        if ( repositoryId == null )
+        {
+            req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+            req.getContexts().add( context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setCount( count );
+        }
+
+        if ( hitLimit != null )
+        {
+            req.setResultHitLimit( hitLimit );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
+            postprocessResults( result.getResults() );
 
-            if ( term.endsWith( ".class" ) )
-            {
-                term = term.substring( 0, term.length() - 6 );
-            }
-
-            Query q = nexusIndexer.constructQuery( MAVEN.CLASSNAMES, term, SearchType.SCORED );
-
-            FlatSearchRequest req = null;
-
-            if ( repositoryId == null )
-            {
-                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( q, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-
-                req.getContexts().add( context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setCount( count );
-            }
-
-            if ( hitLimit != null )
-            {
-                req.setResultHitLimit( hitLimit );
-            }
-
-            try
-            {
-                FlatSearchResponse result = nexusIndexer.searchFlat( req );
-
-                postprocessResults( result.getResults() );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
-
-                return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + term + "\"", e );
+
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
 
@@ -1613,102 +1570,88 @@ public class DefaultIndexerManager
 
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+        BooleanQuery bq = new BooleanQuery();
+
+        if ( gTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
+        }
+
+        if ( aTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
+        }
+
+        if ( vTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.VERSION, vTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
+        }
+
+        if ( pTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.PACKAGING, pTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
+        }
+
+        if ( cTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
+        }
+
+        FlatSearchRequest req = null;
+
+        if ( repositoryId == null )
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+        }
+        else
+        {
+            req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
+
+            req.getContexts().add( context );
+        }
+
+        if ( from != null )
+        {
+            req.setStart( from );
+        }
+
+        if ( count != null )
+        {
+            req.setCount( count );
+        }
+
+        if ( hitLimit != null )
+        {
+            req.setResultHitLimit( hitLimit );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            FlatSearchResponse result = nexusIndexer.searchFlat( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
-            BooleanQuery bq = new BooleanQuery();
+            postprocessResults( result.getResults() );
 
-            if ( gTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
-            }
-
-            if ( aTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
-            }
-
-            if ( vTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.VERSION, vTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
-            }
-
-            if ( pTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.PACKAGING, pTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
-            }
-
-            if ( cTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, SearchType.SCORED ), BooleanClause.Occur.MUST );
-            }
-
-            FlatSearchRequest req = null;
-
-            if ( repositoryId == null )
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-            }
-            else
-            {
-                req = new FlatSearchRequest( bq, ArtifactInfo.REPOSITORY_VERSION_COMPARATOR );
-
-                req.getContexts().add( context );
-            }
-
-            if ( from != null )
-            {
-                req.setStart( from );
-            }
-
-            if ( count != null )
-            {
-                req.setCount( count );
-            }
-
-            if ( hitLimit != null )
-            {
-                req.setResultHitLimit( hitLimit );
-            }
-
-            try
-            {
-                FlatSearchResponse result = nexusIndexer.searchFlat( req );
-
-                postprocessResults( result.getResults() );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
-
-                return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return new FlatSearchResponse( req.getQuery(), -1, new HashSet<ArtifactInfo>() );
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+            return new FlatSearchResponse( req.getQuery(), 0, new HashSet<ArtifactInfo>() );
         }
     }
 
@@ -1878,92 +1821,76 @@ public class DefaultIndexerManager
     {
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        Query q1 = constructQuery( MAVEN.GROUP_ID, term, searchType );
+
+        q1.setBoost( 2.0f );
+
+        Query q2 = constructQuery( MAVEN.ARTIFACT_ID, term, searchType );
+
+        q2.setBoost( 2.0f );
+
+        BooleanQuery bq = new BooleanQuery();
+
+        bq.add( q1, BooleanClause.Occur.SHOULD );
+
+        bq.add( q2, BooleanClause.Occur.SHOULD );
+
+        // switch for "extended" keywords
+        // if ( false )
+        // {
+        // Query q3 = constructQuery( MAVEN.VERSION, term, searchType );
+        //
+        // Query q4 = constructQuery( MAVEN.CLASSIFIER, term, searchType );
+        //
+        // Query q5 = constructQuery( MAVEN.NAME, term, searchType );
+        //
+        // Query q6 = constructQuery( MAVEN.DESCRIPTION, term, searchType );
+        //
+        // bq.add( q3, BooleanClause.Occur.SHOULD );
+        //
+        // bq.add( q4, BooleanClause.Occur.SHOULD );
+        //
+        // bq.add( q5, BooleanClause.Occur.SHOULD );
+        //
+        // bq.add( q6, BooleanClause.Occur.SHOULD );
+        // }
+
+        IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
+
+        req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
+        req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
+
+        if ( repositoryId != null )
+        {
+            req.getContexts().add( context );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            IteratorSearchResponse result = nexusIndexer.searchIterator( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
-
-            Query q1 = constructQuery( MAVEN.GROUP_ID, term, searchType );
-
-            q1.setBoost( 2.0f );
-
-            Query q2 = constructQuery( MAVEN.ARTIFACT_ID, term, searchType );
-
-            q2.setBoost( 2.0f );
-
-            BooleanQuery bq = new BooleanQuery();
-
-            bq.add( q1, BooleanClause.Occur.SHOULD );
-
-            bq.add( q2, BooleanClause.Occur.SHOULD );
-
-            // switch for "extended" keywords
-            // if ( false )
-            // {
-            // Query q3 = constructQuery( MAVEN.VERSION, term, searchType );
-            //
-            // Query q4 = constructQuery( MAVEN.CLASSIFIER, term, searchType );
-            //
-            // Query q5 = constructQuery( MAVEN.NAME, term, searchType );
-            //
-            // Query q6 = constructQuery( MAVEN.DESCRIPTION, term, searchType );
-            //
-            // bq.add( q3, BooleanClause.Occur.SHOULD );
-            //
-            // bq.add( q4, BooleanClause.Occur.SHOULD );
-            //
-            // bq.add( q5, BooleanClause.Occur.SHOULD );
-            //
-            // bq.add( q6, BooleanClause.Occur.SHOULD );
-            // }
-
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
-
-            req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.GROUP_ID, q1, MatchHighlightMode.HTML ) );
-            req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.ARTIFACT_ID, q2, MatchHighlightMode.HTML ) );
-
-            if ( repositoryId != null )
-            {
-                req.getContexts().add( context );
-            }
-
-            try
-            {
-                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
-
-                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
     }
 
@@ -1974,63 +1901,48 @@ public class DefaultIndexerManager
     {
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        if ( term.endsWith( ".class" ) )
+        {
+            term = term.substring( 0, term.length() - 6 );
+        }
+
+        Query q = constructQuery( MAVEN.CLASSNAMES, term, searchType );
+
+        IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false, filters );
+
+        req.getMatchHighlightRequests().add( new MatchHighlightRequest( MAVEN.CLASSNAMES, q, MatchHighlightMode.HTML ) );
+
+        if ( repositoryId != null )
+        {
+            req.getContexts().add( context );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            IteratorSearchResponse result = nexusIndexer.searchIterator( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
-
-            if ( term.endsWith( ".class" ) )
-            {
-                term = term.substring( 0, term.length() - 6 );
-            }
-
-            Query q = constructQuery( MAVEN.CLASSNAMES, term, searchType );
-
-            IteratorSearchRequest req = createRequest( q, from, count, hitLimit, false, filters );
-
-            req.getMatchHighlightRequests().add(
-                new MatchHighlightRequest( MAVEN.CLASSNAMES, q, MatchHighlightMode.HTML ) );
-
-            if ( repositoryId != null )
-            {
-                req.getContexts().add( context );
-            }
-
-            try
-            {
-                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
-
-                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + q.toString() + "\"", e );
+
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
     }
 
@@ -2047,98 +1959,84 @@ public class DefaultIndexerManager
 
         IndexingContext context = null;
 
-        Lock lock = null;
-        try
+        if ( repositoryId != null )
         {
-            if ( repositoryId != null )
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        BooleanQuery bq = new BooleanQuery();
+
+        if ( gTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, searchType ), BooleanClause.Occur.MUST );
+        }
+
+        if ( aTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, searchType ), BooleanClause.Occur.MUST );
+        }
+
+        if ( vTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.VERSION, vTerm, searchType ), BooleanClause.Occur.MUST );
+        }
+
+        if ( pTerm != null )
+        {
+            bq.add( constructQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
+        }
+
+        // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
+        // to bq
+        if ( cTerm != null )
+        {
+            if ( Field.NOT_PRESENT.equalsIgnoreCase( cTerm ) )
             {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
-
-                context = getRepositoryIndexContext( repositoryId );
-            }
-
-            BooleanQuery bq = new BooleanQuery();
-
-            if ( gTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.GROUP_ID, gTerm, searchType ), BooleanClause.Occur.MUST );
-            }
-
-            if ( aTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.ARTIFACT_ID, aTerm, searchType ), BooleanClause.Occur.MUST );
-            }
-
-            if ( vTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.VERSION, vTerm, searchType ), BooleanClause.Occur.MUST );
-            }
-
-            if ( pTerm != null )
-            {
-                bq.add( constructQuery( MAVEN.PACKAGING, pTerm, searchType ), BooleanClause.Occur.MUST );
-            }
-
-            // we can do this, since we enforce (above) that one of GAV is not empty, so we already have queries added
-            // to bq
-            if ( cTerm != null )
-            {
-                if ( Field.NOT_PRESENT.equalsIgnoreCase( cTerm ) )
+                // bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD ),
+                // BooleanClause.Occur.MUST_NOT );
+                // This above should work too! -- TODO: fixit!
+                filters.add( 0, new ArtifactInfoFilter()
                 {
-                    // bq.add( createQuery( MAVEN.CLASSIFIER, Field.NOT_PRESENT, SearchType.KEYWORD ),
-                    // BooleanClause.Occur.MUST_NOT );
-                    // This above should work too! -- TODO: fixit!
-                    filters.add( 0, new ArtifactInfoFilter()
+                    public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
                     {
-                        public boolean accepts( IndexingContext ctx, ArtifactInfo ai )
-                        {
-                            return StringUtils.isBlank( ai.classifier );
-                        }
-                    } );
-                }
-                else
-                {
-                    bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, searchType ), BooleanClause.Occur.MUST );
-                }
+                        return StringUtils.isBlank( ai.classifier );
+                    }
+                } );
             }
-
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
-
-            if ( repositoryId != null )
+            else
             {
-                req.getContexts().add( context );
-            }
-
-            try
-            {
-                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
-
-                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
+                bq.add( constructQuery( MAVEN.CLASSIFIER, cTerm, searchType ), BooleanClause.Occur.MUST );
             }
         }
-        finally
+
+        IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, uniqueRGA, filters );
+
+        if ( repositoryId != null )
         {
-            if ( lock != null )
+            req.getContexts().add( context );
+        }
+
+        try
+        {
+            IteratorSearchResponse result = nexusIndexer.searchIterator( req );
+
+            return result;
+        }
+        catch ( BooleanQuery.TooManyClauses e )
+        {
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
     }
 
@@ -2154,62 +2052,48 @@ public class DefaultIndexerManager
 
         IndexingContext context = null;
 
-        Lock lock = null;
+        if ( repositoryId != null )
+        {
+            context = getRepositoryIndexContext( repositoryId );
+        }
+
+        SearchType searchType = sha1Checksum.length() == 40 ? SearchType.EXACT : SearchType.SCORED;
+
+        BooleanQuery bq = new BooleanQuery();
+
+        if ( sha1Checksum != null )
+        {
+            bq.add( constructQuery( MAVEN.SHA1, sha1Checksum, searchType ), BooleanClause.Occur.MUST );
+        }
+
+        IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false, filters );
+
+        if ( repositoryId != null )
+        {
+            req.getContexts().add( context );
+        }
+
         try
         {
-            if ( repositoryId != null )
-            {
-                lock = getLock( repositoryId ).readLock();
-                lock.lock();
+            IteratorSearchResponse result = nexusIndexer.searchIterator( req );
 
-                context = getRepositoryIndexContext( repositoryId );
-            }
-
-            SearchType searchType = sha1Checksum.length() == 40 ? SearchType.EXACT : SearchType.SCORED;
-
-            BooleanQuery bq = new BooleanQuery();
-
-            if ( sha1Checksum != null )
-            {
-                bq.add( constructQuery( MAVEN.SHA1, sha1Checksum, searchType ), BooleanClause.Occur.MUST );
-            }
-
-            IteratorSearchRequest req = createRequest( bq, from, count, hitLimit, false, filters );
-
-            if ( repositoryId != null )
-            {
-                req.getContexts().add( context );
-            }
-
-            try
-            {
-                IteratorSearchResponse result = nexusIndexer.searchIterator( req );
-
-                return result;
-            }
-            catch ( BooleanQuery.TooManyClauses e )
-            {
-                if ( getLogger().isDebugEnabled() )
-                {
-                    getLogger().debug( "Too many clauses exception caught:", e );
-                }
-
-                // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
-                return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
-            }
-            catch ( IOException e )
-            {
-                getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
-
-                return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
-            }
+            return result;
         }
-        finally
+        catch ( BooleanQuery.TooManyClauses e )
         {
-            if ( lock != null )
+            if ( getLogger().isDebugEnabled() )
             {
-                lock.unlock();
+                getLogger().debug( "Too many clauses exception caught:", e );
             }
+
+            // XXX: a hack, I am sending too many results by setting the totalHits value to -1!
+            return IteratorSearchResponse.TOO_MANY_HITS_ITERATOR_SEARCH_RESPONSE;
+        }
+        catch ( IOException e )
+        {
+            getLogger().error( "Got I/O exception while searching for query \"" + bq.toString() + "\"", e );
+
+            return IteratorSearchResponse.EMPTY_ITERATOR_SEARCH_RESPONSE;
         }
     }
 
@@ -2217,10 +2101,17 @@ public class DefaultIndexerManager
     // Query construction
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     public Query constructQuery( Field field, String query, SearchType type )
         throws IllegalArgumentException
     {
         return nexusIndexer.constructQuery( field, query, type );
+    }
+
+    public Query constructQuery( Field field, SearchExpression expression )
+        throws IllegalArgumentException
+    {
+        return nexusIndexer.constructQuery( field, expression );
     }
 
     // ----------------------------------------------------------------------------

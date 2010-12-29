@@ -25,6 +25,7 @@ import org.apache.maven.index.Field;
 import org.apache.maven.index.FlatSearchResponse;
 import org.apache.maven.index.IteratorSearchResponse;
 import org.apache.maven.index.SearchType;
+import org.apache.maven.index.expr.SearchExpression;
 import org.apache.maven.index.treeview.TreeNode;
 import org.apache.maven.index.treeview.TreeNodeFactory;
 import org.sonatype.nexus.proxy.NoSuchRepositoryException;
@@ -220,7 +221,11 @@ public interface IndexerManager
     // Query construction
     // ----------------------------------------------------------------------------
 
+    @Deprecated
     Query constructQuery( Field field, String query, SearchType type )
+        throws IllegalArgumentException;
+
+    Query constructQuery( Field field, SearchExpression expression )
         throws IllegalArgumentException;
 
     // ----------------------------------------------------------------------------
