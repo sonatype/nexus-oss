@@ -106,7 +106,7 @@ Sonatype.repoServer.RemoteRepositoryBrowsePanel = function( config ) {
 	Ext.extend( Sonatype.repoServer.RemoteRepositoryBrowsePanel, Ext.tree.TreePanel, {
 		
 		getBrowsePath: function( baseUrl, remoteUrl, id ) {
-		var modUrl=baseUrl+"/remotebrowser/"+remoteUrl;
+		var modUrl=baseUrl+"/remotebrowser/"+encodeURIComponent(remoteUrl);
 		return modUrl;
 	  },
 

@@ -1,5 +1,7 @@
 package org.sonatype.nexus.plugins.rrb;
 
+import java.net.URLDecoder;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -63,7 +65,7 @@ public class RemoteBrowserResource
     public PathProtectionDescriptor getResourceProtection()
     {
         // Allow anonymous access for now
-        //return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
+        // return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "anon" );
         return new PathProtectionDescriptor( "/repositories/*/remotebrowser/**", "authcBasic,perms[nexus:browseremote]" );
     }
 
@@ -84,7 +86,18 @@ public class RemoteBrowserResource
     {
         String id = request.getAttributes().get( AbstractRepositoryPlexusResource.REPOSITORY_ID_KEY ).toString();
         ResourceStoreRequest storageItem = getResourceStoreRequest( request );
-        String remoteUrl = storageItem.getRequestPath().substring( 1 );
+        String remoteUrl = null;
+
+        try
+        {
+            remoteUrl = URLDecoder.decode( storageItem.getRequestPath().substring( 1 ), "UTF-8" );
+        }
+        catch ( Exception e )
+        {
+            // old way
+            remoteUrl = storageItem.getRequestPath().substring( 1 );
+        }
+
         String query = storageItem.getRequestUrl().substring( storageItem.getRequestUrl().indexOf( "?" ) + 1 );
         String prefix = "";
         if ( query.indexOf( "prefix=" ) != -1 )
