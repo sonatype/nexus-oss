@@ -1,3 +1,23 @@
+<!--
+
+    Copyright (c) 2008-2011 Sonatype, Inc.
+    All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
+
+    This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+    Public License Version 3 as published by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+    http://www.gnu.org/licenses.
+
+    Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+    Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+    All other trademarks are the property of their respective owners.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
@@ -338,9 +358,52 @@
           <artifactId>nexus-test-environment-maven-plugin</artifactId>
           <version>1.6</version>
         </plugin>
+        
+        <!-- Manually run with: mvn clean license:format -N -->
+        <plugin>
+          <groupId>com.mycila.maven-license-plugin</groupId>
+          <artifactId>maven-license-plugin</artifactId>
+          <version>1.9.0</version>
+          <configuration>
+            <header>nexus/header.txt</header>
+            <strictCheck>true</strictCheck>
+            <useDefaultExcludes>false</useDefaultExcludes>
+            <includes>
+              <include>**/*.java</include>
+              <include>**/*.js</include>
+              <include>**/*.vm</include>
+              <include>**/*.xml</include>
+              <include>**/*.groovy</include>
+              <include>**/*.aj</include>
+            </includes>
+            <excludes>
+              <exclude>**/ext-2.3/**</exclude>
+              <exclude>**/js/filetree/**</exclude>
+              <exclude>**/editarea_0_8_2/**</exclude>
+              <exclude>**/src/test/resources/**</exclude>
+              <exclude>**/nexus-repository-metadata/**</exclude>
+              <exclude>**/gwt/ext/ui/**.js</exclude>
+              <exclude>**/nexus/nexus-test-harness/nexus-test-harness-its/resources/**</exclude>
+            </excludes>
+            <mapping>
+              <vm>XML_STYLE</vm>
+              <groovy>JAVADOC_STYLE</groovy>
+              <aj>JAVADOC_STYLE</aj>
+            </mapping>
+            <properties>
+              <year>2011</year>
+            </properties>
+            <!-- this is important for muti-module project -->
+            <!-- <aggregate>true</aggregate> -->
+          </configuration>
+      </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>com.mycila.maven-license-plugin</groupId>
+        <artifactId>maven-license-plugin</artifactId>
+      </plugin>   
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>

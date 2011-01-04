@@ -1,33 +1,21 @@
-/*
- * $HeadURL: http://svn.apache.org/repos/asf/httpcomponents/oac.hc3x/trunk/src/java/org/apache/commons/httpclient/MultiThreadedHttpConnectionManager.java $
- * $Revision: 608014 $
- * $Date: 2008-01-02 00:48:53 -0500 (Wed, 02 Jan 2008) $
+/**
+ * Copyright (c) 2008-2011 Sonatype, Inc.
+ * All rights reserved. Includes the third-party code listed at http://www.sonatype.com/products/nexus/attributions.
  *
- * ====================================================================
+ * This program is free software: you can redistribute it and/or modify it only under the terms of the GNU Affero General
+ * Public License Version 3 as published by the Free Software Foundation.
  *
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License Version 3
+ * for more details.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * You should have received a copy of the GNU Affero General Public License Version 3 along with this program.  If not, see
+ * http://www.gnu.org/licenses.
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- *
+ * Sonatype Nexus (TM) Open Source Version is available from Sonatype, Inc. Sonatype and Sonatype Nexus are trademarks of
+ * Sonatype, Inc. Apache Maven is a trademark of the Apache Foundation. M2Eclipse is a trademark of the Eclipse Foundation.
+ * All other trademarks are the property of their respective owners.
  */
-
 package org.apache.commons.httpclient;
 
 import java.io.IOException;
