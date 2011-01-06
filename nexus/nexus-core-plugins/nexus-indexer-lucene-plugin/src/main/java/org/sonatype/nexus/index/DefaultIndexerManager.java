@@ -1301,6 +1301,10 @@ public class DefaultIndexerManager
         {
             repository.deleteItem( false, request );
         }
+        catch ( ItemNotFoundException e )
+        {
+            // nothing serious, no index was published yet, keep it silent
+        }
         catch ( Exception e )
         {
             getLogger().error( "Cannot delete index items!", e );
