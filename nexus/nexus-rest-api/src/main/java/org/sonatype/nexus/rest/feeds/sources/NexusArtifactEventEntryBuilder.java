@@ -46,7 +46,7 @@ public class NexusArtifactEventEntryBuilder
     @Override
     protected String buildDescriptionMsgItem( NexusArtifactEvent event )
     {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
 
         msg.append( "The artifact '" );
 
@@ -108,7 +108,7 @@ public class NexusArtifactEventEntryBuilder
             return event.getNexusItemInfo().getPath();
         }
 
-        StringBuffer result = new StringBuffer( gav.getGroupId() )
+        StringBuilder result = new StringBuilder( gav.getGroupId() )
             .append( ":" ).append( gav.getArtifactId() ).append( ":" ).append(
                 gav.getVersion() != null ? gav.getVersion() : "unknown" );
 

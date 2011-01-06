@@ -105,7 +105,7 @@ public class ErrorWarningFeedSource
 
             SyndContent content = new SyndContentImpl();
 
-            StringBuffer contentValue = new StringBuffer();
+            StringBuilder contentValue = new StringBuilder();
 
             contentValue.append( item.getMessage() );
 

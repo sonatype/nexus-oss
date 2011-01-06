@@ -95,7 +95,7 @@ public abstract class AbstractSystemFeedSource
                 ipAddress = null;
             }
 
-            StringBuffer msg = new StringBuffer( item.getMessage() ).append( ". " );
+            StringBuilder msg = new StringBuilder( item.getMessage() ).append( ". " );
 
             if ( username != null )
             {

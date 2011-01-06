@@ -110,7 +110,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
         content.setType( MediaType.TEXT_PLAIN.toString() );
 
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
 
         msg.append( buildDescriptionMsgItem( event ) );
 
@@ -147,25 +147,24 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
     protected String buildDescriptionMsgAction( NexusArtifactEvent event )
     {
-        StringBuffer msg = new StringBuffer( " was " );
+        StringBuilder msg = new StringBuilder( " was " );
 
         if ( NexusArtifactEvent.ACTION_CACHED.equals( event.getAction() ) )
         {
-            msg.append( "cached by Nexus from remote URL " ).append( event.getNexusItemInfo().getRemoteUrl() ).append(
-                                                                                                                       "." );
+            msg.append( "cached from remote URL " ).append( event.getNexusItemInfo().getRemoteUrl() ).append( "." );
         }
         else if ( NexusArtifactEvent.ACTION_DEPLOYED.equals( event.getAction() ) )
         {
-            msg.append( "deployed into Nexus." );
+            msg.append( "deployed." );
 
         }
         else if ( NexusArtifactEvent.ACTION_DELETED.equals( event.getAction() ) )
         {
-            msg.append( "deleted from Nexus." );
+            msg.append( "deleted." );
         }
         else if ( NexusArtifactEvent.ACTION_RETRIEVED.equals( event.getAction() ) )
         {
-            msg.append( "served by Nexus." );
+            msg.append( "served downstream." );
         }
         else if ( NexusArtifactEvent.ACTION_BROKEN.equals( event.getAction() ) )
         {
@@ -199,9 +198,11 @@ abstract public class AbstractNexusItemEventEntryBuilder
 
     protected String buildDescriptionMsgAuthor( NexusArtifactEvent event )
     {
-        if ( buildAuthor( event ) != null )
+        final String author = buildAuthor( event );
+
+        if ( author != null )
         {
-            return "Action was initialized by user " + buildAuthor( event ) + ".\n";
+            return "Action was initiated by user \"" + author + "\".\n";
 
         }
         return "";
@@ -211,7 +212,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
     {
         if ( event.getEventContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
         {
-            return "Request was originated from IP address "
+            return "Request originated from IP address "
                 + (String) event.getEventContext().get( AccessManager.REQUEST_REMOTE_ADDRESS ) + ".\n";
         }
         return "";

@@ -50,7 +50,7 @@ public class NexusFileEventEntryBuilder
     @Override
     protected String buildDescriptionMsgItem( NexusArtifactEvent event )
     {
-        StringBuffer msg = new StringBuffer();
+        StringBuilder msg = new StringBuilder();
 
         msg.append( "The file '" );
 
