@@ -602,7 +602,13 @@ RoleSelectorGrid = function(config) {
       });
 
   this.textFilter = new Ext.form.TextField({
-        emptyText : 'Enter filter text...'
+        emptyText : 'Enter filter text...',
+        listeners : {
+          specialkey : {
+            fn : this.filterTextSpecialkeyListener,
+            scope : this
+          }
+        }
       });
 
   this.selectedFilter = new Ext.Button({
@@ -661,6 +667,12 @@ RoleSelectorGrid = function(config) {
 };
 
 Ext.extend(RoleSelectorGrid, Ext.grid.GridPanel, {
+      filterTextSpecialkeyListener : function(f, e) {
+        if (e.getKey() == e.ENTER)
+        {
+          this.applyFilter();
+        }
+      },
       //implement local onRender to load the first page of store
       onRender : function() {
         RoleSelectorGrid.superclass.onRender.apply(this, arguments);
