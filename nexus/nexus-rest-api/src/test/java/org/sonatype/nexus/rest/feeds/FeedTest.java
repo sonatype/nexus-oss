@@ -50,7 +50,7 @@ public class FeedTest
         // Plexus loading this class
         // so subclassing to expose this method, sort of get around what i am trying to test.
 
-        System.out.println( "feedResource: " + feedResource );
+        //System.out.println( "feedResource: " + feedResource );
 
         Field feedField = AbstractFeedPlexusResource.class.getDeclaredField( "feeds" );
         feedField.setAccessible( true );

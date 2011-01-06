@@ -934,6 +934,16 @@ public abstract class AbstractRepository
         {
             // determine is the thing to be deleted a collection or not
             StorageItem item = getLocalStorage().retrieveItem( this, request );
+            
+            if( request.getRequestContext().containsKey( AccessManager.REQUEST_USER ) )
+            {
+                item.getAttributes().put( AccessManager.REQUEST_USER, request.getRequestContext().get( AccessManager.REQUEST_USER ) +"" );
+            }
+            
+            if( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
+            {
+                item.getAttributes().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getRequestContext().get( AccessManager.REQUEST_REMOTE_ADDRESS ) +"" );
+            }
 
             // fire the event for file being deleted
             getApplicationEventMulticaster().notifyEventListeners( new RepositoryItemEventDelete( this, item ) );
