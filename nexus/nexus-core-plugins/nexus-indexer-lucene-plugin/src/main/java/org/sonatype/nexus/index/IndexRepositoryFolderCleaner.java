@@ -42,9 +42,7 @@ public class IndexRepositoryFolderCleaner
         File indexerFolder =
             getApplicationConfiguration().getWorkingDirectory( DefaultIndexerManager.INDEXER_WORKING_DIRECTORY_KEY );
 
-        delete( new File( indexerFolder, repository.getId() + "-local" ), deleteForever );
-
-        delete( new File( indexerFolder, repository.getId() + "-remote" ), deleteForever );
+        delete( new File( indexerFolder, repository.getId() + DefaultIndexerManager.CTX_SUFIX ), deleteForever );
     }
 
 }
