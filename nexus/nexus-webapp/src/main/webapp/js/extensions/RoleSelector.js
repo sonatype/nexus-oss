@@ -42,7 +42,10 @@ RoleManager = function(config) {
     hideHeaders : true,
     doValidation : true,
     style : 'border:1px solid #B5B8C8',
-    readOnly : false
+    readOnly : false,
+    viewConfig : {
+      forceFit : true
+    }
   };
   //apply the config and defaults to 'this'
   Ext.apply(this, config, defaultConfig);
@@ -109,8 +112,6 @@ RoleManager = function(config) {
         }
       });
 
-  this.autoExpandColumn = 'name';
-
   this.addButton = new Ext.Toolbar.Button({
         text : 'Add',
         handler : this.addHandler,
@@ -125,7 +126,7 @@ RoleManager = function(config) {
         disabled : true
       });
 
-  this.tbar = ['Roles' + (this.usePrivileges ? '/Privileges' : ''), '->', '-', this.addButton, '-', this.removeButton];
+  this.tbar = ['<b>Role' + (this.usePrivileges ? '/Privilege' : '') + ' Management</b>', '->', '-', this.addButton, '-', this.removeButton];
 
   RoleManager.superclass.constructor.call(this, {});
 

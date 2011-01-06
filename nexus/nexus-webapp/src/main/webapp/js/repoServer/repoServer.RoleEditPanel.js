@@ -404,7 +404,8 @@ Sonatype.repoServer.DefaultRoleEditor = function(config) {
         xtype : 'rolemanager',
         name : 'roleManager',
         height : 200,
-        width : 505
+        width : 490,
+        style : 'margin-left: 15px;margin-top: 10px;border: 1px solid #B5B8C8;'
       }];
 
   Sonatype.repoServer.DefaultUserEditor.superclass.constructor.call(this, {
