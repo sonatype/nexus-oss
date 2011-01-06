@@ -109,12 +109,12 @@ public abstract class AbstractIndexerTask
     {
         if ( getRepositoryGroupId() != null )
         {
-            return action + " repository group index " + getRepositoryGroupName() + " from path "
+            return action + " repository group index \"" + getRepositoryGroupName() + "\" from path "
                 + getResourceStorePath() + " and below.";
         }
         else if ( getRepositoryId() != null )
         {
-            return action + " repository index " + getRepositoryName() + " from path " + getResourceStorePath()
+            return action + " repository index \"" + getRepositoryName() + "\" from path " + getResourceStorePath()
                 + " and below.";
         }
         else

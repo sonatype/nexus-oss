@@ -34,7 +34,7 @@ public class RepairIndexTask
 
     public RepairIndexTask()
     {
-        super( "Reparing", true );
+        super( "Repairing", true );
     }
 
 }

@@ -34,7 +34,7 @@ public class UpdateIndexTask
 
     public UpdateIndexTask()
     {
-        super( "Update", false );
+        super( "Updating", false );
     }
 
 }
