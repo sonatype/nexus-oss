@@ -1,6 +1,7 @@
 package org.sonatype.security.rest.roles;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.security.rest.model.RoleAndPrivilegeListFilterResourceRequest;
@@ -102,7 +103,7 @@ public class FilterRequest
                     && ( !getHiddenRoleIds().contains( resource.getId() ) )
                     && ( resource.isExternal() || ( ( ( getRoleIds().isEmpty() && !isOnlySelected() ) || getRoleIds().contains(
                         resource.getId() ) ) ) )
-                    && ( StringUtils.isEmpty( getText() ) || resource.getName().contains( getText() ) ) )
+                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ), Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
                 {
                     return true;
                 }
@@ -113,7 +114,7 @@ public class FilterRequest
                     && ( !getHiddenPrivilegeIds().contains( resource.getId() ) )
                     && ( ( getPrivilegeIds().isEmpty() && !isOnlySelected() ) || getPrivilegeIds().contains(
                         resource.getId() ) )
-                    && ( StringUtils.isEmpty( getText() ) || resource.getName().contains( getText() ) ) )
+                    && ( StringUtils.isEmpty( getText() ) || Pattern.compile( Pattern.quote( getText() ), Pattern.CASE_INSENSITIVE ).matcher( resource.getName() ).find() ) )
                 {
                     return true;
                 }
