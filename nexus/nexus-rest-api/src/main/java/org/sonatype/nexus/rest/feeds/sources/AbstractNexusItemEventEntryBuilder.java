@@ -137,8 +137,7 @@ abstract public class AbstractNexusItemEventEntryBuilder
         }
         catch ( NoSuchRepositoryException e )
         {
-            getLogger().warn( "Could not find Respotiroy with id '" + repoId + "'.", e );
-
+            // that's fine, no need to yell, old timeline entries might correspond to long-time removed reposes
             return repoId;
         }
     }
