@@ -19,6 +19,7 @@
 package org.sonatype.nexus.security.filter.authz;
 
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -91,7 +92,7 @@ public class FailureLoggingHttpMethodPermissionFilter
 
         getLogger().info( msg );
 
-        AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHZ, msg );
+        AuthcAuthzEvent authzEvt = new AuthcAuthzEvent( new Date(), FeedRecorder.SYSTEM_AUTHZ, msg );
 
         if ( HttpServletRequest.class.isAssignableFrom( request.getClass() ) )
         {

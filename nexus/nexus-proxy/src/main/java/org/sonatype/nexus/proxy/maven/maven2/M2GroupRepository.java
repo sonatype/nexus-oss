@@ -396,16 +396,6 @@ public class M2GroupRepository
     // centralize this!
     private NexusArtifactEvent newMetadataFailureEvent( StorageFileItem item, String msg )
     {
-        NexusArtifactEvent nae = new NexusArtifactEvent();
-
-        nae.setAction( NexusArtifactEvent.ACTION_BROKEN );
-
-        nae.setEventDate( new Date() );
-
-        nae.setEventContext( item.getItemContext() );
-
-        nae.setMessage( msg );
-
         NexusItemInfo ai = new NexusItemInfo();
 
         ai.setPath( item.getPath() );
@@ -414,7 +404,9 @@ public class M2GroupRepository
 
         ai.setRemoteUrl( item.getRemoteUrl() );
 
-        nae.setNexusItemInfo( ai );
+        NexusArtifactEvent nae = new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN, msg, ai );
+
+        nae.addEventContext( item.getItemContext() );
 
         return nae;
     }

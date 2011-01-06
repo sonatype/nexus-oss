@@ -36,14 +36,14 @@ public class SystemProcess
     };
 
     /**
-     * The process status.
-     */
-    private Status status;
-
-    /**
      * When was the process started?
      */
     private final Date started;
+
+    /**
+     * The process status.
+     */
+    private Status status;
 
     /**
      * When has finised the process?
@@ -60,9 +60,9 @@ public class SystemProcess
      */
     private Throwable errorCause;
 
-    public SystemProcess( String action, String message, Date started )
+    public SystemProcess( final Date eventDate, final String action, final String message, final Date started )
     {
-        super( action, message );
+        super( eventDate, action, message );
 
         this.started = started;
 
@@ -136,7 +136,7 @@ public class SystemProcess
 
     public String getMessage()
     {
-        StringBuffer sb = new StringBuffer( super.getMessage() );
+        StringBuilder sb = new StringBuilder( super.getMessage() );
 
         if ( started != null )
         {

@@ -18,7 +18,6 @@
  */
 package org.sonatype.nexus.feeds;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,7 +33,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ExceptionUtils;
-import org.codehaus.plexus.util.StringUtils;
 import org.sonatype.nexus.artifact.NexusItemInfo;
 import org.sonatype.nexus.timeline.NexusTimeline;
 import org.sonatype.timeline.TimelineFilter;
@@ -59,6 +57,8 @@ public class DefaultFeedRecorder
     public static final String REMOTE_URL = "rurl";
 
     public static final String CTX_PREFIX = "ctx.";
+
+    public static final String ATR_PREFIX = "atr.";
 
     public static final String ACTION = "action";
 
@@ -138,6 +138,24 @@ public class DefaultFeedRecorder
         return new SimpleDateFormat( EVENT_DATE_FORMAT );
     }
 
+    protected Date getEventDate( final Map<String, String> map )
+    {
+        Date eventDate;
+
+        try
+        {
+            eventDate = getDateFormat().parse( map.get( DATE ) );
+        }
+        catch ( ParseException e )
+        {
+            getLogger().warn( "Could not format event date!", e );
+
+            eventDate = new Date();
+        }
+
+        return eventDate;
+    }
+
     protected List<NexusArtifactEvent> getAisFromMaps( TimelineResult data )
     {
         List<NexusArtifactEvent> result = new ArrayList<NexusArtifactEvent>();
@@ -145,8 +163,6 @@ public class DefaultFeedRecorder
         for ( TimelineRecord record : data )
         {
             Map<String, String> map = record.getData();
-
-            NexusArtifactEvent nae = new NexusArtifactEvent();
 
             NexusItemInfo ai = new NexusItemInfo();
 
@@ -156,20 +172,8 @@ public class DefaultFeedRecorder
 
             ai.setRemoteUrl( map.get( REMOTE_URL ) );
 
-            nae.setNexusItemInfo( ai );
-
-            try
-            {
-                nae.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
-            }
-            catch ( ParseException e )
-            {
-                getLogger().warn( "Could not format event date!", e );
-
-                nae.setEventDate( new Date() );
-            }
-
-            HashMap<String, Object> ctx = new HashMap<String, Object>();
+            HashMap<String, String> ctx = new HashMap<String, String>();
+            HashMap<String, String> atr = new HashMap<String, String>();
 
             for ( String key : map.keySet() )
             {
@@ -177,13 +181,31 @@ public class DefaultFeedRecorder
                 {
                     ctx.put( key.substring( 4 ), map.get( key ) );
                 }
+                else if ( key.startsWith( ATR_PREFIX ) )
+                {
+                    atr.put( key.substring( 4 ), map.get( key ) );
+                }
             }
 
-            nae.setMessage( map.get( MESSAGE ) );
+            NexusArtifactEvent nae =
+                new NexusArtifactEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ), ai );
 
-            nae.setEventContext( ctx );
+            // NEXUS-4038: backward compatibility
+            // Before this fix, nae had NO attributes separately stored, but only ctx map existed with ctx + atr content
+            // overlayed
+            // After fix we have two separate maps. To handle well "old" timeline records, when we detect there is no
+            // atr map (atr map is empty which will never be after fix), we "emulate" and lift all the ctx map into atr
+            // map instead.
 
-            nae.setAction( map.get( ACTION ) );
+            if ( atr.isEmpty() )
+            {
+                nae.addItemAttributes( ctx );
+            }
+            else
+            {
+                nae.addEventContext( ctx );
+                nae.addItemAttributes( atr );
+            }
 
             result.add( nae );
         }
@@ -199,17 +221,6 @@ public class DefaultFeedRecorder
         {
             Map<String, String> map = record.getData();
 
-            SystemEvent se = new SystemEvent( map.get( ACTION ), map.get( MESSAGE ) );
-
-            try
-            {
-                se.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
-            }
-            catch ( ParseException e )
-            {
-                getLogger().warn( "Could not format event date!", e );
-            }
-
             HashMap<String, Object> ctx = new HashMap<String, Object>();
 
             for ( String key : map.keySet() )
@@ -220,7 +231,9 @@ public class DefaultFeedRecorder
                 }
             }
 
-            se.getEventContext().putAll( ctx );
+            SystemEvent se = new SystemEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ) );
+
+            se.addEventContext( ctx );
 
             result.add( se );
         }
@@ -236,17 +249,6 @@ public class DefaultFeedRecorder
         {
             Map<String, String> map = record.getData();
 
-            AuthcAuthzEvent evt = new AuthcAuthzEvent( map.get( ACTION ), map.get( MESSAGE ) );
-
-            try
-            {
-                evt.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
-            }
-            catch ( ParseException e )
-            {
-                getLogger().warn( "Could not format event date!", e );
-            }
-
             HashMap<String, Object> ctx = new HashMap<String, Object>();
 
             for ( String key : map.keySet() )
@@ -257,7 +259,9 @@ public class DefaultFeedRecorder
                 }
             }
 
-            evt.getEventContext().putAll( ctx );
+            AuthcAuthzEvent evt = new AuthcAuthzEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ) );
+
+            evt.addEventContext( ctx );
 
             result.add( evt );
 
@@ -274,26 +278,6 @@ public class DefaultFeedRecorder
         {
             Map<String, String> map = record.getData();
 
-            ErrorWarningEvent evt = null;
-
-            if ( StringUtils.isEmpty( map.get( STACK_TRACE ) ) )
-            {
-                evt = new ErrorWarningEvent( map.get( ACTION ), map.get( MESSAGE ) );
-            }
-            else
-            {
-                evt = new ErrorWarningEvent( map.get( ACTION ), map.get( MESSAGE ), map.get( STACK_TRACE ) );
-            }
-
-            try
-            {
-                evt.setEventDate( getDateFormat().parse( map.get( DATE ) ) );
-            }
-            catch ( ParseException e )
-            {
-                getLogger().warn( "Could not format event date!", e );
-            }
-
             HashMap<String, Object> ctx = new HashMap<String, Object>();
 
             for ( String key : map.keySet() )
@@ -304,13 +288,19 @@ public class DefaultFeedRecorder
                 }
             }
 
-            evt.getEventContext().putAll( ctx );
+            ErrorWarningEvent evt =
+                new ErrorWarningEvent( getEventDate( map ), map.get( ACTION ), map.get( MESSAGE ),
+                    map.get( STACK_TRACE ) );
+
+            evt.addEventContext( ctx );
 
             result.add( evt );
         }
 
         return result;
     }
+
+    // ==
 
     protected void releaseResult( TimelineResult result )
     {
@@ -343,6 +333,7 @@ public class DefaultFeedRecorder
         try
         {
             result = getEvents( REPO_EVENT_TYPE_SET, subtypes, from, count, filter );
+
             return getAisFromMaps( result );
         }
         finally
@@ -358,6 +349,7 @@ public class DefaultFeedRecorder
         try
         {
             result = getEvents( SYSTEM_EVENT_TYPE_SET, subtypes, from, count, filter );
+
             return getSesFromMaps( result );
         }
         finally
@@ -374,6 +366,7 @@ public class DefaultFeedRecorder
         try
         {
             result = getEvents( AUTHC_AUTHZ_EVENT_TYPE_SET, subtypes, from, count, filter );
+
             return getAaesFromMaps( result );
         }
         finally
@@ -390,6 +383,7 @@ public class DefaultFeedRecorder
         try
         {
             result = getEvents( ERROR_WARNING_EVENT_TYPE_SET, subtypes, from, count, filter );
+
             return getEwesFromMaps( result );
         }
         finally
@@ -398,14 +392,16 @@ public class DefaultFeedRecorder
         }
     }
 
+    // ==
+
     public void addSystemEvent( String action, String message )
     {
-        SystemEvent event = new SystemEvent( action, message );
+        SystemEvent event = new SystemEvent( new Date(), action, message );
 
         addToTimeline( event );
     }
 
-    private void putContext( Map<String, String> map, Map<String, Object> context )
+    private void putContext( final Map<String, String> map, final String prefix, final Map<String, ?> context )
     {
         for ( String key : context.keySet() )
         {
@@ -421,7 +417,7 @@ public class DefaultFeedRecorder
                 value = "";
             }
 
-            map.put( CTX_PREFIX + key, value.toString() );
+            map.put( prefix + key, value.toString() );
         }
     }
 
@@ -429,7 +425,7 @@ public class DefaultFeedRecorder
     {
         Map<String, String> map = new HashMap<String, String>();
 
-        putContext( map, evt.getEventContext() );
+        putContext( map, CTX_PREFIX, evt.getEventContext() );
 
         map.put( ACTION, evt.getAction() );
 
@@ -453,7 +449,8 @@ public class DefaultFeedRecorder
             map.put( REMOTE_URL, nae.getNexusItemInfo().getRemoteUrl() );
         }
 
-        putContext( map, nae.getEventContext() );
+        putContext( map, CTX_PREFIX, nae.getEventContext() );
+        putContext( map, ATR_PREFIX, nae.getItemAttributes() );
 
         if ( nae.getMessage() != null )
         {
@@ -469,7 +466,7 @@ public class DefaultFeedRecorder
 
     public SystemProcess systemProcessStarted( String action, String message )
     {
-        SystemProcess prc = new SystemProcess( action, message, new Date() );
+        SystemProcess prc = new SystemProcess( new Date(), action, message, new Date() );
 
         addToTimeline( prc );
 
@@ -500,7 +497,7 @@ public class DefaultFeedRecorder
     {
         Map<String, String> map = new HashMap<String, String>();
 
-        putContext( map, se.getEventContext() );
+        putContext( map, CTX_PREFIX, se.getEventContext() );
 
         map.put( DATE, getDateFormat().format( se.getEventDate() ) );
 
@@ -518,21 +515,21 @@ public class DefaultFeedRecorder
 
     public void addErrorWarningEvent( String action, String message )
     {
-        addErrorWarningEvent( new ErrorWarningEvent( action, message ) );
+        addErrorWarningEvent( new ErrorWarningEvent( new Date(), action, message, null ) );
     }
 
     public void addErrorWarningEvent( String action, String message, Throwable throwable )
     {
         String stackTrace = ExceptionUtils.getFullStackTrace( throwable );
 
-        addErrorWarningEvent( new ErrorWarningEvent( action, message, stackTrace ) );
+        addErrorWarningEvent( new ErrorWarningEvent( new Date(), action, message, stackTrace ) );
     }
 
     protected void addErrorWarningEvent( ErrorWarningEvent errorEvt )
     {
         Map<String, String> map = new HashMap<String, String>();
 
-        putContext( map, errorEvt.getEventContext() );
+        putContext( map, CTX_PREFIX, errorEvt.getEventContext() );
 
         map.put( ACTION, errorEvt.getAction() );
 

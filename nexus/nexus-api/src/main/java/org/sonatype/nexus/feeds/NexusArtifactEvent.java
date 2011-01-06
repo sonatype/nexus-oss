@@ -19,6 +19,7 @@
 package org.sonatype.nexus.feeds;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.sonatype.nexus.artifact.NexusItemInfo;
@@ -29,6 +30,7 @@ import org.sonatype.nexus.artifact.NexusItemInfo;
  * @author cstamas
  */
 public class NexusArtifactEvent
+    extends AbstractEvent
 {
     public static final String ACTION_CACHED = "cached";
 
@@ -45,76 +47,35 @@ public class NexusArtifactEvent
     /**
      * The artifactInfo about artifact.
      */
-    private NexusItemInfo nexusItemInfo;
+    private final NexusItemInfo nexusItemInfo;
 
     /**
-     * The date of the event.
+     * The attributes of the item in question (if any or available).
      */
-    private Date eventDate;
+    private final Map<String, String> itemAttributes;
 
-    /**
-     * The context of the event (request).
-     */
-    private Map<String, Object> eventContext;
+    public NexusArtifactEvent( final Date eventDate, final String action, final String message,
+                               final NexusItemInfo nexusItemInfo )
+    {
+        super( eventDate, action, message );
 
-    /**
-     * The action.
-     */
-    private String action;
+        this.nexusItemInfo = nexusItemInfo;
 
-    /**
-     * The message.
-     */
-    private String message;
+        this.itemAttributes = new HashMap<String, String>();
+    }
 
     public NexusItemInfo getNexusItemInfo()
     {
         return nexusItemInfo;
     }
 
-    public void setNexusItemInfo( NexusItemInfo nexusItemInfo )
+    public Map<String, String> getItemAttributes()
     {
-        this.nexusItemInfo = nexusItemInfo;
+        return itemAttributes;
     }
 
-    public Date getEventDate()
+    public void addItemAttributes( Map<String, String> atr )
     {
-        return eventDate;
+        getItemAttributes().putAll( atr );
     }
-
-    public void setEventDate( Date eventDate )
-    {
-        this.eventDate = eventDate;
-    }
-
-    public Map<String, Object> getEventContext()
-    {
-        return eventContext;
-    }
-
-    public void setEventContext( Map<String, Object> eventContext )
-    {
-        this.eventContext = eventContext;
-    }
-
-    public String getAction()
-    {
-        return action;
-    }
-
-    public void setAction( String action )
-    {
-        this.action = action;
-    }
-
-    public String getMessage()
-    {
-        return message;
-    }
-
-    public void setMessage( String message )
-    {
-        this.message = message;
-    }
-
 }

@@ -19,8 +19,6 @@
 package org.sonatype.nexus.feeds;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A class that encapsulates a Nexus System event, like boot, reconfiguration, etc.
@@ -28,67 +26,10 @@ import java.util.Map;
  * @author cstamas
  */
 public class SystemEvent
+    extends AbstractEvent
 {
-    /**
-     * The date of event.
-     */
-    private Date eventDate;
-
-    /**
-     * The action.
-     */
-    private final String action;
-
-    /**
-     * Human message/descritpion.
-     */
-    private final String message;
-
-    /**
-     * The context of event.
-     */
-    private final Map<String, Object> eventContext;
-
-    public SystemEvent( String action, String message )
+    public SystemEvent( final Date eventDate, final String action, final String message )
     {
-        super();
-
-        this.eventDate = new Date();
-
-        this.action = action;
-
-        this.message = message;
-
-        this.eventContext = new HashMap<String, Object>();
-    }
-
-    public Date getEventDate()
-    {
-        return eventDate;
-    }
-    
-    public void setEventDate(Date date)
-    {
-        this.eventDate = date;
-    }
-
-    public Map<String, Object> getEventContext()
-    {
-        return eventContext;
-    }
-
-    public String getAction()
-    {
-        return action;
-    }
-
-    public String getMessage()
-    {
-        return message;
-    }
-    
-    public String toString()
-    {
-        return getMessage();
+        super( eventDate, action, message );
     }
 }

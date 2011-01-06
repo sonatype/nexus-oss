@@ -76,39 +76,38 @@ public class ItemChangesFeedEventInspector
             {
                 StorageFileItem pomItem = (StorageFileItem) ievt.getItem();
 
-                NexusArtifactEvent nae = new NexusArtifactEvent();
                 NexusItemInfo ai = new NexusItemInfo();
                 ai.setRepositoryId( pomItem.getRepositoryId() );
                 ai.setPath( pomItem.getPath() );
                 ai.setRemoteUrl( pomItem.getRemoteUrl() );
-                nae.setNexusItemInfo( ai );
-                nae.setEventDate( ievt.getEventDate() );
 
-                // Make sure to add the item attributes as well
-                // that is where remote ip is contained (among other things)
-                nae.setEventContext( ievt.getContext() );
-                nae.getEventContext().putAll( ievt.getItem().getAttributes() );
+                String action;
 
                 if ( ievt instanceof RepositoryItemEventCache )
                 {
-                    nae.setAction( NexusArtifactEvent.ACTION_CACHED );
+                    action = NexusArtifactEvent.ACTION_CACHED;
                 }
                 else if ( ievt instanceof RepositoryItemEventStore )
                 {
-                    nae.setAction( NexusArtifactEvent.ACTION_DEPLOYED );
+                    action = NexusArtifactEvent.ACTION_DEPLOYED;
                 }
                 else if ( ievt instanceof RepositoryItemEventDelete )
                 {
-                    nae.setAction( NexusArtifactEvent.ACTION_DELETED );
+                    action = NexusArtifactEvent.ACTION_DELETED;
                 }
                 else
                 {
                     return;
                 }
 
+                NexusArtifactEvent nae = new NexusArtifactEvent( ievt.getEventDate(), action, "", ai );
+                // set context
+                nae.addEventContext( ievt.getContext() );
+                // set attributes
+                nae.addItemAttributes( ievt.getItem().getAttributes() );
+
                 getFeedRecorder().addNexusArtifactEvent( nae );
             }
-
         }
     }
 }

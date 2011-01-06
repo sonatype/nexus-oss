@@ -122,16 +122,6 @@ public abstract class AbstractChecksumContentValidator
 
     private NexusArtifactEvent newChechsumFailureEvent( AbstractStorageItem item, String msg )
     {
-        NexusArtifactEvent nae = new NexusArtifactEvent();
-
-        nae.setAction( NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM );
-
-        nae.setEventDate( new Date() );
-
-        nae.setEventContext( item.getItemContext() );
-
-        nae.setMessage( msg );
-
         NexusItemInfo ai = new NexusItemInfo();
 
         ai.setPath( item.getPath() );
@@ -140,7 +130,10 @@ public abstract class AbstractChecksumContentValidator
 
         ai.setRemoteUrl( item.getRemoteUrl() );
 
-        nae.setNexusItemInfo( ai );
+        NexusArtifactEvent nae =
+            new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM, msg, ai );
+
+        nae.addEventContext(item.getItemContext() );
 
         return nae;
     }

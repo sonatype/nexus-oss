@@ -57,7 +57,7 @@ public class SimpleFeedRecorder
 
     public SystemProcess systemProcessStarted( String action, String message )
     {
-        return new SystemProcess( action, message, new Date() );
+        return new SystemProcess( new Date(), action, message, new Date() );
     }
 
     public void startService()

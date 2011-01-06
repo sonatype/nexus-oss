@@ -18,6 +18,8 @@
  */
 package org.sonatype.nexus.security.filter.authc;
 
+import java.util.Date;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -283,7 +285,7 @@ public class NexusHttpAuthenticationFilter
 
         getLogger().debug( msg );
 
-        AuthcAuthzEvent evt = new AuthcAuthzEvent( FeedRecorder.SYSTEM_AUTHC, msg );
+        AuthcAuthzEvent evt = new AuthcAuthzEvent( new Date(), FeedRecorder.SYSTEM_AUTHC, msg );
 
         String ip = RemoteIPFinder.findIP( (HttpServletRequest) request );
 

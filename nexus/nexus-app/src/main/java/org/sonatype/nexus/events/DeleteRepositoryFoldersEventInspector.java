@@ -20,12 +20,9 @@ package org.sonatype.nexus.events;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.sonatype.nexus.proxy.NoSuchRepositoryException;
 import org.sonatype.nexus.proxy.events.AbstractEventInspector;
 import org.sonatype.nexus.proxy.events.EventInspector;
 import org.sonatype.nexus.proxy.events.RepositoryRegistryEventPostRemove;
-import org.sonatype.nexus.proxy.events.RepositoryRegistryEventRemove;
-import org.sonatype.nexus.proxy.registry.RepositoryRegistry;
 import org.sonatype.nexus.proxy.repository.Repository;
 import org.sonatype.nexus.scheduling.NexusScheduler;
 import org.sonatype.nexus.tasks.DeleteRepositoryFoldersTask;
@@ -40,9 +37,6 @@ import org.sonatype.plexus.appevents.Event;
 public class DeleteRepositoryFoldersEventInspector
     extends AbstractEventInspector
 {
-    @Requirement
-    private RepositoryRegistry repoRegistry;
-
     @Requirement
     private NexusScheduler nexusScheduler;
 

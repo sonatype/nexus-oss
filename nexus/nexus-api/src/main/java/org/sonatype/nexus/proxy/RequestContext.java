@@ -20,6 +20,7 @@ package org.sonatype.nexus.proxy;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import org.codehaus.plexus.util.StringUtils;
 
@@ -84,7 +85,7 @@ public class RequestContext
             if ( this == context )
             {
                 throw new IllegalArgumentException(
-                                                    "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
+                    "The context cannot be parent of itself! The parent instance cannot equals to this instance!" );
             }
             RequestContext otherParentContext = context.getParentContext();
             while ( otherParentContext != null )
@@ -342,5 +343,36 @@ public class RequestContext
         {
             remove( CTX_REQUEST_APP_ROOT_URL );
         }
+    }
+
+    // ==
+
+    /**
+     * Returns a new map instance that contains flattened RequestContext as it is "viewed" by callers (overlaid in
+     * proper order).
+     */
+    public Map<String, Object> flatten()
+    {
+        HashMap<String, Object> result = new HashMap<String, Object>();
+
+        RequestContext ctx = this;
+
+        Stack<RequestContext> stack = new Stack<RequestContext>();
+
+        while ( ctx != null )
+        {
+            stack.push( ctx );
+
+            ctx = ctx.getParentContext();
+        }
+
+        while ( !stack.isEmpty() )
+        {
+            ctx = stack.pop();
+
+            result.putAll( ctx );
+        }
+
+        return result;
     }
 }
