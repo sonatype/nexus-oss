@@ -19,7 +19,6 @@
 package org.sonatype.nexus.proxy.repository;
 
 import org.sonatype.nexus.proxy.ResourceStoreRequest;
-import org.sonatype.nexus.proxy.access.AccessManager;
 import org.sonatype.nexus.proxy.events.RepositoryItemEventDelete;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.walker.AbstractFileWalkerProcessor;
@@ -43,17 +42,7 @@ public class DeletionNotifierWalker
     @Override
     protected void processFileItem( WalkerContext ctx, StorageFileItem item )
     {
-        item.getItemContext().putAll( request.getRequestContext() );
-        
-        if( request.getRequestContext().containsKey( AccessManager.REQUEST_USER ) )
-        {
-            item.getAttributes().put( AccessManager.REQUEST_USER, request.getRequestContext().get( AccessManager.REQUEST_USER ) +"" );
-        }
-        
-        if( request.getRequestContext().containsKey( AccessManager.REQUEST_REMOTE_ADDRESS ) )
-        {
-            item.getAttributes().put( AccessManager.REQUEST_REMOTE_ADDRESS, request.getRequestContext().get( AccessManager.REQUEST_REMOTE_ADDRESS ) +"" );
-        }
+        item.getItemContext().setParentContext( request.getRequestContext() );
         
         // just fire it, and someone will eventually catch it
         applicationEventMulticaster.notifyEventListeners( new RepositoryItemEventDelete(
