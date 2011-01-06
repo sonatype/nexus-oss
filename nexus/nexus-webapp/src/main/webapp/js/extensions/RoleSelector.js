@@ -148,6 +148,8 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
       addHandler : function() {
         this.roleSelectorWindow = new Ext.Window({
               modal : true,
+              layout : 'fit',
+              width : 800,
               items : [{
                     xtype : 'roleselector',
                     name : 'roleSelector',
@@ -156,7 +158,6 @@ Ext.extend(RoleManager, Ext.grid.GridPanel, {
                     usePrivileges : this.usePrivileges,
                     hiddenRoleIds : this.getSelectedRoleIds(),
                     hiddenPrivilegeIds : this.getSelectedPrivilegeIds(),
-                    modal : true,
                     title : 'Add Roles' + (this.usePrivileges ? ' and Privileges' : '')
                   }],
               buttonAlign : 'center',
