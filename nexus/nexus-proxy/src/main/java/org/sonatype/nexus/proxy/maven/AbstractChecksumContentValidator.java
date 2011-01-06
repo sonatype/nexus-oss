@@ -134,6 +134,8 @@ public abstract class AbstractChecksumContentValidator
             new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN_WRONG_REMOTE_CHECKSUM, msg, ai );
 
         nae.addEventContext(item.getItemContext() );
+        
+        nae.addItemAttributes( item.getAttributes() );
 
         return nae;
     }

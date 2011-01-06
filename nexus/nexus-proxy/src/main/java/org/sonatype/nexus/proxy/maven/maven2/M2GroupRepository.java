@@ -407,6 +407,8 @@ public class M2GroupRepository
         NexusArtifactEvent nae = new NexusArtifactEvent( new Date(), NexusArtifactEvent.ACTION_BROKEN, msg, ai );
 
         nae.addEventContext( item.getItemContext() );
+        
+        nae.addItemAttributes( item.getAttributes() );
 
         return nae;
     }
