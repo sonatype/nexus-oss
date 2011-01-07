@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -775,6 +776,18 @@ public class DefaultIndexerManager
     }
 
     // ----------------------------------------------------------------------------
+    // TODO: NEXUS-4052 and NEXUS-4053
+    // when sorted out, these constants will help the change, just remove them
+
+    // all index related operation cascade (currently yes)
+    private static final boolean CASCADE = true;
+
+    // reindex() method does publishing too (currently yes)
+    private static final boolean REINDEX_PUBLISHES = true;
+
+    // ----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
     // Reindexing related
     // ----------------------------------------------------------------------------
 
@@ -785,10 +798,13 @@ public class DefaultIndexerManager
 
         for ( Repository repository : reposes )
         {
-            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
-            {
-                reindexRepository( repository, path, fullReindex );
-            }
+            // going directly to single-shot, we are iterating over all reposes anyway
+            reindexRepository( repository, path, fullReindex );
+        }
+
+        if ( REINDEX_PUBLISHES )
+        {
+            publishAllIndex();
         }
     }
 
@@ -797,47 +813,49 @@ public class DefaultIndexerManager
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            GroupRepository groupRepo = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
-
-            reindexRepositoryGroup( groupRepo, path, fullReindex );
-        }
-        else
-        {
-            if ( repository.isIndexable() )
-            {
-                reindexRepository( repository, path, fullReindex );
-            }
-        }
+        reindexRepository( path, repository, fullReindex, new HashSet<String>() );
     }
 
-    private void reindexRepositoryGroup( final GroupRepository groupRepo, final String path, final boolean fullReindex )
-        throws IOException, NoSuchRepositoryException
+    protected void reindexRepository( final String path, final Repository repository, final boolean fullReindex,
+                                      final Set<String> processedRepositoryIds )
+        throws IOException
     {
-        if ( groupRepo.isIndexable() )
+        if ( !processedRepositoryIds.add( repository.getId() ) )
         {
-            List<Repository> group = groupRepo.getMemberRepositories();
+            // already processed, bail out
+            return;
+        }
 
-            for ( Repository repository : group )
+        if ( CASCADE )
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
-                if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
+
+                for ( Repository member : members )
                 {
-                    reindexRepositoryGroup( repository.adaptToFacet( GroupRepository.class ), path, fullReindex );
-                }
-                else
-                {
-                    reindexRepository( repository, path, fullReindex );
+                    reindexRepository( path, member, fullReindex, processedRepositoryIds );
                 }
             }
+        }
+
+        reindexRepository( repository, path, fullReindex );
+
+        if ( REINDEX_PUBLISHES )
+        {
+            publishRepositoryIndex( repository );
         }
     }
 
     protected void reindexRepository( final Repository repository, final String fromPath, final boolean fullReindex )
         throws IOException
     {
-        if ( !isIndexingSupported( repository )
-            || repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        {
+            return;
+        }
+
+        if ( !isIndexingSupported( repository ) )
         {
             return;
         }
@@ -871,8 +889,11 @@ public class DefaultIndexerManager
                 downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), fullReindex );
             }
 
-            // update always true, since we manually manage ctx purge
-            nexusIndexer.scan( context, fromPath, null, true );
+            if ( !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+            {
+                // update always true, since we manually manage ctx purge
+                nexusIndexer.scan( context, fromPath, null, true );
+            }
         }
         finally
         {
@@ -891,64 +912,63 @@ public class DefaultIndexerManager
 
         for ( ProxyRepository repository : reposes )
         {
-            if ( repository.isIndexable() )
-            {
-                if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
-                {
-                    downloadRepositoryIndex( repository, false );
-                }
-            }
+            downloadRepositoryIndex( repository, false );
         }
     }
 
-    public void downloadRepositoryIndex( String repositoryId )
+    public void downloadRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
-
-            downloadRepositoryGroupIndex( group );
-        }
-        else if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) && repository.isIndexable() )
-        {
-            downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
-        }
+        downloadRepositoryIndex( repository, new HashSet<String>() );
     }
 
-    protected void downloadRepositoryGroupIndex( GroupRepository group )
+    public void downloadRepositoryIndex( final Repository repository, final Set<String> processedRepositoryIds )
         throws IOException
     {
-        List<Repository> members = group.getMemberRepositories();
-
-        for ( Repository repository : members )
+        if ( !processedRepositoryIds.add( repository.getId() ) )
         {
-            if ( !repository.isIndexable() )
-            {
-                continue;
-            }
+            // already processed, bail out
+            return;
+        }
 
+        if ( CASCADE )
+        {
             if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
-                downloadRepositoryGroupIndex( repository.adaptToFacet( GroupRepository.class ) );
-            }
+                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
 
-            if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
-            {
-                downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
+                for ( Repository member : members )
+                {
+                    downloadRepositoryIndex( member, processedRepositoryIds );
+                }
             }
+        }
+
+        if ( repository.getRepositoryKind().isFacetAvailable( ProxyRepository.class ) )
+        {
+            downloadRepositoryIndex( repository.adaptToFacet( ProxyRepository.class ), false );
         }
     }
 
     protected boolean downloadRepositoryIndex( ProxyRepository repository, boolean forceFullUpdate )
         throws IOException
     {
+        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        {
+            return false;
+        }
+
         if ( !isIndexingSupported( repository ) )
         {
             logSkippingRepositoryMessage( repository );
 
+            return false;
+        }
+
+        if ( !repository.isIndexable() )
+        {
             return false;
         }
 
@@ -1007,7 +1027,6 @@ public class DefaultIndexerManager
         {
             lock.unlock();
         }
-
     }
 
     protected boolean updateRemoteIndex( final ProxyRepository repository, boolean forceFullUpdate )
@@ -1126,74 +1145,58 @@ public class DefaultIndexerManager
     {
         List<Repository> reposes = repositoryRegistry.getRepositories();
 
+        // just publish all, since we use merged context, no need for double pass
         for ( Repository repository : reposes )
         {
-            if ( LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() )
-                && !repository.getRepositoryKind().isFacetAvailable( GroupRepository.class )
-                && repository.isIndexable() )
-            {
-                publishRepositoryIndex( repository );
-            }
-        }
-
-        List<GroupRepository> groups = repositoryRegistry.getRepositoriesWithFacet( GroupRepository.class );
-
-        for ( GroupRepository group : groups )
-        {
-            publishRepositoryIndex( group );
+            publishRepositoryIndex( repository );
         }
     }
 
-    public void publishRepositoryIndex( String repositoryId )
+    public void publishRepositoryIndex( final String repositoryId )
         throws IOException, NoSuchRepositoryException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
-        {
-            GroupRepository group = repositoryRegistry.getRepositoryWithFacet( repositoryId, GroupRepository.class );
-
-            publishRepositoryGroupIndex( group );
-        }
-        else
-        {
-            publishRepositoryIndex( repositoryRegistry.getRepository( repositoryId ) );
-        }
+        publishRepositoryIndex( repository, new HashSet<String>() );
     }
 
-    protected void publishRepositoryGroupIndex( GroupRepository group )
+    protected void publishRepositoryIndex( final Repository repository, Set<String> processedRepositoryIds )
         throws IOException
     {
-        if ( group.isIndexable() )
+        if ( !processedRepositoryIds.add( repository.getId() ) )
         {
-            for ( Repository repository : group.getMemberRepositories() )
+            // already processed, bail out
+            return;
+        }
+
+        if ( CASCADE )
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
-                if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+                List<Repository> members = repository.adaptToFacet( GroupRepository.class ).getMemberRepositories();
+
+                for ( Repository member : members )
                 {
-                    publishRepositoryGroupIndex( repository.adaptToFacet( GroupRepository.class ) );
-                }
-                else
-                {
-                    publishRepositoryIndex( repository );
+                    publishRepositoryIndex( member, processedRepositoryIds );
                 }
             }
-
-            publishRepositoryIndex( group );
         }
+
+        publishRepositoryIndex( repository );
     }
 
-    protected void publishRepositoryIndex( Repository repository )
+    protected void publishRepositoryIndex( final Repository repository )
         throws IOException
     {
+        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        {
+            return;
+        }
+
         // is indexing supported at all?
         if ( !isIndexingSupported( repository ) )
         {
-            if ( getLogger().isDebugEnabled() )
-            {
-                getLogger().debug(
-                    "Can't publish index on repository \"" + repository.getName() + "\" (ID=\"" + repository.getId()
-                        + "\") since indexing is not supported on it!" );
-            }
+            logSkippingRepositoryMessage( repository );
 
             return;
         }
@@ -1227,16 +1230,9 @@ public class DefaultIndexerManager
                 throw new IOException( "Could not create temp dir for packing indexes: " + targetDir );
             }
 
-            // copy the current properties file to the temp directory, this is what the indexer uses to
-            // decide
-            // if chunks are necessary, and what to label it as
-            // cstamas: Not needed anymore, context maintans it now properly!
-            // copyIndexPropertiesToTempDir( repository, targetDir );
-
             IndexPackingRequest packReq = new IndexPackingRequest( context, targetDir );
             packReq.setCreateIncrementalChunks( true );
-            // cstamas: Not needed anymore, context maintans it now properly!
-            // packReq.setUseTargetProperties( true );
+
             // not publishing legacy format anymore
             packReq.setFormats( Arrays.asList( IndexFormat.FORMAT_V1 ) );
             indexPacker.packIndex( packReq );
@@ -1364,37 +1360,57 @@ public class DefaultIndexerManager
 
         for ( Repository repository : repos )
         {
-            optimizeIndex( repository );
+            optimizeRepositoryIndex( repository );
         }
     }
 
-    public void optimizeRepositoryIndex( String repositoryId )
+    public void optimizeRepositoryIndex( final String repositoryId )
         throws NoSuchRepositoryException, IOException
     {
         Repository repository = repositoryRegistry.getRepository( repositoryId );
 
-        optimizeIndex( repository );
+        optimizeIndex( repository, new HashSet<String>() );
     }
 
-    protected void optimizeIndex( Repository repo )
+    protected void optimizeIndex( final Repository repository, final Set<String> processedRepositoryIds )
         throws CorruptIndexException, IOException
     {
-        if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
+        if ( !processedRepositoryIds.add( repository.getId() ) )
         {
-            GroupRepository group = repo.adaptToFacet( GroupRepository.class );
+            // already processed, bail out
+            return;
+        }
 
-            for ( Repository member : group.getMemberRepositories() )
+        if ( CASCADE )
+        {
+            if ( repository.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
             {
-                optimizeIndex( member );
+                GroupRepository group = repository.adaptToFacet( GroupRepository.class );
+
+                for ( Repository member : group.getMemberRepositories() )
+                {
+                    optimizeIndex( member, processedRepositoryIds );
+                }
             }
         }
 
+        optimizeRepositoryIndex( repository );
+    }
+
+    protected void optimizeRepositoryIndex( final Repository repository )
+        throws CorruptIndexException, IOException
+    {
+        if ( !LocalStatus.IN_SERVICE.equals( repository.getLocalStatus() ) )
+        {
+            return;
+        }
+
         // local
-        IndexingContext context = getRepositoryIndexContext( repo );
+        IndexingContext context = getRepositoryIndexContext( repository );
 
         if ( context != null )
         {
-            getLogger().debug( "Optimizing local index context for repository: " + repo.getId() );
+            getLogger().debug( "Optimizing local index context for repository: " + repository.getId() );
 
             context.optimize();
         }
