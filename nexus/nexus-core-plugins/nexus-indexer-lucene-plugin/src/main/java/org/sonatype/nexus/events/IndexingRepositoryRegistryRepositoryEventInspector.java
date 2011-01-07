@@ -123,7 +123,7 @@ public class IndexingRepositoryRegistryRepositoryEventInspector
                 if ( applicationStatusSource.getSystemStatus().isNexusStarted() && repository.isIndexable() )
                 {
                     // Create the initial index for the repository
-                    reindexRepo( repository, true, "Creating initial index, repositoryId=" + repository.getId() );
+                    reindexRepo( repository, false, "Creating initial index, repositoryId=" + repository.getId() );
                 }
             }
             else if ( evt instanceof RepositoryRegistryEventRemove )
