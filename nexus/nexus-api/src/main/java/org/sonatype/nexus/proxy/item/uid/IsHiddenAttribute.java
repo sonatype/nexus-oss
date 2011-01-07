@@ -20,11 +20,30 @@ package org.sonatype.nexus.proxy.item.uid;
 
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
-public class IsMetadataMaintainedAttribute
+public class IsHiddenAttribute
     implements Attribute<Boolean>
 {
-    public Boolean getValueFor( RepositoryItemUid subject )
+    public Boolean getValueFor( final RepositoryItemUid subject )
     {
-        return !subject.getBooleanAttributeValue( IsMetacontentAttribute.class );
+        if ( subject.getBooleanAttributeValue( IsMetacontentAttribute.class ) )
+        {
+            // metacontent is hidden
+            return true;
+        }
+        else if ( subject.getPath() != null
+            && ( subject.getPath().indexOf( "/." ) > -1 || subject.getPath().startsWith( "." ) ) )
+        {
+            // paths that start with a . in any directory (or filename)
+            // are considered hidden.
+            // This check will catch (for example):
+            // .metadata
+            // /.meta/something.jar
+            // /something/else/.hidden/something.jar
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }

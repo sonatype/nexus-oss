@@ -47,7 +47,7 @@ public class RepositoryItemUidAttributeManagerTest
 
     @SuppressWarnings( "unchecked" )
     protected List<Class<? extends Attribute<Boolean>>> coreAttributeClasses = Arrays.asList(
-        IsHiddenUidAttribute.class, IsMetadataMaintainedAttribute.class );
+        IsHiddenAttribute.class, IsMetadataMaintainedAttribute.class );
 
     @SuppressWarnings( "unchecked" )
     protected List<Class<? extends Attribute<Boolean>>> mavenAttributeClasses = Arrays.asList(
@@ -93,10 +93,10 @@ public class RepositoryItemUidAttributeManagerTest
         validateAttributes( plain, IsMetadataMaintainedAttribute.class );
 
         RepositoryItemUid hidden = factory.createUid( repository, "/.nexus/hiddenPath.txt" );
-        validateAttributes( hidden, IsMetadataMaintainedAttribute.class, IsHiddenUidAttribute.class );
+        validateAttributes( hidden, IsMetadataMaintainedAttribute.class, IsHiddenAttribute.class );
 
         RepositoryItemUid trashedFile = factory.createUid( repository, "/.nexus/trash/some/plain/fileInTrash.txt" );
-        validateAttributes( trashedFile, IsHiddenUidAttribute.class );
+        validateAttributes( trashedFile, IsHiddenAttribute.class );
     }
 
     public void testMavenAttributes()

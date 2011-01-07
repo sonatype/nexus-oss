@@ -54,6 +54,16 @@ public class StorageFileItemRepresentation
             setTag( new Tag( file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ), false ) );
         }
 
+        if ( file.getItemContext().containsKey( AbstractResourceStoreContentPlexusResource.OVERRIDE_FILENAME_KEY ) )
+        {
+            String filename =
+                file.getItemContext().get( AbstractResourceStoreContentPlexusResource.OVERRIDE_FILENAME_KEY ).toString();
+
+            setDownloadable( true );
+
+            setDownloadName( filename );
+        }
+
     }
 
     protected StorageFileItem getStorageFileItem()

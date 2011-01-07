@@ -37,7 +37,6 @@ import org.codehaus.plexus.util.StringUtils;
 import org.restlet.Context;
 import org.restlet.data.ChallengeRequest;
 import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Form;
 import org.restlet.data.MediaType;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
@@ -48,7 +47,6 @@ import org.restlet.data.Tag;
 import org.restlet.resource.Representation;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.Variant;
-import org.restlet.util.Series;
 import org.sonatype.nexus.proxy.AccessDeniedException;
 import org.sonatype.nexus.proxy.IllegalOperationException;
 import org.sonatype.nexus.proxy.IllegalRequestException;
@@ -66,6 +64,8 @@ import org.sonatype.nexus.proxy.item.StorageCompositeItem;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
 import org.sonatype.nexus.proxy.item.StorageLinkItem;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
+import org.sonatype.nexus.proxy.item.uid.IsRemotelyAccessibleAttribute;
 import org.sonatype.nexus.proxy.storage.UnsupportedStorageOperationException;
 import org.sonatype.nexus.rest.model.ContentListDescribeRequestResource;
 import org.sonatype.nexus.rest.model.ContentListDescribeResource;
@@ -79,7 +79,6 @@ import org.sonatype.plexus.rest.representation.VelocityRepresentation;
 import org.sonatype.security.SecuritySystem;
 
 import com.noelios.restlet.ext.servlet.ServletCall;
-import com.noelios.restlet.http.HttpConstants;
 import com.noelios.restlet.http.HttpRequest;
 
 /**
@@ -330,9 +329,18 @@ public abstract class AbstractResourceStoreContentPlexusResource
             return renderDescribeItem( context, req, res, variant, store, item.getResourceStoreRequest(), item );
         }
 
+        if ( !item.getRepositoryItemUid().getBooleanAttributeValue( IsRemotelyAccessibleAttribute.class ) )
+        {
+            getLogger().debug(
+                String.format( "Request for remotely non-accessible UID %s is made and refused",
+                    item.getRepositoryItemUid().toString() ) );
+
+            throw new ResourceException( Status.CLIENT_ERROR_NOT_FOUND, "Resource is not found." );
+        }
+
         Representation result = null;
 
-        if ( StorageFileItem.class.isAssignableFrom( item.getClass() ) )
+        if ( item instanceof StorageFileItem )
         {
             // we have a file
             StorageFileItem file = (StorageFileItem) item;
@@ -343,7 +351,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 if ( file.getModified() > req.getConditions().getModifiedSince().getTime() )
                 {
                     result = new StorageFileItemRepresentation( file );
-                    this.setOverrideContentDisposition( res, file );
                 }
                 else
                 {
@@ -361,7 +368,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 if ( !file.getAttributes().get( DigestCalculatingInspector.DIGEST_SHA1_KEY ).equals( tag.getName() ) )
                 {
                     result = new StorageFileItemRepresentation( file );
-                    this.setOverrideContentDisposition( res, file );
                 }
                 else
                 {
@@ -371,10 +377,9 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else
             {
                 result = new StorageFileItemRepresentation( file );
-                this.setOverrideContentDisposition( res, file );
             }
         }
-        else if ( StorageLinkItem.class.isAssignableFrom( item.getClass() ) )
+        else if ( item instanceof StorageLinkItem )
         {
             // we have a link, dereference it
             // TODO: we should be able to do HTTP redirects too! (parametrize the dereferencing?)
@@ -390,7 +395,7 @@ public abstract class AbstractResourceStoreContentPlexusResource
                 return null;
             }
         }
-        else if ( StorageCollectionItem.class.isAssignableFrom( item.getClass() ) )
+        else if ( item instanceof StorageCollectionItem )
         {
             String resPath = parsePathFromUri( req.getResourceRef().toString() );
 
@@ -414,27 +419,30 @@ public abstract class AbstractResourceStoreContentPlexusResource
 
             for ( StorageItem child : children )
             {
-                if ( !uniqueNames.contains( child.getName() ) )
+                if ( !child.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
                 {
-                    resource = new ContentListResource();
+                    if ( !uniqueNames.contains( child.getName() ) )
+                    {
+                        resource = new ContentListResource();
 
-                    resource.setText( child.getName() );
+                        resource.setText( child.getName() );
 
-                    resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
+                        resource.setLeaf( !StorageCollectionItem.class.isAssignableFrom( child.getClass() ) );
 
-                    resource.setResourceURI( Reference.decode( createChildReference( req, this, child.getName() ).toString() )
-                        + ( resource.isLeaf() ? "" : "/" ) );
+                        resource.setResourceURI( Reference.decode( createChildReference( req, this, child.getName() ).toString() )
+                            + ( resource.isLeaf() ? "" : "/" ) );
 
-                    resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
+                        resource.setRelativePath( child.getPath() + ( resource.isLeaf() ? "" : "/" ) );
 
-                    resource.setLastModified( new Date( child.getModified() ) );
+                        resource.setLastModified( new Date( child.getModified() ) );
 
-                    resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength()
-                        : -1 );
+                        resource.setSizeOnDisk( StorageFileItem.class.isAssignableFrom( child.getClass() ) ? ( (StorageFileItem) child ).getLength()
+                            : -1 );
 
-                    response.addData( resource );
+                        response.addData( resource );
 
-                    uniqueNames.add( child.getName() );
+                        uniqueNames.add( child.getName() );
+                    }
                 }
             }
 
@@ -451,29 +459,6 @@ public abstract class AbstractResourceStoreContentPlexusResource
         }
 
         return result;
-    }
-
-    private void setOverrideContentDisposition( Response response, StorageFileItem fileItem )
-    {
-        String filename = fileItem.getName();
-        if ( fileItem.getItemContext().containsKey( OVERRIDE_FILENAME_KEY ) )
-        {
-            filename = fileItem.getItemContext().get( OVERRIDE_FILENAME_KEY ).toString();
-
-            Object oHeaders = fileItem.getAttributes().get( HttpConstants.ATTRIBUTE_HEADERS );
-            Series<Parameter> headers = null;
-            if ( oHeaders != null )
-            {
-                headers = (Series<Parameter>) oHeaders;
-            }
-            else
-            {
-                headers = new Form();
-            }
-
-            headers.add( new Parameter( "Content-Disposition", "inline; filename=\"" + filename + "\";" ) );
-            response.getAttributes().put( HttpConstants.ATTRIBUTE_HEADERS, headers );
-        }
     }
 
     protected Representation serialize( Context context, Request req, Variant variant, Object payload )
@@ -837,7 +822,8 @@ public abstract class AbstractResourceStoreContentPlexusResource
             else
             {
                 // if not in DEBUG mode, we obey the flag to decide whether we need to log or not the stack trace
-                if ( (t instanceof ItemNotFoundException || t instanceof IllegalRequestException) && !shouldLogInfoStackTrace )
+                if ( ( t instanceof ItemNotFoundException || t instanceof IllegalRequestException )
+                    && !shouldLogInfoStackTrace )
                 {
                     // mute it
                 }

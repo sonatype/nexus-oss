@@ -101,7 +101,7 @@ import org.sonatype.nexus.proxy.item.PreparedContentLocator;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 import org.sonatype.nexus.proxy.item.StorageFileItem;
 import org.sonatype.nexus.proxy.item.StorageItem;
-import org.sonatype.nexus.proxy.item.uid.IsHiddenUidAttribute;
+import org.sonatype.nexus.proxy.item.uid.IsHiddenAttribute;
 import org.sonatype.nexus.proxy.maven.MavenProxyRepository;
 import org.sonatype.nexus.proxy.maven.MavenRepository;
 import org.sonatype.nexus.proxy.maven.RepositoryPolicy;
@@ -577,7 +577,7 @@ public class DefaultIndexerManager
         }
 
         // is this hidden path?
-        if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenUidAttribute.class ) )
+        if ( item.getRepositoryItemUid().getBooleanAttributeValue( IsHiddenAttribute.class ) )
         {
             getLogger().debug( "Will not index hidden file path: " + item.getRepositoryItemUid().toString() );
 

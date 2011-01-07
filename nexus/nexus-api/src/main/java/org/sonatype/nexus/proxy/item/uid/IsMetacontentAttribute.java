@@ -18,40 +18,33 @@
  */
 package org.sonatype.nexus.proxy.item.uid;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.codehaus.plexus.component.annotations.Component;
 import org.sonatype.nexus.proxy.item.RepositoryItemUid;
 
 /**
- * The source for attributes implemented in Nexus Core.
+ * Attribute yielding "false" for real repository content, and "true" for all the "meta content", that is actually not
+ * holding data serving the basic purpose of this given repository.
  * 
  * @author cstamas
  */
-@Component( role = RepositoryItemUidAttributeSource.class, hint = "core" )
-public class CoreRepositoryItemUidAttributeSource
-    implements RepositoryItemUidAttributeSource
+public class IsMetacontentAttribute
+    implements Attribute<Boolean>
 {
-    private final Map<Class<?>, Attribute<?>> coreAttributes;
-
-    public CoreRepositoryItemUidAttributeSource()
+    public Boolean getValueFor( RepositoryItemUid subject )
     {
-        Map<Class<?>, Attribute<?>> attrs = new HashMap<Class<?>, Attribute<?>>( 2 );
+        // stuff not having metadata:
+        // /.nexus/attributes
+        // /.nexus/trash
+        // we are specific about these for a good reason (see future)
 
-        attrs.put( IsMetacontentAttribute.class, new IsMetacontentAttribute() );
-        attrs.put( IsHiddenAttribute.class, new IsHiddenAttribute() );
-        attrs.put( IsMetadataMaintainedAttribute.class, new IsMetadataMaintainedAttribute() );
-        attrs.put( IsRemotelyAccessibleAttribute.class, new IsRemotelyAccessibleAttribute() );
-
-        this.coreAttributes = Collections.unmodifiableMap( attrs );
-    }
-
-    @Override
-    @SuppressWarnings( "unchecked" )
-    public <T extends Attribute<?>> T getAttribute( Class<T> attributeKey, RepositoryItemUid subject )
-    {
-        return (T) coreAttributes.get( attributeKey );
+        if ( subject.getPath() != null )
+        {
+            // TODO: how to avoid path duplication?
+            return subject.getPath().startsWith( "/.nexus/attributes" )
+                || subject.getPath().startsWith( "/.nexus/trash" );
+        }
+        else
+        {
+            return false;
+        }
     }
 }
