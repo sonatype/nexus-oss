@@ -585,6 +585,8 @@ public class DefaultIndexerManager
         }
 
         // do the work
+        // Maybe detect Merged context and NOT do the work? Everything works transparently, but still... a lot of calls
+        // for nothing
         IndexingContext context = getRepositoryIndexContext( repository );
 
         if ( context != null )
@@ -788,8 +790,6 @@ public class DefaultIndexerManager
                 reindexRepository( repository, path, fullReindex );
             }
         }
-
-        publishAllIndex();
     }
 
     public void reindexRepository( final String path, final String repositoryId, final boolean fullReindex )
@@ -808,8 +808,6 @@ public class DefaultIndexerManager
             if ( repository.isIndexable() )
             {
                 reindexRepository( repository, path, fullReindex );
-
-                publishRepositoryIndex( repositoryId );
             }
         }
     }
@@ -832,8 +830,6 @@ public class DefaultIndexerManager
                     reindexRepository( repository, path, fullReindex );
                 }
             }
-
-            publishRepositoryGroupIndex( groupRepo );
         }
     }
 
@@ -1282,10 +1278,7 @@ public class DefaultIndexerManager
 
             if ( lastException != null )
             {
-                // TODO: for god's sake, use Java6!
-                IOException eek = new IOException( lastException.getMessage() );
-
-                eek.initCause( lastException );
+                IOException eek = new IOException( lastException );
 
                 throw eek;
             }
@@ -1389,6 +1382,7 @@ public class DefaultIndexerManager
         if ( repo.getRepositoryKind().isFacetAvailable( GroupRepository.class ) )
         {
             GroupRepository group = repo.adaptToFacet( GroupRepository.class );
+
             for ( Repository member : group.getMemberRepositories() )
             {
                 optimizeIndex( member );
@@ -1397,9 +1391,11 @@ public class DefaultIndexerManager
 
         // local
         IndexingContext context = getRepositoryIndexContext( repo );
+
         if ( context != null )
         {
             getLogger().debug( "Optimizing local index context for repository: " + repo.getId() );
+
             context.optimize();
         }
     }
